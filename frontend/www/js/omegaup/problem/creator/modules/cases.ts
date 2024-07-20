@@ -9,6 +9,7 @@ import {
   CaseRequest,
   MultipleCaseAddRequest,
   CaseLineKind,
+  CaseLineData,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -254,21 +255,21 @@ export const casesStore: Module<CasesState, RootState> = {
         (_line) => _line.lineID === lineID,
       );
       if (selectedLine === undefined) return;
-      selectedLine.data = (() => {
+      const lineData: CaseLineData = (() => {
         switch (_kind) {
           case 'line':
             return {
-              kind: 'line',
+              kind: _kind,
               value: '',
             };
           case 'multiline':
             return {
-              kind: 'multiline',
+              kind: _kind,
               value: '',
             };
           case 'array':
             return {
-              kind: 'array',
+              kind: _kind,
               size: 10,
               min: 0,
               max: 100,
@@ -277,7 +278,7 @@ export const casesStore: Module<CasesState, RootState> = {
             };
           case 'matrix':
             return {
-              kind: 'matrix',
+              kind: _kind,
               rows: 3,
               cols: 3,
               min: 0,
@@ -287,6 +288,7 @@ export const casesStore: Module<CasesState, RootState> = {
             };
         }
       })();
+      selectedLine.data = lineData;
     },
     sortLines(state, exchangePair: [number, number]) {
       const selectedGroup = state.groups.find(
