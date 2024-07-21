@@ -1,17 +1,23 @@
-# PHP, Python, and SQL files
-* .php @heduenas @pabo99
-* .py @heduenas @pabo99
-* .sql @heduenas @pabo99
+# CODEOWNERS for the used languages
 
-# Vue, TypeScript, JavaScript, HTML, and CSS files
-* .vue @carlosabcs @tvanessa
-* .ts @carlosabcs
-* .js @carlosabcs
-* .html @carlosabcs @tvanessa
-* .css @carlosabcs
+## PHP, Python, and SQL files
 
-# Lang files
-* .lang @tvanessa
+*.php @heduenas @pabo99
+*.py @heduenas @pabo99
+*.sql @heduenas @pabo99
 
-# Default owner for everything else
+## Vue, TypeScript, JavaScript, HTML, and CSS files
+
+*.vue @carlosabcs @tvanessa
+*.ts @carlosabcs
+*.js @carlosabcs
+*.html @carlosabcs @tvanessa
+*.css @carlosabcs
+
+## Lang files
+
+*.lang @tvanessa
+
+## Default owner for everything else
+
 * @heduenas
