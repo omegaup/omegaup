@@ -243,7 +243,6 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       let vueComponents = {};
       vueComponents[componentName] = component;
       let props = {
-        store: store,
         storeMapping: componentState.storeMapping,
       };
       for (let k in componentState) {
