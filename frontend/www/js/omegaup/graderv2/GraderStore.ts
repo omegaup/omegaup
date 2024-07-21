@@ -574,7 +574,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       });
       // if we call this function, we must set current case
       // or it could cause errors
-      state.currentCase = caseData.name;
+      store.commit('currentCase', caseData.name);
       state.dirty = true;
     },
     removeCase(state: GraderStore, name: string) {
@@ -645,3 +645,5 @@ const storeOptions: StoreOptions<GraderStore> = {
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
+store.commit('reset');
+export default store;

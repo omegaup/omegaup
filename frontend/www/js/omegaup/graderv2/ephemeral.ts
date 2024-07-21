@@ -7,14 +7,16 @@ import Vue from 'vue';
 import pako from 'pako';
 import GoldenLayout from 'golden-layout';
 
-import * as Util from '../grader/util';
-import CaseSelectorComponent from '../grader/CaseSelectorComponent.vue';
-import MonacoDiffComponent from '../grader/MonacoDiffComponent.vue';
-import MonacoEditorComponent from '../grader/MonacoEditorComponent.vue';
-import SettingsComponent from '../grader/SettingsComponent.vue';
-import TextEditorComponent from '../grader/TextEditorComponent.vue';
-import ZipViewerComponent from '../grader/ZipViewerComponent.vue';
-import store from '../grader/GraderStore';
+import * as Util from './util';
+import CaseSelector from './CaseSelector.vue';
+import DiffEditor from './DiffEditor.vue';
+import IDESettings from './IDESettings.vue';
+import MonacoEditor from './MonacoEditor.vue';
+import TextEditor from './TextEditor.vue';
+import ZipViewer from './ZipViewer.vue';
+
+// imports from new files
+import store from './GraderStore';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
@@ -277,37 +279,37 @@ let componentMapping = {};
 RegisterVueComponent(
   layout,
   'case-selector-component',
-  CaseSelectorComponent,
+  CaseSelector,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
   'monaco-editor-component',
-  MonacoEditorComponent,
+  MonacoEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
   'monaco-diff-component',
-  MonacoDiffComponent,
+  DiffEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
   'settings-component',
-  SettingsComponent,
+  IDESettings,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
   'text-editor-component',
-  TextEditorComponent,
+  TextEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
   'zip-viewer-component',
-  ZipViewerComponent,
+  ZipViewer,
   componentMapping,
 );
 
@@ -826,6 +828,7 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       out: caseData['out'],
     });
   }
+
   // delete cases that are not in settings cases
   for (let caseName of Object.keys(store.state.request.input.cases)) {
     if (Object.prototype.hasOwnProperty.call(settings.cases, caseName))
