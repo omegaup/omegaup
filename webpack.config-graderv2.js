@@ -46,13 +46,17 @@ module.exports = {
           transpileOnly: true,
         },
       },
+      {
+        test: /\.scss$/,
+        use: ['vue-style-loader', 'css-loader', 'sass-loader'],
+      },
     ],
   },
   optimization: {
     realContentHash: true,
   },
   resolve: {
-    extensions: ['.ts', '.js', '.vue',],
+    extensions: ['.ts', '.js', '.vue'],
     alias: {
       vue$: 'vue/dist/vue.common.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
