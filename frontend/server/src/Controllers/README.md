@@ -209,6 +209,7 @@
 - [Submission](#submission)
   - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
+  - [`/api/submission/setFeedbackList/`](#apisubmissionsetfeedbacklist)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -2175,7 +2176,7 @@ _Nothing_
 
 ### Description
 
-Request feedback
+Request feedback and its corresponding notification
 
 ### Parameters
 
@@ -2314,6 +2315,7 @@ Edit Course contents
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
+| `recommended`               | `bool\|null`                                |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
@@ -4161,7 +4163,8 @@ for given page and username.
 
 ### Description
 
-Updates the admin feedback for a submission or creates the request feedback
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
 
 ### Parameters
 
@@ -4181,6 +4184,26 @@ Updates the admin feedback for a submission or creates the request feedback
 | -------------------------- | ------------------------------ |
 | `submissionFeedback`       | `dao.SubmissionFeedback`       |
 | `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
+
+## `/api/submission/setFeedbackList/`
+
+### Description
+
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback_list`    | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Tag
 
