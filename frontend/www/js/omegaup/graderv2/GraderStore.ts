@@ -248,6 +248,12 @@ const storeOptions: StoreOptions<GraderStore> = {
     'request.input.interactive.main_source'(state: GraderStore) {
       return state.request.input.interactive?.main_source || '';
     },
+    'request.input.interactive.language'(state: GraderStore) {
+      return state.request.input.interactive?.language || '';
+    },
+    Tolenrance(state: GraderStore) {
+      return state.request.input.validator?.tolerance || -1;
+    },
     isCustomValidator(state: GraderStore) {
       return !!state.request.input.validator.custom_validator;
     },
@@ -530,7 +536,9 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       // update with interactive problem templates for each language
       // dont forget to update all cppxx and pyx templates
-      for (const extension in templates) {
+      for (const lang in templates) {
+        const extension = Util.supportedLanguages[lang].extension;
+
         if (Object.prototype.hasOwnProperty.call(templates, extension)) {
           for (const language of Util.extensionToLanguages[extension]) {
             interactiveTemplates[language] = templates[extension];
