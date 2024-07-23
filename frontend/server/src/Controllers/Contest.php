@@ -1716,12 +1716,36 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateContest($contestAlias);
+        $admins = \OmegaUp\DAO\UserRoles::getContestAdmins($contest);
+        $notificationContents = [
+            'type' => \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REQUEST,
+            'body' => [
+                'localizationString' => new \OmegaUp\TranslationString(
+                    'notificationContestRegisterRequest'
+                ),
+                'localizationParams' => [
+                    'username' => $r->identity->username,
+                    'contestTitle' => $contest->title,
+                ],
+                'url' => "/contest/{$contest->alias}/edit/#contestants",
+                'iconUrl' => '/media/info.png',
+            ],
+        ];
 
         \OmegaUp\DAO\ProblemsetIdentityRequest::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
             'problemset_id' => $contest->problemset_id,
             'request_time' => \OmegaUp\Time::get(),
         ]));
+
+        foreach ($admins as $admin) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode($notificationContents),
+                ])
+            );
+        }
 
         return ['status' => 'ok'];
     }
@@ -4628,7 +4652,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             . $targetIdentity->username . ', state=' . $resolution
         );
 
-        return ['status' => 'ok'];
+        $response = ['status' => 'ok'];
+
+        if (is_null($targetIdentity->user_id)) {
+            return $response;
+        }
+
+        \OmegaUp\Controllers\Notification::createForCourseAccessRequest(
+            $contest,
+            $targetIdentity->user_id,
+            $request->accepted
+        );
+
+        return $response;
     }
 
     /**
