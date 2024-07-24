@@ -24,11 +24,12 @@ else
         ARGS="$@"
 fi
 
-# Reset log file.
-# rm -f ${GENERAL_LOG_FILE}
-mysql -uroot -e "SET GLOBAL general_log = 'ON';"
-mysql -uroot -e "SET GLOBAL log_output = 'TABLE';"
-mysql -uroot -e "TRUNCATE TABLE mysql.general_log;"
+# Enable General Query Log
+mysql -h localhost -P 13306 -uroot -e "SET GLOBAL general_log = 'OFF';"
+mysql -h localhost -P 13306 -uroot -e "ALTER TABLE mysql.general_log ENGINE = MyISAM;"
+mysql -h localhost -P 13306 -uroot -e "TRUNCATE TABLE mysql.general_log;"
+mysql -h localhost -P 13306 -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -h localhost -P 13306 -uroot -e "SELECT argument FROM mysql.general_log;"
 
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
@@ -37,4 +38,4 @@ exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	"${ARGS[@]}"
 
 # Disable General Query Log
-mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
+mysql -h localhost -P 13306 -uroot -e "SET GLOBAL general_log = 'OFF';"
