@@ -90,13 +90,13 @@
                       variant="light"
                     >
                       <b-dropdown-item
-                        v-for="lineKindoption in lineKindOptions"
-                        :key="lineKindoption.kind"
+                        v-for="lineKindOption in lineKindOptions"
+                        :key="lineKindOption.kind"
                         @click="
-                          editLineKind([line.lineID, lineKindoption.kind])
+                          editLineKind([line.lineID, lineKindOption.kind])
                         "
                       >
-                        {{ lineKindoption.type }}
+                        {{ lineKindOption.type }}
                       </b-dropdown-item>
                     </b-dropdown>
                     <b-button
