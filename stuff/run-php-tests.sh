@@ -24,19 +24,12 @@ else
         ARGS="$@"
 fi
 
-# Path to the general query log file
-GENERAL_LOG_DIRECTORY="/tmp/omegaup"
-GENERAL_LOG_FILE="${GENERAL_LOG_DIRECTORY}/general_mysql.log"
-
-# Create the log file and set permissions
-mkdir -p ${GENERAL_LOG_DIRECTORY}
-chmod 755 ${GENERAL_LOG_DIRECTORY}
-touch ${GENERAL_LOG_FILE}
-chmod 666 ${GENERAL_LOG_FILE}
-
 # Enable General Query Log
-mysql -h localhost -P 13306 -uroot -e "SET GLOBAL general_log = 'ON';"
-mysql -h localhost -P 13306 -urrot -e "SET GLOBAL general_log_file = '${GENERAL_LOG_FILE}';"
+mysql -h mysql -P 13306 -uroot -e "SET GLOBAL general_log = 'OFF';"
+mysql -h mysql -P 13306 -uroot -e "ALTER TABLE mysql.general_log ENGINE = MyISAM;"
+mysql -h mysql -P 13306 -uroot -e "TRUNCATE TABLE mysql.general_log;"
+mysql -h mysql -P 13306 -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -h mysql -P 13306 -uroot -e "SELECT argument FROM mysql.general_log;"
 
 exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	--bootstrap "${OMEGAUP_ROOT}/frontend/tests/bootstrap.php" \
@@ -45,4 +38,4 @@ exec "${OMEGAUP_ROOT}/vendor/bin/phpunit" \
 	"${ARGS[@]}"
 
 # Disable General Query Log
-mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
+mysql -h mysql -P 13306 -uroot -e "SET GLOBAL general_log = 'OFF';"
