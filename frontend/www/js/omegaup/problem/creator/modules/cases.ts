@@ -290,7 +290,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const newLine: CaseLine = {
         lineID: uuid(),
         caseID: selectedCase.caseID,
-        label: 'NEW',
+        label: '',
         data: {
           kind: 'line',
           value: '',
@@ -362,6 +362,21 @@ export const casesStore: Module<CasesState, RootState> = {
           (group) => group.groupID === state.selected.groupID,
         ) ?? null
       );
+    },
+    getLinesFromSelectedCase: (state) => {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (selectedGroup === undefined) {
+        return [];
+      }
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID === state.selected.caseID,
+      );
+      if (selectedCase === undefined) {
+        return [];
+      }
+      return selectedCase.lines;
     },
     getUngroupedCases: (state) => {
       return state.groups.filter((group) => group.ungroupedCase === true);
