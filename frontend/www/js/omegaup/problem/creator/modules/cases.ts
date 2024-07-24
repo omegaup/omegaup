@@ -232,31 +232,31 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) return;
+      if (!selectedGroup) return;
       const selectedCase = selectedGroup.cases.find(
         (_case) => _case.caseID === state.selected.caseID,
       );
-      if (selectedCase === undefined) return;
+      if (!selectedCase) return;
       const selectedLine = selectedCase.lines.find(
         (_line) => _line.lineID === lineID,
       );
-      if (selectedLine === undefined) return;
+      if (!selectedLine) return;
       selectedLine.data.value = value;
     },
     editLineKind(state, [lineID, _kind]: [LineID, CaseLineKind]) {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) return;
+      if (!selectedGroup) return;
       const selectedCase = selectedGroup.cases.find(
         (_case) => _case.caseID === state.selected.caseID,
       );
-      if (selectedCase === undefined) return;
+      if (!selectedCase) return;
       const selectedLine = selectedCase.lines.find(
         (_line) => _line.lineID === lineID,
       );
       const defaultMatrixDistinctType: MatrixDistinctType = 'none';
-      if (selectedLine === undefined) return;
+      if (!selectedLine) return;
       const lineData: CaseLineData = (() => {
         switch (_kind) {
           case 'line':
@@ -370,7 +370,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const lineToUpdate = selectedCase.lines.find(
         (line) => line.lineID === newLine.lineID,
       );
-      if (lineToUpdate === undefined) {
+      if (!lineToUpdate) {
         return;
       }
       lineToUpdate.label = newLine.label;
@@ -414,7 +414,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) {
+      if (!selectedGroup) {
         return null;
       }
       return (
@@ -434,13 +434,13 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) {
+      if (!selectedGroup) {
         return [];
       }
       const selectedCase = selectedGroup.cases.find(
         (_case) => _case.caseID === state.selected.caseID,
       );
-      if (selectedCase === undefined) {
+      if (!selectedCase) {
         return [];
       }
       return selectedCase.lines;
