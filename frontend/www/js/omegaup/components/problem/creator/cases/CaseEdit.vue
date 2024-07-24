@@ -67,9 +67,7 @@
                   </b-col>
                   <b-col cols="5" class="pr-0 text-center">
                     <b-form-input
-                      v-if="
-                        line.data.kind === 'line' || line.data.kind === 'array'
-                      "
+                      v-if="getLineDisplay(line) === LineDisplayOption.LINE"
                       v-model="line.data.value"
                       size="sm"
                       class="mt-3 mb-3"
@@ -77,8 +75,7 @@
                     />
                     <b-form-textarea
                       v-if="
-                        line.data.kind === 'multiline' ||
-                        line.data.kind === 'matrix'
+                        getLineDisplay(line) === LineDisplayOption.MULTILINE
                       "
                       v-model="line.data.value"
                       class="mt-3 mb-3 text-nowrap overflow-auto w-100"
@@ -104,8 +101,8 @@
                     </b-dropdown>
                     <b-button
                       v-if="
-                        line.data.kind === 'array' ||
-                        line.data.kind === 'matrix'
+                        getEditIconDisplay(line) ===
+                        EditIconDisplayOption.EDIT_ICON
                       "
                       size="sm"
                       type="button"
