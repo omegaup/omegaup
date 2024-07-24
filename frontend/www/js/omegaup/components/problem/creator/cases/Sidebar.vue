@@ -3,9 +3,55 @@
     <div class="d-flex align-items-center justify-content-between">
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
       <div>
-        <b-button size="sm" variant="primary" class="mr-2">
+        <b-button
+          size="sm"
+          variant="primary"
+          class="mr-2"
+          @click="showLayoutSideBar = !showLayoutSideBar"
+        >
           <BIconLayoutSidebar />
         </b-button>
+        <b-sidebar
+          v-model="showLayoutSideBar"
+          right
+          title="Layouts"
+          shadow
+          no-header-close
+          width="385px"
+        >
+          <omegaup-problem-creator-layout-sidebar />
+          <div class="fixed-bottom">
+            <b-container>
+              <b-row class="justify-content-center">
+                <b-button
+                  class="w-84 mb-2"
+                  variant="success"
+                  @click="addLayoutFromSelectedCase"
+                >
+                  Add Layout from selected case
+                </b-button>
+              </b-row>
+              <b-row class="justify-content-center">
+                <b-button
+                  class="w-84 mb-2"
+                  variant="success"
+                  @click="addNewLayout"
+                >
+                  Add new Layout
+                </b-button>
+              </b-row>
+              <b-row class="justify-content-center">
+                <b-button
+                  class="w-84 mb-3"
+                  variant="danger"
+                  @click="showLayoutSideBar = false"
+                >
+                  Close Layout Bar
+                </b-button>
+              </b-row>
+            </b-container>
+          </div>
+        </b-sidebar>
         <b-button
           data-add-window
           size="sm"
@@ -211,6 +257,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import problemCreator_LayoutSideBar from './LayoutSideBar.vue';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
 import {
@@ -222,9 +269,14 @@ import {
 
 const casesStore = namespace('casesStore');
 
-@Component
+@Component({
+  components: {
+    'omegaup-problem-creator-layout-sidebar': problemCreator_LayoutSideBar,
+  },
+})
 export default class Sidebar extends Vue {
   T = T;
+  showLayoutSideBar = false;
 
   @Prop() showWindow!: boolean;
 
@@ -235,6 +287,10 @@ export default class Sidebar extends Vue {
   @casesStore.Getter('getTotalPointsForUngroupedCases')
   getTotalPointsForUngroupedCases!: number;
   @casesStore.Mutation('deleteGroup') deleteGroup!: (groupID: GroupID) => void;
+  @casesStore.Mutation('addLayoutFromSelectedCase')
+  addLayoutFromSelectedCase!: () => void;
+  @casesStore.Mutation('addNewLayout')
+  addNewLayout!: () => void;
   @casesStore.Mutation('deleteCase') deleteCase!: ({
     groupID,
     caseID,
