@@ -47,8 +47,11 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Setup MySQL host
-        run: echo '127.0.0.1 mysql' | sudo tee -a /etc/hosts
+      - name: Add rabbitmq as alias to localhost
+        run: |
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 mysql
+          EOF
 
       - name: Add rabbitmq as alias to localhost
         run: |
