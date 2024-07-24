@@ -116,8 +116,6 @@ services:
       - --max_execution_time=30000
       - --lock_wait_timeout=10
       - --wait_timeout=20
-      - --general_log=1
-      - --log_output=TABLE
     expose:
       - '13306'
     volumes:
