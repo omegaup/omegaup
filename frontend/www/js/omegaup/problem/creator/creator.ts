@@ -5,16 +5,9 @@ import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import store from './store';
 import T from '../../lang';
 import * as ui from '../../ui';
-import Sortable from 'sortablejs';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-Vue.directive('Sortable', {
-  inserted: (el: HTMLElement, binding) => {
-    new Sortable(el, binding.value || {});
-  },
-});
 
 OmegaUp.on('ready', () => {
   Vue.use(BootstrapVue);
