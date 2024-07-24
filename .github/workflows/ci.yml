@@ -14,7 +14,7 @@ jobs:
       mysql:
         image: mysql:8.0.23
         ports:
-          - 13306:13306
+          - 13306:3306
         env:
           MYSQL_ROOT_PASSWORD:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -122,6 +122,17 @@ jobs:
             --username=root --password= --hostname=localhost --port=13306 \
             --database=omegaup-test \
             validate --all < /dev/null
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping --host=localhost --port=13306 --protocol=tcp --user=root --password=omegaup > /dev/null 2>&1; then
+              echo "MySQL is up!"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 1
+          done
 
       - name: Run tests
         env:
