@@ -35,5 +35,12 @@ export default new Vuex.Store({
     updateCodeExtension(state: StoreState, newExtension: string) {
       state.problemCodeExtension = newExtension;
     },
+    resetStore(state: StoreState) {
+      state.problemName = T.problemCreatorNewProblem;
+      state.problemMarkdown = T.problemCreatorEmpty;
+      state.problemCodeContent = T.problemCreatorEmpty;
+      state.problemCodeExtension = T.problemCreatorEmpty;
+      state.problemSolutionMarkdown = T.problemCreatorEmpty;
+    },
   },
 });
