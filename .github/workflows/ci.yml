@@ -14,14 +14,14 @@ jobs:
       mysql:
         image: mysql:8.0.23
         ports:
-          - 13306:3306
+          - 13306:13306
         env:
           MYSQL_ROOT_PASSWORD:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: omegaup
           MYSQL_PASSWORD: omegaup
           MYSQL_DATABASE: omegaup-test
-          MYSQL_TCP_PORT: 3306
+          MYSQL_TCP_PORT: 13306
 
       redis:
         image: redis
