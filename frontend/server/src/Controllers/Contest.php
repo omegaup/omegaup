@@ -4782,6 +4782,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
     }
+
     /**
      * Update a Contest
      *

@@ -63,6 +63,7 @@
           <div
             v-if="currentAdmissionMode === AdmissionMode.Public"
             class="form-group"
+            data-toggle-public-course-list
           >
             <omegaup-toggle-switch
               v-if="shouldShowPublicOption"
