@@ -6,7 +6,6 @@ set -e
 # returns.
 
 OMEGAUP_ROOT=$(/usr/bin/git rev-parse --show-toplevel)
-MYSQL_TCP_PORT=13306
 
 # Clean up anything that might have been left from a previous run.
 if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
@@ -14,13 +13,13 @@ if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
 fi
 
 # Enable General Query Log
-mysql -h mysql -P ${MYSQL_TCP_PORT} -uroot -e "TRUNCATE TABLE mysql.general_log;"
-mysql -h mysql -P ${MYSQL_TCP_PORT} -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -h mysql -uroot -e "TRUNCATE TABLE mysql.general_log;"
+mysql -h mysql -uroot -e "SET GLOBAL general_log = 'ON';"
 
 "${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
 
 # Disable General Query Log
-mysql -h mysql -P ${MYSQL_TCP_PORT} -uroot -e "SET GLOBAL general_log = 'OFF';"
+mysql -h mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \

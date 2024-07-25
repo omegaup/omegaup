@@ -129,17 +129,6 @@ jobs:
             --database=omegaup-test \
             validate --all < /dev/null
 
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in $(seq 1 30); do
-            if mysqladmin ping --host=localhost --port=13306 --protocol=tcp --user=root --password=omegaup > /dev/null 2>&1; then
-              echo "MySQL is up!"
-              break
-            fi
-            echo "Waiting for MySQL..."
-            sleep 1
-          done
-
       - name: Run tests
         env:
           MYSQL_TCP_PORT: 13306
