@@ -1578,6 +1578,7 @@ const translations: { [key: string]: string; } = {
   submitFeedbackPlaceholder: "(En73r y0ur f33dback (0p7i0na1))",
   submitFeedbackRequireConfirmation: "(Submi7 f33dback)",
   submitFeedbackSubmit: "(Submi7)",
+  systemInMaintainance: "(Th3 C0d3r 0f 7h3 M0n7h 5y573m i5 und3r main73nanc3.\n\nW3 wi11 b3 back 500n.)",
   tagAdded: "(Tag 5ucc355fu11y add3d!)",
   tagNotFound: "(Tag n07 f0und)",
   tagPrefixRestricted: "(Th3 'pr0b13mTag' pr3fix can'7 b3 u53d f0r 7ag5 add3d manua11y.)",
