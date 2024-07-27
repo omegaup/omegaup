@@ -21,7 +21,7 @@
           {{ T.problemCreatorGenerateProblem }}</span
         >
       </b-button>
-      <b-button variant="warning" size="sm">
+      <b-button variant="warning" size="sm" @click="createNewProblem">
         <BIconPlus class="mr-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
@@ -43,6 +43,12 @@ export default class Header extends Vue {
   @Watch('name')
   onNameChanged(newProblemName: string) {
     this.$store.commit('updateName', newProblemName);
+  }
+
+  createNewProblem() {
+    this.$store.commit('resetStore');
+    this.$store.commit('casesStore/resetStore');
+    window.location.reload();
   }
 }
 </script>

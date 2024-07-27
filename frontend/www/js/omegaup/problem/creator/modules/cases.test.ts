@@ -371,7 +371,7 @@ describe('cases.ts', () => {
           max: 10,
           min: 1,
           size: 2,
-          value: [1, 2],
+          value: '1 2',
         },
       },
     ];
@@ -396,7 +396,7 @@ describe('cases.ts', () => {
     const lineToBeExpected: CaseLine = {
       lineID: lineID,
       caseID: store.state.casesStore.groups[0].cases[0].caseID,
-      label: 'NEW',
+      label: '',
       data: { kind: 'line', value: '' },
     };
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(1);
@@ -427,7 +427,7 @@ describe('cases.ts', () => {
         max: 10,
         min: 1,
         size: 2,
-        value: [1, 2],
+        value: '1, 2',
       },
     };
     store.dispatch('casesStore/updateLine', updatedLine);

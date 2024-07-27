@@ -248,7 +248,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
-     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
     public static function getContestAdmins(\OmegaUp\DAO\VO\Contests $contest): array {
         return self::getAdmins(intval($contest->acl_id));
@@ -264,7 +264,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
-     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
     public static function getProblemAdmins(\OmegaUp\DAO\VO\Problems $problem): array {
         return self::getAdmins(intval($problem->acl_id));

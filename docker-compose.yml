@@ -25,6 +25,7 @@ services:
         mode: host
     environment:
       CI: "${CI:-false}"
+      MYSQL_TCP_PORT: 13306
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
