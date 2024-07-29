@@ -228,48 +228,6 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
-    editLineValue(state, [selectedLine, value]: [CaseLine, string]) {
-      if (!selectedLine) return;
-      selectedLine.data.value = value;
-    },
-    editLineKind(state, [selectedLine, _kind]: [CaseLine, CaseLineKind]) {
-      if (!selectedLine) return;
-      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
-      const lineData: CaseLineData = (() => {
-        switch (_kind) {
-          case 'line':
-            return {
-              kind: _kind,
-              value: '',
-            };
-          case 'multiline':
-            return {
-              kind: _kind,
-              value: '',
-            };
-          case 'array':
-            return {
-              kind: _kind,
-              size: 10,
-              min: 0,
-              max: 100,
-              distinct: false,
-              value: '',
-            };
-          case 'matrix':
-            return {
-              kind: _kind,
-              rows: 3,
-              cols: 3,
-              min: 0,
-              max: 100,
-              distinct: defaultMatrixDistinctType,
-              value: '',
-            };
-        }
-      })();
-      selectedLine.data = lineData;
-    },
     setLayout(state, layoutLines: CaseLine[]) {
       state.layout = layoutLines;
     },
@@ -330,16 +288,49 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = lines;
     },
-    editLineValue(
-      { commit, getters },
-      [lineID, value]: [LineID, CaseLineKind],
-    ) {
+    editLineValue({ getters }, [lineID, value]: [LineID, CaseLineKind]) {
       const selectedLine: CaseLine = getters.getLineFromID(lineID);
-      commit('editLineValue', [selectedLine, value]);
+      if (!selectedLine) return;
+      selectedLine.data.value = value;
     },
-    editLineKind({ commit, getters }, [lineID, _kind]: [LineID, CaseLineKind]) {
+    editLineKind({ getters }, [lineID, _kind]: [LineID, CaseLineKind]) {
       const selectedLine: CaseLine = getters.getLineFromID(lineID);
-      commit('editLineKind', [selectedLine, _kind]);
+      if (!selectedLine) return;
+      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
+      const lineData: CaseLineData = (() => {
+        switch (_kind) {
+          case 'line':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'multiline':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'array':
+            return {
+              kind: _kind,
+              size: 10,
+              min: 0,
+              max: 100,
+              distinct: false,
+              value: '',
+            };
+          case 'matrix':
+            return {
+              kind: _kind,
+              rows: 3,
+              cols: 3,
+              min: 0,
+              max: 100,
+              distinct: defaultMatrixDistinctType,
+              value: '',
+            };
+        }
+      })();
+      selectedLine.data = lineData;
     },
     addNewLine({ getters }) {
       const selectedCase: Case = getters.getSelectedCase;
