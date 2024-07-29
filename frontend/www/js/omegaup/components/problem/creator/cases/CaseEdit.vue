@@ -436,32 +436,152 @@ export default class CaseEdit extends Vue {
     )?.type;
   }
 
+  getDistinctArrayContents(
+    size: number,
+    low: number = 0,
+    high: number = 0,
+  ): string {
+    const generatedArray = new Set<number>();
+    while (generatedArray.size < size) {
+      generatedArray.add(
+        Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+      );
+    }
+    return [...generatedArray].join(' ');
+  }
+
+  getNonDistinctArrayContents(
+    size: number,
+    low: number = 0,
+    high: number = 0,
+  ): string {
+    const generatedArray = [];
+    while (generatedArray.length < size) {
+      generatedArray.push(
+        Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+      );
+    }
+    return [...generatedArray].join(' ');
+  }
+
   getArrayContent(
     size: number,
     low: number = 0,
     high: number = 0,
     distinct: boolean = false,
-  ) {
+  ): string {
     if (distinct && high - low + 1 < size) {
       return '';
     }
-    let generatedArray: number[] | Set<number>;
     if (distinct) {
-      generatedArray = new Set<number>();
-      while (generatedArray.size < size) {
-        generatedArray.add(
-          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
-        );
-      }
+      return this.getDistinctArrayContents(size, low, high);
     } else {
-      generatedArray = [];
-      while (generatedArray.length < size) {
-        generatedArray.push(
+      return this.getNonDistinctArrayContents(size, low, high);
+    }
+  }
+
+  getNoneDistinctMatrixContents(
+    rows: number,
+    columns: number,
+    low: number = 0,
+    high: number = 0,
+  ) {
+    const generatedArray: number[] = this.getNonDistinctArrayContents(
+      rows * columns,
+      low,
+      high,
+    )
+      .split(' ')
+      .map(Number);
+
+    let matrix = [];
+    let index = 0;
+
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < columns; j++) {
+        row.push(generatedArray[index]);
+        index++;
+      }
+      matrix.push(row);
+    }
+
+    return matrix.map((row) => row.join(' ')).join('\n');
+  }
+
+  getRowsDistinctMatrixContents(
+    rows: number,
+    columns: number,
+    low: number = 0,
+    high: number = 0,
+  ) {
+    const generatedRows: Set<number>[] = Array.from(
+      { length: rows },
+      () => new Set<number>(),
+    );
+    for (let i = 0; i < rows; i++) {
+      while (generatedRows[i].size < columns) {
+        generatedRows[i].add(
           Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
         );
       }
     }
-    return [...generatedArray].join(' ');
+    return generatedRows.map((row) => [...row].join(' ')).join('\n');
+  }
+
+  getColsDistinctMatrixContents(
+    rows: number,
+    columns: number,
+    low: number = 0,
+    high: number = 0,
+  ) {
+    const generatedColumns: Set<number>[] = Array.from(
+      { length: columns },
+      () => new Set<number>(),
+    );
+    for (let i = 0; i < columns; i++) {
+      while (generatedColumns[i].size < rows) {
+        generatedColumns[i].add(
+          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        );
+      }
+    }
+    const generatedColumnsList: number[][] = generatedColumns.map((column) =>
+      Array.from(column),
+    );
+    const transposedColumnsList: number[][] = generatedColumnsList[0].map(
+      (_, rowIndex) => generatedColumnsList.map((column) => column[rowIndex]),
+    );
+    return transposedColumnsList.map((row) => row.join(' ')).join('\n');
+  }
+
+  getAllDistinctMatrixContents(
+    rows: number,
+    columns: number,
+    low: number = 0,
+    high: number = 0,
+  ) {
+    const generatedArray: number[] = this.getDistinctArrayContents(
+      rows * columns,
+      low,
+      high,
+    )
+      .split(' ')
+      .map(Number);
+
+    let matrix = [];
+    let index = 0;
+
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < columns; j++) {
+        row.push(generatedArray[index]);
+        index++;
+      }
+      matrix.push(row);
+    }
+
+    return matrix.map((row) => row.join(' ')).join('\n');
   }
 
   getMatrixContent(
@@ -480,84 +600,17 @@ export default class CaseEdit extends Vue {
     if (distinct === 'cols' && high - low + 1 < rows) {
       return '';
     }
-    let matrix = [];
     if (distinct === 'none') {
-      const generatedArray: number[] = [];
-      while (generatedArray.length < rows * columns) {
-        generatedArray.push(
-          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
-        );
-      }
-
-      let index = 0;
-
-      for (let i = 0; i < rows; i++) {
-        let row = [];
-        for (let j = 0; j < columns; j++) {
-          row.push(generatedArray[index]);
-          index++;
-        }
-        matrix.push(row);
-      }
-
-      return matrix.map((row) => row.join(' ')).join('\n');
+      return this.getNoneDistinctMatrixContents(rows, columns, low, high);
     }
     if (distinct === 'both') {
-      const generatedArray: Set<number> = new Set<number>();
-      while (generatedArray.size < rows * columns) {
-        generatedArray.add(
-          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
-        );
-      }
-
-      const generatedArrayList: number[] = Array.from(generatedArray);
-      let index = 0;
-
-      for (let i = 0; i < rows; i++) {
-        let row = [];
-        for (let j = 0; j < columns; j++) {
-          row.push(generatedArrayList[index]);
-          index++;
-        }
-        matrix.push(row);
-      }
-      return matrix.map((row) => row.join(' ')).join('\n');
+      return this.getAllDistinctMatrixContents(rows, columns, low, high);
     }
     if (distinct === 'rows') {
-      const generatedRows: Set<number>[] = Array.from(
-        { length: rows },
-        () => new Set<number>(),
-      );
-      for (let i = 0; i < rows; i++) {
-        while (generatedRows[i].size < columns) {
-          generatedRows[i].add(
-            Number(low.toString()) +
-              Math.floor(Math.random() * (high - low + 1)),
-          );
-        }
-      }
-      return generatedRows.map((row) => [...row].join(' ')).join('\n');
+      return this.getRowsDistinctMatrixContents(rows, columns, low, high);
     }
     if (distinct === 'cols') {
-      const generatedColumns: Set<number>[] = Array.from(
-        { length: columns },
-        () => new Set<number>(),
-      );
-      for (let i = 0; i < columns; i++) {
-        while (generatedColumns[i].size < rows) {
-          generatedColumns[i].add(
-            Number(low.toString()) +
-              Math.floor(Math.random() * (high - low + 1)),
-          );
-        }
-      }
-      const generatedColumnsList: number[][] = generatedColumns.map((column) =>
-        Array.from(column),
-      );
-      const transposedColumnsList: number[][] = generatedColumnsList[0].map(
-        (_, rowIndex) => generatedColumnsList.map((column) => column[rowIndex]),
-      );
-      return transposedColumnsList.map((row) => row.join(' ')).join('\n');
+      return this.getColsDistinctMatrixContents(rows, columns, low, high);
     }
     return '';
   }
