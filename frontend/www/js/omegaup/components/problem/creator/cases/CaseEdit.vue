@@ -358,11 +358,11 @@ export default class CaseEdit extends Vue {
   getLinesFromSelectedCase!: CaseLine[];
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
 
-  @casesStore.Mutation('editLineKind') editLineKind!: ([lineID, kind]: [
+  @casesStore.Action('editLineKind') editLineKind!: ([lineID, kind]: [
     LineID,
     CaseLineKind,
   ]) => void;
-  @casesStore.Mutation('editLineValue') editLineValue!: ([lineID, value]: [
+  @casesStore.Action('editLineValue') editLineValue!: ([lineID, value]: [
     LineID,
     string,
   ]) => void;

@@ -228,35 +228,13 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
-    editLineValue(state, [lineID, value]: [LineID, string]) {
-      const selectedGroup = state.groups.find(
-        (group) => group.groupID === state.selected.groupID,
-      );
-      if (!selectedGroup) return;
-      const selectedCase = selectedGroup.cases.find(
-        (_case) => _case.caseID === state.selected.caseID,
-      );
-      if (!selectedCase) return;
-      const selectedLine = selectedCase.lines.find(
-        (_line) => _line.lineID === lineID,
-      );
+    editLineValue(state, [selectedLine, value]: [CaseLine, string]) {
       if (!selectedLine) return;
       selectedLine.data.value = value;
     },
-    editLineKind(state, [lineID, _kind]: [LineID, CaseLineKind]) {
-      const selectedGroup = state.groups.find(
-        (group) => group.groupID === state.selected.groupID,
-      );
-      if (!selectedGroup) return;
-      const selectedCase = selectedGroup.cases.find(
-        (_case) => _case.caseID === state.selected.caseID,
-      );
-      if (!selectedCase) return;
-      const selectedLine = selectedCase.lines.find(
-        (_line) => _line.lineID === lineID,
-      );
-      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
+    editLineKind(state, [selectedLine, _kind]: [CaseLine, CaseLineKind]) {
       if (!selectedLine) return;
+      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
       const lineData: CaseLineData = (() => {
         switch (_kind) {
           case 'line':
@@ -352,6 +330,17 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = lines;
     },
+    editLineValue(
+      { commit, getters },
+      [lineID, value]: [LineID, CaseLineKind],
+    ) {
+      const selectedLine: CaseLine = getters.getLineFromID(lineID);
+      commit('editLineValue', [selectedLine, value]);
+    },
+    editLineKind({ commit, getters }, [lineID, _kind]: [LineID, CaseLineKind]) {
+      const selectedLine: CaseLine = getters.getLineFromID(lineID);
+      commit('editLineKind', [selectedLine, _kind]);
+    },
     addNewLine({ getters }) {
       const selectedCase: Case = getters.getSelectedCase;
       const newLine: CaseLine = {
@@ -429,6 +418,27 @@ export const casesStore: Module<CasesState, RootState> = {
           (group) => group.groupID === state.selected.groupID,
         ) ?? null
       );
+    },
+    getLineFromID: (state) => (lineID: LineID) => {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (!selectedGroup) {
+        return null;
+      }
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID === state.selected.caseID,
+      );
+      if (!selectedCase) {
+        return null;
+      }
+      const selectedLine = selectedCase.lines.find(
+        (line) => line.lineID === lineID,
+      );
+      if (!selectedLine) {
+        return null;
+      }
+      return selectedLine;
     },
     getLinesFromSelectedCase: (state) => {
       const selectedGroup = state.groups.find(
