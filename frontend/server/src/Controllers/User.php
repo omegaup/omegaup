@@ -4160,6 +4160,17 @@ class User extends \OmegaUp\Controllers\Controller {
             // Do nothing. Not logged user can access here
             $r->identity = null;
         }
+        $currentTimeStamp = \OmegaUp\Time::get();
+        $currentDate = date('Y-m-d', $currentTimeStamp);
+        $firstDayOfNextMonth = new \DateTime($currentDate);
+        $firstDayOfNextMonth->modify('first day of next month');
+        $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
+
+        $isMentor = !is_null(
+            $r->identity
+        ) && \OmegaUp\Authorization::isMentor(
+            $r->identity
+        );
         $category = $r->ensureOptionalEnum(
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
@@ -4174,16 +4185,63 @@ class User extends \OmegaUp\Controllers\Controller {
                 'omegaupTitleCodersofthemonthFemale'
             );
         }
+        $candidates = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
+            $dateToSelect,
+            $category
+        );
+        $bestCoders = [];
+        foreach ($candidates as $candidate) {
+            unset($candidate['user_id']);
+            $bestCoders[] = $candidate;
+        }
+
+        $response = [
+            'codersOfCurrentMonth' => self::processCodersList(
+                \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonth(
+                    $category
+                )
+            ),
+            'codersOfPreviousMonth' => self::processCodersList(
+                \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
+                    $currentDate,
+                    $category
+                )
+            ),
+            'candidatesToCoderOfTheMonth' => self::processCodersList(
+                $bestCoders
+            ),
+            'isMentor' => $isMentor,
+            'category' => $category,
+        ];
+
+        if (!$isMentor) {
+            return [
+                'templateProperties' => [
+                    'payload' => $response,
+                    'title' => $title,
+                ],
+                'entrypoint' => 'coder_of_the_month',
+            ];
+        }
+
+        $response['options'] = [
+            'canChooseCoder' =>
+                \OmegaUp\Authorization::canChooseCoderOrSchool(
+                    $currentTimeStamp
+                ),
+            'coderIsSelected' =>
+                !empty(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
+                        $dateToSelect,
+                        autoselected: false,
+                        category: $category,
+                    )
+                ),
+        ];
 
         return [
             'templateProperties' => [
-                'payload' => [
-                    'codersOfCurrentMonth' => [],
-                    'codersOfPreviousMonth' => [],
-                    'candidatesToCoderOfTheMonth' => [],
-                    'isMentor' => false,
-                    'category' => $category,
-                ],
+                'payload' => $response,
                 'title' => $title,
             ],
             'entrypoint' => 'coder_of_the_month',
