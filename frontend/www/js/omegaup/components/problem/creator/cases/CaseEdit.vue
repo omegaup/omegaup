@@ -230,9 +230,6 @@ export default class CaseEdit extends Vue {
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
-  @casesStore.Action('sortLines') sortLines!: (
-    exchangePair: [number, number],
-  ) => void;
   @casesStore.Action('deleteLinesForSelectedCase')
   deleteLinesForSelectedCase!: () => void;
 
@@ -240,12 +237,6 @@ export default class CaseEdit extends Vue {
     this.deleteLinesForSelectedCase();
     (this.$refs.dropdown as any).hide(true);
   }
-
-  updateLinesOrder(event: any) {
-    this.sortLines([event.oldIndex, event.newIndex]);
-
-  @casesStore.Action('addNewLine') addNewLine!: () => void;
-  @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
 
   LineDisplayOption = Object.freeze({
     LINE: 'line',

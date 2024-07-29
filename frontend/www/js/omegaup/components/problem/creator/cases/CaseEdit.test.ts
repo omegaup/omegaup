@@ -92,11 +92,6 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
   });
 
-  it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
-    const wrapper = shallowMount(CaseEdit, { localVue, store: store });
-    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
-  });
-
   it('Should add, modify and delete a line', async () => {
     const wrapper = mount(CaseEdit, { localVue, store: store });
 
@@ -108,14 +103,8 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    expect(wrapper.findAll('b-button-stub[class="w-100"]').length).toBe(3);
-    const dropdownButtons = wrapper.findAll('b-button-stub[class="w-100"]');
-
-    expect(dropdownButtons.at(0).text()).toBe(T.problemCreatorLinesDelete);
-    expect(dropdownButtons.at(1).text()).toBe(T.problemCreatorCaseDownloadIn);
-    expect(dropdownButtons.at(2).text()).toBe(T.problemCreatorCaseDownloadTxt);
-    const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(4);
+    const buttons = wrapper.findAll('button');
+    expect(buttons.length).toBe(7);
 
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
@@ -151,5 +140,70 @@ describe('CaseEdit.vue', () => {
 
     const formInputsUpdated = wrapper.findAll('input');
     expect(formInputsUpdated.length).toBe(0);
+  });
+
+  it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const dropdownButtons = wrapper.findAll('button.w-100');
+    expect(dropdownButtons.length).toBe(3);
+
+    expect(dropdownButtons.at(0).text()).toBe(T.problemCreatorLinesDelete);
+    expect(dropdownButtons.at(1).text()).toBe(T.problemCreatorCaseDownloadIn);
+    expect(dropdownButtons.at(2).text()).toBe(T.problemCreatorCaseDownloadTxt);
+
+    wrapper.vm.addNewLine();
+    await Vue.nextTick();
+
+    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(1);
+
+    await dropdownButtons.at(0).trigger('click');
+
+    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(0);
+
+    wrapper.vm.addNewLine();
+    wrapper.vm.addNewLine();
+    await Vue.nextTick();
+
+    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
+
+    const dropdowns = wrapper.findAll('a[role="menuitem"]');
+    expect(dropdowns.length).toBe(8);
+
+    await dropdowns.at(5).trigger('click');
+
+    const formInputs = wrapper.findAll('input');
+    const formTextArea = wrapper.find('textarea');
+
+    await formInputs.at(0).setValue('testLabel');
+    await formInputs.at(1).setValue('ome g a');
+
+    await formInputs.at(2).setValue('testLabel');
+    await formTextArea.setValue('u\np');
+
+    expect(
+      wrapper.vm.getStringifiedLinesFromCaseGroupID({
+        groupID: groupID,
+        caseID: caseID,
+      }),
+    ).toBe('ome g a\nu\np');
+
+    const mockDownload = jest.spyOn(wrapper.vm, 'downloadInputFile');
+
+    await dropdownButtons.at(1).trigger('click');
+    expect(mockDownload).toHaveBeenCalledWith('.in');
+
+    await dropdownButtons.at(2).trigger('click');
+    expect(mockDownload).toHaveBeenCalledWith('.txt');
+
+    mockDownload.mockRestore();
   });
 });
