@@ -15,12 +15,16 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
     const CERTIFICATE_AWARDED = 'certificate-awarded';
     const CONTEST_CLARIFICATION_REQUEST = 'contest-clarification-request';
     const CONTEST_CLARIFICATION_RESPONSE = 'contest-clarification-response';
+    const CONTEST_REGISTRATION_ACCEPTED = 'contest-registration-accepted';
+    const CONTEST_REGISTRATION_REJECTED = 'contest-registration-rejected';
+    const CONTEST_REGISTRATION_REQUEST = 'contest-registration-request';
     const COURSE_CLARIFICATION_REQUEST = 'course-clarification-request';
     const COURSE_CLARIFICATION_RESPONSE = 'course-clarification-response';
     const COURSE_REGISTRATION_ACCEPTED = 'course-registration-accepted';
     const COURSE_REGISTRATION_REJECTED = 'course-registration-rejected';
     const COURSE_REGISTRATION_REQUEST = 'course-registration-request';
     const COURSE_SUBMISSION_FEEDBACK = 'course-submission-feedback';
+    const COURSE_SUBMISSION_FEEDBACK_THREAD = 'course-submission-feedback-thread';
     const COURSE_REGISTRATION_MANUAL = 'course-registration-manual';
     const COURSE_ADMINISTRATOR_ADDED = 'course-administrator-added';
     const COURSE_TEACHING_ASSISTANT_ADDED = 'course-teaching-assistant-added';

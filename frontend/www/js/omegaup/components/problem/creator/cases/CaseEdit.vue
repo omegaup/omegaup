@@ -80,7 +80,7 @@
     <hr class="border-top my-2" />
     <div>
       <table class="table">
-        <tbody v-sortable="{ onUpdate: updateLinesOrder }">
+        <tbody>
           <tr v-for="line in getLinesFromSelectedCase">
             <td>
               <b-container fluid class="bg-light">
@@ -104,9 +104,7 @@
                   </b-col>
                   <b-col cols="5" class="pr-0 text-center">
                     <b-form-input
-                      v-if="
-                        line.data.kind === 'line' || line.data.kind === 'array'
-                      "
+                      v-if="getLineDisplay(line) === LineDisplayOption.LINE"
                       v-model="line.data.value"
                       size="sm"
                       class="mt-3 mb-3"
@@ -114,8 +112,7 @@
                     />
                     <b-form-textarea
                       v-if="
-                        line.data.kind === 'multiline' ||
-                        line.data.kind === 'matrix'
+                        getLineDisplay(line) === LineDisplayOption.MULTILINE
                       "
                       v-model="line.data.value"
                       class="mt-3 mb-3 text-nowrap overflow-auto w-100"
@@ -139,8 +136,8 @@
                     </b-dropdown>
                     <b-button
                       v-if="
-                        line.data.kind === 'array' ||
-                        line.data.kind === 'matrix'
+                        getEditIconDisplay(line) ===
+                        EditIconDisplayOption.EDIT_ICON
                       "
                       size="sm"
                       type="button"
@@ -246,6 +243,34 @@ export default class CaseEdit extends Vue {
 
   updateLinesOrder(event: any) {
     this.sortLines([event.oldIndex, event.newIndex]);
+
+  @casesStore.Action('addNewLine') addNewLine!: () => void;
+  @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
+
+  LineDisplayOption = Object.freeze({
+    LINE: 'line',
+    MULTILINE: 'multiline',
+  });
+
+  EditIconDisplayOption = Object.freeze({
+    EDIT_ICON: 'edit_icon',
+  });
+
+  get getLineDisplay() {
+    return (line: CaseLine) => {
+      if (line.data.kind === 'line' || line.data.kind === 'array') {
+        return this.LineDisplayOption.LINE;
+      }
+      return this.LineDisplayOption.MULTILINE;
+    };
+  }
+
+  get getEditIconDisplay() {
+    return (line: CaseLine) => {
+      if (line.data.kind === 'array' || line.data.kind === 'matrix') {
+        return this.EditIconDisplayOption.EDIT_ICON;
+      }
+    };
   }
 
   lineOptions: {

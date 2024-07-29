@@ -10,6 +10,47 @@
  */
 class Notification extends \OmegaUp\Controllers\Controller {
     /**
+     * Creates a new notification for an arbitrary request for access from a
+     * contest user
+     */
+    public static function createForCourseAccessRequest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        int $userId,
+        bool $isAccepted
+    ): void {
+        \OmegaUp\DAO\Notifications::create(
+            new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $userId,
+                'contents' =>  json_encode(
+                    [
+                        'type' => (
+                            $isAccepted ?
+                            \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_ACCEPTED :
+                            \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REJECTED
+                        ),
+                        'body' => [
+                            'localizationString' => (
+                                $isAccepted ?
+                                new \OmegaUp\TranslationString(
+                                    'notificationContestRegisterationAccepted'
+                                ) :
+                                new \OmegaUp\TranslationString(
+                                    'notificationContestRegisterationRejected'
+                                )
+                            ),
+                            'localizationParams' => [
+                                'contestTitle' => $contest->title,
+                            ],
+                            'url' => "/arena/{$contest->alias}/",
+                            'iconUrl' => '/media/info.png',
+                        ],
+                    ]
+                ),
+            ])
+        );
+    }
+
+    /**
      * @param list<int> $usersIds
      * @param string $contestTitle
      * @param list<string> $verificationCodes

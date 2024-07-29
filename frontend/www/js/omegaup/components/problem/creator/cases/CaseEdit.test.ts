@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import CaseEdit from './CaseEdit.vue';
 import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
@@ -94,6 +94,11 @@ describe('CaseEdit.vue', () => {
 
   it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
     const wrapper = shallowMount(CaseEdit, { localVue, store: store });
+    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+  });
+
+  it('Should add, modify and delete a line', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store: store });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -109,5 +114,42 @@ describe('CaseEdit.vue', () => {
     expect(dropdownButtons.at(0).text()).toBe(T.problemCreatorLinesDelete);
     expect(dropdownButtons.at(1).text()).toBe(T.problemCreatorCaseDownloadIn);
     expect(dropdownButtons.at(2).text()).toBe(T.problemCreatorCaseDownloadTxt);
+    const buttons = wrapper.findAllComponents(BButton);
+    expect(buttons.length).toBe(4);
+
+    expect(wrapper.text()).toContain(newCase.name);
+    expect(wrapper.text()).toContain(newGroup.name);
+
+    wrapper.vm.addNewLine();
+    await Vue.nextTick();
+
+    expect(wrapper.find('table').exists()).toBe(true);
+    const formInputs = wrapper.findAll('input');
+
+    formInputs.at(0).setValue('testLabel');
+    formInputs.at(1).setValue('testValue');
+    await wrapper.trigger('click');
+
+    expect(wrapper.vm.getLinesFromSelectedCase[0].label).toBe('testLabel');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe('testValue');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('line');
+
+    const dropdowns = wrapper.findAll('a.dropdown-item');
+    expect(dropdowns.length).toBe(4);
+
+    await dropdowns.at(1).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
+
+    await dropdowns.at(2).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+
+    await dropdowns.at(3).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+
+    wrapper.vm.deleteLine(wrapper.vm.getLinesFromSelectedCase[0].lineID);
+    await Vue.nextTick();
+
+    const formInputsUpdated = wrapper.findAll('input');
+    expect(formInputsUpdated.length).toBe(0);
   });
 });
