@@ -4171,6 +4171,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ) && \OmegaUp\Authorization::isMentor(
             $r->identity
         );
+
         $category = $r->ensureOptionalEnum(
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
@@ -4185,6 +4186,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'omegaupTitleCodersofthemonthFemale'
             );
         }
+
         $candidates = \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
             $dateToSelect,
             $category
@@ -4238,7 +4240,6 @@ class User extends \OmegaUp\Controllers\Controller {
                     )
                 ),
         ];
-
         return [
             'templateProperties' => [
                 'payload' => $response,
