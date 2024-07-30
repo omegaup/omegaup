@@ -37,7 +37,7 @@
           >{{ T.wordsContent }}</a
         >
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" data-course-edit-admission-mode>
         <a
           href="#admission-mode"
           class="nav-link"
@@ -177,6 +177,7 @@
 
       <div
         v-if="showTab === 'admission-mode'"
+        data-admission-mode-tab
         class="tab-pane active"
         role="tabpanel"
       >

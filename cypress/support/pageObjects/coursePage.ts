@@ -131,6 +131,17 @@ export class CoursePage {
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
+  makeCoursePublic(): Cypress.Chainable<string> {
+    cy.get('[data-course-edit-admission-mode]').click();
+    cy.get('div[data-admission-mode-tab]').should('be.visible');
+    cy.get('[name="admission-mode"]').select('public');
+    cy.get('button[data-clipboard-click-handler]').click();
+    cy.get('form[data-course-admission-mode-form]').submit();
+    return cy.window().then((win) => {
+      return win.navigator.clipboard.readText();
+    });
+  }
+
   createInvalidSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,

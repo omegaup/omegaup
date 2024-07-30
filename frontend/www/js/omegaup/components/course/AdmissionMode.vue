@@ -1,7 +1,11 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="publish-form" @submit.prevent="onSubmit">
+      <form
+        class="publish-form"
+        data-course-admission-mode-form
+        @submit.prevent="onSubmit"
+      >
         <div class="form-group">
           <label>{{ T.courseEditAdmissionModeSelect }}</label>
           <a
