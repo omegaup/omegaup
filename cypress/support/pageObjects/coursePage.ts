@@ -138,6 +138,7 @@ export class CoursePage {
     cy.get('button[data-clipboard-click-handler]').click();
     cy.get('form[data-course-admission-mode-form]').submit();
     return cy.window().then((win) => {
+      win.focus();
       return win.navigator.clipboard.readText();
     });
   }
