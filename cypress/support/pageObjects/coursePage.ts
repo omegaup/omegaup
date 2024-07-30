@@ -136,6 +136,7 @@ export class CoursePage {
     cy.get('div[data-admission-mode-tab]').should('be.visible');
     cy.get('[name="admission-mode"]').select('public');
     cy.get('form[data-course-admission-mode-form]').submit();
+    cy.get('button.close').click();
     cy.get('button[data-clipboard-click-handler]').click();
     return cy.window().then((win) => {
       win.focus();
