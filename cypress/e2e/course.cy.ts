@@ -609,23 +609,22 @@ describe('Course Test', () => {
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
-    coursePage.makeCoursePublic().then((courseUrlLink) => {
-      coursePage.addAssignmentWithProblems(
-        assignmentAlias,
-        shortAlias,
-        problemOptions,
-      );
-      cy.logout();
+    coursePage.makeCoursePublic(courseOptions.courseAlias);
+    coursePage.addAssignmentWithProblems(
+      assignmentAlias,
+      shortAlias,
+      problemOptions,
+    );
+    cy.logout();
 
-      cy.login(loginOptions[1]);
-      cy.get('a[data-nav-courses]').click();
-      cy.get('a[data-nav-courses-all]').click();
-      cy.get('.introjs-skipbutton').click();
-      const courseUrl = '/course/' + courseAlias;
-      cy.get(`div>a[href="${courseUrl}"]`, { timeout: 0 }).should('not.exist');
-      cy.visit(courseUrlLink);
-      cy.waitUntil(() => cy.url().should('include', courseUrl));
-      cy.get('button[name=start-course-submit]').click();
-    });
+    cy.login(loginOptions[1]);
+    cy.get('a[data-nav-courses]').click();
+    cy.get('a[data-nav-courses-all]').click();
+    cy.get('.introjs-skipbutton').click();
+    const courseUrl = '/course/' + courseAlias;
+    cy.get(`div>a[href="${courseUrl}"]`, { timeout: 0 }).should('not.exist');
+    cy.visit(courseUrl);
+    cy.waitUntil(() => cy.url().should('include', courseUrl));
+    cy.get('button[name=start-course-submit]').click();
   });
 });
