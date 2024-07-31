@@ -290,6 +290,7 @@ describe('Course Test', () => {
     coursePage.verifyFeedback({
       feedback: suggestions[0].text,
       problemAlias: runOptions.problemAlias,
+      courseAlias: courseOptions.courseAlias,
     });
     cy.logout();
   });

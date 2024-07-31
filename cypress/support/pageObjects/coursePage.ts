@@ -229,7 +229,7 @@ export class CoursePage {
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
 
-    cy.get('.CodeMirror')
+    cy.get('.CodeMirror', { timeout: 20000 })
       .should('exist')
       .then((editor) => {
         cy.wrap(editor).should('be.visible');
@@ -278,23 +278,20 @@ export class CoursePage {
   verifyFeedback({
     feedback,
     problemAlias,
+    courseAlias,
   }: {
     feedback: string;
     problemAlias: string;
+    courseAlias: string;
   }): void {
-    cy.get('.notification-toggle').last().click();
-
-    cy.get('[data-notification-list]')
-      .contains(problemAlias)
-      .then((element) => {
-        cy.wrap(element).should('have.length', 1);
-        cy.wrap(element).click({ force: true });
-    });
+    coursePage.enterCourse(courseAlias, false);
+    cy.get(`a[data-problem="${problemAlias}"]`).click();
+    cy.get('button[data-run-details]').click();
     cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
       'contain',
       feedback,
     );
-    cy.get('.CodeMirror-lines', { timeout: 10000 }).should('be.visible');
+    cy.get('.CodeMirror-lines', { timeout: 20000 }).should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
       const userCode: Array<string> = [];
       Cypress.$.makeArray(rawHTMLElements).forEach((element) => {

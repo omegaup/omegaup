@@ -12,7 +12,14 @@ if [[ -d "${OMEGAUP_ROOT}/frontend/tests/runfiles/" ]]; then
 	find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.log -exec rm -f {} \;
 fi
 
+# Enable General Query Log
+mysql -h mysql -uroot -e "TRUNCATE TABLE mysql.general_log;"
+mysql -h mysql -uroot -e "SET GLOBAL general_log = 'ON';"
+
 "${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
+
+# Disable General Query Log
+mysql -h mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
 
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \
