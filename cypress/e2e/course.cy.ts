@@ -609,7 +609,7 @@ describe('Course Test', () => {
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
-    coursePage.makeCoursePublic(courseOptions.courseAlias);
+    coursePage.makeCoursePublic();
     coursePage.addAssignmentWithProblems(
       assignmentAlias,
       shortAlias,
