@@ -131,17 +131,21 @@ export class CoursePage {
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
-  makeCoursePublic(): Cypress.Chainable<string> {
+  makeCoursePublic(courseAlias: string): void {
     cy.get('[data-course-edit-admission-mode]').click();
     cy.get('div[data-admission-mode-tab]').should('be.visible');
     cy.get('[name="admission-mode"]').select('public');
     cy.get('form[data-course-admission-mode-form]').submit();
-    cy.get('button.close').click();
-    cy.get('button[data-clipboard-click-handler]').click();
-    return cy.window().then((win) => {
-      win.focus();
-      return win.navigator.clipboard.readText();
-    });
+    cy.get('button[data-clipboard-click-handler]')
+      .each(($button) => {
+        cy.wrap($button).click().then(() => {
+          cy.window().then((win) => {
+            win.navigator.clipboard.readText().then((text) => {
+              expect(text).to.include(`/course/${courseAlias}/`);
+            });
+          });
+        });
+      });
   }
 
   createInvalidSubmission(
