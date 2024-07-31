@@ -163,6 +163,9 @@ const translations: { [key: string]: string; } = {
   cannotAddProb: "Cannot add problem. You are not a contest admin.",
   cannotRemoveProblem: "Cannot remove the problem. You are not a contest admin.",
   cannotRemoveProblemWithSubmissions: "You cannot remove a problem that already has submissions",
+  caseEditTitle: "Edit case",
+  caseModalBack: "Back",
+  caseModalSave: "Save",
   certificateDetailsBody: "Please send us an email to [certificates@omegaup.com](mailto:certificates@omegaup.com?subject=Verify%20certificate%20%(uuid)) to verify a certificate. Make sure to include the ID of the certificate (%(uuid)) in the subject.",
   certificateDetailsTitle: "Certificate verification process",
   certificateListMineActions: "Actions",
@@ -1998,7 +2001,6 @@ const translations: { [key: string]: string; } = {
   wordsVerdictsOf: "Verdicts of %(alias)",
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
-  wordsYes: "Yes",
 };
 
 export {translations as default};
