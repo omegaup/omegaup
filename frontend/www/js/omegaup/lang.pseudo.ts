@@ -2001,6 +2001,7 @@ const translations: { [key: string]: string; } = {
   wordsVerdictsOf: "(V3rdic75 0f %(alias))",
   wordsWallTimeInSeconds: "(Wa11-7im3 (S3c))",
   wordsWarningProblem: "(K33p wi7h a warning)",
+  wordsYes: "(Y35)",
 };
 
 export {translations as default};

@@ -1999,5 +1999,6 @@
 	"wordsVerdict": "Verdict",
 	"wordsVerdictsOf": "Verdicts of %(alias)",
 	"wordsWallTimeInSeconds": "Wall-time (Sec)",
-	"wordsWarningProblem": "Keep with a warning"
+	"wordsWarningProblem": "Keep with a warning",
+	"wordsYes": "Yes"
 }

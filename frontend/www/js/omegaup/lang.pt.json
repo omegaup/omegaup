@@ -1999,5 +1999,6 @@
 	"wordsVerdict": "Verdito",
 	"wordsVerdictsOf": "Veredictos de %(alias)",
 	"wordsWallTimeInSeconds": "Tempo-real (Seg)",
-	"wordsWarningProblem": "Mantener com um aviso"
+	"wordsWarningProblem": "Mantener com um aviso",
+	"wordsYes": "Sim"
 }
