@@ -1,5 +1,47 @@
 import GoldenLayout from 'golden-layout';
 
+export const TEXT_EDITOR_COMPONENT_NAME = 'text-editor-component';
+interface TextEditorComponentConfig {
+  contents: string;
+  readOnly: boolean;
+  module?: string;
+  extension: string;
+  id: string;
+}
+const createTextEditorComponent = ({
+  contents,
+  readOnly,
+  module,
+  extension,
+  id,
+}: TextEditorComponentConfig) => ({
+  type: 'component',
+  componentName: TEXT_EDITOR_COMPONENT_NAME,
+  componentState: {
+    storeMapping: { contents, module },
+    readOnly,
+    extension,
+    module: id,
+    id,
+  },
+  isClosable: false,
+});
+
+export const MONACO_EDITOR_COMPONENT_NAME = 'monaco-editor-component';
+const createMonacoEditorComponent = () => ({
+  type: 'component',
+  componentName: MONACO_EDITOR_COMPONENT_NAME,
+  componentState: {
+    storeMapping: {
+      contents: 'request.source',
+      language: 'request.language',
+      module: 'moduleName',
+    },
+    id: 'source',
+  },
+  isClosable: false,
+});
+
 export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
   settings: {
     showPopoutIcon: false,
@@ -16,19 +58,7 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
               type: 'stack',
               id: 'source-and-settings',
               content: [
-                {
-                  type: 'component',
-                  componentName: 'monaco-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'request.source',
-                      language: 'request.language',
-                      module: 'moduleName',
-                    },
-                    id: 'source',
-                  },
-                  isClosable: false,
-                },
+                createMonacoEditorComponent(),
                 {
                   type: 'component',
                   componentName: 'settings-component',
@@ -43,34 +73,18 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
             {
               type: 'stack',
               content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'compilerOutput',
-                    },
-                    readOnly: true,
-                    module: 'compiler',
-                    extension: 'out/err',
-                    id: 'compiler',
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'logs',
-                    },
-                    readOnly: true,
-                    module: 'logs',
-                    extension: 'txt',
-                    id: 'logs',
-                  },
-                  isClosable: false,
-                },
+                createTextEditorComponent({
+                  contents: 'compilerOutput',
+                  readOnly: true,
+                  extension: 'out/err',
+                  id: 'compiler',
+                }),
+                createTextEditorComponent({
+                  contents: 'logs',
+                  readOnly: true,
+                  extension: 'txt',
+                  id: 'logs',
+                }),
                 {
                   type: 'component',
                   componentName: 'zip-viewer-component',
@@ -93,67 +107,39 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
             {
               type: 'row',
               content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'inputIn',
-                      module: 'currentCase',
-                    },
-                    readOnly: false,
-                    extension: 'in',
-                    id: 'in',
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'inputOut',
-                      module: 'currentCase',
-                    },
-                    readOnly: false,
-                    extension: 'out',
-                    id: 'out',
-                  },
-                  isClosable: false,
-                },
+                createTextEditorComponent({
+                  contents: 'inputIn',
+                  readOnly: false,
+                  module: 'currentCase',
+                  extension: 'in',
+                  id: 'in',
+                }),
+                createTextEditorComponent({
+                  contents: 'inputOut',
+                  readOnly: false,
+                  module: 'currentCase',
+                  extension: 'out',
+                  id: 'out',
+                }),
               ],
             },
             {
               type: 'stack',
               content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'outputStdout',
-                      module: 'currentCase',
-                    },
-                    readOnly: false,
-                    extension: 'out',
-                    id: 'stdout',
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'outputStderr',
-                      module: 'currentCase',
-                    },
-                    readOnly: false,
-                    extension: 'err',
-                    id: 'stderr',
-                  },
-                  isClosable: false,
-                },
+                createTextEditorComponent({
+                  contents: 'outputStdout',
+                  readOnly: false,
+                  module: 'currentCase',
+                  extension: 'out',
+                  id: 'stdout',
+                }),
+                createTextEditorComponent({
+                  contents: 'outputStderr',
+                  readOnly: false,
+                  module: 'currentCase',
+                  extension: 'err',
+                  id: 'stderr',
+                }),
                 {
                   type: 'component',
                   componentName: 'monaco-diff-component',
@@ -164,6 +150,7 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
                     },
                     id: 'diff',
                   },
+                  title: 'diff',
                   isClosable: false,
                 },
               ],
@@ -210,50 +197,22 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                   id: 'main-column',
                   title: 'code',
                   content: [
-                    {
-                      type: 'component',
-                      componentName: 'monaco-editor-component',
-                      componentState: {
-                        storeMapping: {
-                          contents: 'request.source',
-                          language: 'request.language',
-                          module: 'moduleName',
-                        },
-                        id: 'source',
-                      },
-                      isClosable: false,
-                    },
+                    createMonacoEditorComponent(),
                     {
                       type: 'stack',
                       content: [
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'compilerOutput',
-                            },
-                            readOnly: true,
-                            module: 'compiler',
-                            extension: 'out/err',
-                            id: 'compiler',
-                          },
-                          isClosable: false,
-                        },
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'logs',
-                            },
-                            readOnly: true,
-                            module: 'logs',
-                            extension: 'txt',
-                            id: 'logs',
-                          },
-                          isClosable: false,
-                        },
+                        createTextEditorComponent({
+                          contents: 'compilerOutput',
+                          readOnly: true,
+                          extension: 'out/err',
+                          id: 'compiler',
+                        }),
+                        createTextEditorComponent({
+                          contents: 'logs',
+                          readOnly: true,
+                          extension: 'txt',
+                          id: 'logs',
+                        }),
                         {
                           type: 'component',
                           componentName: 'zip-viewer-component',
@@ -278,67 +237,39 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                     {
                       type: 'row',
                       content: [
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'inputIn',
-                              module: 'currentCase',
-                            },
-                            readOnly: false,
-                            extension: 'in',
-                            id: 'in',
-                          },
-                          isClosable: false,
-                        },
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'inputOut',
-                              module: 'currentCase',
-                            },
-                            readOnly: false,
-                            extension: 'out',
-                            id: 'out',
-                          },
-                          isClosable: false,
-                        },
+                        createTextEditorComponent({
+                          contents: 'inputIn',
+                          readOnly: false,
+                          module: 'currentCase',
+                          extension: 'in',
+                          id: 'in',
+                        }),
+                        createTextEditorComponent({
+                          contents: 'inputOut',
+                          readOnly: false,
+                          module: 'currentCase',
+                          extension: 'out',
+                          id: 'out',
+                        }),
                       ],
                     },
                     {
                       type: 'stack',
                       content: [
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'outputStdout',
-                              module: 'currentCase',
-                            },
-                            readOnly: false,
-                            extension: 'out',
-                            id: 'stdout',
-                          },
-                          isClosable: false,
-                        },
-                        {
-                          type: 'component',
-                          componentName: 'text-editor-component',
-                          componentState: {
-                            storeMapping: {
-                              contents: 'outputStderr',
-                              module: 'currentCase',
-                            },
-                            readOnly: false,
-                            extension: 'err',
-                            id: 'stderr',
-                          },
-                          isClosable: false,
-                        },
+                        createTextEditorComponent({
+                          contents: 'outputStdout',
+                          readOnly: false,
+                          module: 'currentCase',
+                          extension: 'out',
+                          id: 'stdout',
+                        }),
+                        createTextEditorComponent({
+                          contents: 'outputStderr',
+                          readOnly: false,
+                          module: 'currentCase',
+                          extension: 'err',
+                          id: 'stderr',
+                        }),
                         {
                           type: 'component',
                           componentName: 'monaco-diff-component',
@@ -349,6 +280,7 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                             },
                             id: 'diff',
                           },
+                          title: 'diff',
                           isClosable: false,
                         },
                       ],
