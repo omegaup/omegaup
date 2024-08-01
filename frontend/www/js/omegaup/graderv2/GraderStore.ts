@@ -270,8 +270,15 @@ const storeOptions: StoreOptions<GraderStore> = {
     isDirty(state: GraderStore) {
       return state.dirty;
     },
+    // new getters separate from refactored code
     zipContent(state: GraderStore) {
       return state.zipContent;
+    },
+    compilerOutput(state: GraderStore) {
+      return state.compilerOutput;
+    },
+    logs(state: GraderStore) {
+      return state.logs;
     },
   },
   mutations: {
@@ -663,6 +670,18 @@ const storeOptions: StoreOptions<GraderStore> = {
   actions: {
     zipContent({ commit }: { commit: Commit }, value: string) {
       commit('zipContent', value);
+    },
+    compilerOutput({ commit }: { commit: Commit }, value: string) {
+      commit('compilerOutput', value);
+    },
+    logs({ commit }: { commit: Commit }, value: string) {
+      commit('logs', value);
+    },
+    inputIn({ commit }: { commit: Commit }, value: string) {
+      commit('inputIn', value);
+    },
+    inputOut({ commit }: { commit: Commit }, value: string) {
+      commit('inputOut', value);
     },
   },
   strict: true,
