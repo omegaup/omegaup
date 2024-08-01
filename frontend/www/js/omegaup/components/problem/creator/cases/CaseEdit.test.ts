@@ -64,7 +64,7 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBeTruthy();
   });
 
   it('Should show a grouped case', async () => {
@@ -90,7 +90,7 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+    expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBeTruthy();
   });
 
   it('Should add, modify and delete a line', async () => {
@@ -113,7 +113,7 @@ describe('CaseEdit.vue', () => {
     wrapper.vm.addNewLine();
     await Vue.nextTick();
 
-    expect(wrapper.find('table').exists()).toBe(true);
+    expect(wrapper.find('table').exists()).toBeTruthy();
     const formInputs = wrapper.findAll('input');
 
     formInputs.at(0).setValue('testLabel');
@@ -219,7 +219,7 @@ describe('CaseEdit.vue', () => {
       matrix.every((row) =>
         row.every((num) => num >= matrixLow && num <= matrixHigh),
       ),
-    ).toBe(true);
+    ).toBeTruthy();
     expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
       true,
     );
@@ -242,12 +242,12 @@ describe('CaseEdit.vue', () => {
       matrix.every((row) =>
         row.every((num) => num >= matrixLow && num <= matrixHigh),
       ),
-    ).toBe(true);
+    ).toBeTruthy();
     expect(
       matrix[0]
         .map((_, colIndex) => matrix.map((row) => row[colIndex]))
         .every((row) => new Set(row).size === matrixRows),
-    ).toBe(true);
+    ).toBeTruthy();
 
     matrix = wrapper.vm
       .getMatrixContent(
@@ -267,7 +267,7 @@ describe('CaseEdit.vue', () => {
       matrix.every((row) =>
         row.every((num) => num >= matrixLow && num <= matrixHigh),
       ),
-    ).toBe(true);
+    ).toBeTruthy();
     expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
       true,
     );
@@ -275,7 +275,7 @@ describe('CaseEdit.vue', () => {
       matrix[0]
         .map((_, colIndex) => matrix.map((row) => row[colIndex]))
         .every((row) => new Set(row).size === matrixRows),
-    ).toBe(true);
+    ).toBeTruthy();
 
     let emptyMatrix = wrapper.vm.getMatrixContent(
       matrixRows,
@@ -328,7 +328,7 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
-    expect(editSVG.exists()).toBe(true);
+    expect(editSVG.exists()).toBeTruthy();
 
     let editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
     await editIcon.trigger('click');
