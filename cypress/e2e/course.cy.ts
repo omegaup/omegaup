@@ -7,7 +7,6 @@ import {
   RunOptions,
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
-import { contestPage } from '../support/pageObjects/contestPage';
 import { profilePage } from '../support/pageObjects/profilePage';
 import getEditorIframeBody from '../support/pageObjects/util';
 import { problemPage } from '../support/pageObjects/problemPage';
@@ -597,5 +596,36 @@ describe('Course Test', () => {
         cy.readFile(filename).should('exist');
       });
     cy.logout();
+  });
+
+
+  it('Should create a public course and share the link to allow joining it', () => {
+    const loginOptions = loginPage.registerMultipleUsers(2);
+    const courseOptions = coursePage.generateCourseOptions();
+    const courseAlias = courseOptions.courseAlias;
+    const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
+    const problemOptions = problemPage.generateProblemOptions(1);
+
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    coursePage.createCourse(courseOptions);
+    coursePage.makeCoursePublic();
+    coursePage.addAssignmentWithProblems(
+      assignmentAlias,
+      shortAlias,
+      problemOptions,
+    );
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    cy.get('a[data-nav-courses]').click();
+    cy.get('a[data-nav-courses-all]').click();
+    cy.get('.introjs-skipbutton').click();
+    const courseUrl = '/course/' + courseAlias;
+    cy.get(`div>a[href="${courseUrl}"]`, { timeout: 0 }).should('not.exist');
+    cy.visit(courseUrl);
+    cy.waitUntil(() => cy.url().should('include', courseUrl));
+    cy.get('button[name=start-course-submit]').click();
   });
 });
