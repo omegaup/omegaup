@@ -146,7 +146,7 @@ describe('CaseEdit.vue', () => {
     const wrapper = mount(CaseEdit, { localVue, store });
 
     const arrSize = 10;
-    const arrlow = 0;
+    const arrLow = 0;
     const arrHigh = 9;
 
     let array = wrapper.vm
