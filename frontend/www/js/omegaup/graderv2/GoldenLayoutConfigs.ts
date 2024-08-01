@@ -128,14 +128,14 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
               content: [
                 createTextEditorComponent({
                   contents: 'outputStdout',
-                  readOnly: false,
+                  readOnly: true,
                   module: 'currentCase',
                   extension: 'out',
                   id: 'stdout',
                 }),
                 createTextEditorComponent({
                   contents: 'outputStderr',
-                  readOnly: false,
+                  readOnly: true,
                   module: 'currentCase',
                   extension: 'err',
                   id: 'stderr',
@@ -258,14 +258,14 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                       content: [
                         createTextEditorComponent({
                           contents: 'outputStdout',
-                          readOnly: false,
+                          readOnly: true,
                           module: 'currentCase',
                           extension: 'out',
                           id: 'stdout',
                         }),
                         createTextEditorComponent({
                           contents: 'outputStderr',
-                          readOnly: false,
+                          readOnly: true,
                           module: 'currentCase',
                           extension: 'err',
                           id: 'stderr',
