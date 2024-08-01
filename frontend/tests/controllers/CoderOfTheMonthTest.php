@@ -421,7 +421,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider coderOfTheMonthCategoryProvider
      */
     public function testCoderOfTheMonthDetailsForTypeScript(string $category) {
-        $this->markTestSkipped('This test is temporarily disabled');
         // Test coder of the month details when user is not logged
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
             new \OmegaUp\Request(['category' => $category])
