@@ -379,7 +379,7 @@ export default class CaseEdit extends Vue {
     EDIT_ICON: 'edit_icon',
   });
 
-  get getLineDisplay() {
+  get getLineDisplay(): (line: CaseLine) => 'line' | 'multiline' {
     return (line: CaseLine) => {
       if (line.data.kind === 'line' || line.data.kind === 'array') {
         return this.LineDisplayOption.LINE;
@@ -388,7 +388,7 @@ export default class CaseEdit extends Vue {
     };
   }
 
-  get getEditIconDisplay() {
+  get getEditIconDisplay(): (line: CaseLine) => 'edit_icon' | undefined {
     return (line: CaseLine) => {
       if (line.data.kind === 'array' || line.data.kind === 'matrix') {
         return this.EditIconDisplayOption.EDIT_ICON;
@@ -416,7 +416,7 @@ export default class CaseEdit extends Vue {
     { type: T.matrixModalDistinctAll, distinctType: 'both' },
   ];
 
-  editModalState(kind: CaseLineKind) {
+  editModalState(kind: CaseLineKind): void {
     if (kind === 'array') {
       this.matrixModalEdit = false;
       this.arrayModalEdit = true;
@@ -426,11 +426,11 @@ export default class CaseEdit extends Vue {
     }
   }
 
-  getLineNameFromKind(kind: CaseLineKind) {
+  getLineNameFromKind(kind: CaseLineKind): string | undefined {
     return this.lineKindOptions.find((row) => row.kind === kind)?.type;
   }
 
-  getDistinctNameFromType(distinctype: MatrixDistinctType) {
+  getDistinctNameFromType(distinctype: MatrixDistinctType): string | undefined {
     return this.matrixDistinctOptions.find(
       (row) => row.distinctType === distinctype,
     )?.type;
@@ -443,9 +443,7 @@ export default class CaseEdit extends Vue {
   ): string {
     const generatedArray = new Set<number>();
     while (generatedArray.size < size) {
-      generatedArray.add(
-        low + Math.floor(Math.random() * (high - low + 1)),
-      );
+      generatedArray.add(low + Math.floor(Math.random() * (high - low + 1)));
     }
     return [...generatedArray].join(' ');
   }
@@ -457,9 +455,7 @@ export default class CaseEdit extends Vue {
   ): string {
     const generatedArray = [];
     while (generatedArray.length < size) {
-      generatedArray.push(
-        Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
-      );
+      generatedArray.push(low + Math.floor(Math.random() * (high - low + 1)));
     }
     return [...generatedArray].join(' ');
   }
@@ -485,7 +481,7 @@ export default class CaseEdit extends Vue {
     columns: number,
     low: number = 0,
     high: number = 0,
-  ) {
+  ): string {
     const generatedArray: number[] = this.getNonDistinctArrayContents(
       rows * columns,
       low,
@@ -514,7 +510,7 @@ export default class CaseEdit extends Vue {
     columns: number,
     low: number = 0,
     high: number = 0,
-  ) {
+  ): string {
     const generatedRows: Set<number>[] = Array.from(
       { length: rows },
       () => new Set<number>(),
@@ -534,7 +530,7 @@ export default class CaseEdit extends Vue {
     columns: number,
     low: number = 0,
     high: number = 0,
-  ) {
+  ): string {
     const generatedColumns: Set<number>[] = Array.from(
       { length: columns },
       () => new Set<number>(),
@@ -560,7 +556,7 @@ export default class CaseEdit extends Vue {
     columns: number,
     low: number = 0,
     high: number = 0,
-  ) {
+  ): string {
     const generatedArray: number[] = this.getDistinctArrayContents(
       rows * columns,
       low,
@@ -590,7 +586,7 @@ export default class CaseEdit extends Vue {
     low: number = 0,
     high: number = 100,
     distinct: MatrixDistinctType = 'none',
-  ) {
+  ): string {
     if (distinct === 'both' && high - low + 1 < rows * columns) {
       return '';
     }

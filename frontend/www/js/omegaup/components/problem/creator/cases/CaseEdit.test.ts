@@ -150,25 +150,25 @@ describe('CaseEdit.vue', () => {
     const arrHigh = 9;
 
     let array = wrapper.vm
-      .getArrayContent(arrSize, arrlow, arrHigh, false)
+      .getArrayContent(arrSize, arrLow, arrHigh, false)
       .split(' ')
       .map(Number);
 
     expect(array.length).toBe(arrSize);
-    expect(array.every((num) => num >= arrlow && num <= arrHigh)).toBeTruthy();
+    expect(array.every((num) => num >= arrLow && num <= arrHigh)).toBeTruthy();
 
     array = wrapper.vm
-      .getArrayContent(arrSize, arrlow, arrHigh, true)
+      .getArrayContent(arrSize, arrLow, arrHigh, true)
       .split(' ')
       .map(Number);
 
     expect(array.length).toBe(arrSize);
-    expect(array.every((num) => num >= arrlow && num <= arrHigh));
+    expect(array.every((num) => num >= arrLow && num <= arrHigh));
     expect(new Set(array).size).toBe(arrSize);
 
     const emptyArray = wrapper.vm.getArrayContent(
       arrSize,
-      arrlow,
+      arrLow,
       arrHigh - 1,
       true,
     );
