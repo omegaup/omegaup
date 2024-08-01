@@ -410,10 +410,13 @@ export default class CaseEdit extends Vue {
     type: string;
     distinctType: MatrixDistinctType;
   }[] = [
-    { type: T.matrixModalDistinctNone, distinctType: 'none' },
-    { type: T.matrixModalDistinctRow, distinctType: 'rows' },
-    { type: T.matrixModalDistinctColumn, distinctType: 'cols' },
-    { type: T.matrixModalDistinctAll, distinctType: 'both' },
+    { type: T.matrixModalDistinctNone, distinctType: MatrixDistinctType.None },
+    { type: T.matrixModalDistinctRow, distinctType: MatrixDistinctType.Rows },
+    {
+      type: T.matrixModalDistinctColumn,
+      distinctType: MatrixDistinctType.Cols,
+    },
+    { type: T.matrixModalDistinctAll, distinctType: MatrixDistinctType.Both },
   ];
 
   editModalState(kind: CaseLineKind): void {
@@ -585,7 +588,7 @@ export default class CaseEdit extends Vue {
     columns: number,
     low: number = 0,
     high: number = 100,
-    distinct: MatrixDistinctType = 'none',
+    distinct: MatrixDistinctType = MatrixDistinctType.None,
   ): string {
     if (distinct === 'both' && high - low + 1 < rows * columns) {
       return '';

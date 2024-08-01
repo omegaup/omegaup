@@ -46,7 +46,12 @@ export type CaseLineKind = 'line' | 'multiline' | 'array' | 'matrix';
  * MatrixDistinctType
  * Defines the different ways matrix can be distinct
  */
-export type MatrixDistinctType = 'none' | 'rows' | 'cols' | 'both';
+export enum MatrixDistinctType {
+  None = 'none',
+  Rows = 'rows',
+  Cols = 'cols',
+  Both = 'both',
+}
 
 /**
  * CaseLineData

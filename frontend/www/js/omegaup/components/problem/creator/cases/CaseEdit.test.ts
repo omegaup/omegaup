@@ -10,6 +10,7 @@ import {
 } from '@/js/omegaup/problem/creator/modules/cases';
 
 import T from '../../../../lang';
+import { MatrixDistinctType } from '@/js/omegaup/problem/creator/types';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -186,7 +187,7 @@ describe('CaseEdit.vue', () => {
         matrixColumns,
         matrixLow,
         matrixHigh,
-        'none',
+        MatrixDistinctType.None,
       )
       .trim()
       .split('\n')
@@ -206,7 +207,7 @@ describe('CaseEdit.vue', () => {
         matrixColumns,
         matrixLow,
         matrixHigh,
-        'rows',
+        MatrixDistinctType.Rows,
       )
       .trim()
       .split('\n')
@@ -229,7 +230,7 @@ describe('CaseEdit.vue', () => {
         matrixColumns,
         matrixLow,
         matrixHigh,
-        'cols',
+        MatrixDistinctType.Cols,
       )
       .trim()
       .split('\n')
@@ -254,7 +255,7 @@ describe('CaseEdit.vue', () => {
         matrixColumns,
         matrixLow,
         matrixHigh,
-        'both',
+        MatrixDistinctType.Both,
       )
       .trim()
       .split('\n')
@@ -281,7 +282,7 @@ describe('CaseEdit.vue', () => {
       matrixColumns,
       matrixLow,
       matrixLow + matrixColumns - 2,
-      'rows',
+      MatrixDistinctType.Rows,
     );
 
     expect(emptyMatrix).toBe('');
@@ -291,7 +292,7 @@ describe('CaseEdit.vue', () => {
       matrixColumns,
       matrixLow,
       matrixLow + matrixRows - 2,
-      'cols',
+      MatrixDistinctType.Cols,
     );
 
     expect(emptyMatrix).toBe('');
@@ -301,7 +302,7 @@ describe('CaseEdit.vue', () => {
       matrixColumns,
       matrixLow,
       matrixHigh - 1,
-      'both',
+      MatrixDistinctType.Both,
     );
 
     expect(emptyMatrix).toBe('');

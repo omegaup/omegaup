@@ -296,7 +296,8 @@ export const casesStore: Module<CasesState, RootState> = {
     editLineKind({ getters }, [lineID, _kind]: [LineID, CaseLineKind]) {
       const selectedLine: CaseLine = getters.getLineFromID(lineID);
       if (!selectedLine) return;
-      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
+      const defaultMatrixDistinctType: MatrixDistinctType =
+        MatrixDistinctType.None;
       const lineData: CaseLineData = (() => {
         switch (_kind) {
           case 'line':
