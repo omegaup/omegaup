@@ -143,7 +143,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('Should generate arrays and matrices', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store: store });
+    const wrapper = mount(CaseEdit, { localVue, store });
 
     const arrSize = 10;
     const arrlow = 0;
