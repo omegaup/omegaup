@@ -379,7 +379,7 @@ describe('CaseEdit.vue', () => {
     await dropdowns.at(3).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
-    editIcon = wrapper.find('button[title="Editar"]');
+    editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
     await editIcon.trigger('click');
 
     modalBody = wrapper.find('div.modal-body');
