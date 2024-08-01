@@ -17,6 +17,7 @@ import ZipViewer from './ZipViewer.vue';
 
 // imports from new files
 import store from './GraderStore';
+import { UNEMBEDDED_CONFIG, EMBEDDED_CONFIG } from './GoldenLayoutConfigs';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
@@ -28,212 +29,9 @@ const languageExtensionMapping = Object.fromEntries(
     value.extension,
   ]),
 );
-const goldenLayoutSettings = {
-  settings: {
-    showPopoutIcon: false,
-  },
-  content: [
-    {
-      type: 'row',
-      content: [
-        {
-          type: 'column',
-          id: 'main-column',
-          content: [
-            {
-              type: 'stack',
-              id: 'source-and-settings',
-              content: [
-                {
-                  type: 'component',
-                  componentName: 'monaco-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'request.source',
-                      language: 'request.language',
-                      module: 'moduleName',
-                    },
-                    theme,
-                  },
-                  id: 'source',
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'settings-component',
-                  id: 'settings',
-                  componentState: {
-                    storeMapping: {},
-                    id: 'settings',
-                  },
-                  isClosable: false,
-                },
-              ],
-            },
-            {
-              type: 'stack',
-              content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'compilerOutput',
-                    },
-                    id: 'compiler',
-                    readOnly: true,
-                    module: 'compiler',
-                    extension: 'out/err',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'logs',
-                    },
-                    id: 'logs',
-                    readOnly: true,
-                    module: 'logs',
-                    extension: 'txt',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'zip-viewer-component',
-                  componentState: {
-                    storeMapping: {},
-                    id: 'zipviewer',
-                    theme,
-                  },
-                  title: 'files.zip',
-                  isClosable: false,
-                },
-              ],
-              height: 20,
-            },
-          ],
-          isClosable: false,
-        },
-        {
-          type: 'column',
-          id: 'cases-column',
-          content: [
-            {
-              type: 'row',
-              content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'inputIn',
-                      module: 'currentCase',
-                    },
-                    id: 'in',
-                    readOnly: false,
-                    extension: 'in',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'inputOut',
-                      module: 'currentCase',
-                    },
-                    id: 'out',
-                    readOnly: false,
-                    extension: 'out',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-              ],
-            },
-            {
-              type: 'stack',
-              content: [
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'outputStdout',
-                      module: 'currentCase',
-                    },
-                    id: 'stdout',
-                    readOnly: false,
-                    extension: 'out',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'text-editor-component',
-                  componentState: {
-                    storeMapping: {
-                      contents: 'outputStderr',
-                      module: 'currentCase',
-                    },
-                    id: 'stderr',
-                    readOnly: false,
-                    extension: 'err',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-                {
-                  type: 'component',
-                  componentName: 'monaco-diff-component',
-                  componentState: {
-                    storeMapping: {
-                      originalContents: 'inputOut',
-                      modifiedContents: 'outputStdout',
-                    },
-                    id: 'diff',
-                    theme,
-                  },
-                  isClosable: false,
-                },
-              ],
-            },
-          ],
-          isClosable: false,
-        },
-        {
-          type: 'component',
-          id: 'case-selector-column',
-          componentName: 'case-selector-component',
-          componentState: {
-            storeMapping: {
-              cases: 'request.input.cases',
-              currentCase: 'currentCase',
-            },
-            id: 'source',
-            theme,
-          },
-          title: 'cases/',
-          width: 15,
-          isClosable: false,
-        },
-      ],
-    },
-  ],
-};
-
 // eslint-disable-next-line no-undef
 const layout = new GoldenLayout(
-  goldenLayoutSettings,
+  isEmbedded ? EMBEDDED_CONFIG : UNEMBEDDED_CONFIG,
   document.getElementById('layout-root'),
 );
 
@@ -244,6 +42,7 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       vueComponents[componentName] = component;
       let props = {
         storeMapping: componentState.storeMapping,
+        theme: theme,
       };
       for (let k in componentState) {
         if (k == 'id') continue;
@@ -314,48 +113,18 @@ RegisterVueComponent(
 
 function initialize() {
   layout.init();
-
   if (isEmbedded) {
     // Embedded layout should not be able to modify the settings.
-    layout.root.getItemsById('settings')[0].remove();
     document.getElementById('download').style.display = 'none';
     document.getElementById('upload').style.display = 'none';
     document.querySelector('label[for="upload"]').style.display = 'none';
-
-    // Since the embedded grader has a lot less horizontal space available, we
-    // move the first two columns into a stack so they can be switched between.
-    let mainColumn = layout.root.getItemsById('main-column')[0];
-    let casesColumn = layout.root.getItemsById('cases-column')[0];
-    let caseSelectorColumn = layout.root.getItemsById(
-      'case-selector-column',
-    )[0];
-    let oldWidth = caseSelectorColumn.element[0].clientWidth;
-    let oldHeight = caseSelectorColumn.element[0].clientHeight;
-
-    let newStack = layout.createContentItem({
-      type: 'stack',
-      content: [],
-      isClosable: false,
-    });
-
-    mainColumn.parent.addChild(newStack, 0);
-
-    casesColumn.setTitle('cases');
-    casesColumn.parent.removeChild(casesColumn, true);
-    newStack.addChild(casesColumn, 0);
-
-    mainColumn.setTitle('code');
-    mainColumn.parent.removeChild(mainColumn, true);
-    newStack.addChild(mainColumn, 0);
-
-    // Also extend the case selector column a little bit so that it looks nicer.
-    caseSelectorColumn.container.setSize(Math.max(160, oldWidth), oldHeight);
 
     // Whenever a case is selected, show the cases tab.
     store.watch(
       Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
       (value) => {
         if (store.getters.isUpdatingSettings) return;
+        let casesColumn = layout.root.getItemsById('cases-column')[0];
         casesColumn.parent.setActiveContentItem(casesColumn);
       },
     );
