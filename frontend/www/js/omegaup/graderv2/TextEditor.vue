@@ -12,11 +12,11 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Prop, Component } from 'vue-property-decorator';
+import store from './GraderStore';
 import * as Util from './util';
 
 @Component
 export default class TextEditor extends Vue {
-  @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ required: true }) extension!: string;
   @Prop({ default: null }) module!: string | null;
@@ -25,7 +25,7 @@ export default class TextEditor extends Vue {
 
   get filename(): string {
     if (typeof this.storeMapping.module !== 'undefined') {
-      return `${Util.vuexGet(this.store, this.storeMapping.module)}.${
+      return `${Util.vuexGet(store, this.storeMapping.module)}.${
         this.extension
       }`;
     }
@@ -33,12 +33,12 @@ export default class TextEditor extends Vue {
   }
 
   get contents(): string {
-    return Util.vuexGet(this.store, this.storeMapping.contents);
+    return Util.vuexGet(store, this.storeMapping.contents);
   }
 
   set contents(value: string) {
     if (this.readOnly) return;
-    Util.vuexSet(this.store, this.storeMapping.contents, value);
+    Util.vuexSet(store, this.storeMapping.contents, value);
   }
 
   get title(): string {
