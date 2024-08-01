@@ -198,7 +198,7 @@ describe('CaseEdit.vue', () => {
       matrix.every((row) =>
         row.every((num) => num >= matrixLow && num <= matrixHigh),
       ),
-    ).toBe(true);
+    ).toBeTruthy();
 
     matrix = wrapper.vm
       .getMatrixContent(
