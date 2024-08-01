@@ -131,6 +131,13 @@ export class CoursePage {
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
+  makeCoursePublic(): void {
+    cy.get('[data-course-edit-admission-mode]').click();
+    cy.get('div[data-admission-mode-tab]').should('be.visible');
+    cy.get('[name="admission-mode"]').select('public');
+    cy.get('form[data-course-admission-mode-form]').submit();
+  }
+
   createInvalidSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
