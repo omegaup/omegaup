@@ -155,7 +155,7 @@ describe('CaseEdit.vue', () => {
       .map(Number);
 
     expect(array.length).toBe(arrSize);
-    expect(array.every((num) => num >= arrlow && num <= arrHigh)).toBe(true);
+    expect(array.every((num) => num >= arrlow && num <= arrHigh)).toBeTruthy();
 
     array = wrapper.vm
       .getArrayContent(arrSize, arrlow, arrHigh, true)
