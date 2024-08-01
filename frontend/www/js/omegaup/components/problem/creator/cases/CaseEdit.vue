@@ -444,7 +444,7 @@ export default class CaseEdit extends Vue {
     const generatedArray = new Set<number>();
     while (generatedArray.size < size) {
       generatedArray.add(
-        Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+        low + Math.floor(Math.random() * (high - low + 1)),
       );
     }
     return [...generatedArray].join(' ');
