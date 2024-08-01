@@ -35,9 +35,46 @@
             </div>
           </div>
         </b-button>
-        <b-button class="h-100" variant="light">
-          <BIconThreeDotsVertical />
-        </b-button>
+        <b-dropdown ref="dropdown" variant="light" class="h-100" right no-caret>
+          <template #button-content>
+            <BIconThreeDotsVertical />
+          </template>
+          <b-button variant="light" class="w-100" @click="deleteLines()">
+            <div class="d-flex">
+              <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
+              {{ T.problemCreatorLinesDelete }}
+            </div>
+          </b-button>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-button
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.in')"
+          >
+            <div class="d-flex">
+              <BIconBoxArrowDown
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadIn }}
+            </div>
+          </b-button>
+          <b-button
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.txt')"
+          >
+            <div class="d-flex">
+              <BIconTextLeft
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadTxt }}
+            </div>
+          </b-button>
+        </b-dropdown>
       </div>
     </div>
     <hr class="border-top my-2" />
@@ -155,6 +192,7 @@ import {
   CaseLineKind,
   CaseLine,
   LineID,
+  CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
 import {
   FontAwesomeIcon,
@@ -187,9 +225,18 @@ export default class CaseEdit extends Vue {
   @casesStore.Getter('getLinesFromSelectedCase')
   getLinesFromSelectedCase!: CaseLine[];
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
+  @casesStore.Action('deleteLinesForSelectedCase')
+  deleteLinesForSelectedCase!: () => void;
+
+  deleteLines() {
+    this.deleteLinesForSelectedCase();
+    (this.$refs.dropdown as any).hide(true);
+  }
 
   LineDisplayOption = Object.freeze({
     LINE: 'line',
@@ -229,6 +276,22 @@ export default class CaseEdit extends Vue {
 
   getLineNameFromKind(kind: CaseLineKind) {
     return this.lineOptions.find((line) => line.kind === kind)?.type;
+  }
+
+  downloadInputFile(ext: '.txt' | '.in') {
+    const caseGroupID: CaseGroupID = {
+      groupID: this.getSelectedGroup.groupID,
+      caseID: this.getSelectedCase.caseID,
+    };
+    const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+    const blob = new Blob([input], { type: 'text/plain' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = this.getSelectedCase.name + ext;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 </script>
