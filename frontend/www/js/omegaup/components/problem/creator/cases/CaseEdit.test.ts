@@ -329,7 +329,7 @@ describe('CaseEdit.vue', () => {
     const editSVG = wrapper.find('svg.bi-pencil-square');
     expect(editSVG.exists()).toBe(true);
 
-    let editIcon = wrapper.find('button[title="Editar"]');
+    let editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
     await editIcon.trigger('click');
 
     let modalBody = wrapper.find('div.modal-body');
