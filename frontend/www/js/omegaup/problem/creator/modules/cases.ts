@@ -158,6 +158,72 @@ export const casesStore: Module<CasesState, RootState> = {
       }
       state = assignMissingPoints(state);
     },
+    updateCase(state, [oldGroupID, updateCaseRequest]: [GroupID, CaseRequest]) {
+      const oldGroup = state.groups.find(
+        (_group) => _group.groupID === oldGroupID,
+      );
+      if (!oldGroup) return;
+      const caseToEdit = oldGroup.cases.find(
+        (_case) => _case.caseID === updateCaseRequest.caseID,
+      );
+      if (!caseToEdit) return;
+      if (
+        updateCaseRequest.groupID === UUID_NIL &&
+        oldGroup.ungroupedCase === true
+      ) {
+        if (caseToEdit.name !== updateCaseRequest.name) {
+          caseToEdit.name = updateCaseRequest.name;
+          oldGroup.name = updateCaseRequest.name;
+        }
+        caseToEdit.points = updateCaseRequest.points;
+        state = assignMissingPoints(state);
+        return;
+      }
+      if (
+        updateCaseRequest.groupID === UUID_NIL &&
+        oldGroup.ungroupedCase === false
+      ) {
+        oldGroup.cases = oldGroup.cases.filter(
+          (_case) => _case.caseID !== caseToEdit.caseID,
+        );
+        const groupID = uuid();
+        const newGroup = generateGroup({
+          name: updateCaseRequest.name,
+          groupID: groupID,
+          points: updateCaseRequest.points,
+          autoPoints: updateCaseRequest.points === null,
+          ungroupedCase: true,
+          cases: [caseToEdit],
+        });
+        caseToEdit.name = updateCaseRequest.name;
+        caseToEdit.groupID = groupID;
+        caseToEdit.points = updateCaseRequest.points;
+        state.groups.push(newGroup);
+        state = assignMissingPoints(state);
+        return;
+      }
+      caseToEdit.name = updateCaseRequest.name;
+      caseToEdit.points = updateCaseRequest.points;
+
+      if (caseToEdit.groupID === updateCaseRequest.groupID) {
+        return;
+      }
+      caseToEdit.groupID = updateCaseRequest.groupID;
+
+      oldGroup.cases = oldGroup.cases.filter(
+        (_case) => _case.caseID !== updateCaseRequest.caseID,
+      );
+
+      if (oldGroup.ungroupedCase === true && oldGroup.cases.length === 0) {
+        state.groups = state.groups.filter(
+          (_group) => _group.groupID !== oldGroup.groupID,
+        );
+      }
+      state.groups
+        .find((_group) => _group.groupID === updateCaseRequest.groupID)
+        ?.cases.push(caseToEdit);
+      state = assignMissingPoints(state);
+    },
     deleteGroup(state, groupIDToBeDeleted: GroupID) {
       state.groups = state.groups.filter(
         (group) => group.groupID !== groupIDToBeDeleted,
