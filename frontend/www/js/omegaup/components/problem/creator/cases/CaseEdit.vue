@@ -518,7 +518,7 @@ export default class CaseEdit extends Vue {
     for (let i = 0; i < rows; i++) {
       while (generatedRows[i].size < columns) {
         generatedRows[i].add(
-          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+          low + Math.floor(Math.random() * (high - low + 1)),
         );
       }
     }
@@ -538,7 +538,7 @@ export default class CaseEdit extends Vue {
     for (let i = 0; i < columns; i++) {
       while (generatedColumns[i].size < rows) {
         generatedColumns[i].add(
-          Number(low.toString()) + Math.floor(Math.random() * (high - low + 1)),
+          low + Math.floor(Math.random() * (high - low + 1)),
         );
       }
     }
