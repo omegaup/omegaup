@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <div
-      v-if="getSelectedCase && getSelectedGroup"
-      class="d-flex justify-content-between"
-    >
+  <div v-if="getSelectedCase && getSelectedGroup">
+    <div class="d-flex justify-content-between">
       <div>
         <h3 class="mb-0 d-md-inline mr-2">{{ getSelectedCase.name }}</h3>
         <h5 class="mb-0 d-none d-md-inline text-muted">
@@ -11,7 +8,11 @@
         </h5>
       </div>
       <div>
-        <b-button variant="light" class="mr-2">
+        <b-button
+          variant="light"
+          class="mr-2"
+          @click="editCaseModal = !editCaseModal"
+        >
           <div class="container">
             <div class="row">
               <BIconPencilFill
@@ -23,6 +24,25 @@
             </div>
           </div>
         </b-button>
+        <b-modal
+          v-model="editCaseModal"
+          :title="T.caseEditTitle"
+          :ok-title="T.caseModalSave"
+          ok-variant="success"
+          :cancel-title="T.caseModalBack"
+          cancel-variant="danger"
+          static
+          lazy
+          @ok="updateCaseInfo"
+        >
+          <omegaup-problem-creator-case-input
+            ref="case-input"
+            :name="getSelectedCase.name"
+            :group="getSelectedGroup.groupID"
+            :points="getSelectedCase.points"
+            :edit-mode="true"
+          />
+        </b-modal>
         <b-button variant="light" class="mr-2">
           <div class="container">
             <div class="row">
@@ -309,8 +329,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import T from '../../../../lang';
+import problemCreator_Cases_CaseInput from './CaseInput.vue';
 import { namespace } from 'vuex-class';
 import {
   Case,
@@ -319,6 +340,8 @@ import {
   CaseLine,
   LineID,
   MatrixDistinctType,
+  CaseRequest,
+  GroupID,
 } from '@/js/omegaup/problem/creator/types';
 import {
   FontAwesomeIcon,
@@ -338,6 +361,7 @@ const casesStore = namespace('casesStore');
 
 @Component({
   components: {
+    'omegaup-problem-creator-case-input': problemCreator_Cases_CaseInput,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -345,6 +369,9 @@ const casesStore = namespace('casesStore');
 })
 export default class CaseEdit extends Vue {
   T = T;
+  editCaseModal = false;
+
+  @Ref('case-input') caseInputRef!: problemCreator_Cases_CaseInput;
 
   arrayModalEdit: boolean = false;
   matrixModalEdit: boolean = false;
@@ -366,6 +393,10 @@ export default class CaseEdit extends Vue {
     LineID,
     string,
   ]) => void;
+  @casesStore.Mutation('updateCase') updateCase!: ([
+    oldGroupID,
+    updateCaseRequest,
+  ]: [GroupID, CaseRequest]) => void;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
@@ -612,6 +643,18 @@ export default class CaseEdit extends Vue {
       return this.getColsDistinctMatrixContents(rows, columns, low, high);
     }
     return '';
+  }
+
+  updateCaseInfo() {
+    const updateCaseRequest: CaseRequest = {
+      groupID: this.caseInputRef.caseGroup,
+      caseID: this.getSelectedCase.caseID,
+      name: this.caseInputRef.caseName,
+      points: this.caseInputRef.casePoints,
+      autoPoints: this.caseInputRef.casePoints === null,
+    };
+    const oldGroupID: GroupID = this.getSelectedGroup.groupID;
+    this.updateCase([oldGroupID, updateCaseRequest]);
   }
 }
 </script>

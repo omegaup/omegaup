@@ -96,12 +96,12 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import store from './GraderStore';
 import * as Util from './util';
 import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ default: 'vs-dark' }) theme!: string;
 
@@ -111,19 +111,17 @@ export default class CaseSelector extends Vue {
 
   get summary(): string {
     if (
-      this.store.state.dirty ||
-      !this.store.state.results ||
-      !this.store.state.results.verdict
+      store.state.dirty ||
+      !store.state.results ||
+      !store.state.results.verdict
     ) {
       return '…';
     }
-    return `${this.store.state.results.verdict} ${this.score(
-      this.store.state.results,
-    )}`;
+    return `${store.state.results.verdict} ${this.score(store.state.results)}`;
   }
 
   get groups(): { [key: string]: any }[] {
-    const flatCases: any = Util.vuexGet(this.store, this.storeMapping.cases);
+    const flatCases: any = Util.vuexGet(store, this.storeMapping.cases);
     const resultMap: { [key: string]: any } = {};
 
     for (const caseName in flatCases) {
@@ -156,17 +154,17 @@ export default class CaseSelector extends Vue {
   }
 
   get currentCase(): string {
-    return Util.vuexGet(this.store, this.storeMapping.currentCase);
+    return Util.vuexGet(store, this.storeMapping.currentCase);
   }
 
   set currentCase(value) {
-    Util.vuexSet(this.store, this.storeMapping.currentCase, value);
+    Util.vuexSet(store, this.storeMapping.currentCase, value);
   }
 
   caseResult(caseName: string): null | any {
-    const flatCaseResults = this.store.getters.flatCaseResults;
+    const flatCaseResults = store.getters.flatCaseResults;
     if (
-      this.store.state.dirty ||
+      store.state.dirty ||
       !Object.prototype.hasOwnProperty.call(flatCaseResults, caseName)
     )
       return null;
@@ -174,8 +172,8 @@ export default class CaseSelector extends Vue {
   }
 
   groupResult(groupName: string): null | any {
-    const results = this.store.state.results;
-    if (this.store.state.dirty || !results || !results.groups) return null;
+    const results = store.state.results;
+    if (store.state.dirty || !results || !results.groups) return null;
     for (const group of results.groups) {
       if (group.group == groupName) return group;
     }
@@ -235,7 +233,7 @@ export default class CaseSelector extends Vue {
 
   createCase(): void {
     if (!this.newCaseName) return;
-    this.store.commit('createCase', {
+    store.commit('createCase', {
       name: this.newCaseName,
       weight: parseFloat(this.newCaseWeight.toString()),
     });
@@ -245,7 +243,7 @@ export default class CaseSelector extends Vue {
   }
 
   removeCase(name: string): void {
-    this.store.commit('removeCase', name);
+    store.commit('removeCase', name);
   }
 }
 </script>

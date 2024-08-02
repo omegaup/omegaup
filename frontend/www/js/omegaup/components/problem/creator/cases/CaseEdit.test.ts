@@ -143,6 +143,54 @@ describe('CaseEdit.vue', () => {
     expect(formInputsUpdated.length).toBe(0);
   });
 
+  it('Should modify and move a case', async () => {
+    store.commit('casesStore/resetStore');
+
+    newUngroupedCasegroup.cases = [];
+    newGroup.cases = [];
+
+    store.commit('casesStore/addGroup', newUngroupedCasegroup);
+    store.commit('casesStore/addCase', newUngroupedCase);
+    store.commit('casesStore/addGroup', newGroup);
+
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const groupID = newUngroupedCasegroup.groupID;
+    const caseID = newUngroupedCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const editButton = wrapper.find('button');
+    expect(editButton.text()).toBe(T.caseEditTitle);
+
+    await editButton.trigger('click');
+
+    const modifiedName = 'modifiedname';
+    const editNameInput = wrapper.find('input');
+    await editNameInput.setValue(modifiedName);
+
+    const saveButton = wrapper.find('button.btn-success');
+    expect(saveButton.text()).toBe(T.caseModalSave);
+
+    await saveButton.trigger('click');
+
+    expect(wrapper.vm.getSelectedCase.name).toBe(modifiedName);
+    expect(wrapper.vm.getSelectedGroup.name).toBe(modifiedName);
+
+    await editButton.trigger('click');
+
+    wrapper.vm.caseInputRef.caseGroup = newGroup.groupID;
+    wrapper.vm.updateCaseInfo();
+
+    expect(wrapper.vm.groups.length).toBe(1);
+
+    expect(wrapper.vm.groups[0].cases[0].name).toBe(modifiedName);
+    expect(wrapper.vm.groups[0].cases[0].groupID).toBe(newGroup.groupID);
+  });
+
   const arrayInputMapping: {
     arrSize: number;
     arrLow: number;
