@@ -18,6 +18,14 @@ import ZipViewer from './ZipViewer.vue';
 // imports from new files
 import store from './GraderStore';
 import { UNEMBEDDED_CONFIG, EMBEDDED_CONFIG } from './GoldenLayoutConfigs';
+import {
+  TEXT_EDITOR_COMPONENT_NAME,
+  MONACO_DIFF_COMPONENT_NAME,
+  MONACO_EDITOR_COMPONENT_NAME,
+  CASE_SELECTOR_COMPONENT_NAME,
+  ZIP_VIEWER_COMPONENT_NAME,
+  SETTINGS_COMPONENT_NAME,
+} from './GoldenLayoutConfigs';
 
 const isEmbedded = window.location.search.indexOf('embedded') !== -1;
 const theme = document.getElementById('theme').value;
@@ -76,37 +84,37 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
 let componentMapping = {};
 RegisterVueComponent(
   layout,
-  'case-selector-component',
+  CASE_SELECTOR_COMPONENT_NAME,
   CaseSelector,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
-  'monaco-editor-component',
+  MONACO_EDITOR_COMPONENT_NAME,
   MonacoEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
-  'monaco-diff-component',
+  MONACO_DIFF_COMPONENT_NAME,
   DiffEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
-  'settings-component',
+  SETTINGS_COMPONENT_NAME,
   IDESettings,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
-  'text-editor-component',
+  TEXT_EDITOR_COMPONENT_NAME,
   TextEditor,
   componentMapping,
 );
 RegisterVueComponent(
   layout,
-  'zip-viewer-component',
+  ZIP_VIEWER_COMPONENT_NAME,
   ZipViewer,
   componentMapping,
 );

@@ -42,6 +42,60 @@ const createMonacoEditorComponent = () => ({
   isClosable: false,
 });
 
+export const CASE_SELECTOR_COMPONENT_NAME = 'case-selector-component';
+const createCaseSelectorComponent = () => ({
+  type: 'component',
+  componentName: CASE_SELECTOR_COMPONENT_NAME,
+  componentState: {
+    storeMapping: {
+      cases: 'request.input.cases',
+      currentCase: 'currentCase',
+    },
+    id: 'cases',
+  },
+  title: 'cases/',
+  width: 15,
+  isClosable: false,
+});
+
+export const MONACO_DIFF_COMPONENT_NAME = 'monaco-diff-component';
+const createMonacoDiffComponent = () => ({
+  type: 'component',
+  componentName: MONACO_DIFF_COMPONENT_NAME,
+  componentState: {
+    storeMapping: {
+      originalContents: 'inputOut',
+      modifiedContents: 'outputStdout',
+    },
+    id: 'diff',
+  },
+  title: 'diff',
+  isClosable: false,
+});
+
+export const ZIP_VIEWER_COMPONENT_NAME = 'zip-viewer-component';
+const createZipViewerComponent = () => ({
+  type: 'component',
+  componentName: ZIP_VIEWER_COMPONENT_NAME,
+  componentState: {
+    storeMapping: {},
+    id: 'zipviewer',
+  },
+  title: 'files.zip',
+  isClosable: false,
+});
+
+export const SETTINGS_COMPONENT_NAME = 'settings-component';
+const createSettingsComponent = () => ({
+  type: 'component',
+  componentName: SETTINGS_COMPONENT_NAME,
+  componentState: {
+    storeMapping: {},
+    id: 'settings',
+  },
+  isClosable: false,
+});
+
 export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
   settings: {
     showPopoutIcon: false,
@@ -59,15 +113,7 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
               id: 'source-and-settings',
               content: [
                 createMonacoEditorComponent(),
-                {
-                  type: 'component',
-                  componentName: 'settings-component',
-                  componentState: {
-                    storeMapping: {},
-                    id: 'settings',
-                  },
-                  isClosable: false,
-                },
+                createSettingsComponent(),
               ],
             },
             {
@@ -85,15 +131,7 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
                   extension: 'txt',
                   id: 'logs',
                 }),
-                {
-                  type: 'component',
-                  componentName: 'zip-viewer-component',
-                  componentState: {
-                    storeMapping: {},
-                    id: 'zipviewer',
-                  },
-                  isClosable: false,
-                },
+                createZipViewerComponent(),
               ],
               height: 20,
             },
@@ -140,39 +178,13 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
                   extension: 'err',
                   id: 'stderr',
                 }),
-                {
-                  type: 'component',
-                  componentName: 'monaco-diff-component',
-                  componentState: {
-                    storeMapping: {
-                      originalContents: 'inputOut',
-                      modifiedContents: 'outputStdout',
-                    },
-                    id: 'diff',
-                  },
-                  title: 'diff',
-                  isClosable: false,
-                },
+                createMonacoDiffComponent(),
               ],
             },
           ],
           isClosable: false,
         },
-        {
-          type: 'component',
-          id: 'case-selector-column',
-          componentName: 'case-selector-component',
-          componentState: {
-            storeMapping: {
-              cases: 'request.input.cases',
-              currentCase: 'currentCase',
-            },
-            id: 'cases',
-          },
-          title: 'cases/',
-          width: 15,
-          isClosable: false,
-        },
+        createCaseSelectorComponent(),
       ],
     },
   ],
@@ -213,16 +225,7 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                           extension: 'txt',
                           id: 'logs',
                         }),
-                        {
-                          type: 'component',
-                          componentName: 'zip-viewer-component',
-                          componentState: {
-                            storeMapping: {},
-                            id: 'zipviewer',
-                          },
-                          title: 'files.zip',
-                          isClosable: false,
-                        },
+                        createZipViewerComponent(),
                       ],
                       height: 20,
                     },
@@ -270,19 +273,7 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
                           extension: 'err',
                           id: 'stderr',
                         }),
-                        {
-                          type: 'component',
-                          componentName: 'monaco-diff-component',
-                          componentState: {
-                            storeMapping: {
-                              originalContents: 'inputOut',
-                              modifiedContents: 'outputStdout',
-                            },
-                            id: 'diff',
-                          },
-                          title: 'diff',
-                          isClosable: false,
-                        },
+                        createMonacoDiffComponent(),
                       ],
                     },
                   ],
@@ -293,21 +284,7 @@ export const EMBEDDED_CONFIG: GoldenLayout.Config = {
           ],
           isClosable: false,
         },
-        {
-          type: 'component',
-          id: 'case-selector-column',
-          componentName: 'case-selector-component',
-          componentState: {
-            storeMapping: {
-              cases: 'request.input.cases',
-              currentCase: 'currentCase',
-            },
-            id: 'cases',
-          },
-          title: 'cases/',
-          width: 15,
-          isClosable: false,
-        },
+        createCaseSelectorComponent(),
       ],
     },
   ],
