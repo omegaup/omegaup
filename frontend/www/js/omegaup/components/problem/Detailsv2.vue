@@ -68,9 +68,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="filteredLanguages"
-              :next-submission-timestamp="
-                problem.nextSubmissionTimestamp || new Date()
-              "
+              :seconds-to-next-submission="problem.secondsToNextSubmission"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>

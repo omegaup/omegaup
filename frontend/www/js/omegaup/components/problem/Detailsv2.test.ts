@@ -45,6 +45,7 @@ describe('Detailsv2.vue', () => {
     problem_id: 1,
     quality_seal: true,
     score: 100,
+    secondsToNextSubmission: 0,
     settings: {
       cases: {
         statement_001: {

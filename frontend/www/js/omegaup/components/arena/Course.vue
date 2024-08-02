@@ -66,7 +66,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :seconds-to-next-submission="currentSecondsToNextSubmission"
               :problem="problemInfo"
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
@@ -100,9 +100,7 @@
                     isDismissed,
                   })
               "
-              @new-submission-popup-displayed="
-                $emit('new-submission-popup-displayed')
-              "
+              @new-submission-popup-displayed="onNewSubmissionPopupDisplayed"
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -291,7 +289,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: 0 }) secondsToNextSubmission!: number;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop({ default: false }) showRanking!: boolean;
@@ -315,7 +313,7 @@ export default class ArenaCourse extends Vue {
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
-  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentSecondsToNextSubmission = this.secondsToNextSubmission;
   now = new Date();
   INF = '∞';
 
@@ -419,6 +417,13 @@ export default class ArenaCourse extends Vue {
     this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
+  onNewSubmissionPopupDisplayed(): void {
+    this.$emit('new-submission-popup-displayed', {
+      target: this,
+      problemAlias: this.activeProblem?.alias,
+    });
+  }
+
   onRunAdminDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
@@ -453,8 +458,7 @@ export default class ArenaCourse extends Vue {
     if (!newValue) {
       return;
     }
-    this.currentNextSubmissionTimestamp =
-      newValue.nextSubmissionTimestamp ?? null;
+    this.currentSecondsToNextSubmission = newValue.secondsToNextSubmission;
   }
 
   @Watch('runDetailsData')

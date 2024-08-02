@@ -172,13 +172,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Validate next submission timestamp
-        $submission_gap = isset(
+        $submissionGap = isset(
             $contest->submissions_gap
         ) ? $contest->submissions_gap : \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        $this->assertSame(
-            \OmegaUp\Time::get() + $submission_gap,
-            $response['nextSubmissionTimestamp']->time
-        );
+        $this->assertSame($submissionGap, $response['secondsToNextSubmission']);
 
         $log = \OmegaUp\DAO\SubmissionLog::getByPK($submission->submission_id);
 

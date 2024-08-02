@@ -3859,7 +3859,7 @@ Create a new run
 | Name                      | Type     |
 | ------------------------- | -------- |
 | `guid`                    | `string` |
-| `nextSubmissionTimestamp` | `Date`   |
+| `secondsToNextSubmission` | `number` |
 | `submission_deadline`     | `Date`   |
 | `submit_delay`            | `number` |
 
