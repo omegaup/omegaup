@@ -143,169 +143,180 @@ describe('CaseEdit.vue', () => {
     expect(formInputsUpdated.length).toBe(0);
   });
 
-  it('Should generate arrays and matrices', async () => {
+  const arrayInputMapping: {
+    arrSize: number;
+    arrLow: number;
+    arrHigh: number;
+    distinct: boolean;
+    uniqueConstraint: boolean;
+    emptyConstraint: boolean;
+  }[] = [
+    {
+      arrSize: 10,
+      arrLow: 0,
+      arrHigh: 9,
+      distinct: false,
+      uniqueConstraint: false,
+      emptyConstraint: false,
+    },
+    {
+      arrSize: 10,
+      arrLow: 0,
+      arrHigh: 9,
+      distinct: true,
+      uniqueConstraint: true,
+      emptyConstraint: false,
+    },
+    {
+      arrSize: 11,
+      arrLow: 0,
+      arrHigh: 9,
+      distinct: true,
+      uniqueConstraint: false,
+      emptyConstraint: true,
+    },
+  ];
+
+  describe.each(arrayInputMapping)(`An array with:`, (arrayInput) => {
+    it(`size ${arrayInput.arrSize}, minimum ${arrayInput.arrLow}, maximum ${arrayInput.arrHigh}, distinct ${arrayInput.distinct}, should have uniqueConstraint ${arrayInput.emptyConstraint} and emptyConstraint ${arrayInput.emptyConstraint}`, async () => {
+      const wrapper = mount(CaseEdit, { localVue, store });
+
+      const array = wrapper.vm
+        .getArrayContent(
+          arrayInput.arrSize,
+          arrayInput.arrLow,
+          arrayInput.arrHigh,
+          arrayInput.distinct,
+        )
+        .split(' ')
+        .map(Number);
+
+      if (arrayInput.emptyConstraint) {
+        expect(array).toStrictEqual([0]);
+      } else {
+        expect(array.length).toBe(arrayInput.arrSize);
+        expect(
+          array.every(
+            (num) => num >= arrayInput.arrLow && num <= arrayInput.arrHigh,
+          ),
+        ).toBeTruthy();
+      }
+
+      if (arrayInput.uniqueConstraint) {
+        expect(new Set(array).size).toBe(arrayInput.arrSize);
+      }
+    });
+  });
+
+  const matrixInputMapping: {
+    matrixRows: number;
+    matrixCols: number;
+    matrixLow: number;
+    matrixHigh: number;
+    distinct: MatrixDistinctType;
+    rowUniqueConstraint: boolean;
+    colUniqueConstraint: boolean;
+    emptyConstraint: boolean;
+  }[] = [
+    {
+      matrixRows: 3,
+      matrixCols: 3,
+      matrixLow: 0,
+      matrixHigh: 8,
+      distinct: MatrixDistinctType.None,
+      rowUniqueConstraint: false,
+      colUniqueConstraint: false,
+      emptyConstraint: false,
+    },
+    {
+      matrixRows: 3,
+      matrixCols: 3,
+      matrixLow: 0,
+      matrixHigh: 8,
+      distinct: MatrixDistinctType.Rows,
+      rowUniqueConstraint: true,
+      colUniqueConstraint: false,
+      emptyConstraint: false,
+    },
+    {
+      matrixRows: 3,
+      matrixCols: 3,
+      matrixLow: 0,
+      matrixHigh: 8,
+      distinct: MatrixDistinctType.Cols,
+      rowUniqueConstraint: false,
+      colUniqueConstraint: true,
+      emptyConstraint: false,
+    },
+    {
+      matrixRows: 3,
+      matrixCols: 3,
+      matrixLow: 0,
+      matrixHigh: 8,
+      distinct: MatrixDistinctType.Both,
+      rowUniqueConstraint: true,
+      colUniqueConstraint: true,
+      emptyConstraint: false,
+    },
+    {
+      matrixRows: 3,
+      matrixCols: 3,
+      matrixLow: 0,
+      matrixHigh: 7,
+      distinct: MatrixDistinctType.Both,
+      rowUniqueConstraint: false,
+      colUniqueConstraint: false,
+      emptyConstraint: true,
+    },
+  ];
+
+  describe.each(matrixInputMapping)(`A matrix with:`, (matrixInput) => {
+    it(`${matrixInput.matrixRows} rows, ${matrixInput.matrixCols} columns, minimum ${matrixInput.matrixLow}, maximum ${matrixInput.matrixHigh}, distinct type ${matrixInput.distinct}, should have emptyConstraint ${matrixInput.emptyConstraint}, rowUniqueConstraint ${matrixInput.rowUniqueConstraint}, colUniqueConstraint ${matrixInput.colUniqueConstraint}`, async () => {
+      const wrapper = mount(CaseEdit, { localVue, store });
+      const matrix = wrapper.vm
+        .getMatrixContent(
+          matrixInput.matrixRows,
+          matrixInput.matrixCols,
+          matrixInput.matrixLow,
+          matrixInput.matrixHigh,
+          matrixInput.distinct,
+        )
+        .trim()
+        .split('\n')
+        .map((row) => row.trim().split(' ').map(Number));
+
+      if (matrixInput.emptyConstraint) {
+        expect(matrix).toStrictEqual([[0]]);
+      } else {
+        expect(matrix.length).toBe(matrixInput.matrixRows);
+        expect(matrix[0].length).toBe(matrixInput.matrixCols);
+        expect(
+          matrix.every((row) =>
+            row.every(
+              (num) =>
+                num >= matrixInput.matrixLow && num <= matrixInput.matrixHigh,
+            ),
+          ),
+        ).toBeTruthy();
+      }
+
+      if (matrixInput.rowUniqueConstraint) {
+        expect(
+          matrix.every((row) => new Set(row).size === matrixInput.matrixCols),
+        ).toBe(true);
+      }
+      if (matrixInput.colUniqueConstraint) {
+        expect(
+          matrix[0]
+            .map((_, colIndex) => matrix.map((row) => row[colIndex]))
+            .every((row) => new Set(row).size === matrixInput.matrixRows),
+        ).toBeTruthy();
+      }
+    });
+  });
+
+  it('Should generate and render arrays', async () => {
     const wrapper = mount(CaseEdit, { localVue, store });
-
-    const arrSize = 10;
-    const arrLow = 0;
-    const arrHigh = 9;
-
-    let array = wrapper.vm
-      .getArrayContent(arrSize, arrLow, arrHigh, false)
-      .split(' ')
-      .map(Number);
-
-    expect(array.length).toBe(arrSize);
-    expect(array.every((num) => num >= arrLow && num <= arrHigh)).toBeTruthy();
-
-    array = wrapper.vm
-      .getArrayContent(arrSize, arrLow, arrHigh, true)
-      .split(' ')
-      .map(Number);
-
-    expect(array.length).toBe(arrSize);
-    expect(array.every((num) => num >= arrLow && num <= arrHigh));
-    expect(new Set(array).size).toBe(arrSize);
-
-    const emptyArray = wrapper.vm.getArrayContent(
-      arrSize,
-      arrLow,
-      arrHigh - 1,
-      true,
-    );
-
-    expect(emptyArray).toBe('');
-
-    const matrixRows = 10;
-    const matrixColumns = 9;
-    const matrixLow = 0;
-    const matrixHigh = 89;
-
-    let matrix = wrapper.vm
-      .getMatrixContent(
-        matrixRows,
-        matrixColumns,
-        matrixLow,
-        matrixHigh,
-        MatrixDistinctType.None,
-      )
-      .trim()
-      .split('\n')
-      .map((row) => row.trim().split(' ').map(Number));
-
-    expect(matrix.length).toBe(matrixRows);
-    expect(matrix[0].length).toBe(matrixColumns);
-    expect(
-      matrix.every((row) =>
-        row.every((num) => num >= matrixLow && num <= matrixHigh),
-      ),
-    ).toBeTruthy();
-
-    matrix = wrapper.vm
-      .getMatrixContent(
-        matrixRows,
-        matrixColumns,
-        matrixLow,
-        matrixHigh,
-        MatrixDistinctType.Rows,
-      )
-      .trim()
-      .split('\n')
-      .map((row) => row.trim().split(' ').map(Number));
-
-    expect(matrix.length).toBe(matrixRows);
-    expect(matrix[0].length).toBe(matrixColumns);
-    expect(
-      matrix.every((row) =>
-        row.every((num) => num >= matrixLow && num <= matrixHigh),
-      ),
-    ).toBeTruthy();
-    expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
-      true,
-    );
-
-    matrix = wrapper.vm
-      .getMatrixContent(
-        matrixRows,
-        matrixColumns,
-        matrixLow,
-        matrixHigh,
-        MatrixDistinctType.Cols,
-      )
-      .trim()
-      .split('\n')
-      .map((row) => row.trim().split(' ').map(Number));
-
-    expect(matrix.length).toBe(matrixRows);
-    expect(matrix[0].length).toBe(matrixColumns);
-    expect(
-      matrix.every((row) =>
-        row.every((num) => num >= matrixLow && num <= matrixHigh),
-      ),
-    ).toBeTruthy();
-    expect(
-      matrix[0]
-        .map((_, colIndex) => matrix.map((row) => row[colIndex]))
-        .every((row) => new Set(row).size === matrixRows),
-    ).toBeTruthy();
-
-    matrix = wrapper.vm
-      .getMatrixContent(
-        matrixRows,
-        matrixColumns,
-        matrixLow,
-        matrixHigh,
-        MatrixDistinctType.Both,
-      )
-      .trim()
-      .split('\n')
-      .map((row) => row.trim().split(' ').map(Number));
-
-    expect(matrix.length).toBe(matrixRows);
-    expect(matrix[0].length).toBe(matrixColumns);
-    expect(
-      matrix.every((row) =>
-        row.every((num) => num >= matrixLow && num <= matrixHigh),
-      ),
-    ).toBeTruthy();
-    expect(matrix.every((row) => new Set(row).size === matrixColumns)).toBe(
-      true,
-    );
-    expect(
-      matrix[0]
-        .map((_, colIndex) => matrix.map((row) => row[colIndex]))
-        .every((row) => new Set(row).size === matrixRows),
-    ).toBeTruthy();
-
-    let emptyMatrix = wrapper.vm.getMatrixContent(
-      matrixRows,
-      matrixColumns,
-      matrixLow,
-      matrixLow + matrixColumns - 2,
-      MatrixDistinctType.Rows,
-    );
-
-    expect(emptyMatrix).toBe('');
-
-    emptyMatrix = wrapper.vm.getMatrixContent(
-      matrixRows,
-      matrixColumns,
-      matrixLow,
-      matrixLow + matrixRows - 2,
-      MatrixDistinctType.Cols,
-    );
-
-    expect(emptyMatrix).toBe('');
-
-    emptyMatrix = wrapper.vm.getMatrixContent(
-      matrixRows,
-      matrixColumns,
-      matrixLow,
-      matrixHigh - 1,
-      MatrixDistinctType.Both,
-    );
-
-    expect(emptyMatrix).toBe('');
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
@@ -330,15 +341,17 @@ describe('CaseEdit.vue', () => {
     const editSVG = wrapper.find('svg.bi-pencil-square');
     expect(editSVG.exists()).toBeTruthy();
 
-    let editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
+    const editIcon = wrapper.find(
+      `button[title="${T.problemCreatorLineEdit}"]`,
+    );
     await editIcon.trigger('click');
 
-    let modalBody = wrapper.find('div.modal-body');
+    const modalBody = wrapper.find('div.modal-body');
 
-    let modalInputs = modalBody.findAll('input');
+    const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(5);
 
-    let modalButtons = modalBody.findAll('button');
+    const modalButtons = modalBody.findAll('button');
     expect(modalButtons.length).toBe(1);
 
     const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
@@ -366,9 +379,9 @@ describe('CaseEdit.vue', () => {
       (modalBody.findAll('input').at(4).element as HTMLInputElement).value,
     ).toBe('10 10 10 10 10');
 
-    let modalFooter = wrapper.find('footer.modal-footer');
+    const modalFooter = wrapper.find('footer.modal-footer');
 
-    let footerButtons = modalFooter.findAll('button');
+    const footerButtons = modalFooter.findAll('button');
     expect(footerButtons.length).toBe(2);
 
     await footerButtons.at(1).trigger('click');
@@ -376,6 +389,33 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
       '10 10 10 10 10',
     );
+  });
+
+  it('Should generate and render matrices', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    expect(wrapper.text()).toContain(newCase.name);
+    expect(wrapper.text()).toContain(newGroup.name);
+
+    const dropdowns = wrapper.findAll('a.dropdown-item');
+    expect(dropdowns.length).toBe(4);
+
+    await dropdowns.at(2).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+
+    const editSVG = wrapper.find('svg.bi-pencil-square');
+    expect(editSVG.exists()).toBeTruthy();
+
+    let editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
+    await editIcon.trigger('click');
 
     await dropdowns.at(3).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
@@ -383,12 +423,12 @@ describe('CaseEdit.vue', () => {
     editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
     await editIcon.trigger('click');
 
-    modalBody = wrapper.find('div.modal-body');
+    const modalBody = wrapper.find('div.modal-body');
 
-    modalInputs = modalBody.findAll('input');
+    const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(4);
 
-    modalButtons = modalBody.findAll('button');
+    const modalButtons = modalBody.findAll('button');
     expect(modalButtons.length).toBe(2);
 
     const mockGenerateMatrix = jest.spyOn(wrapper.vm, 'getMatrixContent');
@@ -407,9 +447,9 @@ describe('CaseEdit.vue', () => {
       (modalBody.findAll('textarea').at(0).element as HTMLInputElement).value,
     ).toBe('20 20 20\n20 20 20\n20 20 20');
 
-    modalFooter = wrapper.find('footer.modal-footer');
+    const modalFooter = wrapper.find('footer.modal-footer');
 
-    footerButtons = modalFooter.findAll('button');
+    const footerButtons = modalFooter.findAll('button');
     expect(footerButtons.length).toBe(2);
 
     wrapper.vm.editLineValue([
