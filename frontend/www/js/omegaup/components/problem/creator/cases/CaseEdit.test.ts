@@ -389,30 +389,28 @@ describe('CaseEdit.vue', () => {
     const editSVG = wrapper.find('svg.bi-pencil-square');
     expect(editSVG.exists()).toBeTruthy();
 
-    const editIcon = wrapper.find(
-      `button[title="${T.problemCreatorLineEdit}"]`,
-    );
+    const editIcon = wrapper.find(`button[data-line-edit-button]`);
     await editIcon.trigger('click');
 
-    const modalBody = wrapper.find('div.modal-body');
+    const modalBody = wrapper.find('div[data-array-modal]');
 
     const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(5);
 
-    const modalButtons = modalBody.findAll('button');
-    expect(modalButtons.length).toBe(1);
+    const modalButton = modalBody.find('button[data-array-modal-generate]');
+    expect(modalButton.exists).toBeTruthy();
 
     const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
 
-    await modalButtons.at(0).trigger('click');
+    await modalButton.trigger('click');
     expect(mockGenerate).toHaveBeenCalledWith(10, 0, 100, false);
 
-    await modalInputs.at(0).setValue(5);
-    await modalInputs.at(1).setValue(10);
-    await modalInputs.at(2).setValue(20);
-    await modalInputs.at(3).setChecked(true);
+    await modalBody.find('input[data-array-modal-size]').setValue(5);
+    await modalBody.find('input[data-array-modal-min]').setValue(10);
+    await modalBody.find('input[data-array-modal-max]').setValue(20);
+    await modalBody.find('input[data-array-modal-checkbox]').setChecked(true);
 
-    await modalButtons.at(0).trigger('click');
+    await modalButton.trigger('click');
     expect(mockGenerate).toHaveBeenCalledWith(5, 10, 20, true);
     mockGenerate.mockRestore();
 
@@ -421,10 +419,11 @@ describe('CaseEdit.vue', () => {
     await modalInputs.at(2).setValue(10);
     await modalInputs.at(3).setChecked(false);
 
-    await modalButtons.at(0).trigger('click');
+    await modalButton.trigger('click');
 
     expect(
-      (modalBody.findAll('input').at(4).element as HTMLInputElement).value,
+      (modalBody.find('input[data-array-modal-generated-array]')
+        .element as HTMLInputElement).value,
     ).toBe('10 10 10 10 10');
 
     const modalFooter = wrapper.find('footer.modal-footer');
@@ -456,43 +455,38 @@ describe('CaseEdit.vue', () => {
     const dropdowns = wrapper.findAll('a.dropdown-item');
     expect(dropdowns.length).toBe(4);
 
-    await dropdowns.at(2).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+    await dropdowns.at(3).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
 
     const editSVG = wrapper.find('svg.bi-pencil-square');
     expect(editSVG.exists()).toBeTruthy();
 
-    let editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
+    const editIcon = wrapper.find(`button[data-line-edit-button]`);
     await editIcon.trigger('click');
 
-    await dropdowns.at(3).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
-
-    editIcon = wrapper.find(`button[title="${T.problemCreatorLineEdit}"]`);
-    await editIcon.trigger('click');
-
-    const modalBody = wrapper.find('div.modal-body');
+    const modalBody = wrapper.find('div[data-matrix-modal]');
 
     const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(4);
 
-    const modalButtons = modalBody.findAll('button');
-    expect(modalButtons.length).toBe(2);
+    const modalButton = modalBody.find('button[data-matrix-modal-generate]');
+    expect(modalButton.exists).toBeTruthy();
 
     const mockGenerateMatrix = jest.spyOn(wrapper.vm, 'getMatrixContent');
 
-    await modalButtons.at(1).trigger('click');
+    await modalButton.trigger('click');
     expect(mockGenerateMatrix).toHaveBeenCalledWith(3, 3, 0, 100, 'none');
     mockGenerateMatrix.mockRestore();
 
-    await modalInputs.at(0).setValue(3);
-    await modalInputs.at(1).setValue(3);
-    await modalInputs.at(2).setValue(20);
-    await modalInputs.at(3).setValue(20);
+    await modalBody.find('input[data-matrix-modal-rows]').setValue(3);
+    await modalBody.find('input[data-matrix-modal-columns]').setValue(3);
+    await modalBody.find('input[data-matrix-modal-min]').setValue(20);
+    await modalBody.find('input[data-matrix-modal-max]').setValue(20);
 
-    await modalButtons.at(1).trigger('click');
+    await modalButton.trigger('click');
     expect(
-      (modalBody.findAll('textarea').at(0).element as HTMLInputElement).value,
+      (modalBody.find('textarea[data-matrix-modal-generated-matrix]')
+        .element as HTMLInputElement).value,
     ).toBe('20 20 20\n20 20 20\n20 20 20');
 
     const modalFooter = wrapper.find('footer.modal-footer');
@@ -509,4 +503,73 @@ describe('CaseEdit.vue', () => {
       '20 20 20\n20 20 20\n20 20 20',
     );
   });
+
+  const matrixDistinctTypeMapping: {
+    matrixDistinctType: string;
+    matrixDistinctEnum: MatrixDistinctType;
+  }[] = [
+    {
+      matrixDistinctType: T.matrixModalDistinctNone,
+      matrixDistinctEnum: MatrixDistinctType.None,
+    },
+    {
+      matrixDistinctType: T.matrixModalDistinctRow,
+      matrixDistinctEnum: MatrixDistinctType.Rows,
+    },
+    {
+      matrixDistinctType: T.matrixModalDistinctColumn,
+      matrixDistinctEnum: MatrixDistinctType.Cols,
+    },
+    {
+      matrixDistinctType: T.matrixModalDistinctAll,
+      matrixDistinctEnum: MatrixDistinctType.Both,
+    },
+  ];
+
+  describe.each(matrixDistinctTypeMapping)(
+    `When dropdown:`,
+    ({ matrixDistinctType, matrixDistinctEnum }) => {
+      it(`${matrixDistinctType} is selected, function should be called with ${matrixDistinctEnum}`, async () => {
+        const wrapper = mount(CaseEdit, { localVue, store });
+
+        const groupID = newGroup.groupID;
+        const caseID = newCase.caseID;
+        store.commit('casesStore/setSelected', {
+          groupID,
+          caseID,
+        });
+        await Vue.nextTick();
+        const dropdowns = wrapper.findAll('a.dropdown-item');
+        expect(dropdowns.length).toBe(4);
+
+        await dropdowns.at(3).trigger('click');
+        expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+
+        const editIcon = wrapper.find(`button[data-line-edit-button]`);
+        await editIcon.trigger('click');
+
+        const modalBody = wrapper.find('div[data-matrix-modal]');
+
+        const modalButton = modalBody.find(
+          'button[data-matrix-modal-generate]',
+        );
+        expect(modalButton.exists).toBeTruthy();
+
+        const mockGenerateMatrix = jest.spyOn(wrapper.vm, 'getMatrixContent');
+
+        await modalBody
+          .find(`a[data-matrix-modal-dropdown="${matrixDistinctType}"]`)
+          .trigger('click');
+        await modalButton.trigger('click');
+        expect(mockGenerateMatrix).toHaveBeenCalledWith(
+          3,
+          3,
+          0,
+          100,
+          matrixDistinctEnum,
+        );
+        mockGenerateMatrix.mockRestore();
+      });
+    },
+  );
 });

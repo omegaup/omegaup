@@ -124,6 +124,7 @@
                         getEditIconDisplay(line) ===
                         EditIconDisplayOption.EDIT_ICON
                       "
+                      data-line-edit-button
                       size="sm"
                       type="button"
                       :title="T.problemCreatorLineEdit"
@@ -135,6 +136,7 @@
                     <b-modal
                       v-if="line.data.kind === 'array'"
                       v-model="arrayModalEdit"
+                      data-array-modal
                       :title="T.arrayEditTitle"
                       :ok-title="T.arrayModalSave"
                       ok-variant="success"
@@ -153,27 +155,30 @@
                             {{ T.arrayModalSize }}
                             <b-form-input
                               v-model="line.data.size"
-                              type="number"
+                              data-array-modal-size
                             />
                           </b-col>
                           <b-col class="text-left">
                             {{ T.arrayModalMinimum }}
                             <b-form-input
                               v-model="line.data.min"
-                              type="number"
+                              data-array-modal-min
                             />
                           </b-col>
                           <b-col class="text-left">
                             {{ T.arrayModalMaximum }}
                             <b-form-input
                               v-model="line.data.max"
-                              type="number"
+                              data-array-modal-max
                             />
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
                           <b-col class="text-left">
-                            <b-form-checkbox v-model="line.data.distinct">
+                            <b-form-checkbox
+                              v-model="line.data.distinct"
+                              data-array-modal-checkbox
+                            >
                               {{ T.arrayModalDistinctValues }}
                             </b-form-checkbox>
                           </b-col>
@@ -182,6 +187,7 @@
                           <b-col class="text-left">
                             <b-button
                               variant="primary"
+                              data-array-modal-generate
                               @click="
                                 arrayModalEditArray = getArrayContent(
                                   Number(line.data.size),
@@ -200,6 +206,7 @@
                         </div>
                         <b-form-input
                           v-model="arrayModalEditArray"
+                          data-array-modal-generated-array
                           class="w-100"
                         />
                       </b-container>
@@ -207,6 +214,7 @@
                     <b-modal
                       v-if="line.data.kind === 'matrix'"
                       v-model="matrixModalEdit"
+                      data-matrix-modal
                       :title="T.matrixEditTitle"
                       :ok-title="T.matrixModalSave"
                       ok-variant="success"
@@ -223,19 +231,31 @@
                         <b-row class="mb-4">
                           <b-col class="text-left">
                             {{ T.matrixModalRows }}
-                            <b-form-input v-model="line.data.rows" />
+                            <b-form-input
+                              v-model="line.data.rows"
+                              data-matrix-modal-rows
+                            />
                           </b-col>
                           <b-col>
                             {{ T.matrixModalColumns }}
-                            <b-form-input v-model="line.data.cols" />
+                            <b-form-input
+                              v-model="line.data.cols"
+                              data-matrix-modal-columns
+                            />
                           </b-col>
                           <b-col class="text-left">
                             {{ T.matrixModalMinimum }}
-                            <b-form-input v-model="line.data.min" />
+                            <b-form-input
+                              v-model="line.data.min"
+                              data-matrix-modal-min
+                            />
                           </b-col>
                           <b-col>
                             {{ T.matrixModalMaximum }}
-                            <b-form-input v-model="line.data.max" />
+                            <b-form-input
+                              v-model="line.data.max"
+                              data-matrix-modal-max
+                            />
                           </b-col>
                         </b-row>
                         <b-row class="mt-2 mb-4">
@@ -247,6 +267,7 @@
                               :text="
                                 getDistinctNameFromType(line.data.distinct)
                               "
+                              data-matrix-modal-dropdown
                               variant="light"
                             >
                               <b-dropdown-header>
@@ -255,6 +276,9 @@
                               <b-dropdown-item
                                 v-for="matrixDistinctOption in matrixDistinctOptions"
                                 :key="matrixDistinctOption.distinctType"
+                                :data-matrix-modal-dropdown="
+                                  matrixDistinctOption.type
+                                "
                                 @click="
                                   line.data.distinct =
                                     matrixDistinctOption.distinctType
@@ -269,6 +293,7 @@
                           <b-col class="text-left">
                             <b-button
                               variant="primary"
+                              data-matrix-modal-generate
                               @click="
                                 matrixModalEditArray = getMatrixContent(
                                   Number(line.data.rows),
@@ -288,6 +313,7 @@
                         </div>
                         <b-form-textarea
                           v-model="matrixModalEditArray"
+                          data-matrix-modal-generated-matrix
                           class="w-100"
                         />
                       </b-container>
