@@ -124,7 +124,7 @@ function initialize() {
       Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
       (value) => {
         if (store.getters.isUpdatingSettings) return;
-        let casesColumn = layout.root.getItemsById('cases-column')[0];
+        const casesColumn = layout.root.getItemsById('cases-column')[0];
         casesColumn.parent.setActiveContentItem(casesColumn);
       },
     );
