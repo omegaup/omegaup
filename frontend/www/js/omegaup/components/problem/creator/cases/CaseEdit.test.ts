@@ -431,7 +431,7 @@ describe('CaseEdit.vue', () => {
     const footerButtons = modalFooter.findAll('button');
     expect(footerButtons.length).toBe(2);
 
-    await footerButtons.at(1).trigger('click');
+    await modalFooter.find('button.btn-success').trigger('click');
 
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
       '10 10 10 10 10',
