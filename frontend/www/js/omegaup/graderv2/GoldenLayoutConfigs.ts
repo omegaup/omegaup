@@ -14,7 +14,7 @@ const createTextEditorComponent = ({
   module,
   extension,
   id,
-}: TextEditorComponentConfig) => ({
+}: TextEditorComponentConfig): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: TEXT_EDITOR_COMPONENT_NAME,
   componentState: {
@@ -26,9 +26,8 @@ const createTextEditorComponent = ({
   },
   isClosable: false,
 });
-
 export const MONACO_EDITOR_COMPONENT_NAME = 'monaco-editor-component';
-const createMonacoEditorComponent = () => ({
+const createMonacoEditorComponent = (): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: MONACO_EDITOR_COMPONENT_NAME,
   componentState: {
@@ -43,7 +42,7 @@ const createMonacoEditorComponent = () => ({
 });
 
 export const CASE_SELECTOR_COMPONENT_NAME = 'case-selector-component';
-const createCaseSelectorComponent = () => ({
+const createCaseSelectorComponent = (): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: CASE_SELECTOR_COMPONENT_NAME,
   componentState: {
@@ -59,7 +58,7 @@ const createCaseSelectorComponent = () => ({
 });
 
 export const MONACO_DIFF_COMPONENT_NAME = 'monaco-diff-component';
-const createMonacoDiffComponent = () => ({
+const createMonacoDiffComponent = (): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: MONACO_DIFF_COMPONENT_NAME,
   componentState: {
@@ -74,7 +73,7 @@ const createMonacoDiffComponent = () => ({
 });
 
 export const ZIP_VIEWER_COMPONENT_NAME = 'zip-viewer-component';
-const createZipViewerComponent = () => ({
+const createZipViewerComponent = (): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: ZIP_VIEWER_COMPONENT_NAME,
   componentState: {
@@ -86,7 +85,7 @@ const createZipViewerComponent = () => ({
 });
 
 export const SETTINGS_COMPONENT_NAME = 'settings-component';
-const createSettingsComponent = () => ({
+const createSettingsComponent = (): GoldenLayout.ComponentConfig => ({
   type: 'component',
   componentName: SETTINGS_COMPONENT_NAME,
   componentState: {
