@@ -410,7 +410,7 @@ export default class CaseEdit extends Vue {
     EDIT_ICON: 'edit_icon',
   });
 
-  get getLineDisplay(): (line: CaseLine) => 'line' | 'multiline' {
+  get getLineDisplay() {
     return (line: CaseLine) => {
       if (line.data.kind === 'line' || line.data.kind === 'array') {
         return this.LineDisplayOption.LINE;
@@ -419,7 +419,7 @@ export default class CaseEdit extends Vue {
     };
   }
 
-  get getEditIconDisplay(): (line: CaseLine) => 'edit_icon' | undefined {
+  get getEditIconDisplay() {
     return (line: CaseLine) => {
       if (line.data.kind === 'array' || line.data.kind === 'matrix') {
         return this.EditIconDisplayOption.EDIT_ICON;
