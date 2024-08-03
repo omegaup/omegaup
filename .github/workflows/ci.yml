@@ -306,6 +306,14 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Download the Docker containers
         run: |
           docker-compose pull
@@ -453,6 +461,14 @@ jobs:
       - name: Install retry
         run: |
           sudo apt-get update -y && sudo apt-get install -y retry
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       - name: Download the Docker containers
         run: |
