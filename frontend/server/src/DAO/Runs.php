@@ -24,7 +24,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ON
             ss.submission_id = sf.submission_id
         WHERE
-            ss.problem_id = ?
+            sf.range_bytes_start IS NOT NULL
         GROUP BY
             ss.submission_id
     )';
@@ -239,7 +239,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         if (!is_null($problemsetId)) {
             $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
-            $val[] = $problemsetId;
 
             $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
@@ -1019,7 +1018,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
             $whereClause = ' AND s.problemset_id = ?';
-            $params = [$problemId, $problemId, $identityId, $problemsetId];
+            $params = [$problemId, $identityId, $problemsetId];
         }
 
         $sql = "{$cteSubmissionsFeedback}
