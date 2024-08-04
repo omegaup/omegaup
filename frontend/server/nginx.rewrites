@@ -2,7 +2,7 @@
 # https://github.com/omegaup/omegaup/issues/7678#issuecomment-2246728697
 server {
     server_name www.omegaup.com;
-    rewrite ^(.*)$ https://omegaup.com$1 permanent;
+    return 301 https://omegaup.com$request_uri;
 }
 
 location /api/ {
