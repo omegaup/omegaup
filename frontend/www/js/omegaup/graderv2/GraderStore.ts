@@ -683,6 +683,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     inputOut({ commit }: { commit: Commit }, value: string) {
       commit('inputOut', value);
     },
+    'request.source'({ commit }: { commit: Commit }, value: string) {
+      commit('request.source', value);
+    },
   },
   strict: true,
 };
