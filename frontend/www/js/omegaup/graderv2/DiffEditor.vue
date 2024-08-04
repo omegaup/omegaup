@@ -5,12 +5,12 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
 
 @Component
 export default class DiffEditor extends Vue {
-  @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ default: 'vs-dark' }) theme!: string;
   @Prop({ default: false }) readOnly!: boolean;
@@ -20,11 +20,11 @@ export default class DiffEditor extends Vue {
   _editor: monaco.editor.IStandaloneDiffEditor | null = null;
 
   get originalContents(): string {
-    return Util.vuexGet(this.store, this.storeMapping.originalContents);
+    return Util.vuexGet(store, this.storeMapping.originalContents);
   }
 
   get modifiedContents(): string {
-    return Util.vuexGet(this.store, this.storeMapping.modifiedContents);
+    return Util.vuexGet(store, this.storeMapping.modifiedContents);
   }
 
   @Watch('originalContents')

@@ -5,12 +5,12 @@
 <script lang="ts">
 // TODO: replace all instances of any with correct type
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
 
 @Component
 export default class MonacoEditor extends Vue {
-  @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
   @Prop({ default: 'vs-dark' }) theme!: string;
   @Prop({ default: null }) initialModule!: string | null;
@@ -23,20 +23,20 @@ export default class MonacoEditor extends Vue {
 
   get language(): string {
     if (this.initialLanguage) return this.initialLanguage;
-    return Util.vuexGet(this.store, this.storeMapping.language);
+    return Util.vuexGet(store, this.storeMapping.language);
   }
 
   get module(): string {
     if (this.initialModule) return this.initialModule;
-    return Util.vuexGet(this.store, this.storeMapping.module);
+    return Util.vuexGet(store, this.storeMapping.module);
   }
 
   get contents(): string {
-    return Util.vuexGet(this.store, this.storeMapping.contents);
+    return Util.vuexGet(store, this.storeMapping.contents);
   }
 
   set contents(value: string) {
-    Util.vuexSet(this.store, this.storeMapping.contents, value);
+    Util.vuexSet(store, this.storeMapping.contents, value);
   }
 
   get filename(): string {

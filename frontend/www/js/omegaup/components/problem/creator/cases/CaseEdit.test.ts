@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import CaseEdit from './CaseEdit.vue';
 import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
@@ -52,7 +52,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(4);
 
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
@@ -78,7 +78,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(4);
 
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
@@ -90,5 +90,103 @@ describe('CaseEdit.vue', () => {
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
     expect(wrapper.find('biconthreedotsvertical-stub').exists()).toBe(true);
+  });
+
+  it('Should add, modify and delete a line', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const buttons = wrapper.findAllComponents(BButton);
+    expect(buttons.length).toBe(4);
+
+    expect(wrapper.text()).toContain(newCase.name);
+    expect(wrapper.text()).toContain(newGroup.name);
+
+    wrapper.vm.addNewLine();
+    await Vue.nextTick();
+
+    expect(wrapper.find('table').exists()).toBe(true);
+    const formInputs = wrapper.findAll('input');
+
+    formInputs.at(0).setValue('testLabel');
+    formInputs.at(1).setValue('testValue');
+    await wrapper.trigger('click');
+
+    expect(wrapper.vm.getLinesFromSelectedCase[0].label).toBe('testLabel');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe('testValue');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('line');
+
+    const dropdowns = wrapper.findAll('a.dropdown-item');
+    expect(dropdowns.length).toBe(4);
+
+    await dropdowns.at(1).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
+
+    await dropdowns.at(2).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+
+    await dropdowns.at(3).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+
+    wrapper.vm.deleteLine(wrapper.vm.getLinesFromSelectedCase[0].lineID);
+    await Vue.nextTick();
+
+    const formInputsUpdated = wrapper.findAll('input');
+    expect(formInputsUpdated.length).toBe(0);
+  });
+
+  it('Should modify and move a case', async () => {
+    store.commit('casesStore/resetStore');
+
+    newUngroupedCasegroup.cases = [];
+    newGroup.cases = [];
+
+    store.commit('casesStore/addGroup', newUngroupedCasegroup);
+    store.commit('casesStore/addCase', newUngroupedCase);
+    store.commit('casesStore/addGroup', newGroup);
+
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const groupID = newUngroupedCasegroup.groupID;
+    const caseID = newUngroupedCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const editButton = wrapper.find('button');
+    expect(editButton.text()).toBe(T.caseEditTitle);
+
+    await editButton.trigger('click');
+
+    const modifiedName = 'modifiedname';
+    const editNameInput = wrapper.find('input');
+    await editNameInput.setValue(modifiedName);
+
+    const saveButton = wrapper.find('button.btn-success');
+    expect(saveButton.text()).toBe(T.caseModalSave);
+
+    await saveButton.trigger('click');
+
+    expect(wrapper.vm.getSelectedCase.name).toBe(modifiedName);
+    expect(wrapper.vm.getSelectedGroup.name).toBe(modifiedName);
+
+    await editButton.trigger('click');
+
+    wrapper.vm.caseInputRef.caseGroup = newGroup.groupID;
+    wrapper.vm.updateCaseInfo();
+
+    expect(wrapper.vm.groups.length).toBe(1);
+
+    expect(wrapper.vm.groups[0].cases[0].name).toBe(modifiedName);
+    expect(wrapper.vm.groups[0].cases[0].groupID).toBe(newGroup.groupID);
   });
 });
