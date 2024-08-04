@@ -1,3 +1,7 @@
+# Rewrite all requests to go from www.omegaup.com to omegaup.com as mentioned in
+# https://github.com/omegaup/omegaup/issues/7678#issuecomment-2246728697
+rewrite ^ https://omegaup.com$ permanent;
+
 location /api/ {
 	rewrite ^/api/(.*)$ /api/ApiEntryPoint.php last;
 }
