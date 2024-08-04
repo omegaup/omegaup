@@ -305,21 +305,13 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Download the Docker containers
         run: |
-          docker-compose pull
+          docker compose pull
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          docker compose up --no-build --detach
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
@@ -388,11 +380,11 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+          docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
         run: |
@@ -461,21 +453,13 @@ jobs:
         run: |
           sudo apt-get update -y && sudo apt-get install -y retry
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Download the Docker containers
         run: |
-          docker-compose pull
+          docker compose pull
 
       - name: Start the Docker containers
         run: |
-          docker-compose up --no-build --detach
+          docker compose up --no-build --detach
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
@@ -484,7 +468,7 @@ jobs:
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
-          retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
+          retry -t 5 -d 5 -- docker compose exec -T rabbitmq rabbitmqctl await_startup
 
           for i in $(seq 10); do
             if [[ "$(mysql \
@@ -536,7 +520,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
@@ -546,11 +530,11 @@ jobs:
           # Create directory to prevent --purge from failing.
           sudo mkdir -p /var/lib/omegaup
           sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+          docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Run Python tests
         run: |
-          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
+          docker compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}
