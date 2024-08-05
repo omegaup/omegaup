@@ -516,7 +516,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .async('string')
               .then((value) => {
                 store.commit('Validator', 'custom');
-                store.commit('ValidatorLanguage', extension);
+                store.commit(
+                  'request.input.validator.custom_validator.language',
+                  extension,
+                );
                 store.commit(
                   'request.input.validator.custom_validator.source',
                   value,
