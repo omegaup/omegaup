@@ -61,6 +61,16 @@ export interface SettingsCasesGroup {
   Cases: SettingsCase[];
   Weight: number;
 }
+// TODO: combine case selector group and settings cases group
+export interface CaseSelectorGroup {
+  explicit: boolean;
+  name: string;
+  cases: {
+    name: string;
+    item: { in: string; out: string; weight?: number };
+  }[];
+}
+
 const languageSelectElement = document.getElementById(
   'language',
 ) as HTMLSelectElement;
@@ -268,6 +278,54 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     Validator(state: GraderStore) {
       return state.request.input.validator.name;
+    },
+    caseSelectorGroups(state: GraderStore): CaseSelectorGroup[] {
+      const flatCases = state.request.input.cases;
+
+      const resultMap: {
+        [key: string]: CaseSelectorGroup;
+      } = {};
+
+      for (const caseName in flatCases) {
+        if (!flatCases[caseName]) continue;
+
+        const tokens = caseName.split('.', 2);
+        if (!resultMap[tokens[0]]) {
+          resultMap[tokens[0]] = {
+            explicit: tokens.length > 1,
+            name: tokens[0],
+            cases: [],
+          };
+        }
+
+        resultMap[tokens[0]].cases.push({
+          name: caseName,
+          item: flatCases[caseName],
+        });
+      }
+
+      const result: CaseSelectorGroup[] = [];
+      for (const groupName in resultMap) {
+        if (!resultMap[groupName]) continue;
+
+        resultMap[groupName].cases.sort(
+          (
+            a: {
+              name: string;
+              item: { in: string; out: string; weight?: number };
+            },
+            b: {
+              name: string;
+              item: { in: string; out: string; weight?: number };
+            },
+          ) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+        );
+        result.push(resultMap[groupName]);
+      }
+      result.sort((a: CaseSelectorGroup, b: CaseSelectorGroup) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      );
+      return result;
     },
   },
   mutations: {
@@ -586,7 +644,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     createCase(
       state: GraderStore,
-      caseData: { name: string; in: string; out: string; weight?: number },
+      caseData: { name: string; in?: string; out?: string; weight?: number },
     ) {
       // if case doesnt already exist create it?
       // no! always create a case
@@ -699,6 +757,18 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     Validator({ commit }: { commit: Commit }, value: string) {
       commit('Validator', value);
+    },
+    currentCase({ commit }: { commit: Commit }, value: string) {
+      commit('currentCase', value);
+    },
+    createCase(
+      { commit }: { commit: Commit },
+      caseData: { name: string; in?: string; out?: string; weight?: number },
+    ) {
+      commit('createCase', caseData);
+    },
+    removeCase({ commit }: { commit: Commit }, name: string) {
+      commit('removeCase', name);
     },
   },
   strict: true,
