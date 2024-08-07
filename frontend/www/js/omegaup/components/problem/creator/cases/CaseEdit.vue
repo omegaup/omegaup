@@ -201,7 +201,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
+import { BNavItemDropdown, FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
@@ -235,7 +235,7 @@ export default class CaseEdit extends Vue {
 
   deleteLines() {
     this.deleteLinesForSelectedCase();
-    (this.$refs.dropdown as any).hide(true);
+    (this.$refs.dropdown as BNavItemDropdown).hide(true);
   }
 
   LineDisplayOption = Object.freeze({
