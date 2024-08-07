@@ -155,6 +155,7 @@
                             {{ T.arrayModalSize }}
                             <b-form-input
                               v-model="line.data.size"
+                              type="number"
                               data-array-modal-size
                             />
                           </b-col>
@@ -162,6 +163,7 @@
                             {{ T.arrayModalMinimum }}
                             <b-form-input
                               v-model="line.data.min"
+                              type="number"
                               data-array-modal-min
                             />
                           </b-col>
@@ -169,6 +171,7 @@
                             {{ T.arrayModalMaximum }}
                             <b-form-input
                               v-model="line.data.max"
+                              type="number"
                               data-array-modal-max
                             />
                           </b-col>
@@ -233,6 +236,7 @@
                             {{ T.matrixModalRows }}
                             <b-form-input
                               v-model="line.data.rows"
+                              type="number"
                               data-matrix-modal-rows
                             />
                           </b-col>
@@ -240,6 +244,7 @@
                             {{ T.matrixModalColumns }}
                             <b-form-input
                               v-model="line.data.cols"
+                              type="number"
                               data-matrix-modal-columns
                             />
                           </b-col>
@@ -247,6 +252,7 @@
                             {{ T.matrixModalMinimum }}
                             <b-form-input
                               v-model="line.data.min"
+                              type="number"
                               data-matrix-modal-min
                             />
                           </b-col>
@@ -254,6 +260,7 @@
                             {{ T.matrixModalMaximum }}
                             <b-form-input
                               v-model="line.data.max"
+                              type="number"
                               data-matrix-modal-max
                             />
                           </b-col>
