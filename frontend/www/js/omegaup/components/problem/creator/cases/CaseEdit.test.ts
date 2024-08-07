@@ -143,7 +143,7 @@ describe('CaseEdit.vue', () => {
   });
 
   it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
-    const wrapper = mount(CaseEdit, { localVue, store: store });
+    const wrapper = mount(CaseEdit, { localVue, store });
 
     const groupID = newGroup.groupID;
     const caseID = newCase.caseID;
