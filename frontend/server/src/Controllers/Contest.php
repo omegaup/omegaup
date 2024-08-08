@@ -2808,7 +2808,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode',
             ['partial','all_or_nothing','max_per_group'],
         );
-        $submissionsGap = $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
+        $submissionsGap = $r->ensureOptionalInt(
+            'submissions_gap',
+            0,
+            null,
+            $isRequired
+        );
         $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
