@@ -61,9 +61,6 @@ export interface SettingsCasesGroup {
   Cases: SettingsCase[];
   Weight: number;
 }
-const languageSelectElement = document.getElementById(
-  'language',
-) as HTMLSelectElement;
 
 const persistToSessionStorage = Util.throttle(
   ({
@@ -274,26 +271,22 @@ const storeOptions: StoreOptions<GraderStore> = {
       }
 
       state.alias = value;
+      state.sessionStorageSources = null;
+
       const itemString = sessionStorage.getItem(
         `ephemeral-sources-${state.alias}`,
       );
-      state.sessionStorageSources = null;
-
       if (itemString) {
         state.sessionStorageSources = JSON.parse(itemString);
       }
       if (!state.sessionStorageSources) {
-        if (state.request.input.interactive) {
-          state.sessionStorageSources = {
-            language: languageSelectElement.value,
-            sources: interactiveTemplates,
-          };
-        } else {
-          state.sessionStorageSources = {
-            language: languageSelectElement.value,
-            sources: sourceTemplates,
-          };
-        }
+        state.sessionStorageSources = {
+          language: 'cpp17-gcc',
+          sources: state.request.input.interactive
+            ? interactiveTemplates
+            : sourceTemplates,
+        };
+
         persistToSessionStorage(state.alias)({
           alias: state.alias,
           contents: state.sessionStorageSources,
@@ -302,30 +295,10 @@ const storeOptions: StoreOptions<GraderStore> = {
       store.commit('request.language', state.sessionStorageSources.language);
     },
     showSubmitButton(state: GraderStore, value: boolean) {
-      state.problemsetId = value;
-      const submitButton = document.querySelector(
-        'button[data-submit-button]',
-      ) as HTMLButtonElement;
-      if (value) {
-        submitButton.classList.remove('d-none');
-      } else {
-        submitButton.classList.add('d-none');
-      }
+      state.showSubmitButton = value;
     },
     languages(state: GraderStore, value: string[]) {
-      // hide languages that are not accepted
       state.languages = value;
-      document
-        .querySelectorAll<HTMLOptionElement>(
-          'select[data-language-select] option',
-        )
-        .forEach((option) => {
-          if (!state.languages.includes(option.value)) {
-            option.classList.add('d-none');
-          } else {
-            option.classList.remove('d-none');
-          }
-        });
     },
     currentCase(state: GraderStore, value: string) {
       state.currentCase = value;
@@ -339,46 +312,40 @@ const storeOptions: StoreOptions<GraderStore> = {
     request(state: GraderStore, value: GraderRequest) {
       Vue.set(state, 'request', value);
     },
-    'request.language'(state: GraderStore, value: string) {
-      state.request.language = value;
-      languageSelectElement.value = value;
-      if (
-        Object.prototype.hasOwnProperty.call(languageExtensionMapping, value)
-      ) {
-        const language = languageExtensionMapping[value];
-        if (state.sessionStorageSources) {
-          if (
-            Object.prototype.hasOwnProperty.call(
-              state.sessionStorageSources.sources,
-              language,
-            )
-          ) {
-            state.request.source =
-              state.sessionStorageSources.sources[language];
-          }
-        } else if (store.getters.isInteractive) {
-          if (
-            Object.prototype.hasOwnProperty.call(interactiveTemplates, language)
-          ) {
-            state.request.source = interactiveTemplates[language];
-          }
-        } else {
-          if (Object.prototype.hasOwnProperty.call(sourceTemplates, language)) {
-            state.request.source = sourceTemplates[language];
-          }
+    'request.language'(state: GraderStore, language: string) {
+      state.request.language = language;
+      if (!languageExtensionMapping[language]) {
+        state.dirty = true;
+        return;
+      }
+
+      const extension = languageExtensionMapping[language];
+      if (state.sessionStorageSources) {
+        if (state.sessionStorageSources.sources[extension]) {
+          state.request.source = state.sessionStorageSources.sources[extension];
         }
-        if (state.sessionStorageSources && !state.updatingSettings) {
-          state.sessionStorageSources.language = value;
-          persistToSessionStorage(state.alias)({
-            alias: state.alias,
-            contents: state.sessionStorageSources,
-          });
+      } else if (state.request.input.interactive) {
+        if (interactiveTemplates[extension]) {
+          state.request.source = interactiveTemplates[extension];
+        }
+      } else {
+        if (sourceTemplates[extension]) {
+          state.request.source = sourceTemplates[extension];
         }
       }
+
+      if (state.sessionStorageSources && !state.updatingSettings) {
+        state.sessionStorageSources.language = language;
+        persistToSessionStorage(state.alias)({
+          alias: state.alias,
+          contents: state.sessionStorageSources,
+        });
+      }
+
       state.dirty = true;
     },
-    'request.source'(state: GraderStore, value: string) {
-      state.request.source = value;
+    'request.source'(state: GraderStore, source: string) {
+      state.request.source = source;
       if (state.updatingSettings || !state.sessionStorageSources) {
         state.dirty = true;
         return;
@@ -386,11 +353,12 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       state.sessionStorageSources.sources[
         languageExtensionMapping[state.sessionStorageSources.language]
-      ] = value;
+      ] = source;
       persistToSessionStorage(state.alias)({
         alias: state.alias,
         contents: state.sessionStorageSources,
       });
+
       state.dirty = true;
     },
     inputIn(state: GraderStore, value: string) {
@@ -649,9 +617,57 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       state.dirty = true;
     },
+    initWithProblem(
+      state: GraderStore,
+      {
+        languages,
+        alias,
+        initialLanguage,
+        showSubmitButton,
+        settings,
+      }: {
+        languages: string[];
+        alias: string;
+        initialLanguage: string;
+        showSubmitButton: boolean;
+        settings: types.ProblemSettingsDistrib;
+      },
+    ) {
+      store.commit('updatingSettings', true);
+
+      store.commit('languages', languages);
+      store.commit('Interactive', settings.interactive);
+      store.commit('alias', alias);
+      store.commit('request.language', initialLanguage);
+      store.commit('showSubmitButton', showSubmitButton);
+      store.commit('limits', settings.limits);
+      store.commit('Validator', settings.validator.name);
+      store.commit('Tolerance', settings.validator.tolerance);
+
+      // create cases for current problem
+      for (const caseName in settings.cases) {
+        if (!settings.cases[caseName]) continue;
+        const caseData = settings.cases[caseName];
+        store.commit('createCase', {
+          name: caseName,
+          weight: caseData.weight,
+          in: caseData['in'],
+          out: caseData['out'],
+        });
+      }
+
+      // delete cases that are not in settings cases
+      for (const caseName of Object.keys(store.state.request.input.cases)) {
+        if (Object.prototype.hasOwnProperty.call(settings.cases, caseName))
+          continue;
+        store.commit('removeCase', caseName);
+      }
+
+      store.commit('updatingSettings', false);
+      state.dirty = true;
+    },
   },
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
-store.commit('reset');
 export default store;
