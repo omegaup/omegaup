@@ -2825,7 +2825,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
             'submissions_gap',
             1,
-            is_null($contestLength) ? null : floor($contestLength / 60),
+            $contestLength === 0 ? null : floor($contestLength / 60),
             $isRequired
         );
 
