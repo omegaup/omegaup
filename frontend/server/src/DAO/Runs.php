@@ -23,8 +23,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             Submissions ss
         ON
             ss.submission_id = sf.submission_id
-        WHERE
-            sf.range_bytes_start IS NOT NULL
         GROUP BY
             ss.submission_id
     )';
