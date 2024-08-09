@@ -49,16 +49,16 @@ export default class TextEditor extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
-.textarea.vs-dark {
+
+.vs-dark {
   background: var(--textarea-vs-dark-background-color);
-  border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
   color: var(--textarea-vs-dark-font-color);
 }
 
-.textarea.vs {
-  border: 0px;
+.vs {
+  background: var(--textarea-vs-background-color);
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
 }
