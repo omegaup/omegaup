@@ -18,6 +18,12 @@ class CourseParams {
     const COURSE_REQUEST_USER_INFORMATION_OPTIONAL = 'optional';
     const COURSE_REQUEST_USER_INFORMATION_REQUIRED = 'required';
 
+    const VALID_ADMISSION_MODES = [
+        self::COURSE_ADMISSION_MODE_PRIVATE,
+        self::COURSE_ADMISSION_MODE_REGISTRATION,
+        self::COURSE_ADMISSION_MODE_PUBLIC,
+    ];
+
     /**
      * @readonly
      * @var string
@@ -140,11 +146,7 @@ class CourseParams {
             \OmegaUp\Validators::validateInEnum(
                 $params['admission_mode'],
                 'admission_mode',
-                [
-                    \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE,
-                    \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_REGISTRATION,
-                    \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PUBLIC,
-                ]
+                \OmegaUp\CourseParams::VALID_ADMISSION_MODES
             );
         }
         if (!is_null($params['requests_user_information'])) {
