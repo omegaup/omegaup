@@ -822,31 +822,31 @@ Creates a new contest
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `check_plagiarism`          | `bool\|null`   |             |
-| `contest_for_teams`         | `bool\|null`   |             |
-| `description`               | `mixed`        |             |
-| `feedback`                  | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `needs_basic_information`   | `bool\|null`   |             |
-| `penalty`                   | `mixed`        |             |
-| `penalty_calc_policy`       | `mixed`        |             |
-| `penalty_type`              | `mixed`        |             |
-| `points_decay_factor`       | `mixed`        |             |
-| `problems`                  | `null\|string` |             |
-| `requests_user_information` | `mixed`        |             |
-| `score_mode`                | `null\|string` |             |
-| `scoreboard`                | `mixed`        |             |
-| `show_scoreboard_after`     | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `submissions_gap`           | `mixed`        |             |
-| `teams_group_alias`         | `null\|string` |             |
-| `title`                     | `mixed`        |             |
-| `window_length`             | `int\|null`    |             |
+| Name                        | Type                                                       | Description |
+| --------------------------- | ---------------------------------------------------------- | ----------- |
+| `finish_time`               | `int`                                                      |             |
+| `start_time`                | `int`                                                      |             |
+| `submissions_gap`           | `int`                                                      |             |
+| `window_length`             | `int`                                                      |             |
+| `admission_mode`            | `'private'\|'public'\|'registration'\|null`                |             |
+| `alias`                     | `null\|string`                                             |             |
+| `check_plagiarism`          | `bool\|null`                                               |             |
+| `contest_for_teams`         | `bool\|null`                                               |             |
+| `description`               | `null\|string`                                             |             |
+| `feedback`                  | `'detailed'\|'none'\|'summary'\|null`                      |             |
+| `languages`                 | `null\|string`                                             |             |
+| `needs_basic_information`   | `bool\|null`                                               |             |
+| `penalty`                   | `int\|null`                                                |             |
+| `penalty_calc_policy`       | `'max'\|'sum'\|null`                                       |             |
+| `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
+| `points_decay_factor`       | `float\|null`                                              |             |
+| `problems`                  | `null\|string`                                             |             |
+| `requests_user_information` | `bool\|null`                                               |             |
+| `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
+| `scoreboard`                | `float\|null`                                              |             |
+| `show_scoreboard_after`     | `bool\|null`                                               |             |
+| `teams_group_alias`         | `null\|string`                                             |             |
+| `title`                     | `null\|string`                                             |             |
 
 ### Returns
 
@@ -1405,6 +1405,7 @@ Update a Contest
 | -------------------------------------------- | ---------------------------------------------------------- | ----------- |
 | `contest_alias`                              | `string`                                                   |             |
 | `finish_time`                                | `int`                                                      |             |
+| `start_time`                                 | `int`                                                      |             |
 | `submissions_gap`                            | `int`                                                      |             |
 | `window_length`                              | `int`                                                      |             |
 | `admission_mode`                             | `null\|string`                                             |             |
@@ -1425,7 +1426,6 @@ Update a Contest
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
 | `show_scoreboard_after`                      | `bool\|null`                                               |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null`                                  |             |
 | `teams_group_alias`                          | `null\|string`                                             |             |
 | `title`                                      | `null\|string`                                             |             |
 

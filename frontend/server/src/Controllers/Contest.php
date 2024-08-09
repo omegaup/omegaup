@@ -2592,29 +2592,29 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
-     * @omegaup-request-param mixed $points_decay_factor
-     * @omegaup-request-param null|string $problems
-     * @omegaup-request-param mixed $requests_user_information
-     * @omegaup-request-param mixed $scoreboard
-     * @omegaup-request-param null|string $score_mode
-     * @omegaup-request-param mixed $show_scoreboard_after
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
-     * @omegaup-request-param bool|null $contest_for_teams
-     * @omegaup-request-param null|string $teams_group_alias
-     * @omegaup-request-param mixed $title
-     * @omegaup-request-param int|null $window_length
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param null|string $alias
      * @omegaup-request-param bool|null $check_plagiarism
+     * @omegaup-request-param bool|null $contest_for_teams
+     * @omegaup-request-param null|string $description
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
+     * @omegaup-request-param int $finish_time
+     * @omegaup-request-param null|string $languages
+     * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param int|null $penalty
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
+     * @omegaup-request-param null|string $problems
+     * @omegaup-request-param bool|null $requests_user_information
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
+     * @omegaup-request-param int $start_time
+     * @omegaup-request-param int $submissions_gap
+     * @omegaup-request-param null|string $teams_group_alias
+     * @omegaup-request-param null|string $title
+     * @omegaup-request-param int $window_length
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2974,7 +2974,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param int $start_time
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
@@ -4784,7 +4784,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param int $start_time
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
