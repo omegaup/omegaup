@@ -10,35 +10,34 @@
 </template>
 
 <script lang="ts">
-// TODO: replace all instances of any with correct type
 import { Vue, Prop, Component } from 'vue-property-decorator';
 import store from './GraderStore';
-import * as Util from './util';
 
 @Component
 export default class TextEditor extends Vue {
-  @Prop({ required: true }) storeMapping!: any;
+  // TODO: place more restrictions on value of keys inside storeMapping
+  @Prop({ required: true }) storeMapping!: {
+    [key: string]: string;
+  };
   @Prop({ required: true }) extension!: string;
-  @Prop({ default: null }) module!: string | null;
+  @Prop({ default: 'NA' }) module!: string;
   @Prop({ default: false }) readOnly!: boolean;
   @Prop({ default: 'vs' }) theme!: string;
 
   get filename(): string {
-    if (typeof this.storeMapping.module !== 'undefined') {
-      return `${Util.vuexGet(store, this.storeMapping.module)}.${
-        this.extension
-      }`;
+    if (this.storeMapping.module) {
+      return `${store.getters[this.storeMapping.module]}.${this.extension}`;
     }
     return `${this.module}.${this.extension}`;
   }
 
   get contents(): string {
-    return Util.vuexGet(store, this.storeMapping.contents);
+    return store.getters[this.storeMapping.contents];
   }
 
   set contents(value: string) {
     if (this.readOnly) return;
-    Util.vuexSet(store, this.storeMapping.contents, value);
+    store.dispatch(this.storeMapping.contents, value);
   }
 
   get title(): string {
