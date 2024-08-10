@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * ContestCreateTest
  */
@@ -72,7 +70,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token'] = $login->auth_token;
 
             try {
-                $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+                \OmegaUp\Controllers\Contest::apiCreate($r);
                 $this->fail("Exception was expected. Parameter: {$key}");
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                 $this->assertSame('parameterEmpty', $e->getMessage());
@@ -190,7 +188,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r['auth_token'] = $login->auth_token;
 
         try {
-            $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+            \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame(
@@ -264,6 +262,34 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Public contest with same start and finish time is not valid.
+     */
+    public function testCreateContestWithWrongDates() {
+        $currentTime = \OmegaUp\Time::get();
+
+        // Create a valid contest Request object
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $currentTime,
+                'finishTime' => $currentTime,
+            ])
+        );
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('contestNewInvalidStartTime', $e->getMessage());
+        }
+    }
+
+    /**
      * Creates a contest with window length, and review contestant
      * only can create run inside sumbission window
      */
@@ -289,7 +315,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create a contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
@@ -405,9 +431,6 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $problem,
             $contest
         );
-
-        // Create a contestant
-        $login = self::login($contest['director']);
 
         // Create a contest request
         $response = \OmegaUp\DAO\Contests::getByAlias(

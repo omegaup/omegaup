@@ -1679,7 +1679,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Create a contest in the past with one run.
             $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
                 new \OmegaUp\Test\Factories\ContestParams([
-                    'startTime' => $originalTime - 60 * 60,
+                    'startTime' => $originalTime - 120 * 60,
                     'finishTime' => $originalTime - 5 * 60,
                     'contestDirector' => $contestDirector,
                 ])
