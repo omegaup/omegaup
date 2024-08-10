@@ -11,32 +11,30 @@ import * as monaco from 'monaco-editor';
 
 @Component
 export default class MonacoEditor extends Vue {
-  @Prop({ required: true }) storeMapping!: any;
+  // TODO: place more restrictions on value of keys inside storeMapping
+  @Prop({ required: true }) storeMapping!: {
+    [key: string]: string;
+  };
   @Prop({ default: 'vs-dark' }) theme!: string;
-  @Prop({ default: null }) initialModule!: string | null;
   @Prop({ default: false }) readOnly!: boolean;
-  @Prop({ default: null }) extension!: string | null;
-  @Prop({ default: null }) initialLanguage!: string | null;
 
   _editor: monaco.editor.IStandaloneCodeEditor | null = null;
   _model: monaco.editor.ITextModel | null = null;
 
   get language(): string {
-    if (this.initialLanguage) return this.initialLanguage;
-    return Util.vuexGet(store, this.storeMapping.language);
+    return store.getters[this.storeMapping.language];
   }
 
   get module(): string {
-    if (this.initialModule) return this.initialModule;
-    return Util.vuexGet(store, this.storeMapping.module);
+    return store.getters[this.storeMapping.module];
   }
 
   get contents(): string {
-    return Util.vuexGet(store, this.storeMapping.contents);
+    return store.getters[this.storeMapping.contents];
   }
 
   set contents(value: string) {
-    Util.vuexSet(store, this.storeMapping.contents, value);
+    store.dispatch(this.storeMapping.contents, value);
   }
 
   get filename(): string {
@@ -85,7 +83,7 @@ export default class MonacoEditor extends Vue {
     if (!this._model) return;
 
     this._model.onDidChangeContent(() => {
-      this.contents = this._model?.getValue() || '';
+      store.dispatch(this.storeMapping.contents, this._model?.getValue() || '');
     });
   }
 
