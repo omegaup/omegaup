@@ -627,6 +627,16 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($admin);
 
+        $runs = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment_alias' => $courseData['assignment_alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['currentAssignment']['runs'];
+
+        $this->assertSame(1, $runs[0]['suggestions']);
+
         $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -662,6 +672,17 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($feedbackList[0]['range_bytes_start']);
         $this->assertSame(1, $feedbackList[1]['range_bytes_start']);
         $this->assertSame($feedback, $feedbackList[1]['feedback']);
+
+        // This should be reflected in the course details for the admin
+        $runs = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment_alias' => $courseData['assignment_alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['currentAssignment']['runs'];
+
+        $this->assertSame(2, $runs[0]['suggestions']);
 
         // Even when the feedback is updated, the feedback in the line 1 should
         // remain the same as originally set because updating the feedback in
