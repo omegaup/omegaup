@@ -2,7 +2,7 @@
   <div class="root d-flex flex-row h-100">
     <textarea
       v-model="contents"
-      class="col px-0"
+      class="col pl-1"
       :class="theme"
       :disabled="readOnly"
     ></textarea>
@@ -50,16 +50,19 @@ export default class TextEditor extends Vue {
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
 
-.vs-dark {
-  background: var(--textarea-vs-dark-background-color);
+textarea {
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
-  color: var(--textarea-vs-dark-font-color);
-}
+  border: 0px;
+  resize: none;
 
-.vs {
-  background: var(--textarea-vs-background-color);
-  font-family: 'Droid Sans Mono', 'Courier New', monospace,
-    'Droid Sans Fallback';
+  &.vs {
+    background: var(--textarea-vs-background-color);
+  }
+
+  &.vs-dark {
+    background: var(--textarea-vs-dark-background-color);
+    color: var(--textarea-vs-dark-font-color);
+  }
 }
 </style>
