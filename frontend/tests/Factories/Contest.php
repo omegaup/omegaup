@@ -10,6 +10,12 @@ class ContestParams {
     public $title;
 
     /**
+     * @readonly
+     * @var string
+     */
+    public $description;
+
+    /**
      * @var string
      */
     public $admissionMode;
@@ -46,7 +52,7 @@ class ContestParams {
 
     /**
      * @readonly
-     * @var null|list<string>
+     * @var list<string>
      */
     public $languages;
 
@@ -129,10 +135,23 @@ class ContestParams {
     public $penaltyType;
 
     /**
-     * @param array{alias?: string, admissionMode?: string, basicInformation?: bool, checkPlagiarism?: bool, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, contestForTeams?: bool, feedback?: string, finishTime?: \OmegaUp\Timestamp, languages?: ?list<string>, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, penaltyType?: string, requestsUserInformation?: string, scoreboardPct?: int, scoreMode?: string, showScoreboardAfter?: bool, startTime?: \OmegaUp\Timestamp, teamsGroupAlias?: string, title?: string, windowLength?: ?int} $params
+     * @readonly
+     * @var int
+     */
+    public $submissionsGap;
+
+    /**
+     * @readonly
+     * @var float
+     */
+    public $pointsDecayFactor;
+
+    /**
+     * @param array{alias?: string, admissionMode?: string, basicInformation?: bool, checkPlagiarism?: bool, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, contestForTeams?: bool, feedback?: string, finishTime?: \OmegaUp\Timestamp, languages?: list<string>, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, penaltyType?: string, requestsUserInformation?: string, scoreboardPct?: int, scoreMode?: string, showScoreboardAfter?: bool, startTime?: \OmegaUp\Timestamp, teamsGroupAlias?: string, title?: string, windowLength?: ?int} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
+        $this->description = $params['description'] ?? 'description';
         $this->alias = $params['alias'] ?? substr($this->title, 0, 20);
         $this->admissionMode = $params['admissionMode'] ?? 'public';
         $this->basicInformation = $params['basicInformation'] ?? false;
@@ -174,6 +193,8 @@ class ContestParams {
         $this->checkPlagiarism = $params['checkPlagiarism'] ?? false;
         $this->showScoreboardAfter = $params['showScoreboardAfter'] ?? false;
         $this->scoreboardPct = $params['scoreboardPct'] ?? 100;
+        $this->submissionsGap = $params['submissionsGap'] ?? 60;
+        $this->pointsDecayFactor = $params['pointsDecayFactor'] ?? 0.02;
     }
 }
 
@@ -200,7 +221,7 @@ class Contest {
         // Set context
         $r = new \OmegaUp\Request([
             'title' => $params->title,
-            'description' => 'description',
+            'description' => $params->description,
             'start_time' => (new \OmegaUp\Timestamp($params->startTime))->time,
             'finish_time' => (new \OmegaUp\Timestamp(
                 $params->finishTime
@@ -211,14 +232,14 @@ class Contest {
             'window_length' => $params->windowLength,
             'admission_mode' => $params->admissionMode,
             'alias' => $params->alias,
-            'points_decay_factor' => '0.02',
+            'points_decay_factor' => $params->pointsDecayFactor,
             'score_mode' => $params->scoreMode,
-            'submissions_gap' => '60',
+            'submissions_gap' => $params->submissionsGap,
             'feedback' => $params->feedback,
             'penalty' => 100,
             'scoreboard' => $params->scoreboardPct,
             'penalty_type' => $params->penaltyType,
-            'languages' => $params->languages,
+            'languages' => join(',', $params->languages),
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
             'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,

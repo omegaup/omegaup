@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests of the \OmegaUp\Controllers\Contest::apiRemoveProblem
  */
@@ -170,7 +168,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = \OmegaUp\Test\ControllerTestCase::login($identity);
 
@@ -204,7 +202,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        \OmegaUp\Controllers\Contest::apiUpdate($r);
     }
 
     /**
@@ -216,7 +214,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'admissionMode' => 'private',
-                    'languages' => 'c11-gcc',
+                    'languages' => ['c11-gcc'],
                 ]
             )
         );
@@ -292,7 +290,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'admissionMode' => 'private',
-                    'languages' => 'c11-gcc',
+                    'languages' => ['c11-gcc'],
                 ]
             )
         );
@@ -377,7 +375,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -420,7 +418,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData
         );
 
-        ['user' => $secondaryAdmin, 'identity' => $secondaryIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $secondaryIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare request
         $login = \OmegaUp\Test\ControllerTestCase::login(
@@ -473,10 +471,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        [
-            'user' => $contestant,
-            'identity' => $identity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -526,7 +521,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -571,7 +566,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -605,7 +600,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -648,7 +643,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -669,7 +664,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+        \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );

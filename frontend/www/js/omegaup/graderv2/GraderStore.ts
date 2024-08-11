@@ -1,6 +1,6 @@
 // TODO: add return types to each of the getters
 // TODO: move logic from components inside this store
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex, { Commit, StoreOptions } from 'vuex';
 import Vue from 'vue';
 
 import * as Util from './util';
@@ -50,6 +50,9 @@ export interface GraderStore {
   sessionStorageSources: GraderSessionStorageSources | null;
   showSubmitButton: boolean;
   updatingSettings: boolean;
+
+  // new attributes separate from refactored code
+  zipContent: string;
 }
 export interface SettingsCase {
   Name: string;
@@ -140,6 +143,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     sessionStorageSources: null,
     showSubmitButton: false,
     updatingSettings: false,
+    zipContent: '',
   },
   getters: {
     alias(state: GraderStore) {
@@ -265,6 +269,16 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     isDirty(state: GraderStore) {
       return state.dirty;
+    },
+    // new getters separate from refactored code
+    zipContent(state: GraderStore) {
+      return state.zipContent;
+    },
+    compilerOutput(state: GraderStore) {
+      return state.compilerOutput;
+    },
+    logs(state: GraderStore) {
+      return state.logs;
     },
   },
   mutations: {
@@ -616,6 +630,9 @@ const storeOptions: StoreOptions<GraderStore> = {
       store.commit('OverallWallTimeLimit', limits.OverallWallTimeLimit);
       store.commit('ExtraWallTime', limits.ExtraWallTime);
     },
+    zipContent(state: GraderStore, value: string) {
+      state.zipContent = value;
+    },
     reset(state: GraderStore) {
       store.commit('request.language', 'cpp17-gcc');
       store.commit('request.source', sourceTemplates.cpp);
@@ -648,6 +665,26 @@ const storeOptions: StoreOptions<GraderStore> = {
       store.commit('updatingSettings', false);
 
       state.dirty = true;
+    },
+  },
+  actions: {
+    zipContent({ commit }: { commit: Commit }, value: string) {
+      commit('zipContent', value);
+    },
+    compilerOutput({ commit }: { commit: Commit }, value: string) {
+      commit('compilerOutput', value);
+    },
+    logs({ commit }: { commit: Commit }, value: string) {
+      commit('logs', value);
+    },
+    inputIn({ commit }: { commit: Commit }, value: string) {
+      commit('inputIn', value);
+    },
+    inputOut({ commit }: { commit: Commit }, value: string) {
+      commit('inputOut', value);
+    },
+    'request.source'({ commit }: { commit: Commit }, value: string) {
+      commit('request.source', value);
     },
   },
   strict: true,
