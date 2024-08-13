@@ -1,3 +1,7 @@
+import * as sugar from 'sugar';
+sugar.extend({
+  namespaces: [Date],
+});
 import formatDuration from 'date-fns/formatDuration';
 import intervalToDuration from 'date-fns/intervalToDuration';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
