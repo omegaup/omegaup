@@ -26,11 +26,11 @@ if [[ "${IN_DOCKER}" == 1 ]]; then
 	# type check.
 	"${OMEGAUP_ROOT}/stuff/mysql_types.sh"
 else
-	docker-compose exec -T frontend python3 "./stuff/db-migrate.py" validate
-	docker-compose exec -T frontend python3 "./stuff/policy-tool.py" validate
+	docker compose exec -T frontend python3 "./stuff/db-migrate.py" validate
+	docker compose exec -T frontend python3 "./stuff/policy-tool.py" validate
 	# This runs the controllers + badges PHPUnit tests, as well as the MySQL return
 	# type check.
-	docker-compose exec -T frontend "./stuff/mysql_types.sh"
+	docker compose exec -T frontend "./stuff/mysql_types.sh"
 fi
 
 "${OMEGAUP_ROOT}/vendor/bin/psalm" --show-info=false

@@ -120,6 +120,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import RadioSwitch from '../components/RadioSwitch.vue';
+import store from './GraderStore';
+import * as Util from './util';
 import T from '../lang';
 
 @Component({
@@ -128,100 +130,98 @@ import T from '../lang';
   },
 })
 export default class IDESettings extends Vue {
-  @Prop({ required: true }) store!: any;
   @Prop({ required: true }) storeMapping!: any;
 
   T = T;
-  get timeLimit() {
-    return this.store.state.request.input.limits.TimeLimit;
+  get timeLimit(): number {
+    return Util.parseDuration(store.state.request.input.limits.TimeLimit);
   }
 
   set timeLimit(value: number) {
-    this.store.commit('TimeLimit', Number.parseFloat(value.toString()));
+    store.commit('TimeLimit', value.toString());
   }
 
-  get overallWallTimeLimit() {
-    return this.store.state.request.input.limits.OverallWallTimeLimit;
-  }
-
-  set overallWallTimeLimit(value: number) {
-    this.store.commit(
-      'OverallWallTimeLimit',
-      Number.parseFloat(value.toString()),
+  get overallWallTimeLimit(): number {
+    return Util.parseDuration(
+      store.state.request.input.limits.OverallWallTimeLimit,
     );
   }
 
-  get extraWallTime() {
-    return this.store.state.request.input.limits.ExtraWallTime;
+  set overallWallTimeLimit(value: number) {
+    store.commit('OverallWallTimeLimit', value.toString());
+  }
+
+  get extraWallTime(): number {
+    return Util.parseDuration(store.state.request.input.limits.ExtraWallTime);
   }
 
   set extraWallTime(value: number) {
-    this.store.commit('ExtraWallTime', Number.parseFloat(value.toString()));
+    store.commit('ExtraWallTime', value.toString());
   }
 
-  get memoryLimit() {
-    return this.store.state.request.input.limits.MemoryLimit;
+  get memoryLimit(): number {
+    return Util.parseDuration(store.state.request.input.limits.MemoryLimit);
   }
 
   set memoryLimit(value: number) {
-    this.store.commit('MemoryLimit', Number.parseInt(value.toString()));
+    store.commit('MemoryLimit', Number.parseInt(value.toString()));
   }
 
-  get outputLimit() {
-    return this.store.state.request.input.limits.OutputLimit;
+  get outputLimit(): number {
+    return Util.parseDuration(store.state.request.input.limits.OutputLimit);
   }
 
   set outputLimit(value: number) {
-    this.store.commit('OutputLimit', Number.parseInt(value.toString()));
+    store.commit('OutputLimit', Number.parseInt(value.toString()));
   }
 
-  get validator() {
-    return this.store.state.request.input.validator.name;
+  get validator(): string {
+    return store.state.request.input.validator.name;
   }
 
   set validator(value: string) {
-    this.store.commit('Validator', value);
+    store.commit('Validator', value);
   }
 
-  get tolerance() {
-    return this.store.state.request.input.validator.tolerance;
+  get tolerance(): number {
+    return store.getters.Tolerance;
   }
 
   set tolerance(value: number) {
-    this.store.commit('Tolerance', value);
+    store.commit('Tolerance', value);
   }
 
-  get validatorLanguage() {
-    return this.store.state.request.input.validator.custom_validator?.language;
+  get validatorLanguage(): string {
+    return store.getters['request.input.validator.custom_validator.language'];
   }
 
   set validatorLanguage(value: string) {
-    this.store.commit('ValidatorLanguage', value);
+    store.commit('ValidatorLanguage', value);
   }
 
-  get interactive() {
-    return this.store.getters.isInteractive;
+  get interactive(): boolean {
+    return store.getters.isInteractive;
   }
 
   set interactive(value: boolean) {
-    if (value) this.store.commit('Interactive', {});
-    else this.store.commit('Interactive', undefined);
+    if (value) store.commit('Interactive', {});
+    else store.commit('Interactive', undefined);
   }
 
-  get interactiveLanguage() {
-    return this.store.state.request.input.interactive.language;
+  get interactiveLanguage(): string {
+    return store.getters['request.input.interactive.language'];
   }
 
   set interactiveLanguage(value: string) {
-    this.store.commit('InteractiveLanguage', value);
+    store.commit('InteractiveLanguage', value);
   }
 
-  get interactiveModuleName() {
-    return this.store.state.request.input.interactive.module_name;
+  get interactiveModuleName(): string {
+    return store.getters.moduleName;
   }
 
   set interactiveModuleName(value: string) {
-    this.store.commit('InteractiveModuleName', value);
+    store.commit('InteractiveModuleName', value);
   }
 }
 </script>

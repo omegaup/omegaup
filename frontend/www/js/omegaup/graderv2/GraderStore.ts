@@ -1,6 +1,6 @@
 // TODO: add return types to each of the getters
 // TODO: move logic from components inside this store
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex, { Commit, StoreOptions } from 'vuex';
 import Vue from 'vue';
 
 import * as Util from './util';
@@ -50,6 +50,9 @@ export interface GraderStore {
   sessionStorageSources: GraderSessionStorageSources | null;
   showSubmitButton: boolean;
   updatingSettings: boolean;
+
+  // new attributes separate from refactored code
+  zipContent: string;
 }
 export interface SettingsCase {
   Name: string;
@@ -140,6 +143,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     sessionStorageSources: null,
     showSubmitButton: false,
     updatingSettings: false,
+    zipContent: '',
   },
   getters: {
     alias(state: GraderStore) {
@@ -248,6 +252,12 @@ const storeOptions: StoreOptions<GraderStore> = {
     'request.input.interactive.main_source'(state: GraderStore) {
       return state.request.input.interactive?.main_source || '';
     },
+    'request.input.interactive.language'(state: GraderStore) {
+      return state.request.input.interactive?.language || '';
+    },
+    Tolenrance(state: GraderStore) {
+      return state.request.input.validator?.tolerance || -1;
+    },
     isCustomValidator(state: GraderStore) {
       return !!state.request.input.validator.custom_validator;
     },
@@ -259,6 +269,16 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     isDirty(state: GraderStore) {
       return state.dirty;
+    },
+    // new getters separate from refactored code
+    zipContent(state: GraderStore) {
+      return state.zipContent;
+    },
+    compilerOutput(state: GraderStore) {
+      return state.compilerOutput;
+    },
+    logs(state: GraderStore) {
+      return state.logs;
     },
   },
   mutations: {
@@ -530,7 +550,9 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       // update with interactive problem templates for each language
       // dont forget to update all cppxx and pyx templates
-      for (const extension in templates) {
+      for (const lang in templates) {
+        const extension = Util.supportedLanguages[lang].extension;
+
         if (Object.prototype.hasOwnProperty.call(templates, extension)) {
           for (const language of Util.extensionToLanguages[extension]) {
             interactiveTemplates[language] = templates[extension];
@@ -574,7 +596,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       });
       // if we call this function, we must set current case
       // or it could cause errors
-      state.currentCase = caseData.name;
+      store.commit('currentCase', caseData.name);
       state.dirty = true;
     },
     removeCase(state: GraderStore, name: string) {
@@ -607,6 +629,9 @@ const storeOptions: StoreOptions<GraderStore> = {
       store.commit('TimeLimit', limits.TimeLimit);
       store.commit('OverallWallTimeLimit', limits.OverallWallTimeLimit);
       store.commit('ExtraWallTime', limits.ExtraWallTime);
+    },
+    zipContent(state: GraderStore, value: string) {
+      state.zipContent = value;
     },
     reset(state: GraderStore) {
       store.commit('request.language', 'cpp17-gcc');
@@ -642,6 +667,28 @@ const storeOptions: StoreOptions<GraderStore> = {
       state.dirty = true;
     },
   },
+  actions: {
+    zipContent({ commit }: { commit: Commit }, value: string) {
+      commit('zipContent', value);
+    },
+    compilerOutput({ commit }: { commit: Commit }, value: string) {
+      commit('compilerOutput', value);
+    },
+    logs({ commit }: { commit: Commit }, value: string) {
+      commit('logs', value);
+    },
+    inputIn({ commit }: { commit: Commit }, value: string) {
+      commit('inputIn', value);
+    },
+    inputOut({ commit }: { commit: Commit }, value: string) {
+      commit('inputOut', value);
+    },
+    'request.source'({ commit }: { commit: Commit }, value: string) {
+      commit('request.source', value);
+    },
+  },
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
+store.commit('reset');
+export default store;

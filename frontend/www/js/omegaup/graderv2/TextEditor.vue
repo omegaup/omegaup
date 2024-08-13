@@ -2,7 +2,7 @@
   <div class="root d-flex flex-row h-100">
     <textarea
       v-model="contents"
-      class="col px-0"
+      class="col px-0 border-0 pl-1"
       :class="theme"
       :disabled="readOnly"
     ></textarea>
@@ -10,35 +10,34 @@
 </template>
 
 <script lang="ts">
-// TODO: replace all instances of any with correct type
 import { Vue, Prop, Component } from 'vue-property-decorator';
-import * as Util from './util';
+import store from './GraderStore';
 
 @Component
 export default class TextEditor extends Vue {
-  @Prop({ required: true }) store!: any;
-  @Prop({ required: true }) storeMapping!: any;
+  // TODO: place more restrictions on value of keys inside storeMapping
+  @Prop({ required: true }) storeMapping!: {
+    [key: string]: string;
+  };
   @Prop({ required: true }) extension!: string;
-  @Prop({ default: null }) module!: string | null;
+  @Prop({ default: 'NA' }) module!: string;
   @Prop({ default: false }) readOnly!: boolean;
   @Prop({ default: 'vs' }) theme!: string;
 
   get filename(): string {
-    if (typeof this.storeMapping.module !== 'undefined') {
-      return `${Util.vuexGet(this.store, this.storeMapping.module)}.${
-        this.extension
-      }`;
+    if (this.storeMapping.module) {
+      return `${store.getters[this.storeMapping.module]}.${this.extension}`;
     }
     return `${this.module}.${this.extension}`;
   }
 
   get contents(): string {
-    return Util.vuexGet(this.store, this.storeMapping.contents);
+    return store.getters[this.storeMapping.contents];
   }
 
   set contents(value: string) {
     if (this.readOnly) return;
-    Util.vuexSet(this.store, this.storeMapping.contents, value);
+    store.dispatch(this.storeMapping.contents, value);
   }
 
   get title(): string {
@@ -49,16 +48,15 @@ export default class TextEditor extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
+
 .textarea.vs-dark {
   background: var(--textarea-vs-dark-background-color);
-  border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
   color: var(--textarea-vs-dark-font-color);
 }
 
 .textarea.vs {
-  border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
 }
