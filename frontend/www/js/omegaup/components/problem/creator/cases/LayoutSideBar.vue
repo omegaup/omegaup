@@ -24,7 +24,7 @@
                   class="pt-1 mr-3"
                   font-scale="1.2"
                 />
-                Load to the selected case
+                {{ T.problemCreatorLayoutLoadToSelected }}
               </div>
             </b-dropdown-item>
             <b-dropdown-item @click="enforceLayoutToAllCases(layout.layoutID)">
@@ -34,7 +34,7 @@
                   class="pt-1 mr-3"
                   font-scale="1.2"
                 />
-                Load to all the cases
+                {{ T.problemCreatorLayoutLoadToAll }}
               </div>
             </b-dropdown-item>
             <b-dropdown-item @click="copyLayout(layout.layoutID)">
@@ -44,7 +44,7 @@
                   class="pt-1 mr-3"
                   font-scale="1.2"
                 />
-                Make a copy
+                {{ T.problemCreatorLayoutCopy }}
               </div>
             </b-dropdown-item>
             <b-dropdown-item @click="removeLayout(layout.layoutID)">
@@ -54,7 +54,7 @@
                   class="pt-1 mr-3"
                   font-scale="1.2"
                 />
-                Delete current layout
+                {{ T.problemCreatorLayoutDelete }}
               </div>
             </b-dropdown-item>
           </b-dropdown>
@@ -151,7 +151,7 @@
                     font-scale="1.25"
                     class="mr-2 pt-1"
                   />
-                  Add line info
+                  {{ T.problemCreatorLayoutAddLineInfo }}
                 </div>
               </div>
             </b-button>

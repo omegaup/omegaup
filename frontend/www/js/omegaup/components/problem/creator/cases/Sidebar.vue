@@ -28,7 +28,7 @@
                   variant="success"
                   @click="addLayoutFromSelectedCase"
                 >
-                  Add Layout from selected case
+                  {{ T.problemCreatorLayoutAddFromCase }}
                 </b-button>
               </b-row>
               <b-row class="justify-content-center">
@@ -37,7 +37,7 @@
                   variant="success"
                   @click="addNewLayout"
                 >
-                  Add new Layout
+                  {{ T.problemCreatorLayoutAddNew }}
                 </b-button>
               </b-row>
               <b-row class="justify-content-center">
@@ -46,7 +46,7 @@
                   variant="danger"
                   @click="showLayoutSideBar = false"
                 >
-                  Close Layout Bar
+                  {{ T.problemCreatorLayoutBarClose }}
                 </b-button>
               </b-row>
             </b-container>

@@ -16,6 +16,7 @@ import {
   MatrixDistinctType,
   CaseLineData,
 } from '../types';
+import T from '../../../lang';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import Vue from 'vue';
@@ -397,7 +398,7 @@ export const casesStore: Module<CasesState, RootState> = {
       );
       const copiedLayout: Layout = {
         layoutID: uuid(),
-        name: targetLayout.name + '_copy',
+        name: targetLayout.name + T.problemCreatorLayoutWordCopy,
         caseLineInfos: copiedLineInfos,
       };
       state.layouts.push(copiedLayout);
@@ -405,7 +406,7 @@ export const casesStore: Module<CasesState, RootState> = {
     addNewLayout(state) {
       const newLayout: Layout = {
         layoutID: uuid(),
-        name: 'New layout',
+        name: T.problemCreatorLayoutNew,
         caseLineInfos: [],
       };
       state.layouts.push(newLayout);
