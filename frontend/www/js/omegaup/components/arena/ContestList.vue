@@ -407,10 +407,11 @@ export default class ArenaContestList extends Vue {
 
   getTimeLink(tab: ContestTab, contestItem: types.ContestListItem): string {
     const time =
-      tab === ContestTab.Future
-        ? contestItem.start_time
-        : contestItem.finish_time;
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+      tab !== ContestTab.Current
+        ? contestItem.finish_time
+        : contestItem.start_time;
+    const timeToISO = time.toISOString();
+    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${timeToISO}`;
   }
 
   getTimeLinkDescription(
