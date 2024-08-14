@@ -1,7 +1,3 @@
-import * as sugar from 'sugar';
-sugar.extend({
-  namespaces: [Date],
-});
 import formatDuration from 'date-fns/formatDuration';
 import intervalToDuration from 'date-fns/intervalToDuration';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
@@ -9,6 +5,16 @@ import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
+
+import * as Sugar from 'sugar';
+import sugarEsLocale from './locales/es';
+import sugarPtLocale from './locales/pt';
+
+Sugar.Date.addLocale('es', sugarEsLocale);
+Sugar.Date.addLocale('pt', sugarPtLocale);
+Sugar.extend({
+  namespaces: [Date],
+});
 
 let remoteDeltaTime: number = 0;
 
