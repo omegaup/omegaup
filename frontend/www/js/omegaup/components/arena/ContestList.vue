@@ -159,139 +159,65 @@
           </b-container>
         </b-card>
         <b-tab
-          ref="currentContestTab"
+          v-for="tab in tabsContent"
+          :key="tab.name"
+          :ref="tab.ref"
           class="scroll-content"
-          :title="T.contestListCurrent"
-          :title-link-class="titleLinkClass(ContestTab.Current)"
-          :active="currentTab === ContestTab.Current"
-          :title-link-attributes="{
-            href: hrefGen({ tab: ContestTab.Current }),
-          }"
-          @click="goToPage(ContestTab.Current)"
+          :title="tab.title"
+          :title-link-class="titleLinkClass(tab.name)"
+          :active="currentTab === tab.name"
+          :title-link-attributes="{ href: hrefGen({ tab: tab.name }) }"
+          @click="goToPage(tab.name)"
         >
           <div v-if="refreshing" :class="{ line: true }"></div>
           <div v-else-if="contests.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.finish_time)">
-                  {{
-                    ui.formatString(T.contestEndTime, {
-                      endDate: finishContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contests"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template
+                v-if="tab.name === ContestTab.Past"
+                #contest-enroll-status
+              >
+                <div></div>
+              </template>
+              <template v-else #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(tab.name, contestItem)">
+                    {{ getTimeLinkDescription(tab.name, contestItem) }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template
+                v-if="tab.name === ContestTab.Future"
+                #contest-button-enter
+              >
+                <div></div>
+              </template>
+              <template
+                v-if="tab.name === ContestTab.Past"
+                #contest-button-see-details
+              >
+                <div></div>
+              </template>
+              <template v-else #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
           <b-spinner
             v-if="refreshing"
             class="spinner mt-4"
             variant="primary"
           ></b-spinner>
-        </b-tab>
-        <b-tab
-          ref="futureContestTab"
-          class="scroll-content"
-          :title="T.contestListFuture"
-          :title-link-class="titleLinkClass(ContestTab.Future)"
-          :active="currentTab === ContestTab.Future"
-          :title-link-attributes="{ href: hrefGen({ tab: ContestTab.Future }) }"
-          @click="goToPage(ContestTab.Future)"
-        >
-          <div v-if="refreshing" :class="{ line: true }"></div>
-          <div v-else-if="contests.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
-          </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartTime, {
-                      startDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
-        </b-tab>
-        <b-tab
-          ref="pastContestTab"
-          class="scroll-content"
-          :title="T.contestListPast"
-          :title-link-class="titleLinkClass(ContestTab.Past)"
-          :active="currentTab === ContestTab.Past"
-          :title-link-attributes="{ href: hrefGen({ tab: ContestTab.Past }) }"
-          @click="goToPage(ContestTab.Past)"
-        >
-          <div v-if="refreshing" :class="{ line: true }"></div>
-          <div v-else-if="contests.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
-          </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-enroll-status>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartedTime, {
-                      startedDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-button-see-details>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
         </b-tab>
       </b-tabs>
       <b-pagination-nav
@@ -359,6 +285,20 @@ export enum ContestFilter {
   All = 'all',
 }
 
+const tabsContent = [
+  {
+    name: ContestTab.Current,
+    ref: 'currentContestTab',
+    title: T.contestListCurrent,
+  },
+  {
+    name: ContestTab.Future,
+    ref: 'futureContestTab',
+    title: T.contestListFuture,
+  },
+  { name: ContestTab.Past, ref: 'pastContestTab', title: T.contestListPast },
+];
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -375,6 +315,7 @@ export default class ArenaContestList extends Vue {
   @Prop() page!: number;
   T = T;
   ui = ui;
+  tabsContent = tabsContent;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
@@ -464,8 +405,32 @@ export default class ArenaContestList extends Vue {
     return contest.start_time.toLocaleDateString();
   }
 
-  getTimeLink(time: Date): string {
+  getTimeLink(tab: ContestTab, contestItem: types.ContestListItem): string {
+    const time =
+      tab === ContestTab.Future
+        ? contestItem.start_time
+        : contestItem.finish_time;
     return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+  }
+
+  getTimeLinkDescription(
+    tab: ContestTab,
+    contestItem: types.ContestListItem,
+  ): string {
+    switch (tab) {
+      case ContestTab.Future:
+        return ui.formatString(T.contestStartTime, {
+          startDate: this.startContestDate(contestItem),
+        });
+      case ContestTab.Current:
+        return ui.formatString(T.contestEndTime, {
+          endDate: this.finishContestDate(contestItem),
+        });
+      case ContestTab.Past:
+        return ui.formatString(T.contestStartedTime, {
+          startedDate: this.startContestDate(contestItem),
+        });
+    }
   }
 }
 </script>
