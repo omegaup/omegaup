@@ -10,10 +10,18 @@ export type LineID = string;
  * @alias StoreState
  * @typedef {object}
  * @property {string} problemName Name of the problem
+ * @property {string} problemMarkdown Markdown of the problem
+ * @property {string} problemCodeContent Content of the code file
+ * @property {string} problemCodeExtension Extebsion of the code file
+ * @property {string} problemSolutionMarkdown Markdown of the solution to the problem
  * @property {CasesState} casesStore Module containing all the cases tab logic
  */
 export interface StoreState {
   problemName: string;
+  problemMarkdown: string;
+  problemCodeContent: string;
+  problemCodeExtension: string;
+  problemSolutionMarkdown: string;
   casesStore: CasesState;
 }
 
@@ -26,6 +34,23 @@ export interface StoreState {
  */
 export interface RootState {
   problemName: string;
+}
+
+/**
+ * CaseLineKind
+ * Contains the possible values of Caseline kind
+ */
+export type CaseLineKind = 'line' | 'multiline' | 'array' | 'matrix';
+
+/**
+ * MatrixDistinctType
+ * Defines the different ways matrix can be distinct
+ */
+export enum MatrixDistinctType {
+  None = 'none',
+  Rows = 'rows',
+  Cols = 'cols',
+  Both = 'both',
 }
 
 /**
@@ -47,7 +72,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: boolean;
-      value: number[];
+      value: string;
     }
   | {
       kind: 'matrix';
@@ -55,24 +80,23 @@ export type CaseLineData =
       cols: number;
       min: number;
       max: number;
-      distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: number[][];
+      distinct: MatrixDistinctType;
+      value: string;
     };
 
 /**
- * InLine
+ * CaseLine
  * Line in the editor
  * @alias CaseLine
  * @typedef {object}
  * @property {LineID} lineID UUID of the line
+ * @property {CaseID | null} caseID UUID referencing to the parent case
  * @property {string} label Label of the line
- * @property {string} value Value of the line
- * @property {LineType} lineType Type of line
- * @property {ArrayData} arrayData Object containig all the logic for the Array Generator
- * @property {object} matrixData Object containig all the logic for the Matrix Generator
+ * @property {CaseLineData} data data of the line
  */
 export interface CaseLine {
   lineID: LineID;
+  caseID: CaseID | null;
   label: string;
   data: CaseLineData;
 }
@@ -86,7 +110,7 @@ export interface CaseLine {
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number | null} points Points of the case
- * @property {Array<InLine>} lines Lines containing .IN information of the cases
+ * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
   caseID: string;
