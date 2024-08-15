@@ -241,6 +241,9 @@ class ContestParams {
      */
     public $checkPlagiarism;
 
+    /**
+     * @param array{alias: string, title: string, description: string, start_time: int, finish_time: int, last_updated: int, window_length?: int, rerun_id?: int, admission_mode: \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PRIVATE|\OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_REGISTRATION|\OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PUBLIC, scoreboard: int, points_decay_factor: float, submissions_gap: int, feedback: \OmegaUp\ContestParams::CONTEST_FEEDBACK_NONE|\OmegaUp\ContestParams::CONTEST_FEEDBACK_SUMMARY|\OmegaUp\ContestParams::CONTEST_FEEDBACK_DETAILED, penalty: int, penalty_type: \OmegaUp\ContestParams::CONTEST_PENALTY_TYPE_CONTEST_START|\OmegaUp\ContestParams::CONTEST_PENALTY_TYPE_PROBLEM_OPEN|\OmegaUp\ContestParams::CONTEST_PENALTY_TYPE_RUNTIME|\OmegaUp\ContestParams::CONTEST_PENALTY_TYPE_NONE, penalty_calc_policy: \OmegaUp\ContestParams::CONTEST_PENALTY_CALC_POLICY_SUM|\OmegaUp\ContestParams::CONTEST_PENALTY_CALC_POLICY_MAX, show_scoreboard_after: int, languages?: list<string>, urgent: bool, recommended: bool, archived: bool, certificate_cutoff?: int, certificates_status: \OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_UNINITIATED|\OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_QUEUED|\OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_GENERATED|\OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_RETRYABLE_ERROR|\OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_FATAL_ERROR, contest_for_teams?: bool, default_show_all_contestants_in_scoreboard?: bool, score_mode: \OmegaUp\ContestParams::CONTEST_SCORE_MODE_PARTIAL|\OmegaUp\ContestParams::CONTEST_SCORE_MODE_ALL_OR_NOTHING|\OmegaUp\ContestParams::CONTEST_SCORE_MODE_MAX_PER_GROUP, plagiarism_treshold: bool, check_plagiarism: bool} $params
+     */
     public function __construct($params) {
         $this->contestAlias = $params['alias'];
         $this->title = $params['title'];
