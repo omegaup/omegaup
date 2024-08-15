@@ -29,8 +29,6 @@
       {% endfor %}
     {% endif %}
 
-    <script type="text/javascript" src="{% versionHash '/js/head.sugar_locale.js' %}" defer></script>
-
     <!-- Bootstrap 4 -->
     <link rel="stylesheet" href="/third_party/bootstrap-4.5.0/css/bootstrap.min.css"/>
     <script src="/third_party/bootstrap-4.5.0/js/bootstrap.bundle.min.js"></script>
