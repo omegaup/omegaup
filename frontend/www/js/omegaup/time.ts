@@ -12,6 +12,7 @@ import sugarPtLocale from './locales/pt';
 
 Sugar.Date.addLocale('es', sugarEsLocale);
 Sugar.Date.addLocale('pt', sugarPtLocale);
+Sugar.Date.addLocale('pseudo', Sugar.Date.getLocale('en'));
 Sugar.extend({
   namespaces: [Date],
 });
