@@ -2,6 +2,8 @@
 
 namespace OmegaUp\Controllers;
 
+use OmegaUp\Test\Factories\ContestParams;
+
 /**
  * ContestController
  *
@@ -2624,11 +2626,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate request
         self::validateCreate($r, $r->identity);
 
-        // Set private contest by default if is not sent in request
-        if (
-            !is_null($r['admission_mode']) &&
-            $r['admission_mode'] !== 'private'
-        ) {
+        $contestParams = self::convertRequestToContestParams($r);
+
+        if ($contestParams->admissionMode === \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PUBLIC) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestMustBeCreatedInPrivateMode'
             );
@@ -2638,45 +2638,44 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'needs_basic_information' => $r->ensureOptionalBool(
                 'needs_basic_information'
             ) ?? false,
-            'requests_user_information' => $r['requests_user_information'],
+            'requests_user_information' => $r->ensureOptionalEnum(
+                'requests_user_information',
+                ['no', 'optional', 'required']
+            ) ?? 'no',
         ]);
 
-        /** @var null|list<string>|scalar $languages */
-        $languages = $r['languages'];
-
-        $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
-        $teamsGroupsAlias = $forTeams ? $r->ensureString(
+        $teamsGroupsAlias = $contestParams->contestForTeams ? $r->ensureString(
             'teams_group_alias',
             fn (string $alias) => \OmegaUp\Validators::alias(
                 $alias
             )
         ) : null;
 
-        $scoreMode = $r->ensureOptionalEnum(
-            'score_mode',
-            ['partial','all_or_nothing','max_per_group'],
-        );
-        $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         $contest = new \OmegaUp\DAO\VO\Contests([
-            'admission_mode' => 'private',
-            'title' => $r['title'],
-            'description' => $r['description'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'window_length' => $r['window_length'] ?: null,
-            'alias' => $r['alias'],
-            'scoreboard' => $r['scoreboard'],
-            'points_decay_factor' => $r['points_decay_factor'],
-            'submissions_gap' => $r['submissions_gap'],
-            'feedback' => $r['feedback'],
-            'penalty_calc_policy' => $r['penalty_calc_policy'],
-            'penalty' => max(0, intval($r['penalty'])),
-            'penalty_type' => $r['penalty_type'],
-            'languages' => $languages,
-            'score_mode' => $scoreMode,
-            'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
-            'contest_for_teams' => $forTeams,
-            'check_plagiarism' => $checkPlagiarism ? true : false,
+            'admission_mode' => $contestParams->admissionMode,
+            'title' => $contestParams->title,
+            'description' => $contestParams->description,
+            'start_time' => $contestParams->startTime,
+            'finish_time' => $contestParams->finishTime,
+            'window_length' => $contestParams->windowLength ?: null,
+            'alias' => $contestParams->contestAlias,
+            'scoreboard' => $contestParams->scoreboard,
+            'points_decay_factor' => $contestParams->pointsDecayFactor,
+            'submissions_gap' => $contestParams->submissionsGap,
+            'feedback' => $contestParams->feedback,
+            'penalty_calc_policy' => $contestParams->penaltyCalcPolicy,
+            'penalty' => max(0, intval($contestParams->penalty)),
+            'penalty_type' => $contestParams->penaltyType,
+            'languages' => !is_null(
+                $contestParams->languages
+            ) ? implode(
+                ',',
+                $contestParams->languages
+            ) : null,
+            'score_mode' => $contestParams->scoreMode,
+            'show_scoreboard_after' => $contestParams->showScoreboardAfter,
+            'contest_for_teams' => $contestParams->contestForTeams,
+            'check_plagiarism' => $contestParams->checkPlagiarism,
         ]);
 
         self::createContest(
@@ -2692,6 +2691,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Validates that Request contains expected data to create or update a contest
+     * and then, it converts the request to contest params.
      * In case of update, everything is optional except the contest_alias
      * In case of error, this function throws.
      *
@@ -2709,7 +2709,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
-     * @omegaup-request-param null|string $problems
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
@@ -2719,74 +2718,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
      */
-    private static function validateCommonCreateOrUpdate(
+    private static function convertRequestToContestParams(
         \OmegaUp\Request $r,
-        \OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Contests $contest = null,
-        bool $isRequired = true
-    ): void {
-        $r->ensureOptionalString('title', $isRequired);
-        $r->ensureOptionalString('description', $isRequired);
+        bool $isUpdate = false
+    ): \OmegaUp\ContestParams {
+        $isRequired = !$isUpdate;
 
-        // Get the actual start and finish time of the contest, considering that
-        // in case of update, parameters can be optional
-        $startTime = $r->ensureOptionalTimestamp(
-            'start_time',
-            required: $isRequired
-        ) ?? (
-            is_null($contest)
-                ? null
-                : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                    $contest->start_time
-                )
-        );
-        $finishTime = $r->ensureOptionalTimestamp(
-            'finish_time',
-            required: $isRequired
-        ) ?? (
-            is_null($contest)
-                ? null
-                : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                    $contest->finish_time
-                )
-        );
-
-        // Calculate the actual contest length
-        $contestLength = 0;
-        if (!is_null($finishTime) && !is_null($startTime)) {
-            // Validate start & finish time where finish_time must be strictly
-            // greater than start_time
-            if ($startTime->time >= $finishTime->time) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'contestNewInvalidStartTime',
-                    'finish_time'
-                );
-            }
-            $contestLength = $finishTime->time - $startTime->time;
-        }
-
-        // Validate max contest length
-        if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'contestLengthTooLong',
-                'finish_time'
-            );
-        }
-
-        // Window_length is optional
-        if (!empty($r['window_length'])) {
-            $r->ensureOptionalInt(
-                'window_length',
-                lowerBound: 0,
-                upperBound: intval(floor($contestLength / 60)),
-                required: false
-            );
-        }
-
-        $r->ensureOptionalEnum(
-            'admission_mode',
-            ['public', 'private', 'registration']
-        );
         $contestAlias = $r->ensureOptionalString(
             'alias',
             $isRequired,
@@ -2802,19 +2740,48 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $exception->addCustomMessageToArray('parameter', 'alias');
             throw $exception;
         }
-        $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
-        $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
-        $r->ensureOptionalEnum(
-            'score_mode',
-            ['partial','all_or_nothing','max_per_group'],
-        );
+
+        // Get the actual start and finish time of the contest, considering that
+        // in case of update, parameters can be optional
+        if (!is_null($contest)) {
+            $startTime = $r->ensureOptionalTimestamp(
+                'start_time',
+                required: false
+            ) ?? \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->start_time);
+            $finishTime = $r->ensureOptionalTimestamp(
+                'finish_time',
+                required: false
+            ) ?? \OmegaUp\DAO\DAO::fromMySQLTimestamp($contest->finish_time);
+        } else {
+            $startTime = $r->ensureTimestamp('start_time');
+            $finishTime = $r->ensureTimestamp('finish_time');
+        }
+
+        // Validate start & finish time where finish_time must be strictly
+        // greater than start_time
+        if ($startTime->time >= $finishTime->time) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestNewInvalidStartTime',
+                'finish_time'
+            );
+        }
+        // Calculate the actual contest length
+        $contestLength = $finishTime->time - $startTime->time;
+
+        // Validate max contest length
+        if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestLengthTooLong',
+                'finish_time'
+            );
+        }
+
         $submissionsGap = $r->ensureOptionalInt(
             'submissions_gap',
             0,
             null,
             $isRequired
         );
-        $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
@@ -2829,20 +2796,92 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        $r->ensureOptionalEnum(
-            'feedback',
-            ['none', 'summary', 'detailed'],
-            $isRequired
-        );
-        $r->ensureOptionalEnum(
-            'penalty_type',
-            ['contest_start', 'problem_open', 'runtime', 'none'],
-            $isRequired
-        );
-        $r->ensureOptionalEnum(
-            'penalty_calc_policy',
-            ['sum', 'max']
-        );
+        $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
+        if ($forTeams) {
+            $r->ensureString(
+                'teams_group_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            );
+        }
+
+        $params = [
+            'alias' => $contestAlias,
+            'title' => $r->ensureOptionalString('title', $isRequired),
+            'description' => $r->ensureOptionalString(
+                'description',
+                $isRequired
+            ),
+            'start_time' => $startTime,
+            'finish_time' => $finishTime,
+            'admission_mode' => $r->ensureOptionalEnum(
+                'admission_mode',
+                \OmegaUp\ContestParams::VALID_ADMISSION_MODES
+            ) ?? \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PRIVATE,
+            'scoreboard' => $r->ensureOptionalFloat(
+                'scoreboard',
+                0,
+                100,
+                $isRequired
+            ),
+            'points_decay_factor' => $r->ensureOptionalFloat(
+                'points_decay_factor',
+                0,
+                1,
+                $isRequired
+            ),
+            'submissions_gap' => $submissionsGap,
+            'feedback' => $r->ensureOptionalEnum(
+                'feedback',
+                \OmegaUp\ContestParams::VALID_FEEDBACK_VALUES,
+                $isRequired
+            ),
+            'penalty' => $r->ensureOptionalInt(
+                'penalty',
+                0,
+                10000,
+                $isRequired
+            ),
+            'penalty_type' => $r->ensureOptionalEnum(
+                'penalty_type',
+                \OmegaUp\ContestParams::VALID_PENALTY_TYPES,
+                $isRequired
+            ),
+            'penalty_calc_policy' => $r->ensureOptionalEnum(
+                'penalty_calc_policy',
+                \OmegaUp\ContestParams::VALID_PENALTY_CALC_POLICY_VALUES
+            ),
+            // Show scoreboard is always optional
+            'show_scoreboard_after' => $r->ensureOptionalBool(
+                'show_scoreboard_after'
+            ),
+            'languages' => $r->ensureOptionalString('languages', $isRequired),
+            'contest_for_teams' => $forTeams,
+            'score_mode' => $r->ensureOptionalEnum(
+                'score_mode',
+                \OmegaUp\ContestParams::VALID_SCORE_MODES,
+            ),
+            'check_plagiarism' => $r->ensureOptionalBool(
+                'check_plagiarism'
+            ) ?? false,
+        ];
+        if (isset($r['window_length'])) {
+            $params['window_length'] = $r->ensureOptionalInt(
+                'window_length',
+                lowerBound: 0,
+                upperBound: intval(floor($contestLength / 60)),
+                required: false
+            );
+        }
+        return new \OmegaUp\ContestParams($params);
+    }
+
+    /**
+     * @omegaup-request-param null|string $problems
+     */
+    private static function validateCommonCreateOrUpdate(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
         $problems = $r->ensureOptionalString('problems');
 
         // Problems is optional
@@ -2878,39 +2917,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'points' => $requestProblem['points']
                 ]);
             }
-
-            $r['problems'] = $problems;
-        }
-
-        // Show scoreboard is always optional
-        $r->ensureOptionalBool('show_scoreboard_after');
-
-        $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
-        if ($forTeams) {
-            $r->ensureString(
-                'teams_group_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
-        }
-        $r->ensureOptionalBool('check_plagiarism') ?? false;
-
-        // languages is required only when a contest is created
-        $languagesAsString = $r->ensureOptionalString('languages', $isRequired);
-        if (is_null($languagesAsString)) {
-            return;
-        }
-        $languages = explode(',', $languagesAsString);
-        foreach ($languages as $language) {
-            if (empty($language)) {
-                continue;
-            }
-            \OmegaUp\Validators::validateInEnum(
-                $language,
-                'languages',
-                array_keys(
-                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                )
-            );
         }
     }
 
@@ -2920,27 +2926,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param null|string $alias
-     * @omegaup-request-param bool|null $check_plagiarism
-     * @omegaup-request-param bool|null $contest_for_teams
-     * @omegaup-request-param null|string $description
-     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
-     * @omegaup-request-param int $finish_time
-     * @omegaup-request-param null|string $languages
-     * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
-     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
-     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
-     * @omegaup-request-param float|null $scoreboard
-     * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param int $start_time
-     * @omegaup-request-param int $submissions_gap
-     * @omegaup-request-param null|string $teams_group_alias
-     * @omegaup-request-param null|string $title
-     * @omegaup-request-param int $window_length
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
@@ -2958,27 +2944,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return \OmegaUp\DAO\VO\Contests
      *
-     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param null|string $alias
-     * @omegaup-request-param bool|null $check_plagiarism
-     * @omegaup-request-param bool|null $contest_for_teams
-     * @omegaup-request-param null|string $description
-     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
-     * @omegaup-request-param int $finish_time
-     * @omegaup-request-param null|string $languages
-     * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
-     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
-     * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
-     * @omegaup-request-param float|null $scoreboard
-     * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param int $start_time
-     * @omegaup-request-param int $submissions_gap
-     * @omegaup-request-param null|string $teams_group_alias
-     * @omegaup-request-param null|string $title
-     * @omegaup-request-param int $window_length
      */
     private static function validateUpdate(
         \OmegaUp\Request $r,
@@ -2990,12 +2957,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $identity
         );
 
-        self::validateCommonCreateOrUpdate(
-            $r,
-            $identity,
-            $contest,
-            isRequired: false,
-        );
+        self::validateCommonCreateOrUpdate($r, $identity);
 
         // Prevent date changes if a contest already has runs
         $startTime = $r->ensureOptionalTimestamp('start_time');
@@ -4801,6 +4763,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateUpdate($r, $r->identity, $contestAlias);
+
+        self::convertRequestToContestParams(
+            $r,
+            $contest,
+            isUpdate: true
+        );
+
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'contestNotFound'
