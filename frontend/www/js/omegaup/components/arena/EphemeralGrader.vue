@@ -19,23 +19,25 @@ export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
+  @Prop({ default: true }) canRun!: boolean;
   @Prop({ default: () => [] }) acceptedLanguages!: string[];
   @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
 
   loaded = false;
 
+  // initial language is used. initial source could be used in the future
+  get initialLanguage() {
+    if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
+      return this.acceptedLanguages[0];
+    }
+    return this.preferredLanguage;
+  }
+  get initialSource() {
+    return '';
+  }
+
   mounted(): void {
     (this.$refs.grader as HTMLIFrameElement).onload = () => {
-      const languageSelectElement: HTMLSelectElement = ((this.$refs
-        .grader as HTMLIFrameElement)
-        .contentWindow as Window).document.getElementById(
-        'language',
-      ) as HTMLSelectElement;
-      if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
-        languageSelectElement.value = this.acceptedLanguages[0];
-      } else {
-        languageSelectElement.value = this.preferredLanguage;
-      }
       this.iframeLoaded();
     };
     window.addEventListener('resize', this.handleWindowResize);
@@ -50,6 +52,7 @@ export default class EphemeralGrader extends Vue {
       1 / window.devicePixelRatio,
     );
   }
+
   @Watch('problem')
   onProblemChanged() {
     if (!this.loaded) {
@@ -65,9 +68,11 @@ export default class EphemeralGrader extends Vue {
       {
         method: 'setSettings',
         params: {
-          alias: this.problem.alias,
-          settings: this.problem.settings,
+          problem: this.problem,
+          initialLanguage: this.initialLanguage,
+          initialSource: this.initialSource,
           languages: this.acceptedLanguages,
+          showRunButton: this.canRun,
           showSubmitButton: this.canSubmit,
         },
       },
