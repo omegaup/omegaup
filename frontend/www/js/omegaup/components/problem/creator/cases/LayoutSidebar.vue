@@ -109,8 +109,8 @@
                           </b-dropdown>
                           <b-button
                             v-if="
-                              lineInfo.data.kind === 'array' ||
-                              lineInfo.data.kind === 'matrix'
+                              getEditIconDisplay(lineInfo) ===
+                              EditIconDisplayOption.EDIT_ICON
                             "
                             size="sm"
                             type="button"
@@ -184,6 +184,7 @@ import {
   CaseLineKind,
   LineInfoID,
   Group,
+  CaseLineInfo,
 } from '@/js/omegaup/problem/creator/types';
 
 const casesStore = namespace('casesStore');
@@ -216,6 +217,18 @@ export default class Sidebar extends Vue {
   ]) => void;
 
   showLayout: { [key: LayoutID]: boolean } = {};
+
+  EditIconDisplayOption = Object.freeze({
+    EDIT_ICON: 'edit_icon',
+  });
+
+  get getEditIconDisplay() {
+    return (lineInfo: CaseLineInfo) => {
+      if (lineInfo.data.kind === 'array' || lineInfo.data.kind === 'matrix') {
+        return this.EditIconDisplayOption.EDIT_ICON;
+      }
+    };
+  }
 
   lineKindOptions: {
     type: string;
