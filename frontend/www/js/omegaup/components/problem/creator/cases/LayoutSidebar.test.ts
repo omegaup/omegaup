@@ -58,6 +58,7 @@ describe('LayoutSidebar.vue', () => {
       store,
     });
 
+    expect(wrapper.vm.getAllLayouts.length).toBe(1);
     expect(
       wrapper.vm.getAllLayouts.filter(
         (_layout) => _layout.name === T.problemCreatorLayoutNew,
