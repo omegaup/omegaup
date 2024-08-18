@@ -16,7 +16,6 @@ localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
 describe('Sidebar.vue', () => {
-
   // Total 7 buttons are rendered initially on this page.
   // - Layout button
   // - Add case/group button
