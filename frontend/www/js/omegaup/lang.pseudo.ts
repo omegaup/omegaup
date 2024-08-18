@@ -1082,6 +1082,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorLayoutLoadToSelected: "(L0ad 70 7h3 5313c73d ca53)",
   problemCreatorLayoutNew: "(N3w Lay0u7)",
   problemCreatorLayoutWordCopy: "( c0py)",
+  problemCreatorLayoutWordLayouts: "(Lay0u75)",
   problemCreatorLineArray: "(Array)",
   problemCreatorLineDelete: "(D31373)",
   problemCreatorLineEdit: "(Edi7)",

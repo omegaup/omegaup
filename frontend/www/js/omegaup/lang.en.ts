@@ -1082,6 +1082,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorLayoutLoadToSelected: "Load to the selected case",
   problemCreatorLayoutNew: "New Layout",
   problemCreatorLayoutWordCopy: " copy",
+  problemCreatorLayoutWordLayouts: "Layouts",
   problemCreatorLineArray: "Array",
   problemCreatorLineDelete: "Delete",
   problemCreatorLineEdit: "Edit",

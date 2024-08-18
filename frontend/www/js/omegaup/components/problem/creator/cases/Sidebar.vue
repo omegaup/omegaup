@@ -14,7 +14,7 @@
         <b-sidebar
           v-model="showLayoutSidebar"
           right
-          title="Layouts"
+          :title="T.problemCreatorLayoutWordLayouts"
           shadow
           no-header-close
           width="385px"

@@ -1082,6 +1082,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorLayoutLoadToSelected: "Cargar en el caso seleccionado",
   problemCreatorLayoutNew: "Nuevo dise\u00f1o",
   problemCreatorLayoutWordCopy: " copia",
+  problemCreatorLayoutWordLayouts: "Dise\u00f1os",
   problemCreatorLineArray: "Arreglo",
   problemCreatorLineDelete: "Borrar",
   problemCreatorLineEdit: "Editar",
