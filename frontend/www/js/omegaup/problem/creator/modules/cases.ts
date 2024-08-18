@@ -9,6 +9,9 @@ import {
   CaseRequest,
   MultipleCaseAddRequest,
   CaseID,
+  CaseLineKind,
+  CaseLineData,
+  MatrixDistinctType,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -159,6 +162,72 @@ export const casesStore: Module<CasesState, RootState> = {
       }
       state = assignMissingPoints(state);
     },
+    updateCase(state, [oldGroupID, updateCaseRequest]: [GroupID, CaseRequest]) {
+      const oldGroup = state.groups.find(
+        (_group) => _group.groupID === oldGroupID,
+      );
+      if (!oldGroup) return;
+      const caseToEdit = oldGroup.cases.find(
+        (_case) => _case.caseID === updateCaseRequest.caseID,
+      );
+      if (!caseToEdit) return;
+      if (
+        updateCaseRequest.groupID === UUID_NIL &&
+        oldGroup.ungroupedCase === true
+      ) {
+        if (caseToEdit.name !== updateCaseRequest.name) {
+          caseToEdit.name = updateCaseRequest.name;
+          oldGroup.name = updateCaseRequest.name;
+        }
+        caseToEdit.points = updateCaseRequest.points;
+        state = assignMissingPoints(state);
+        return;
+      }
+      if (
+        updateCaseRequest.groupID === UUID_NIL &&
+        oldGroup.ungroupedCase === false
+      ) {
+        oldGroup.cases = oldGroup.cases.filter(
+          (_case) => _case.caseID !== caseToEdit.caseID,
+        );
+        const groupID = uuid();
+        const newGroup = generateGroup({
+          name: updateCaseRequest.name,
+          groupID: groupID,
+          points: updateCaseRequest.points,
+          autoPoints: updateCaseRequest.points === null,
+          ungroupedCase: true,
+          cases: [caseToEdit],
+        });
+        caseToEdit.name = updateCaseRequest.name;
+        caseToEdit.groupID = groupID;
+        caseToEdit.points = updateCaseRequest.points;
+        state.groups.push(newGroup);
+        state = assignMissingPoints(state);
+        return;
+      }
+      caseToEdit.name = updateCaseRequest.name;
+      caseToEdit.points = updateCaseRequest.points;
+
+      if (caseToEdit.groupID === updateCaseRequest.groupID) {
+        return;
+      }
+      caseToEdit.groupID = updateCaseRequest.groupID;
+
+      oldGroup.cases = oldGroup.cases.filter(
+        (_case) => _case.caseID !== updateCaseRequest.caseID,
+      );
+
+      if (oldGroup.ungroupedCase === true && oldGroup.cases.length === 0) {
+        state.groups = state.groups.filter(
+          (_group) => _group.groupID !== oldGroup.groupID,
+        );
+      }
+      state.groups
+        .find((_group) => _group.groupID === updateCaseRequest.groupID)
+        ?.cases.push(caseToEdit);
+      state = assignMissingPoints(state);
+    },
     deleteGroup(state, groupIDToBeDeleted: GroupID) {
       state.groups = state.groups.filter(
         (group) => group.groupID !== groupIDToBeDeleted,
@@ -286,6 +355,51 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = lines;
     },
+    editLineValue({ getters }, [lineID, value]: [LineID, CaseLineKind]) {
+      const selectedLine: CaseLine = getters.getLineFromID(lineID);
+      if (!selectedLine) return;
+      selectedLine.data.value = value;
+    },
+    editLineKind({ getters }, [lineID, _kind]: [LineID, CaseLineKind]) {
+      const selectedLine: CaseLine = getters.getLineFromID(lineID);
+      if (!selectedLine) return;
+      const defaultMatrixDistinctType: MatrixDistinctType =
+        MatrixDistinctType.None;
+      const lineData: CaseLineData = (() => {
+        switch (_kind) {
+          case 'line':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'multiline':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'array':
+            return {
+              kind: _kind,
+              size: 10,
+              min: 0,
+              max: 100,
+              distinct: false,
+              value: '',
+            };
+          case 'matrix':
+            return {
+              kind: _kind,
+              rows: 3,
+              cols: 3,
+              min: 0,
+              max: 100,
+              distinct: defaultMatrixDistinctType,
+              value: '',
+            };
+        }
+      })();
+      selectedLine.data = lineData;
+    },
     addNewLine({ getters }) {
       const selectedCase: Case = getters.getSelectedCase;
       const newLine: CaseLine = {
@@ -304,7 +418,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const lineToUpdate = selectedCase.lines.find(
         (line) => line.lineID === newLine.lineID,
       );
-      if (lineToUpdate === undefined) {
+      if (!lineToUpdate) {
         return;
       }
       lineToUpdate.label = newLine.label;
@@ -352,7 +466,7 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) {
+      if (!selectedGroup) {
         return null;
       }
       return (
@@ -386,17 +500,38 @@ export const casesStore: Module<CasesState, RootState> = {
         ) ?? null
       );
     },
+    getLineFromID: (state) => (lineID: LineID) => {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (!selectedGroup) {
+        return null;
+      }
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID === state.selected.caseID,
+      );
+      if (!selectedCase) {
+        return null;
+      }
+      const selectedLine = selectedCase.lines.find(
+        (line) => line.lineID === lineID,
+      );
+      if (!selectedLine) {
+        return null;
+      }
+      return selectedLine;
+    },
     getLinesFromSelectedCase: (state) => {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup === undefined) {
+      if (!selectedGroup) {
         return [];
       }
       const selectedCase = selectedGroup.cases.find(
         (_case) => _case.caseID === state.selected.caseID,
       );
-      if (selectedCase === undefined) {
+      if (!selectedCase) {
         return [];
       }
       return selectedCase.lines;

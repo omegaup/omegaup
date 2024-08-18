@@ -317,7 +317,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Schools s ON c.school_id = s.school_id
             WHERE
                 c.admission_mode = ? AND
-                c.finish_time IS NULL AND
                 c.recommended = 1 AND
                 c.archived = 0;';
 
