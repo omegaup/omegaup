@@ -11,11 +11,13 @@
             block
             split
             right
+            data-layout-dropdown
             :text="layout.name"
             variant="primary"
             @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"
           >
             <b-dropdown-item
+              data-layout-dropdown-enforce-to-selected
               @click="enforceLayoutToTheSelectedCase(layout.layoutID)"
             >
               <div class="d-flex">
@@ -27,7 +29,10 @@
                 {{ T.problemCreatorLayoutLoadToSelected }}
               </div>
             </b-dropdown-item>
-            <b-dropdown-item @click="enforceLayoutToAllCases(layout.layoutID)">
+            <b-dropdown-item
+              data-layout-dropdown-enforce-to-all
+              @click="enforceLayoutToAllCases(layout.layoutID)"
+            >
               <div class="d-flex">
                 <BIconArrowRepeat
                   variant="success"
@@ -37,7 +42,10 @@
                 {{ T.problemCreatorLayoutLoadToAll }}
               </div>
             </b-dropdown-item>
-            <b-dropdown-item @click="copyLayout(layout.layoutID)">
+            <b-dropdown-item
+              data-layout-dropdown-copy
+              @click="copyLayout(layout.layoutID)"
+            >
               <div class="d-flex">
                 <BIconBoxArrowInDown
                   variant="success"
@@ -47,7 +55,10 @@
                 {{ T.problemCreatorLayoutCopy }}
               </div>
             </b-dropdown-item>
-            <b-dropdown-item @click="removeLayout(layout.layoutID)">
+            <b-dropdown-item
+              data-layout-dropdown-delete
+              @click="removeLayout(layout.layoutID)"
+            >
               <div class="d-flex">
                 <BIconTrash
                   variant="danger"
@@ -140,6 +151,7 @@
           </div>
           <div class="text-center mb-2">
             <b-button
+              data-layout-add-line-info
               variant="light"
               class="mr-2"
               @click="addNewLineInfoToLayout(layout.layoutID)"
@@ -171,6 +183,7 @@ import {
   LayoutID,
   CaseLineKind,
   LineInfoID,
+  Group,
 } from '@/js/omegaup/problem/creator/types';
 
 const casesStore = namespace('casesStore');
@@ -179,6 +192,7 @@ const casesStore = namespace('casesStore');
 export default class Sidebar extends Vue {
   T = T;
 
+  @casesStore.State('groups') groups!: Group[];
   @casesStore.Getter('getAllLayouts') getAllLayouts!: Layout[];
   @casesStore.Mutation('enforceLayoutToTheSelectedCase')
   enforceLayoutToTheSelectedCase!: (layoutID: LayoutID) => void;

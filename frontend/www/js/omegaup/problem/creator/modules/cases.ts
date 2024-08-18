@@ -334,7 +334,8 @@ export const casesStore: Module<CasesState, RootState> = {
         (lineInfo) => lineInfo.lineInfoID === lineInfoID,
       );
       if (!selectedLineInfo) return;
-      const defaultMatrixDistinctType: MatrixDistinctType = 'none';
+      const defaultMatrixDistinctType: MatrixDistinctType =
+        MatrixDistinctType.None;
       const lineInfoData: CaseLineData = (() => {
         switch (_kind) {
           case 'line':

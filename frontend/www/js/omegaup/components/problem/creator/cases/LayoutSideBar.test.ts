@@ -1,0 +1,166 @@
+import { createLocalVue, mount } from '@vue/test-utils';
+
+import LayoutSideBar from './LayoutSideBar.vue';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
+import T from '../../../../lang';
+import Vue from 'vue';
+import store from '@/js/omegaup/problem/creator/store';
+import {
+  generateCase,
+  generateGroup,
+} from '@/js/omegaup/problem/creator/modules/cases';
+
+const localVue = createLocalVue();
+localVue.use(BootstrapVue);
+localVue.use(IconsPlugin);
+
+describe('CaseInput.vue', () => {
+  store.commit('casesStore/addNewLayout');
+  const newUngroupedCasegroup = generateGroup({
+    name: 'new_ungrouped_case',
+    ungroupedCase: true,
+  });
+  const newUngroupedCase = generateCase({
+    name: 'new_ungrouped_case',
+    groupID: newUngroupedCasegroup.groupID,
+  });
+  const newGroup = generateGroup({
+    name: 'new_group',
+    ungroupedCase: false,
+  });
+  const newCase = generateCase({
+    name: 'new_case',
+    groupID: newGroup.groupID,
+  });
+  store.commit('casesStore/addGroup', newUngroupedCasegroup);
+  store.commit('casesStore/addCase', newUngroupedCase);
+  store.commit('casesStore/addGroup', newGroup);
+  store.commit('casesStore/addCase', newCase);
+  const ungroupedCaseGroupID = newUngroupedCasegroup.groupID;
+  const ungroupedCaseCaseID = newUngroupedCase.caseID;
+  const groupedCaseGroupID = newGroup.groupID;
+  const groupedCaseCaseID = newCase.caseID;
+
+  // Currently, there are 4 methods on layout:
+  // - Enforce layout to the selected case.
+  // - Enforce layout to all the cases.
+  // - Copy layout.
+  // - Delete Layout. .
+  const layoutDropdownButtonCounts = 4;
+  store.commit('casesStore/setSelected', {
+    groupID: ungroupedCaseGroupID,
+    caseID: ungroupedCaseCaseID,
+  });
+  it('Should show layouts and methods', async () => {
+    const wrapper = mount(LayoutSideBar, {
+      localVue,
+      store,
+    });
+
+    expect(
+      wrapper.vm.getAllLayouts.filter(
+        (_layout) => _layout.name === T.problemCreatorLayoutNew,
+      ).length,
+    ).toBe(1);
+
+    const layoutDropdown = wrapper.find('div[data-layout-dropdown]');
+    expect(layoutDropdown.text()).toContain(T.problemCreatorLayoutNew);
+
+    const dropdownButtons = layoutDropdown.findAll('a.dropdown-item');
+    expect(dropdownButtons.length).toBe(layoutDropdownButtonCounts);
+
+    const addLineInfoButton = wrapper.find('button[data-layout-add-line-info]');
+    await addLineInfoButton.trigger('click');
+
+    // Rows of `line info` form a table in their primitive form.
+    expect(wrapper.find('table.table').exists()).toBeTruthy();
+
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === ungroupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === ungroupedCaseCaseID)?.lines
+        .length,
+    ).toBe(0);
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === groupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === groupedCaseCaseID)?.lines
+        .length,
+    ).toBe(0);
+
+    const enforceLayoutToSelectedButton = layoutDropdown.find(
+      'a[data-layout-dropdown-enforce-to-selected]',
+    );
+    await enforceLayoutToSelectedButton.trigger('click');
+
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === ungroupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === ungroupedCaseCaseID)?.lines
+        .length,
+    ).toBe(1);
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === groupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === groupedCaseCaseID)?.lines
+        .length,
+    ).toBe(0);
+
+    const enforceLayoutToAllButton = layoutDropdown.find(
+      'a[data-layout-dropdown-enforce-to-all]',
+    );
+    await enforceLayoutToAllButton.trigger('click');
+
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === ungroupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === ungroupedCaseCaseID)?.lines
+        .length,
+    ).toBe(1);
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === groupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === groupedCaseCaseID)?.lines
+        .length,
+    ).toBe(1);
+
+    const copyLayoutButton = layoutDropdown.find(
+      'a[data-layout-dropdown-copy]',
+    );
+    await copyLayoutButton.trigger('click');
+
+    expect(wrapper.vm.getAllLayouts.length).toBe(2);
+    expect(wrapper.vm.getAllLayouts[1].name).toBe(
+      T.problemCreatorLayoutNew + T.problemCreatorLayoutWordCopy,
+    );
+
+    const deleteLayoutButton = layoutDropdown.find(
+      'a[data-layout-dropdown-delete]',
+    );
+    await deleteLayoutButton.trigger('click');
+
+    expect(wrapper.vm.getAllLayouts.length).toBe(1);
+    expect(
+      wrapper.vm.getAllLayouts.filter(
+        (_layout) => _layout.name === T.problemCreatorLayoutNew,
+      ).length,
+    ).toBe(0);
+
+    store.dispatch('casesStore/addNewLine');
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === ungroupedCaseGroupID)
+        ?.cases.find((_case) => _case.caseID === ungroupedCaseCaseID)?.lines
+        .length,
+    ).toBe(2);
+
+    store.commit('casesStore/addLayoutFromSelectedCase');
+    await Vue.nextTick();
+    const layoutDropdownNew = wrapper
+      .findAll('div[data-layout-dropdown]')
+      .at(1);
+    expect(layoutDropdownNew.text()).toContain(
+      newUngroupedCasegroup.name + '_' + newUngroupedCase.name,
+    );
+  });
+});
