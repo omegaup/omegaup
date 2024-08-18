@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 
-import LayoutSideBar from './LayoutSideBar.vue';
+import LayoutSidebar from './LayoutSidebar.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
@@ -14,7 +14,7 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('CaseInput.vue', () => {
+describe('LayoutSidebar.vue', () => {
   store.commit('casesStore/addNewLayout');
   const newUngroupedCasegroup = generateGroup({
     name: 'new_ungrouped_case',
@@ -47,12 +47,13 @@ describe('CaseInput.vue', () => {
   // - Copy layout.
   // - Delete Layout. .
   const layoutDropdownButtonCounts = 4;
+
   store.commit('casesStore/setSelected', {
     groupID: ungroupedCaseGroupID,
     caseID: ungroupedCaseCaseID,
   });
   it('Should show layouts and methods', async () => {
-    const wrapper = mount(LayoutSideBar, {
+    const wrapper = mount(LayoutSidebar, {
       localVue,
       store,
     });
