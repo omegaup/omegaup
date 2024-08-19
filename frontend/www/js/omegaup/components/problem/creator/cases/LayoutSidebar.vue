@@ -75,7 +75,7 @@
             <table class="table">
               <tbody>
                 <tr v-for="lineInfo in layout.caseLineInfos">
-                  <td>
+                  <td class="align-middle border-0">
                     <b-container fluid class="bg-light">
                       <b-row
                         class="d-flex justify-content-between"
@@ -253,10 +253,5 @@ export default class Sidebar extends Vue {
 
 .w-84 {
   width: 84%;
-}
-
-.table td {
-  vertical-align: middle;
-  border: none;
 }
 </style>
