@@ -582,21 +582,41 @@ describe('CaseEdit.vue', () => {
       groupID,
       caseID,
     });
+    store.dispatch('casesStore/deleteLinesForSelectedCase');
     await Vue.nextTick();
 
-    const dropdownButtons = wrapper.findAll('button.w-100');
-    expect(dropdownButtons.length).toBe(3);
+    // console.log(wrapper.html());
 
-    expect(dropdownButtons.at(0).text()).toBe(T.problemCreatorLinesDelete);
-    expect(dropdownButtons.at(1).text()).toBe(T.problemCreatorCaseDownloadIn);
-    expect(dropdownButtons.at(2).text()).toBe(T.problemCreatorCaseDownloadTxt);
+    const menuDropdown = wrapper.find('div[data-menu-dropdown]');
+    expect(menuDropdown.exists()).toBeTruthy();
+
+    // There are four buttons in the dropdown area.
+    // - Toggle dropdown
+    // - delete lines
+    // - Download .in
+    // - Download .txt
+    const dropdownAreaButtonCount = 4;
+
+    const dropdownButtons = menuDropdown.findAll('button');
+    expect(dropdownButtons.length).toBe(dropdownAreaButtonCount);
+
+    const deleteButton = menuDropdown.find('button[data-menu-delete-lines]');
+    const downloadInButton = menuDropdown.find('button[data-menu-download-in]');
+    const downloadTxtButton = menuDropdown.find(
+      'button[data-menu-download-txt]',
+    );
+
+    expect(deleteButton.text()).toBe(T.problemCreatorLinesDelete);
+    expect(downloadInButton.text()).toBe(T.problemCreatorCaseDownloadIn);
+    expect(downloadTxtButton.text()).toBe(T.problemCreatorCaseDownloadTxt);
 
     wrapper.vm.addNewLine();
     await Vue.nextTick();
 
+    // Only one line is added.
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(1);
 
-    await dropdownButtons.at(0).trigger('click');
+    await deleteButton.trigger('click');
 
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(0);
 
@@ -604,12 +624,17 @@ describe('CaseEdit.vue', () => {
     wrapper.vm.addNewLine();
     await Vue.nextTick();
 
+    // Two lines are added, so!
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
 
-    const dropdowns = wrapper.findAll('a[role="menuitem"]');
-    expect(dropdowns.length).toBe(8);
+    const dropdownsMultiline = wrapper.findAll(
+      `a[data-array-modal-dropdown="${T.problemCreatorLineMultiline}"]`,
+    );
 
-    await dropdowns.at(5).trigger('click');
+    // There are two dropdown items for multiline, one for each line.
+    expect(dropdownsMultiline.length).toBe(2);
+
+    await dropdownsMultiline.at(1).trigger('click');
 
     const formInputs = wrapper.findAll('input');
     const formTextArea = wrapper.find('textarea');
@@ -629,10 +654,10 @@ describe('CaseEdit.vue', () => {
 
     const mockDownload = jest.spyOn(wrapper.vm, 'downloadInputFile');
 
-    await dropdownButtons.at(1).trigger('click');
+    await downloadInButton.trigger('click');
     expect(mockDownload).toHaveBeenCalledWith('.in');
 
-    await dropdownButtons.at(2).trigger('click');
+    await downloadTxtButton.trigger('click');
     expect(mockDownload).toHaveBeenCalledWith('.txt');
 
     mockDownload.mockRestore();

@@ -55,11 +55,23 @@
             </div>
           </div>
         </b-button>
-        <b-dropdown ref="dropdown" variant="light" class="h-100" right no-caret>
+        <b-dropdown
+          ref="dropdown"
+          data-menu-dropdown
+          variant="light"
+          class="h-100"
+          right
+          no-caret
+        >
           <template #button-content>
             <BIconThreeDotsVertical />
           </template>
-          <b-button variant="light" class="w-100" @click="deleteLines()">
+          <b-button
+            data-menu-delete-lines
+            variant="light"
+            class="w-100"
+            @click="deleteLines()"
+          >
             <div class="d-flex">
               <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
               {{ T.problemCreatorLinesDelete }}
@@ -67,6 +79,7 @@
           </b-button>
           <b-dropdown-divider></b-dropdown-divider>
           <b-button
+            data-menu-download-in
             variant="light"
             class="w-100"
             @click="downloadInputFile('.in')"
@@ -81,6 +94,7 @@
             </div>
           </b-button>
           <b-button
+            data-menu-download-txt
             variant="light"
             class="w-100"
             @click="downloadInputFile('.txt')"
@@ -143,12 +157,14 @@
                   </b-col>
                   <b-col cols="3" class="pl-2 pr-0 text-center">
                     <b-dropdown
+                      data-array-modal-dropdown
                       :text="getLineNameFromKind(line.data.kind)"
                       variant="light"
                     >
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
+                        :data-array-modal-dropdown="lineKindOption.type"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
