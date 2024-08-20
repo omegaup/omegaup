@@ -33,6 +33,7 @@ module.exports = {
       '<rootDir>/frontend/www/js/omegaup/__mocks__/styleMock.js',
     'monaco-editor':
       '<rootDir>/frontend/www/third_party/js/__mocks__/monacoEditor.js',
+    sugar: '<rootDir>/frontend/www/js/omegaup/__mocks__/sugar.js',
   },
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   globals: {
