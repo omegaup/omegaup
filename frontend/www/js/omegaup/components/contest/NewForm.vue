@@ -607,7 +607,10 @@ export default class NewForm extends Vue {
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
-    const request = { contest, teamsGroupAlias: this.currentTeamsGroupAlias };
+    const request = {
+      contest,
+      teamsGroupAlias: this.currentTeamsGroupAlias?.key,
+    };
     if (this.update) {
       this.$emit('update-contest', request);
       return;
