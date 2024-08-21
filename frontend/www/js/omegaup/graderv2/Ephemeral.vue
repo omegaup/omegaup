@@ -42,12 +42,13 @@
           data-run-button
           @click.prevent="handleRun"
         >
-          <span>Run</span>
-          <img
+          <span>{{ T.wordsRun }}</span>
+          <span
             v-if="isRunLoading"
-            src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg"
-            height="16"
-          />
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
         </button>
         <button
           v-if="isSubmitButton"
@@ -55,12 +56,13 @@
           data-submit-button
           @click.prevent="handleSubmit"
         >
-          <span>Submit</span>
-          <img
+          <span>{{ T.wordsSubmit }}</span>
+          <span
             v-if="isSubmitLoading"
-            src="https://samherbert.net/svg-loaders/svg-loaders/tail-spin.svg"
-            height="16"
-          />
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
         </button>
       </form>
     </div>
@@ -75,9 +77,9 @@ import type { Component as VueComponent } from 'vue'; // this is the component t
 import GoldenLayout from 'golden-layout';
 
 import { types } from '../api_types';
-
 import store from './GraderStore';
 import * as Util from './util';
+import T from '../lang';
 
 interface GraderComponent extends Vue {
   title?: string;
@@ -106,6 +108,9 @@ export default class Ephemeral extends Vue {
 
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
+  T = T;
+  isRunLoading = false;
+  isSubmitLoading = false;
 
   get isUploadButton() {
     return !this.isEmbedded;
