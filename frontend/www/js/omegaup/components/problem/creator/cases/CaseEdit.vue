@@ -759,14 +759,10 @@ export default class CaseEdit extends Vue {
       caseID: this.getSelectedCase.caseID,
     };
     const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
-    const blob = new Blob([input], { type: 'text/plain' });
-
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = this.getSelectedCase.name + ext;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    this.$emit('download-input-file', {
+      fileName: this.getSelectedCase.name + ext,
+      fileContent: input,
+    });
   }
 }
 </script>
