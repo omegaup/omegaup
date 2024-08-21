@@ -52,8 +52,17 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
+    // There are currently 6 bootstrap buttons on the page.
+    // - Edit case
+    // - Delete case
+    // - Download .in
+    // - Download .txt
+    // - Delete lines
+    // - Add new line
+    const initialBButtonsCount = 6;
+
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(6);
+    expect(buttons.length).toBe(initialBButtonsCount);
 
     expect(wrapper.text()).toContain(newUngroupedCase.name);
     expect(wrapper.text()).toContain(newUngroupedCasegroup.name);
@@ -595,10 +604,10 @@ describe('CaseEdit.vue', () => {
     // - delete lines
     // - Download .in
     // - Download .txt
-    const dropdownAreaButtonCount = 4;
+    const dropdownAreaButtonsCount = 4;
 
     const dropdownButtons = menuDropdown.findAll('button');
-    expect(dropdownButtons.length).toBe(dropdownAreaButtonCount);
+    expect(dropdownButtons.length).toBe(dropdownAreaButtonsCount);
 
     const deleteButton = menuDropdown.find('button[data-menu-delete-lines]');
     const downloadInButton = menuDropdown.find('button[data-menu-download-in]');
