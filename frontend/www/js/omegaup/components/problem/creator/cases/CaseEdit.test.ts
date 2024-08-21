@@ -573,7 +573,7 @@ describe('CaseEdit.vue', () => {
     },
   );
 
-  it('calls deleteLinesForSelectedCase when the delete option is clicked', async () => {
+  it('deletes line, downloads .in and downloads .txt, when corresponding buttons are clicked', async () => {
     const wrapper = mount(CaseEdit, { localVue, store });
 
     const groupID = newGroup.groupID;
@@ -659,6 +659,11 @@ describe('CaseEdit.vue', () => {
 
     await downloadTxtButton.trigger('click');
     expect(mockDownload).toHaveBeenCalledWith('.txt');
+
+    expect(wrapper.emitted()['download-input-file']).toStrictEqual([
+      [{ fileName: 'New Case.in', fileContent: 'ome g a\nu\np' }],
+      [{ fileName: 'New Case.txt', fileContent: 'ome g a\nu\np' }],
+    ]);
 
     mockDownload.mockRestore();
   });
