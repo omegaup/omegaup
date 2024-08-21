@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call: # make this workflow reusable
   pull_request: {}
   push:
     branches:
