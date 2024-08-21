@@ -226,6 +226,9 @@
 
             <omegaup-common-typeahead
               v-if="currentContestForTeams && !hasSubmissions"
+              :class="{
+                'is-invalid': invalidParameterName === 'teams_group_alias',
+              }"
               :existing-options="searchResultTeamsGroups"
               :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
