@@ -31,6 +31,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/frontend/www/$1',
     '\\.(css|less)$':
       '<rootDir>/frontend/www/js/omegaup/__mocks__/styleMock.js',
+    sugar: '<rootDir>/frontend/www/js/omegaup/__mocks__/sugar.js',
   },
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   globals: {

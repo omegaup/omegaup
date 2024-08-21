@@ -10,7 +10,7 @@
       <div class="list-group">
         <button
           v-if="!zip"
-          class="list-group-item list-group-item-action disabled"
+          class="text-truncate list-group-item list-group-item-action disabled"
           type="button"
         >
           <em>{{ T.wordsEmpty }}</em>
@@ -19,7 +19,7 @@
           v-for="(item, name) in zip.files"
           v-else
           :key="name"
-          class="list-group-item list-group-item-action"
+          class="text-truncate list-group-item list-group-item-action"
           type="button"
           :class="{ active: active === name }"
           :title="name"
@@ -38,6 +38,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as Util from './util';
 import T from '../lang';
 import JSZip, { JSZipObject } from 'jszip';
+import store from './GraderStore';
 
 @Component
 export default class ZipViewer extends Vue {
@@ -45,17 +46,20 @@ export default class ZipViewer extends Vue {
 
   zip: JSZip | null = null;
   active: string | null = null;
-  contents: string = '';
   T = T;
 
+  get contents(): string {
+    return store.getters.zipContent;
+  }
+
   select(item: JSZipObject): void {
-    this.active = item.name;
     item
       .async('string')
       .then((value: string) => {
-        this.contents = value;
+        store.dispatch('zipContent', value);
       })
       .catch(Util.asyncError);
+    this.active = item.name;
   }
 }
 </script>
@@ -67,9 +71,6 @@ div.filenames {
 
 button.list-group-item {
   width: 10em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 textarea {
