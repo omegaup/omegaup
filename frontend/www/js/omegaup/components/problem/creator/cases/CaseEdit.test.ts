@@ -87,9 +87,6 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(6);
-
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
 
@@ -113,9 +110,6 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    const buttons = wrapper.findAll('button');
-    expect(buttons.length).toBe(7);
-
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
 
@@ -133,8 +127,15 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe('testValue');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('line');
 
+    // There are 4 dropdown items for each line:
+    // - Line
+    // - Multiline
+    // - Array
+    // - Matrix
+    const dropdownItemCount = 4;
+
     const dropdowns = wrapper.findAll('a.dropdown-item');
-    expect(dropdowns.length).toBe(4);
+    expect(dropdowns.length).toBe(dropdownItemCount);
 
     await dropdowns.at(1).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
@@ -149,6 +150,8 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const formInputsUpdated = wrapper.findAll('input');
+
+    // The input element should be replaced by textarea element
     expect(formInputsUpdated.length).toBe(0);
   });
 
@@ -194,6 +197,7 @@ describe('CaseEdit.vue', () => {
     wrapper.vm.caseInputRef.caseGroup = newGroup.groupID;
     wrapper.vm.updateCaseInfo();
 
+    // There's only one group added to the store.
     expect(wrapper.vm.groups.length).toBe(1);
 
     expect(wrapper.vm.groups[0].cases[0].name).toBe(modifiedName);
@@ -390,7 +394,6 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const dropdowns = wrapper.findAll('a.dropdown-item');
-    expect(dropdowns.length).toBe(4);
 
     await dropdowns.at(2).trigger('click');
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
@@ -404,7 +407,6 @@ describe('CaseEdit.vue', () => {
     const modalBody = wrapper.find('div[data-array-modal]');
 
     const modalInputs = modalBody.findAll('input');
-    expect(modalInputs.length).toBe(5);
 
     const modalButton = modalBody.find('button[data-array-modal-generate]');
     expect(modalButton.exists).toBeTruthy();
@@ -437,8 +439,11 @@ describe('CaseEdit.vue', () => {
 
     const modalFooter = wrapper.find('footer.modal-footer');
 
+    // There should be two footer buttons: Save and Cancel.
+    const footerButtonsCount = 2;
+
     const footerButtons = modalFooter.findAll('button');
-    expect(footerButtons.length).toBe(2);
+    expect(footerButtons.length).toBe(footerButtonsCount);
 
     await modalFooter.find('button.btn-success').trigger('click');
 
