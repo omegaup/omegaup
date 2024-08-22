@@ -67,6 +67,9 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
+    // Support.
+    const SUPPORT_ROLE = 6;
+
     // Identity creator.
     const IDENTITY_CREATOR_ROLE = 7;
 
@@ -539,6 +542,10 @@ class Authorization {
         return self::isGroupMember(
             $identity,
             self::$_supportGroup
+        ) || self::hasRole(
+            $identity,
+            self::$_supportGroup->acl_id,
+            self::SUPPORT_ROLE
         );
     }
 
