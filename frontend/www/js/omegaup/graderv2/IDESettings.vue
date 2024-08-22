@@ -142,7 +142,7 @@ export default class IDESettings extends Vue {
     // convert back the time in seconds
     store.dispatch('limits', {
       ...store.state.request.input.limits,
-      TimeLimit: value.toString() + 's',
+      TimeLimit: `${value}s`,
     });
   }
 
@@ -155,7 +155,7 @@ export default class IDESettings extends Vue {
   set overallWallTimeLimit(value: number) {
     store.dispatch('limits', {
       ...store.state.request.input.limits,
-      OverallWallTimeLimit: value.toString() + 's',
+      OverallWallTimeLimit: `${value}s`,
     });
   }
 
@@ -166,7 +166,7 @@ export default class IDESettings extends Vue {
   set extraWallTime(value: number) {
     store.dispatch('limits', {
       ...store.state.request.input.limits,
-      ExtraWallTime: value.toString() + 's',
+      ExtraWallTime: `${value}s`,
     });
   }
 
