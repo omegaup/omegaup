@@ -599,7 +599,6 @@ describe('CaseEdit.vue', () => {
     store.dispatch('casesStore/deleteLinesForSelectedCase');
     await Vue.nextTick();
 
-    // console.log(wrapper.html());
 
     const menuDropdown = wrapper.find('div[data-menu-dropdown]');
     expect(menuDropdown.exists()).toBeTruthy();
