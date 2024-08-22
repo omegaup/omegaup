@@ -712,7 +712,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       { commit }: { commit: Commit },
       {
         initialLanguage,
-        initialSource,
+        initialSource = '',
         languages,
         problem,
         showRunButton,

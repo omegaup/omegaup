@@ -32,9 +32,6 @@ export default class EphemeralGrader extends Vue {
     }
     return this.preferredLanguage;
   }
-  get initialSource() {
-    return '';
-  }
 
   mounted(): void {
     (this.$refs.grader as HTMLIFrameElement).onload = () => {
@@ -70,7 +67,6 @@ export default class EphemeralGrader extends Vue {
         params: {
           problem: this.problem,
           initialLanguage: this.initialLanguage,
-          initialSource: this.initialSource,
           languages: this.acceptedLanguages,
           showRunButton: this.canRun,
           showSubmitButton: this.canSubmit,
