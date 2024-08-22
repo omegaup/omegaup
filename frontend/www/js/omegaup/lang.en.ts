@@ -2027,6 +2027,7 @@ const translations: { [key: string]: string; } = {
   wordsUnlockSolution: "Unlock Solution",
   wordsUpdateLecture: "Update lecture",
   wordsUpdateProblem: "Update problem",
+  wordsUpload: "Upload",
   wordsUploadedOn: "Problem uploaded on: %(date)",
   wordsUsersFeedback: "Coders Feedback",
   wordsVerdict: "Verdict",

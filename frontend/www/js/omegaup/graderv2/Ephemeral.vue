@@ -8,7 +8,11 @@
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <label v-if="isUploadButton" for="upload">
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <span class="fa fa-upload" title="Upload" aria-hidden="true"></span>
+            <span
+              class="fa fa-upload"
+              title="{{T.wordsUpload}}"
+              aria-hidden="true"
+            ></span>
           </a>
         </label>
 
@@ -16,7 +20,7 @@
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
             <span
               class="fa fa-download"
-              title="Download"
+              title="{{T.wordsDownload}}"
               aria-hidden="true"
             ></span>
           </a>
