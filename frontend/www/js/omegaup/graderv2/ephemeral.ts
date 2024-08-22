@@ -240,7 +240,7 @@ document.getElementById('upload').addEventListener('change', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
       .then((zip) => {
-        store.dispatch('RESET');
+        store.dispatch('reset');
         store.commit('removeCase', 'long');
         let cases = {};
         for (let fileName in zip.files) {
@@ -585,7 +585,7 @@ window.addEventListener(
 
     switch (e.data.method) {
       case 'setSettings':
-        store.dispatch('INIT_PROBLEM', {
+        store.dispatch('initProblem', {
           problem: e.data.params.problem,
           initialLanguage: e.data.params.initialLanguage,
           initialSource: e.data.params.initialSource,
@@ -611,7 +611,7 @@ window.addEventListener(
 
 function onHashChanged() {
   if (window.location.hash.length == 0) {
-    store.dispatch('RESET');
+    store.dispatch('reset');
     store.commit('logs', '');
     onDetailsJsonReady({});
     onFilesZipReady(null);
@@ -625,7 +625,7 @@ function onHashChanged() {
     })
     .then((request) => {
       if (!request) {
-        store.dispatch('RESET');
+        store.dispatch('reset');
         store.commit('logs', '');
         onDetailsJsonReady({});
         onFilesZipReady(null);

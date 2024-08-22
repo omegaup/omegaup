@@ -668,7 +668,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     'request.source'({ commit }: { commit: Commit }, value: string) {
       commit('request.source', value);
     },
-    RESET({ commit }: { commit: Commit }) {
+    reset({ commit }: { commit: Commit }) {
       commit(
         'languages',
         Object.values(Util.supportedLanguages).map(
@@ -708,7 +708,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       commit('updatingSettings', false);
       store.state.dirty = true;
     },
-    INIT_PROBLEM(
+    initProblem(
       { commit }: { commit: Commit },
       {
         initialLanguage,
@@ -769,5 +769,5 @@ const storeOptions: StoreOptions<GraderStore> = {
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
-store.dispatch('RESET');
+store.dispatch('reset');
 export default store;
