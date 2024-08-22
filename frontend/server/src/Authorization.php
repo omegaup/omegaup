@@ -539,6 +539,9 @@ class Authorization {
                 return false;
             }
         }
+        if (is_null(self::$_supportGroup->acl_id)) {
+            return false;
+        }
         return self::isGroupMember(
             $identity,
             self::$_supportGroup
