@@ -760,7 +760,7 @@ export default class CaseEdit extends Vue {
     };
     const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
     this.$emit('download-input-file', {
-      fileName: this.getSelectedCase.name + ext,
+      fileName: `${this.getSelectedCase.name}${ext}`,
       fileContent: input,
     });
   }
