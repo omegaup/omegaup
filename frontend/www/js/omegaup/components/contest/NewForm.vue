@@ -91,6 +91,7 @@
               :class="{
                 'is-invalid': invalidParameterName === 'description',
               }"
+              data-description
               name="description"
               cols="30"
               rows="10"

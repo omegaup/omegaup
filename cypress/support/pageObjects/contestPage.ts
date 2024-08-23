@@ -99,11 +99,11 @@ export class ContestPage {
 
     if (contestOptions.contestForTeams) {
       cy.get('[data-contest-for-teams]').should('be.checked');
-      cy.get('[name="team_group_alias"]').should(
-        'have.value',
+      cy.get('.tags-input-badge').should(
+        'have.text',
         contestOptions.teamGroupAlias,
       );
-
+      return;
     }
 
     cy.addProblemsToContest(contestOptions);

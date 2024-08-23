@@ -77,8 +77,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(loginOptions[0]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     contestPage.setPasswordForIdentity(identityLogin.username, '12345678');
     contestPage.createContest(contestOptions, [identityLogin.username]);
     cy.logout();
@@ -163,8 +163,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(userLoginOptions[0]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     cy.logout();
 
     const contestOptions = contestPage.generateContestOptions(
@@ -232,8 +232,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(userLoginOptions[4]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     cy.logout();
 
     const users: Array<string> = [];
@@ -570,7 +570,6 @@ describe('Contest Test', () => {
     contestPage.createContest(contestOptions, []);
 
     // Update contest title and description
-    cy.get(`a[href="/contest/${contestOptions.contestAlias}/edit/"]`).click();
     cy.waitUntil(() =>
       cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
     );
@@ -580,9 +579,8 @@ describe('Contest Test', () => {
     cy.get('[data-description]').clear().type(newContestDescription);
     cy.get('button[type="submit"]').click();
 
-    cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
-    cy.get('[name="description"]').should('have.value', contestOptions.description,
-    );
+    cy.get('[name="title"]').should('have.value', newContestTitle);
+    cy.get('[name="description"]').should('have.value', newContestDescription);
     cy.logout();
   });
 });
