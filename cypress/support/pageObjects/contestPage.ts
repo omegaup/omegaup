@@ -19,59 +19,12 @@ enum ScoreMode {
 }
 
 export class ContestPage {
-  createGroup(groupOptions: GroupOptions): void {
-    cy.get('[data-nav-user]').click();
-    cy.get('[data-nav-user-groups]').click();
-
-    cy.get('[href="/group/new/"]').click();
-
-    cy.get('[name="title"]').type(groupOptions.groupTitle);
-    cy.get('[name="description"]').type(groupOptions.groupDescription);
-
-    cy.get('[data-group-new]').submit();
-  }
-
-  addIdentitiesGroup(): void {
-    cy.get('[href="#identities"]').click();
-    cy.get('.introjs-skipbutton').click();
-    cy.get('[name="identities"]').attachFile('identities.csv');
-
-    cy.get('[data-identity-username]').then((rawHTMLElements) => {
-      const userNames: Array<string> = [];
-      Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
-        cy.task('log', element.innerText);
-        userNames.push(element.innerText);
-      });
-
-      cy.wrap(userNames).as('userNamesList');
-    });
-
-    const uploadedPasswords: Array<string> = [];
-    cy.get('[data-identity-password]').then((rawHTMLElements) => {
-      uploadedPasswords.concat(
-        Cypress.$.makeArray(rawHTMLElements).map((el) => el.innerText),
-      );
-    });
-
-    cy.get('[name="create-identities"]').click();
-    cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
-    });
-
-    cy.get('[href="#members"]').click();
-    cy.get('@userNamesList').then((textArray) => {
-      cy.get('[data-members-username]')
-        .should('have.length', textArray.length)
-        .then((rawHTMLElements) => {
-          return Cypress.$.makeArray(rawHTMLElements).map((el) => el.innerText);
-        })
-        .should('deep.equal', textArray);
-    });
-  }
-
   // FIXME: When trying to bulk users, cypress is not able to find the results table
   // TODO: Replace multiuser add for courses/contests
   addStudentsBulk(users: Array<string>): void {
+    if (users.length === 0) {
+      return; // No users to add  to the contest
+    }
     cy.get('a[data-nav-contestant]').click();
 
     cy.get('textarea[data-contestant-names]').type(users.join(', '));
@@ -144,6 +97,15 @@ export class ContestPage {
       contestOptions.description,
     );
 
+    if (contestOptions.contestForTeams) {
+      cy.get('[data-contest-for-teams]').should('be.checked');
+      cy.get('[name="team_group_alias"]').should(
+        'have.value',
+        contestOptions.teamGroupAlias,
+      );
+
+    }
+
     cy.addProblemsToContest(contestOptions);
 
     this.addStudentsBulk(users);
@@ -160,6 +122,8 @@ export class ContestPage {
     loginOption: LoginOptions,
     firstTimeVisited: boolean = true,
     numberOfProblems: number = 1,
+    contestForTeams: boolean = false,
+    teamGroupAlias?: string,
   ): ContestOptions {
     const problems = problemPage.generateProblemOptions(numberOfProblems);
     const contestProblems: ProblemOptions[] = [];
@@ -201,6 +165,11 @@ export class ContestPage {
       problems: contestProblems,
       runs: contestRuns,
     };
+
+    if (contestForTeams) {
+      contestOptions.contestForTeams = true;
+      contestOptions.teamGroupAlias = teamGroupAlias;
+    }
 
     return contestOptions;
   }
