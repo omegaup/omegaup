@@ -217,8 +217,8 @@
             <div class="checkbox">
               <label>
                 <input
-                  data-contest-for-teams
                   v-model="currentContestForTeams"
+                  data-contest-for-teams
                   type="checkbox"
                   :disabled="update"
                 />

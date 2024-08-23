@@ -548,7 +548,7 @@ describe('Contest Test', () => {
     cy.logout();
   });
 
-  it.only('Should create and update a contest for teams', () => {
+  it('Should create and update a contest for teams', () => {
     const userLoginOptions = loginPage.registerMultipleUsers(1);
     const groupTitle = 'ut_teamgroup_' + uuid();
     const contestOptions = contestPage.generateContestOptions(
