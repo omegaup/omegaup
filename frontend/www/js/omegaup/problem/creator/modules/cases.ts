@@ -441,9 +441,6 @@ export const casesStore: Module<CasesState, RootState> = {
         state.groups.find((group) => group.groupID === groupID)?.cases ?? null
       );
     },
-    getAllGroups: (state) => {
-      return state.groups;
-    },
     getGroupIdsAndNames: (state) => {
       // We use reduce because we don't want to show the ungrouped cases/groups
       // Also this way we avoid chaining a map and a filter

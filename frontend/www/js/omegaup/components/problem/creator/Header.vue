@@ -50,9 +50,9 @@ export default class Header extends Vue {
   T = T;
   name: string = T.problemCreatorEmpty;
 
+  @casesStore.State('groups') groups!: Group[];
   @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
   getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
-  @casesStore.Getter('getAllGroups') getAllGroups!: Group[];
 
   @Watch('name')
   onNameChanged(newProblemName: string) {
@@ -75,7 +75,7 @@ export default class Header extends Vue {
     const folder = zip.folder('cases');
     let testPlanData: string = '';
 
-    this.getAllGroups.forEach((_group) => {
+    this.groups.forEach((_group) => {
       _group.cases.forEach((_case) => {
         let fileName = _case.name;
         if (_group.ungroupedCase === false) {
@@ -101,16 +101,10 @@ export default class Header extends Vue {
     this.getSolution(zip);
     this.getCasesAndTestPlan(zip);
 
-    const problemName = this.$store.state.problemName;
-    zip.generateAsync({ type: 'blob' }).then((content) => {
-      // The following codeblock just adds a link element to the document for the download , clicks on it to download, removes the link from the document and then frees up the memory.
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(content);
-      link.download = problemName.toLowerCase().replaceAll(' ', '_') + '.zip';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+    const problemName: string = this.$store.state.problemName;
+    this.$emit('download-zip-file', {
+      fileName: problemName.replace(/ /g, "_"),
+      zipContent: zip,
     });
   }
 

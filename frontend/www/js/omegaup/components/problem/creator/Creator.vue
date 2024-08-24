@@ -1,6 +1,10 @@
 <template>
   <b-container fluid="lg">
-    <creator-header />
+    <creator-header
+    @download-zip-file="
+        (zipObject) => $emit('download-zip-file', zipObject)
+      " 
+    />
     <creator-tabs
       @show-update-success-message="() => $emit('show-update-success-message')"
       @download-input-file="
