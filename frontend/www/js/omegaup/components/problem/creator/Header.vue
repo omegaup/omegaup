@@ -93,6 +93,7 @@ export default class Header extends Vue {
     });
 
     zip.file('testplan', testPlanData);
+    zip.file('cdp.data', JSON.stringify(this.$store.state));
   }
 
   generateProblem() {
