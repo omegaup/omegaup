@@ -4,7 +4,7 @@
       <div class="form-group col-md-4">
         <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
         <input
-          v-model="timeLimit"
+          v-model.number="timeLimit"
           class="form-control"
           max="5.0"
           min="0.1"
@@ -17,7 +17,7 @@
           T.settingsOverallWallTimeLimit
         }}</label>
         <input
-          v-model="overallWallTimeLimit"
+          v-model.number="overallWallTimeLimit"
           class="form-control"
           max="5.0"
           min="0.1"
@@ -28,7 +28,7 @@
       <div class="form-group col-md-4">
         <label for="inputExtraWallTime">{{ T.settingsExtraWallTime }}</label>
         <input
-          v-model="extraWallTime"
+          v-model.number="extraWallTime"
           class="form-control"
           max="5.0"
           min="0.0"
@@ -41,7 +41,7 @@
       <div class="form-group col-md-6">
         <label for="inputMemoryLimit">{{ T.settingsMemoryLimit }}</label>
         <input
-          v-model="memoryLimit"
+          v-model.number="memoryLimit"
           class="form-control"
           max="1073741824"
           min="33554432"
@@ -52,7 +52,7 @@
       <div class="form-group col-md-6">
         <label for="inputOutputLimit">{{ T.settingsOutputLimit }}</label>
         <input
-          v-model="outputLimit"
+          v-model.number="outputLimit"
           class="form-control"
           max="104857600"
           min="0"
@@ -75,7 +75,7 @@
       <div v-if="validator == 'token-numeric'" class="form-group col-md-6">
         <label for="inputTolerance">{{ T.settingsTolerance }}</label>
         <input
-          v-model="tolerance"
+          v-model.number="tolerance"
           class="form-control"
           max="1"
           min="0"
@@ -118,6 +118,7 @@
 </template>
 
 <script lang="ts">
+// TODO: use mapGetters, mapMutations and mapActions to get auto complete
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import RadioSwitch from '../components/RadioSwitch.vue';
 import store from './GraderStore';
@@ -138,7 +139,11 @@ export default class IDESettings extends Vue {
   }
 
   set timeLimit(value: number) {
-    store.commit('TimeLimit', value.toString());
+    // convert back the time in seconds
+    store.dispatch('limits', {
+      ...store.state.request.input.limits,
+      TimeLimit: `${value}s`,
+    });
   }
 
   get overallWallTimeLimit(): number {
@@ -148,7 +153,10 @@ export default class IDESettings extends Vue {
   }
 
   set overallWallTimeLimit(value: number) {
-    store.commit('OverallWallTimeLimit', value.toString());
+    store.dispatch('limits', {
+      ...store.state.request.input.limits,
+      OverallWallTimeLimit: `${value}s`,
+    });
   }
 
   get extraWallTime(): number {
@@ -156,7 +164,10 @@ export default class IDESettings extends Vue {
   }
 
   set extraWallTime(value: number) {
-    store.commit('ExtraWallTime', value.toString());
+    store.dispatch('limits', {
+      ...store.state.request.input.limits,
+      ExtraWallTime: `${value}s`,
+    });
   }
 
   get memoryLimit(): number {
@@ -164,7 +175,10 @@ export default class IDESettings extends Vue {
   }
 
   set memoryLimit(value: number) {
-    store.commit('MemoryLimit', Number.parseInt(value.toString()));
+    store.dispatch('limits', {
+      ...store.state.request.input.limits,
+      MemoryLimit: value,
+    });
   }
 
   get outputLimit(): number {
@@ -172,23 +186,26 @@ export default class IDESettings extends Vue {
   }
 
   set outputLimit(value: number) {
-    store.commit('OutputLimit', Number.parseInt(value.toString()));
+    store.dispatch('limits', {
+      ...store.state.request.input.limits,
+      OutputLimit: value,
+    });
   }
 
   get validator(): string {
-    return store.state.request.input.validator.name;
+    return store.getters['Validator'];
   }
 
   set validator(value: string) {
-    store.commit('Validator', value);
+    store.dispatch('Validator', value);
   }
 
   get tolerance(): number {
-    return store.getters.Tolerance;
+    return store.getters['Tolerance'];
   }
 
   set tolerance(value: number) {
-    store.commit('Tolerance', value);
+    store.dispatch('Tolerance', value);
   }
 
   get validatorLanguage(): string {
@@ -196,16 +213,18 @@ export default class IDESettings extends Vue {
   }
 
   set validatorLanguage(value: string) {
-    store.commit('ValidatorLanguage', value);
+    store.dispatch('request.input.validator.custom_validator.language', value);
   }
 
   get interactive(): boolean {
-    return store.getters.isInteractive;
+    return store.getters['isInteractive'];
   }
 
   set interactive(value: boolean) {
-    if (value) store.commit('Interactive', {});
-    else store.commit('Interactive', undefined);
+    // radio switch triggers an event value, make sure that value is a boolean
+    if (typeof value !== 'boolean') return;
+    if (value) store.dispatch('Interactive', {});
+    else store.dispatch('Interactive', undefined);
   }
 
   get interactiveLanguage(): string {
@@ -213,15 +232,15 @@ export default class IDESettings extends Vue {
   }
 
   set interactiveLanguage(value: string) {
-    store.commit('InteractiveLanguage', value);
+    store.dispatch('request.input.interactive.language', value);
   }
 
   get interactiveModuleName(): string {
-    return store.getters.moduleName;
+    return store.getters['moduleName'];
   }
 
   set interactiveModuleName(value: string) {
-    store.commit('InteractiveModuleName', value);
+    store.dispatch('moduleName', value);
   }
 }
 </script>
