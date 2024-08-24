@@ -1,8 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { GroupOptions, TeamGroupOptions } from '../support/types';
-import { contestPage } from '../support/pageObjects/contestPage';
-import { profilePage } from '../support/pageObjects/profilePage';
+import { groupPage } from '../support/pageObjects/groupPage';
 
 describe('Group Test', () => {
   beforeEach(() => {
@@ -24,8 +23,8 @@ describe('Group Test', () => {
     );
 
     cy.login(loginOptions[0]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     cy.logout();
   });
 
@@ -43,8 +42,8 @@ describe('Group Test', () => {
     );
 
     cy.login(loginOptions[0]);
-    profilePage.createTeamGroup(teamGroupOptions);
-    profilePage.uploadTeamGroups();
+    groupPage.createTeamGroup(teamGroupOptions);
+    groupPage.uploadTeamGroups();
     cy.logout();
   });
 });
