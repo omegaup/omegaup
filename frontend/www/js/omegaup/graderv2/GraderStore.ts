@@ -1,5 +1,6 @@
 // TODO: add return types to each of the getters
 // TODO: move logic from components inside this store
+
 import Vuex, { Commit, StoreOptions } from 'vuex';
 import Vue from 'vue';
 
@@ -65,6 +66,16 @@ export interface SettingsCasesGroup {
   Cases: SettingsCase[];
   Weight: number;
 }
+// TODO: combine case selector group and settings cases group
+export interface CaseSelectorGroup {
+  explicit: boolean;
+  name: string;
+  cases: {
+    name: string;
+    item: { in: string; out: string; weight?: number };
+  }[];
+}
+
 const languageSelectElement = document.getElementById(
   'language',
 ) as HTMLSelectElement;
@@ -258,8 +269,8 @@ const storeOptions: StoreOptions<GraderStore> = {
     'request.input.interactive.language'(state: GraderStore) {
       return state.request.input.interactive?.language || '';
     },
-    Tolenrance(state: GraderStore) {
-      return state.request.input.validator?.tolerance || -1;
+    Tolerance(state: GraderStore) {
+      return state.request.input.validator?.tolerance || 0;
     },
     isCustomValidator(state: GraderStore) {
       return !!state.request.input.validator.custom_validator;
@@ -285,6 +296,57 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     showRunButton(state: GraderStore) {
       return state.showRunButton;
+    },
+    Validator(state: GraderStore) {
+      return state.request.input.validator.name;
+    },
+    caseSelectorGroups(state: GraderStore): CaseSelectorGroup[] {
+      const flatCases = state.request.input.cases;
+
+      const resultMap: {
+        [key: string]: CaseSelectorGroup;
+      } = {};
+
+      for (const caseName in flatCases) {
+        if (!flatCases[caseName]) continue;
+
+        const tokens = caseName.split('.', 2);
+        if (!resultMap[tokens[0]]) {
+          resultMap[tokens[0]] = {
+            explicit: tokens.length > 1,
+            name: tokens[0],
+            cases: [],
+          };
+        }
+
+        resultMap[tokens[0]].cases.push({
+          name: caseName,
+          item: flatCases[caseName],
+        });
+      }
+
+      const result: CaseSelectorGroup[] = [];
+      for (const groupName in resultMap) {
+        if (!resultMap[groupName]) continue;
+
+        resultMap[groupName].cases.sort(
+          (
+            a: {
+              name: string;
+              item: { in: string; out: string; weight?: number };
+            },
+            b: {
+              name: string;
+              item: { in: string; out: string; weight?: number };
+            },
+          ) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+        );
+        result.push(resultMap[groupName]);
+      }
+      result.sort((a: CaseSelectorGroup, b: CaseSelectorGroup) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      );
+      return result;
     },
   },
   mutations: {
@@ -502,16 +564,24 @@ const storeOptions: StoreOptions<GraderStore> = {
       } else {
         Vue.delete(state.request.input.validator, 'custom_validator');
       }
-      state.request.input.validator.name = value;
+
+      Vue.set(state.request.input.validator, 'name', value);
       state.dirty = true;
     },
     Tolerance(state: GraderStore, value: number) {
       state.request.input.validator.tolerance = value;
       state.dirty = true;
     },
-    ValidatorLanguage(state: GraderStore, value: string) {
+    'request.input.validator.custom_validator.language'(
+      state: GraderStore,
+      value: string,
+    ) {
       if (!state.request.input.validator.custom_validator) return;
-      state.request.input.validator.custom_validator.language = value;
+      Vue.set(
+        state.request.input.validator.custom_validator,
+        'language',
+        value,
+      );
       state.dirty = true;
     },
     Interactive(
@@ -551,8 +621,8 @@ const storeOptions: StoreOptions<GraderStore> = {
       } = value;
 
       store.commit('request.input.interactive.idl', idl);
-      store.commit('InteractiveLanguage', language);
-      store.commit('InteractiveModuleName', module_name);
+      store.commit('request.input.interactive.language', language);
+      store.commit('moduleName', module_name);
       store.commit('request.input.interactive.main_source', main_source);
       // if its the same template from before, no need to update
       if (templates == state.request.input.interactive?.templates) {
@@ -579,15 +649,21 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       state.dirty = true;
     },
-    InteractiveLanguage(state: GraderStore, value: string) {
+    'request.input.interactive.language'(state: GraderStore, value: string) {
       if (value == 'cpp') value = 'cpp17-gcc';
       if (!state.request.input.interactive) return;
-      state.request.input.interactive.language = value;
+
+      Vue.set(state.request.input.interactive, 'language', value);
       state.dirty = true;
     },
-    InteractiveModuleName(state: GraderStore, value: string) {
+    moduleName(state: GraderStore, value: string) {
       if (!state.request.input.interactive) return;
-      state.request.input.interactive.module_name = value;
+
+      // this statement is not reactive
+      // state.request.input.interactive.module_name = value;
+
+      // this one is reactive
+      Vue.set(state.request.input.interactive, 'module_name', value);
       state.dirty = true;
     },
     updatingSettings(state: GraderStore, value: boolean) {
@@ -595,7 +671,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     createCase(
       state: GraderStore,
-      caseData: { name: string; in: string; out: string; weight?: number },
+      caseData: { name: string; in?: string; out?: string; weight?: number },
     ) {
       // if case doesnt already exist create it?
       // no! always create a case
@@ -634,7 +710,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     limits(_state: GraderStore, limits: types.LimitsSettings) {
       store.commit(
         'MemoryLimit',
-        Util.parseDuration(limits.MemoryLimit) * 1024,
+        // is memory implicitly stored in units of kilobytes?
+        // Util.parseDuration(limits.MemoryLimit) * 1024,
+        Util.parseDuration(limits.MemoryLimit),
       );
 
       store.commit('OutputLimit', limits.OutputLimit);
@@ -667,6 +745,48 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     'request.source'({ commit }: { commit: Commit }, value: string) {
       commit('request.source', value);
+    },
+    limits({ commit }: { commit: Commit }, limits: types.LimitsSettings) {
+      commit('limits', limits);
+    },
+    Interactive(
+      { commit }: { commit: Commit },
+      interactiveSettings: types.InteractiveSettingsDistrib | undefined,
+    ) {
+      commit('Interactive', interactiveSettings);
+    },
+    'request.input.validator.custom_validator.language'(
+      { commit }: { commit: Commit },
+      language: string,
+    ) {
+      commit('request.input.validator.custom_validator.language', language);
+    },
+    'request.input.interactive.language'(
+      { commit }: { commit: Commit },
+      language: string,
+    ) {
+      commit('request.input.interactive.language', language);
+    },
+    moduleName({ commit }: { commit: Commit }, moduleName: string) {
+      commit('moduleName', moduleName);
+    },
+    Tolerance({ commit }: { commit: Commit }, value: number) {
+      commit('Tolerance', value);
+    },
+    Validator({ commit }: { commit: Commit }, value: string) {
+      commit('Validator', value);
+    },
+    currentCase({ commit }: { commit: Commit }, value: string) {
+      commit('currentCase', value);
+    },
+    createCase(
+      { commit }: { commit: Commit },
+      caseData: { name: string; in?: string; out?: string; weight?: number },
+    ) {
+      commit('createCase', caseData);
+    },
+    removeCase({ commit }: { commit: Commit }, name: string) {
+      commit('removeCase', name);
     },
     reset({ commit }: { commit: Commit }) {
       commit(
