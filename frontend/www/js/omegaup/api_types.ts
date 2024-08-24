@@ -3336,6 +3336,7 @@ export namespace types {
     name: string;
     needs_basic_information: boolean;
     objective?: string;
+    recommended: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -5704,6 +5705,8 @@ export namespace messages {
     submissionFeedback?: dao.SubmissionFeedback;
     submissionFeedbackThread?: dao.SubmissionFeedbackThread;
   };
+  export type SubmissionSetFeedbackListRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackListResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -6488,6 +6491,9 @@ export namespace controllers {
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
+    setFeedbackList: (
+      params?: messages.SubmissionSetFeedbackListRequest,
+    ) => Promise<messages.SubmissionSetFeedbackListResponse>;
   }
 
   export interface Tag {

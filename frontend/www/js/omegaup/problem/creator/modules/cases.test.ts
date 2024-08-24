@@ -355,9 +355,15 @@ describe('cases.ts', () => {
       caseID: newCase.caseID,
     });
     const lines: CaseLine[] = [
-      { lineID: uuid(), label: 'line1', data: { kind: 'line', value: '1' } },
       {
         lineID: uuid(),
+        caseID: newCase.caseID,
+        label: 'line1',
+        data: { kind: 'line', value: '1' },
+      },
+      {
+        lineID: uuid(),
+        caseID: newCase.caseID,
         label: 'line2',
         data: {
           kind: 'array',
@@ -365,7 +371,7 @@ describe('cases.ts', () => {
           max: 10,
           min: 1,
           size: 2,
-          value: [1, 2],
+          value: '1 2',
         },
       },
     ];
@@ -389,7 +395,8 @@ describe('cases.ts', () => {
     const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
     const lineToBeExpected: CaseLine = {
       lineID: lineID,
-      label: 'NEW',
+      caseID: store.state.casesStore.groups[0].cases[0].caseID,
+      label: '',
       data: { kind: 'line', value: '' },
     };
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(1);
@@ -420,7 +427,7 @@ describe('cases.ts', () => {
         max: 10,
         min: 1,
         size: 2,
-        value: [1, 2],
+        value: '1, 2',
       },
     };
     store.dispatch('casesStore/updateLine', updatedLine);

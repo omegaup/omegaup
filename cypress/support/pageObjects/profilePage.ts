@@ -23,49 +23,33 @@ export class ProfilePage {
     cy.get('[data-preference-save-button]').click();
     cy.get('#alert-close').click();
   }
-  createTeamGroup(teamGroupOptions: TeamGroupOptions): void {
+
+  navigateToMyProblemsPage(): void {
     cy.get('[data-nav-user]').click();
-    cy.get('[data-nav-user-teams-groups]').click();
-    cy.get('[href="/teamsgroup/new/"]').click();
-
-    cy.get('[name="title"]').type(teamGroupOptions.groupTitle);
-    cy.get('[name="description"]').type(teamGroupOptions.groupDescription);
-    cy.get('[name="number-of-contestants"]')
-      .clear()
-      .type(teamGroupOptions.noOfContestants);
-
-    cy.get('[data-create-teams-group]').click();
+    cy.get('a[href="/profile/#created-content"]').click();
+    cy.get('a[href="/problem/mine/"]').click();
   }
 
-  uploadTeamGroups(): void {
-    cy.get('[href="#upload"]').click();
-    cy.get('[name="identities"]').attachFile('team_groups.csv');
+  verifyProblemIsVisible(problemAlias: string): void {
+    cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('be.visible');
+  }
 
-    cy.get('td[aria-colindex="2"]').then((rawHTMLElements) => {
-      const teamNames: Array<string> = [];
-      Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
-        cy.task('log', element.innerText);
-        teamNames.push(element.innerText);
-      });
+  verifyProblemIsNotVisible(problemAlias: string): void {
+    cy.get(`a[href="/arena/problem/${problemAlias}/"]`).should('not.exist');
+  }
 
-      cy.wrap(teamNames).as('teamNamesList');
+  deleteProblem(problemAlias: string): void {
+    cy.get(`[data-delete-problem="${problemAlias}"]`).click();
+    cy.get('.modal-footer>button.btn-danger').click();
+  }
+
+  deleteProblemsInBatch(problemAliases: string[]): void {
+    problemAliases.forEach((problemAlias) => {
+      cy.get(`input[type="checkbox"][data-selected-problem="${problemAlias}"]`).click();
     });
-
-    cy.get('[name="create-identities"]').click();
-    cy.get('#alert-close').click();
-    cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
-    });
-
-    cy.get('[href="#teams"]').click();
-    cy.get('@teamNamesList').then((textArray) => {
-      cy.get('[data-group-team-name]')
-        .should('have.length', textArray.length)
-        .then((rawHTMLElements) => {
-          return Cypress.$.makeArray(rawHTMLElements).map((el) => el.innerText);
-        })
-        .should('deep.equal', textArray);
-    });
+    cy.get('select[data-selected-problems]').select("2");
+    cy.get("[data-visibility-action]").click();
+    cy.get('.modal-footer>button.btn-danger').click();
   }
 
   changePassword(oldPassword: string, newPassword: string): void {

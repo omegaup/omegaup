@@ -7,9 +7,9 @@ import {
   RunOptions,
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
-import { contestPage } from '../support/pageObjects/contestPage';
 import { profilePage } from '../support/pageObjects/profilePage';
 import getEditorIframeBody from '../support/pageObjects/util';
+import { problemPage } from '../support/pageObjects/problemPage';
 
 describe('Course Test', () => {
   let loginOptions: LoginOptions[] = [];
@@ -27,7 +27,7 @@ describe('Course Test', () => {
     const users = [loginOptions[0].username];
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    problemOptions = contestPage.generateProblemOptions(1);
+    problemOptions = problemPage.generateProblemOptions(1);
 
     // We are creating an course with assignment that end after two minutes
     // so that it can be used as a past assignment which will be tested later
@@ -56,7 +56,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
     cy.login(loginOptions[1]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
@@ -130,7 +130,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
@@ -212,7 +212,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
 
     cy.login(loginOptions[1]);
     cy.createProblem(problemOptions[0]);
@@ -250,7 +250,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
@@ -278,11 +278,20 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
-    coursePage.leaveFeedbackOnSolution('Solution is not optimal');
+    const suggestions: { line: number; text: string; }[] = [
+      { line: 1, text: 'Solution is not optimal' },
+      { line: 3, text: 'This code could be improved' },
+      { line: 5, text: 'This line could be removed' },
+    ]
+    coursePage.leaveFeedbackOnSolution(suggestions);
     cy.logout();
 
     cy.login(loginOptions[0]);
-    coursePage.verifyFeedback('Solution is not optimal');
+    coursePage.verifyFeedback({
+      feedback: suggestions[0].text,
+      problemAlias: runOptions.problemAlias,
+      courseAlias: courseOptions.courseAlias,
+    });
     cy.logout();
   });
 
@@ -292,7 +301,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
@@ -339,7 +348,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
@@ -408,7 +417,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_1' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(2);
+    const problemOptions = problemPage.generateProblemOptions(2);
     const problems = [
       problemOptions[0].problemAlias,
       problemOptions[1].problemAlias,
@@ -477,7 +486,7 @@ describe('Course Test', () => {
     const courseOptions = coursePage.generateCourseOptions();
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = contestPage.generateProblemOptions(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
@@ -515,8 +524,8 @@ describe('Course Test', () => {
     const shortAlias1 = assignmentAlias1.slice(0, 12);
     const assignmentAlias2 = 'ut_rank_hw_2' + uuid();
     const shortAlias2 = assignmentAlias2.slice(0, 12);
-    const problemOptions1 = contestPage.generateProblemOptions(1);
-    const problemOptions2 = contestPage.generateProblemOptions(1);
+    const problemOptions1 = problemPage.generateProblemOptions(1);
+    const problemOptions2 = problemPage.generateProblemOptions(1);
     const courseUrl = '/course/' + courseOptions.courseAlias;
     const studentsProgressUrl =
       '/course/' + courseOptions.courseAlias + '/students/';
@@ -587,5 +596,36 @@ describe('Course Test', () => {
         cy.readFile(filename).should('exist');
       });
     cy.logout();
+  });
+
+
+  it('Should create a public course and share the link to allow joining it', () => {
+    const loginOptions = loginPage.registerMultipleUsers(2);
+    const courseOptions = coursePage.generateCourseOptions();
+    const courseAlias = courseOptions.courseAlias;
+    const assignmentAlias = 'ut_rank_hw_' + uuid();
+    const shortAlias = assignmentAlias.slice(0, 12);
+    const problemOptions = problemPage.generateProblemOptions(1);
+
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    coursePage.createCourse(courseOptions);
+    coursePage.makeCoursePublic();
+    coursePage.addAssignmentWithProblems(
+      assignmentAlias,
+      shortAlias,
+      problemOptions,
+    );
+    cy.logout();
+
+    cy.login(loginOptions[1]);
+    cy.get('a[data-nav-courses]').click();
+    cy.get('a[data-nav-courses-all]').click();
+    cy.get('.introjs-skipbutton').click();
+    const courseUrl = '/course/' + courseAlias;
+    cy.get(`div>a[href="${courseUrl}"]`, { timeout: 0 }).should('not.exist');
+    cy.visit(courseUrl);
+    cy.waitUntil(() => cy.url().should('include', courseUrl));
+    cy.get('button[name=start-course-submit]').click();
   });
 });

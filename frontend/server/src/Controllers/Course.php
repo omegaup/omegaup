@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -298,6 +298,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $level
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
@@ -408,6 +409,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
@@ -454,9 +456,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        // Show scoreboard, needs basic information and request user information are always optional
+        // Show scoreboard, needs basic information, recommended and request
+        // user information are always optional
         $r->ensureOptionalBool('needs_basic_information');
         $r->ensureOptionalBool('show_scoreboard');
+        $recommended = $r->ensureOptionalBool('recommended') ?? false;
         $r->ensureOptionalEnum(
             'requests_user_information',
             ['no', 'optional', 'required']
@@ -511,6 +515,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Only curator can set public
         if (
             !\OmegaUp\Authorization::canCreatePublicCourse($r->identity)
+            && $recommended
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3279,7 +3284,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Request feedback
+     * Request feedback and its corresponding notification
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3362,8 +3367,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Submission::createOrUpdateFeedback(
             $r->identity,
             $submission,
-            $course,
-            $courseSubmissionInfo,
             $feedback
         );
 
@@ -5385,6 +5388,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admission_mode' => $course->admission_mode,
             'needs_basic_information' => $course->needs_basic_information,
             'show_scoreboard' => boolval($course->show_scoreboard),
+            'recommended' => boolval($course->recommended),
             'requests_user_information' => $course->requests_user_information,
             'unlimited_duration' => false,
         ];
@@ -5992,6 +5996,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
@@ -6042,6 +6047,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'transform' => fn (string $value): bool => boolval($value),
             ],
             'level',
+            'recommended' => [
+                'transform' => fn (string $value): bool => boolval($value),
+            ],
             'requests_user_information',
             'admission_mode',
         ];
