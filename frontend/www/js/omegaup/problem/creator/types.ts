@@ -59,30 +59,30 @@ export enum MatrixDistinctType {
  */
 export type CaseLineData =
   | {
-    kind: 'line';
-    value: string;
-  }
+      kind: 'line';
+      value: string;
+    }
   | {
-    kind: 'multiline';
-    value: string;
-  }
+      kind: 'multiline';
+      value: string;
+    }
   | {
-    kind: 'array';
-    size: number;
-    min: number;
-    max: number;
-    distinct: boolean;
-    value: string;
-  }
+      kind: 'array';
+      size: number;
+      min: number;
+      max: number;
+      distinct: boolean;
+      value: string;
+    }
   | {
-    kind: 'matrix';
-    rows: number;
-    cols: number;
-    min: number;
-    max: number;
-    distinct: MatrixDistinctType;
-    value: string;
-  };
+      kind: 'matrix';
+      rows: number;
+      cols: number;
+      min: number;
+      max: number;
+      distinct: MatrixDistinctType;
+      value: string;
+    };
 
 /**
  * CaseLine
