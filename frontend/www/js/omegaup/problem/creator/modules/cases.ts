@@ -430,6 +430,10 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
+    deleteLinesForSelectedCase({ getters }) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = [];
+    },
   },
   getters: {
     getCasesFromGroup: (state) => (groupID: GroupID) => {

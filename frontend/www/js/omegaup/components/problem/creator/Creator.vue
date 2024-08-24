@@ -3,6 +3,9 @@
     <creator-header />
     <creator-tabs
       @show-update-success-message="() => $emit('show-update-success-message')"
+      @download-input-file="
+        (fileObject) => $emit('download-input-file', fileObject)
+      "
     />
   </b-container>
 </template>
