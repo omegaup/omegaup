@@ -53,7 +53,7 @@ OmegaUp.on('ready', () => {
               // The following codeblock just adds a link element to the document for the download, clicks on it to download, removes the link from the document and then frees up the memory.
               const link = document.createElement('a');
               link.href = URL.createObjectURL(content);
-              link.download = `${fileName}.zip`
+              link.download = `${fileName}.zip`;
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);

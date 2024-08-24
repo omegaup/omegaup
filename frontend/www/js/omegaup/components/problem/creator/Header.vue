@@ -103,7 +103,7 @@ export default class Header extends Vue {
 
     const problemName: string = this.$store.state.problemName;
     this.$emit('download-zip-file', {
-      fileName: problemName.replace(/ /g, "_"),
+      fileName: problemName.replace(/ /g, '_'),
       zipContent: zip,
     });
   }
