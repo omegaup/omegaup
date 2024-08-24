@@ -8,6 +8,7 @@ import {
   LineID,
   CaseRequest,
   MultipleCaseAddRequest,
+  CaseID,
   CaseLineKind,
   CaseLineData,
   MatrixDistinctType,
@@ -429,6 +430,10 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
+    deleteLinesForSelectedCase({ getters }) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = [];
+    },
   },
   getters: {
     getCasesFromGroup: (state) => (groupID: GroupID) => {
@@ -469,6 +474,24 @@ export const casesStore: Module<CasesState, RootState> = {
           (_case) => _case.caseID === state.selected.caseID,
         ) ?? null
       );
+    },
+    getStringifiedLinesFromCaseGroupID: (state) => (
+      caseGroupID: CaseGroupID,
+    ) => {
+      const groupID: GroupID = caseGroupID.groupID;
+      const caseID: CaseID = caseGroupID.caseID;
+      const _group = state.groups.find((group) => group.groupID === groupID);
+      if (_group === undefined) {
+        return '';
+      }
+      const _case = _group.cases.find((thisCase) => thisCase.caseID === caseID);
+      if (_case == undefined) {
+        return '';
+      }
+      const stringifiedLine: string = _case.lines
+        .map((line) => line.data.value)
+        .join('\n');
+      return stringifiedLine;
     },
     getSelectedGroup: (state) => {
       return (
