@@ -190,6 +190,8 @@ Cypress.Commands.add(
     requestParticipantInformation = 'no',
     differentStart = false,
     differentStartTime = "",
+    contestForTeams = false,
+    teamGroupAlias = "",
   },shouldShowIntro: boolean = true) => {
     cy.visit('contest/new/');
     if (shouldShowIntro) {
@@ -213,6 +215,11 @@ Cypress.Commands.add(
     cy.get('[data-request-user-information]').select(
       requestParticipantInformation,
     ); // no | optional | required
+    if (contestForTeams) {
+      cy.get('[data-contest-for-teams]').click();
+      cy.get('.tags-input input[type="text"]').first().type(teamGroupAlias);
+      cy.get('.typeahead-dropdown li').first().click();
+    }
     cy.get('button[type="submit"]').click();
   },
 );
