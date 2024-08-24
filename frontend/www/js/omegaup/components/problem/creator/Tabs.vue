@@ -27,7 +27,11 @@
         <BIconCheckCircle class="mr-1" />
         <span name="testcases" data-tab> {{ T.problemCreatorTestCases }}</span>
       </template>
-      <omegaup-problem-creator-cases-tab />
+      <omegaup-problem-creator-cases-tab
+        @download-input-file="
+          (fileObject) => $emit('download-input-file', fileObject)
+        "
+      />
     </b-tab>
     <b-tab>
       <template #title>
