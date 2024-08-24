@@ -2,7 +2,7 @@
   <div class="course-edit">
     <div class="page-header">
       <h1>
-        {{ T.wordsEditCourse }}
+        {{ readOnly ? T.omegaupTitleCourseDetails : T.wordsEditCourse }}
         <span
           data-course-name
           :class="{ 'text-secondary': data.course.archived }"
@@ -16,7 +16,7 @@
         </small>
       </h1>
     </div>
-    <ul class="nav nav-pills mt-4">
+    <ul v-if="!readOnly" class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           href="#course"
@@ -37,7 +37,7 @@
           >{{ T.wordsContent }}</a
         >
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" data-course-edit-admission-mode>
         <a
           href="#admission-mode"
           class="nav-link"
@@ -96,6 +96,7 @@
           :course="data.course"
           :all-languages="data.allLanguages"
           :search-result-schools="searchResultSchools"
+          :read-only="readOnly"
           @emit-cancel="onCancel"
           @submit="(request) => $emit('submit-edit-course', request)"
           @update-search-result-schools="
@@ -176,15 +177,17 @@
 
       <div
         v-if="showTab === 'admission-mode'"
+        data-admission-mode-tab
         class="tab-pane active"
         role="tabpanel"
       >
         <omegaup-course-admision-mode
-          :initial-admission-mode="data.course.admission_mode"
+          :admission-mode="data.course.admission_mode"
           :should-show-public-option="data.course.is_curator"
           :course-alias="data.course.alias"
-          @emit-update-admission-mode="
-            (admisionMode) => $emit('update-admission-mode', admisionMode)
+          :show-in-public-courses-list="data.course.recommended"
+          @update-admission-mode="
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-course-admision-mode>
       </div>
@@ -390,6 +393,7 @@ export default class CourseEdit extends Vue {
   @Prop() searchResultTeachingAssistants!: types.ListItem[];
   @Prop() searchResultGroupsTeachingAssistants!: types.ListItem[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop() readOnly!: boolean;
 
   T = T;
   showTab = this.initialTab;

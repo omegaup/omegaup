@@ -1,10 +1,15 @@
 <template>
   <div>
     <div class="container-fluid" data-feedback-code-mirror>
-      <textarea v-show="false" ref="cm-editor" v-model="value"></textarea>
+      <textarea
+        v-show="false"
+        ref="cm-editor"
+        v-model="ensureTenLinesInSolution"
+      ></textarea>
     </div>
     <div v-if="!readonly" class="container-fluid text-right py-2">
       <button
+        data-button-send-feedback
         class="btn btn-primary mx-2"
         :disabled="!numberOfComments"
         @click.prevent="saveFeedbackList"
@@ -210,6 +215,16 @@ export default class FeedbackCodeView extends Vue {
         });
       },
     );
+  }
+
+  // Ensures that the code displayed always has at least 10 lines by adding
+  // empty lines if necessary. This makes a better UX.
+  get ensureTenLinesInSolution(): string {
+    let linesToAdd = 10 - this.value.split('\n').length;
+    if (linesToAdd <= 0) {
+      return this.value;
+    }
+    return this.value + '\n'.repeat(linesToAdd);
   }
 
   setFeedback({

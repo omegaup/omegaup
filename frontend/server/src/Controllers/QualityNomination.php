@@ -499,10 +499,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
-            // TODO: rename 'tag' to 'level'.
             if (
-                isset($contents['tag']) &&
-                !in_array($contents['tag'], self::LEVEL_TAGS)
+                isset($contents['level']) &&
+                !in_array($contents['level'], self::LEVEL_TAGS)
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -924,17 +923,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Base\Notifications::create(
-            new \OmegaUp\DAO\VO\Notifications([
-                'user_id' => $userId,
-                'contents' =>  json_encode(
-                    [
-                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
-                        'message' => $notificationContents,
-                        'status' => $status
-                    ]
-                ),
-            ])
+        \OmegaUp\Controllers\Notification::setNotification(
+            [$userId],
+            json_encode(
+                [
+                    'type' => \OmegaUp\DAO\Notifications::DEMOTION,
+                    'message' => $notificationContents,
+                    'status' => $status
+                ]
+            )
         );
 
         \OmegaUp\Email::sendEmail([$email], $subject, $body);

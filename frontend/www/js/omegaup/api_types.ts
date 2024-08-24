@@ -2311,8 +2311,26 @@ export namespace types {
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        x.dependents = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.parent_email_verification_deadline !== 'undefined' &&
+              x.parent_email_verification_deadline !== null
+            )
+              x.parent_email_verification_deadline = ((x: number) =>
+                new Date(x * 1000))(x.parent_email_verification_deadline);
+            return x;
+          });
+        })(x.dependents);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -3069,7 +3087,7 @@ export namespace types {
     contest_id: number;
     contestants: number;
     description: string;
-    duration?: number;
+    duration_minutes?: number;
     finish_time: Date;
     last_updated: Date;
     organizer: string;
@@ -3143,6 +3161,7 @@ export namespace types {
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
+    extra_note?: string;
     feedback: string;
     finish_time: Date;
     languages: string;
@@ -3317,6 +3336,7 @@ export namespace types {
     name: string;
     needs_basic_information: boolean;
     objective?: string;
+    recommended: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -4047,6 +4067,7 @@ export namespace types {
   export interface ProblemListItem {
     accepted: number;
     alias: string;
+    can_be_removed?: boolean;
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
@@ -4280,6 +4301,7 @@ export namespace types {
     status_memory?: string;
     status_runtime?: string;
     submit_delay: number;
+    suggestions?: number;
     time: Date;
     type?: string;
     username: string;
@@ -4749,8 +4771,16 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserDependent {
+    classname: string;
+    name?: string;
+    parent_email_verification_deadline?: Date;
+    parent_verified?: boolean;
+    username: string;
+  }
+
   export interface UserDependentsPayload {
-    dependents: { email?: string; name?: string; username: string }[];
+    dependents: types.UserDependent[];
   }
 
   export interface UserDetailsPayload {
@@ -5666,11 +5696,16 @@ export namespace messages {
   };
 
   // Submission
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { submissions: types.Submission[] };
   export type SubmissionSetFeedbackRequest = { [key: string]: any };
   export type SubmissionSetFeedbackResponse = {
     submissionFeedback?: dao.SubmissionFeedback;
     submissionFeedbackThread?: dao.SubmissionFeedbackThread;
   };
+  export type SubmissionSetFeedbackListRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackListResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -6449,9 +6484,15 @@ export namespace controllers {
   }
 
   export interface Submission {
+    list: (
+      params?: messages.SubmissionListRequest,
+    ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
       params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
+    setFeedbackList: (
+      params?: messages.SubmissionSetFeedbackListRequest,
+    ) => Promise<messages.SubmissionSetFeedbackListResponse>;
   }
 
   export interface Tag {

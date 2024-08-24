@@ -74,7 +74,12 @@
                       : T.wordsNotApplicable
                   }}
                 </td>
-                <template v-if="courses.accessMode === 'admin'">
+                <template
+                  v-if="
+                    courses.accessMode === 'admin' &&
+                    filteredCourses.timeType !== 'teachingAssistant'
+                  "
+                >
                   <td class="align-middle">
                     <a :href="`/course/${course.alias}/edit/`">
                       <font-awesome-icon
@@ -84,7 +89,7 @@
                     </a>
                   </td>
                   <td class="align-middle">
-                    <a href="`/course/${course.alias}/list/`">
+                    <a :href="`/course/${course.alias}/list/`">
                       <font-awesome-icon
                         icon="list-alt"
                         :title="T.courseListSubmissionsByGroup"
@@ -97,6 +102,18 @@
                         icon="clock"
                         :title="T.activityReport"
                       />
+                    </a>
+                  </td>
+                </template>
+                <template
+                  v-else-if="filteredCourses.timeType === 'teachingAssistant'"
+                >
+                  <td colspan="3" class="align-middle text-center">
+                    <a
+                      :href="`/course/${course.alias}/edit/`"
+                      :title="T.contestButtonSeeDetails"
+                    >
+                      <font-awesome-icon :icon="['fas', 'search']" />
                     </a>
                   </td>
                 </template>

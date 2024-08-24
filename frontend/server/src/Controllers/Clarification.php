@@ -68,8 +68,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $contest = null;
         $problemsetId = null;
         $admins = [];
-        /** @var array{type: string, body: array{localizationString: \OmegaUp\TranslationString, localizationParams: array{problemAlias: string, contestAlias?: string, courseAlias?: string}, url: string, iconUrl: string}}*/
-        $notificationContents = [];
         if (is_null($contestAlias)) {
             // Clarification for course assignment
             $courseAlias = $r->ensureString(
@@ -120,19 +118,14 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
             $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
 
-            $notificationContents = [
-                'type' => \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
-                'body' => [
-                    'localizationString' => new \OmegaUp\TranslationString(
-                        'notificationCourseClarificationRequest'
-                    ),
-                    'localizationParams' => [
-                        'problemAlias' => $problem->alias,
-                        'courseName' => $course->name,
-                    ],
-                    'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#problems/{$problem->alias}/",
-                    'iconUrl' => '/media/info.png',
-                ],
+            $localizationString = new \OmegaUp\TranslationString(
+                'notificationCourseClarificationRequest'
+            );
+            $notificationType = \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST;
+            $url = "/course/{$course->alias}/assignment/{$assignmentAlias}/#problems/{$problem->alias}/";
+            $localizationParams = [
+                'problemAlias' => $problem->alias,
+                'courseName' => $course->name,
             ];
         } else {
             // Clarification for contest
@@ -147,19 +140,14 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
             $admins = \OmegaUp\DAO\UserRoles::getContestAdmins($contest);
 
-            $notificationContents = [
-                'type' => \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_REQUEST,
-                'body' => [
-                    'localizationString' => new \OmegaUp\TranslationString(
-                        'notificationContestClarificationRequest'
-                    ),
-                    'localizationParams' => [
-                        'problemAlias' => $problem->alias,
-                        'contestAlias' => $contest->alias,
-                    ],
-                    'url' => "/arena/{$contest->alias}/#problems/{$problem->alias}/",
-                    'iconUrl' => '/media/info.png',
-                ],
+            $localizationString = new \OmegaUp\TranslationString(
+                'notificationContestClarificationRequest'
+            );
+            $notificationType = \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_REQUEST;
+            $url = "/arena/{$contest->alias}/#problems/{$problem->alias}/";
+            $localizationParams = [
+                'problemAlias' => $problem->alias,
+                'contestAlias' => $contest->alias,
             ];
         }
 
@@ -203,15 +191,18 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
-        foreach ($admins as $admin) {
-            \OmegaUp\DAO\Notifications::create(
-                new \OmegaUp\DAO\VO\Notifications([
-                    'user_id' => $admin['user_id'],
-                    'contents' =>  json_encode($notificationContents),
-                ])
-            );
-        }
+        $userIds = array_map(
+            fn (array $admin) => $admin['user_id'] ?? 0,
+            $admins
+        );
+
+        \OmegaUp\Controllers\Notification::setCommonNotification(
+            $userIds,
+            $localizationString,
+            $notificationType,
+            $url,
+            $localizationParams
+        );
 
         return [
             'answer' => $clarification->answer,
@@ -381,45 +372,31 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         // Send notification to author
         if (!is_null($author->user_id) && !is_null($answer)) {
             if ($contest) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $author->user_id,
-                        'contents' =>  json_encode([
-                            'type' => \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_RESPONSE,
-                            'body' => [
-                                'localizationString' => new \OmegaUp\TranslationString(
-                                    'notificationContestClarificationResponse'
-                                ),
-                                'localizationParams' => [
-                                    'problemAlias' => $problem->alias,
-                                    'contestAlias' => $contest->alias,
-                                ],
-                                'url' => "/arena/{$contest->alias}/#problems/{$problem->alias}/",
-                                'iconUrl' => '/media/info.png',
-                            ],
-                        ]),
-                    ])
+                \OmegaUp\Controllers\Notification::setCommonNotification(
+                    [$author->user_id],
+                    new \OmegaUp\TranslationString(
+                        'notificationContestClarificationResponse'
+                    ),
+                    \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_RESPONSE,
+                    "/arena/{$contest->alias}/#problems/{$problem->alias}/",
+                    [
+                        'problemAlias' => $problem->alias,
+                        'contestAlias' => $contest->alias,
+                    ]
                 );
             }
             if ($course && $assignment) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $author->user_id,
-                        'contents' =>  json_encode([
-                            'type' => \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
-                            'body' => [
-                                'localizationString' => new \OmegaUp\TranslationString(
-                                    'notificationCourseClarificationResponse'
-                                ),
-                                'localizationParams' => [
-                                    'problemAlias' => $problem->alias,
-                                    'courseName' => $course->name,
-                                ],
-                                'url' => "/course/{$course->alias}/assignment/{$assignment->alias}/#problems/{$problem->alias}/",
-                                'iconUrl' => '/media/info.png',
-                            ],
-                        ]),
-                    ])
+                \OmegaUp\Controllers\Notification::setCommonNotification(
+                    [$author->user_id],
+                    new \OmegaUp\TranslationString(
+                        'notificationCourseClarificationResponse'
+                    ),
+                    \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
+                    "/course/{$course->alias}/assignment/{$assignment->alias}/#problems/{$problem->alias}/",
+                    [
+                        'problemAlias' => $problem->alias,
+                        'courseName' => $course->name,
+                    ]
                 );
             }
         }

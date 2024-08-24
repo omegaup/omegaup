@@ -21,7 +21,7 @@
           {{ T.problemCreatorGenerateProblem }}</span
         >
       </b-button>
-      <b-button variant="warning" size="sm">
+      <b-button variant="warning" size="sm" @click="createNewProblem">
         <BIconPlus class="mr-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
@@ -32,11 +32,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import T from '../../../lang';
 
 @Component
 export default class Header extends Vue {
   T = T;
+  name: string = T.problemCreatorEmpty;
+
+  @Watch('name')
+  onNameChanged(newProblemName: string) {
+    this.$store.commit('updateName', newProblemName);
+  }
+
+  createNewProblem() {
+    this.$store.commit('resetStore');
+    this.$store.commit('casesStore/resetStore');
+    window.location.reload();
+  }
 }
 </script>

@@ -171,8 +171,8 @@
               :problem-alias="problem.alias"
               :problem-title="problem.title"
               @dismiss="currentPopupDisplayed = PopupDisplayed.None"
-              @submit="
-                (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+              @rate-problem-as-reviewer="
+                (request) => $emit('rate-problem-as-reviewer', request)
               "
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
@@ -184,6 +184,7 @@
               :problem="problem"
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
+              :preferred-language="preferredLanguage"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -523,11 +524,15 @@ export default class ProblemDetails extends Vue {
   }
 
   get preferredLanguage(): null | string {
-    const [lastRun] = this.runs.slice(-1);
-    if (lastRun) {
-      return lastRun.language;
+    if (!(this.runs?.length > 0)) {
+      return this.problem.preferred_language ?? null;
     }
-    return this.problem.preferred_language ?? null;
+    const mostRecentRun = this.runs.reduce(function (prev, current) {
+      return prev && prev.time.getTime() > current.time.getTime()
+        ? prev
+        : current;
+    });
+    return mostRecentRun.language;
   }
 
   get clarificationsCount(): string {
