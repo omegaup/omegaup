@@ -46,6 +46,7 @@ describe('Edit.vue', () => {
             is_teaching_assistant: false,
             name: courseName,
             public: true,
+            recommended: false,
             requests_user_information: 'no',
             school_name: '',
             show_scoreboard: false,

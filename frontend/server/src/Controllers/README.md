@@ -209,6 +209,7 @@
 - [Submission](#submission)
   - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
+  - [`/api/submission/setFeedbackList/`](#apisubmissionsetfeedbacklist)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -821,31 +822,31 @@ Creates a new contest
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `check_plagiarism`          | `bool\|null`   |             |
-| `contest_for_teams`         | `bool\|null`   |             |
-| `description`               | `mixed`        |             |
-| `feedback`                  | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `needs_basic_information`   | `bool\|null`   |             |
-| `penalty`                   | `mixed`        |             |
-| `penalty_calc_policy`       | `mixed`        |             |
-| `penalty_type`              | `mixed`        |             |
-| `points_decay_factor`       | `mixed`        |             |
-| `problems`                  | `null\|string` |             |
-| `requests_user_information` | `mixed`        |             |
-| `score_mode`                | `null\|string` |             |
-| `scoreboard`                | `mixed`        |             |
-| `show_scoreboard_after`     | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `submissions_gap`           | `mixed`        |             |
-| `teams_group_alias`         | `null\|string` |             |
-| `title`                     | `mixed`        |             |
-| `window_length`             | `int\|null`    |             |
+| Name                        | Type                                                       | Description |
+| --------------------------- | ---------------------------------------------------------- | ----------- |
+| `finish_time`               | `int`                                                      |             |
+| `start_time`                | `int`                                                      |             |
+| `submissions_gap`           | `int`                                                      |             |
+| `window_length`             | `int`                                                      |             |
+| `admission_mode`            | `'private'\|'public'\|'registration'\|null`                |             |
+| `alias`                     | `null\|string`                                             |             |
+| `check_plagiarism`          | `bool\|null`                                               |             |
+| `contest_for_teams`         | `bool\|null`                                               |             |
+| `description`               | `null\|string`                                             |             |
+| `feedback`                  | `'detailed'\|'none'\|'summary'\|null`                      |             |
+| `languages`                 | `null\|string`                                             |             |
+| `needs_basic_information`   | `bool\|null`                                               |             |
+| `penalty`                   | `int\|null`                                                |             |
+| `penalty_calc_policy`       | `'max'\|'sum'\|null`                                       |             |
+| `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
+| `points_decay_factor`       | `float\|null`                                              |             |
+| `problems`                  | `null\|string`                                             |             |
+| `requests_user_information` | `bool\|null`                                               |             |
+| `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
+| `scoreboard`                | `float\|null`                                              |             |
+| `show_scoreboard_after`     | `bool\|null`                                               |             |
+| `teams_group_alias`         | `null\|string`                                             |             |
+| `title`                     | `null\|string`                                             |             |
 
 ### Returns
 
@@ -1400,33 +1401,33 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                                 | Description |
-| -------------------------------------------- | ---------------------------------------------------- | ----------- |
-| `contest_alias`                              | `string`                                             |             |
-| `finish_time`                                | `int`                                                |             |
-| `submissions_gap`                            | `int`                                                |             |
-| `window_length`                              | `int`                                                |             |
-| `admission_mode`                             | `null\|string`                                       |             |
-| `alias`                                      | `null\|string`                                       |             |
-| `check_plagiarism`                           | `bool\|null`                                         |             |
-| `contest_for_teams`                          | `bool\|null`                                         |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
-| `description`                                | `null\|string`                                       |             |
-| `feedback`                                   | `mixed`                                              |             |
-| `languages`                                  | `mixed`                                              |             |
-| `needs_basic_information`                    | `bool\|null`                                         |             |
-| `penalty`                                    | `int\|null`                                          |             |
-| `penalty_calc_policy`                        | `mixed`                                              |             |
-| `penalty_type`                               | `mixed`                                              |             |
-| `points_decay_factor`                        | `float\|null`                                        |             |
-| `problems`                                   | `null\|string`                                       |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                 |             |
-| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null` |             |
-| `scoreboard`                                 | `float\|null`                                        |             |
-| `show_scoreboard_after`                      | `bool\|null`                                         |             |
-| `start_time`                                 | `\OmegaUp\Timestamp\|null`                           |             |
-| `teams_group_alias`                          | `null\|string`                                       |             |
-| `title`                                      | `null\|string`                                       |             |
+| Name                                         | Type                                                       | Description |
+| -------------------------------------------- | ---------------------------------------------------------- | ----------- |
+| `contest_alias`                              | `string`                                                   |             |
+| `finish_time`                                | `int`                                                      |             |
+| `start_time`                                 | `int`                                                      |             |
+| `submissions_gap`                            | `int`                                                      |             |
+| `window_length`                              | `int`                                                      |             |
+| `admission_mode`                             | `null\|string`                                             |             |
+| `alias`                                      | `null\|string`                                             |             |
+| `check_plagiarism`                           | `bool\|null`                                               |             |
+| `contest_for_teams`                          | `bool\|null`                                               |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                               |             |
+| `description`                                | `null\|string`                                             |             |
+| `feedback`                                   | `'detailed'\|'none'\|'summary'\|null`                      |             |
+| `languages`                                  | `null\|string`                                             |             |
+| `needs_basic_information`                    | `bool\|null`                                               |             |
+| `penalty`                                    | `int\|null`                                                |             |
+| `penalty_calc_policy`                        | `'max'\|'sum'\|null`                                       |             |
+| `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
+| `points_decay_factor`                        | `float\|null`                                              |             |
+| `problems`                                   | `null\|string`                                             |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
+| `scoreboard`                                 | `float\|null`                                              |             |
+| `show_scoreboard_after`                      | `bool\|null`                                               |             |
+| `teams_group_alias`                          | `null\|string`                                             |             |
+| `title`                                      | `null\|string`                                             |             |
 
 ### Returns
 
@@ -2175,7 +2176,7 @@ _Nothing_
 
 ### Description
 
-Request feedback
+Request feedback and its corresponding notification
 
 ### Parameters
 
@@ -2314,6 +2315,7 @@ Edit Course contents
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
+| `recommended`               | `bool\|null`                                |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
@@ -4161,7 +4163,8 @@ for given page and username.
 
 ### Description
 
-Updates the admin feedback for a submission or creates the request feedback
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
 
 ### Parameters
 
@@ -4181,6 +4184,26 @@ Updates the admin feedback for a submission or creates the request feedback
 | -------------------------- | ------------------------------ |
 | `submissionFeedback`       | `dao.SubmissionFeedback`       |
 | `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
+
+## `/api/submission/setFeedbackList/`
+
+### Description
+
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback_list`    | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Tag
 

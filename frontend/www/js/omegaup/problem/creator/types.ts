@@ -37,50 +37,66 @@ export interface RootState {
 }
 
 /**
+ * CaseLineKind
+ * Contains the possible values of Caseline kind
+ */
+export type CaseLineKind = 'line' | 'multiline' | 'array' | 'matrix';
+
+/**
+ * MatrixDistinctType
+ * Defines the different ways matrix can be distinct
+ */
+export enum MatrixDistinctType {
+  None = 'none',
+  Rows = 'rows',
+  Cols = 'cols',
+  Both = 'both',
+}
+
+/**
  * CaseLineData
  * Contains the type and the corresponding parameters for each type
  */
 export type CaseLineData =
   | {
-      kind: 'line';
-      value: string;
-    }
+    kind: 'line';
+    value: string;
+  }
   | {
-      kind: 'multiline';
-      value: string;
-    }
+    kind: 'multiline';
+    value: string;
+  }
   | {
-      kind: 'array';
-      size: number;
-      min: number;
-      max: number;
-      distinct: boolean;
-      value: string;
-    }
+    kind: 'array';
+    size: number;
+    min: number;
+    max: number;
+    distinct: boolean;
+    value: string;
+  }
   | {
-      kind: 'matrix';
-      rows: number;
-      cols: number;
-      min: number;
-      max: number;
-      distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: string;
-    };
+    kind: 'matrix';
+    rows: number;
+    cols: number;
+    min: number;
+    max: number;
+    distinct: MatrixDistinctType;
+    value: string;
+  };
 
 /**
- * InLine
+ * CaseLine
  * Line in the editor
  * @alias CaseLine
  * @typedef {object}
  * @property {LineID} lineID UUID of the line
+ * @property {CaseID | null} caseID UUID referencing to the parent case
  * @property {string} label Label of the line
- * @property {string} value Value of the line
- * @property {LineType} lineType Type of line
- * @property {ArrayData} arrayData Object containig all the logic for the Array Generator
- * @property {object} matrixData Object containig all the logic for the Matrix Generator
+ * @property {CaseLineData} data data of the line
  */
 export interface CaseLine {
   lineID: LineID;
+  caseID: CaseID | null;
   label: string;
   data: CaseLineData;
 }
@@ -94,7 +110,7 @@ export interface CaseLine {
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number | null} points Points of the case
- * @property {Array<InLine>} lines Lines containing .IN information of the cases
+ * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
  * @property {string} output output of the case
  */
 export interface Case {

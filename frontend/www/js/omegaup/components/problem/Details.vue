@@ -171,8 +171,8 @@
               :problem-alias="problem.alias"
               :problem-title="problem.title"
               @dismiss="currentPopupDisplayed = PopupDisplayed.None"
-              @submit="
-                (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+              @rate-problem-as-reviewer="
+                (request) => $emit('rate-problem-as-reviewer', request)
               "
             ></omegaup-quality-nomination-reviewer-popup>
           </template>

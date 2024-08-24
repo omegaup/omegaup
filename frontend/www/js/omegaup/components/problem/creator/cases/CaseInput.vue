@@ -60,6 +60,7 @@ export default class CaseInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
   @Prop({ default: null }) points!: number | null;
+  @Prop({ default: false }) editMode!: boolean;
 
   // This return the group name, and the group ID of all groups in the store. Matching the required type for the select component./
   @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
@@ -78,6 +79,12 @@ export default class CaseInput extends Vue {
     const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
     if (!this.storedGroups) {
       return [noGroup];
+    }
+    if (
+      this.editMode &&
+      !this.storedGroups.find((group) => group.value === this.group)
+    ) {
+      this.caseGroup = NIL;
     }
     return [noGroup, ...this.storedGroups];
   }

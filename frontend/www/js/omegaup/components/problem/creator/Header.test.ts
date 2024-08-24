@@ -29,6 +29,49 @@ describe('Header.vue', () => {
     expect(wrapper.findComponent(BFormInput).exists()).toBe(true);
   });
 
+  it('Should reset the store on clicking the reset button', async () => {
+    const original = window.location;
+
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { reload: jest.fn() },
+    });
+
+    const wrapper = mount(Header, { localVue, store });
+
+    const buttonsList = wrapper.findAll('button');
+    expect(buttonsList.length).toBe(3);
+
+    const resetButton = buttonsList.at(2);
+    expect(resetButton.exists()).toBe(true);
+
+    const testText = 'Hello';
+    const emptyText = '';
+    wrapper.vm.$store.state.problemName = testText;
+    wrapper.vm.$store.state.problemMarkdown = testText;
+    wrapper.vm.$store.state.problemCodeContent = testText;
+    wrapper.vm.$store.state.problemCodeExtension = testText;
+    wrapper.vm.$store.state.problemSolutionMarkdown = testText;
+
+    await resetButton.trigger('click');
+
+    expect(window.location.reload).toHaveBeenCalledTimes(1);
+
+    expect(wrapper.vm.$store.state.problemName).toBe(
+      T.problemCreatorNewProblem,
+    );
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe(emptyText);
+    expect(wrapper.vm.$store.state.problemCodeContent).toBe(emptyText);
+    expect(wrapper.vm.$store.state.problemCodeExtension).toBe(emptyText);
+    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe(emptyText);
+
+    jest.restoreAllMocks();
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: original,
+    });
+  });
+
   it('Should download the zip file', async () => {
     const wrapper = mount(Header, { localVue, store });
 
