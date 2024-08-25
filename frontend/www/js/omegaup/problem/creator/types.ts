@@ -3,6 +3,8 @@ import { CasesState } from './modules/cases';
 export type CaseID = string;
 export type GroupID = string;
 export type LineID = string;
+export type LineInfoID = string;
+export type LayoutID = string;
 
 /**
  * StoreState
@@ -102,6 +104,19 @@ export interface CaseLine {
 }
 
 /**
+ * CaseLifeInfo
+ * Info of a CaseLine
+ * @alias CaseLineInfo
+ * @typedef {object}
+ * @property {LineInfoID} lineInfoID UUID of the lineInfo
+ * @property {string} label Label of the line
+ * @property {CaseLineData} content content of the line
+ */
+export interface CaseLineInfo extends Omit<CaseLine, 'lineID' | 'caseID'> {
+  lineInfoID: LineInfoID;
+}
+
+/**
  * Case
  * Contains all the information of a case
  * @alias Case
@@ -123,7 +138,7 @@ export interface Case {
 /**
  * Group
  * Contains all the information of a group
- * @alis Group
+ * @alias Group
  * @typedef {object}
  * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
@@ -139,6 +154,21 @@ export interface Group {
   autoPoints: boolean;
   ungroupedCase: boolean;
   cases: Case[];
+}
+
+/**
+ * Layout
+ * Contains all the information of a Layout
+ * @alias Group
+ * @typedef {object}
+ * @property {LayoutID} layoutID UUID of the layout
+ * @property {string} name Name of the Layout
+ * @property {Array<CaseLineInfo>} caseLineInfos Line infos of the Layout
+ */
+export interface Layout {
+  layoutID: LayoutID;
+  name: string;
+  caseLineInfos: CaseLineInfo[];
 }
 
 /**
