@@ -43,7 +43,17 @@
             :edit-mode="true"
           />
         </b-modal>
-        <b-button variant="light" class="mr-2">
+        <b-button
+          data-delete-case
+          variant="light"
+          class="mr-2"
+          @click="
+            deleteCase({
+              groupID: getSelectedGroup.groupID,
+              caseID: getSelectedCase.caseID,
+            })
+          "
+        >
           <div class="container">
             <div class="row">
               <BIconTrashFill
@@ -480,6 +490,10 @@ export default class CaseEdit extends Vue {
     LineID,
     string,
   ]) => void;
+  @casesStore.Mutation('deleteCase') deleteCase!: ({
+    groupID,
+    caseID,
+  }: CaseGroupID) => void;
   @casesStore.Mutation('updateCase') updateCase!: ([
     oldGroupID,
     updateCaseRequest,
