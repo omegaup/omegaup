@@ -91,7 +91,7 @@ describe('Header.vue', () => {
     jest.restoreAllMocks();
   });
 
-  it('Should correctly extract the inputs', async () => {
+  it('Should have correct file/folder structure', async () => {
     const wrapper = mount(Header, { localVue, store });
 
     const newUngroupedCasegroup = generateGroup({
