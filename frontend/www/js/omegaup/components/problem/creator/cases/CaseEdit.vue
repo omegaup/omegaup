@@ -394,6 +394,37 @@
               </b-container>
             </td>
           </tr>
+          <tr>
+            <td>
+              <b-container fluid class="bg-light">
+                <b-row class="d-flex justify-content-between" align-v="center">
+                  <b-col class="pr-1 text-center">
+                    <b-form-textarea
+                      v-model="getSelectedCase.output"
+                      data-output-textarea
+                      class="mt-3 mb-3 text-nowrap overflow-auto w-100"
+                      rows="2"
+                      max-rows="3"
+                      :placeholder="T.problemCreatorOutputPlaceHolder"
+                    >
+                    </b-form-textarea>
+                  </b-col>
+                  <b-col cols="1.5">
+                    <b-button
+                      data-erase-output
+                      class="btn text-danger btn-lg"
+                      type="button"
+                      :title="T.problemCreatorEraseOutput"
+                      variant="light"
+                      @click="getSelectedCase.output = ''"
+                    >
+                      <font-awesome-icon icon="eraser" />
+                    </b-button>
+                  </b-col>
+                </b-row>
+              </b-container>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
