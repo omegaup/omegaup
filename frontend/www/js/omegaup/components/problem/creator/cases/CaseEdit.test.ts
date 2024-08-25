@@ -447,7 +447,7 @@ describe('CaseEdit.vue', () => {
     const modalInputs = modalBody.findAll('input');
 
     const modalButton = modalBody.find('button[data-array-modal-generate]');
-    expect(modalButton.exists).toBeTruthy();
+    expect(modalButton.exists()).toBeTruthy();
 
     const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
 
