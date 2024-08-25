@@ -1,5 +1,10 @@
 <template>
-  <div submissions-problem>
+  <div
+    v-infinite-scroll="() => $emit('fetch-more-data')"
+    submissions-problem
+    infinite-scroll-disabled="isScrollDisabled"
+    infinite-scroll-distance="10"
+  >
     <div class="text-center mb-5 submissions-title">
       <h2>
         {{ T.submissionsListTitle }}
@@ -55,7 +60,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(submission, index) in submissions" :key="index">
+            <tr v-for="submission in submissions" :key="submission.guid">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
@@ -109,6 +114,13 @@
                 }}
               </td>
             </tr>
+            <template v-if="loading">
+              <tr v-for="index in 3" :key="index">
+                <td colspan="16">
+                  <div class="line"></div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -125,6 +137,7 @@ import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginator.vue';
+import infiniteScroll from 'vue-infinite-scroll';
 
 @Component({
   components: {
@@ -132,22 +145,31 @@ import common_Paginator from '../common/Paginator.vue';
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class SubmissionsList extends Vue {
+  @Prop() page!: number;
   @Prop() includeUser!: boolean;
   @Prop() submissions!: types.Submission[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() loading!: boolean;
+  @Prop() endOfResults!: boolean;
 
   T = T;
   ui = ui;
   time = time;
-  searchedUsername: null | types.ListItem = null;
+  searchedUsername: types.ListItem | null = null;
 
   get hrefSearchUser(): string {
     if (!this.searchedUsername?.key) {
       return '/submissions/';
     }
     return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
+  }
+  get isScrollDisabled() {
+    return this.loading || this.endOfResults;
   }
 }
 </script>
@@ -198,5 +220,30 @@ table.submissions-table > tbody > tr > td {
 
 [submissions-problem] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+}
+.line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>
