@@ -16,6 +16,7 @@
         >
       </b-button>
       <b-button
+        data-download-zip
         class="mr-2"
         variant="primary"
         size="sm"
@@ -49,6 +50,7 @@ import JSZip from 'jszip';
 export default class Header extends Vue {
   T = T;
   name: string = T.problemCreatorEmpty;
+  zip: JSZip = new JSZip();
 
   @casesStore.State('groups') groups!: Group[];
   @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
@@ -97,15 +99,14 @@ export default class Header extends Vue {
   }
 
   generateProblem() {
-    let zip = new JSZip();
-    this.getStatement(zip);
-    this.getSolution(zip);
-    this.getCasesAndTestPlan(zip);
+    this.getStatement(this.zip);
+    this.getSolution(this.zip);
+    this.getCasesAndTestPlan(this.zip);
 
     const problemName: string = this.$store.state.problemName;
     this.$emit('download-zip-file', {
       fileName: problemName.replace(/ /g, '_'),
-      zipContent: zip,
+      zipContent: this.zip,
     });
   }
 
