@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
-import { ContestOptions, GroupOptions, LoginOptions } from '../support/types';
+import { ContestOptions, GroupOptions, LoginOptions, TeamGroupOptions } from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { getISODateTime, addSubtractDateTime } from '../support/commands';
 import { profilePage } from '../support/pageObjects/profilePage';
+import { groupPage } from '../support/pageObjects/groupPage';
 
 describe('Contest Test', () => {
   let virtualContestDetails: ContestOptions;
@@ -76,8 +77,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(loginOptions[0]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     contestPage.setPasswordForIdentity(identityLogin.username, '12345678');
     contestPage.createContest(contestOptions, [identityLogin.username]);
     cy.logout();
@@ -162,8 +163,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(userLoginOptions[0]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     cy.logout();
 
     const contestOptions = contestPage.generateContestOptions(
@@ -231,8 +232,8 @@ describe('Contest Test', () => {
     );
 
     cy.login(userLoginOptions[4]);
-    contestPage.createGroup(groupOptions);
-    contestPage.addIdentitiesGroup();
+    groupPage.createGroup(groupOptions);
+    groupPage.addIdentitiesGroup();
     cy.logout();
 
     const users: Array<string> = [];
@@ -544,6 +545,42 @@ describe('Contest Test', () => {
     cy.get('td.numeric.status-disqualified').its('length').should('eq', 1);
     cy.get('[data-actions-requalify]').click({ force: true });
     cy.get('td.numeric.status-ac').its('length').should('eq', 1);
+    cy.logout();
+  });
+
+  it('Should create and update a contest for teams', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    const groupTitle = 'ut_teamgroup_' + uuid();
+    const contestOptions = contestPage.generateContestOptions(
+      userLoginOptions[0],
+      true,
+      1,
+      true,
+      groupTitle,
+    );
+    const teamGroupOptions: TeamGroupOptions = {
+      groupTitle,
+      groupDescription: 'group description',
+      noOfContestants: '2',
+    };
+    
+    cy.login(userLoginOptions[0]);
+    groupPage.createTeamGroup(teamGroupOptions);
+    cy.visit('/');
+    contestPage.createContest(contestOptions, []);
+
+    // Update contest title and description
+    cy.waitUntil(() =>
+      cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
+    );
+    const newContestTitle = 'New Contest Title';
+    const newContestDescription = 'New Contest Description';
+    cy.get('[data-title]').clear().type(newContestTitle);
+    cy.get('[data-description]').clear().type(newContestDescription);
+    cy.get('button[type="submit"]').click();
+
+    cy.get('[name="title"]').should('have.value', newContestTitle);
+    cy.get('[name="description"]').should('have.value', newContestDescription);
     cy.logout();
   });
 });

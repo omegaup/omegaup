@@ -25,6 +25,21 @@ OmegaUp.on('ready', () => {
           'show-update-success-message': () => {
             ui.success(T.problemCreatorUpdateAlert);
           },
+          'download-input-file': ({
+            fileName: fileName,
+            fileContent: fileContent,
+          }: {
+            fileName: string;
+            fileContent: string;
+          }) => {
+            const link = document.createElement('a');
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          },
         },
       });
     },
