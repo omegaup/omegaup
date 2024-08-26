@@ -1,6 +1,6 @@
 -- Add a unique constraint to the table in order to avoid duplicates
 ALTER TABLE `Coder_Of_The_Month`
-  ADD UNIQUE KEY `unique_user_time_category` (`user_id`, `time`, `category`);
+  ADD UNIQUE KEY `unique_user_time_category` (`user_id`, `time`, `category`, `ranking`);
 
 -- Insert the coder of the month for August 2024
 INSERT INTO `Coder_Of_The_Month`

@@ -149,7 +149,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   `problems_solved` int NOT NULL DEFAULT '0',
   `certificate_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   PRIMARY KEY (`coder_of_the_month_id`),
-  UNIQUE KEY `unique_user_time_category` (`user_id`,`time`,`category`),
+  UNIQUE KEY `unique_user_time_category` (`user_id`,`time`,`category`,`ranking`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
