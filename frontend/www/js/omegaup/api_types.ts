@@ -4717,6 +4717,7 @@ export namespace types {
   export interface SubmissionsListPayload {
     includeUser: boolean;
     submissions: types.Submission[];
+    username?: string;
   }
 
   export interface Tag {

@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call: # make this workflow reusable
   pull_request: {}
   push:
     branches:
@@ -38,12 +39,12 @@ jobs:
           RABBITMQ_DEFAULT_PASS: 'omegaup'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.8'
 
@@ -157,7 +158,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: frontend/tests/runfiles/*/*.log
@@ -166,25 +167,12 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Run JavaScript tests
         run: yarn test:coverage
@@ -200,7 +188,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -220,20 +208,7 @@ jobs:
           EOF
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -297,7 +272,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -387,20 +362,7 @@ jobs:
           docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Build webpack resources
         run: yarn build
@@ -423,15 +385,15 @@ jobs:
           done
 
       - name: Upload cypress screenshot artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
+        uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
+        uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: cypress/videos
@@ -440,7 +402,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -547,7 +509,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-test-logs
           path: /tmp/container-logs/*.log
