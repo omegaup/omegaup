@@ -15,6 +15,7 @@ fi
 # Enable General Query Log
 mysql -h mysql -uroot -e "TRUNCATE TABLE mysql.general_log;"
 mysql -h mysql -uroot -e "SET GLOBAL general_log = 'ON';"
+mysql -h mysql -uroot -e "SET GLOBAL log_output = 'TABLE';"
 
 "${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
 
