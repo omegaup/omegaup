@@ -15,6 +15,9 @@
       />
       <omegaup-problem-creator-cases-case-edit
         v-if="shouldShowCaseEditWindow"
+        @download-input-file="
+          (fileObject) => $emit('download-input-file', fileObject)
+        "
       />
     </b-col>
   </b-row>

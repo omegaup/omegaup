@@ -8,17 +8,23 @@ import {
   LineID,
   CaseRequest,
   MultipleCaseAddRequest,
+  CaseID,
+  Layout,
+  CaseLineInfo,
+  LayoutID,
+  LineInfoID,
   CaseLineKind,
-  CaseLineData,
   MatrixDistinctType,
+  CaseLineData,
 } from '../types';
+import T from '../../../lang';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import Vue from 'vue';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
-  layout: CaseLine[];
+  layouts: Layout[];
   hide: boolean;
 }
 
@@ -30,7 +36,7 @@ export const casesStore: Module<CasesState, RootState> = {
       caseID: UUID_NIL,
       groupID: UUID_NIL,
     },
-    layout: [],
+    layouts: [],
     hide: false,
   },
   mutations: {
@@ -40,7 +46,7 @@ export const casesStore: Module<CasesState, RootState> = {
         caseID: UUID_NIL,
         groupID: UUID_NIL,
       };
-      state.layout = [];
+      state.layouts = [];
       state.hide = false;
     },
     addGroup(state, newGroup: Group) {
@@ -268,34 +274,191 @@ export const casesStore: Module<CasesState, RootState> = {
       }
       state = assignMissingPoints(state);
     },
-    addLayoutLine(state) {
-      const payload: CaseLine = {
-        lineID: uuid(),
-        caseID: null,
-        label: 'NEW',
+    addLayoutFromSelectedCase(state) {
+      if (!state.selected.caseID || !state.selected.groupID) {
+        return;
+      }
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID == state.selected.groupID,
+      );
+      if (!selectedGroup) return;
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID == state.selected.caseID,
+      );
+      if (!selectedCase) return;
+      const caseLineInfos: CaseLineInfo[] = selectedCase.lines.map(
+        (caseLine) => ({
+          lineInfoID: uuid(),
+          label: caseLine.label,
+          data: {
+            ...caseLine.data,
+            value: '',
+          },
+        }),
+      );
+      const layoutFromSelectedCase: Layout = {
+        layoutID: uuid(),
+        name: selectedGroup.name + '_' + selectedCase.name,
+        caseLineInfos: caseLineInfos,
+      };
+      state.layouts.push(layoutFromSelectedCase);
+    },
+    removeLayout(state, layoutIDToBeDeleted: LineID) {
+      state.layouts = state.layouts.filter(
+        (layout) => layout.layoutID !== layoutIDToBeDeleted,
+      );
+    },
+    addNewLineInfoToLayout(state, layoutID: LayoutID) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) return;
+      const newLineInfo: CaseLineInfo = {
+        lineInfoID: uuid(),
+        label: '',
         data: {
           kind: 'line',
           value: '',
         },
       };
-      state.layout.push(payload);
+      targetLayout.caseLineInfos.push(newLineInfo);
     },
-    editLayoutLine(state, layoutLineData: CaseLine) {
-      const lineToEdit = state.layout.find(
-        (line) => line.lineID === layoutLineData.lineID,
+    editLineInfoKind(
+      state,
+      [layoutID, lineInfoID, _kind]: [LayoutID, LineInfoID, CaseLineKind],
+    ) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
       );
-      if (lineToEdit) {
-        lineToEdit.data.kind = layoutLineData.data.kind;
-        lineToEdit.label = layoutLineData.label;
+      if (!targetLayout) return;
+      const selectedLineInfo = targetLayout.caseLineInfos.find(
+        (lineInfo) => lineInfo.lineInfoID === lineInfoID,
+      );
+      if (!selectedLineInfo) return;
+      const defaultMatrixDistinctType: MatrixDistinctType =
+        MatrixDistinctType.None;
+      const lineInfoData: CaseLineData = (() => {
+        switch (_kind) {
+          case 'line':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'multiline':
+            return {
+              kind: _kind,
+              value: '',
+            };
+          case 'array':
+            return {
+              kind: _kind,
+              size: 10,
+              min: 0,
+              max: 100,
+              distinct: false,
+              value: '',
+            };
+          case 'matrix':
+            return {
+              kind: _kind,
+              rows: 3,
+              cols: 3,
+              min: 0,
+              max: 100,
+              distinct: defaultMatrixDistinctType,
+              value: '',
+            };
+        }
+      })();
+      selectedLineInfo.data = lineInfoData;
+    },
+    removeLineInfoFromLayout(
+      state,
+      [layoutID, lineInfoID]: [LayoutID, LineInfoID],
+    ) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) return;
+      targetLayout.caseLineInfos = targetLayout.caseLineInfos.filter(
+        (lineInfo) => lineInfo.lineInfoID !== lineInfoID,
+      );
+    },
+    copyLayout(state, layoutID: LayoutID) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) return;
+      const copiedLineInfos: CaseLineInfo[] = targetLayout.caseLineInfos.map(
+        (lineInfo) => ({
+          lineInfoID: uuid(),
+          label: lineInfo.label,
+          data: {
+            ...lineInfo.data,
+          },
+        }),
+      );
+      const copiedLayout: Layout = {
+        layoutID: uuid(),
+        name: targetLayout.name + T.problemCreatorLayoutWordCopy,
+        caseLineInfos: copiedLineInfos,
+      };
+      state.layouts.push(copiedLayout);
+    },
+    addNewLayout(state) {
+      const newLayout: Layout = {
+        layoutID: uuid(),
+        name: T.problemCreatorLayoutNew,
+        caseLineInfos: [],
+      };
+      state.layouts.push(newLayout);
+    },
+    enforceLayoutToTheSelectedCase(state, layoutID: LayoutID) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) return;
+      if (!state.selected.caseID || !state.selected.groupID) {
+        return;
       }
-    },
-    removeLayoutLine(state, lineIDToBeDeleted: LineID) {
-      state.layout = state.layout.filter(
-        (line) => line.lineID !== lineIDToBeDeleted,
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID == state.selected.groupID,
       );
+      if (!selectedGroup) return;
+      const selectedCase = selectedGroup.cases.find(
+        (_case) => _case.caseID == state.selected.caseID,
+      );
+      if (!selectedCase) return;
+      const linesFromLayout: CaseLine[] = targetLayout.caseLineInfos.map(
+        (lineInfo) => ({
+          lineID: uuid(),
+          caseID: selectedCase.caseID,
+          label: lineInfo.label,
+          data: {
+            ...lineInfo.data,
+          },
+        }),
+      );
+      selectedCase.lines = linesFromLayout;
     },
-    setLayout(state, layoutLines: CaseLine[]) {
-      state.layout = layoutLines;
+    enforceLayoutToAllCases(state, layoutID: LayoutID) {
+      state.groups.forEach((_group) => {
+        _group.cases.forEach((_case) => {
+          const targetLayout = state.layouts.find(
+            (layout) => layout.layoutID === layoutID,
+          );
+          if (!targetLayout) return;
+          const linesFromLayout: CaseLine[] = targetLayout.caseLineInfos.map(
+            (lineInfo) => ({
+              lineID: uuid(),
+              caseID: _case.caseID,
+              label: lineInfo.label,
+              data: lineInfo.data,
+            }),
+          );
+          _case.lines = linesFromLayout;
+        });
+      });
     },
     setSelected(state, CaseGroupsIDToBeSelected: CaseGroupID) {
       state.selected = CaseGroupsIDToBeSelected;
@@ -429,6 +592,10 @@ export const casesStore: Module<CasesState, RootState> = {
         (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
+    deleteLinesForSelectedCase({ getters }) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = [];
+    },
   },
   getters: {
     getCasesFromGroup: (state) => (groupID: GroupID) => {
@@ -457,6 +624,9 @@ export const casesStore: Module<CasesState, RootState> = {
         return [...cases, ...currCase.cases];
       }, []);
     },
+    getAllLayouts: (state) => {
+      return state.layouts;
+    },
     getSelectedCase: (state) => {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
@@ -469,6 +639,24 @@ export const casesStore: Module<CasesState, RootState> = {
           (_case) => _case.caseID === state.selected.caseID,
         ) ?? null
       );
+    },
+    getStringifiedLinesFromCaseGroupID: (state) => (
+      caseGroupID: CaseGroupID,
+    ) => {
+      const groupID: GroupID = caseGroupID.groupID;
+      const caseID: CaseID = caseGroupID.caseID;
+      const _group = state.groups.find((group) => group.groupID === groupID);
+      if (_group === undefined) {
+        return '';
+      }
+      const _case = _group.cases.find((thisCase) => thisCase.caseID === caseID);
+      if (_case == undefined) {
+        return '';
+      }
+      const stringifiedLine: string = _case.lines
+        .map((line) => line.data.value)
+        .join('\n');
+      return stringifiedLine;
     },
     getSelectedGroup: (state) => {
       return (
