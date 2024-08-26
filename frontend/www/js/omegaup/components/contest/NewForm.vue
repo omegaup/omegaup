@@ -91,6 +91,7 @@
               :class="{
                 'is-invalid': invalidParameterName === 'description',
               }"
+              data-description
               name="description"
               cols="30"
               rows="10"
@@ -217,6 +218,7 @@
               <label>
                 <input
                   v-model="currentContestForTeams"
+                  data-contest-for-teams
                   type="checkbox"
                   :disabled="update"
                 />
@@ -226,6 +228,9 @@
 
             <omegaup-common-typeahead
               v-if="currentContestForTeams && !hasSubmissions"
+              :class="{
+                'is-invalid': invalidParameterName === 'teams_group_alias',
+              }"
               :existing-options="searchResultTeamsGroups"
               :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
@@ -607,7 +612,10 @@ export default class NewForm extends Vue {
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
-    const request = { contest, teamsGroupAlias: this.currentTeamsGroupAlias };
+    const request = {
+      contest,
+      teamsGroupAlias: this.currentTeamsGroupAlias?.key,
+    };
     if (this.update) {
       this.$emit('update-contest', request);
       return;

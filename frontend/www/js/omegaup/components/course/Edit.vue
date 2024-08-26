@@ -37,7 +37,7 @@
           >{{ T.wordsContent }}</a
         >
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" data-course-edit-admission-mode>
         <a
           href="#admission-mode"
           class="nav-link"
@@ -177,15 +177,17 @@
 
       <div
         v-if="showTab === 'admission-mode'"
+        data-admission-mode-tab
         class="tab-pane active"
         role="tabpanel"
       >
         <omegaup-course-admision-mode
-          :initial-admission-mode="data.course.admission_mode"
+          :admission-mode="data.course.admission_mode"
           :should-show-public-option="data.course.is_curator"
           :course-alias="data.course.alias"
-          @emit-update-admission-mode="
-            (admisionMode) => $emit('update-admission-mode', admisionMode)
+          :show-in-public-courses-list="data.course.recommended"
+          @update-admission-mode="
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-course-admision-mode>
       </div>

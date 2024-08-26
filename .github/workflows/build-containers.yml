@@ -24,7 +24,7 @@ jobs:
           DOCKER_BUILDKIT: 1
           TAG: ${{ github.sha }}
         run: |
-          docker-compose --file=docker-compose.k8s.yml build \
+          docker compose --file=docker-compose.k8s.yml build \
             --build-arg BRANCH=${{ steps.extract_branch.outputs.branch }} \
             frontend \
             frontend-sidecar \

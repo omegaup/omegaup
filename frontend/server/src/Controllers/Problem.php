@@ -23,7 +23,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ProblemListItem=array{accepted: int, alias: string, can_be_removed?: bool, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
@@ -2520,7 +2520,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $show_solvers
      * @omegaup-request-param null|string $statement_type
      */
-    public static function apiDetails(\OmegaUp\Request $r): array {
+    public static function apiDetails(\OmegaUp\Request $r) {
         $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
         $preventProblemsetOpen = $r->ensureOptionalBool(
             'prevent_problemset_open'
@@ -2740,11 +2740,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             unset($response['source']);
         }
 
-        $problemsetId = !is_null(
-            $problemset
-        ) ? intval(
-            $problemset->problemset_id
-        ) : null;
+        $problemsetId = $problemset?->problemset_id ?? null;
 
         $isPracticeMode = false;
         $container = null;
@@ -2841,9 +2837,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if ($container instanceof \OmegaUp\DAO\VO\Contests) {
                 $lastRunTime = null;
 
-                if (($n = count($runsArray)) > 0) {
-                    $lastRun = $runsArray[$n - 1];
-                    $lastRunTime = $lastRun['time'];
+                if (count($runsArray) > 0) {
+                    $lastRunTime = max(
+                        array_map(
+                            fn($run) => $run['time'],
+                            $runsArray
+                        )
+                    );
                 }
                 $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
                     $container,
@@ -4802,9 +4802,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $lastRunTime = null;
 
-        if (($n = count($runsPayload)) > 0) {
-            $lastRun = $runsPayload[$n - 1];
-            $lastRunTime = $lastRun['time'];
+        if (count($runsPayload) > 0) {
+            $lastRunTime = max(
+                array_map(
+                    fn($run) => $run['time'],
+                    $runsPayload
+                )
+            );
         }
 
         $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(

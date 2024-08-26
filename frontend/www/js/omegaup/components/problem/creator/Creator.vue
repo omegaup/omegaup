@@ -1,7 +1,12 @@
 <template>
   <b-container fluid="lg">
     <creator-header />
-    <creator-tabs />
+    <creator-tabs
+      @show-update-success-message="() => $emit('show-update-success-message')"
+      @download-input-file="
+        (fileObject) => $emit('download-input-file', fileObject)
+      "
+    />
   </b-container>
 </template>
 

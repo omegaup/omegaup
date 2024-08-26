@@ -86,6 +86,8 @@ export interface ContestOptions {
   problems: Array<ProblemOptions>;
   runs: Array<RunOptions>;
   statusCheck?: boolean;
+  contestForTeams?: boolean;
+  teamGroupAlias?: string;
 }
 
 export interface RunOptions {
