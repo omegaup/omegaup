@@ -52,7 +52,7 @@ export const casesStore: Module<CasesState, RootState> = {
     replaceState(state, uploadedState: CasesState) {
       state.groups = uploadedState.groups;
       state.selected = uploadedState.selected;
-      state.layout = uploadedState.layout;
+      state.layouts = uploadedState.layouts;
       state.hide = uploadedState.hide;
     },
     addGroup(state, newGroup: Group) {
