@@ -5629,12 +5629,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $activeTabStatus = \OmegaUp\DAO\Enum\ContestTabStatus::getIntValue(
                 $index
             ) + 1;
-            if (is_null($activeTabStatus)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'tab_name'
-                );
-            }
         }
 
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
