@@ -5610,12 +5610,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ) ?? \OmegaUp\DAO\Enum\ContestFilterStatus::ALL;
         $tab = $r->ensureOptionalEnum(
             'tab_name',
-            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS,
-            required: false
-        ) ?? \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT;
-        $activeTabStatus = \OmegaUp\DAO\Enum\ContestTabStatus::getIntValue(
-            $tab
-        ) ?? \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT;
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+        );
+
+        if (is_null($tab)) {
+            $activeTabStatus = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
+        } else {
+            $index = array_search(
+                $tab,
+                \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+            );
+            if ($index === false) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'tab_name'
+                );
+            }
+            $activeTabStatus = \OmegaUp\DAO\Enum\ContestTabStatus::getIntValue(
+                $index
+            ) + 1;
+            if (is_null($activeTabStatus)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'tab_name'
+                );
+            }
+        }
 
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
         if ($activeFilterStatus === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
