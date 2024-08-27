@@ -1242,6 +1242,7 @@ CREATE TABLE `Users_Badges` (
   `badge_alias` varchar(32) NOT NULL COMMENT 'Identificador de badge',
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
+  UNIQUE KEY `user_badge` (`badge_alias`,`user_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Badges de Usuario';
