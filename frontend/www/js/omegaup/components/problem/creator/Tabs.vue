@@ -6,6 +6,7 @@
         <span name="writing" data-tab> {{ T.problemCreatorStatement }}</span>
       </template>
       <omegaup-problem-creator-statement-tab
+        :current-markdown-prop="currentMarkdownProp"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -17,6 +18,8 @@
         <span name="code" data-tab> {{ T.problemCreatorCode }}</span>
       </template>
       <omegaup-problem-creator-code-tab
+        :code-prop="codeProp"
+        :extension-prop="extensionProp"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -39,6 +42,7 @@
         <span name="solution" data-tab> {{ T.problemCreatorSolution }}</span>
       </template>
       <omegaup-problem-creator-solution-tab
+        :current-solution-markdown-prop="currentSolutionMarkdownProp"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -48,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import problemCreator_CasesTab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
 import problemCreator_CodeTab from './code/CodeTab.vue';
@@ -64,5 +68,13 @@ import T from '../../../lang';
 })
 export default class Tabs extends Vue {
   T = T;
+  @Prop({ default: T.problemCreatorEmpty })
+  currentSolutionMarkdownProp!: string;
+  @Prop({ default: T.problemCreatorEmpty })
+  currentMarkdownProp!: string;
+  @Prop({ default: T.problemCreatorEmpty })
+  codeProp!: string;
+  @Prop({ default: T.problemCreatorEmpty })
+  extensionProp!: string;
 }
 </script>
