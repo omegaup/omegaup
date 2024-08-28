@@ -1,12 +1,10 @@
 <template>
-  <div ref="ide-layout">
-    <ephemeral-ide
-      :accepted-languages="acceptedLanguages"
-      :initial-language="initialLanguage"
-      :problem="problem"
-      :can-submit="canSubmit"
-    />
-  </div>
+  <ephemeral-ide
+    :accepted-languages="acceptedLanguages"
+    :initial-language="initialLanguage"
+    :problem="problem"
+    :can-submit="canSubmit"
+  />
 </template>
 
 <script lang="ts">
