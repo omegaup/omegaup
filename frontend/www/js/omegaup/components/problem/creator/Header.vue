@@ -95,30 +95,26 @@ export default class Header extends Vue {
       .loadAsync(this.zipFile)
       .then((zipContent) => {
         const cdpDataFile = zipContent.file('cdp.data');
-        if (cdpDataFile) {
-          cdpDataFile.async('text').then((content) => {
-            const storeData = JSON.parse(content);
-            //console.log(storeData['casesStore']['groups'][0]['cases'][1]['lines']);
-            this.$emit('upload-zip-file', storeData);
-            this.name = storeData.problemName;
-            this.$store.replaceState({
-              ...this.$store.state,
-              problemName: storeData.problemName,
-              problemMarkdown: storeData.problemMarkdown,
-              problemCodeContent: storeData.problemCodeContent,
-              problemCodeExtension: storeData.problemCodeExtension,
-              problemSolutionMarkdown: storeData.problemSolutionMarkdown,
-            });
-            if (storeData.casesStore) {
-              this.$store.commit(
-                'casesStore/replaceState',
-                storeData.casesStore,
-              );
-            }
-          });
-        } else {
+        if (!cdpDataFile) {
           ui.error(T.problemCreatorZipFileIsNotComplete);
+          return;
         }
+        cdpDataFile.async('text').then((content) => {
+          const storeData = JSON.parse(content);
+          this.$emit('upload-zip-file', storeData);
+          this.name = storeData.problemName;
+          this.$store.replaceState({
+            ...this.$store.state,
+            problemName: storeData.problemName,
+            problemMarkdown: storeData.problemMarkdown,
+            problemCodeContent: storeData.problemCodeContent,
+            problemCodeExtension: storeData.problemCodeExtension,
+            problemSolutionMarkdown: storeData.problemSolutionMarkdown,
+          });
+          if (storeData.casesStore) {
+            this.$store.commit('casesStore/replaceState', storeData.casesStore);
+          }
+        });
       })
       .catch(() => {
         ui.error(T.problemCreatorZipFileIsNotValid);
