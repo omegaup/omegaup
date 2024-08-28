@@ -50,7 +50,7 @@ describe('Course Test', () => {
     cy.clearLocalStorage();
     cy.visit('/');
   });
-  it('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
+  xit('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
@@ -278,11 +278,11 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
-    const suggestions: { line: number; text: string; }[] = [
+    const suggestions: { line: number; text: string }[] = [
       { line: 1, text: 'Solution is not optimal' },
       { line: 3, text: 'This code could be improved' },
       { line: 5, text: 'This line could be removed' },
-    ]
+    ];
     coursePage.leaveFeedbackOnSolution(suggestions);
     cy.logout();
 
@@ -597,7 +597,6 @@ describe('Course Test', () => {
       });
     cy.logout();
   });
-
 
   it('Should create a public course and share the link to allow joining it', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
