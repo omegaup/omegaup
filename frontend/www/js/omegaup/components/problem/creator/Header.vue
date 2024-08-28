@@ -69,7 +69,7 @@ export default class Header extends Vue {
 
   getSolution(zip: JSZip) {
     const folder = zip.folder('solutions');
-    const solutionMarkdownData = this.$store.state.problemMarkdown;
+    const solutionMarkdownData = this.$store.state.problemSolutionMarkdown;
     folder?.file('es.markdown', solutionMarkdownData);
   }
 
