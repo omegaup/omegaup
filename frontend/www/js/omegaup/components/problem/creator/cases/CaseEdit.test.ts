@@ -4,6 +4,7 @@ import CaseEdit from './CaseEdit.vue';
 import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
+import { NIL as UUID_NIL } from 'uuid';
 import {
   generateCase,
   generateGroup,
@@ -98,6 +99,33 @@ describe('CaseEdit.vue', () => {
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
     expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+  });
+
+  it('Should delete a case', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const caseDeleteButton = wrapper.find('button[data-delete-case]');
+    expect(caseDeleteButton.exists()).toBeTruthy();
+
+    await caseDeleteButton.trigger('click');
+    expect(
+      wrapper.vm.groups.find((_group) => _group.groupID === newGroup.groupID),
+    ).toBeTruthy();
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === newGroup.groupID)
+        ?.cases.find((_case) => _case.caseID === newCase.caseID),
+    ).toBeFalsy();
+    expect(store.state.casesStore.selected.caseID).toBe(UUID_NIL);
+    expect(store.state.casesStore.selected.groupID).toBe(UUID_NIL);
   });
 
   it('Should add, modify and delete a line', async () => {
