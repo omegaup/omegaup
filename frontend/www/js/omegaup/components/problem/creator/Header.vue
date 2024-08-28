@@ -10,6 +10,7 @@
     </b-col>
     <b-col class="d-flex justify-content-end">
       <b-button
+        data-load-problem-button
         class="mr-2"
         variant="success"
         size="sm"
@@ -33,6 +34,7 @@
       >
         <div class="mb-4">{{ T.problemCreatorUploadZipMessage }}</div>
         <input
+          data-upload-zip-file
           class="w-100"
           type="file"
           accept=".zip"
@@ -96,6 +98,7 @@ export default class Header extends Vue {
         if (cdpDataFile) {
           cdpDataFile.async('text').then((content) => {
             const storeData = JSON.parse(content);
+            //console.log(storeData['casesStore']['groups'][0]['cases'][1]['lines']);
             this.$emit('upload-zip-file', storeData);
             this.name = storeData.problemName;
             this.$store.replaceState({
