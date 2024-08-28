@@ -6,8 +6,7 @@ import arena_EphemeralGrader from './EphemeralGrader.vue';
 type SetSettingsMessage = {
   method: 'setSettings';
   params: {
-    alias: string;
-    settings: types.ProblemSettingsDistrib;
+    problem: types.ProblemInfo;
     languages: string[];
   };
 };
@@ -108,11 +107,11 @@ Here we can add code.
     const settingsMessage = await postPromise;
     expect({
       method: settingsMessage.method,
-      params: { alias: settingsMessage.params.alias },
+      params: { problem: settingsMessage.params.problem },
     }).toEqual({
       method: 'setSettings',
       params: {
-        alias: problem.alias,
+        problem,
       },
     });
 
@@ -145,13 +144,16 @@ Here we can add code.
     expect({
       method: settingsMessage.method,
       params: {
-        alias: settingsMessage.params.alias,
+        problem: settingsMessage.params.problem,
         languages: settingsMessage.params.languages,
       },
     }).toEqual({
       method: 'setSettings',
       params: {
-        alias: newAlias,
+        problem: {
+          ...problem,
+          alias: newAlias,
+        },
         languages: [],
       },
     });
