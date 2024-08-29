@@ -872,12 +872,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // solves same problems than first.
         $runCreationDate = self::setFirstDayOfTheLastMonth();
 
-        $this->createRuns($user1, $runCreationDate, numRuns: 1);
-        $this->createRuns($user1, $runCreationDate, numRuns: 1);
+        $this->createRuns($user1, $runCreationDate, numRuns: 2);
         $this->createRuns($user2, $runCreationDate, numRuns: 1);
-        $this->createRuns($user3, $runCreationDate, numRuns: 1);
-        $this->createRuns($user3, $runCreationDate, numRuns: 1);
-        $this->createRuns($user3, $runCreationDate, numRuns: 1);
+        $this->createRuns($user3, $runCreationDate, numRuns: 3);
 
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
@@ -910,9 +907,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $creatorLogin = self::login($creatorIdentity);
         $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
-            name: null,
-            description: null,
-            alias: null,
             login: $creatorLogin
         );
 
@@ -935,10 +929,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $identity->password = $identityPassword;
 
-        $this->createRuns($identity, $runCreationDate, numRuns: 1);
-        $this->createRuns($identity, $runCreationDate, numRuns: 1);
-        $this->createRuns($identity, $runCreationDate, numRuns: 1);
-        $this->createRuns($identity, $runCreationDate, numRuns: 1);
+        $this->createRuns($identity, $runCreationDate, numRuns: 4);
 
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
