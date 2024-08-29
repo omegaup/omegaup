@@ -2,29 +2,62 @@
   <b-row class="mb-3">
     <b-col class="d-flex align-items-center">
       <span class="mr-2">{{ T.problemCreatorName }}</span>
-      <b-form-input v-model="name" size="sm" :placeholder="T.problemCreatorNewProblem" />
+      <b-form-input
+        v-model="name"
+        size="sm"
+        :placeholder="T.problemCreatorNewProblem"
+      />
     </b-col>
     <b-col class="d-flex justify-content-end">
-      <b-button data-load-problem-button class="mr-2" variant="success" size="sm"
-        @click="uploadZipModal = !uploadZipModal">
+      <b-button
+        data-load-problem-button
+        class="mr-2"
+        variant="success"
+        size="sm"
+        @click="uploadZipModal = !uploadZipModal"
+      >
         <BIconUpload class="mr-1" />
         <span class="d-none d-md-inline">
-          {{ T.problemCreatorLoadProblem }}</span>
+          {{ T.problemCreatorLoadProblem }}</span
+        >
       </b-button>
-      <b-modal v-model="uploadZipModal" :title="T.problemCreatorZipFileUpload" :ok-title="T.problemCreatorUploadZip"
-        ok-variant="success" :cancel-title="T.caseModalBack" cancel-variant="danger" static lazy @ok="retrieveStore">
+      <b-modal
+        v-model="uploadZipModal"
+        :title="T.problemCreatorZipFileUpload"
+        :ok-title="T.problemCreatorUploadZip"
+        ok-variant="success"
+        :cancel-title="T.caseModalBack"
+        cancel-variant="danger"
+        static
+        lazy
+        @ok="retrieveStore"
+      >
         <div class="mb-4">{{ T.problemCreatorUploadZipMessage }}</div>
-        <input data-upload-zip-file class="w-100" type="file" accept=".zip" @change="handleZipFile" />
+        <input
+          data-upload-zip-file
+          class="w-100"
+          type="file"
+          accept=".zip"
+          @change="handleZipFile"
+        />
       </b-modal>
-      <b-button data-download-zip class="mr-2" variant="primary" size="sm" @click="generateProblem()">
+      <b-button
+        data-download-zip
+        class="mr-2"
+        variant="primary"
+        size="sm"
+        @click="generateProblem()"
+      >
         <BIconDownload class="mr-1" />
         <span class="d-none d-md-inline">
-          {{ T.problemCreatorGenerateProblem }}</span>
+          {{ T.problemCreatorGenerateProblem }}</span
+        >
       </b-button>
       <b-button variant="warning" size="sm" @click="createNewProblem">
         <BIconPlus class="mr-1" />
         <span class="d-none d-md-inline">
-          {{ T.problemCreatorNewProblem }}</span>
+          {{ T.problemCreatorNewProblem }}</span
+        >
       </b-button>
     </b-col>
   </b-row>
@@ -72,8 +105,8 @@ export default class Header extends Vue {
     if (!this.zipFile) {
       return;
     }
-    const zip = new JSZip();
-    zip
+    const zipUploaded = new JSZip();
+    zipUploaded
       .loadAsync(this.zipFile)
       .then((zipContent) => {
         const cdpDataFile = zipContent.file('cdp.data');
