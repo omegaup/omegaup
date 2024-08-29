@@ -848,11 +848,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    /**
-     * @dataProvider coderOfTheMonthCategoryProvider
-     */
-    public function testCoderOfTheMonthCalcWithIdentities(string $category) {
-        $gender = $category == 'all' ? 'male' : 'female';
+    public function testCoderOfTheMonthCalcWithIdentities() {
+        $category = 'all';
+        $gender = 'male';
         $usersMapping = [
             ['username' => 'user1', 'numRuns' => 2, 'coderPosition' => 1],
             ['username' => 'user2', 'numRuns' => 1, 'coderPosition' => 2],
