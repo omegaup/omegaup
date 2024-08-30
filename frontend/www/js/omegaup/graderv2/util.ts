@@ -159,13 +159,13 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     language: 'py',
   },
   py2: {
-    extension: 'py',
+    extension: 'py2',
     name: 'Python (2.7)',
     modelMapping: 'python',
     language: 'py2',
   },
   py3: {
-    extension: 'py',
+    extension: 'py3',
     name: 'Python (3.9)',
     modelMapping: 'python',
     language: 'py3',
