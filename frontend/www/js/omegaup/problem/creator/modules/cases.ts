@@ -748,6 +748,7 @@ export function generateCase(
     groupID: UUID_NIL,
     lines: [],
     points: null,
+    output: '',
     ...caseParams,
   };
 }
