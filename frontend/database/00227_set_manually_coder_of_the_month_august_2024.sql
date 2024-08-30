@@ -1,11 +1,12 @@
--- Add a unique constraint to the table in order to avoid duplicates
-ALTER TABLE `Coder_Of_The_Month`
-  ADD UNIQUE KEY `unique_user_time_category` (`user_id`, `time`, `category`);
+-- Delete any existing entry for the coder of the month for August 2024
+DELETE FROM `Coder_Of_The_Month`
+WHERE `time` = '2024-08-01'
+  AND `ranking` = '1'
+  AND `category` = 'all';
 
--- Replace the coder of the month for August 2024 with the correct one
-REPLACE INTO `Coder_Of_The_Month`
+  -- Insert the new coder of the month for August 2024
+INSERT INTO `Coder_Of_The_Month`
     (
-      `coder_of_the_month_id`,
       `user_id`,
       `time`,
       `ranking`,
@@ -14,15 +15,8 @@ REPLACE INTO `Coder_Of_The_Month`
       `score`,
       `problems_solved`
     )
-  VALUES
+VALUES
     (
-      (
-        SELECT `coder_of_the_month_id` FROM (
-          SELECT `coder_of_the_month_id` FROM `Coder_Of_The_Month` WHERE `user_id` = (
-            SELECT `user_id` FROM `Identities` WHERE `username` = 'Mixer6151' AND `time` = '2024-08-01' AND `category` = 'all'
-          )
-        ) AS temp_table
-      ),
       COALESCE((SELECT `user_id` FROM `Identities` WHERE `username` = 'Mixer6151'), 1),
       '2024-08-01',
       '1',
