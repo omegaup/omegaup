@@ -1115,7 +1115,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorUngroupedCases: "Casos sem grupo",
   problemCreatorUpdateAlert: "O problema foi atualizado com \u00eaxito.",
   problemCreatorUploadZip: "Enviar",
-  problemCreatorUploadZipMessage: "Por favor, envie o arquivo zip para o problema",
+  problemCreatorUploadZipMessage: "Envie aqui o arquivo zip do seu problema.",
   problemCreatorZipFileIsNotComplete: "O arquivo zip deve conter o arquivo cdp.data",
   problemCreatorZipFileIsNotValid: "O arquivo enviado n\u00e3o \u00e9 um arquivo zip v\u00e1lido",
   problemCreatorZipFileUpload: "Enviar arquivo zip",
