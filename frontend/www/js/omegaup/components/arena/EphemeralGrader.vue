@@ -4,11 +4,12 @@
     :initial-language="initialLanguage"
     :problem="problem"
     :can-submit="canSubmit"
+    :can-run="canRun"
   />
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Ref } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import Ephemeral from '../../graderv2/Ephemeral.vue';
 
@@ -18,7 +19,6 @@ import Ephemeral from '../../graderv2/Ephemeral.vue';
   },
 })
 export default class EphemeralGrader extends Vue {
-  @Ref('ide-layout') readonly ideLayout!: HTMLDivElement;
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: true }) canRun!: boolean;
