@@ -382,8 +382,8 @@ const storeOptions: StoreOptions<GraderStore> = {
         state.sessionStorageSources = {
           language: initialLanguage,
           sources: state.request.input.interactive
-            ? interactiveTemplates
-            : sourceTemplates,
+            ? { ...interactiveTemplates }
+            : { ...sourceTemplates },
         };
       }
       // do not persist storage sources
