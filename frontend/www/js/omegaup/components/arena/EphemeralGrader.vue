@@ -27,6 +27,7 @@ export default class EphemeralGrader extends Vue {
 
   loaded = false;
 
+  // note: initial source is for the IDE is also supported
   get initialLanguage() {
     if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
       return this.acceptedLanguages[0];
