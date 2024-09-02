@@ -1,4 +1,4 @@
-import { LoginOptions } from "../support/types";
+import { LoginOptions } from '../support/types';
 
 describe('Problem creator Test', () => {
   beforeEach(() => {
@@ -18,10 +18,13 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-tab="statement"]').click();
 
-    cy.get('[data-problem-creator-editor-markdown]').type("Hello omegaUp!");
-    cy.get("[data-problem-creator-save-markdown]").click();
+    cy.get('[data-problem-creator-editor-markdown]').type('Hello omegaUp!');
+    cy.get('[data-problem-creator-save-markdown]').click();
 
-    cy.get("[data-problem-creator-previewer-markdown]").should("have.html", "<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>")
+    cy.get('[data-problem-creator-previewer-markdown]').should(
+      'have.html',
+      '<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>',
+    );
   });
 
   it('Should write and verify the problem solution', () => {
@@ -35,10 +38,15 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-tab="solution"]').click();
 
-    cy.get('[data-problem-creator-solution-editor-markdown]').type("Hello **solution**!");
-    cy.get("[data-problem-creator-solution-save-markdown]").click();
+    cy.get('[data-problem-creator-solution-editor-markdown]').type(
+      'Hello **solution**!',
+    );
+    cy.get('[data-problem-creator-solution-save-markdown]').click();
 
-    cy.get("[data-problem-creator-solution-previewer-markdown]").should("have.html", "<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>")
+    cy.get('[data-problem-creator-solution-previewer-markdown]').should(
+      'have.html',
+      '<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>',
+    );
   });
 
   it('Should upload code and verify the problem code', () => {
@@ -66,4 +74,4 @@ describe('Problem creator Test', () => {
         .should('contain', 'Rust (1.56.1)');
     })
   });
-})
+});
