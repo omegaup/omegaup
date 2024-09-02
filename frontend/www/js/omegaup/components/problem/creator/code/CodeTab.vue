@@ -8,6 +8,7 @@
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
+            data-problem-creator-code-language
             class="form-control"
             name="language"
           >
@@ -27,6 +28,7 @@
           <div class="h-100">
             <omegaup-creator-code-view
               v-model="code"
+              data-problem-creator-code-editor
               :language="selectedLanguage"
               :readonly="false"
               @change-language="handleChangeLanguage($event)"
@@ -40,6 +42,7 @@
         </label>
         <div class="col-sm-7">
           <input
+            data-problem-creator-code-input
             class="w-100"
             type="file"
             name="file"
