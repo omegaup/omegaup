@@ -3,14 +3,6 @@ import type { types } from '../../api_types';
 
 import arena_EphemeralGrader from './EphemeralGrader.vue';
 
-type SetSettingsMessage = {
-  method: 'setSettings';
-  params: {
-    problem: types.ProblemInfo;
-    languages: string[];
-  };
-};
-
 describe('EphemeralGrader.vue', () => {
   beforeEach(() => {
     const div = document.createElement('div');
@@ -90,70 +82,56 @@ Here we can add code.
     input_limit: 1000,
   };
 
-  xit('Should handle showing the ephemeral grader for a problem upon load', async () => {
+  it('Should handle showing the ephemeral grader for a problem upon load', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
       propsData: {
         problem,
+        acceptedLanguages: ['py3'],
+        preferredLanguage: 'py3',
       },
     });
-    const contentWindow: Window = (wrapper.findComponent({ ref: 'grader' })
-      .element as HTMLIFrameElement).contentWindow as Window;
-
-    const postPromise = new Promise<SetSettingsMessage>((accept) => {
-      contentWindow.postMessage = jest.fn(accept);
-    });
-    const settingsMessage = await postPromise;
-    expect({
-      method: settingsMessage.method,
-      params: { problem: settingsMessage.params.problem },
-    }).toEqual({
-      method: 'setSettings',
-      params: {
-        problem,
-      },
-    });
+    expect(wrapper.text()).toContain('triangulos');
+    expect(wrapper.text()).toContain('in');
+    expect(wrapper.text()).toContain('out');
+    expect(wrapper.text()).toContain('code');
+    expect(wrapper.text()).toContain('diff');
+    expect(wrapper.get('[data-run-button]').exists()).toBe(true);
+    expect(wrapper.get('option[value="py3"]').exists()).toBe(true);
 
     wrapper.destroy();
   });
 
-  xit('Should handle showing the ephemeral grader for a problem after changing settings', async () => {
+  it('Should handle showing the ephemeral grader for a problem after changing settings', async () => {
     const wrapper = mount(arena_EphemeralGrader, {
       attachTo: '#root',
       propsData: {
         problem,
+        acceptedLanguages: ['py3'],
+        preferredLanguage: 'py3',
+        canSubmit: false,
       },
     });
-    const contentWindow: Window = (wrapper.findComponent({ ref: 'grader' })
-      .element as HTMLIFrameElement).contentWindow as Window;
 
-    const postPromise = new Promise<SetSettingsMessage>((accept) => {
-      contentWindow.postMessage = jest.fn(accept);
-    });
     const newAlias = 'sumas2';
     await wrapper.setProps({
       problem: {
         ...problem,
         alias: newAlias,
       },
+      acceptedLanguages: ['cpp17-gcc'],
+      preferredLanguage: 'cpp17-gcc',
+      canSubmit: true,
     });
-    const settingsMessage = await postPromise;
-    expect({
-      method: settingsMessage.method,
-      params: {
-        problem: settingsMessage.params.problem,
-        languages: settingsMessage.params.languages,
-      },
-    }).toEqual({
-      method: 'setSettings',
-      params: {
-        problem: {
-          ...problem,
-          alias: newAlias,
-        },
-        languages: [],
-      },
-    });
+
+    expect(wrapper.text()).toContain('sumas2');
+    expect(wrapper.text()).toContain('in');
+    expect(wrapper.text()).toContain('out');
+    expect(wrapper.text()).toContain('code');
+    expect(wrapper.text()).toContain('diff');
+    expect(wrapper.get('[data-run-button]').exists()).toBe(true);
+    expect(wrapper.get('[data-submit-button]').exists()).toBe(true);
+    expect(wrapper.get('option[value="cpp17-gcc"]').exists()).toBe(true);
 
     wrapper.destroy();
   });

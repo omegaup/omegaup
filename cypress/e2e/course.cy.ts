@@ -8,7 +8,6 @@ import {
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import getEditorIframeBody from '../support/pageObjects/util';
 import { problemPage } from '../support/pageObjects/problemPage';
 
 describe('Course Test', () => {
@@ -50,7 +49,7 @@ describe('Course Test', () => {
     cy.clearLocalStorage();
     cy.visit('/');
   });
-  xit('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
+  it('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
@@ -75,17 +74,14 @@ describe('Course Test', () => {
     coursePage.enterCourse(courseOptions.courseAlias);
     cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
 
-    let iframeBody = getEditorIframeBody();
-    // should have py2 as selected language language
-    iframeBody
-      .find('#language')
+    cy.get('[data-language-select]')
       .should('be.visible')
       .find('option:selected')
       .should('have.value', 'py2');
-
     // language of the modal should be py2 aswell
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').should('have.value', 'py2');
+
     // close the modal using close button that is visible
     // (there is 4, only one of them is visible at a time)
     cy.get('.close').each(($button) => {
@@ -105,16 +101,14 @@ describe('Course Test', () => {
     };
     coursePage.createSubmission(problemOptions[0], runOptions);
     coursePage.closePopup(problemOptions[0]);
+
     // reload the page, check the language again
     // clear session storage before reloading
     cy.clearAllSessionStorage();
     cy.reload();
-    cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
-    iframeBody = getEditorIframeBody();
 
-    // the language should be cpp20 per hierarchy
-    iframeBody
-      .find('#language')
+    cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
+    cy.get('[data-language-select]')
       .should('be.visible')
       .find('option:selected')
       .should('have.value', 'cpp20-gcc');
