@@ -1,10 +1,10 @@
 <template>
-  <div ref="monaco-div"></div>
+  <div></div>
 </template>
 
 <script lang="ts">
 // TODO: replace all instances of any with correct type
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
@@ -17,7 +17,6 @@ export default class MonacoEditor extends Vue {
   };
   @Prop({ default: 'vs-dark' }) theme!: string;
   @Prop({ default: false }) readOnly!: boolean;
-  @Ref('monaco-div') readonly monacoDiv!: HTMLElement;
 
   _editor: monaco.editor.IStandaloneCodeEditor | null = null;
   _model: monaco.editor.ITextModel | null = null;

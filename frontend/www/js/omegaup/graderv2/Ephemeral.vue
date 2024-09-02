@@ -283,15 +283,6 @@ export default class Ephemeral extends Vue {
     })
       .then((response) => {
         if (!response.ok) return null;
-
-        // refreshing appends a hash to the current url at the end
-        // i dont think this is intended behaviour
-
-        // history.replaceState(
-        // undefined
-        //   '',
-        //   '#' + response.headers.get('X-OmegaUp-EphemeralToken'),
-        // );
         return response.formData();
       })
       .then((formData) => {
