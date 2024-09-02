@@ -15,7 +15,7 @@ describe('Problem creator Test', () => {
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
-    
+
     cy.get('[data-problem-creator-tab="statement"]').click();
 
     cy.get('[data-problem-creator-editor-markdown]').type("Hello omegaUp!");
