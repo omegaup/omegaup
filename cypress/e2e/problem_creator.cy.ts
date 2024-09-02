@@ -1,4 +1,4 @@
-import { LoginOptions } from "../support/types";
+import { LoginOptions } from '../support/types';
 
 describe('Problem creator Test', () => {
   beforeEach(() => {
@@ -18,9 +18,12 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-tab="statement"]').click();
 
-    cy.get('[data-problem-creator-editor-markdown]').type("Hello omegaUp!");
-    cy.get("[data-problem-creator-save-markdown]").click();
+    cy.get('[data-problem-creator-editor-markdown]').type('Hello omegaUp!');
+    cy.get('[data-problem-creator-save-markdown]').click();
 
-    cy.get("[data-problem-creator-previewer-markdown]").should("have.html", "<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>")
+    cy.get('[data-problem-creator-previewer-markdown]').should(
+      'have.html',
+      '<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>',
+    );
   });
-})
+});
