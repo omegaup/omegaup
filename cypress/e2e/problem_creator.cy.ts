@@ -38,9 +38,14 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-tab="solution"]').click();
 
-    cy.get('[data-problem-creator-solution-editor-markdown]').type("Hello **solution**!");
-    cy.get("[data-problem-creator-solution-save-markdown]").click();
+    cy.get('[data-problem-creator-solution-editor-markdown]').type(
+      'Hello **solution**!',
+    );
+    cy.get('[data-problem-creator-solution-save-markdown]').click();
 
-    cy.get("[data-problem-creator-solution-previewer-markdown]").should("have.html", "<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>")
+    cy.get('[data-problem-creator-solution-previewer-markdown]').should(
+      'have.html',
+      '<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>',
+    );
   });
 });
