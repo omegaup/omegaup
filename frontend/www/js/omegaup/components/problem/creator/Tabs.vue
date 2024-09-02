@@ -3,7 +3,7 @@
     <b-tab>
       <template #title>
         <BIconPencil class="mr-1" />
-        <span name="writing" data-problem-creator-statement-tab>
+        <span name="writing" data-problem-creator-tab="statement">
           {{ T.problemCreatorStatement }}</span
         >
       </template>
@@ -16,7 +16,7 @@
     <b-tab>
       <template #title>
         <BIconFileCode class="mr-1" />
-        <span name="code" data-problem-creator-code-tab>
+        <span name="code" data-problem-creator-tab="code">
           {{ T.problemCreatorCode }}</span
         >
       </template>
@@ -29,7 +29,7 @@
     <b-tab>
       <template #title>
         <BIconCheckCircle class="mr-1" />
-        <span name="testcases" data-problem-creator-cases-tab>
+        <span name="testcases" data-problem-creator-tab="cases">
           {{ T.problemCreatorTestCases }}</span
         >
       </template>
@@ -42,7 +42,7 @@
     <b-tab>
       <template #title>
         <BIconFileEarmarkCheck class="mr-1" />
-        <span name="solution" data-problem-creator-solution-tab>
+        <span name="solution" data-problem-creator-tab="solution">
           {{ T.problemCreatorSolution }}</span
         >
       </template>
