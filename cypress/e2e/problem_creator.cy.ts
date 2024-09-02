@@ -60,18 +60,20 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-tab="code"]').click();
 
-    cy.get('[data-problem-creator-code-input]').attachFile("../fixtures/main.rs")
+    cy.get('[data-problem-creator-code-input]').attachFile(
+      '../fixtures/main.rs',
+    );
 
     // CodeMirror takes some time to load the uploaded code, so we will wait for 2 seconds.
     cy.wait(1000).then(() => {
       cy.get('.CodeMirror-line').then((rawHTMLElements) => {
-        const intendedLine = rawHTMLElements[1]
-        expect(intendedLine.innerText).to.eq('println!("Hello omegaUp!");')
+        const intendedLine = rawHTMLElements[1];
+        expect(intendedLine.innerText).to.eq('println!("Hello omegaUp!");');
       });
       cy.get('[data-problem-creator-code-language]')
         .should('have.value', 'rs')
         .find('option:selected')
         .should('contain', 'Rust (1.56.1)');
-    })
+    });
   });
 });
