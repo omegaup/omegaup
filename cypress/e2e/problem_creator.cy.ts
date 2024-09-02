@@ -7,7 +7,7 @@ describe('Problem creator Test', () => {
     cy.visit('/');
   });
 
-  it('Should write and verify the problem statement statement', () => {
+  it('Should write and verify the problem statement', () => {
     const loginOptions: LoginOptions = {
       username: 'user',
       password: 'user',
