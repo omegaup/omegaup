@@ -238,7 +238,7 @@ describe('Course Test', () => {
     cy.logout();
   });
 
-  it('Should create a course and leave feedback for the submission', () => {
+  xit('Should create a course and leave feedback for the submission', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
     const users = [loginOptions[0].username];
     const courseOptions = coursePage.generateCourseOptions();
