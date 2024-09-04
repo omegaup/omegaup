@@ -848,66 +848,57 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testCoderOfTheMonthCalcWithIdentities() {
-        $category = 'all';
-        $gender = 'male';
-        $usersMapping = [
-            ['username' => 'user1', 'numRuns' => 2, 'coderPosition' => 1],
-            ['username' => 'user2', 'numRuns' => 1, 'coderPosition' => 2],
-            ['username' => 'user3', 'numRuns' => 3, 'coderPosition' => 0],
-        ];
-        $users = [];
+    /**
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfTheMonthCalcWithIdentities(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        ['identity' => $user1] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($user1, $gender);
+        ['identity' => $user2] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($user2, $gender);
+        ['identity' => $user3] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($user3, $gender);
+
+        // Add a custom school
+        $login = self::login($user1);
         $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school->school_id,
+        ]));
+
+        // First user solves two problems, second user solves just one, third
+        // solves same problems than first.
         $runCreationDate = self::setFirstDayOfTheLastMonth();
-        foreach ($usersMapping as $i => $user) {
-            [
-                'identity' => $users[$i],
-            ] = \OmegaUp\Test\Factories\User::createUser(
-                new \OmegaUp\Test\Factories\UserParams(
-                    ['username' => $user['username']]
-                )
-            );
-            self::updateIdentity($users[$i], $gender);
 
-            if ($i === 0) {
-                $login = self::login($users[$i]);
-                \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'school_id' => $school->school_id,
-                ]));
-            }
-
-            $this->createRuns($users[$i], $runCreationDate, $user['numRuns']);
-        }
+        $this->createRuns($user1, $runCreationDate, numRuns: 2);
+        $this->createRuns($user2, $runCreationDate, numRuns: 1);
+        $this->createRuns($user3, $runCreationDate, numRuns: 3);
 
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
             new \OmegaUp\Request(['category' => $category])
         );
 
-        // User 3 is the coder of the month
         $this->assertSame(
-            $users[2]->username,
+            $user3->username,
             $response['coderinfo']['username']
         );
 
         // Now check if the other users have been saved on database too
         ['coders' => $coders] = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
             new \OmegaUp\Request([
-                //'auth_token' => $login->auth_token,
+                'auth_token' => $login->auth_token,
                 'date' => date('Y-m-d', \OmegaUp\Time::get()),
                 'category' => $category,
             ])
         );
-
-        // Now check the order of the participants in the coder of the month
-        // for their respective category.
-        foreach ($usersMapping as $i => $user) {
-            $this->assertSame(
-                $users[$i]->username,
-                $coders[$user['coderPosition']]['username']
-            );
-        }
+        // Now check if the third user has not participated in the coder of the
+        // month in that category.
+        $this->assertSame($user3->username, $coders[0]['username']);
+        $this->assertSame($user1->username, $coders[1]['username']);
+        $this->assertSame($user2->username, $coders[2]['username']);
 
         // Identity creator group member will upload csv file
         [
@@ -945,13 +936,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request(['category' => $category])
         );
 
-        // User 3 is still the coder of the month
         $this->assertSame(
-            $users[2]->username,
+            $user3->username,
             $response['coderinfo']['username']
         );
 
-        $login = self::login($users[1]);
+        $login = self::login($user2);
         \OmegaUp\Controllers\User::apiAssociateIdentity(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -967,7 +957,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now user2 is the coder of the month
         $this->assertSame(
-            $users[1]->username,
+            $user2->username,
             $response['coderinfo']['username']
         );
     }
@@ -981,51 +971,81 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testMultipleCodersOfTheMonth(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
         // Create a submissions mapping for different users
-        // Add random number of runs for 3 users in 5 days
+        // Add random number of runs for 5 users in 8 days
         $submissionsMapping = [
             0 => [
-                ['username' => 'user_01', 'numRuns' => 2, 'expectedPosition' => 2],
-                ['username' => 'user_02', 'numRuns' => 3, 'expectedPosition' => 1],
-                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 0],
+                ['username' => 'user_01', 'numRuns' => 2, 'expectedPosition' => 3],
+                ['username' => 'user_02', 'numRuns' => 3, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_04', 'numRuns' => 6, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 4],
             ],
             1 => [
-                ['username' => 'user_01', 'numRuns' => 4, 'expectedPosition' => 0],
-                ['username' => 'user_02', 'numRuns' => 1, 'expectedPosition' => 2],
-                ['username' => 'user_03', 'numRuns' => 1, 'expectedPosition' => 1],
+                ['username' => 'user_01', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 1, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 0, 'expectedPosition' => 4],
             ],
             2 => [
-                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 0],
-                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 1],
-                ['username' => 'user_03', 'numRuns' => 0, 'expectedPosition' => 2],
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 0, 'expectedPosition' => 3],
+                ['username' => 'user_04', 'numRuns' => 3, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 4],
             ],
             3 => [
-                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 2],
-                ['username' => 'user_02', 'numRuns' => 4, 'expectedPosition' => 0],
-                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_02', 'numRuns' => 4, 'expectedPosition' => 1],
+                ['username' => 'user_03', 'numRuns' => 4, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 1, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 5, 'expectedPosition' => 4],
             ],
             4 => [
+                ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 4],
+                ['username' => 'user_02', 'numRuns' => 0, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_04', 'numRuns' => 0, 'expectedPosition' => 1],
+                ['username' => 'user_05', 'numRuns' => 6, 'expectedPosition' => 0],
+            ],
+            5 => [
+                ['username' => 'user_01', 'numRuns' => 3, 'expectedPosition' => 2],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 0, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 1, 'expectedPosition' => 1],
+            ],
+            6 => [
+                ['username' => 'user_01', 'numRuns' => 3, 'expectedPosition' => 1],
+                ['username' => 'user_02', 'numRuns' => 2, 'expectedPosition' => 2],
+                ['username' => 'user_03', 'numRuns' => 1, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 3, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 0, 'expectedPosition' => 3],
+            ],
+            7 => [
                 ['username' => 'user_01', 'numRuns' => 1, 'expectedPosition' => 2],
-                ['username' => 'user_02', 'numRuns' => 0, 'expectedPosition' => 1],
-                ['username' => 'user_03', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_02', 'numRuns' => 1, 'expectedPosition' => 3],
+                ['username' => 'user_03', 'numRuns' => 3, 'expectedPosition' => 4],
+                ['username' => 'user_04', 'numRuns' => 2, 'expectedPosition' => 0],
+                ['username' => 'user_05', 'numRuns' => 4, 'expectedPosition' => 1],
             ],
         ];
 
-        $identities = [];
         foreach ($submissionsMapping[0] as $index => $user) {
             [
-                'identity' => $identities[$index],
+                'identity' => $identity[$index],
             ] = \OmegaUp\Test\Factories\User::createUser(
                 new \OmegaUp\Test\Factories\UserParams(
                     ['username' => $user['username']]
                 )
             );
-            self::updateIdentity($identities[$index], $gender);
+            self::updateIdentity($identity[$index], $gender);
         }
         $runCreationDate = self::setFirstDayOfTheCurrentMonth();
         foreach ($submissionsMapping as $submissions) {
             foreach ($submissions as $index => $submission) {
                 $this->createRuns(
-                    $identities[$index],
+                    $identity[$index],
                     $runCreationDate,
                     $submission['numRuns']
                 );
