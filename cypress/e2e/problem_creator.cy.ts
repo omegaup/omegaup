@@ -30,7 +30,6 @@ describe('Problem creator Test', () => {
   });
 
   it('Should write and verify the problem solution', () => {
-
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
