@@ -1244,6 +1244,7 @@ CREATE TABLE `Users_Badges` (
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
   KEY `user_id` (`user_id`),
+  KEY `user_badge` (`badge_alias`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Badges de Usuario';
 /*!40101 SET character_set_client = @saved_cs_client */;
