@@ -37,7 +37,6 @@
             aria-hidden="true"
           ></span>
         </a>
-        </label>
 
         <select
           v-model="selectedLanguage"
@@ -442,6 +441,137 @@ export default class Ephemeral extends Vue {
         store.dispatch('isDirty', false);
       })
       .catch(Util.asyncError);
+  }
+  handleUpload(e: Event) {
+    const files = (e.target as HTMLInputElement)?.files;
+    if (!files || files.length !== 1) return;
+
+    const reader = new FileReader();
+    reader.addEventListener('loadend', async (e) => {
+      if (e.target?.readyState != FileReader.DONE) return;
+      // due to the way files are strcutured
+      // to work as intended i use async awaiys instead of promisies
+
+      JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
+        await store.dispatch('reset');
+        await store.dispatch('removeCase', 'long');
+
+        // testplan is only used to give weights to cases
+        // we need to get weights before creating the cases
+        const testplanValue = await zip.file('testplan')?.async('string');
+        const casesWeights: { [key: string]: number } = {};
+        if (testplanValue) {
+          for (const line of testplanValue.split('\n')) {
+            if (line.startsWith('#') || line.trim() === '') continue;
+            const tokens = line.split(/\s+/);
+
+            if (tokens.length !== 2) continue;
+            const [caseName, weight] = tokens;
+            casesWeights[caseName] = parseFloat(weight);
+          }
+        }
+
+        for (const fileName in zip.files) {
+          if (!zip.files[fileName]) continue;
+
+          if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+            const caseName = fileName.substring(
+              'cases/'.length,
+              fileName.length - '.in'.length,
+            );
+            const caseInFileName = fileName;
+            const caseOutFileName = `cases/${caseName}.out`;
+
+            // both casename.in and casename.out must exist
+            Promise.all([
+              zip.file(caseInFileName)?.async('string'),
+              zip.file(caseOutFileName)?.async('string'),
+            ])
+              .then(([caseIn, caseOut]) => {
+                store.dispatch('createCase', {
+                  name: caseName,
+                  in: caseIn,
+                  out: caseOut,
+                  weight: casesWeights[caseName] || 1,
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('validator.')) {
+            const extension = fileName.substring('validator.'.length);
+            if (!Util.supportedExtensions.includes(extension)) continue;
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                // the validator need to be set first
+                // before updaing language and source
+                store.dispatch('Validator', 'custom').then(() => {
+                  store.dispatch(
+                    'request.input.validator.custom_validator.language',
+                    extension,
+                  );
+                  store.dispatch(
+                    'request.input.validator.custom_validator.source',
+                    value,
+                  );
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (
+            fileName.startsWith('interactive/') &&
+            fileName.endsWith('.idl')
+          ) {
+            const moduleName = fileName.substring(
+              'interactive/'.length,
+              fileName.length - '.idl'.length,
+            );
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                store.dispatch('Interactive', {
+                  idl: value,
+                  module_name: moduleName,
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('interactive/Main.')) {
+            const extension = fileName.substring('interactive/Main.'.length);
+            if (!Util.supportedExtensions.includes(extension)) continue;
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                store.dispatch('Interactive', {
+                  language: extension,
+                  main_source: value,
+                });
+              })
+              .catch(Util.asyncError);
+          }
+        }
+        zip
+          .file('settings.json')
+          ?.async('string')
+          .then((value) => {
+            const settings: Partial<types.ProblemSettings> = JSON.parse(value);
+            if (settings.Limits) {
+              store.dispatch('limits', settings.Limits);
+            }
+            if (settings.Validator?.Name) {
+              store.dispatch('Validator', settings.Validator.Name);
+            }
+            if (settings.Validator?.Tolerance) {
+              store.dispatch('Tolerance', settings.Validator.Tolerance);
+            }
+          })
+          .catch(Util.asyncError);
+      });
+    });
+    reader.readAsArrayBuffer(files[0]);
   }
   RegisterVueComponent(componentName: string, component: VueComponent) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
