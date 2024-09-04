@@ -3,7 +3,9 @@
     <b-tab>
       <template #title>
         <BIconPencil class="mr-1" />
-        <span name="writing" data-tab> {{ T.problemCreatorStatement }}</span>
+        <span name="writing" data-problem-creator-tab="statement">
+          {{ T.problemCreatorStatement }}</span
+        >
       </template>
       <omegaup-problem-creator-statement-tab
         @show-update-success-message="
@@ -14,7 +16,9 @@
     <b-tab>
       <template #title>
         <BIconFileCode class="mr-1" />
-        <span name="code" data-tab> {{ T.problemCreatorCode }}</span>
+        <span name="code" data-problem-creator-tab="code">
+          {{ T.problemCreatorCode }}</span
+        >
       </template>
       <omegaup-problem-creator-code-tab
         @show-update-success-message="
@@ -25,7 +29,9 @@
     <b-tab>
       <template #title>
         <BIconCheckCircle class="mr-1" />
-        <span name="testcases" data-tab> {{ T.problemCreatorTestCases }}</span>
+        <span name="testcases" data-problem-creator-tab="cases">
+          {{ T.problemCreatorTestCases }}</span
+        >
       </template>
       <omegaup-problem-creator-cases-tab
         @download-input-file="
@@ -36,7 +42,9 @@
     <b-tab>
       <template #title>
         <BIconFileEarmarkCheck class="mr-1" />
-        <span name="solution" data-tab> {{ T.problemCreatorSolution }}</span>
+        <span name="solution" data-problem-creator-tab="solution">
+          {{ T.problemCreatorSolution }}</span
+        >
       </template>
       <omegaup-problem-creator-solution-tab
         @show-update-success-message="
