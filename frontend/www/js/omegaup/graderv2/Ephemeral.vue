@@ -15,15 +15,28 @@
             ></span>
           </a>
         </label>
-
-        <label v-if="isDownloadButton" for="download">
-          <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <span
-              class="fa fa-download"
-              :title="T.wordsDownload"
-              aria-hidden="true"
-            ></span>
-          </a>
+        <input
+          :id="'upload'"
+          type="file"
+          accept=".zip"
+          class="d-none"
+          @change="handleUpload"
+        />
+        <a
+          v-if="isDownloadButton"
+          ref="zip-download-link"
+          class="btn btn-secondary btn-sm mr-sm-2"
+          role="button"
+          @click="handleDownload"
+        >
+          <span
+            ref="zip-download-icon"
+            class="fa"
+            :class="isDirty ? 'fa-file-archive' : 'fa-download'"
+            :title="isDirty ? T.zipPrepare : T.wordsDownload"
+            aria-hidden="true"
+          ></span>
+        </a>
         </label>
 
         <select
@@ -126,6 +139,8 @@ export default class Ephemeral extends Vue {
   @Prop({ default: true }) canRun!: boolean;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
+  @Ref('zip-download-link') readonly zipDownloadLink!: HTMLAnchorElement;
+  @Ref('zip-download-icon') readonly zipDownloadIcon!: HTMLSpanElement;
 
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
@@ -144,6 +159,9 @@ export default class Ephemeral extends Vue {
   }
   get isRunButton() {
     return store.getters['showRunButton'];
+  }
+  get isDirty() {
+    return store.getters['isDirty'];
   }
 
   get selectedLanguage() {
@@ -200,6 +218,13 @@ export default class Ephemeral extends Vue {
     const casesColumn = this.goldenLayout?.root.getItemsById('cases-column')[0];
     if (!casesColumn) return;
     casesColumn.parent.setActiveContentItem(casesColumn);
+  }
+  @Watch('isDirty')
+  onDirtyChange(value: boolean) {
+    if (!value || this.isEmbedded) return;
+
+    this.zipDownloadLink.removeAttribute('href');
+    this.zipDownloadLink.removeAttribute('download');
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -344,7 +369,80 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleDownload(e: Event) {
+    // the state is dirty when we need to re-configure zip file
+    // if not, download the url (continue default behavior)
+    if (!this.isDirty) return true;
 
+    e.preventDefault();
+    const zip = new JSZip();
+    const cases = zip.folder('cases');
+    if (!cases) {
+      console.error('could not create cases folder');
+      return;
+    }
+
+    const inputCases = store.getters['inputCases'];
+    let testplan = '';
+    for (const caseName in inputCases) {
+      if (!inputCases[caseName]) continue;
+      cases.file(`${caseName}.in`, inputCases[caseName].in);
+      cases.file(`${caseName}.out`, inputCases[caseName].out);
+      testplan += `${caseName} ${inputCases[caseName].weight || 1}\n`;
+    }
+    zip.file('testplan', testplan);
+
+    const customValidator = store.getters['customValidator'];
+    const settingsJson: Partial<types.ProblemSettings> = {
+      Cases: store.getters['settingsCases'],
+      Limits: store.getters['limits'],
+      Validator: {
+        Name: store.getters['Validator'],
+        Tolerance: store.getters['Tolerance'] || 0,
+        // Lang only appears if language exists
+        ...(customValidator?.language
+          ? { Lang: customValidator?.language }
+          : {}),
+      },
+    };
+    zip.file('settings.json', JSON.stringify(settingsJson, null, '  '));
+
+    const interactive: undefined | types.InteractiveSettingsDistrib =
+      store.getters['Interactive'];
+    if (interactive) {
+      const interactiveFolder = zip.folder('interactive');
+      if (!interactiveFolder) {
+        console.error('could not create interactive folder');
+        return;
+      }
+
+      interactiveFolder.file(`${interactive.module_name}.idl`, interactive.idl);
+      interactiveFolder.file(
+        `Main.${Util.supportedLanguages[interactive.language].extension}`,
+        interactive.main_source,
+      );
+      interactiveFolder.file('examples/sample.in', inputCases.sample?.in || '');
+    }
+
+    if (customValidator) {
+      zip.file(
+        `validator.${
+          Util.supportedLanguages[customValidator.language].extension
+        }`,
+        customValidator.source,
+      );
+    }
+
+    zip
+      .generateAsync({ type: 'blob' })
+      .then((blob) => {
+        this.zipDownloadLink.download = `${store.getters['moduleName']}.zip`;
+        this.zipDownloadLink.href = window.URL.createObjectURL(blob);
+
+        store.dispatch('isDirty', false);
+      })
+      .catch(Util.asyncError);
+  }
   RegisterVueComponent(componentName: string, component: VueComponent) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
