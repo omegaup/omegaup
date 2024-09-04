@@ -983,7 +983,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             (participating.identity_id IS NOT NULL) AS participating
         FROM
             Contests
-        LEFT JOIN
+        INNER JOIN
             Problemset_Identities participating
         ON
             participating.problemset_id = Contests.problemset_id AND
