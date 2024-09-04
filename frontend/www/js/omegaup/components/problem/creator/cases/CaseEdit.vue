@@ -43,7 +43,17 @@
             :edit-mode="true"
           />
         </b-modal>
-        <b-button variant="light" class="mr-2">
+        <b-button
+          data-delete-case
+          variant="light"
+          class="mr-2"
+          @click="
+            deleteCase({
+              groupID: getSelectedGroup.groupID,
+              caseID: getSelectedCase.caseID,
+            })
+          "
+        >
           <div class="container">
             <div class="row">
               <BIconTrashFill
@@ -55,9 +65,60 @@
             </div>
           </div>
         </b-button>
-        <b-button class="h-100" variant="light">
-          <BIconThreeDotsVertical />
-        </b-button>
+        <b-dropdown
+          ref="dropdown"
+          data-menu-dropdown
+          variant="light"
+          class="h-100"
+          right
+          no-caret
+        >
+          <template #button-content>
+            <BIconThreeDotsVertical />
+          </template>
+          <b-button
+            data-menu-delete-lines
+            variant="light"
+            class="w-100"
+            @click="deleteLines()"
+          >
+            <div class="d-flex">
+              <BIconTrash variant="danger" class="pt-1 mr-3" font-scale="1.2" />
+              {{ T.problemCreatorLinesDelete }}
+            </div>
+          </b-button>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-button
+            data-menu-download-in
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.in')"
+          >
+            <div class="d-flex">
+              <BIconBoxArrowDown
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadIn }}
+            </div>
+          </b-button>
+          <b-button
+            data-menu-download-txt
+            variant="light"
+            class="w-100"
+            @click="downloadInputFile('.txt')"
+          >
+            <div class="d-flex">
+              <BIconTextLeft
+                variant="info"
+                class="pt-1 mr-3"
+                font-scale="1.2"
+              />
+              {{ T.problemCreatorCaseDownloadTxt }}
+            </div>
+          </b-button>
+        </b-dropdown>
       </div>
     </div>
     <hr class="border-top my-2" />
@@ -106,12 +167,14 @@
                   </b-col>
                   <b-col cols="3" class="pl-2 pr-0 text-center">
                     <b-dropdown
+                      data-array-modal-dropdown
                       :text="getLineNameFromKind(line.data.kind)"
                       variant="light"
                     >
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
+                        :data-array-modal-dropdown="lineKindOption.type"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
@@ -341,6 +404,37 @@
               </b-container>
             </td>
           </tr>
+          <tr>
+            <td>
+              <b-container fluid class="bg-light">
+                <b-row class="d-flex justify-content-between" align-v="center">
+                  <b-col class="pr-1 text-center">
+                    <b-form-textarea
+                      v-model="getSelectedCase.output"
+                      data-output-textarea
+                      class="mt-3 mb-3 text-nowrap overflow-auto w-100"
+                      rows="2"
+                      max-rows="3"
+                      :placeholder="T.problemCreatorOutputPlaceHolder"
+                    >
+                    </b-form-textarea>
+                  </b-col>
+                  <b-col cols="1.5">
+                    <b-button
+                      data-erase-output
+                      class="btn text-danger btn-lg"
+                      type="button"
+                      :title="T.problemCreatorEraseOutput"
+                      variant="light"
+                      @click="getSelectedCase.output = ''"
+                    >
+                      <font-awesome-icon icon="eraser" />
+                    </b-button>
+                  </b-col>
+                </b-row>
+              </b-container>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -372,6 +466,7 @@ import {
   CaseLineKind,
   CaseLine,
   LineID,
+  CaseGroupID,
   MatrixDistinctType,
   CaseRequest,
   GroupID,
@@ -383,7 +478,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import { FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
+import { BNavItemDropdown, FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
@@ -426,13 +521,26 @@ export default class CaseEdit extends Vue {
     LineID,
     string,
   ]) => void;
+  @casesStore.Mutation('deleteCase') deleteCase!: ({
+    groupID,
+    caseID,
+  }: CaseGroupID) => void;
   @casesStore.Mutation('updateCase') updateCase!: ([
     oldGroupID,
     updateCaseRequest,
   ]: [GroupID, CaseRequest]) => void;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
+  @casesStore.Action('deleteLinesForSelectedCase')
+  deleteLinesForSelectedCase!: () => void;
+
+  deleteLines() {
+    this.deleteLinesForSelectedCase();
+    (this.$refs.dropdown as BNavItemDropdown).hide(true);
+  }
 
   LineDisplayOption = Object.freeze({
     LINE: 'line',
@@ -688,6 +796,18 @@ export default class CaseEdit extends Vue {
     };
     const oldGroupID: GroupID = this.getSelectedGroup.groupID;
     this.updateCase([oldGroupID, updateCaseRequest]);
+  }
+
+  downloadInputFile(ext: '.txt' | '.in') {
+    const caseGroupID: CaseGroupID = {
+      groupID: this.getSelectedGroup.groupID,
+      caseID: this.getSelectedCase.caseID,
+    };
+    const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+    this.$emit('download-input-file', {
+      fileName: `${this.getSelectedCase.name}${ext}`,
+      fileContent: input,
+    });
   }
 }
 </script>

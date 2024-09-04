@@ -240,7 +240,7 @@ document.getElementById('upload').addEventListener('change', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
       .then((zip) => {
-        store.commit('reset');
+        store.dispatch('reset');
         store.commit('removeCase', 'long');
         let cases = {};
         for (let fileName in zip.files) {
@@ -293,7 +293,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .async('string')
               .then((value) => {
                 store.commit('Validator', 'custom');
-                store.commit('ValidatorLanguage', extension);
+                store.commit(
+                  'request.input.validator.custom_validator.language',
+                  extension,
+                );
                 store.commit(
                   'request.input.validator.custom_validator.source',
                   value,
@@ -576,53 +579,6 @@ runButton.addEventListener('click', () => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings, languages, showSubmitButton }) {
-  // if there is not an alias for some reason
-  // should also return early
-  if (!settings || !alias) {
-    return;
-  }
-  store.commit('updatingSettings', true);
-
-  store.commit('Interactive', settings.interactive);
-  store.commit('alias', alias);
-  store.commit('languages', languages);
-  store.commit('showSubmitButton', showSubmitButton);
-  store.commit('limits', settings.limits);
-  store.commit('Validator', settings.validator.name);
-  store.commit('Tolerance', settings.validator.tolerance);
-
-  // create cases for current problem
-  for (let caseName in settings.cases) {
-    if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
-      continue;
-    let caseData = settings.cases[caseName];
-    store.commit('createCase', {
-      name: caseName,
-      weight: caseData.weight,
-      in: caseData['in'],
-      out: caseData['out'],
-    });
-  }
-
-  // delete cases that are not in settings cases
-  for (let caseName of Object.keys(store.state.request.input.cases)) {
-    if (Object.prototype.hasOwnProperty.call(settings.cases, caseName))
-      continue;
-    store.commit('removeCase', caseName);
-  }
-  // Given that the current case will change several times, schedule the
-  // flag to avoid swapping into the cases view for the next tick.
-  //
-  // Also change to the main column in case it was not previously selected.
-  setTimeout(() => {
-    store.commit('updatingSettings', false);
-    if (!isInitialised) return;
-    let mainColumn = layout.root.getItemsById('main-column')[0];
-    mainColumn.parent.setActiveContentItem(mainColumn);
-  });
-}
-
 // Add a message listener in case we are embedded or the embedded runner was
 // popped into a full-blown tab.
 window.addEventListener(
@@ -632,11 +588,23 @@ window.addEventListener(
 
     switch (e.data.method) {
       case 'setSettings':
-        setSettings({
-          alias: e.data.params.alias,
-          settings: e.data.params.settings,
-          showSubmitButton: e.data.params.showSubmitButton,
+        store.dispatch('initProblem', {
+          problem: e.data.params.problem,
+          initialLanguage: e.data.params.initialLanguage,
+          initialSource: e.data.params.initialSource,
           languages: e.data.params.languages,
+          showRunButton: e.data.params.showRunButton,
+          showSubmitButton: e.data.params.showSubmitButton,
+        });
+        // Given that the current case will change several times, schedule the
+        // flag to avoid swapping into the cases view for the next tick.
+        //
+        // Also change to the main column in case it was not previously selected.
+        setTimeout(() => {
+          store.commit('updatingSettings', false);
+          if (!isInitialised) return;
+          let mainColumn = layout.root.getItemsById('main-column')[0];
+          mainColumn.parent.setActiveContentItem(mainColumn);
         });
         break;
     }
@@ -646,7 +614,7 @@ window.addEventListener(
 
 function onHashChanged() {
   if (window.location.hash.length == 0) {
-    store.commit('reset');
+    store.dispatch('reset');
     store.commit('logs', '');
     onDetailsJsonReady({});
     onFilesZipReady(null);
@@ -660,7 +628,7 @@ function onHashChanged() {
     })
     .then((request) => {
       if (!request) {
-        store.commit('reset');
+        store.dispatch('reset');
         store.commit('logs', '');
         onDetailsJsonReady({});
         onFilesZipReady(null);

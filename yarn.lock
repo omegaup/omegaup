@@ -15016,6 +15016,11 @@ vue-inbrowser-compiler-independent-utils@^4.69.0:
   resolved "https://registry.yarnpkg.com/vue-inbrowser-compiler-independent-utils/-/vue-inbrowser-compiler-independent-utils-4.71.1.tgz#dc6830b204f7cfdc30ffc4f31ba81b0c72c52136"
   integrity sha512-K3wt3iVmNGaFEOUR4JIThQRWfqokxLfnPslD41FDZB2ajXp789+wCqJyGYlIFsvEQ2P61PInw6/ph5iiqg51gg==
 
+vue-infinite-scroll@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vue-infinite-scroll/-/vue-infinite-scroll-2.0.2.tgz#ca37a91fe92ee0ad3b74acf8682c00917144b711"
+  integrity sha512-n+YghR059YmciANGJh9SsNWRi1YZEBVlODtmnb/12zI+4R72QZSWd+EuZ5mW6auEo/yaJXgxzwsuhvALVnm73A==
+
 vue-jest@^3.0.7:
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/vue-jest/-/vue-jest-3.0.7.tgz#a6d29758a5cb4d750f5d1242212be39be4296a33"
@@ -15079,11 +15084,6 @@ vue-slider-component@^3.0.25:
   integrity sha512-wT4gC7cWUXDp96Gft1j5Jkapb4rwjnPErZIfJTeJWz85zqXQOVyD7s5LGa9OY8W/qi9VpgjANe3OAaL8HUzERg==
   dependencies:
     vue-property-decorator "^8.0.0"
-
-vue-spinner@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/vue-spinner/-/vue-spinner-1.0.4.tgz#0e794d9d93acb23b5b6564042157a531e7ce413b"
-  integrity sha512-GNG2F+8BLX201JT/jUX+84Gsi3ZteVQwt9K7mues3ts9FcQ95dGn7uu6a5ndSxdYYUEzfh1KngZiOE0u+l4itA==
 
 vue-style-loader@^4.1.0:
   version "4.1.2"
