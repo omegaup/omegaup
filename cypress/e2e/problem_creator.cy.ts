@@ -48,10 +48,6 @@ describe('Problem creator Test', () => {
   });
 
   it('Should upload code and verify the problem code', () => {
-    const loginOptions: LoginOptions = {
-      username: 'user',
-      password: 'user',
-    };
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
