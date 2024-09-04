@@ -10,7 +10,7 @@
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
             <span
               class="fa fa-upload"
-              title="{{T.wordsUpload}}"
+              :title="T.wordsUpload"
               aria-hidden="true"
             ></span>
           </a>
@@ -20,7 +20,7 @@
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
             <span
               class="fa fa-download"
-              title="{{T.wordsDownload}}"
+              :title="T.wordsDownload"
               aria-hidden="true"
             ></span>
           </a>
@@ -70,7 +70,7 @@
         </button>
       </form>
     </div>
-    <div ref="layout-root" class="col px-0" style="min-height: 60em"></div>
+    <section ref="layout-root" class="col px-0"></section>
   </div>
 </template>
 
@@ -79,10 +79,27 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import Vue, { CreateElement } from 'vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
+import JSZip from 'jszip';
+import pako from 'pako';
 
 import { types } from '../api_types';
-import store from './GraderStore';
+import CaseSelector from './CaseSelector.vue';
+import DiffEditor from './DiffEditor.vue';
+import IDESettings from './IDESettings.vue';
+import MonacoEditor from './MonacoEditor.vue';
+import TextEditor from './TextEditor.vue';
+import ZipViewer from './ZipViewer.vue';
+import store, { GraderResults } from './GraderStore';
 import * as Util from './util';
+import { UNEMBEDDED_CONFIG, EMBEDDED_CONFIG } from './GoldenLayoutConfigs';
+import {
+  TEXT_EDITOR_COMPONENT_NAME,
+  MONACO_DIFF_COMPONENT_NAME,
+  MONACO_EDITOR_COMPONENT_NAME,
+  CASE_SELECTOR_COMPONENT_NAME,
+  ZIP_VIEWER_COMPONENT_NAME,
+  SETTINGS_COMPONENT_NAME,
+} from './GoldenLayoutConfigs';
 import T from '../lang';
 
 interface GraderComponent extends Vue {
@@ -108,7 +125,7 @@ export default class Ephemeral extends Vue {
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: true }) canRun!: boolean;
 
-  @Ref('layout-root') readonly layoutRoot!: HTMLDivElement;
+  @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
@@ -126,48 +143,206 @@ export default class Ephemeral extends Vue {
     return store.getters['showSubmitButton'];
   }
   get isRunButton() {
-    // TODO: use showRunButton getter from store
-    return true;
+    return store.getters['showRunButton'];
   }
 
   get selectedLanguage() {
     return store.getters['request.language'];
   }
   set selectedLanguage(language: string) {
-    // TODO: dispatch request.langauge action
+    store.dispatch('request.language', language);
+  }
+  getLanguageName(language: string): string {
+    return Util.supportedLanguages[language].name;
   }
   get languages(): string[] {
     return store.getters['languages'];
   }
-
-  getLanguageName(language: string): string {
-    return Util.supportedLanguages[language].name;
+  get currentCase(): string {
+    return store.getters['currentCase'];
   }
+
   initProblem() {
-    // TODO: trigger INIT_PROBLEM mutation
+    // use commits for synchronous behavior
+    // or else bugs occur where layout toggles cases column
+    // when it shouldnt
+    store.commit('updatingSettings', true);
+    store
+      .dispatch('initProblem', {
+        initialLanguage: this.initialLanguage,
+        languages: this.acceptedLanguages,
+        problem: this.problem,
+        showRunButton: this.canRun,
+        showSubmitButton: this.canSubmit,
+      })
+      .then(() => {
+        store.commit('updatingSettings', false);
+        this.$nextTick(() => {
+          if (!this.goldenLayout?.isInitialised) return;
+          let mainColumn = this.goldenLayout.root.getItemsById(
+            'main-column',
+          )[0];
+          mainColumn.parent.setActiveContentItem(mainColumn);
+        });
+      })
+      .catch(Util.asyncError);
   }
-  @Watch('problem', { deep: true })
+  @Watch('problem')
+  @Watch('initialLanguage')
   onProblemChange() {
-    this.initProblem();
+    if (this.isEmbedded) {
+      this.initProblem();
+    }
   }
-  beforeMount() {
-    this.initProblem();
-  }
-  mounted() {
-    // TODO: init golden layout
+  @Watch('currentCase', { immediate: true })
+  onCurrentCaseChange() {
+    if (!this.isEmbedded || store.getters['isUpdatingSettings']) return;
+    const casesColumn = this.goldenLayout?.root.getItemsById('cases-column')[0];
+    if (!casesColumn) return;
+    casesColumn.parent.setActiveContentItem(casesColumn);
   }
 
-  onDetailsJsonReady() {
-    // TODO: implement this over from ephemeral.ts
+  onDetailsJsonReady(results: GraderResults) {
+    store.dispatch('results', results);
+    store.dispatch('compilerOutput', results.compile_error || '');
   }
-  onFilesZipReady() {
-    // TODO: implement this over from ephemeral.ts
+  onFilesZipReady(blob: Blob | null) {
+    if (blob == null || blob.size == 0) {
+      if (this.componentMapping.zipviewer) {
+        (this.componentMapping.zipviewer as ZipViewer).zip = null;
+      }
+      store.dispatch('clearOutputs');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.addEventListener('loadend', (e) => {
+      if (e.target?.readyState != FileReader.DONE) return;
+      if (!reader.result) return;
+
+      JSZip.loadAsync(reader.result)
+        .then((zip) => {
+          if (this.componentMapping.zipviewer) {
+            (this.componentMapping.zipviewer as ZipViewer).zip = zip;
+          }
+          store.dispatch('clearOutputs');
+
+          Promise.all([
+            zip.file('Main/compile.err')?.async('string'),
+            zip.file('Main/compile.out')?.async('string'),
+          ])
+            .then((values) => {
+              for (const value of values) {
+                if (!value) continue;
+                store.dispatch('compilerOutput', value);
+                return;
+              }
+              store.dispatch('compilerOutput', '');
+            })
+            .catch(Util.asyncError);
+
+          for (const filename in zip.files) {
+            if (filename.indexOf('/') !== -1) continue;
+            zip
+              .file(filename)
+              ?.async('string')
+              .then((contents) => {
+                store.dispatch('output', {
+                  name: filename,
+                  contents: contents,
+                });
+              })
+              .catch(Util.asyncError);
+          }
+        })
+        .catch(Util.asyncError);
+    });
+    reader.readAsArrayBuffer(blob);
   }
+
   handleSubmit() {
-    // TODO: implement this over from ephemeral.ts
+    postMessage({
+      method: 'submitRun',
+      params: {
+        problem_alias: store.getters['alias'],
+        language: store.getters['request.language'],
+        source: store.getters['request.source'],
+      },
+    });
   }
   handleRun() {
-    // TODO: implement this over from ephemeral.ts
+    if (this.isRunLoading) return;
+
+    this.isRunLoading = true;
+    fetch(`/grader/ephemeral/run/new/`, {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(store.getters['request']),
+    })
+      .then((response) => {
+        if (!response.ok) return null;
+        return response.formData();
+      })
+      .then((formData) => {
+        if (!formData) {
+          this.onDetailsJsonReady({
+            contest_score: 0,
+            judged_by: 'runner',
+            max_score: 0,
+            score: 0,
+            verdict: 'JE',
+          });
+          store.dispatch('logs', '');
+          this.onFilesZipReady(null);
+          return;
+        }
+
+        if (formData.has('details.json')) {
+          const reader = new FileReader();
+          reader.addEventListener('loadend', () => {
+            if (!reader.result) {
+              this.onDetailsJsonReady({
+                contest_score: 0,
+                judged_by: 'runner',
+                max_score: 0,
+                score: 0,
+                verdict: 'JE',
+              });
+            } else this.onDetailsJsonReady(JSON.parse(reader.result as string));
+          });
+          reader.readAsText(formData.get('details.json') as File);
+        }
+
+        if (formData.has('logs.txt.gz')) {
+          const reader = new FileReader();
+          reader.addEventListener('loadend', function () {
+            if (
+              reader.result instanceof ArrayBuffer &&
+              reader.result.byteLength == 0
+            ) {
+              store.dispatch('logs', '');
+              return;
+            }
+            store.dispatch(
+              'logs',
+              new TextDecoder('utf-8').decode(
+                pako.inflate(reader.result as ArrayBuffer),
+              ),
+            );
+          });
+          reader.readAsArrayBuffer(formData.get('logs.txt.gz') as File);
+        } else {
+          store.dispatch('logs', '');
+        }
+
+        this.onFilesZipReady(formData.get('files.zip') as File);
+      })
+      .catch(Util.asyncError)
+      .finally(() => {
+        this.isRunLoading = false;
+      });
   }
 
   RegisterVueComponent(componentName: string, component: VueComponent) {
@@ -220,10 +395,49 @@ export default class Ephemeral extends Vue {
       },
     );
   }
+
+  beforeMount() {
+    if (this.isEmbedded) {
+      this.initProblem();
+    } else {
+      store.dispatch('reset');
+    }
+  }
+  onResized() {
+    if (!this.layoutRoot.clientWidth) return;
+    if (!this.goldenLayout?.isInitialised) {
+      this.goldenLayout?.init();
+    }
+    this.goldenLayout?.updateSize();
+  }
+  mounted() {
+    this.goldenLayout = new GoldenLayout(
+      this.isEmbedded ? EMBEDDED_CONFIG : UNEMBEDDED_CONFIG,
+      this.layoutRoot,
+    );
+
+    this.RegisterVueComponent(CASE_SELECTOR_COMPONENT_NAME, CaseSelector);
+    this.RegisterVueComponent(MONACO_EDITOR_COMPONENT_NAME, MonacoEditor);
+    this.RegisterVueComponent(MONACO_DIFF_COMPONENT_NAME, DiffEditor);
+    this.RegisterVueComponent(SETTINGS_COMPONENT_NAME, IDESettings);
+    this.RegisterVueComponent(TEXT_EDITOR_COMPONENT_NAME, TextEditor);
+    this.RegisterVueComponent(ZIP_VIEWER_COMPONENT_NAME, ZipViewer);
+
+    this.goldenLayout.init();
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(this.onResized).observe(this.layoutRoot);
+    } else {
+      window.addEventListener('resize', this.onResized);
+    }
+  }
 }
 </script>
 
 <style scoped>
+div > section {
+  min-height: 70em;
+}
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 @import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
 </style>

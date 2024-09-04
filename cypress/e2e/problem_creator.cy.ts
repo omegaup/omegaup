@@ -1,6 +1,12 @@
 import { LoginOptions } from '../support/types';
 
 describe('Problem creator Test', () => {
+
+  const loginOptions: LoginOptions = {
+    username: 'user',
+    password: 'user',
+  };
+
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
@@ -8,10 +14,6 @@ describe('Problem creator Test', () => {
   });
 
   it('Should write and verify the problem statement', () => {
-    const loginOptions: LoginOptions = {
-      username: 'user',
-      password: 'user',
-    };
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
@@ -28,10 +30,7 @@ describe('Problem creator Test', () => {
   });
 
   it('Should write and verify the problem solution', () => {
-    const loginOptions: LoginOptions = {
-      username: 'user',
-      password: 'user',
-    };
+
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
