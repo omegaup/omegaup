@@ -869,7 +869,7 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       // when there are no problem statement I/O
       // settings.cases become an empty object
-      if (Object.keys(settings.cases).length === 0) {
+      if (!Object.keys(settings.cases).length) {
         commit('createCase', {
           name: 'sample',
           in: '1 2\n',
