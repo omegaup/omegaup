@@ -30,6 +30,10 @@ export interface GraderResults {
   time?: number;
   verdict: string;
   wall_time?: number;
+
+  // compile_error attribute has been added here for now
+  // it might not be the correct place for it and removed later
+  compile_error?: string;
 }
 
 export interface GraderSessionStorageSources {
@@ -75,10 +79,6 @@ export interface CaseSelectorGroup {
     item: { in: string; out: string; weight?: number };
   }[];
 }
-
-const languageSelectElement = document.getElementById(
-  'language',
-) as HTMLSelectElement;
 
 const persistToSessionStorage = Util.throttle(
   ({
@@ -294,9 +294,6 @@ const storeOptions: StoreOptions<GraderStore> = {
     logs(state: GraderStore) {
       return state.logs;
     },
-    showRunButton(state: GraderStore) {
-      return state.showRunButton;
-    },
     Validator(state: GraderStore) {
       return state.request.input.validator.name;
     },
@@ -348,6 +345,12 @@ const storeOptions: StoreOptions<GraderStore> = {
       );
       return result;
     },
+    showRunButton(state: GraderStore) {
+      return state.showRunButton;
+    },
+    request(state: GraderStore) {
+      return state.request;
+    },
   },
   mutations: {
     alias(
@@ -379,8 +382,8 @@ const storeOptions: StoreOptions<GraderStore> = {
         state.sessionStorageSources = {
           language: initialLanguage,
           sources: state.request.input.interactive
-            ? interactiveTemplates
-            : sourceTemplates,
+            ? { ...interactiveTemplates }
+            : { ...sourceTemplates },
         };
       }
       // do not persist storage sources
@@ -390,33 +393,12 @@ const storeOptions: StoreOptions<GraderStore> = {
         state.sessionStorageSources.sources[
           languageExtensionMapping[state.request.language]
         ];
-      languageSelectElement.value = state.sessionStorageSources.language;
     },
     showSubmitButton(state: GraderStore, value: boolean) {
-      state.problemsetId = value;
-      const submitButton = document.querySelector(
-        'button[data-submit-button]',
-      ) as HTMLButtonElement;
-      if (value) {
-        submitButton.classList.remove('d-none');
-      } else {
-        submitButton.classList.add('d-none');
-      }
+      state.showSubmitButton = value;
     },
-    languages(state: GraderStore, value: string[]) {
-      // hide languages that are not accepted
-      state.languages = value;
-      document
-        .querySelectorAll<HTMLOptionElement>(
-          'select[data-language-select] option',
-        )
-        .forEach((option) => {
-          if (!state.languages.includes(option.value)) {
-            option.classList.add('d-none');
-          } else {
-            option.classList.remove('d-none');
-          }
-        });
+    languages(state: GraderStore, languages: string[]) {
+      state.languages = languages;
     },
     currentCase(state: GraderStore, value: string) {
       state.currentCase = value;
@@ -432,7 +414,6 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     'request.language'(state: GraderStore, language: string) {
       state.request.language = language;
-      languageSelectElement.value = language;
       const extension = languageExtensionMapping[language];
 
       if (!extension) {
@@ -788,6 +769,21 @@ const storeOptions: StoreOptions<GraderStore> = {
     removeCase({ commit }: { commit: Commit }, name: string) {
       commit('removeCase', name);
     },
+    'request.language'({ commit }: { commit: Commit }, value: string) {
+      commit('request.language', value);
+    },
+    results({ commit }: { commit: Commit }, value: GraderResults) {
+      commit('results', value);
+    },
+    output(
+      { commit }: { commit: Commit },
+      payload: { name: CaseKey; contents: string },
+    ) {
+      commit('output', payload);
+    },
+    clearOutputs({ commit }: { commit: Commit }) {
+      commit('clearOutputs');
+    },
     reset({ commit }: { commit: Commit }) {
       commit(
         'languages',
@@ -851,7 +847,6 @@ const storeOptions: StoreOptions<GraderStore> = {
       if (!alias || !settings) {
         return;
       }
-      commit('updatingSettings', true);
 
       commit('languages', languages);
       commit('Interactive', settings.interactive);
@@ -904,5 +899,4 @@ const storeOptions: StoreOptions<GraderStore> = {
   strict: true,
 };
 const store = new Vuex.Store<GraderStore>(storeOptions);
-store.dispatch('reset');
 export default store;

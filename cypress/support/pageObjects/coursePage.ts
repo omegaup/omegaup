@@ -224,7 +224,7 @@ export class CoursePage {
     cy.get('[data-clarification-answer-text]').should('contain', answer);
   }
 
-  leaveFeedbackOnSolution(feedbacks: { line: number, text: string }[]): void {
+  leaveFeedbackOnSolution(feedbacks: { line: number; text: string }[]): void {
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
@@ -235,7 +235,9 @@ export class CoursePage {
         cy.wrap(editor).should('be.visible');
 
         feedbacks.forEach(({ line, text }) => {
-          const gutterLines = editor.find('.CodeMirror-gutter-wrapper .CodeMirror-linenumber');
+          const gutterLines = editor.find(
+            '.CodeMirror-gutter-wrapper .CodeMirror-linenumber',
+          );
 
           // Ensure we have enough gutters
           expect(gutterLines.length).to.be.greaterThan(line);
@@ -272,7 +274,7 @@ export class CoursePage {
           .should('be.visible')
           .first()
           .click({ force: true });
-    });
+      });
   }
 
   verifyFeedback({
@@ -291,7 +293,7 @@ export class CoursePage {
       'contain',
       feedback,
     );
-    cy.get('.CodeMirror-lines', { timeout: 20000 }).should('be.visible');
+    cy.get('.CodeMirror-line', { timeout: 20000 }).should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
       const userCode: Array<string> = [];
       Cypress.$.makeArray(rawHTMLElements).forEach((element) => {

@@ -25,7 +25,7 @@ describe('Tabs.vue', () => {
     // BootstrapVue takes a tick to render the content inside the tabs
     await Vue.nextTick();
 
-    const buttons = wrapper.findAll('[data-tab]');
+    const buttons = wrapper.findAll('[data-problem-creator-tab]');
     expect(expectedText.length).toEqual(buttons.length);
     for (let i = 0; i < buttons.length; i++) {
       expect(buttons.at(i).text()).toEqual(expectedText[i]);
