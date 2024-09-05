@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="navbar navbar-light bg-light py-0 border-bottom">
+    <div class="navbar py-0" :class="theme">
       <span class="navbar-brand">
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
@@ -127,6 +127,10 @@ export default class Ephemeral extends Vue {
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
+  readonly themeToRef: { [key: string]: string } = {
+    vs: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    'vs-dark': `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+  };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
   T = T;
@@ -402,6 +406,10 @@ export default class Ephemeral extends Vue {
     } else {
       store.dispatch('reset');
     }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[this.theme];
+    document.head.appendChild(link);
   }
   onResized() {
     if (!this.layoutRoot.clientWidth) return;
@@ -434,9 +442,21 @@ export default class Ephemeral extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
 div > section {
   min-height: 70em;
+}
+div {
+  &.vs-dark {
+    background: var(--textarea-vs-dark-background-color);
+    color: var(--textarea-vs-dark-font-color);
+    border-bottom: 1px solid var(--textarea-vs-dark-background-color);
+  }
+  &.vs {
+    background: var(--textarea-vs-background-color);
+    border-bottom: 1px solid var(--textarea-vs-background-color);
+  }
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 @import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');

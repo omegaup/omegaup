@@ -113,6 +113,7 @@ module.exports = {
     user_verification_parental_token:
       './frontend/www/js/omegaup/user/verification_parental_token.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
+    ide: './frontend/www/js/omegaup/graderv2/ide.ts',
   },
 
   output: {
