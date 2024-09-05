@@ -245,6 +245,7 @@ export default class IDESettings extends Vue {
   }
 }
 </script>
+
 <style lang="scss">
 @import '../../../sass/main.scss';
 form {

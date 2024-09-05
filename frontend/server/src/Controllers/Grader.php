@@ -25,7 +25,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * 
+     *
      * @return array{templateProperties: array{title: \OmegaUp\TranslationString}, fullWidth?: bool, hideFooterAndHeader?: bool, entrypoint: string}
      */
     public static function getGraderForTypeScript(
@@ -34,7 +34,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaUp problemless grader'
+                    'problemlessGrader'
                 ),
                 'fullWidth' => true,
                 'hideFooterAndHeader' => true,

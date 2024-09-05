@@ -1384,6 +1384,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "Nombre de la cuenta",
   problemVersionVersion: "Versi\u00f3n del problema",
   problemcollectionViewProblems: "Ver problemas",
+  problemlessGrader: "omegaUp calificador sin problemas",
   problemsOrderUpdated: "Se actualiz\u00f3 el orden de los problemas",
   problemsetIdentityNotFound: "La cuenta o identidad no est\u00e1 asociada con el curso, concurso o tarea.",
   problemsetNotFound: "Conjunto de problemas no encontrado.",

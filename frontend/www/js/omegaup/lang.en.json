@@ -1383,6 +1383,7 @@
 	"problemVersionUsername": "Account name",
 	"problemVersionVersion": "Problem version",
 	"problemcollectionViewProblems": "View problems",
+	"problemlessGrader": "omegaUp problemless grader",
 	"problemsOrderUpdated": "Problems' order has been updated",
 	"problemsetIdentityNotFound": "Account or identity is not associated with this course, contest or task.",
 	"problemsetNotFound": "Problemset does not exist.",
