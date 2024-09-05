@@ -2596,6 +2596,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param 'fatal_error'|'generated'|'queued'|'retryable_error'|'uninitiated'|null $certificates_status
      * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param null|string $description
@@ -2699,6 +2700,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param 'fatal_error'|'generated'|'queued'|'retryable_error'|'uninitiated'|null $certificates_status
      * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param null|string $description
@@ -2863,6 +2865,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'check_plagiarism' => $r->ensureOptionalBool(
                 'check_plagiarism'
             ) ?? false,
+            'certificates_status' => $r->ensureOptionalEnum(
+                'certificates_status',
+                \OmegaUp\ContestParams::VALID_CERTIFICATES_STATUSES
+            ) ?? \OmegaUp\ContestParams::CONTEST_CERTIFICATE_STATUS_UNINITIATED,
         ];
         if (isset($r['window_length'])) {
             $params['window_length'] = $r->ensureOptionalInt(
@@ -4728,6 +4734,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param 'fatal_error'|'generated'|'queued'|'retryable_error'|'uninitiated'|null $certificates_status
      * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param bool|null $contest_for_teams
