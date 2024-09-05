@@ -1837,19 +1837,19 @@ API to Create an assignment
 
 ### Parameters
 
-| Name                 | Type           | Description |
-| -------------------- | -------------- | ----------- |
-| `course_alias`       | `string`       |             |
-| `alias`              | `mixed`        |             |
-| `assignment_type`    | `mixed`        |             |
-| `description`        | `mixed`        |             |
-| `finish_time`        | `mixed`        |             |
-| `name`               | `mixed`        |             |
-| `order`              | `int\|null`    |             |
-| `problems`           | `null\|string` |             |
-| `publish_time_delay` | `mixed`        |             |
-| `start_time`         | `mixed`        |             |
-| `unlimited_duration` | `bool\|null`   |             |
+| Name                 | Type                           | Description |
+| -------------------- | ------------------------------ | ----------- |
+| `alias`              | `string`                       |             |
+| `assignment_type`    | `'homework'\|'lesson'\|'test'` |             |
+| `course_alias`       | `string`                       |             |
+| `description`        | `string`                       |             |
+| `name`               | `string`                       |             |
+| `start_time`         | `\OmegaUp\Timestamp`           |             |
+| `finish_time`        | `\OmegaUp\Timestamp\|null`     |             |
+| `order`              | `int\|null`                    |             |
+| `problems`           | `null\|string`                 |             |
+| `publish_time_delay` | `int\|null`                    |             |
+| `unlimited_duration` | `bool\|null`                   |             |
 
 ### Returns
 
