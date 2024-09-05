@@ -25,9 +25,8 @@ class Grader extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     *
-     * @return array{templateProperties: array{title: \OmegaUp\TranslationString}, fullWidth?: bool, hideFooterAndHeader?: bool, entrypoint: string}
-     */
+     * @psalm-return array{templateProperties: array{title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>}, entrypoint: string, inContest?: bool, navbarSection?: string}
+    */
     public static function getGraderForTypeScript(
         \OmegaUp\Request $r
     ): array {
@@ -38,8 +37,9 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 ),
                 'fullWidth' => true,
                 'hideFooterAndHeader' => true,
+                'payload' => [],
             ],
-            'entrypoint' => 'ide'
+            'entrypoint' => 'ide',
         ];
     }
 }
