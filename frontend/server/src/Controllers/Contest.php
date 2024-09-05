@@ -2,8 +2,6 @@
 
 namespace OmegaUp\Controllers;
 
-use OmegaUp\Test\Factories\ContestParams;
-
 /**
  * ContestController
  *
