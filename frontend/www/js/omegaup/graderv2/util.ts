@@ -12,36 +12,46 @@ export function vuexGet(store: any, name: string) {
 export function vuexSet(store: any, name: string, value: any) {
   store.commit(name, value);
 }
+export const units: { [key: string]: number } = {
+  ns: 1e-9,
+  us: 1e-6,
+  µs: 1e-6,
+  ms: 1e-3,
+  s: 1,
+  m: 60,
+  '': 1,
+};
+
+export const splitMeasurement = (
+  measurement: string,
+): {
+  numericalValue: number;
+  unit: string;
+} => {
+  for (const unit in units) {
+    if (measurement.endsWith(unit)) {
+      const numberPart = measurement.slice(0, -unit.length);
+      if (!isNaN(parseFloat(numberPart))) {
+        return { numericalValue: parseFloat(numberPart), unit };
+      } else {
+        throw new Error('Invalid input format');
+      }
+    }
+  }
+
+  if (isNaN(parseFloat(measurement))) {
+    throw new Error('Invalid input format');
+  }
+  return { numericalValue: parseFloat(measurement), unit: '' };
+};
 
 export function parseDuration(value: number | string) {
   if (typeof value === 'number') {
     return value;
   }
 
-  let result = 0.0;
-  if (value) {
-    const match = value.match(/\d+(ns|us|µs|m|s)?/g);
-    if (!match) {
-      return result;
-    }
-    for (const chunk of match) {
-      let scale = 1.0;
-      if (chunk.indexOf('ns') === chunk.length - 2) {
-        scale = 1e-9;
-      } else if (
-        chunk.indexOf('us') === chunk.length - 2 ||
-        chunk.indexOf('µs') === chunk.length - 2
-      ) {
-        scale = 1e-6;
-      } else if (chunk.indexOf('ms') === chunk.length - 2) {
-        scale = 1e-3;
-      } else if (chunk.indexOf('m') === chunk.length - 1) {
-        scale = 60;
-      }
-      result += scale * parseFloat(chunk);
-    }
-  }
-  return result;
+  const { numericalValue, unit } = splitMeasurement(value);
+  return numericalValue * units[unit];
 }
 
 export interface LanguageInfo {
@@ -149,13 +159,13 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     language: 'py',
   },
   py2: {
-    extension: 'py',
+    extension: 'py2',
     name: 'Python (2.7)',
     modelMapping: 'python',
     language: 'py2',
   },
   py3: {
-    extension: 'py',
+    extension: 'py3',
     name: 'Python (3.9)',
     modelMapping: 'python',
     language: 'py3',

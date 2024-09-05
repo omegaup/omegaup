@@ -427,7 +427,7 @@ describe('cases.ts', () => {
         max: 10,
         min: 1,
         size: 2,
-        value: '1, 2',
+        value: '1 2',
       },
     };
     store.dispatch('casesStore/updateLine', updatedLine);
@@ -452,5 +452,69 @@ describe('cases.ts', () => {
     const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
     store.dispatch('casesStore/deleteLine', lineID);
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(0);
+  });
+
+  it('should create and modify a layout', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      autoPoints: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+
+    const groupID = store.state.casesStore.groups[0].groupID;
+
+    store.commit('casesStore/addLayoutFromSelectedCase');
+    expect(store.state.casesStore.layouts.length).toBe(0);
+
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+
+    store.commit('casesStore/addLayoutFromSelectedCase');
+
+    const layoutID = store.state.casesStore.layouts[0].layoutID;
+    store.commit('casesStore/addNewLineInfoToLayout', layoutID);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'line',
+    );
+
+    const lineInfoID =
+      store.state.casesStore.layouts[0].caseLineInfos[0].lineInfoID;
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'multiline',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'multiline',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'array',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'array',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'matrix',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'matrix',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [layoutID, lineInfoID, 'line']);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'line',
+    );
+
+    store.commit('casesStore/removeLineInfoFromLayout', [layoutID, lineInfoID]);
   });
 });

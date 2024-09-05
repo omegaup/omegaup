@@ -15,16 +15,26 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('Tabs.vue', () => {
+describe('Sidebar.vue', () => {
+  // Total 7 buttons are rendered initially on this page.
+  // - Layout button
+  // - Add case/group button
+  // - Delete group button
+  // - Delete Cases button
+  // - Add new layout button
+  // - Add layout from selected case button
+  // - close layout bar button
+  const initialButtonsCount = 7;
+
   beforeEach(() => {
     store.commit('casesStore/resetStore');
   });
 
-  it('Should contain 4 buttons and Groups text', async () => {
+  it('Should contain buttons and Groups text', async () => {
     const wrapper = shallowMount(Sidebar, { localVue, store });
 
     const buttons = wrapper.findAllComponents(BButton);
-    expect(buttons.length).toBe(4);
+    expect(buttons.length).toBe(initialButtonsCount);
     let shouldContainAddText = false;
     buttons.wrappers.forEach((button) => {
       if (button.text() === T.problemCreatorAdd) shouldContainAddText = true;
