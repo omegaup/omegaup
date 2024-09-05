@@ -186,11 +186,18 @@
               </div>
             </div>
           </b-button>
-          <b-dropdown variant="light" size="sm" right no-caret>
+          <b-dropdown
+            data-sidebar-edit-group-dropdown
+            variant="light"
+            size="sm"
+            right
+            no-caret
+          >
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
             <b-dropdown-item
+              data-sidebar-edit-group-dropdown="edit group"
               @click="editGroupModal[groupID] = !editGroupModal[groupID]"
               ><b-row
                 ><div class="ml-6">
@@ -199,7 +206,9 @@
                 <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div></b-row
               >
             </b-dropdown-item>
-            <b-dropdown-item @click="deleteGroup(groupID)"
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="delete group"
+              @click="deleteGroup(groupID)"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
@@ -209,7 +218,9 @@
                 </div>
               </b-row>
             </b-dropdown-item>
-            <b-dropdown-item @click="deleteGroupCases(groupID)"
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="delete cases"
+              @click="deleteGroupCases(groupID)"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
@@ -264,6 +275,7 @@
           </b-collapse>
           <b-modal
             v-model="editGroupModal[groupID]"
+            data-sidebar-edit-group-modal
             :title="T.groupEditTitle"
             :ok-title="T.groupModalSave"
             ok-variant="success"
@@ -281,6 +293,7 @@
               >
                 <b-form-input
                   v-model="editGroupName[groupID]"
+                  data-sidebar-edit-group-modal="edit name"
                   :formatter="formatter"
                   required
                   autocomplete="off"
@@ -292,6 +305,7 @@
               >
                 <b-form-input
                   v-model="editGroupPoints[groupID]"
+                  data-sidebar-edit-group-modal="edit points"
                   :formatter="pointsFormatter"
                   type="number"
                   number
@@ -304,6 +318,7 @@
                 :description="T.problemCreatorAutomaticPointsHelperGroup"
               >
                 <b-form-checkbox
+                  data-sidebar-edit-group-modal="edit nullpoint"
                   :checked="editGroupPoints[groupID] === null"
                   @change="
                     editGroupPoints[groupID] =

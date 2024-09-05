@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import Sidebar from './Sidebar.vue';
 import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
@@ -95,7 +95,13 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(6);
+    const totalDropdownItemsCount = 8;
+    // There are
+    // - 3 dropdown items for each group
+    // - a dropdown item for each case
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(
+      totalDropdownItemsCount,
+    );
 
     const group1 = wrapper.find('b-button-stub[title="group1"]');
     const group2 = wrapper.find('b-button-stub[title="group2withlongname"]');
@@ -121,21 +127,24 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
+    // The number of dropdown stubs should be equal to
+    // (#dropdown-stubs) = 3*(#groups) + 1*(#cases)
+
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(4);
+    ).toBe(5);
     expect(
       group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(3);
+    ).toBe(4);
 
     store.commit('casesStore/deleteGroupCases', newGroup2.groupID);
     await Vue.nextTick();
     expect(
       group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(2);
+    ).toBe(3);
 
     store.commit('casesStore/deleteCase', {
       groupID: newGroup1.groupID,
@@ -145,10 +154,50 @@ describe('Sidebar.vue', () => {
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(3);
+    ).toBe(4);
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(4);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(5);
+  });
+
+  it('Should modify a group', async () => {
+    const wrapper = mount(Sidebar, { localVue, store: store });
+
+    const newGroup = generateGroup({
+      name: 'group',
+    });
+    store.commit('casesStore/addGroup', newGroup);
+    await Vue.nextTick();
+
+    const editButton = wrapper.find(
+      '[data-sidebar-edit-group-dropdown="edit group"]',
+    );
+    await editButton.trigger('click');
+
+    const editModal = wrapper.find('[data-sidebar-edit-group-modal=""]');
+
+    const modifiedName = 'modifiedgroup';
+    const editNameInput = editModal.find(
+      '[data-sidebar-edit-group-modal="edit name"]',
+    );
+    await editNameInput.setValue(modifiedName);
+
+    const modifiedPoints = 100;
+    const editPointsInput = editModal.find(
+      '[data-sidebar-edit-group-modal="edit points"]',
+    );
+    await editPointsInput.setValue(modifiedPoints);
+
+    await editModal.find('button.btn-success').trigger('click');
+
+    expect(
+      wrapper.vm.groups.find((_group) => _group.groupID === newGroup.groupID)
+        ?.name,
+    ).toBe(modifiedName);
+    expect(
+      wrapper.vm.groups.find((_group) => _group.groupID === newGroup.groupID)
+        ?.points,
+    ).toBe(modifiedPoints);
   });
 });
