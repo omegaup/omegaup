@@ -190,6 +190,15 @@
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
+            <b-dropdown-item
+              @click="editGroupModal[groupID] = !editGroupModal[groupID]"
+              ><b-row
+                ><div class="ml-6">
+                  <BIconPencilFill variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div></b-row
+              >
+            </b-dropdown-item>
             <b-dropdown-item @click="deleteGroup(groupID)"
               ><b-row>
                 <div class="ml-6">
@@ -253,6 +262,58 @@
               </b-row>
             </b-card>
           </b-collapse>
+          <b-modal
+            v-model="editGroupModal[groupID]"
+            :title="T.groupEditTitle"
+            :ok-title="T.groupModalSave"
+            ok-variant="success"
+            :cancel-title="T.groupModalBack"
+            cancel-variant="danger"
+            static
+            lazy
+            @ok="updateGroupInfo(groupID)"
+          >
+            <div class="mt-3">
+              <b-form-group
+                :description="T.problemCreatorCaseGroupNameHelper"
+                :label="T.problemCreatorGroupName"
+                class="mb-4"
+              >
+                <b-form-input
+                  v-model="editGroupName[groupID]"
+                  :formatter="formatter"
+                  required
+                  autocomplete="off"
+                />
+              </b-form-group>
+              <b-form-group
+                v-show="editGroupPoints[groupID] !== null"
+                :label="T.problemCreatorPoints"
+              >
+                <b-form-input
+                  v-model="editGroupPoints[groupID]"
+                  :formatter="pointsFormatter"
+                  type="number"
+                  number
+                  min="0"
+                  max="100"
+                />
+              </b-form-group>
+              <b-form-group
+                :label="T.problemCreatorAutomaticPoints"
+                :description="T.problemCreatorAutomaticPointsHelperGroup"
+              >
+                <b-form-checkbox
+                  :checked="editGroupPoints[groupID] === null"
+                  @change="
+                    editGroupPoints[groupID] =
+                      editGroupPoints[groupID] === null ? 0 : null
+                  "
+                >
+                </b-form-checkbox>
+              </b-form-group>
+            </div>
+          </b-modal>
         </b-row>
       </b-card>
     </div>
@@ -260,7 +321,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import problemCreator_LayoutSidebar from './LayoutSidebar.vue';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
@@ -307,9 +368,52 @@ export default class Sidebar extends Vue {
   @casesStore.Mutation('setSelected') setSelected!: (
     CaseGroupsIDToBeSelected: CaseGroupID,
   ) => void;
+  @casesStore.Mutation('updateGroup') updateGroup!: ([
+    groupID,
+    newName,
+    newPoints,
+  ]: [GroupID, string, number | null]) => void;
 
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
+  editGroupModal: { [key: GroupID]: boolean } = {};
+  editGroupName: { [key: GroupID]: string } = {};
+  editGroupPoints: { [key: GroupID]: number | null } = {};
+
+  @Watch('groups')
+  onGroupsChanged() {
+    this.editGroupModal = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = false;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    this.editGroupName = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.name;
+      return acc;
+    }, {} as { [key: string]: string });
+    this.editGroupPoints = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.points;
+      return acc;
+    }, {} as { [key: string]: number | null });
+  }
+
+  formatter(text: string) {
+    return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
+  }
+
+  pointsFormatter(points: number | null) {
+    if (points === null) {
+      return null;
+    }
+    return Math.max(points, 0);
+  }
+
+  updateGroupInfo(groupID: GroupID) {
+    this.updateGroup([
+      groupID,
+      this.editGroupName[groupID],
+      this.editGroupPoints[groupID],
+    ]);
+  }
 
   editCase(groupID: GroupID, caseID: CaseID) {
     this.setSelected({
