@@ -459,5 +459,4 @@ div {
   }
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
-@import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
 </style>
