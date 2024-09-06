@@ -8,6 +8,7 @@ module.exports = {
         setValue: jest.fn(),
       })),
       layout: jest.fn(),
+      updateOptions: jest.fn(),
     })),
     createModel: jest.fn(() => ({
       setValue: jest.fn(),

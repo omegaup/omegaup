@@ -1073,6 +1073,7 @@ CREATE TABLE `Submissions` (
   KEY `fk_s_current_run_id` (`current_run_id`),
   KEY `school_id` (`school_id`),
   KEY `school_id_problem_id` (`school_id`,`problem_id`),
+  KEY `verdict_type_time` (`verdict`,`type`,`time`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1244,6 +1245,7 @@ CREATE TABLE `Users_Badges` (
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
   KEY `user_id` (`user_id`),
+  KEY `user_badge` (`badge_alias`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Badges de Usuario';
 /*!40101 SET character_set_client = @saved_cs_client */;
