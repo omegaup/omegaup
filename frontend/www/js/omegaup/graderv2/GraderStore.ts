@@ -862,6 +862,22 @@ const storeOptions: StoreOptions<GraderStore> = {
       commit('Validator', settings.validator.name);
       commit('Tolerance', settings.validator.tolerance);
 
+      // when there are no problem statement I/O
+      // settings.cases become an empty object
+      if (!Object.keys(settings.cases).length) {
+        commit('createCase', {
+          name: 'sample',
+          in: '1 2\n',
+          out: '3\n',
+          weight: 1,
+        });
+        for (const caseName of Object.keys(store.state.request.input.cases)) {
+          if (caseName == 'sample') continue;
+          commit('removeCase', caseName);
+        }
+        return;
+      }
+
       // create cases for current problem
       for (const caseName in settings.cases) {
         if (!settings.cases[caseName]) continue;
@@ -873,7 +889,6 @@ const storeOptions: StoreOptions<GraderStore> = {
           out: caseData['out'],
         });
       }
-
       // delete cases that are not in settings cases
       for (const caseName of Object.keys(store.state.request.input.cases)) {
         if (settings.cases[caseName]) continue;
