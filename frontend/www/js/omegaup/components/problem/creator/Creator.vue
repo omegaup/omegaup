@@ -5,6 +5,7 @@
     />
     <creator-tabs
       @show-update-success-message="() => $emit('show-update-success-message')"
+      @download-zip-file="(zipObject) => $emit('download-zip-file', zipObject)"
       @download-input-file="
         (fileObject) => $emit('download-input-file', fileObject)
       "

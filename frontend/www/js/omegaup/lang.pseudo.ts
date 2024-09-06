@@ -1050,6 +1050,8 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomKarelProblem: "(Rand0m Kar31 Pr0b13m)",
   problemCollectionRandomLanguageProblem: "(Rand0m Pr0b13m)",
   problemCollectionSearchProblem: "(Pr0b13m Find3r)",
+  problemCraetorGroupDownloadIn: "(Sav3 .in)",
+  problemCraetorGroupDownloadTxt: "(Sav3 .7x7)",
   problemCreatorAdd: "(Add)",
   problemCreatorAddLine: "(Add 1in3)",
   problemCreatorAutomaticPoints: "(Au70ma7ica11y ca1cu1a73 p0in75)",
