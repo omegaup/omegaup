@@ -162,7 +162,7 @@ describe('Sidebar.vue', () => {
   });
 
   it('Should modify a group', async () => {
-    const wrapper = mount(Sidebar, { localVue, store: store });
+    const wrapper = mount(Sidebar, { localVue, store });
 
     const newGroup = generateGroup({
       name: 'group',
