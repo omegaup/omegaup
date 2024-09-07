@@ -5,6 +5,10 @@ import * as Util from './util';
 
 OmegaUp.on('ready', () => {
   // no payload is necessary for full IDE
+  // we need to manipulate the dom to make the IDE full screen
+  document.body.style.padding = '0';
+  const main = document.querySelector('main') as HTMLElement;
+  main.style.flex = '1 1 auto';
   new Vue({
     el: '#main-container',
     render: function (createElement) {

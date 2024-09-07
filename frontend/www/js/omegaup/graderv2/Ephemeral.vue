@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="d-flex flex-column h-100">
     <div class="navbar py-0" :class="theme">
       <span class="navbar-brand">
         omegaUp ephemeral grader
@@ -70,7 +70,7 @@
         </button>
       </form>
     </div>
-    <section ref="layout-root" class="col px-0"></section>
+    <section ref="layout-root" class="col px-0 flex-grow-1"></section>
   </div>
 </template>
 
@@ -445,7 +445,7 @@ export default class Ephemeral extends Vue {
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
 div > section {
-  min-height: 70em;
+  min-height: 60em;
 }
 div {
   &.vs-dark {
