@@ -8,11 +8,11 @@
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <label v-if="isUploadButton" for="upload">
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <span
-              class="fa fa-upload"
+            <font-awesome-icon
+              :icon="['fas', 'upload']"
               :title="T.wordsUpload"
               aria-hidden="true"
-            ></span>
+            />
           </a>
         </label>
         <input
@@ -29,13 +29,11 @@
           role="button"
           @click="handleDownload"
         >
-          <span
-            ref="zip-download-icon"
-            class="fa"
-            :class="isDirty ? 'fa-file-archive' : 'fa-download'"
+          <font-awesome-icon
+            :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
             :title="isDirty ? T.zipPrepare : T.wordsDownload"
             aria-hidden="true"
-          ></span>
+          />
         </a>
 
         <select
@@ -112,6 +110,16 @@ import {
   ZIP_VIEWER_COMPONENT_NAME,
   SETTINGS_COMPONENT_NAME,
 } from './GoldenLayoutConfigs';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faUpload,
+  faFileArchive,
+  faDownload,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faUpload, faFileArchive, faDownload);
+
 import T from '../lang';
 
 interface GraderComponent extends Vue {
@@ -125,7 +133,11 @@ interface ComponentState {
   [key: string]: any;
 }
 
-@Component
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Ephemeral extends Vue {
   @Prop({ default: true }) isEmbedded!: boolean;
   @Prop({ default: 'vs' }) theme!: string;
@@ -139,7 +151,6 @@ export default class Ephemeral extends Vue {
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
   @Ref('zip-download-link') readonly zipDownloadLink!: HTMLAnchorElement;
-  @Ref('zip-download-icon') readonly zipDownloadIcon!: HTMLSpanElement;
 
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
@@ -665,6 +676,10 @@ export default class Ephemeral extends Vue {
 <style scoped>
 div > section {
   min-height: 70em;
+}
+a:hover {
+  text-decoration: none;
+  color: inherit;
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 @import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
