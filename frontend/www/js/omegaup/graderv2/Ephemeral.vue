@@ -457,7 +457,7 @@ export default class Ephemeral extends Vue {
     reader.addEventListener('loadend', async (e) => {
       if (e.target?.readyState != FileReader.DONE) return;
       // due to the way files are strcutured
-      // to work as intended i use async awaiys instead of promisies
+      // to work as intended i use async awaits instead of promisses
 
       JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
         await store.dispatch('reset');
