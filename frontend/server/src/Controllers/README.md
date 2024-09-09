@@ -1837,19 +1837,19 @@ API to Create an assignment
 
 ### Parameters
 
-| Name                 | Type           | Description |
-| -------------------- | -------------- | ----------- |
-| `course_alias`       | `string`       |             |
-| `alias`              | `mixed`        |             |
-| `assignment_type`    | `mixed`        |             |
-| `description`        | `mixed`        |             |
-| `finish_time`        | `mixed`        |             |
-| `name`               | `mixed`        |             |
-| `order`              | `int\|null`    |             |
-| `problems`           | `null\|string` |             |
-| `publish_time_delay` | `mixed`        |             |
-| `start_time`         | `mixed`        |             |
-| `unlimited_duration` | `bool\|null`   |             |
+| Name                 | Type                           | Description |
+| -------------------- | ------------------------------ | ----------- |
+| `alias`              | `string`                       |             |
+| `assignment_type`    | `'homework'\|'lesson'\|'test'` |             |
+| `course_alias`       | `string`                       |             |
+| `description`        | `string`                       |             |
+| `name`               | `string`                       |             |
+| `start_time`         | `\OmegaUp\Timestamp`           |             |
+| `finish_time`        | `\OmegaUp\Timestamp\|null`     |             |
+| `order`              | `int\|null`                    |             |
+| `problems`           | `null\|string`                 |             |
+| `publish_time_delay` | `int\|null`                    |             |
+| `unlimited_duration` | `bool\|null`                   |             |
 
 ### Returns
 
@@ -2968,25 +2968,25 @@ Create a new problem
 | Name                      | Type           | Description |
 | ------------------------- | -------------- | ----------- |
 | `problem_alias`           | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 
@@ -3337,25 +3337,25 @@ Update problem contents
 | ------------------------- | -------------- | ----------- |
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
+| `redirect`                | `bool\|string` |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
-| `redirect`                | `mixed`        |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
 | `visibility`              | `null\|string` |             |
 
 ### Returns
@@ -3394,26 +3394,26 @@ Updates problem solution only
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
 | `solution`                | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
 | `lang`                    | `null\|string` |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 
@@ -3429,29 +3429,29 @@ Updates problem statement only
 
 | Name                      | Type           | Description |
 | ------------------------- | -------------- | ----------- |
+| `lang`                    | `string`       |             |
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
 | `statement`               | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `lang`                    | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 

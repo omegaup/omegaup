@@ -68,7 +68,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertSame(false, $problemSettings->Slow);
         $this->assertSame($r['validator'], $problemSettings->Validator->Name);
-        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame(5000, $r['time_limit']);
         $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
         $this->assertSame(
             $r['memory_limit'] * 1024,
@@ -891,7 +891,7 @@ if __name__ == \'__main__\':
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertSame(false, $problemSettings->Slow);
         $this->assertSame($r['validator'], $problemSettings->Validator->Name);
-        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame(5000, $r['time_limit']);
         $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
         $this->assertSame(
             $r['memory_limit'] * 1024,
