@@ -24,9 +24,10 @@
           </label>
           <label>
             <a
-              ref="zip-download-link"
               class="btn btn-secondary btn-sm mr-sm-2"
               role="button"
+              :href="zipHref"
+              :download="zipDownload"
               @click="handleDownload"
             >
               <font-awesome-icon
@@ -151,13 +152,14 @@ export default class Ephemeral extends Vue {
   @Prop({ default: true }) canRun!: boolean;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
-  @Ref('zip-download-link') readonly zipDownloadLink!: HTMLAnchorElement;
 
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: VueComponent } = {};
   T = T;
   isRunLoading = false;
   isSubmitLoading = false;
+  zipHref: string | null = null;
+  zipDownload: string | null = null;
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -227,9 +229,8 @@ export default class Ephemeral extends Vue {
   @Watch('isDirty')
   onDirtyChange(value: boolean) {
     if (!value || this.isEmbedded) return;
-
-    this.zipDownloadLink.removeAttribute('href');
-    this.zipDownloadLink.removeAttribute('download');
+    this.zipHref = null;
+    this.zipDownload = null;
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -441,8 +442,8 @@ export default class Ephemeral extends Vue {
     zip
       .generateAsync({ type: 'blob' })
       .then((blob) => {
-        this.zipDownloadLink.download = `${store.getters['moduleName']}.zip`;
-        this.zipDownloadLink.href = window.URL.createObjectURL(blob);
+        this.zipDownload = `${store.getters['moduleName']}.zip`;
+        this.zipHref = window.URL.createObjectURL(blob);
 
         store.dispatch('isDirty', false);
       })
