@@ -6,35 +6,37 @@
         <sup>&alpha;</sup>
       </span>
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
-        <label v-if="isUploadButton">
-          <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <font-awesome-icon
-              :icon="['fas', 'upload']"
-              :title="T.wordsUpload"
-              aria-hidden="true"
+        <slot name="zip-buttons">
+          <label>
+            <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
+              <font-awesome-icon
+                :icon="['fas', 'upload']"
+                :title="T.wordsUpload"
+                aria-hidden="true"
+              />
+            </a>
+            <input
+              type="file"
+              accept=".zip"
+              class="d-none"
+              @change="handleUpload"
             />
-          </a>
-          <input
-            type="file"
-            accept=".zip"
-            class="d-none"
-            @change="handleUpload"
-          />
-        </label>
-        <label v-if="isDownloadButton">
-          <a
-            ref="zip-download-link"
-            class="btn btn-secondary btn-sm mr-sm-2"
-            role="button"
-            @click="handleDownload"
-          >
-            <font-awesome-icon
-              :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
-              :title="isDirty ? T.zipPrepare : T.wordsDownload"
-              aria-hidden="true"
-            />
-          </a>
-        </label>
+          </label>
+          <label>
+            <a
+              ref="zip-download-link"
+              class="btn btn-secondary btn-sm mr-sm-2"
+              role="button"
+              @click="handleDownload"
+            >
+              <font-awesome-icon
+                :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
+                :title="isDirty ? T.zipPrepare : T.wordsDownload"
+                aria-hidden="true"
+              />
+            </a>
+          </label>
+        </slot>
         <select
           v-model="selectedLanguage"
           class="form-control form-control-sm mr-sm-2"
@@ -157,12 +159,6 @@ export default class Ephemeral extends Vue {
   isRunLoading = false;
   isSubmitLoading = false;
 
-  get isUploadButton() {
-    return !this.isEmbedded;
-  }
-  get isDownloadButton() {
-    return !this.isEmbedded;
-  }
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
   }

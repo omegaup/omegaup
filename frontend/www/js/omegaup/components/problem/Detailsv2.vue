@@ -83,7 +83,9 @@
             :problem="problem"
             :can-submit="false"
             :accepted-languages="filteredLanguages"
-          ></omegaup-arena-ephemeral-grader>
+          >
+            <template #zip-buttons><div></div></template>
+          </omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs-v2
             :problem-alias="problem.alias"
             :runs="userRuns"
