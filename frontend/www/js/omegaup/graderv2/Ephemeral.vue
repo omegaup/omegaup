@@ -6,7 +6,7 @@
         <sup>&alpha;</sup>
       </span>
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
-        <label v-if="isUploadButton" for="upload">
+        <label v-if="isUploadButton">
           <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
             <font-awesome-icon
               :icon="['fas', 'upload']"
@@ -14,28 +14,27 @@
               aria-hidden="true"
             />
           </a>
-        </label>
-        <input
-          :id="'upload'"
-          type="file"
-          accept=".zip"
-          class="d-none"
-          @change="handleUpload"
-        />
-        <a
-          v-if="isDownloadButton"
-          ref="zip-download-link"
-          class="btn btn-secondary btn-sm mr-sm-2"
-          role="button"
-          @click="handleDownload"
-        >
-          <font-awesome-icon
-            :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
-            :title="isDirty ? T.zipPrepare : T.wordsDownload"
-            aria-hidden="true"
+          <input
+            type="file"
+            accept=".zip"
+            class="d-none"
+            @change="handleUpload"
           />
-        </a>
-
+        </label>
+        <label v-if="isDownloadButton">
+          <a
+            ref="zip-download-link"
+            class="btn btn-secondary btn-sm mr-sm-2"
+            role="button"
+            @click="handleDownload"
+          >
+            <font-awesome-icon
+              :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
+              :title="isDirty ? T.zipPrepare : T.wordsDownload"
+              aria-hidden="true"
+            />
+          </a>
+        </label>
         <select
           v-model="selectedLanguage"
           class="form-control form-control-sm mr-sm-2"
