@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="root d-flex flex-column h-100"
-    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
-  >
+  <div class="root d-flex flex-column h-100">
     <div class="summary">
       {{ summary }}
     </div>
@@ -42,7 +39,7 @@
             :class="{
               'in-group': group.explicit,
               active: currentCase == item.name && theme == 'vs',
-              'vs-dark-active': currentCase == item.name && theme == 'vs-dark',
+              'vs-dark': currentCase == item.name && theme == 'vs-dark',
             }"
             @click="selectCase(item.name)"
           >
@@ -270,8 +267,9 @@ input[type='number'].case-weight {
   border-left-width: 6px;
   padding-left: 15px;
 }
-.vs-dark-active {
-  background: var(--textarea-vs-dark-background-color);
-  color: var(--textarea-vs-dark-font-color);
+
+.vs-dark {
+  background: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <form :class="theme">
+  <form class="h-100" :class="theme">
     <div class="form-row">
       <div class="form-group col-md-4">
         <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
@@ -250,7 +250,12 @@ export default class IDESettings extends Vue {
 @import '../../../sass/main.scss';
 form {
   &.vs-dark {
-    color: var(--textarea-vs-background-color);
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
+  }
+  &.vs {
+    background: var(--vs-background-color);
+    color: var(--vs-font-color);
   }
 }
 </style>

@@ -449,13 +449,13 @@ div > section {
 }
 div {
   &.vs-dark {
-    background: var(--textarea-vs-dark-background-color);
-    color: var(--textarea-vs-dark-font-color);
-    border-bottom: 1px solid var(--textarea-vs-dark-background-color);
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
+    border-bottom: 1px solid var(--vs-dark-background-color);
   }
   &.vs {
-    background: var(--textarea-vs-background-color);
-    border-bottom: 1px solid var(--textarea-vs-background-color);
+    background: var(--vs-background-color);
+    border-bottom: 1px solid var(--vs-background-color);
   }
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
