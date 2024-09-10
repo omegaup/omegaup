@@ -154,7 +154,7 @@ export default class Ephemeral extends Vue {
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   goldenLayout: GoldenLayout | null = null;
-  componentMapping: { [key: string]: VueComponent } = {};
+  componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
   isRunLoading = false;
   isSubmitLoading = false;
@@ -624,9 +624,8 @@ export default class Ephemeral extends Vue {
           if (vueComponent.onResize) {
             container.on('resize', () => vueComponent.onResize?.());
           }
+          self.componentMapping[componentState.id] = vueComponent;
         });
-
-        self.componentMapping[componentState.id] = component;
       },
     );
   }
