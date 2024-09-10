@@ -6,9 +6,7 @@
     :can-submit="canSubmit"
     :can-run="canRun"
   >
-    <template #zip-buttons>
-      <slot name="zip-buttons"></slot>
-    </template>
+    <template #zip-buttons><div></div></template>
   </ephemeral-ide>
 </template>
 
