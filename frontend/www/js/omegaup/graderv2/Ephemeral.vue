@@ -669,12 +669,14 @@ export default class Ephemeral extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
+
 div > section {
   min-height: 70em;
 }
 a:hover {
-  color: white;
+  color: var(--zip-button-color--hover);
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 @import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
