@@ -39,7 +39,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 'hideFooterAndHeader' => true,
                 'payload' => [],
             ],
-            'entrypoint' => 'ide',
+            'entrypoint' => 'grader_ide',
         ];
     }
 }
