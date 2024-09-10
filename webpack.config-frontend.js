@@ -69,6 +69,7 @@ module.exports = {
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
     course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
+    grader_ide: './frontend/www/js/omegaup/graderv2/ide.ts',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
@@ -113,7 +114,6 @@ module.exports = {
     user_verification_parental_token:
       './frontend/www/js/omegaup/user/verification_parental_token.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
-    ide: './frontend/www/js/omegaup/graderv2/ide.ts',
   },
 
   output: {
