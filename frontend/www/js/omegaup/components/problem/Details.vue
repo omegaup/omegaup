@@ -186,7 +186,6 @@
               :accepted-languages="filteredLanguages"
               :preferred-language="preferredLanguage"
             >
-              <template #zip-buttons><div></div></template>
             </omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
