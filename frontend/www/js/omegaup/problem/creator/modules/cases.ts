@@ -459,7 +459,9 @@ export const casesStore: Module<CasesState, RootState> = {
               lineID: uuid(),
               caseID: _case.caseID,
               label: lineInfo.label,
-              data: lineInfo.data,
+              data: {
+                ...lineInfo.data,
+              },
             }),
           );
           _case.lines = linesFromLayout;
