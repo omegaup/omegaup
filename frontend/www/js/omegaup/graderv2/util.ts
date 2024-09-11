@@ -61,7 +61,6 @@ export interface LanguageInfo {
   language: string;
 }
 export const supportedLanguages: Record<string, LanguageInfo> = {
-  '': { extension: '', name: '', modelMapping: '', language: '' },
   kp: {
     extension: 'kp',
     name: 'Karel (Pascal)',
@@ -74,12 +73,6 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     modelMapping: '',
     language: 'kj',
   },
-  c: {
-    extension: 'c',
-    name: 'C11 (gcc 10.3)',
-    modelMapping: 'cpp',
-    language: 'c',
-  },
   'c11-gcc': {
     extension: 'c',
     name: 'C11 (gcc 10.3)',
@@ -91,18 +84,6 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     name: 'C11 (clang 10.0)',
     modelMapping: 'cpp',
     language: 'c11-clang',
-  },
-  cpp: {
-    extension: 'cpp',
-    name: 'C++03 (g++ 10.3)',
-    modelMapping: 'cpp',
-    language: 'cpp',
-  },
-  cpp11: {
-    extension: 'cpp',
-    name: 'C++11 (g++ 10.3)',
-    modelMapping: 'cpp',
-    language: 'cpp11',
   },
   'cpp11-gcc': {
     extension: 'cpp',
@@ -151,12 +132,6 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     name: 'Kotlin (1.6.10)',
     modelMapping: 'kotlin',
     language: 'kt',
-  },
-  py: {
-    extension: 'py',
-    name: 'Python (2.7)',
-    modelMapping: 'python',
-    language: 'py',
   },
   py2: {
     extension: 'py2',
