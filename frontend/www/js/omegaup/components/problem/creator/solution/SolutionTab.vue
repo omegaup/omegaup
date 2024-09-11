@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import * as ui from '../../../../ui';
@@ -60,11 +60,26 @@ export default class SolutionTab extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
+  @Prop({ default: T.problemCreatorEmpty })
+  currentSolutionMarkdownProp!: string;
+
   T = T;
   ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
-  currentSolutionMarkdown: string = T.problemCreatorEmpty;
+  currentSolutionMarkdownInternal: string = T.problemCreatorEmpty;
+
+  get currentSolutionMarkdown(): string {
+    return this.currentSolutionMarkdownInternal;
+  }
+  set currentSolutionMarkdown(newMarkdown: string) {
+    this.currentSolutionMarkdownInternal = newMarkdown;
+  }
+
+  @Watch('currentSolutionMarkdownProp')
+  onCurrentSolutionMarkdownPropChanged() {
+    this.currentSolutionMarkdown = this.currentSolutionMarkdownProp;
+  }
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {

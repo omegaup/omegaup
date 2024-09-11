@@ -49,6 +49,12 @@ export const casesStore: Module<CasesState, RootState> = {
       state.layouts = [];
       state.hide = false;
     },
+    replaceState(state, uploadedState: CasesState) {
+      state.groups = uploadedState.groups;
+      state.selected = uploadedState.selected;
+      state.layouts = uploadedState.layouts;
+      state.hide = uploadedState.hide;
+    },
     addGroup(state, newGroup: Group) {
       state.groups.push(newGroup);
       state = assignMissingPoints(state);
