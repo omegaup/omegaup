@@ -218,6 +218,12 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     modelMapping: 'javascript',
     language: 'js',
   },
+  cat: {
+    extension: 'cat',
+    name: 'Output Only',
+    modelMapping: '',
+    language: 'cat',
+  },
 };
 export const supportedExtensions: string[] = [
   ...new Set(
