@@ -185,8 +185,7 @@
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
               :preferred-language="preferredLanguage"
-            >
-            </omegaup-arena-ephemeral-grader>
+            ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
             {{ T.ephemeralGraderAlert }}
