@@ -7,11 +7,13 @@
           <textarea
             ref="markdownInput"
             v-model="currentSolutionMarkdown"
+            data-problem-creator-solution-editor-markdown
             class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <omegaup-markdown
+            data-problem-creator-solution-previewer-markdown
             :markdown="
               T.problemCreatorMarkdownPreviewInitialRender +
               currentSolutionMarkdown
@@ -22,7 +24,12 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-primary" type="submit" @click="updateMarkdown">
+          <button
+            data-problem-creator-solution-save-markdown
+            class="btn btn-primary"
+            type="submit"
+            @click="updateMarkdown"
+          >
             {{ T.problemCreatorMarkdownSave }}
           </button>
         </div>
