@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="navbar navbar-light bg-light py-0 border-bottom">
+  <div class="d-flex flex-column h-100">
+    <div class="navbar py-0" :class="theme">
       <span class="navbar-brand">
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
@@ -82,7 +82,7 @@
         </button>
       </form>
     </div>
-    <section ref="layout-root" class="col px-0"></section>
+    <section ref="layout-root" class="col px-0 flex-grow-1"></section>
   </div>
 </template>
 
@@ -153,6 +153,10 @@ export default class Ephemeral extends Vue {
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
+  readonly themeToRef: { [key: string]: string } = {
+    vs: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    'vs-dark': `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+  };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
@@ -636,6 +640,10 @@ export default class Ephemeral extends Vue {
     } else {
       store.dispatch('reset');
     }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[this.theme];
+    document.head.appendChild(link);
   }
   onResized() {
     if (!this.layoutRoot.clientWidth) return;
@@ -672,11 +680,21 @@ export default class Ephemeral extends Vue {
 @import '../../../sass/main.scss';
 
 div > section {
-  min-height: 70em;
+  min-height: 60em;
+}
+div {
+  &.vs-dark {
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
+    border-bottom: 1px solid var(--vs-dark-background-color);
+  }
+  &.vs {
+    background: var(--vs-background-color);
+    border-bottom: 1px solid var(--vs-background-color);
+  }
 }
 a:hover {
   color: var(--zip-button-color--hover);
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
-@import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
 </style>
