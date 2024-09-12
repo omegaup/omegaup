@@ -2054,5 +2054,6 @@
 	"wordsVerdictsOf": "Verdicts of %(alias)",
 	"wordsWallTimeInSeconds": "Wall-time (Sec)",
 	"wordsWarningProblem": "Keep with a warning",
-	"wordsYes": "Yes"
+	"wordsYes": "Yes",
+	"zipPrepare": "Prepare zip file"
 }

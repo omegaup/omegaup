@@ -5,7 +5,9 @@
     :problem="problem"
     :can-submit="canSubmit"
     :can-run="canRun"
-  />
+  >
+    <template #zip-buttons><div></div></template>
+  </ephemeral-ide>
 </template>
 
 <script lang="ts">
