@@ -1114,6 +1114,11 @@ const translations: { [key: string]: string; } = {
   problemCreatorUngrouped: "Sin_grupo",
   problemCreatorUngroupedCases: "Casos sin grupo",
   problemCreatorUpdateAlert: "El problema se ha actualizado correctamente.",
+  problemCreatorUploadZip: "Subir",
+  problemCreatorUploadZipMessage: "Sube el archivo zip de tu problema aqu\u00ed.",
+  problemCreatorZipFileIsNotComplete: "El archivo zip debe contener el archivo cdp.data",
+  problemCreatorZipFileIsNotValid: "El archivo subido no es un archivo zip v\u00e1lido",
+  problemCreatorZipFileUpload: "Subir archivo zip",
   problemDeployerChangeMissingSettingsJson: "El problema necesita tener un archivo 'settings.json'.",
   problemDeployerConfigBadLayout: "El commit a 'refs/meta/config' tiene una estructura incorrecta.",
   problemDeployerConfigInvalidPublishingMode: "El modo de publicaci\u00f3n elegido no est\u00e1 soportado.",
@@ -2052,6 +2057,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tiempo-real (Seg)",
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
+  zipPrepare: "Preparar archivo zip",
 };
 
 export {translations as default};

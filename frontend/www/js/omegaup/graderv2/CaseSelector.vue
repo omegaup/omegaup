@@ -110,11 +110,7 @@ export default class CaseSelector extends Vue {
   T = T;
 
   get summary(): string {
-    if (
-      store.state.dirty ||
-      !store.state.results ||
-      !store.state.results.verdict
-    ) {
+    if (!store.state.results || !store.state.results.verdict) {
       return '…';
     }
     return `${store.state.results.verdict} ${this.score(store.state.results)}`;
@@ -134,13 +130,13 @@ export default class CaseSelector extends Vue {
 
   caseResult(caseName: string): null | types.CaseResult {
     const flatCaseResults = store.getters.flatCaseResults;
-    if (store.state.dirty || !flatCaseResults[caseName]) return null;
+    if (!flatCaseResults[caseName]) return null;
     return flatCaseResults[caseName];
   }
 
   groupResult(groupName: string): null | types.RunDetailsGroup {
     const results = store.state.results;
-    if (store.state.dirty || !results || !results.groups) return null;
+    if (!results || !results.groups) return null;
     for (const group of results.groups) {
       if (group.group == groupName) return group;
     }

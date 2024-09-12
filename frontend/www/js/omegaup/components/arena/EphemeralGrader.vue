@@ -7,7 +7,9 @@
     :can-run="canRun"
     :is-embedded="isEmbedded"
     :theme="theme"
-  />
+  >
+    <template #zip-buttons><div></div></template>
+  </ephemeral-ide>
 </template>
 
 <script lang="ts">

@@ -1113,6 +1113,11 @@
 	"problemCreatorUngrouped": "Ungrouped",
 	"problemCreatorUngroupedCases": "Ungrouped cases",
 	"problemCreatorUpdateAlert": "The problem has been updated succesfully.",
+	"problemCreatorUploadZip": "Upload",
+	"problemCreatorUploadZipMessage": "Upload the zip file of your problem here.",
+	"problemCreatorZipFileIsNotComplete": "The zip file must contain cdp.data file",
+	"problemCreatorZipFileIsNotValid": "The uploaded file is not a valid zip file",
+	"problemCreatorZipFileUpload": "Upload zip file",
 	"problemDeployerChangeMissingSettingsJson": "The problem is missing a 'settings.json' file.",
 	"problemDeployerConfigBadLayout": "The commit to 'refs/meta/config' has the wrong layout.",
 	"problemDeployerConfigInvalidPublishingMode": "The chosen publishing mode is not supported.",
@@ -2050,5 +2055,6 @@
 	"wordsVerdictsOf": "Verdicts of %(alias)",
 	"wordsWallTimeInSeconds": "Wall-time (Sec)",
 	"wordsWarningProblem": "Keep with a warning",
-	"wordsYes": "Yes"
+	"wordsYes": "Yes",
+	"zipPrepare": "Prepare zip file"
 }
