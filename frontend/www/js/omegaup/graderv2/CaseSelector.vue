@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="root d-flex flex-column h-100"
-    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
-  >
+  <div class="root d-flex flex-column h-100">
     <div class="summary">
       {{ summary }}
     </div>
@@ -41,7 +38,8 @@
             type="button"
             :class="{
               'in-group': group.explicit,
-              active: currentCase == item.name,
+              active: currentCase == item.name && theme == 'vs',
+              'vs-dark': currentCase == item.name && theme == 'vs-dark',
             }"
             @click="selectCase(item.name)"
           >
@@ -79,9 +77,13 @@
         <input v-model="newCaseName" class="form-control" type="text" />
         <div class="input-group-append">
           <button
-            class="btn btn-secondary"
+            class="btn"
+            :class="{
+              'btn-primary': theme == 'vs',
+              'btn-secondary': theme == 'vs-dark',
+            }"
             type="submit"
-            :disabled="newCaseName.length == 1"
+            :disabled="!newCaseName.length"
             @click="createCase()"
           >
             +
@@ -217,7 +219,9 @@ export default class CaseSelector extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
+
 button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
@@ -258,5 +262,10 @@ input[type='number'].case-weight {
   font-weight: bold;
   border-left-width: 6px;
   padding-left: 15px;
+}
+
+.vs-dark {
+  background: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
 }
 </style>
