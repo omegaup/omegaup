@@ -2056,6 +2056,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tempo-real (Seg)",
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
+  zipPrepare: "Preparar arquivo zip",
 };
 
 export {translations as default};

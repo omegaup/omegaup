@@ -2056,6 +2056,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "(Wa11-7im3 (S3c))",
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
+  zipPrepare: "(Pr3par3 zip fi13)",
 };
 
 export {translations as default};
