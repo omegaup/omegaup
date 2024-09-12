@@ -5801,7 +5801,9 @@ export namespace messages {
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
     birth_date?: Date;
+    email: string;
     last_login?: Date;
+    roles: string[];
     username: string;
     verified: boolean;
     within_last_day: boolean;

@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
- * @psalm-type UserRole=array{name: string, description?: string}
+ * @psalm-type UserRole=array{name: string, description: null|string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
  * @psalm-type SupportDetailsPayload=array{roleNamesWithDescription: list<UserRole>}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
@@ -1704,31 +1704,48 @@ class User extends \OmegaUp\Controllers\Controller {
      * - last password change request
      * - verify status
      * - birth date to verify the user identity
+     * - roles assigned to user
      *
-     * @omegaup-request-param string $email
+     * @omegaup-request-param string $usernameOrEmail
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, email: string, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool, roles: list<string>}
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $email = $r->ensureString(
+        $usernameOrEmail = $r->ensureString(
             'email',
-            fn (string $email) => \OmegaUp\Validators::email($email)
+            fn (string $usernameOrEmail) => \OmegaUp\Validators::usernameOrEmail(
+                $usernameOrEmail
+            )
         );
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = \OmegaUp\DAO\Identities::getExtraInformation($email);
+        $response = \OmegaUp\DAO\Identities::getExtraInformation(
+            $usernameOrEmail
+        );
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
         }
+
+        $user = self::resolveTargetUser(new \OmegaUp\Request([
+            'username' => $response['username'],
+        ]));
+        $response = array_merge(
+            $response,
+            [
+                'roles' => \OmegaUp\DAO\UserRoles::getSystemRoles(
+                    $user->user_id
+                ),
+            ]
+        );
         return $response;
     }
 
@@ -3234,9 +3251,13 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         string $roleName
     ): \OmegaUp\DAO\VO\Roles {
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowedPrivilegeSelfAssignment'
+            );
+        }
         if (
-            !\OmegaUp\Authorization::isSystemAdmin($identity) &&
-            !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
+            !\OmegaUp\Authorization::isSupportTeamMember($identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
@@ -3246,10 +3267,11 @@ class User extends \OmegaUp\Controllers\Controller {
         $role = \OmegaUp\DAO\Roles::getByName($roleName);
         if (
             $role->role_id === \OmegaUp\Authorization::ADMIN_ROLE
-            && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
+            && !\OmegaUp\Authorization::isSystemAdmin($identity)
         ) {
             // System-admin role cannot be added/removed from the UI, only when
-            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
+            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on and user has
+            // sys-admin role.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -4433,7 +4455,10 @@ class User extends \OmegaUp\Controllers\Controller {
             if (is_null($role->name)) {
                 continue;
             }
-            $rolesList[] = ['name' => $role->name];
+            $rolesList[] = [
+                'name' => $role->name,
+                'description' => $role->description,
+            ];
         }
 
         $systemExperiments = [];

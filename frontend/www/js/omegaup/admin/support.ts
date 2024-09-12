@@ -24,6 +24,7 @@ OmegaUp.on('ready', () => {
         lastLogin: null as null | Date,
         birthDate: null as null | Date,
         roles: [] as Array<string>,
+        storedEmail: null as null | string,
       };
     },
     render: function (createElement) {
@@ -36,6 +37,7 @@ OmegaUp.on('ready', () => {
           birthDate: this.birthDate,
           roleNamesWithDescription: payload.roleNamesWithDescription,
           roles: this.roles,
+          storedEmail: this.storedEmail,
         },
         on: {
           'search-email': (email: string): void => {
@@ -44,12 +46,16 @@ OmegaUp.on('ready', () => {
             adminSupport.lastLogin = null;
             adminSupport.birthDate = null;
             adminSupport.verified = false;
+            adminSupport.roles = [];
+            adminSupport.storedEmail = null;
             api.User.extraInformation({ email: email })
               .then((data) => {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
                 adminSupport.lastLogin = data.last_login ?? null;
                 adminSupport.birthDate = data.birth_date ?? null;
+                adminSupport.roles = data.roles ?? [];
+                adminSupport.storedEmail = data.email;
               })
               .catch(ui.apiError);
           },
@@ -87,6 +93,8 @@ OmegaUp.on('ready', () => {
             adminSupport.verified = false;
             adminSupport.lastLogin = null;
             adminSupport.birthDate = null;
+            adminSupport.roles = [];
+            adminSupport.storedEmail = null;
           },
           'change-role': (role: {
             selected: boolean;

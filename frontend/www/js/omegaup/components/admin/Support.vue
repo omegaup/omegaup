@@ -2,8 +2,10 @@
   <div class="card">
     <div class="text-white bg-primary card-header">
       <div class="card-title h4">
-        {{ T.omegaupTitleSupportDashboard }} — {{ username }}
-        <span v-if="username != null">- {{ username }}</span>
+        {{ T.omegaupTitleSupportDashboard }}
+        <span v-if="username != null"
+          >- {{ username }} ({{ storedEmail }})</span
+        >
       </div>
     </div>
     <div class="card-body">
@@ -18,7 +20,7 @@
                 type="text"
                 required="required"
                 :disabled="username != null"
-                :placeholder="T.email"
+                :placeholder="T.supportTypeEmailOrUsername"
               />
               <div class="input-group-append">
                 <button
@@ -153,7 +155,7 @@
           </form>
         </div>
         <div class="row mb-3">
-          <h4>{{ T.userRoles }}</h4>
+          <h4>{{ T.supportAssignUserRoles }}</h4>
           <table class="table">
             <tbody>
               <tr v-for="role in roleNamesWithDescription" :key="role.name">
@@ -166,7 +168,9 @@
                     @change.prevent="onChangeRole($event, role)"
                   />
                 </td>
-
+                <td>
+                  <span class="badge badge-info w-100">{{ role.name }}</span>
+                </td>
                 <td>{{ role.description }}</td>
               </tr>
             </tbody>
@@ -210,6 +214,7 @@ export interface UpdateEmailRequest {
 })
 export default class AdminSupport extends Vue {
   @Prop() username!: string;
+  @Prop() storedEmail!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
   @Prop() lastLogin!: null | Date;
