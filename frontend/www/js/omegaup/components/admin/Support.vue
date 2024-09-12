@@ -2,7 +2,7 @@
   <div class="card">
     <div class="text-white bg-primary card-header">
       <div class="card-title h4">
-        {{ T.omegaupTitleSupportDashboard }}
+        {{ T.omegaupTitleSupportDashboard }} — {{ username }}
         <span v-if="username != null">- {{ username }}</span>
       </div>
     </div>
@@ -31,6 +31,16 @@
               </div>
             </div>
           </form>
+        </div>
+        <div class="col-md-6 text-right">
+          <button
+            v-if="username != null"
+            class="btn btn-secondary"
+            type="reset"
+            @click.prevent="onReset"
+          >
+            {{ T.supportNewSearch }}
+          </button>
         </div>
       </div>
       <template v-if="username != null">
@@ -142,16 +152,25 @@
             </div>
           </form>
         </div>
-        <div class="row float-right">
-          <div class="col-md-12">
-            <button
-              class="btn btn-secondary"
-              type="reset"
-              @click.prevent="onReset"
-            >
-              {{ T.wordsCancel }}
-            </button>
-          </div>
+        <div class="row mb-3">
+          <h4>{{ T.userRoles }}</h4>
+          <table class="table">
+            <tbody>
+              <tr v-for="role in roleNamesWithDescription" :key="role.name">
+                <td>
+                  <input
+                    v-if="role.name != 'Admin'"
+                    type="checkbox"
+                    :checked="hasRole(role.name)"
+                    :class="role.name"
+                    @change.prevent="onChangeRole($event, role)"
+                  />
+                </td>
+
+                <td>{{ role.description }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </template>
     </div>
@@ -164,12 +183,14 @@ import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import { types } from '../../api_types';
 
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
   FontAwesomeLayersText,
 } from '@fortawesome/vue-fontawesome';
+import { omegaup } from '../../omegaup';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
@@ -193,12 +214,18 @@ export default class AdminSupport extends Vue {
   @Prop() link!: string;
   @Prop() lastLogin!: null | Date;
   @Prop() birthDate!: null | Date;
+  @Prop() roles!: string[];
+  @Prop() roleNamesWithDescription!: types.UserRole[];
 
   T = T;
   ui = ui;
   time = time;
   email: null | string = null;
   newEmail: null | string = null;
+
+  hasRole(role: string): boolean {
+    return this.roles.indexOf(role) !== -1;
+  }
 
   @Emit('search-email')
   onSearchEmail(): null | string {
@@ -228,6 +255,17 @@ export default class AdminSupport extends Vue {
   onReset() {
     this.email = null;
     this.newEmail = null;
+  }
+
+  @Emit('change-role')
+  onChangeRole(
+    ev: Event,
+    role: types.UserRole,
+  ): omegaup.Selectable<types.UserRole> {
+    return {
+      value: role,
+      selected: (ev.target as HTMLInputElement).checked,
+    };
   }
 }
 </script>

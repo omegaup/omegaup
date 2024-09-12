@@ -1631,6 +1631,7 @@ const translations: { [key: string]: string; } = {
   submitFeedbackPlaceholder: "Enter your feedback (optional)",
   submitFeedbackRequireConfirmation: "Submit feedback",
   submitFeedbackSubmit: "Submit",
+  supportNewSearch: "Nueva b\u00fasqueda",
   systemInMaintainance: "The Coder of the Month system is under maintenance.\n\nWe will be back soon.",
   tagAdded: "Tag successfully added!",
   tagNotFound: "Tag not found",

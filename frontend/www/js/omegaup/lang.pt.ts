@@ -1631,6 +1631,7 @@ const translations: { [key: string]: string; } = {
   submitFeedbackPlaceholder: "Insira seus coment\u00e1rios (opcional)",
   submitFeedbackRequireConfirmation: "Enviar coment\u00e1rios",
   submitFeedbackSubmit: "Enviar",
+  supportNewSearch: "Nova pesquisa",
   systemInMaintainance: "O sistema de Coder do M\u00eas est\u00e1 em manuten\u00e7\u00e3o.\n\nVoltaremos em breve.",
   tagAdded: "Tag adicionado com sucesso!",
   tagNotFound: "Etiqueta n\u00e3o encontrada",

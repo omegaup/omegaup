@@ -6,8 +6,11 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
+import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.SupportDetailsPayload();
+
   const adminSupport = new Vue({
     el: '#main-container',
     components: {
@@ -20,6 +23,7 @@ OmegaUp.on('ready', () => {
         verified: false,
         lastLogin: null as null | Date,
         birthDate: null as null | Date,
+        roles: [] as Array<string>,
       };
     },
     render: function (createElement) {
@@ -30,6 +34,8 @@ OmegaUp.on('ready', () => {
           verified: this.verified,
           lastLogin: this.lastLogin,
           birthDate: this.birthDate,
+          roleNamesWithDescription: payload.roleNamesWithDescription,
+          roles: this.roles,
         },
         on: {
           'search-email': (email: string): void => {
@@ -81,6 +87,30 @@ OmegaUp.on('ready', () => {
             adminSupport.verified = false;
             adminSupport.lastLogin = null;
             adminSupport.birthDate = null;
+          },
+          'change-role': (role: {
+            selected: boolean;
+            value: types.UserRole;
+          }): void => {
+            if (role.selected) {
+              api.User.addRole({
+                username: adminSupport.username,
+                role: role.value.name,
+              })
+                .then(() => {
+                  ui.success(T.userEditSuccess);
+                })
+                .catch(ui.apiError);
+            } else {
+              api.User.removeRole({
+                username: adminSupport.username,
+                role: role.value.name,
+              })
+                .then(() => {
+                  ui.success(T.userEditSuccess);
+                })
+                .catch(ui.apiError);
+            }
           },
         },
       });

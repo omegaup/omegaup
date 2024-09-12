@@ -42,8 +42,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
- * @psalm-type UserRole=array{name: string}
+ * @psalm-type UserRole=array{name: string, description?: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
+ * @psalm-type SupportDetailsPayload=array{roleNamesWithDescription: list<UserRole>}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
@@ -4465,6 +4466,42 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'admin_user',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: SupportDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getSupportDetailsForTypeScript(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'adminSupportPageNotFound'
+            );
+        }
+
+        $roles = \OmegaUp\DAO\Roles::getAll();
+        $rolesList = [];
+        foreach ($roles as $role) {
+            if (is_null($role->name) || $role->name == 'Admin') {
+                continue;
+            }
+            $rolesList[] = [
+                'name' => $role->name,
+                'description' => $role->description,
+            ];
+        }
+
+        return [
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSupportDashboard'
+                ),
+                'payload' => [
+                    'roleNamesWithDescription' => $rolesList,
+                ],
+            ],
+            'entrypoint' => 'admin_support',
         ];
     }
 
