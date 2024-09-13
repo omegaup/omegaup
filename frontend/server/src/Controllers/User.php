@@ -3270,7 +3270,7 @@ class User extends \OmegaUp\Controllers\Controller {
             && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
         ) {
             // System-admin role cannot be added/removed from the UI, only when
-            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
+            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
