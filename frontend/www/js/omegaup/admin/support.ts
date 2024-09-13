@@ -55,7 +55,7 @@ OmegaUp.on('ready', () => {
                 adminSupport.lastLogin = data.last_login ?? null;
                 adminSupport.birthDate = data.birth_date ?? null;
                 adminSupport.roles = data.roles ?? [];
-                adminSupport.email = data.email;
+                adminSupport.email = data.email ?? null;
               })
               .catch(ui.apiError);
           },

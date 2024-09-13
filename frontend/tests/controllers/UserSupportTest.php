@@ -49,7 +49,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiExtraInformation(
             new \OmegaUp\Request([
                 'auth_token' => $supportLogin->auth_token,
-                'email' => $email,
+                'usernameOrEmail' => $email,
             ])
         );
 
@@ -65,7 +65,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiExtraInformation(
             new \OmegaUp\Request([
                 'auth_token' => $supportLogin->auth_token,
-                'email' => $email,
+                'usernameOrEmail' => $email,
             ])
         );
 
@@ -236,7 +236,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support tries to generate token without a request
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
 
         $this->assertFalse($response['within_last_day']);
@@ -249,7 +249,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support can genearate token
         \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
         $response = \OmegaUp\Controllers\Reset::apiGenerateToken(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
@@ -296,7 +296,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support can not genearate token because it has expired
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
 
         $this->assertFalse($response['within_last_day']);

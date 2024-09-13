@@ -693,7 +693,6 @@ const translations: { [key: string]: string; } = {
   dependentsVerified: "La cuenta del dependiente ha sido verificada correctamente",
   duplicateTagsNotAllowed: "No se permiten etiquetas duplicadas. Hay al menos una etiqueta duplicada en la lista: %(tags) <br> Corrija la informaci\u00f3n.",
   editFieldRequired: "Falta un valor requerido",
-  email: "Correo electr\u00f3nico",
   emailNotVerified: "Tu direcci\u00f3n de correo a\u00fan no ha sido verificada. Busca el correo de verificaci\u00f3n en tu bandeja de entrada o de spam. Si sigues teniendo problemas, escribe a soporte@omegaup.com para obtener ayuda.",
   enterContest: "Entrar al concurso",
   ephemeralGraderAlert: "Necesitas una pantalla de mayor tama\u00f1o para poder usar el Ephemeral Grader. Intente poner el tel\u00e9fono en posici\u00f3n horizontal o usar otro dispositivo.",
