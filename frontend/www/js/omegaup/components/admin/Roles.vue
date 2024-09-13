@@ -48,18 +48,15 @@ import T from '../../lang';
 
 @Component
 export default class AdminRoles extends Vue {
-  @Prop() roles!: types.UserRole[];
+  @Prop() roles!: omegaup.Role[];
   @Prop() groups!: types.Group[];
 
   T = T;
-  currentRoles: types.UserRole[] = this.roles;
+  currentRoles: omegaup.Role[] = this.roles;
   currentGroups: types.Group[] = this.groups;
 
   @Emit()
-  changeRole(
-    ev: Event,
-    role: types.UserRole,
-  ): omegaup.Selectable<types.UserRole> {
+  changeRole(ev: Event, role: omegaup.Role): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
       selected: (ev.target as HTMLInputElement).checked,

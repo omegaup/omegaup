@@ -291,6 +291,10 @@ export namespace omegaup {
     name: string;
   }
 
+  export interface Role {
+    name: string;
+  }
+
   export interface Run {
     [period: string]: number;
   }
