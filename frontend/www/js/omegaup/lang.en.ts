@@ -1388,6 +1388,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "Account name",
   problemVersionVersion: "Problem version",
   problemcollectionViewProblems: "View problems",
+  problemlessGrader: "omegaUp IDE",
   problemsOrderUpdated: "Problems' order has been updated",
   problemsetIdentityNotFound: "Account or identity is not associated with this course, contest or task.",
   problemsetNotFound: "Problemset does not exist.",
@@ -2059,6 +2060,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
+  zipPrepare: "Prepare zip file",
 };
 
 export {translations as default};

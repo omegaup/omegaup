@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <form class="h-100" :class="theme">
     <div class="form-row">
       <div class="form-group col-md-4">
         <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
@@ -132,6 +132,7 @@ import T from '../lang';
 })
 export default class IDESettings extends Vue {
   @Prop({ required: true }) storeMapping!: any;
+  @Prop({ default: 'vs' }) theme!: string;
 
   T = T;
   get timeLimit(): number {
@@ -244,3 +245,17 @@ export default class IDESettings extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../sass/main.scss';
+form {
+  &.vs-dark {
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
+  }
+  &.vs {
+    background: var(--vs-background-color);
+    color: var(--vs-font-color);
+  }
+}
+</style>
