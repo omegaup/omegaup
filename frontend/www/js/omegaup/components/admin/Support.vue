@@ -3,9 +3,7 @@
     <div class="text-white bg-primary card-header">
       <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
-        <span v-if="username != null"
-          >- {{ username }} ({{ storedEmail }})</span
-        >
+        <span v-if="username != null">- {{ username }} ({{ email }})</span>
       </div>
     </div>
     <div class="card-body">
@@ -14,7 +12,7 @@
           <form class="form w-100" @submit.prevent="onSearchEmail">
             <div class="input-group">
               <input
-                v-model="email"
+                v-model="usernameOrEmail"
                 class="form-control"
                 name="email"
                 type="text"
@@ -214,7 +212,7 @@ export interface UpdateEmailRequest {
 })
 export default class AdminSupport extends Vue {
   @Prop() username!: string;
-  @Prop() storedEmail!: string;
+  @Prop() email!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
   @Prop() lastLogin!: null | Date;
@@ -225,29 +223,29 @@ export default class AdminSupport extends Vue {
   T = T;
   ui = ui;
   time = time;
-  email: null | string = null;
+  usernameOrEmail: null | string = null;
   newEmail: null | string = null;
 
   hasRole(role: string): boolean {
     return this.roles.indexOf(role) !== -1;
   }
 
-  @Emit('search-email')
+  @Emit('search-username-or-email')
   onSearchEmail(): null | string {
-    if (this.email == null) return null;
-    return this.email;
+    if (this.usernameOrEmail == null) return null;
+    return this.usernameOrEmail;
   }
 
   @Emit('update-email')
   onUpdateEmail(): null | UpdateEmailRequest {
-    if (this.email == null || this.newEmail == null) return null;
+    if (!this.email == null || this.newEmail == null) return null;
     return { email: this.email, newEmail: this.newEmail };
   }
 
   @Emit('verify-user')
   onVerifyUser(): null | string {
-    if (this.email == null) return null;
-    return this.email;
+    if (this.usernameOrEmail == null) return null;
+    return this.usernameOrEmail;
   }
 
   @Emit('generate-token')
@@ -258,7 +256,7 @@ export default class AdminSupport extends Vue {
 
   @Emit('reset')
   onReset() {
-    this.email = null;
+    this.usernameOrEmail = null;
     this.newEmail = null;
   }
 

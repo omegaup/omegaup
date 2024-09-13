@@ -1699,6 +1699,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'username' => $response['username']
         ];
     }
+
     /**
      * Gets extra information of the identity:
      * - last password change request
@@ -1711,12 +1712,12 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, email: string, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool, roles: list<string>}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, email: null|string, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool, roles: list<string>}
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $usernameOrEmail = $r->ensureString(
-            'email',
+            'usernameOrEmail',
             fn (string $usernameOrEmail) => \OmegaUp\Validators::usernameOrEmail(
                 $usernameOrEmail
             )
@@ -1735,9 +1736,12 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $user = self::resolveTargetUser(new \OmegaUp\Request([
-            'username' => $response['username'],
-        ]));
+        $user = self::resolveUser($usernameOrEmail);
+        if (is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
+        }
         $response = array_merge(
             $response,
             [

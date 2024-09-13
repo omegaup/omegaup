@@ -5801,7 +5801,7 @@ export namespace messages {
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
     birth_date?: Date;
-    email: string;
+    email?: string;
     last_login?: Date;
     roles: string[];
     username: string;

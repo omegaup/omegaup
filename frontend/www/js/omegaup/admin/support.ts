@@ -24,7 +24,7 @@ OmegaUp.on('ready', () => {
         lastLogin: null as null | Date,
         birthDate: null as null | Date,
         roles: [] as Array<string>,
-        storedEmail: null as null | string,
+        email: null as null | string,
       };
     },
     render: function (createElement) {
@@ -37,25 +37,25 @@ OmegaUp.on('ready', () => {
           birthDate: this.birthDate,
           roleNamesWithDescription: payload.roleNamesWithDescription,
           roles: this.roles,
-          storedEmail: this.storedEmail,
+          email: this.email,
         },
         on: {
-          'search-email': (email: string): void => {
+          'search-username-or-email': (usernameOrEmail: string): void => {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.lastLogin = null;
             adminSupport.birthDate = null;
             adminSupport.verified = false;
             adminSupport.roles = [];
-            adminSupport.storedEmail = null;
-            api.User.extraInformation({ email: email })
+            adminSupport.email = null;
+            api.User.extraInformation({ usernameOrEmail })
               .then((data) => {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
                 adminSupport.lastLogin = data.last_login ?? null;
                 adminSupport.birthDate = data.birth_date ?? null;
                 adminSupport.roles = data.roles ?? [];
-                adminSupport.storedEmail = data.email;
+                adminSupport.email = data.email;
               })
               .catch(ui.apiError);
           },
@@ -69,8 +69,8 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'verify-user': (email: string): void => {
-            api.User.verifyEmail({ usernameOrEmail: email })
+          'verify-user': (usernameOrEmail: string): void => {
+            api.User.verifyEmail({ usernameOrEmail })
               .then(() => {
                 adminSupport.verified = true;
                 ui.success(T.userVerified);
@@ -78,9 +78,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'generate-token': (email: string): void => {
-            api.Reset.generateToken({
-              email: email,
-            })
+            api.Reset.generateToken({ email })
               .then((data) => {
                 ui.success(T.passwordResetTokenWasGeneratedSuccessfully);
                 adminSupport.link = data.link;
@@ -94,7 +92,7 @@ OmegaUp.on('ready', () => {
             adminSupport.lastLogin = null;
             adminSupport.birthDate = null;
             adminSupport.roles = [];
-            adminSupport.storedEmail = null;
+            adminSupport.email = null;
           },
           'change-role': (role: {
             selected: boolean;
