@@ -1739,7 +1739,6 @@ const translations: { [key: string]: string; } = {
   userNextRegisteredContestButtonSeeDetails: "See details",
   userNextRegisteredContestTitle: "Remember to participate in the contest",
   userNotAllowed: "You do not have the permits to perform this action.",
-  userNotAllowedPrivilegeSelfAssignment: "You do not have the permits to perform this action when privilege self assignment flag is off",
   userNotExist: "Account does not exist.",
   userNotInListOfRequests: "This account does not have a pending request.",
   userObjectivesModalAnswerCompetitive: "programming contests",

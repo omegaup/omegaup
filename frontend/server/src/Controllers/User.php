@@ -3255,13 +3255,9 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         string $roleName
     ): \OmegaUp\DAO\VO\Roles {
-        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowedPrivilegeSelfAssignment'
-            );
-        }
         if (
-            !\OmegaUp\Authorization::isSupportTeamMember($identity)
+            !\OmegaUp\Authorization::isSupportTeamMember($identity) &&
+            !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
@@ -3271,11 +3267,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $role = \OmegaUp\DAO\Roles::getByName($roleName);
         if (
             $role->role_id === \OmegaUp\Authorization::ADMIN_ROLE
-            && !\OmegaUp\Authorization::isSystemAdmin($identity)
+            && !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
         ) {
             // System-admin role cannot be added/removed from the UI, only when
-            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT flag is on and user has
-            // sys-admin role.
+            // OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );

@@ -1739,7 +1739,6 @@ const translations: { [key: string]: string; } = {
   userNextRegisteredContestButtonSeeDetails: "Ver detalles",
   userNextRegisteredContestTitle: "Recuerda participar en el concurso",
   userNotAllowed: "No tienes los permisos para realizar esa acci\u00f3n",
-  userNotAllowedPrivilegeSelfAssignment: "No tienes los permisos para realizar esa acci\u00f3n cuando la bandera de auto asignar permisos est\u00e1 desactivada",
   userNotExist: "La cuenta no existe",
   userNotInListOfRequests: "Esta cuenta no tiene una solicitud pendiente.",
   userObjectivesModalAnswerCompetitive: "concursos de programaci\u00f3n",
