@@ -68,9 +68,9 @@
         data-create-new-problem
         :title="T.problemCreatorCreateNewProblem"
         :ok-title="T.problemCreatorCreateNewProblemContinue"
-        ok-variant="success"
+        ok-variant="danger"
         :cancel-title="T.problemCreatorCreateNewProblemBack"
-        cancel-variant="danger"
+        cancel-variant="success"
         static
         lazy
         @ok="createNewProblem"

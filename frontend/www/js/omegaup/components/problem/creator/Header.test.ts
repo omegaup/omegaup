@@ -61,7 +61,7 @@ describe('Header.vue', () => {
     await resetButton.trigger('click');
 
     const createNewProblemModal = wrapper.find('[data-create-new-problem]');
-    await createNewProblemModal.find('button.btn-success').trigger('click');
+    await createNewProblemModal.find('button.btn-danger').trigger('click');
 
     expect(window.location.reload).toHaveBeenCalledTimes(1);
 
