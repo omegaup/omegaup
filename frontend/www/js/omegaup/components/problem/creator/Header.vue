@@ -53,12 +53,29 @@
           {{ T.problemCreatorGenerateProblem }}</span
         >
       </b-button>
-      <b-button variant="warning" size="sm" @click="createNewProblem">
+      <b-button
+        variant="warning"
+        size="sm"
+        @click="newProblemConfirmationModal = !newProblemConfirmationModal"
+      >
         <BIconPlus class="mr-1" />
         <span class="d-none d-md-inline">
           {{ T.problemCreatorNewProblem }}</span
         >
       </b-button>
+      <b-modal
+        v-model="newProblemConfirmationModal"
+        :title="T.problemCreatorCreateNewProblem"
+        :ok-title="T.problemCreatorCreateNewProblemContinue"
+        ok-variant="success"
+        :cancel-title="T.problemCreatorCreateNewProblemBack"
+        cancel-variant="danger"
+        static
+        lazy
+        @ok="createNewProblem"
+      >
+        <div class="mb-4">{{ T.problemCreatorCreateNewProblemWarning }}</div>
+      </b-modal>
     </b-col>
   </b-row>
 </template>
@@ -78,6 +95,7 @@ export default class Header extends Vue {
   T = T;
   zipFile: File | null = null;
   uploadZipModal: boolean = false;
+  newProblemConfirmationModal: boolean = false;
 
   nameInternal: string = T.problemCreatorEmpty;
   zip: JSZip = new JSZip();
