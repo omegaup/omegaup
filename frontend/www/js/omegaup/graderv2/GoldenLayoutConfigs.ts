@@ -111,28 +111,35 @@ export const UNEMBEDDED_CONFIG: GoldenLayout.Config = {
               type: 'stack',
               id: 'source-and-settings',
               content: [
-                createMonacoEditorComponent(),
+                {
+                  type: 'column',
+                  title: 'code',
+                  content: [
+                    createMonacoEditorComponent(),
+                    {
+                      type: 'stack',
+                      content: [
+                        createTextEditorComponent({
+                          contents: 'compilerOutput',
+                          readOnly: true,
+                          extension: 'out/err',
+                          id: 'compiler',
+                        }),
+                        createTextEditorComponent({
+                          contents: 'logs',
+                          readOnly: true,
+                          extension: 'txt',
+                          id: 'logs',
+                        }),
+                        createZipViewerComponent(),
+                      ],
+                      height: 20,
+                    },
+                  ],
+                  isClosable: false,
+                },
                 createSettingsComponent(),
               ],
-            },
-            {
-              type: 'stack',
-              content: [
-                createTextEditorComponent({
-                  contents: 'compilerOutput',
-                  readOnly: true,
-                  extension: 'out/err',
-                  id: 'compiler',
-                }),
-                createTextEditorComponent({
-                  contents: 'logs',
-                  readOnly: true,
-                  extension: 'txt',
-                  id: 'logs',
-                }),
-                createZipViewerComponent(),
-              ],
-              height: 20,
             },
           ],
           isClosable: false,
