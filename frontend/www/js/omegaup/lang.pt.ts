@@ -1389,6 +1389,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "Nome da conta",
   problemVersionVersion: "Vers\u00e3o do problema",
   problemcollectionViewProblems: "Ver problemas",
+  problemlessGrader: "omegaUp IDE",
   problemsOrderUpdated: "A ordem dos problemas foi atualizada.",
   problemsetIdentityNotFound: "A conta ou identidade n\u00e3o est\u00e1 associada ao curso, concurso ou tarefa.",
   problemsetNotFound: "Conjunto de problemas n\u00e3o encontrado.",
@@ -2056,6 +2057,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tempo-real (Seg)",
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
+  zipPrepare: "Preparar arquivo zip",
 };
 
 export {translations as default};

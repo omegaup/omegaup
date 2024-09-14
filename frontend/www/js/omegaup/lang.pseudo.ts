@@ -1389,6 +1389,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "(Acc0un7 nam3)",
   problemVersionVersion: "(Pr0b13m v3r5i0n)",
   problemcollectionViewProblems: "(Vi3w pr0b13m5)",
+  problemlessGrader: "(0m3gaUp IDE)",
   problemsOrderUpdated: "(Pr0b13m5' 0rd3r ha5 b33n upda73d)",
   problemsetIdentityNotFound: "(Acc0un7 0r id3n7i7y i5 n07 a550cia73d wi7h 7hi5 c0ur53, c0n7357 0r 7a5k.)",
   problemsetNotFound: "(Pr0b13m537 d035 n07 3xi57.)",
@@ -2056,6 +2057,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "(Wa11-7im3 (S3c))",
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
+  zipPrepare: "(Pr3par3 zip fi13)",
 };
 
 export {translations as default};
