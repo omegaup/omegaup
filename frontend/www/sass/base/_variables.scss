@@ -239,10 +239,14 @@
   --grader-status-submissions-link-font-color: #000000;
   --grader-status-submissions-link-background-color--hover: #ffffff;
 
-  // GRADER TEXTEDITOR
-  --textarea-vs-background-color: #f8f9fa;
-  --textarea-vs-dark-background-color: #222;
-  --textarea-vs-dark-font-color: #d4d4d4;
+  // GRADER MODES
+  --vs-background-color: #f8f9fa;
+  --vs-font-color: #333333;
+  --vs-dark-background-color: #222;
+  --vs-dark-font-color: #d4d4d4;
+
+  // GRADER ZIP BUTTONS
+  --zip-button-color--hover: #ffffff;
 
   // TOGGLE SWITCH
   --toggle-switch-slider-background-color: #dddddd;

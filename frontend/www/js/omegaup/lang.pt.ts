@@ -1114,6 +1114,11 @@ const translations: { [key: string]: string; } = {
   problemCreatorUngrouped: "Sem_grupo",
   problemCreatorUngroupedCases: "Casos sem grupo",
   problemCreatorUpdateAlert: "O problema foi atualizado com \u00eaxito.",
+  problemCreatorUploadZip: "Enviar",
+  problemCreatorUploadZipMessage: "Envie aqui o arquivo zip do seu problema.",
+  problemCreatorZipFileIsNotComplete: "O arquivo zip deve conter o arquivo cdp.data",
+  problemCreatorZipFileIsNotValid: "O arquivo enviado n\u00e3o \u00e9 um arquivo zip v\u00e1lido",
+  problemCreatorZipFileUpload: "Enviar arquivo zip",
   problemDeployerChangeMissingSettingsJson: "O problema precisa ter um arquivo 'settings.json'.",
   problemDeployerConfigBadLayout: "O commit para 'refs/meta/config' tem uma estrutura incorreta.",
   problemDeployerConfigInvalidPublishingMode: "O modo de publica\u00e7\u00e3o escolhido n\u00e3o \u00e9 suportado.",
@@ -1384,6 +1389,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "Nome da conta",
   problemVersionVersion: "Vers\u00e3o do problema",
   problemcollectionViewProblems: "Ver problemas",
+  problemlessGrader: "omegaUp IDE",
   problemsOrderUpdated: "A ordem dos problemas foi atualizada.",
   problemsetIdentityNotFound: "A conta ou identidade n\u00e3o est\u00e1 associada ao curso, concurso ou tarefa.",
   problemsetNotFound: "Conjunto de problemas n\u00e3o encontrado.",
@@ -2051,6 +2057,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tempo-real (Seg)",
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
+  zipPrepare: "Preparar arquivo zip",
 };
 
 export {translations as default};

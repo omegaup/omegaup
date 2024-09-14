@@ -351,6 +351,18 @@ const storeOptions: StoreOptions<GraderStore> = {
     request(state: GraderStore) {
       return state.request;
     },
+    customValidator(state: GraderStore) {
+      return state.request.input.validator.custom_validator;
+    },
+    inputCases(state: GraderStore) {
+      return state.request.input.cases;
+    },
+    Interactive(state: GraderStore) {
+      return state.request.input.interactive;
+    },
+    limits(state: GraderStore) {
+      return state.request.input.limits;
+    },
   },
   mutations: {
     alias(
@@ -472,7 +484,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     results(state: GraderStore, value: GraderResults) {
       Vue.set(state, 'results', value);
-      state.dirty = false;
+      state.dirty = true;
     },
     clearOutputs(state: GraderStore) {
       Vue.set(state, 'outputs', {});
@@ -567,7 +579,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     Interactive(
       state: GraderStore,
-      value: types.InteractiveSettingsDistrib | undefined,
+      value: Partial<types.InteractiveSettingsDistrib> | undefined,
     ) {
       const isInteractive = !!value;
       if (!isInteractive) {
@@ -616,7 +628,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       for (const lang in templates) {
         const extension = Util.supportedLanguages[lang].extension;
 
-        if (Object.prototype.hasOwnProperty.call(templates, extension)) {
+        if (templates[extension]) {
           for (const language of Util.extensionToLanguages[extension]) {
             interactiveTemplates[language] = templates[extension];
           }
@@ -627,7 +639,7 @@ const storeOptions: StoreOptions<GraderStore> = {
           }
         }
       }
-
+      store.commit('request.language', state.request.language);
       state.dirty = true;
     },
     'request.input.interactive.language'(state: GraderStore, value: string) {
@@ -707,6 +719,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     showRunButton(state: GraderStore, value: boolean) {
       state.showRunButton = value;
     },
+    isDirty(state: GraderStore, value: boolean) {
+      state.dirty = value;
+    },
   },
   actions: {
     zipContent({ commit }: { commit: Commit }, value: string) {
@@ -732,7 +747,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     Interactive(
       { commit }: { commit: Commit },
-      interactiveSettings: types.InteractiveSettingsDistrib | undefined,
+      interactiveSettings:
+        | Partial<types.InteractiveSettingsDistrib>
+        | undefined,
     ) {
       commit('Interactive', interactiveSettings);
     },
@@ -783,6 +800,18 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     clearOutputs({ commit }: { commit: Commit }) {
       commit('clearOutputs');
+    },
+    'request.input.validator.custom_validator.source'(
+      { commit }: { commit: Commit },
+      value: string,
+    ) {
+      commit('request.input.validator.custom_validator.source', value);
+    },
+    isDirty({ commit }: { commit: Commit }, value: boolean) {
+      commit('isDirty', value);
+    },
+    Toleration({ commit }: { commit: Commit }, value: number) {
+      commit('Toleration', value);
     },
     reset({ commit }: { commit: Commit }) {
       commit(

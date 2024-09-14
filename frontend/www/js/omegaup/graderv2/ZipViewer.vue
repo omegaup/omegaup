@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="root d-flex flex-row h-100"
-    :class="{
-      'bg-dark': theme === 'vs-dark',
-      'text-white': theme === 'vs-dark',
-    }"
-  >
+  <div class="root d-flex flex-row h-100">
     <div class="filenames">
       <div class="list-group">
         <button
@@ -21,7 +15,10 @@
           :key="name"
           class="text-truncate list-group-item list-group-item-action"
           type="button"
-          :class="{ active: active === name }"
+          :class="{
+            active: active === name && theme === 'vs',
+            'vs-dark': active === name && theme === 'vs-dark',
+          }"
           :title="name"
           @click="select(item)"
         >
@@ -29,7 +26,12 @@
         </button>
       </div>
     </div>
-    <textarea v-model="contents" class="editor" readonly></textarea>
+    <textarea
+      v-model="contents"
+      class="editor"
+      :class="theme"
+      readonly
+    ></textarea>
   </div>
 </template>
 
@@ -75,5 +77,18 @@ button.list-group-item {
 
 textarea {
   flex: 1;
+  font-family: 'Droid Sans Mono', 'Courier New', monospace,
+    'Droid Sans Fallback';
+  border: 0px;
+  resize: none;
+}
+
+.vs {
+  background: var(--vs-background-color);
+  color: var(--vs-font-color);
+}
+.vs-dark {
+  background: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
 }
 </style>
