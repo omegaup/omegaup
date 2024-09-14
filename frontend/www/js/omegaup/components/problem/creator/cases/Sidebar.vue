@@ -199,12 +199,12 @@
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="edit group"
               @click="editGroupModal[groupID] = !editGroupModal[groupID]"
-              ><b-row
-                ><div class="ml-6">
+              ><b-row>
+                <div class="ml-6">
                   <BIconPencil variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div></b-row
-              >
+                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+              </b-row>
             </b-dropdown-item>
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="delete group"
@@ -233,26 +233,26 @@
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="download .in"
               @click="downloadGroupInput(groupID, '.in')"
-              ><b-row
-                ><div class="ml-6">
+              ><b-row>
+                <div class="ml-6">
                   <BIconBoxArrowDown variant="info" font-scale=".95" />
                 </div>
                 <div class="ml-8">
                   {{ T.problemCraetorGroupDownloadIn }}
-                </div></b-row
-              >
+                </div>
+              </b-row>
             </b-dropdown-item>
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="download .txt"
               @click="downloadGroupInput(groupID, '.txt')"
-              ><b-row
-                ><div class="ml-6">
+              ><b-row>
+                <div class="ml-6">
                   <BIconTextLeft variant="info" font-scale=".95" />
                 </div>
                 <div class="ml-8">
                   {{ T.problemCraetorGroupDownloadTxt }}
-                </div></b-row
-              >
+                </div>
+              </b-row>
             </b-dropdown-item>
           </b-dropdown>
           <b-collapse v-model="showCases[groupID]" class="w-100">
