@@ -1119,6 +1119,11 @@ const translations: { [key: string]: string; } = {
   problemCreatorUngrouped: "Ungrouped",
   problemCreatorUngroupedCases: "Ungrouped cases",
   problemCreatorUpdateAlert: "The problem has been updated succesfully.",
+  problemCreatorUploadZip: "Upload",
+  problemCreatorUploadZipMessage: "Upload the zip file of your problem here.",
+  problemCreatorZipFileIsNotComplete: "The zip file must contain cdp.data file",
+  problemCreatorZipFileIsNotValid: "The uploaded file is not a valid zip file",
+  problemCreatorZipFileUpload: "Upload zip file",
   problemDeployerChangeMissingSettingsJson: "The problem is missing a 'settings.json' file.",
   problemDeployerConfigBadLayout: "The commit to 'refs/meta/config' has the wrong layout.",
   problemDeployerConfigInvalidPublishingMode: "The chosen publishing mode is not supported.",
@@ -1389,6 +1394,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUsername: "Account name",
   problemVersionVersion: "Problem version",
   problemcollectionViewProblems: "View problems",
+  problemlessGrader: "omegaUp IDE",
   problemsOrderUpdated: "Problems' order has been updated",
   problemsetIdentityNotFound: "Account or identity is not associated with this course, contest or task.",
   problemsetNotFound: "Problemset does not exist.",
@@ -2056,6 +2062,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
+  zipPrepare: "Prepare zip file",
 };
 
 export {translations as default};
