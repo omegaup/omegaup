@@ -41,6 +41,28 @@ class Run extends \OmegaUp\Controllers\Controller {
         'rs' => 'Rust (1.56.1)',
         'js' => 'JavaScript (Node.js 16)',
     ];
+    /**
+     *
+     * @return array<string, string>
+     */
+    public static function supported_languages(): array {
+        static $supportedLanguages = [];
+
+        if (empty($supportedLanguages)) {
+            $languagesFile = __DIR__ . '/../../../data/languages.json';
+            $languagesJsonArray = json_decode(
+                file_get_contents(
+                    $languagesFile
+                ),
+                true
+            );
+            foreach ($languagesJsonArray as $key => $languageInfo) {
+                $supportedLanguages[$key] = $languageInfo['name'];
+            }
+        }
+
+        return $supportedLanguages;
+    }
 
     // These languages are aliases. They can be shown to the user, but should
     // not appear as selectable mostly anywhere.
@@ -73,7 +95,24 @@ class Run extends \OmegaUp\Controllers\Controller {
         'rs',
         'js',
     ];
+    /**
+     *
+     * @return list<string>
+     */
+    public static function default_languages(): array {
+        static $defaultLanguages = [];
 
+        if (empty($defaultLanguages)) {
+            $supportedLanguages = self::supported_languages();
+            $filterList = ['cat', 'kp', 'kj'];
+
+            $defaultLanguages = array_keys(array_filter($supportedLanguages, function ($key) use ($filterList) {
+                return !in_array($key, $filterList);
+            }));
+        }
+
+        return $defaultLanguages;
+    }
     /** @var int */
     public static $defaultSubmissionGap = 60; // seconds.
 
@@ -109,7 +148,6 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
-
     /**
      * Validates that a run is happening within the submission gap.
      *
@@ -190,7 +228,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         /** @var list<string> $allowedLanguages */
         $allowedLanguages = array_intersect(
-            array_keys(self::SUPPORTED_LANGUAGES),
+            array_keys(self::supported_languages()),
             explode(',', $problem->languages)
         );
         $language = $r->ensureString('language');
@@ -1811,7 +1849,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
+        $languagesKeys = array_keys(self::supported_languages());
         [
             'runs' => $runs,
             'totalRuns' => $totalRuns,
