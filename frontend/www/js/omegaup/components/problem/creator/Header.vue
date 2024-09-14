@@ -65,6 +65,7 @@
       </b-button>
       <b-modal
         v-model="newProblemConfirmationModal"
+        data-create-new-problem
         :title="T.problemCreatorCreateNewProblem"
         :ok-title="T.problemCreatorCreateNewProblemContinue"
         ok-variant="success"
