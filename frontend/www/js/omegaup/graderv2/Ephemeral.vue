@@ -37,6 +37,17 @@
               />
             </a>
           </label>
+          <label>
+            <button
+              class="btn btn-secondary btn-sm mr-2"
+              @click.prevent="toggleTheme"
+            >
+              <font-awesome-icon
+                :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
+                aria-hidden="true"
+              />
+            </button>
+          </label>
         </slot>
         <select
           v-model="selectedLanguage"
@@ -119,8 +130,10 @@ import {
   faUpload,
   faFileArchive,
   faDownload,
+  faSun,
+  faMoon,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload);
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
 
 import T from '../lang';
 
@@ -142,7 +155,7 @@ interface ComponentState {
 })
 export default class Ephemeral extends Vue {
   @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
+  @Prop({ required: true }) initialTheme!: string;
 
   @Prop() problem!: types.ProblemInfo;
   @Prop({ default: 'cpp17-gcc' }) initialLanguage!: string;
@@ -154,8 +167,8 @@ export default class Ephemeral extends Vue {
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    vs: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
-    'vs-dark': `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+    [Util.VS_LIGHT_THEME]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    [Util.VS_DARK_THEME]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -193,7 +206,18 @@ export default class Ephemeral extends Vue {
   get currentCase(): string {
     return store.getters['currentCase'];
   }
+  get isDark() {
+    return this.theme === Util.VS_DARK_THEME;
+  }
 
+  toggleTheme() {
+    store.dispatch(
+      'theme',
+      this.theme === Util.VS_LIGHT_THEME
+        ? Util.VS_DARK_THEME
+        : Util.VS_LIGHT_THEME,
+    );
+  }
   initProblem() {
     // use commits for synchronous behavior
     // or else bugs occur where layout toggles cases column
@@ -202,6 +226,7 @@ export default class Ephemeral extends Vue {
     store
       .dispatch('initProblem', {
         initialLanguage: this.initialLanguage,
+        initialTheme: this.initialTheme,
         languages: this.acceptedLanguages,
         problem: this.problem,
         showRunButton: this.canRun,
@@ -238,6 +263,16 @@ export default class Ephemeral extends Vue {
     if (!value || this.isEmbedded) return;
     this.zipHref = null;
     this.zipDownload = null;
+  }
+  @Watch('theme')
+  onThemeChange() {
+    // remove old theme
+    for (const theme in this.themeToRef) {
+      if (theme === this.theme) continue;
+      const link = document.getElementById(this.themeToRef[theme]);
+      if (link) link.remove();
+    }
+    this.downloadThemeStylesheet(this.theme);
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -602,7 +637,6 @@ export default class Ephemeral extends Vue {
         container.on('open', () => {
           const props: ComponentProps = {
             storeMapping: componentState.storeMapping,
-            theme: self.theme,
           };
           for (const k in componentState) {
             if (k === 'id' || !componentState[k]) continue;
@@ -637,23 +671,26 @@ export default class Ephemeral extends Vue {
     );
   }
 
-  beforeMount() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    } else {
-      store.dispatch('reset');
-    }
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = this.themeToRef[this.theme];
-    document.head.appendChild(link);
-  }
   onResized() {
     if (!this.layoutRoot.clientWidth) return;
     if (!this.goldenLayout?.isInitialised) {
       this.goldenLayout?.init();
     }
     this.goldenLayout?.updateSize();
+  }
+  downloadThemeStylesheet(theme: string) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[theme];
+    document.head.appendChild(link);
+  }
+  beforeMount() {
+    if (this.isEmbedded) {
+      this.initProblem();
+    } else {
+      store.dispatch('reset');
+    }
+    this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(

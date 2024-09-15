@@ -6,7 +6,7 @@
     :can-submit="canSubmit"
     :can-run="canRun"
     :is-embedded="isEmbedded"
-    :theme="theme"
+    :initial-theme="initialTheme"
   >
     <template #zip-buttons><div></div></template>
   </ephemeral-ide>
@@ -15,6 +15,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import { VS_LIGHT_THEME } from '../../graderv2/util';
 import Ephemeral from '../../graderv2/Ephemeral.vue';
 
 @Component({
@@ -29,7 +30,8 @@ export default class EphemeralGrader extends Vue {
   @Prop({ default: () => [] }) acceptedLanguages!: string[];
   @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
   @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
+  @Prop({ default: VS_LIGHT_THEME }) initialTheme!: string;
+
   // note: initial source is for the IDE is also supported
   get initialLanguage() {
     if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
