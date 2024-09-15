@@ -19,12 +19,11 @@ describe('Sidebar.vue', () => {
   // Total 7 buttons are rendered initially on this page.
   // - Layout button
   // - Add case/group button
-  // - Delete group button
-  // - Delete Cases button
+  // - Ungrouped case button
   // - Add new layout button
   // - Add layout from selected case button
   // - close layout bar button
-  const initialButtonsCount = 7;
+  const initialButtonsCount = 6;
 
   beforeEach(() => {
     store.commit('casesStore/resetStore');
@@ -61,23 +60,23 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(4);
     expect(
       wrapper.find('b-button-stub[title="ungroupedCase1"]').text(),
     ).toContain('ungroupedCase1');
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(2);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
 
     store.commit('casesStore/addGroup', newGroup1);
     store.commit('casesStore/addGroup', newGroup2);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(4);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(5);
 
     store.commit('casesStore/deleteUngroupedCases');
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(2);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(3);
   });
 
   it('should show groups and cases inside them', async () => {
@@ -85,20 +84,25 @@ describe('Sidebar.vue', () => {
 
     const newGroup1 = generateGroup({
       name: 'group1',
+      ungroupedCase: false,
     });
     const newGroup2 = generateGroup({
       name: 'group2withlongname',
+      ungroupedCase: false,
     });
     store.commit('casesStore/addGroup', newGroup1);
     store.commit('casesStore/addGroup', newGroup2);
     expect(store.state.casesStore.groups).toStrictEqual([newGroup1, newGroup2]);
 
     await Vue.nextTick();
+    await Vue.nextTick();
 
-    const totalDropdownItemsCount = 8;
+    const totalDropdownItemsCount = 9;
     // There are
     // - 3 dropdown items for each group
-    // - a dropdown item for each case
+    // - 2 dropdown itema for ungrouped case
+    // - a dropdown item for validate points
+
     expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(
       totalDropdownItemsCount,
     );
@@ -128,7 +132,7 @@ describe('Sidebar.vue', () => {
     await Vue.nextTick();
 
     // The number of dropdown stubs should be equal to
-    // (#dropdown-stubs) = 3*(#groups) + 1*(#cases)
+    // (#dropdown-stubs) = 3*(#groups) + 2 (for ungrouped cases) + 1 (for validate points) 
 
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
@@ -158,7 +162,7 @@ describe('Sidebar.vue', () => {
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(5);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(6);
   });
 
   it('Should modify a group', async () => {
@@ -166,6 +170,7 @@ describe('Sidebar.vue', () => {
 
     const newGroup = generateGroup({
       name: 'group',
+      autoPoints: true,
     });
     store.commit('casesStore/addGroup', newGroup);
     await Vue.nextTick();
@@ -188,6 +193,11 @@ describe('Sidebar.vue', () => {
       '[data-sidebar-edit-group-modal="edit points"]',
     );
     await editPointsInput.setValue(modifiedPoints);
+    
+    const editAutoPointsInput = editModal.find(
+      '[data-sidebar-edit-group-modal="edit autoPoints"]',
+    );
+    await editAutoPointsInput.setChecked(false);
 
     await editModal.find('button.btn-success').trigger('click');
 

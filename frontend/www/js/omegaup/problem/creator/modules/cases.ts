@@ -219,6 +219,8 @@ export const casesStore: Module<CasesState, RootState> = {
         }
         caseToEdit.points = updateCaseRequest.points;
         oldGroup.points = updateCaseRequest.points;
+        caseToEdit.autoPoints = updateCaseRequest.autoPoints;
+        oldGroup.autoPoints = updateCaseRequest.autoPoints;
         state = assignMissingPoints(state);
         return;
       }
@@ -234,7 +236,7 @@ export const casesStore: Module<CasesState, RootState> = {
           name: updateCaseRequest.name,
           groupID: groupID,
           points: updateCaseRequest.points,
-          autoPoints: updateCaseRequest.points === null,
+          autoPoints: updateCaseRequest.autoPoints,
           ungroupedCase: true,
           cases: [caseToEdit],
         });

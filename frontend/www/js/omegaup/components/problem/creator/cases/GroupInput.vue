@@ -34,7 +34,7 @@
     >
       <b-form-checkbox
         :checked="groupAutoPoints"
-        name="auto-points"
+        name="group-auto-points"
         @change="toggleGroupAutoPoints"
       >
       </b-form-checkbox>

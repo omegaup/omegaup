@@ -146,22 +146,22 @@
           <b-collapse v-model="showUngroupedCases" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
-                v-for="{ cases, groupID } in ungroupedCases"
+                v-for="{ name, points, cases, groupID } in ungroupedCases"
                 :key="groupID"
                 class="mb-1"
               >
                 <b-button
                   variant="light"
                   data-placement="top"
-                  :title="cases[0].name"
+                  :title="name"
                   class="w-82"
                   @click="editCase(groupID, cases[0].caseID)"
                 >
                   <div class="d-flex justify-content-between">
-                    <div class="mr-2 text-truncate">{{ cases[0].name }}</div>
+                    <div class="mr-2 text-truncate">{{ name }}</div>
                     <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
-                        {{ Math.round(cases[0].points || 0) }}
+                        {{ Math.round(points || 0) }}
                         {{ T.problemCreatorPointsAbbreviation }}</b-badge
                       >
                     </div>
@@ -342,7 +342,7 @@
                 :description="T.problemCreatorAutomaticPointsHelperGroup"
               >
                 <b-form-checkbox
-                  data-sidebar-edit-group-modal="edit nullpoint"
+                  data-sidebar-edit-group-modal="edit autoPoints"
                   :checked="editGroupAutoPoints[groupID]"
                   @change="toggleGroupAutoPoints(groupID)"
                 >
