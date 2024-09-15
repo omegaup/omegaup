@@ -2904,7 +2904,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if (empty($language)) {
                 continue;
             }
-            
+
             /** @psalm-suppress RedundantCondition non-falsy-string for $language is always a string */
             \OmegaUp\Validators::validateInEnum(
                 $language,
@@ -5193,7 +5193,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES());
+        $languages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
 
         // Get our runs
         return self::getAllRuns(

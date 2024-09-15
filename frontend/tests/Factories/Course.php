@@ -19,7 +19,7 @@ class Course {
         ?bool $needsBasicInformation = false,
         ?array $languages = []
     ): array {
-        if(is_array($languages) && empty($languages) ){
+        if (is_array($languages) && empty($languages)) {
             $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES();
         }
         if (is_null($admin)) {

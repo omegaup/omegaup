@@ -15,7 +15,6 @@
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
-
     // this variable is not used anywhere
     public const LANGUAGE_ALIASES = [
         'c' => 'C11 (gcc 9.3)',
