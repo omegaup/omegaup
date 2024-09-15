@@ -93,9 +93,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             $supportedLanguages = self::SUPPORTED_LANGUAGES();
             $filterList = ['cat', 'kp', 'kj'];
 
-            $defaultLanguages = array_keys(array_filter($supportedLanguages, function ($key) use ($filterList) {
+            $defaultLanguages = array_keys(array_filter($supportedLanguages, function (
+                $languageName,
+                $key
+            ) use ($filterList) {
                 return !in_array($key, $filterList);
-            }));
+            }, ARRAY_FILTER_USE_BOTH));
         }
 
         return $defaultLanguages;
