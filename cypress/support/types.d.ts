@@ -48,6 +48,7 @@ export interface ProblemOptions {
   problemLevelIndex: number;
   publicAccess?: boolean;
   firstTimeVisited?: boolean;
+  languagesValue?: string;
 }
 
 export interface CourseOptions {
