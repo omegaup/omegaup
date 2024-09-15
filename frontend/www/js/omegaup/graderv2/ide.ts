@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import grader_EphemeralIDE from '../components/arena/EphemeralGrader.vue';
-import { OmegaUp } from '../omegaup';
+
 import * as Util from './util';
+import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
   // TODO: implement typescript payload parser
@@ -14,14 +15,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement(grader_EphemeralIDE, {
         props: {
-          canSubmit: false,
-          canRun: true,
-          acceptedLanguages: Object.values(Util.supportedLanguages).map(
-            (languageInfo) => languageInfo.language,
-          ),
-          preferredLanguage: 'cpp17-gcc',
           isEmbedded: false,
-          theme: 'vs-dark',
+          initialTheme: Util.VS_DARK_THEME,
         },
       });
     },
