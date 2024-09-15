@@ -203,6 +203,7 @@ rl.question('', (t) => {
   }
   rl.close();
 });`,
+  cat: '',
 };
 
 export const originalInteractiveTemplates: Record<string, string> = {
@@ -260,4 +261,5 @@ end.`,
   go: '// not supported',
   rs: '// not supported',
   js: '// not supported',
+  cat: '// not supported',
 };
