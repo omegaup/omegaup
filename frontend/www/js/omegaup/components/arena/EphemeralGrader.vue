@@ -8,14 +8,13 @@
     :is-embedded="isEmbedded"
     :initial-theme="initialTheme"
   >
-    <template #zip-buttons><div></div></template>
   </ephemeral-ide>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import { VS_LIGHT_THEME } from '../../graderv2/util';
+import * as Util from '../../graderv2/util';
 import Ephemeral from '../../graderv2/Ephemeral.vue';
 
 @Component({
@@ -24,13 +23,20 @@ import Ephemeral from '../../graderv2/Ephemeral.vue';
   },
 })
 export default class EphemeralGrader extends Vue {
-  @Prop() problem!: types.ProblemInfo;
+  @Prop({ default: () => ({ ...Util.DUMMY_PROBLEM }) })
+  problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
   @Prop({ default: true }) canRun!: boolean;
-  @Prop({ default: () => [] }) acceptedLanguages!: string[];
+  @Prop({
+    default: () =>
+      Object.values(Util.supportedLanguages).map(
+        (languageInfo) => languageInfo.language,
+      ),
+  })
+  acceptedLanguages!: string[];
   @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
   @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: VS_LIGHT_THEME }) initialTheme!: string;
+  @Prop({ default: Util.VS_LIGHT_THEME }) initialTheme!: string;
 
   // note: initial source is for the IDE is also supported
   get initialLanguage() {
