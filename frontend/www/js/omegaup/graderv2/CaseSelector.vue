@@ -95,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import store from './GraderStore';
 import { types } from '../api_types';
 import { GraderResults, CaseSelectorGroup } from './GraderStore';
