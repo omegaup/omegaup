@@ -121,7 +121,7 @@ export default class AddPanel extends Vue {
       const caseName = this.caseInputRef.caseName;
       const caseGroup = this.caseInputRef.caseGroup;
       const casePoints = this.caseInputRef.casePoints;
-      const caseAutoPoints = casePoints === null;
+      const caseAutoPoints = this.caseInputRef.caseAutoPoints;
 
       // Check if there is a group/case with the same name already
       if (caseGroup === NIL) {
@@ -151,7 +151,7 @@ export default class AddPanel extends Vue {
     } else if (this.tab === 'group') {
       const groupName = this.groupInputRef.groupName;
       const groupPoints = this.groupInputRef.groupPoints;
-      const groupAutoPoints = groupPoints === null;
+      const groupAutoPoints = this.groupInputRef.groupAutoPoints;
 
       // Check if there is a group with the same name already
       const nameAlreadyExists = this.groups.find((g) => g.name === groupName);
