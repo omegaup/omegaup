@@ -101,7 +101,7 @@ export const casesStore: Module<CasesState, RootState> = {
         const groupID = uuid();
         const newGroup = generateGroup({
           name: caseRequest.name,
-          groupID,
+          groupID: groupID,
           points: caseRequest.points,
           autoPoints: caseRequest.autoPoints,
           ungroupedCase: true,
