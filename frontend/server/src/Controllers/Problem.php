@@ -406,7 +406,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'languages',
                 array_merge(
                     [''],
-                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+                    array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES())
                 )
             );
         }
@@ -5007,7 +5007,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'problemEditFormCustom'
             ),
         ];
-        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
+        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES();
         sort($sortedLanguages);
         $validLanguages = [
             join(
@@ -5461,7 +5461,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ];
             }
         }
-        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES;
+        $sortedLanguages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES();
         sort($sortedLanguages);
 
         return [
