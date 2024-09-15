@@ -61,7 +61,9 @@ export interface LanguageInfo {
   modelMapping: string;
   language: string;
 }
+
 export const supportedLanguages: Record<string, LanguageInfo> = languages;
+
 export const supportedExtensions: string[] = [
   ...new Set(
     Object.values(supportedLanguages).map((language) => language.extension),
