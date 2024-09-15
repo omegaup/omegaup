@@ -297,3 +297,5 @@ export function throttle<T extends any[]>(
 
   return throttled;
 }
+export const VS_LIGHT_THEME = 'vs';
+export const VS_DARK_THEME = 'vs-dark';
