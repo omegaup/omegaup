@@ -103,12 +103,13 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  @Prop({ default: 'vs-dark' }) theme!: string;
-
   newCaseWeight: number = 1;
   newCaseName: string = '';
   T = T;
 
+  get theme(): string {
+    return store.getters['theme'];
+  }
   get summary(): string {
     if (!store.state.results || !store.state.results.verdict) {
       return '…';

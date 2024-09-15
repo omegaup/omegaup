@@ -174,6 +174,9 @@ export default class Ephemeral extends Vue {
   get isDirty() {
     return store.getters['isDirty'];
   }
+  get theme() {
+    return store.getters['theme'];
+  }
 
   get selectedLanguage() {
     return store.getters['request.language'];
