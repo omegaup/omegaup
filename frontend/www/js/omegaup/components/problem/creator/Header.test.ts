@@ -1,4 +1,5 @@
 import { shallowMount, createLocalVue, mount } from '@vue/test-utils';
+import JSZip from 'jszip';
 
 import Header from './Header.vue';
 import BootstrapVue, { IconsPlugin, BButton, BFormInput } from 'bootstrap-vue';
@@ -139,5 +140,142 @@ describe('Header.vue', () => {
     expect(Object.keys(wrapper.vm.zip.files)).toStrictEqual(fileFolderList);
 
     jest.restoreAllMocks();
+  });
+
+  it('Should process the zip after it is uploaded', async () => {
+    const wrapper = mount(Header, {
+      localVue,
+      store,
+    });
+
+    const cdpDataText = `{"problemName":"Hello","problemMarkdown":"Hello Statement!","problemCodeContent":"print('Hello world')","problemCodeExtension":"py","problemSolutionMarkdown":"Hello Solution!","casesStore":{"groups":[{"groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","name":"hellogroup","points":100,"autoPoints":false,"ungroupedCase":false,"cases":[{"caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","lines":[{"lineID":"c54c349e-b56e-426e-b4e1-032c62b05e8e","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","label":"Line1","data":{"kind":"line","value":"Hello line"}},{"lineID":"9768961e-27fc-4cdc-a4ca-c2de43fc15b1","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e","label":"Line2","data":{"kind":"multiline","value":"Hello multiline"}}],"points":100,"output":"","name":"hellocase"}]}],"selected":{"groupID":"26fdf593-d0c5-49f0-80b0-09bf0673c974","caseID":"8dda8030-60b9-4daf-b484-c4254525be6e"},"layouts":[{"layoutID":"2b741bd6-6f20-46bd-9a0f-d3fbfc4ad03f","name":"hellogroup_hellocase","caseLineInfos":[{"lineInfoID":"d8942896-0c67-42ce-8f4b-581eade8840f","label":"Line1","data":{"kind":"line","value":""}},{"lineInfoID":"416ce979-62c7-4e9c-b282-d4734a7b556e","label":"Line2","data":{"kind":"multiline","value":""}}]}],"hide":false}}`;
+
+    const zip = new JSZip();
+    zip.file('cdp.data', cdpDataText);
+
+    const zipContent = await zip.generateAsync({ type: 'blob' });
+    const testZipFile = new File([zipContent], 'testfile.zip', {
+      type: 'application/zip',
+    });
+
+    const mockReadFileMethod = jest
+      .spyOn(wrapper.vm, 'readFile')
+      .mockImplementation(() => testZipFile);
+
+    const loadFileButton = wrapper.find('button[data-load-problem-button]');
+    expect(loadFileButton.exists()).toBeTruthy();
+
+    await loadFileButton.trigger('click');
+
+    const fileInput = wrapper.find('input[data-upload-zip-file]');
+    expect(fileInput.exists()).toBeTruthy();
+
+    await fileInput.trigger('change');
+
+    wrapper.vm.retrieveStore();
+    expect(mockReadFileMethod).toHaveBeenCalled();
+
+    const emittedStoreData = {
+      problemName: 'Hello',
+      problemMarkdown: 'Hello Statement!',
+      problemCodeContent: "print('Hello world')",
+      problemCodeExtension: 'py',
+      problemSolutionMarkdown: 'Hello Solution!',
+      casesStore: {
+        groups: [
+          {
+            groupID: '26fdf593-d0c5-49f0-80b0-09bf0673c974',
+            name: 'hellogroup',
+            points: 100,
+            autoPoints: false,
+            ungroupedCase: false,
+            cases: [
+              {
+                caseID: '8dda8030-60b9-4daf-b484-c4254525be6e',
+                groupID: '26fdf593-d0c5-49f0-80b0-09bf0673c974',
+                lines: [
+                  {
+                    lineID: 'c54c349e-b56e-426e-b4e1-032c62b05e8e',
+                    caseID: '8dda8030-60b9-4daf-b484-c4254525be6e',
+                    label: 'Line1',
+                    data: {
+                      kind: 'line',
+                      value: 'Hello line',
+                    },
+                  },
+                  {
+                    lineID: '9768961e-27fc-4cdc-a4ca-c2de43fc15b1',
+                    caseID: '8dda8030-60b9-4daf-b484-c4254525be6e',
+                    label: 'Line2',
+                    data: {
+                      kind: 'multiline',
+                      value: 'Hello multiline',
+                    },
+                  },
+                ],
+                points: 100,
+                output: '',
+                name: 'hellocase',
+              },
+            ],
+          },
+        ],
+        selected: {
+          groupID: '26fdf593-d0c5-49f0-80b0-09bf0673c974',
+          caseID: '8dda8030-60b9-4daf-b484-c4254525be6e',
+        },
+        layouts: [
+          {
+            layoutID: '2b741bd6-6f20-46bd-9a0f-d3fbfc4ad03f',
+            name: 'hellogroup_hellocase',
+            caseLineInfos: [
+              {
+                lineInfoID: 'd8942896-0c67-42ce-8f4b-581eade8840f',
+                label: 'Line1',
+                data: {
+                  kind: 'line',
+                  value: '',
+                },
+              },
+              {
+                lineInfoID: '416ce979-62c7-4e9c-b282-d4734a7b556e',
+                label: 'Line2',
+                data: {
+                  kind: 'multiline',
+                  value: '',
+                },
+              },
+            ],
+          },
+        ],
+        hide: false,
+      },
+    };
+
+    await new Promise((r) => setTimeout(r, 1000)); // Waiting for the JSZIp to complete extracting the file.
+
+    expect(wrapper.emitted()['upload-zip-file']).toStrictEqual([
+      [emittedStoreData],
+    ]);
+
+    expect(wrapper.vm.nameInternal).toBe(emittedStoreData.problemName);
+    expect(wrapper.vm.$store.state.problemName).toBe(
+      emittedStoreData.problemName,
+    );
+    expect(wrapper.vm.$store.state.problemCodeContent).toBe(
+      emittedStoreData.problemCodeContent,
+    );
+    expect(wrapper.vm.$store.state.problemCodeExtension).toBe(
+      emittedStoreData.problemCodeExtension,
+    );
+    expect(wrapper.vm.$store.state.problemMarkdown).toBe(
+      emittedStoreData.problemMarkdown,
+    );
+    expect(wrapper.vm.$store.state.problemSolutionMarkdown).toBe(
+      emittedStoreData.problemSolutionMarkdown,
+    );
+    expect(wrapper.vm.$store.state.casesStore).toStrictEqual(
+      emittedStoreData.casesStore,
+    );
   });
 });
