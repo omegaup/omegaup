@@ -6,7 +6,7 @@
         <sup>&alpha;</sup>
       </span>
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
-        <slot name="zip-buttons">
+        <template v-if="!isEmbedded">
           <label>
             <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
               <font-awesome-icon
@@ -48,7 +48,7 @@
               />
             </button>
           </label>
-        </slot>
+        </template>
         <select
           v-model="selectedLanguage"
           class="form-control form-control-sm mr-sm-2"
@@ -154,15 +154,13 @@ interface ComponentState {
   },
 })
 export default class Ephemeral extends Vue {
-  @Prop({ default: true }) isEmbedded!: boolean;
+  @Prop({ required: true }) acceptedLanguages!: string[];
+  @Prop({ required: true }) isEmbedded!: boolean;
+  @Prop({ required: true }) canRun!: boolean;
+  @Prop({ required: true }) canSubmit!: boolean;
+  @Prop({ required: true }) initialLanguage!: string;
   @Prop({ required: true }) initialTheme!: string;
-
-  @Prop() problem!: types.ProblemInfo;
-  @Prop({ default: 'cpp17-gcc' }) initialLanguage!: string;
-  @Prop({ default: '' }) initialSource!: string;
-  @Prop({ default: () => [] }) acceptedLanguages!: string[];
-  @Prop({ default: false }) canSubmit!: boolean;
-  @Prop({ default: true }) canRun!: boolean;
+  @Prop({ required: true }) problem!: types.ProblemInfo;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
@@ -235,7 +233,7 @@ export default class Ephemeral extends Vue {
       .then(() => {
         store.commit('updatingSettings', false);
         this.$nextTick(() => {
-          if (!this.goldenLayout?.isInitialised) return;
+          if (!this.isEmbedded || !this.goldenLayout?.isInitialised) return;
           let mainColumn = this.goldenLayout.root.getItemsById(
             'main-column',
           )[0];
@@ -247,9 +245,7 @@ export default class Ephemeral extends Vue {
   @Watch('problem')
   @Watch('initialLanguage')
   onProblemChange() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    }
+    this.initProblem();
   }
   @Watch('currentCase', { immediate: true })
   onCurrentCaseChange() {
@@ -685,11 +681,7 @@ export default class Ephemeral extends Vue {
     document.head.appendChild(link);
   }
   beforeMount() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    } else {
-      store.dispatch('reset');
-    }
+    this.initProblem();
     this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
