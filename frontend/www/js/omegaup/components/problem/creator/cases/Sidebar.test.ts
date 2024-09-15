@@ -132,7 +132,7 @@ describe('Sidebar.vue', () => {
     await Vue.nextTick();
 
     // The number of dropdown stubs should be equal to
-    // (#dropdown-stubs) = 3*(#groups) + 2 (for ungrouped cases) + 1 (for validate points) 
+    // (#dropdown-stubs) = 3*(#groups) + 2 (for ungrouped cases) + 1 (for validate points)
 
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
@@ -193,7 +193,7 @@ describe('Sidebar.vue', () => {
       '[data-sidebar-edit-group-modal="edit points"]',
     );
     await editPointsInput.setValue(modifiedPoints);
-    
+
     const editAutoPointsInput = editModal.find(
       '[data-sidebar-edit-group-modal="edit autoPoints"]',
     );
