@@ -74,7 +74,12 @@
           class="form-control case-weight"
           type="text"
         />
-        <input v-model="newCaseName" class="form-control" type="text" />
+        <input
+          v-model="newCaseName"
+          class="form-control"
+          type="text"
+          data-case-name
+        />
         <div class="input-group-append">
           <button
             class="btn"
@@ -84,6 +89,7 @@
             }"
             type="submit"
             :disabled="!newCaseName.length"
+            data-add-button
             @click="createCase()"
           >
             +

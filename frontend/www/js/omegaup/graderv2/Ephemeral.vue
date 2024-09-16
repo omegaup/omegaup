@@ -13,6 +13,7 @@
                 :icon="['fas', 'upload']"
                 :title="T.wordsUpload"
                 aria-hidden="true"
+              data-zip-upload
               />
             </a>
             <input
@@ -28,6 +29,7 @@
               role="button"
               :href="zipHref"
               :download="zipDownload"
+            data-zip-download
               @click="handleDownload"
             >
               <font-awesome-icon
