@@ -798,7 +798,7 @@ export function assignMissingPoints(
       } else {
         _group.points = 100;
       }
-      if(_group.points === 0 && notDefinedCount != 0){
+      if (_group.points === 0 && notDefinedCount != 0) {
         _group.points = 100;
       }
       const remainingAssignablePoints = _group.points - casesPoints;
