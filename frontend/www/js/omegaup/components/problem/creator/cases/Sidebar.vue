@@ -186,11 +186,29 @@
               </div>
             </div>
           </b-button>
-          <b-dropdown variant="light" size="sm" right no-caret>
+          <b-dropdown
+            data-sidebar-edit-group-dropdown
+            variant="light"
+            size="sm"
+            right
+            no-caret
+          >
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
-            <b-dropdown-item @click="deleteGroup(groupID)"
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="edit group"
+              @click="editGroupModal[groupID] = !editGroupModal[groupID]"
+              ><b-row>
+                <div class="ml-6">
+                  <BIconPencil variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="delete group"
+              @click="deleteGroup(groupID)"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
@@ -200,13 +218,39 @@
                 </div>
               </b-row>
             </b-dropdown-item>
-            <b-dropdown-item @click="deleteGroupCases(groupID)"
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="delete cases"
+              @click="deleteGroupCases(groupID)"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="download .in"
+              @click="downloadGroupInput(groupID, '.in')"
+              ><b-row>
+                <div class="ml-6">
+                  <BIconBoxArrowDown variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadIn }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="download .txt"
+              @click="downloadGroupInput(groupID, '.txt')"
+              ><b-row>
+                <div class="ml-6">
+                  <BIconTextLeft variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadTxt }}
                 </div>
               </b-row>
             </b-dropdown-item>
@@ -253,6 +297,62 @@
               </b-row>
             </b-card>
           </b-collapse>
+          <b-modal
+            v-model="editGroupModal[groupID]"
+            data-sidebar-edit-group-modal
+            :title="T.groupEditTitle"
+            :ok-title="T.groupModalSave"
+            ok-variant="success"
+            :cancel-title="T.groupModalBack"
+            cancel-variant="danger"
+            static
+            lazy
+            @ok="updateGroupInfo(groupID)"
+          >
+            <div class="mt-3">
+              <b-form-group
+                :description="T.problemCreatorCaseGroupNameHelper"
+                :label="T.problemCreatorGroupName"
+                class="mb-4"
+              >
+                <b-form-input
+                  v-model="editGroupName[groupID]"
+                  data-sidebar-edit-group-modal="edit name"
+                  :formatter="formatter"
+                  required
+                  autocomplete="off"
+                />
+              </b-form-group>
+              <b-form-group
+                v-show="editGroupPoints[groupID] !== null"
+                :label="T.problemCreatorPoints"
+              >
+                <b-form-input
+                  v-model="editGroupPoints[groupID]"
+                  data-sidebar-edit-group-modal="edit points"
+                  :formatter="pointsFormatter"
+                  type="number"
+                  number
+                  min="0"
+                  max="100"
+                />
+              </b-form-group>
+              <b-form-group
+                :label="T.problemCreatorAutomaticPoints"
+                :description="T.problemCreatorAutomaticPointsHelperGroup"
+              >
+                <b-form-checkbox
+                  data-sidebar-edit-group-modal="edit nullpoint"
+                  :checked="editGroupPoints[groupID] === null"
+                  @change="
+                    editGroupPoints[groupID] =
+                      editGroupPoints[groupID] === null ? 0 : null
+                  "
+                >
+                </b-form-checkbox>
+              </b-form-group>
+            </div>
+          </b-modal>
         </b-row>
       </b-card>
     </div>
@@ -260,7 +360,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import problemCreator_LayoutSidebar from './LayoutSidebar.vue';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
@@ -270,6 +370,7 @@ import {
   CaseID,
   CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
+import JSZip from 'jszip';
 
 const casesStore = namespace('casesStore');
 
@@ -307,9 +408,54 @@ export default class Sidebar extends Vue {
   @casesStore.Mutation('setSelected') setSelected!: (
     CaseGroupsIDToBeSelected: CaseGroupID,
   ) => void;
+  @casesStore.Mutation('updateGroup') updateGroup!: ([
+    groupID,
+    newName,
+    newPoints,
+  ]: [GroupID, string, number | null]) => void;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
+  editGroupModal: { [key: GroupID]: boolean } = {};
+  editGroupName: { [key: GroupID]: string } = {};
+  editGroupPoints: { [key: GroupID]: number | null } = {};
+
+  @Watch('groups')
+  onGroupsChanged() {
+    this.editGroupModal = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = false;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    this.editGroupName = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.name;
+      return acc;
+    }, {} as { [key: string]: string });
+    this.editGroupPoints = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.points;
+      return acc;
+    }, {} as { [key: string]: number | null });
+  }
+
+  formatter(text: string) {
+    return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
+  }
+
+  pointsFormatter(points: number | null) {
+    if (points === null) {
+      return null;
+    }
+    return Math.max(points, 0);
+  }
+
+  updateGroupInfo(groupID: GroupID) {
+    this.updateGroup([
+      groupID,
+      this.editGroupName[groupID],
+      this.editGroupPoints[groupID],
+    ]);
+  }
 
   editCase(groupID: GroupID, caseID: CaseID) {
     this.setSelected({
@@ -317,6 +463,29 @@ export default class Sidebar extends Vue {
       caseID: caseID,
     });
     this.$emit('open-case-edit-window');
+  }
+
+  downloadGroupInput(groupID: GroupID, ext: '.in' | '.txt') {
+    const groupZip: JSZip = new JSZip();
+    const targetGroup = this.groups.find(
+      (_group: Group) => _group.groupID === groupID,
+    );
+    if (!targetGroup) return;
+
+    targetGroup.cases.forEach((_case) => {
+      let fileName = _case.name;
+      const caseGroupID: CaseGroupID = {
+        groupID: targetGroup.groupID,
+        caseID: _case.caseID,
+      };
+      const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+      groupZip?.file(`${fileName}${ext}`, input);
+    });
+
+    this.$emit('download-zip-file', {
+      fileName: targetGroup.name,
+      zipContent: groupZip,
+    });
   }
 }
 </script>
