@@ -29,6 +29,56 @@ describe('Test IDE', () => {
     cy.visit('/');
   });
 
+  it('Should verify that zip files working as intended', () => {
+    cy.login(loginOptions[0]);
+    cy.visit('/grader/ephemeral/');
+
+    cy.get('[data-zip-download]').should('be.visible').click();
+    cy.wait(1000); // wait a little bit to make sure the file is ready
+    cy.get('[data-zip-download]').should('be.visible').click(); // cypress/downloads
+
+    const fileName = 'Main.zip';
+    const filePath = `cypress/downloads/${fileName}`;
+    cy.get('[data-zip-upload]').should('be.visible');
+    cy.get('input[type="file"]').selectFile(filePath, {
+      force: true,
+      action: 'drag-drop',
+    });
+
+    cy.get('input[type="file"]').then(($input) => {
+      const file = ($input[0] as HTMLInputElement).files?.[0];
+      // cypress promise is aware, this promise will run
+      return new Cypress.Promise((resolve, reject) => {
+        if (!file) {
+          reject(new Error(`file not found`));
+          return;
+        }
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          JSZip.loadAsync(reader.result as ArrayBuffer)
+            .then((zip) => {
+              cy.log('log', Object.keys(zip.files));
+              expect(zip.files).to.have.property('settings.json');
+              expect(zip.files).to.have.property('cases/');
+              expect(zip.files).to.have.property('testplan');
+              resolve(zip);
+            })
+            .catch((err) => {
+              reject(new Error(`error loading zip: ${err.message}`));
+            });
+        };
+
+        reader.onerror = () => reject(new Error('Error reading file'));
+
+        reader.readAsArrayBuffer(file);
+      });
+    });
+
+    cy.visit('/');
+    cy.logout();
+  });
+
   it('Should create a problem of type output only and display cat langauge only', () => {
     cy.login(loginOptions[0]);
 
@@ -59,6 +109,93 @@ describe('Test IDE', () => {
       if (language === 'cat') return;
       cy.get('@selectMenu').find(`option[value="${language}"]`).should('exist');
     });
+
+    cy.logout();
+  });
+
+  it('Should verify that original editor of diff is updated basted on output', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
+    cy.reload();
+
+    const caseName = 'test';
+    const caseOutput = '1st\n2nd\n3rd';
+
+    cy.get('input[data-case-name]').type(caseName);
+    cy.get('[data-add-button]').should('be.visible').click();
+
+    cy.get(`textarea[data-title="${caseName}.out"]`, { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .type(caseOutput);
+    cy.get(`li[title="diff"]`).should('be.visible').click();
+
+    let concatText = '';
+    cy.get('.editor.original .view-line span span') // lhs is the original text
+      .each((span, index, $list) => {
+        cy.wrap(span)
+          .invoke('text')
+          .then((text) => {
+            concatText += text + (index === $list.length - 1 ? '' : '\n');
+          });
+      })
+      .then(() => {
+        expect(concatText).to.equal(caseOutput);
+      });
+
+    cy.logout();
+  });
+
+  it('Should verify that zip files after clicking run', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
+    cy.reload();
+
+    cy.get('[data-run-button]').should('be.visible').click();
+    cy.get(`li[title="files.zip"]`).should('be.visible').click();
+
+    const extensions = ['err', 'out', 'meta'];
+    extensions.forEach((extension) => {
+      cy.get(`button[title="Main/compile.${extension}"]`).should('be.visible');
+    });
+
+    cy.logout();
+  });
+
+  it('Should verify log data after clicking run', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
+    cy.reload();
+
+    cy.get('[data-run-button]').should('be.visible').click();
+    cy.get(`li[title="logs.txt"]`).should('be.visible').click();
+
+    cy.get('[data-language-select]')
+      .invoke('val')
+      .then((selectedLanguage) => {
+        cy.get('textarea[data-title="logs.txt"]')
+          .invoke('val')
+          .should('not.be.empty', { timeout: 10000 }) // the following are some of the text that should exist
+          .should('contain', `Language:${selectedLanguage}`)
+          .should('contain', 'client')
+          .should('contain', 'runner');
+      });
+    cy.logout();
+  });
+
+  it('Should create a new case for a problem', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
+    cy.reload();
+
+    const caseName = 'test';
+    cy.get('input[data-case-name]').type(caseName);
+    cy.get('[data-add-button]').should('be.visible').click();
+    cy.get(`li[title="${caseName}.in"]`).should('be.visible');
 
     cy.logout();
   });
