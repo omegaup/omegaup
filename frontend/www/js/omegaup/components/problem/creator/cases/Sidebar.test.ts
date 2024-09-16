@@ -95,9 +95,9 @@ describe('Sidebar.vue', () => {
 
     await Vue.nextTick();
 
-    const totalDropdownItemsCount = 8;
+    const totalDropdownItemsCount = 12;
     // There are
-    // - 3 dropdown items for each group
+    // - 5 dropdown items for each group
     // - a dropdown item for each case
     expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(
       totalDropdownItemsCount,
@@ -128,23 +128,23 @@ describe('Sidebar.vue', () => {
     await Vue.nextTick();
 
     // The number of dropdown stubs should be equal to
-    // (#dropdown-stubs) = 3*(#groups) + 1*(#cases)
+    // (#dropdown-stubs) = 5*(#groups) + 1*(#cases)
 
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(5);
+    ).toBe(7);
     expect(
       group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(4);
+    ).toBe(6);
 
     store.commit('casesStore/deleteGroupCases', newGroup2.groupID);
     await Vue.nextTick();
     expect(
       group2.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(3);
+    ).toBe(5);
 
     store.commit('casesStore/deleteCase', {
       groupID: newGroup1.groupID,
@@ -154,15 +154,15 @@ describe('Sidebar.vue', () => {
     expect(
       group1.element.parentElement?.querySelectorAll('b-dropdown-item-stub')
         .length,
-    ).toBe(4);
+    ).toBe(6);
 
     store.commit('casesStore/deleteGroup', newGroup1.groupID);
     await Vue.nextTick();
-    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(5);
+    expect(wrapper.findAll('b-dropdown-item-stub').length).toBe(7);
   });
 
   it('Should modify a group', async () => {
-    const wrapper = mount(Sidebar, { localVue, store });
+    const wrapper = mount(Sidebar, { localVue, store: store });
 
     const newGroup = generateGroup({
       name: 'group',
@@ -199,5 +199,32 @@ describe('Sidebar.vue', () => {
       wrapper.vm.groups.find((_group) => _group.groupID === newGroup.groupID)
         ?.points,
     ).toBe(modifiedPoints);
+  });
+
+  it('Should download a group', async () => {
+    const wrapper = mount(Sidebar, { localVue, store: store });
+
+    const newGroup = generateGroup({
+      name: 'group',
+    });
+    store.commit('casesStore/addGroup', newGroup);
+    await Vue.nextTick();
+
+    const downloadInButton = wrapper.find(
+      '[data-sidebar-edit-group-dropdown="download .in"]',
+    );
+    const downloadTxtButton = wrapper.find(
+      '[data-sidebar-edit-group-dropdown="download .txt"]',
+    );
+
+    const mockDownload = jest.spyOn(wrapper.vm, 'downloadGroupInput');
+
+    await downloadInButton.trigger('click');
+    expect(mockDownload).toHaveBeenCalledWith(newGroup.groupID, '.in');
+
+    await downloadTxtButton.trigger('click');
+    expect(mockDownload).toHaveBeenCalledWith(newGroup.groupID, '.txt');
+
+    expect(wrapper.emitted()['download-zip-file']?.length).toBe(2);
   });
 });

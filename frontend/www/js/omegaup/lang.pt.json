@@ -1049,6 +1049,8 @@
 	"problemCollectionRandomKarelProblem": "Problema aleat\u00f3rio de Karel",
 	"problemCollectionRandomLanguageProblem": "problema aleat\u00f3rio",
 	"problemCollectionSearchProblem": "Localizador de Problemas",
+	"problemCraetorGroupDownloadIn": "Salvar .in",
+	"problemCraetorGroupDownloadTxt": "Salvar .txt",
 	"problemCreatorAdd": "Adicionar",
 	"problemCreatorAddLine": "Adicionar linha",
 	"problemCreatorAutomaticPoints": "Pontua\u00e7\u00e3o autom\u00e1tica",
