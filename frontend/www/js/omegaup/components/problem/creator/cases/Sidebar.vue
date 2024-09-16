@@ -68,6 +68,7 @@
             <BIconThreeDotsVertical />
           </template>
           <b-dropdown-item
+            data-sidebar-validate-points-dropdown-item
             @click="validateAndFixPointsModal = !validateAndFixPointsModal"
             ><b-row>
               <div class="ml-6">
@@ -325,11 +326,11 @@
                 />
               </b-form-group>
               <b-form-group
-                v-show="editGroupPoints[groupID] !== null"
+                v-show="!editGroupAutoPoints[groupID]"
                 :label="T.problemCreatorPoints"
               >
                 <b-form-input
-                  v-model="editGroupAutoPoints[groupID]"
+                  v-model="editGroupPoints[groupID]"
                   data-sidebar-edit-group-modal="edit points"
                   :formatter="pointsFormatter"
                   type="number"
@@ -434,6 +435,10 @@ export default class Sidebar extends Vue {
       acc[group.groupID] = group.points;
       return acc;
     }, {} as { [key: string]: number });
+    this.editGroupAutoPoints = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.autoPoints;
+      return acc;
+    }, {} as { [key: string]: boolean });
   }
 
   toggleGroupAutoPoints(groupID: GroupID) {
