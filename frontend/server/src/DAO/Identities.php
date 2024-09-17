@@ -229,14 +229,15 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: \OmegaUp\Timestamp|null, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, email: null|string, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}|null
      */
-    public static function getExtraInformation(string $email): ?array {
+    public static function getExtraInformation(string $usernameOrEmail): ?array {
         $sql = 'SELECT
                   u.reset_sent_at,
                   u.verified,
                   u.birth_date,
                   IFNULL(i.username, "") AS `username`,
+                  IFNULL(e.email, "") AS `email`,
                   (
                     SELECT
                       MAX(ill.time)
@@ -256,13 +257,16 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ON
                   e.user_id = u.user_id
                 WHERE
-                  e.email = ?
+                  (i.username = ? OR e.email = ?)
                 ORDER BY
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        /** @var array{birth_date: null|string, last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
+        /** @var array{birth_date: null|string, email: string, last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$usernameOrEmail, $usernameOrEmail]
+        );
         if (empty($rs)) {
             return null;
         }
@@ -275,6 +279,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ),
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username'],
+            'email' => $rs['email'],
             'birth_date' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $rs['birth_date']
             ),
