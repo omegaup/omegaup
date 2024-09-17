@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { coursePage } from '../support/pageObjects/coursePage';
+import * as Util from '../../frontend/www/js/omegaup/graderv2/util';
 import {
   CourseOptions,
   LoginOptions,
@@ -48,6 +49,38 @@ describe('Course Test', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
+  });
+  it('Should create a problem of type output only and display cat langauge only', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    cy.login(loginOptions[0]);
+
+    const problemOptions = {
+      ...problemPage.generateProblemOptions(1)[0],
+      languagesValue: 'cat',
+    };
+    cy.createProblem(problemOptions);
+
+    cy.visit(`arena/problem/${problemOptions.problemAlias}/`);
+    cy.get('[data-language-select] option').should('have.length', 1);
+    cy.get('[data-language-select] option[value="cat"]').should('exist');
+
+    cy.logout();
+  });
+  it('Should display full list of supported languages in profile prefrences page', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    cy.login(loginOptions[0]);
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preferred-language]').should('exist');
+
+    cy.get('[data-preferred-language]').as('selectMenu').should('exist');
+    Object.keys(Util.supportedLanguages).forEach((language) => {
+      // cannot select cat language
+      if (language === 'cat') return;
+      cy.get('@selectMenu').find(`option[value="${language}"]`).should('exist');
+    });
+    cy.logout();
   });
   it('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);
