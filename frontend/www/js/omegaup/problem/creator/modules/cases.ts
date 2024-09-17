@@ -70,6 +70,17 @@ export const casesStore: Module<CasesState, RootState> = {
       }
       state = assignMissingPoints(state);
     },
+    updateGroup(
+      state,
+      [groupID, newName, newPoints]: [GroupID, string, number | null],
+    ) {
+      const targetGroup = state.groups.find(
+        (_group) => _group.groupID === groupID,
+      );
+      if (!targetGroup) return;
+      targetGroup.name = newName;
+      targetGroup.points = newPoints;
+    },
     addCase(state, caseRequest: CaseRequest) {
       if (caseRequest.groupID === UUID_NIL) {
         // Should create a new group with the same name
