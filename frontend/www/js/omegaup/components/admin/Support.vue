@@ -230,10 +230,10 @@ export default class AdminSupport extends Vue {
     return this.roles.indexOf(role) !== -1;
   }
 
-  @Emit('search-email')
+  @Emit('search-username-or-email')
   onSearchEmail(): null | string {
-    if (this.email == null) return null;
-    return this.email;
+    if (this.usernameOrEmail == null) return null;
+    return this.usernameOrEmail;
   }
 
   @Emit('update-email')
