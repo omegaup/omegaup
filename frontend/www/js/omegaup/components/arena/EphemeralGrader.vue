@@ -36,7 +36,8 @@ export default class EphemeralGrader extends Vue {
   acceptedLanguages!: string[];
   @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
   @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: Util.VS_LIGHT_THEME }) initialTheme!: string;
+  @Prop({ default: Util.MonacoThemes.VSLight })
+  initialTheme!: Util.MonacoThemes;
 
   // note: initial source is for the IDE is also supported
   get initialLanguage() {

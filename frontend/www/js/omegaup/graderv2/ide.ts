@@ -16,7 +16,7 @@ OmegaUp.on('ready', () => {
       return createElement(grader_EphemeralIDE, {
         props: {
           isEmbedded: false,
-          initialTheme: Util.VS_DARK_THEME,
+          initialTheme: Util.MonacoThemes.VSDark,
         },
       });
     },

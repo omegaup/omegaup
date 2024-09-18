@@ -59,7 +59,7 @@ export interface GraderStore {
   // new attributes separate from refactored code
   zipContent: string;
   showRunButton: boolean;
-  theme: string;
+  theme: Util.MonacoThemes;
 }
 export interface SettingsCase {
   Name: string;
@@ -157,7 +157,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     updatingSettings: false,
     zipContent: '',
     showRunButton: true,
-    theme: Util.VS_LIGHT_THEME,
+    theme: Util.MonacoThemes.VSLight,
   },
   getters: {
     alias(state: GraderStore) {
@@ -727,7 +727,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     isDirty(state: GraderStore, value: boolean) {
       state.dirty = value;
     },
-    theme(state: GraderStore, value: string) {
+    theme(state: GraderStore, value: Util.MonacoThemes) {
       state.theme = value;
     },
   },
@@ -877,7 +877,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       }: {
         initialLanguage: string;
         initialSource: string;
-        initialTheme: string;
+        initialTheme: Util.MonacoThemes;
         languages: string[];
         problem: types.ProblemInfo;
         showRunButton: boolean;

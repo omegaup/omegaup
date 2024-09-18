@@ -159,14 +159,16 @@ export default class Ephemeral extends Vue {
   @Prop({ required: true }) canRun!: boolean;
   @Prop({ required: true }) canSubmit!: boolean;
   @Prop({ required: true }) initialLanguage!: string;
-  @Prop({ required: true }) initialTheme!: string;
+  @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
   @Prop({ required: true }) problem!: types.ProblemInfo;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    [Util.VS_LIGHT_THEME]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
-    [Util.VS_DARK_THEME]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+    [Util.MonacoThemes
+      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    [Util.MonacoThemes
+      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -205,15 +207,15 @@ export default class Ephemeral extends Vue {
     return store.getters['currentCase'];
   }
   get isDark() {
-    return this.theme === Util.VS_DARK_THEME;
+    return this.theme === Util.MonacoThemes.VSDark;
   }
 
   toggleTheme() {
     store.dispatch(
       'theme',
-      this.theme === Util.VS_LIGHT_THEME
-        ? Util.VS_DARK_THEME
-        : Util.VS_LIGHT_THEME,
+      this.theme === Util.MonacoThemes.VSLight
+        ? Util.MonacoThemes.VSDark
+        : Util.MonacoThemes.VSLight,
     );
   }
   initProblem() {

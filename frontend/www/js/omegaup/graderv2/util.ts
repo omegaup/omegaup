@@ -300,9 +300,10 @@ export function throttle<T extends any[]>(
   return throttled;
 }
 
-export const VS_LIGHT_THEME = 'vs';
-export const VS_DARK_THEME = 'vs-dark';
-
+export enum MonacoThemes {
+  VSLight = 'vs',
+  VSDark = 'vs-dark',
+}
 export const DUMMY_PROBLEM: types.ProblemInfo = {
   alias: 'dummy-problem',
   settings: {
