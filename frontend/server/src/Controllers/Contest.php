@@ -2899,19 +2899,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($languagesAsString)) {
             return;
         }
-        $languages = explode(',', $languagesAsString);
-        foreach ($languages as $language) {
-            if (empty($language)) {
-                continue;
-            }
 
-            /** @psalm-suppress RedundantCondition non-falsy-string for $language is always a string */
-            \OmegaUp\Validators::validateInEnum(
-                $language,
+        $languages = explode(',', $languagesAsString);
+        $supportedLanguages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
+        $diff = array_unique(array_diff($languages, $supportedLanguages));
+        $isSubset = $diff === [] || $diff === [''];
+
+        if (!$isSubset) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotInExpectedSet',
                 'languages',
-                array_keys(
-                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
-                )
+                [
+                    'bad_elements' => implode(', ', $languages),
+                    'expected_set' => implode(', ', $supportedLanguages),
+                ]
             );
         }
     }
