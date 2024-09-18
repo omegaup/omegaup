@@ -154,6 +154,7 @@ CREATE TABLE `Coder_Of_The_Month` (
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
   KEY `rank_time_category` (`category`,`ranking`,`time`),
+  KEY `time_category` (`category`,`time`),
   CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)

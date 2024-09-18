@@ -56,12 +56,13 @@ textarea {
   resize: none;
 
   &.vs {
-    background: var(--textarea-vs-background-color);
+    background: var(--vs-background-color);
+    color: var(--vs-font-color);
   }
 
   &.vs-dark {
-    background: var(--textarea-vs-dark-background-color);
-    color: var(--textarea-vs-dark-font-color);
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
   }
 }
 </style>
