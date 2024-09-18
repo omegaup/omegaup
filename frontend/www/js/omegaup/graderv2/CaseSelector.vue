@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import store from './GraderStore';
 import { types } from '../api_types';
 import { GraderResults, CaseSelectorGroup } from './GraderStore';
@@ -109,12 +109,13 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  @Prop({ default: 'vs-dark' }) theme!: string;
-
   newCaseWeight: number = 1;
   newCaseName: string = '';
   T = T;
 
+  get theme(): string {
+    return store.getters['theme'];
+  }
   get summary(): string {
     if (!store.state.results || !store.state.results.verdict) {
       return '…';

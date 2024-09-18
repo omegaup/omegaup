@@ -6,7 +6,7 @@
         <sup>&alpha;</sup>
       </span>
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
-        <slot name="zip-buttons">
+        <template v-if="!isEmbedded">
           <label>
             <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
               <font-awesome-icon
@@ -39,7 +39,18 @@
               />
             </a>
           </label>
-        </slot>
+          <label>
+            <button
+              class="btn btn-secondary btn-sm mr-2"
+              @click.prevent="toggleTheme"
+            >
+              <font-awesome-icon
+                :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
+                aria-hidden="true"
+              />
+            </button>
+          </label>
+        </template>
         <select
           v-model="selectedLanguage"
           class="form-control form-control-sm mr-sm-2"
@@ -121,8 +132,10 @@ import {
   faUpload,
   faFileArchive,
   faDownload,
+  faSun,
+  faMoon,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload);
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
 
 import T from '../lang';
 
@@ -143,21 +156,21 @@ interface ComponentState {
   },
 })
 export default class Ephemeral extends Vue {
-  @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
-
-  @Prop() problem!: types.ProblemInfo;
-  @Prop({ default: 'cpp17-gcc' }) initialLanguage!: string;
-  @Prop({ default: '' }) initialSource!: string;
-  @Prop({ default: () => [] }) acceptedLanguages!: string[];
-  @Prop({ default: false }) canSubmit!: boolean;
-  @Prop({ default: true }) canRun!: boolean;
+  @Prop({ required: true }) acceptedLanguages!: string[];
+  @Prop({ required: true }) isEmbedded!: boolean;
+  @Prop({ required: true }) canRun!: boolean;
+  @Prop({ required: true }) canSubmit!: boolean;
+  @Prop({ required: true }) initialLanguage!: string;
+  @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
+  @Prop({ required: true }) problem!: types.ProblemInfo;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    vs: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
-    'vs-dark': `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+    [Util.MonacoThemes
+      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    [Util.MonacoThemes
+      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -176,6 +189,9 @@ export default class Ephemeral extends Vue {
   get isDirty() {
     return store.getters['isDirty'];
   }
+  get theme() {
+    return store.getters['theme'];
+  }
 
   get selectedLanguage() {
     return store.getters['request.language'];
@@ -192,7 +208,18 @@ export default class Ephemeral extends Vue {
   get currentCase(): string {
     return store.getters['currentCase'];
   }
+  get isDark() {
+    return this.theme === Util.MonacoThemes.VSDark;
+  }
 
+  toggleTheme() {
+    store.dispatch(
+      'theme',
+      this.theme === Util.MonacoThemes.VSLight
+        ? Util.MonacoThemes.VSDark
+        : Util.MonacoThemes.VSLight,
+    );
+  }
   initProblem() {
     // use commits for synchronous behavior
     // or else bugs occur where layout toggles cases column
@@ -201,6 +228,7 @@ export default class Ephemeral extends Vue {
     store
       .dispatch('initProblem', {
         initialLanguage: this.initialLanguage,
+        initialTheme: this.initialTheme,
         languages: this.acceptedLanguages,
         problem: this.problem,
         showRunButton: this.canRun,
@@ -209,7 +237,7 @@ export default class Ephemeral extends Vue {
       .then(() => {
         store.commit('updatingSettings', false);
         this.$nextTick(() => {
-          if (!this.goldenLayout?.isInitialised) return;
+          if (!this.isEmbedded || !this.goldenLayout?.isInitialised) return;
           let mainColumn = this.goldenLayout.root.getItemsById(
             'main-column',
           )[0];
@@ -221,9 +249,7 @@ export default class Ephemeral extends Vue {
   @Watch('problem')
   @Watch('initialLanguage')
   onProblemChange() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    }
+    this.initProblem();
   }
   @Watch('currentCase', { immediate: true })
   onCurrentCaseChange() {
@@ -237,6 +263,16 @@ export default class Ephemeral extends Vue {
     if (!value || this.isEmbedded) return;
     this.zipHref = null;
     this.zipDownload = null;
+  }
+  @Watch('theme')
+  onThemeChange() {
+    // remove old theme
+    for (const theme in this.themeToRef) {
+      if (theme === this.theme) continue;
+      const link = document.getElementById(this.themeToRef[theme]);
+      if (link) link.remove();
+    }
+    this.downloadThemeStylesheet(this.theme);
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -601,7 +637,6 @@ export default class Ephemeral extends Vue {
         container.on('open', () => {
           const props: ComponentProps = {
             storeMapping: componentState.storeMapping,
-            theme: self.theme,
           };
           for (const k in componentState) {
             if (k === 'id' || !componentState[k]) continue;
@@ -636,23 +671,22 @@ export default class Ephemeral extends Vue {
     );
   }
 
-  beforeMount() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    } else {
-      store.dispatch('reset');
-    }
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = this.themeToRef[this.theme];
-    document.head.appendChild(link);
-  }
   onResized() {
     if (!this.layoutRoot.clientWidth) return;
     if (!this.goldenLayout?.isInitialised) {
       this.goldenLayout?.init();
     }
     this.goldenLayout?.updateSize();
+  }
+  downloadThemeStylesheet(theme: string) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[theme];
+    document.head.appendChild(link);
+  }
+  beforeMount() {
+    this.initProblem();
+    this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(
