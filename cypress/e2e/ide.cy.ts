@@ -34,6 +34,7 @@ describe('Test IDE', () => {
     cy.visit('/');
     cy.logout();
   });
+
   it('Should verify that zip files working as intended', () => {
     cy.visit('/grader/ephemeral/');
 
