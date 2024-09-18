@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
           acceptedLanguages,
           preferredLanguage,
           isEmbedded: false,
-          theme: 'vs-dark',
+          initialTheme: Util.MonacoThemes.VSDark,
         },
       });
     },
