@@ -2912,7 +2912,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'parameterNotInExpectedSet',
                 'languages',
                 [
-                    'bad_elements' => implode(', ', $languages),
+                    'bad_elements' => implode(', ', $diff),
                     'expected_set' => implode(', ', $supportedLanguages),
                 ]
             );
