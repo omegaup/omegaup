@@ -33,7 +33,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
         $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
             \OmegaUp\Controllers\Session::getCurrentSession()['user']->user_id ?? null
         );
-        
+
         return [
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
@@ -42,7 +42,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 'fullWidth' => true,
                 'hideFooterAndHeader' => true,
                 'payload' => [
-                    'acceptedLanguages' => \OmegaUp\Controllers\Run::default_languages(),
+                    'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
                     'preferredLanguage' => $preferredLanguage,
                 ],
             ],
