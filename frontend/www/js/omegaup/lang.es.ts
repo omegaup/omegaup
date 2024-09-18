@@ -1050,6 +1050,8 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomKarelProblem: "Problema aleatorio de Karel",
   problemCollectionRandomLanguageProblem: "Problema Aleatorio",
   problemCollectionSearchProblem: "Buscador de Problemas",
+  problemCraetorGroupDownloadIn: "Guardar .in",
+  problemCraetorGroupDownloadTxt: "Guardar .txt",
   problemCreatorAdd: "Agregar",
   problemCreatorAddLine: "Agregar l\u00ednea",
   problemCreatorAutomaticPoints: "Calcular puntaje autom\u00e1ticamente",

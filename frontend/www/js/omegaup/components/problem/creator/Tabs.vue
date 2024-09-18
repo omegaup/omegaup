@@ -37,6 +37,9 @@
         >
       </template>
       <omegaup-problem-creator-cases-tab
+        @download-zip-file="
+          (zipObject) => $emit('download-zip-file', zipObject)
+        "
         @download-input-file="
           (fileObject) => $emit('download-input-file', fileObject)
         "

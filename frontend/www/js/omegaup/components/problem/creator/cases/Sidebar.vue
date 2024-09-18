@@ -3,63 +3,34 @@
     <div class="d-flex align-items-center justify-content-between">
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
       <div>
-        <b-button
-          size="sm"
-          variant="primary"
-          class="mr-2"
-          @click="showLayoutSidebar = !showLayoutSidebar"
-        >
+        <b-button size="sm" variant="primary" class="mr-2" @click="showLayoutSidebar = !showLayoutSidebar">
           <BIconLayoutSidebar />
         </b-button>
-        <b-sidebar
-          v-model="showLayoutSidebar"
-          right
-          :title="T.problemCreatorLayoutWordLayouts"
-          shadow
-          no-header-close
-          width="385px"
-        >
+        <b-sidebar v-model="showLayoutSidebar" right :title="T.problemCreatorLayoutWordLayouts" shadow no-header-close
+          width="385px">
           <omegaup-problem-creator-layout-sidebar />
           <div class="fixed-bottom">
             <b-container>
               <b-row class="justify-content-center">
-                <b-button
-                  class="w-84 mb-2"
-                  variant="success"
-                  @click="addLayoutFromSelectedCase"
-                >
+                <b-button class="w-84 mb-2" variant="success" @click="addLayoutFromSelectedCase">
                   {{ T.problemCreatorLayoutAddFromCase }}
                 </b-button>
               </b-row>
               <b-row class="justify-content-center">
-                <b-button
-                  class="w-84 mb-2"
-                  variant="success"
-                  @click="addNewLayout"
-                >
+                <b-button class="w-84 mb-2" variant="success" @click="addNewLayout">
                   {{ T.problemCreatorLayoutAddNew }}
                 </b-button>
               </b-row>
               <b-row class="justify-content-center">
-                <b-button
-                  class="w-84 mb-3"
-                  variant="danger"
-                  @click="showLayoutSidebar = false"
-                >
+                <b-button class="w-84 mb-3" variant="danger" @click="showLayoutSidebar = false">
                   {{ T.problemCreatorLayoutBarClose }}
                 </b-button>
               </b-row>
             </b-container>
           </div>
         </b-sidebar>
-        <b-button
-          data-add-window
-          size="sm"
-          variant="success"
-          class="mr-2"
-          :pressed="showWindow"
-          @click="$emit('open-add-window')"
-        >
+        <b-button data-add-window size="sm" variant="success" class="mr-2" :pressed="showWindow"
+          @click="$emit('open-add-window')">
           <span class="d-none d-xl-inline">{{ T.problemCreatorAdd }}</span>
           <BIconPlusCircle class="d-inline d-xl-none" />
         </b-button>
@@ -67,10 +38,8 @@
           <template #button-content>
             <BIconThreeDotsVertical />
           </template>
-          <b-dropdown-item
-            data-sidebar-validate-points-dropdown-item
-            @click="validateAndFixPointsModal = !validateAndFixPointsModal"
-            ><b-row>
+          <b-dropdown-item data-sidebar-validate-points-dropdown-item
+            @click="validateAndFixPointsModal = !validateAndFixPointsModal"><b-row>
               <div class="ml-6">
                 <BIconBroadcast variant="info" font-scale="1.05" />
               </div>
@@ -80,30 +49,16 @@
         </b-dropdown>
       </div>
     </div>
-    <b-modal
-      v-model="validateAndFixPointsModal"
-      data-sidebar-validate-points-modal
-      :title="T.problemCreatorValidatePoints"
-      :ok-title="T.problemCreatorValidatePointsContinue"
-      ok-variant="success"
-      :cancel-title="T.problemCreatorValidatePointsBack"
-      cancel-variant="danger"
-      static
-      lazy
-      @ok="validateAndFixPoints"
-    >
+    <b-modal v-model="validateAndFixPointsModal" data-sidebar-validate-points-modal
+      :title="T.problemCreatorValidatePoints" :ok-title="T.problemCreatorValidatePointsContinue" ok-variant="success"
+      :cancel-title="T.problemCreatorValidatePointsBack" cancel-variant="danger" static lazy @ok="validateAndFixPoints">
       {{ T.problemCreatorValidatePointsWarning }}
     </b-modal>
     <div>
       <b-card class="border-0">
         <b-row class="mb-1">
-          <b-button
-            variant="light"
-            data-placement="top"
-            :title="T.problemCreatorUngroupedCases"
-            class="w-84"
-            @click="showUngroupedCases = !showUngroupedCases"
-          >
+          <b-button variant="light" data-placement="top" :title="T.problemCreatorUngroupedCases" class="w-84"
+            @click="showUngroupedCases = !showUngroupedCases">
             <div class="d-flex justify-content-between">
               <div class="mr-2 text-truncate">
                 {{ T.problemCreatorUngrouped }}
@@ -111,11 +66,10 @@
               <div class="d-inline-block text-nowrap">
                 <b-badge variant="primary" class="mr-1">{{
                   ungroupedCases.length
-                }}</b-badge>
+                  }}</b-badge>
                 <b-badge variant="info">
                   {{ Math.round(getTotalPointsForUngroupedCases) }}
-                  {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                >
+                  {{ T.problemCreatorPointsAbbreviation }}</b-badge>
               </div>
             </div>
           </b-button>
@@ -123,8 +77,7 @@
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
-            <b-dropdown-item disabled
-              ><b-row>
+            <b-dropdown-item disabled><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
@@ -133,8 +86,7 @@
                 </div>
               </b-row>
             </b-dropdown-item>
-            <b-dropdown-item @click="deleteUngroupedCases()"
-              ><b-row>
+            <b-dropdown-item @click="deleteUngroupedCases()"><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
@@ -146,25 +98,15 @@
           </b-dropdown>
           <b-collapse v-model="showUngroupedCases" class="w-100">
             <b-card class="border-0 w-100">
-              <b-row
-                v-for="{ name, points, cases, groupID } in ungroupedCases"
-                :key="groupID"
-                class="mb-1"
-              >
-                <b-button
-                  variant="light"
-                  data-placement="top"
-                  :title="name"
-                  class="w-82"
-                  @click="editCase(groupID, cases[0].caseID)"
-                >
+              <b-row v-for="{ name, points, cases, groupID } in ungroupedCases" :key="groupID" class="mb-1">
+                <b-button variant="light" data-placement="top" :title="name" class="w-82"
+                  @click="editCase(groupID, cases[0].caseID)">
                   <div class="d-flex justify-content-between">
                     <div class="mr-2 text-truncate">{{ name }}</div>
                     <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(points || 0) }}
-                        {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                      >
+                        {{ T.problemCreatorPointsAbbreviation }}</b-badge>
                     </div>
                   </div>
                 </b-button>
@@ -172,8 +114,7 @@
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"
-                    ><b-row>
+                  <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"><b-row>
                       <div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
@@ -187,55 +128,33 @@
             </b-card>
           </b-collapse>
         </b-row>
-        <b-row
-          v-for="{ name, groupID, cases, points } in groupsButUngroupedCases"
-          :key="groupID"
-          class="mb-1"
-        >
-          <b-button
-            variant="light"
-            data-placement="top"
-            :title="name"
-            class="w-84"
-            @click="showCases[groupID] = !showCases[groupID]"
-          >
+        <b-row v-for="{ name, groupID, cases, points } in groupsButUngroupedCases" :key="groupID" class="mb-1">
+          <b-button variant="light" data-placement="top" :title="name" class="w-84"
+            @click="showCases[groupID] = !showCases[groupID]">
             <div class="d-flex justify-content-between">
               <div class="mr-2 text-truncate">{{ name }}</div>
               <div class="d-inline-block text-nowrap">
                 <b-badge variant="primary" class="mr-1">{{
                   cases.length
-                }}</b-badge>
-                <b-badge variant="info"
-                  >{{ Math.round(points || 0) }}
-                  {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                >
+                  }}</b-badge>
+                <b-badge variant="info">{{ Math.round(points || 0) }}
+                  {{ T.problemCreatorPointsAbbreviation }}</b-badge>
               </div>
             </div>
           </b-button>
-          <b-dropdown
-            data-sidebar-edit-group-dropdown
-            variant="light"
-            size="sm"
-            right
-            no-caret
-          >
+          <b-dropdown data-sidebar-edit-group-dropdown variant="light" size="sm" right no-caret>
             <template #button-content>
               <BIconThreeDotsVertical />
             </template>
-            <b-dropdown-item
-              data-sidebar-edit-group-dropdown="edit group"
-              @click="editGroupModal[groupID] = !editGroupModal[groupID]"
-              ><b-row
-                ><div class="ml-6">
-                  <BIconPencilFill variant="info" font-scale=".95" />
+            <b-dropdown-item data-sidebar-edit-group-dropdown="edit group"
+              @click="editGroupModal[groupID] = !editGroupModal[groupID]"><b-row>
+                <div class="ml-6">
+                  <BIconPencil variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div></b-row
-              >
+                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+              </b-row>
             </b-dropdown-item>
-            <b-dropdown-item
-              data-sidebar-edit-group-dropdown="delete group"
-              @click="deleteGroup(groupID)"
-              ><b-row>
+            <b-dropdown-item data-sidebar-edit-group-dropdown="delete group" @click="deleteGroup(groupID)"><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
@@ -244,10 +163,7 @@
                 </div>
               </b-row>
             </b-dropdown-item>
-            <b-dropdown-item
-              data-sidebar-edit-group-dropdown="delete cases"
-              @click="deleteGroupCases(groupID)"
-              ><b-row>
+            <b-dropdown-item data-sidebar-edit-group-dropdown="delete cases" @click="deleteGroupCases(groupID)"><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
                 </div>
@@ -256,28 +172,38 @@
                 </div>
               </b-row>
             </b-dropdown-item>
+            <b-dropdown-item data-sidebar-edit-group-dropdown="download .in"
+              @click="downloadGroupInput(groupID, '.in')"><b-row>
+                <div class="ml-6">
+                  <BIconBoxArrowDown variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadIn }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item data-sidebar-edit-group-dropdown="download .txt"
+              @click="downloadGroupInput(groupID, '.txt')"><b-row>
+                <div class="ml-6">
+                  <BIconTextLeft variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadTxt }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
           </b-dropdown>
           <b-collapse v-model="showCases[groupID]" class="w-100">
             <b-card class="border-0 w-100">
-              <b-row
-                v-for="{ name: caseName, points: casePoints, caseID } in cases"
-                :key="caseID"
-                class="mb-1"
-              >
-                <b-button
-                  variant="light"
-                  data-placement="top"
-                  :title="caseName"
-                  class="w-82"
-                  @click="editCase(groupID, caseID)"
-                >
+              <b-row v-for="{ name: caseName, points: casePoints, caseID } in cases" :key="caseID" class="mb-1">
+                <b-button variant="light" data-placement="top" :title="caseName" class="w-82"
+                  @click="editCase(groupID, caseID)">
                   <div class="d-flex justify-content-between">
                     <div class="mr-2 text-truncate">{{ caseName }}</div>
                     <div class="d-inline-block text-nowrap">
                       <b-badge variant="info">
                         {{ Math.round(casePoints || 0) }}
-                        {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                      >
+                        {{ T.problemCreatorPointsAbbreviation }}</b-badge>
                     </div>
                   </div>
                 </b-button>
@@ -285,8 +211,7 @@
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item @click="deleteCase({ groupID, caseID })"
-                    ><b-row>
+                  <b-dropdown-item @click="deleteCase({ groupID, caseID })"><b-row>
                       <div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
                       </div>
@@ -299,54 +224,23 @@
               </b-row>
             </b-card>
           </b-collapse>
-          <b-modal
-            v-model="editGroupModal[groupID]"
-            data-sidebar-edit-group-modal
-            :title="T.groupEditTitle"
-            :ok-title="T.groupModalSave"
-            ok-variant="success"
-            :cancel-title="T.groupModalBack"
-            cancel-variant="danger"
-            static
-            lazy
-            @ok="updateGroupInfo(groupID)"
-          >
+          <b-modal v-model="editGroupModal[groupID]" data-sidebar-edit-group-modal :title="T.groupEditTitle"
+            :ok-title="T.groupModalSave" ok-variant="success" :cancel-title="T.groupModalBack" cancel-variant="danger"
+            static lazy @ok="updateGroupInfo(groupID)">
             <div class="mt-3">
-              <b-form-group
-                :description="T.problemCreatorCaseGroupNameHelper"
-                :label="T.problemCreatorGroupName"
-                class="mb-4"
-              >
-                <b-form-input
-                  v-model="editGroupName[groupID]"
-                  data-sidebar-edit-group-modal="edit name"
-                  :formatter="formatter"
-                  required
-                  autocomplete="off"
-                />
+              <b-form-group :description="T.problemCreatorCaseGroupNameHelper" :label="T.problemCreatorGroupName"
+                class="mb-4">
+                <b-form-input v-model="editGroupName[groupID]" data-sidebar-edit-group-modal="edit name"
+                  :formatter="formatter" required autocomplete="off" />
               </b-form-group>
-              <b-form-group
-                v-show="!editGroupAutoPoints[groupID]"
-                :label="T.problemCreatorPoints"
-              >
-                <b-form-input
-                  v-model="editGroupPoints[groupID]"
-                  data-sidebar-edit-group-modal="edit points"
-                  :formatter="pointsFormatter"
-                  type="number"
-                  number
-                  min="0"
-                />
+              <b-form-group v-show="!editGroupAutoPoints[groupID]" :label="T.problemCreatorPoints">
+                <b-form-input v-model="editGroupPoints[groupID]" data-sidebar-edit-group-modal="edit points"
+                  :formatter="pointsFormatter" type="number" number min="0" />
               </b-form-group>
-              <b-form-group
-                :label="T.problemCreatorAutomaticPoints"
-                :description="T.problemCreatorAutomaticPointsHelperGroup"
-              >
-                <b-form-checkbox
-                  data-sidebar-edit-group-modal="edit autoPoints"
-                  :checked="editGroupAutoPoints[groupID]"
-                  @change="toggleGroupAutoPoints(groupID)"
-                >
+              <b-form-group :label="T.problemCreatorAutomaticPoints"
+                :description="T.problemCreatorAutomaticPointsHelperGroup">
+                <b-form-checkbox data-sidebar-edit-group-modal="edit autoPoints" :checked="editGroupAutoPoints[groupID]"
+                  @change="toggleGroupAutoPoints(groupID)">
                 </b-form-checkbox>
               </b-form-group>
             </div>
@@ -368,6 +262,7 @@ import {
   CaseID,
   CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
+import JSZip from 'jszip';
 
 const casesStore = namespace('casesStore');
 
@@ -412,6 +307,8 @@ export default class Sidebar extends Vue {
     newName,
     newPoints,
   ]: [GroupID, string, number]) => void;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   validateAndFixPointsModal: boolean = false;
   showUngroupedCases = false;
@@ -470,6 +367,29 @@ export default class Sidebar extends Vue {
       caseID: caseID,
     });
     this.$emit('open-case-edit-window');
+  }
+
+  downloadGroupInput(groupID: GroupID, ext: '.in' | '.txt') {
+    const groupZip: JSZip = new JSZip();
+    const targetGroup = this.groups.find(
+      (_group: Group) => _group.groupID === groupID,
+    );
+    if (!targetGroup) return;
+
+    targetGroup.cases.forEach((_case) => {
+      let fileName = _case.name;
+      const caseGroupID: CaseGroupID = {
+        groupID: targetGroup.groupID,
+        caseID: _case.caseID,
+      };
+      const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+      groupZip?.file(`${fileName}${ext}`, input);
+    });
+
+    this.$emit('download-zip-file', {
+      fileName: targetGroup.name,
+      zipContent: groupZip,
+    });
   }
 }
 </script>

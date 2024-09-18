@@ -20,13 +20,13 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         array $places
     ) {
         //Create the certificate generator
+        ['identity' => $supportTeamMember] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $certificateGenerator] = \OmegaUp\Test\Factories\User::createUser();
 
-        $loginIdentity = self::login($certificateGenerator);
-
         //Add role certificate generator
+        $loginSupport = self::login($supportTeamMember);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginSupport->auth_token,
             'username' => $certificateGenerator->username,
             'role' => 'CertificateGenerator'
         ]));
@@ -94,6 +94,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         //Send the message to RabbitMQ using the API
+        $loginIdentity = self::login($certificateGenerator);
         $response = \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
             new \OmegaUp\Request([
                 'auth_token' => $loginIdentity->auth_token,
@@ -279,11 +280,12 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      * but not as a contest admin
      */
     public function testGenerateContestCertificatesOnlyAsCertificateGenerator() {
+        ['identity' => $supportTeamMember] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $loginIdentity = self::login($identity);
 
+        $loginSupport = self::login($supportTeamMember);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginSupport->auth_token,
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
@@ -302,6 +304,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $certificatesCutoff = 3;
 
         try {
+            $loginIdentity = self::login($identity);
             \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
                 new \OmegaUp\Request([
                     'auth_token' => $loginIdentity->auth_token,
@@ -359,13 +362,13 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      * Try to generate certificates in a contest that hasn't ended
      */
     public function testGenerateCurrentContestCertificates() {
+        ['identity' => $supportTeamMember] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $loginIdentity = self::login($identity);
-
         //add role certificate generator to identity user
+        $loginSupport = self::login($supportTeamMember);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginSupport->auth_token,
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
@@ -390,6 +393,7 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $certificatesCutoff = 3;
 
         try {
+            $loginIdentity = self::login($identity);
             \OmegaUp\Controllers\Certificate::apiGenerateContestCertificates(
                 new \OmegaUp\Request([
                     'auth_token' => $loginIdentity->auth_token,

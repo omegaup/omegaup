@@ -4700,22 +4700,25 @@ Gets extra information of the identity:
 - last password change request
 - verify status
 - birth date to verify the user identity
+- roles assigned to user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `usernameOrEmail` | `string` |             |
 
 ### Returns
 
-| Name              | Type      |
-| ----------------- | --------- |
-| `birth_date`      | `Date`    |
-| `last_login`      | `Date`    |
-| `username`        | `string`  |
-| `verified`        | `boolean` |
-| `within_last_day` | `boolean` |
+| Name              | Type       |
+| ----------------- | ---------- |
+| `birth_date`      | `Date`     |
+| `email`           | `string`   |
+| `last_login`      | `Date`     |
+| `roles`           | `string[]` |
+| `username`        | `string`   |
+| `verified`        | `boolean`  |
+| `within_last_day` | `boolean`  |
 
 ## `/api/user/generateGitToken/`
 
