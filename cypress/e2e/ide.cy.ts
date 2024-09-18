@@ -26,11 +26,15 @@ describe('Test IDE', () => {
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
-    cy.visit('/');
-  });
 
-  it('Should verify that zip files working as intended', () => {
+    cy.visit('/');
     cy.login(loginOptions[0]);
+  });
+  afterEach(() => {
+    cy.visit('/');
+    cy.logout();
+  });
+  it('Should verify that zip files working as intended', () => {
     cy.visit('/grader/ephemeral/');
 
     cy.get('[data-zip-download]').should('be.visible').click();
@@ -74,14 +78,9 @@ describe('Test IDE', () => {
         reader.readAsArrayBuffer(file);
       });
     });
-
-    cy.visit('/');
-    cy.logout();
   });
 
   it('Should create a problem of type output only and display cat langauge only', () => {
-    cy.login(loginOptions[0]);
-
     const catProblemOptions: ProblemOptions = {
       ...problemOptions[1],
       languagesValue: 'cat',
@@ -91,13 +90,9 @@ describe('Test IDE', () => {
     cy.visit(`arena/problem/${catProblemOptions.problemAlias}/`);
     cy.get('[data-language-select] option').should('have.length', 1);
     cy.get('[data-language-select] option[value="cat"]').should('exist');
-
-    cy.logout();
   });
 
   it('Should display full list of supported languages in profile prefrences page', () => {
-    cy.login(loginOptions[0]);
-
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
@@ -109,13 +104,9 @@ describe('Test IDE', () => {
       if (language === 'cat') return;
       cy.get('@selectMenu').find(`option[value="${language}"]`).should('exist');
     });
-
-    cy.logout();
   });
 
   it('Should verify that original editor of diff is updated basted on output', () => {
-    cy.login(loginOptions[0]);
-
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
     cy.reload();
 
@@ -143,13 +134,9 @@ describe('Test IDE', () => {
       .then(() => {
         expect(concatText).to.equal(caseOutput);
       });
-
-    cy.logout();
   });
 
   it('Should verify that zip files after clicking run', () => {
-    cy.login(loginOptions[0]);
-
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
     cy.reload();
 
@@ -160,13 +147,9 @@ describe('Test IDE', () => {
     extensions.forEach((extension) => {
       cy.get(`button[title="Main/compile.${extension}"]`).should('be.visible');
     });
-
-    cy.logout();
   });
 
   it('Should verify log data after clicking run', () => {
-    cy.login(loginOptions[0]);
-
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
     cy.reload();
 
@@ -183,12 +166,9 @@ describe('Test IDE', () => {
           .should('contain', 'client')
           .should('contain', 'runner');
       });
-    cy.logout();
   });
 
   it('Should create a new case for a problem', () => {
-    cy.login(loginOptions[0]);
-
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
     cy.reload();
 
@@ -196,13 +176,9 @@ describe('Test IDE', () => {
     cy.get('input[data-case-name]').type(caseName);
     cy.get('[data-add-button]').should('be.visible').click();
     cy.get(`li[title="${caseName}.in"]`).should('be.visible');
-
-    cy.logout();
   });
 
   it('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
-    cy.login(loginOptions[0]);
-
     // update preferred langauge to py2
     profilePage.updatePreferredLanguage('py2');
     // go to the link with the editor
@@ -236,7 +212,5 @@ describe('Test IDE', () => {
       .should('be.visible')
       .find('option:selected')
       .should('have.value', 'cpp20-gcc');
-
-    cy.logout();
   });
 });
