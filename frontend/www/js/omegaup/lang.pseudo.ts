@@ -1072,7 +1072,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorCreateNewProblem: "(Cr3a73 n3w pr0b13m)",
   problemCreatorCreateNewProblemBack: "(Back)",
   problemCreatorCreateNewProblemContinue: "(C0n7inu3)",
-  problemCreatorCreateNewProblemWarning: "(D0 y0u wan7 70 57ar7 again? A11 7h3 pr3vi0u5 da7a wi11 b3 1057 and 7h3 cr3a70r wi11 b3 r3537. Sav3 7h3 curr3n7 pr0gr355 b3f0r3 cr3a7ing a n3w 0n3. T0 d0 50, c1ick 0n 7h3 bu770n 'G3n3ra73 pr0b13m'.)",
+  problemCreatorCreateNewProblemWarning: "(D0 y0u wan7 70 57ar7 again? A11 7h3 pr3vi0u5 da7a wi11 b3 1057 and 7h3 cr3a70r wi11 b3 r3537. Sav3 7h3 curr3n7 pr0gr355 b3f0r3 cr3a7ing a n3w 0n3. T0 d0 50, c1ick 0n 7h3 bu770n \"G3n3ra73 pr0b13m\".)",
   problemCreatorDeleteCase: "(D31373 ca53)",
   problemCreatorDeleteCases: "(D31373 ca535)",
   problemCreatorDeleteGroup: "(D31373 gr0up)",

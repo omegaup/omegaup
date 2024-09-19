@@ -1072,7 +1072,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorCreateNewProblem: "Create new problem",
   problemCreatorCreateNewProblemBack: "Back",
   problemCreatorCreateNewProblemContinue: "Continue",
-  problemCreatorCreateNewProblemWarning: "Do you want to start again? All the previous data will be lost and the creator will be reset. Save the current progress before creating a new one. To do so, click on the button 'Generate problem'.",
+  problemCreatorCreateNewProblemWarning: "Do you want to start again? All the previous data will be lost and the creator will be reset. Save the current progress before creating a new one. To do so, click on the button \"Generate problem\".",
   problemCreatorDeleteCase: "Delete case",
   problemCreatorDeleteCases: "Delete cases",
   problemCreatorDeleteGroup: "Delete group",
