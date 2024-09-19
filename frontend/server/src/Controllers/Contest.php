@@ -2901,11 +2901,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         $languages = explode(',', $languagesAsString);
+
         $supportedLanguages = array_keys(
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
         );
         \OmegaUp\Validators::validateValidSubset(
-            $languages,
+            array_filter($languages, function ($language) {
+                return !empty($language);
+            }),
             'langauges',
             $supportedLanguages
         );
