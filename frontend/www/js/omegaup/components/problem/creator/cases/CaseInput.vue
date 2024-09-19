@@ -7,8 +7,8 @@
       class="mb-4"
     >
       <b-form-input
-        data-problem-creator-case-input="name"
         v-model="caseName"
+        data-problem-creator-case-input="name"
         name="case-name"
         :formatter="formatter"
         required

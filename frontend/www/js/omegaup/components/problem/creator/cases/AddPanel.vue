@@ -77,9 +77,13 @@
         @click="$emit('close-add-window')"
         >{{ T.wordsCancel }}</b-button
       >
-      <b-button data-problem-creator-add-panel-submit type="submit" variant="success" size="sm">{{
-        T.problemCreatorAdd
-      }}</b-button>
+      <b-button
+        data-problem-creator-add-panel-submit
+        type="submit"
+        variant="success"
+        size="sm"
+        >{{ T.problemCreatorAdd }}</b-button
+      >
     </form>
   </b-card>
 </template>

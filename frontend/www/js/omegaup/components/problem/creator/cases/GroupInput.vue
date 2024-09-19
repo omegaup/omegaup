@@ -7,8 +7,8 @@
       class="mb-4"
     >
       <b-form-input
-      data-problem-creator-group-input="name"    
         v-model="groupName"
+        data-problem-creator-group-input="name"
         :formatter="formatter"
         required
         autocomplete="off"
