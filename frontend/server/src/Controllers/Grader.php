@@ -27,13 +27,19 @@ class Grader extends \OmegaUp\Controllers\Controller {
     }
     /**
      * @return array{templateProperties: array{payload: FullIDEPayload, title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool}, entrypoint: string}
-     * @omegaup-request-param null|string $auth_token
     */
     public static function getGraderForTypeScript(
         \OmegaUp\Request $r
     ): array {
+        $r->user = null;
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // do nothing
+        }
+
         $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
-            \OmegaUp\Controllers\Session::getCurrentSession()['user']->user_id ?? null
+            $r->user?->user_id
         );
 
         return [
