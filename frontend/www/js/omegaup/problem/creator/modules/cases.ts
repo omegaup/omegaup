@@ -197,7 +197,7 @@ export const casesStore: Module<CasesState, RootState> = {
     updateCase(state, [oldGroupID, updateCaseRequest]: [GroupID, CaseRequest]) {
       if (
         updateCaseRequest.groupID === UUID_NIL &&
-        updateCaseRequest.autoPoints === true
+        updateCaseRequest.autoPoints
       ) {
         updateCaseRequest.points = 100;
       }
@@ -211,7 +211,7 @@ export const casesStore: Module<CasesState, RootState> = {
       if (!caseToEdit) return;
       if (
         updateCaseRequest.groupID === UUID_NIL &&
-        oldGroup.ungroupedCase === true
+        oldGroup.ungroupedCase
       ) {
         if (caseToEdit.name !== updateCaseRequest.name) {
           caseToEdit.name = updateCaseRequest.name;
@@ -259,7 +259,7 @@ export const casesStore: Module<CasesState, RootState> = {
         (_case) => _case.caseID !== updateCaseRequest.caseID,
       );
 
-      if (oldGroup.ungroupedCase === true && oldGroup.cases.length === 0) {
+      if (oldGroup.ungroupedCase && oldGroup.cases.length === 0) {
         state.groups = state.groups.filter(
           (_group) => _group.groupID !== oldGroup.groupID,
         );
@@ -783,7 +783,7 @@ export function assignMissingPoints(
     let notDefinedCount = 0;
 
     _group.cases.forEach((_case) => {
-      if (_case.autoPoints === true) {
+      if (_case.autoPoints) {
         notDefinedCount += 1;
       } else {
         casesPoints += _case.points;
@@ -803,7 +803,7 @@ export function assignMissingPoints(
       }
       const remainingAssignablePoints = _group.points - casesPoints;
       _group.cases.forEach((_case) => {
-        if (_case.autoPoints === true) {
+        if (_case.autoPoints) {
           _case.points = remainingAssignablePoints / notDefinedCount;
         }
       });
@@ -812,7 +812,7 @@ export function assignMissingPoints(
       if (notDefinedCount > 0) {
         const remainingAssignablePoints = _group.points - casesPoints;
         _group.cases.forEach((_case) => {
-          if (_case.autoPoints === true) {
+          if (_case.autoPoints) {
             _case.points = remainingAssignablePoints / notDefinedCount;
           }
         });
@@ -828,7 +828,7 @@ export function assignMissingPoints(
         if (notDefinedCount !== 0) {
           const remainingAssignablePoints = _group.points - casesPoints;
           _group.cases.forEach((_case) => {
-            if (_case.autoPoints === true) {
+            if (_case.autoPoints) {
               _case.points = remainingAssignablePoints / notDefinedCount;
             }
           });
