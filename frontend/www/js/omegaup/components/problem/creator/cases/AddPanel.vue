@@ -5,10 +5,14 @@
         <b-tabs small pills lazy>
           <b-tab
             :active="tab === 'case'"
-            :title="T.problemCreatorCase"
             name="modal-form"
             @click="tab = 'case'"
           >
+            <template #title>
+              <span name="group" data-problem-creator-add-panel-tab="case">
+                {{ T.problemCreatorCase }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidCaseName"
               variant="danger"
@@ -21,10 +25,14 @@
           </b-tab>
           <b-tab
             :active="tab === 'group'"
-            :title="T.problemCreatorGroup"
             name="modal-form"
             @click="tab = 'group'"
           >
+            <template #title>
+              <span name="group" data-problem-creator-add-panel-tab="group">
+                {{ T.problemCreatorGroup }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidGroupName"
               variant="danger"
@@ -37,10 +45,17 @@
           </b-tab>
           <b-tab
             :active="tab === 'multiplecases'"
-            :title="T.problemCreatorMultipleCases"
             name="modal-form"
             @click="tab = 'multiplecases'"
           >
+            <template #title>
+              <span
+                name="multiple-cases"
+                data-problem-creator-add-panel-tab="multiple-cases"
+              >
+                {{ T.problemCreatorMultipleCases }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidCaseName"
               variant="danger"
@@ -62,7 +77,7 @@
         @click="$emit('close-add-window')"
         >{{ T.wordsCancel }}</b-button
       >
-      <b-button type="submit" variant="success" size="sm">{{
+      <b-button data-problem-creator-add-panel-submit type="submit" variant="success" size="sm">{{
         T.problemCreatorAdd
       }}</b-button>
     </form>
