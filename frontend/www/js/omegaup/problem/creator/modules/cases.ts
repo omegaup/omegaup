@@ -89,7 +89,7 @@ export const casesStore: Module<CasesState, RootState> = {
     addCase(state, caseRequest: CaseRequest) {
       if (caseRequest.groupID === UUID_NIL) {
         // Should create a new group with the same name
-        if (caseRequest.autoPoints === true) {
+        if (caseRequest.autoPoints) {
           caseRequest.points = 100;
         }
         const newCase = generateCase({
