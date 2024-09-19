@@ -15,7 +15,7 @@ describe('Test IDE', () => {
     cy.visit('/');
 
     loginOptions = loginPage.registerMultipleUsers(1);
-    problemOptions = problemPage.generateProblemOptions(2);
+    problemOptions = problemPage.generateProblemOptions(3);
 
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
@@ -91,6 +91,25 @@ describe('Test IDE', () => {
     cy.visit(`arena/problem/${catProblemOptions.problemAlias}/`);
     cy.get('[data-language-select] option').should('have.length', 1);
     cy.get('[data-language-select] option[value="cat"]').should('exist');
+  });
+
+  xit('Should create an interactive problem and verify its visible', () => {
+    const interactiveProblemOptions: ProblemOptions = {
+      ...problemOptions[2],
+      zipFile: 'testproblem_interactive.zip',
+    };
+    cy.createProblem(interactiveProblemOptions);
+
+    cy.visit(`arena/problem/${interactiveProblemOptions.problemAlias}/`);
+
+    cy.get('.download-os').should('be.visible');
+    cy.get('.download-lang').should('be.visible');
+
+    cy.get(`li[title="code"]`).should('be.visible');
+    cy.get(`li[title="logs.txt"]`).should('be.visible');
+
+    cy.get(`li[title="cases"]`).should('be.visible').click();
+    cy.get(`li[title="diff"]`).should('be.visible');
   });
 
   it('Should display full list of supported languages in profile prefrences page', () => {
