@@ -2904,19 +2904,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $supportedLanguages = array_keys(
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
         );
-        $diff = array_unique(array_diff($languages, $supportedLanguages));
-        $isSubset = $diff === [] || $diff === [''];
-
-        if (!$isSubset) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotInExpectedSet',
-                'languages',
-                [
-                    'bad_elements' => implode(', ', $diff),
-                    'expected_set' => implode(', ', $supportedLanguages),
-                ]
-            );
-        }
+        \OmegaUp\Validators::validateValidSubset(
+            $languages,
+            'langauges',
+            $supportedLanguages
+        );
     }
 
     /**
