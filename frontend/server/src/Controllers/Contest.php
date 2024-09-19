@@ -2906,9 +2906,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
         );
         \OmegaUp\Validators::validateValidSubset(
-            array_filter($languages, function ($language) {
+            array_values(array_filter($languages, function ($language) {
                 return !empty($language);
-            }),
+            })),
             'langauges',
             $supportedLanguages
         );
