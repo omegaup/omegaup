@@ -209,10 +209,7 @@ export const casesStore: Module<CasesState, RootState> = {
         (_case) => _case.caseID === updateCaseRequest.caseID,
       );
       if (!caseToEdit) return;
-      if (
-        updateCaseRequest.groupID === UUID_NIL &&
-        oldGroup.ungroupedCase
-      ) {
+      if (updateCaseRequest.groupID === UUID_NIL && oldGroup.ungroupedCase) {
         if (caseToEdit.name !== updateCaseRequest.name) {
           caseToEdit.name = updateCaseRequest.name;
           oldGroup.name = updateCaseRequest.name;
