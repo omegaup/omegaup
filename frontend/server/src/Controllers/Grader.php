@@ -6,6 +6,7 @@
  * Description of GraderController
  *
  * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
+ * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string}
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
@@ -25,7 +26,8 @@ class Grader extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @psalm-return array{templateProperties: array{title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>}, entrypoint: string, inContest?: bool, navbarSection?: string}
+     * @return array{templateProperties: array{payload: FullIDEPayload, title: \OmegaUp\TranslationString, fullWidth?: bool, hideFooterAndHeader?: bool}, entrypoint: string}
+     * @omegaup-request-param null|string $auth_token
     */
     public static function getGraderForTypeScript(
         \OmegaUp\Request $r
