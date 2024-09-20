@@ -628,20 +628,12 @@ const storeOptions: StoreOptions<GraderStore> = {
         return;
       }
 
-      // update with interactive problem templates for each language
-      // dont forget to update all cppxx and pyx templates
-      for (const lang in templates) {
-        const extension = Util.supportedLanguages[lang].extension;
-
+      for (const extension in originalInteractiveTemplates) {
         if (templates[extension]) {
-          for (const language of Util.extensionToLanguages[extension]) {
-            interactiveTemplates[language] = templates[extension];
-          }
+          interactiveTemplates[language] = templates[extension];
         } else {
-          for (const language of Util.extensionToLanguages[extension]) {
-            interactiveTemplates[language] =
-              originalInteractiveTemplates[extension];
-          }
+          interactiveTemplates[language] =
+            originalInteractiveTemplates[extension];
         }
       }
       store.commit('request.language', state.request.language);
