@@ -1556,6 +1556,14 @@ export namespace types {
       );
     }
 
+    export function FullIDEPayload(
+      elementId: string = 'payload',
+    ): types.FullIDEPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -3561,6 +3569,11 @@ export namespace types {
     progress?: number;
     school_name?: string;
     start_time: Date;
+  }
+
+  export interface FullIDEPayload {
+    acceptedLanguages: string[];
+    preferredLanguage?: string;
   }
 
   export interface GraderStatus {
