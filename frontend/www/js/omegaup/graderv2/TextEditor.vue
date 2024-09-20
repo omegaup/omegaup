@@ -22,7 +22,10 @@ export default class TextEditor extends Vue {
   @Prop({ required: true }) extension!: string;
   @Prop({ default: 'NA' }) module!: string;
   @Prop({ default: false }) readOnly!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
+
+  get theme(): string {
+    return store.getters['theme'];
+  }
 
   get filename(): string {
     if (this.storeMapping.module) {

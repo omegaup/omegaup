@@ -1,4 +1,6 @@
 import languages from '../../../../data/languages.json';
+import { types } from '../api_types';
+
 export function vuexGet(store: any, name: string) {
   if (typeof store.getters[name] !== 'undefined') return store.getters[name];
   let o = store.state;
@@ -142,3 +144,77 @@ export function throttle<T extends any[]>(
 
   return throttled;
 }
+
+export enum MonacoThemes {
+  VSLight = 'vs',
+  VSDark = 'vs-dark',
+}
+export const DUMMY_PROBLEM: types.ProblemInfo = {
+  alias: 'dummy-problem',
+  settings: {
+    cases: {
+      sample: {
+        in: '1 2\n',
+        out: '3\n',
+        weight: 1,
+      },
+      long: {
+        in: '123456789012345678 123456789012345678\n',
+        out: '246913578024691356\n',
+        weight: 1,
+      },
+    },
+    limits: {
+      ExtraWallTime: '5s',
+      MemoryLimit: 33554432,
+      OutputLimit: 10240,
+      OverallWallTimeLimit: '3s',
+      TimeLimit: '1s',
+    },
+    validator: {
+      name: 'token-numeric',
+      tolerance: 1e-9,
+    },
+  },
+  // the only attributes required for full IDE are the above
+  accepts_submissions: false,
+  karel_problem: false,
+  commit: 'NA',
+  languages: [],
+  limits: {
+    input_limit: '10 KiB',
+    memory_limit: '32 MiB',
+    overall_wall_time_limit: '1s',
+    time_limit: '1s',
+  },
+  points: 100,
+  problem_id: 1,
+  problemsetter: {
+    classname: 'user-rank-unranked',
+    creation_date: new Date(),
+    name: 'omegaUp admin',
+    username: 'omegaup',
+  },
+  quality_seal: false,
+  sample_input: undefined,
+  source: 'omegaUp classics',
+  statement: {
+    images: {},
+    sources: {},
+    language: 'en',
+    markdown: `# test with embed code
+Here we can add code.
+<details>
+<summary>
+  Example:
+</summary>
+
+{{sample.cpp}}
+
+</details>
+    `,
+  },
+  title: 'Dummy Problem',
+  visibility: 2,
+  input_limit: 1000,
+};
