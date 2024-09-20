@@ -6,23 +6,23 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCertificateGeneratorRole() {
         //create users
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         //logins
-        $loginIdentity = self::login($identity);
-        $loginIdentity2 = self::login($identity2);
+        $loginAdmin = self::login($admin);
 
         //add role certificate generator to identity user
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
 
         //add role mentor to identity2 user
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity2->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity2->username,
             'role' => 'Mentor'
         ]));
@@ -48,14 +48,13 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateCourseWithoutMinimumProgressForCertificateValue() {
         //create user
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // login normal users
-        $loginIdentity = self::login($identity);
-
         //add role mentor to identity user
+        $loginAdmin = self::login($admin);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity->username,
             'role' => 'Mentor'
         ]));
@@ -63,6 +62,7 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         // create a course using the new field minimum_progress_for_certificate
+        $loginIdentity = self::login($identity);
         \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -85,19 +85,21 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateCourseWithMinimumProgressForCertificateValue() {
         //create user
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // login normal users
-        $loginIdentity = self::login($identity);
-
         //add role certificate generator to identity user
+        $loginAdmin = self::login($admin);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
 
         $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        // login normal users
+        $loginIdentity = self::login($identity);
 
         // create a course using the new field minimum_progress_for_certificate
         \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
@@ -112,7 +114,7 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $course = \OmegaUp\DAO\Courses::getByAlias($alias);
 
-        $this->assertEquals($course->minimum_progress_for_certificate, 100);
+        $this->assertSame($course->minimum_progress_for_certificate, 100);
     }
 
     /**
@@ -121,14 +123,13 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateCourseWithoutMinimumProgressForCertificateValue() {
         //create user
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // login normal users
-        $loginIdentity = self::login($identity);
-
         //add role mentor to identity2 user
+        $loginAdmin = self::login($admin);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity->username,
             'role' => 'Mentor'
         ]));
@@ -136,6 +137,7 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         // create a course using the new field minimum_progress_for_certificate
+        $loginIdentity = self::login($identity);
         \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
@@ -172,13 +174,13 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateCourseWithMinimumProgressForCertificateValue() {
         //create user
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createSupportUser();
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $loginIdentity = self::login($identity);
-
         //add role as certificate generator
+        $loginAdmin = self::login($admin);
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $loginIdentity->auth_token,
+            'auth_token' => $loginAdmin->auth_token,
             'username' => $identity->username,
             'role' => 'CertificateGenerator'
         ]));
@@ -186,6 +188,7 @@ class GenerateCertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         // create a course using the new field minimum_progress_for_certificate
+        $loginIdentity = self::login($identity);
         \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
             'auth_token' => $loginIdentity->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),

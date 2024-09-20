@@ -49,6 +49,12 @@ export const casesStore: Module<CasesState, RootState> = {
       state.layouts = [];
       state.hide = false;
     },
+    replaceState(state, uploadedState: CasesState) {
+      state.groups = uploadedState.groups;
+      state.selected = uploadedState.selected;
+      state.layouts = uploadedState.layouts;
+      state.hide = uploadedState.hide;
+    },
     addGroup(state, newGroup: Group) {
       state.groups.push(newGroup);
       state = assignMissingPoints(state);
@@ -63,6 +69,17 @@ export const casesStore: Module<CasesState, RootState> = {
         groupTarget.autoPoints = groupData.autoPoints;
       }
       state = assignMissingPoints(state);
+    },
+    updateGroup(
+      state,
+      [groupID, newName, newPoints]: [GroupID, string, number | null],
+    ) {
+      const targetGroup = state.groups.find(
+        (_group) => _group.groupID === groupID,
+      );
+      if (!targetGroup) return;
+      targetGroup.name = newName;
+      targetGroup.points = newPoints;
     },
     addCase(state, caseRequest: CaseRequest) {
       if (caseRequest.groupID === UUID_NIL) {
@@ -453,7 +470,9 @@ export const casesStore: Module<CasesState, RootState> = {
               lineID: uuid(),
               caseID: _case.caseID,
               label: lineInfo.label,
-              data: lineInfo.data,
+              data: {
+                ...lineInfo.data,
+              },
             }),
           );
           _case.lines = linesFromLayout;
@@ -748,6 +767,7 @@ export function generateCase(
     groupID: UUID_NIL,
     lines: [],
     points: null,
+    output: '',
     ...caseParams,
   };
 }
