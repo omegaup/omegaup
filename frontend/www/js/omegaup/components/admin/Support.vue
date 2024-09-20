@@ -3,7 +3,7 @@
     <div class="text-white bg-primary card-header">
       <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
-        <span v-if="username != null">- {{ username }}</span>
+        <span v-if="username != null">- {{ username }} ({{ email }})</span>
       </div>
     </div>
     <div class="card-body">
@@ -12,13 +12,13 @@
           <form class="form w-100" @submit.prevent="onSearchEmail">
             <div class="input-group">
               <input
-                v-model="email"
+                v-model="usernameOrEmail"
                 class="form-control"
                 name="email"
                 type="text"
                 required="required"
                 :disabled="username != null"
-                :placeholder="T.email"
+                :placeholder="T.supportTypeEmailOrUsername"
               />
               <div class="input-group-append">
                 <button
@@ -31,6 +31,16 @@
               </div>
             </div>
           </form>
+        </div>
+        <div class="col-md-6 text-right">
+          <button
+            v-if="username != null"
+            class="btn btn-secondary"
+            type="reset"
+            @click.prevent="onReset"
+          >
+            {{ T.supportNewSearch }}
+          </button>
         </div>
       </div>
       <template v-if="username != null">
@@ -142,16 +152,27 @@
             </div>
           </form>
         </div>
-        <div class="row float-right">
-          <div class="col-md-12">
-            <button
-              class="btn btn-secondary"
-              type="reset"
-              @click.prevent="onReset"
-            >
-              {{ T.wordsCancel }}
-            </button>
-          </div>
+        <div class="row mb-3">
+          <h4>{{ T.supportAssignUserRoles }}</h4>
+          <table class="table">
+            <tbody>
+              <tr v-for="role in roleNamesWithDescription" :key="role.name">
+                <td>
+                  <input
+                    v-if="role.name != 'Admin'"
+                    type="checkbox"
+                    :checked="hasRole(role.name)"
+                    :class="role.name"
+                    @change.prevent="onChangeRole($event, role)"
+                  />
+                </td>
+                <td>
+                  <span class="badge badge-info w-100">{{ role.name }}</span>
+                </td>
+                <td>{{ role.description }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </template>
     </div>
@@ -164,6 +185,8 @@ import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 
 import {
   FontAwesomeIcon,
@@ -189,21 +212,28 @@ export interface UpdateEmailRequest {
 })
 export default class AdminSupport extends Vue {
   @Prop() username!: string;
+  @Prop() email!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
   @Prop() lastLogin!: null | Date;
   @Prop() birthDate!: null | Date;
+  @Prop() roles!: string[];
+  @Prop() roleNamesWithDescription!: types.UserRole[];
 
   T = T;
   ui = ui;
   time = time;
-  email: null | string = null;
+  usernameOrEmail: null | string = null;
   newEmail: null | string = null;
 
-  @Emit('search-email')
+  hasRole(role: string): boolean {
+    return this.roles.indexOf(role) !== -1;
+  }
+
+  @Emit('search-username-or-email')
   onSearchEmail(): null | string {
-    if (this.email == null) return null;
-    return this.email;
+    if (this.usernameOrEmail == null) return null;
+    return this.usernameOrEmail;
   }
 
   @Emit('update-email')
@@ -214,8 +244,8 @@ export default class AdminSupport extends Vue {
 
   @Emit('verify-user')
   onVerifyUser(): null | string {
-    if (this.email == null) return null;
-    return this.email;
+    if (this.usernameOrEmail == null) return null;
+    return this.usernameOrEmail;
   }
 
   @Emit('generate-token')
@@ -226,8 +256,19 @@ export default class AdminSupport extends Vue {
 
   @Emit('reset')
   onReset() {
-    this.email = null;
+    this.usernameOrEmail = null;
     this.newEmail = null;
+  }
+
+  @Emit('change-role')
+  onChangeRole(
+    ev: Event,
+    role: types.UserRole,
+  ): omegaup.Selectable<types.UserRole> {
+    return {
+      value: role,
+      selected: (ev.target as HTMLInputElement).checked,
+    };
   }
 }
 </script>

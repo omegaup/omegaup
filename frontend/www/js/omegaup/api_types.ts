@@ -2279,6 +2279,14 @@ export namespace types {
       );
     }
 
+    export function SupportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.SupportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function TeamGroupEditPayload(
       elementId: string = 'payload',
     ): types.TeamGroupEditPayload {
@@ -4733,6 +4741,10 @@ export namespace types {
     username?: string;
   }
 
+  export interface SupportDetailsPayload {
+    roleNamesWithDescription: types.UserRole[];
+  }
+
   export interface Tag {
     name: string;
   }
@@ -4929,6 +4941,7 @@ export namespace types {
   }
 
   export interface UserRole {
+    description?: string;
     name: string;
   }
 
@@ -5801,7 +5814,9 @@ export namespace messages {
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
     birth_date?: Date;
+    email?: string;
     last_login?: Date;
+    roles: string[];
     username: string;
     verified: boolean;
     within_last_day: boolean;

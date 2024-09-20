@@ -86,11 +86,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         self::validateCreateRequest($r);
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['email'],
-            'email'
-        );
-        $email = $r['email'];
+        $email = $r->ensureString('email');
 
         $lastRequest = \OmegaUp\DAO\Identities::getExtraInformation($email);
 
