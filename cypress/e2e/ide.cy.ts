@@ -97,7 +97,7 @@ describe('Test IDE', () => {
     cy.logout();
   });
 
-  xit('Should create an interactive problem and verify its visible', () => {
+  it('Should create an interactive problem and verify its visible', () => {
     cy.login(loginOptions[0]);
 
     const interactiveProblemOptions: ProblemOptions = {
