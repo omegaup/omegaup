@@ -4989,21 +4989,33 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>, visibilityStatuses: array<string, int>}
      */
-    public static function getCommonPayloadForTypeScript(): array {
+    public static function getCommonPayloadForTypeScript(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
         $validatorTypes = [
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance(
+                $identity
+            )->get(
                 'problemEditFormTokenCaseless'
             ),
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC => \OmegaUp\Translations::getInstance()->get(
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC => \OmegaUp\Translations::getInstance(
+                $identity
+            )->get(
                 'problemEditFormNumericTokensWithTolerance'
             ),
-            \OmegaUp\ProblemParams::VALIDATOR_TOKEN => \OmegaUp\Translations::getInstance()->get(
+            \OmegaUp\ProblemParams::VALIDATOR_TOKEN => \OmegaUp\Translations::getInstance(
+                $identity
+            )->get(
                 'problemEditFormTokenByToken'
             ),
-            \OmegaUp\ProblemParams::VALIDATOR_LITERAL => \OmegaUp\Translations::getInstance()->get(
+            \OmegaUp\ProblemParams::VALIDATOR_LITERAL => \OmegaUp\Translations::getInstance(
+                $identity
+            )->get(
                 'problemEditFormLiteral'
             ),
-            \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance()->get(
+            \OmegaUp\ProblemParams::VALIDATOR_CUSTOM => \OmegaUp\Translations::getInstance(
+                $identity
+            )->get(
                 'problemEditFormCustom'
             ),
         ];
@@ -5015,10 +5027,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $sortedLanguages
             ) => 'C, C++, C#, Java, Kotlin, Python, Ruby, Pascal, Haskell, Lua, Go, Rust, JavaScript',
             'kj,kp' => 'Karel',
-            'cat' => \OmegaUp\Translations::getInstance()->get(
+            'cat' => \OmegaUp\Translations::getInstance($identity)->get(
                 'wordsJustOutput'
             ),
-            '' => \OmegaUp\Translations::getInstance()->get(
+            '' => \OmegaUp\Translations::getInstance($identity)->get(
                 'wordsNoSubmissions'
             ),
         ];
@@ -5141,7 +5153,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => array_merge(
                     $details,
-                    self::getCommonPayloadForTypeScript(),
+                    self::getCommonPayloadForTypeScript($r->identity),
                     $extraInfo
                 ),
                 'title' => new \OmegaUp\TranslationString(
@@ -5176,7 +5188,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $details = self::getProblemEditDetails($problem, $r->identity);
                 $result['templateProperties']['payload'] = array_merge(
                     $details,
-                    self::getCommonPayloadForTypeScript()
+                    self::getCommonPayloadForTypeScript($r->identity)
                 );
                 $result['templateProperties']['payload'] = array_merge(
                     $extraInfo,
@@ -5451,7 +5463,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                             ],
-                            self::getCommonPayloadForTypeScript()
+                            self::getCommonPayloadForTypeScript($r->identity)
                         ),
                         'title' => new \OmegaUp\TranslationString(
                             'omegaupTitleProblemNew'
@@ -5499,7 +5511,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             'has-visited-create-problem'
                         ),
                     ],
-                    self::getCommonPayloadForTypeScript()
+                    self::getCommonPayloadForTypeScript($r->identity)
                 ),
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblemNew'
