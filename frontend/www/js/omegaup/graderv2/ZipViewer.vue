@@ -5,6 +5,7 @@
         <button
           v-if="!zip"
           class="text-truncate list-group-item list-group-item-action disabled"
+          :class="theme"
           type="button"
         >
           <em>{{ T.wordsEmpty }}</em>
@@ -36,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import * as Util from './util';
 import T from '../lang';
 import JSZip, { JSZipObject } from 'jszip';
@@ -44,11 +45,13 @@ import store from './GraderStore';
 
 @Component
 export default class ZipViewer extends Vue {
-  @Prop({ default: 'vs' }) theme!: string;
-
   zip: JSZip | null = null;
   active: string | null = null;
   T = T;
+
+  get theme(): string {
+    return store.getters['theme'];
+  }
 
   get contents(): string {
     return store.getters.zipContent;

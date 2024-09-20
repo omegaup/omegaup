@@ -14,13 +14,15 @@ export default class DiffEditor extends Vue {
   @Prop({ required: true }) storeMapping!: {
     [key: string]: string;
   };
-  @Prop({ default: 'vs-dark' }) theme!: string;
   @Prop({ default: false }) readOnly!: boolean;
 
   _originalModel: monaco.editor.ITextModel | null = null;
   _modifiedModel: monaco.editor.ITextModel | null = null;
   _editor: monaco.editor.IStandaloneDiffEditor | null = null;
 
+  get theme(): string {
+    return store.getters['theme'];
+  }
   get originalContents(): string {
     return store.getters[this.storeMapping.originalContents];
   }
