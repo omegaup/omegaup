@@ -57,143 +57,23 @@ int main() {
   int t;
   scanf("%d", &t);
   while (t--) {
-    // TODO: fixme.
-  }
 
-  return 0;
-}`,
-  'c11-gcc': `#include <stdio.h>
-#include <stdint.h>
-
-int main() {
-  int t;
-  scanf("%d", &t);
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'c11-clang': `#include <stdio.h>
-#include <stdint.h>
-
-int main() {
-  int t;
-  scanf("%d", &t);
-  while (t--) {
-    // TODO: fixme.
   }
 
   return 0;
 }`,
   cpp: `#include <iostream>
 
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  cpp11: `#include <iostream>
+using namespace std;
 
 int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
+  cin.tie(nullptr);
+  ios_base::sync_with_stdio(false);
 
   int t;
-  std::cin >> t;
+  cin >> t;
   while (t--) {
-    // TODO: fixme.
-  }
 
-  return 0;
-}`,
-  'cpp11-gcc': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'cpp11-clang': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'cpp17-gcc': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'cpp17-clang': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'cpp20-gcc': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
-  }
-
-  return 0;
-}`,
-  'cpp20-clang': `#include <iostream>
-
-int main() {
-  std::cin.tie(nullptr);
-  std::ios_base::sync_with_stdio(false);
-
-  int t;
-  std::cin >> t;
-  while (t--) {
-    // TODO: fixme.
   }
 
   return 0;
@@ -210,7 +90,7 @@ public class Main {
     StringTokenizer st = new StringTokenizer(br.readLine());
     int t = Integer.parseInt(st.nextToken());
     while (t-- > 0) {
-      // TODO: fixme.
+
     }
   }
 }`,
@@ -220,7 +100,7 @@ fun main() {
   val scanner = Scanner(System.in)
   val t = scanner.nextInt()
   repeat(t) {
-    // TODO: fixme.
+
   }
 }`,
   py: `#!/usr/bin/python3
@@ -228,34 +108,14 @@ fun main() {
 def _main() -> None:
   t = int(input())
   for _ in range(t):
-    # TODO: fixme.
-  pass
 
-if __name__ == '__main__':
-  _main()`,
-  py2: `#!/usr/bin/python
-
-def _main():
-  t = int(raw_input())
-  for _ in range(t):
-    // TODO: fixme.
-  pass
-
-if __name__ == '__main__':
-  _main()`,
-  py3: `#!/usr/bin/python3
-
-def _main() -> None:
-  t = int(input())
-  for _ in range(t):
-    // TODO: fixme.
   pass
 
 if __name__ == '__main__':
   _main()`,
   rb: `t = gets.to_i
 t.times do
-  // TODO: fixme.
+
 end`,
   cs: `using System;
 using System.Collections.Generic;
@@ -264,7 +124,7 @@ class Program {
   static void Main(string[] args) {
     int t = int.Parse(Console.ReadLine());
     for (int i = 0; i < t; i++) {
-      // TODO: fixme.
+
     }
   }
 }`,
@@ -275,18 +135,18 @@ begin
   readln(t);
   for i := 1 to t do
   begin
-    // TODO: fixme.
+
   end;
 end.`,
   hs: `main :: IO ()
 main = do
   t <- readLn
   mapM_ (\\_ -> do
-    // TODO: fixme.
+
     return ()) [1..t]`,
   lua: `local t = io.read("*n")
 for i = 1, t do
-  // TODO: fixme.
+
 end`,
   go: `package main
 
@@ -296,7 +156,7 @@ func main() {
   var t int
   fmt.Scan(&t)
   for i := 0; i < t; i++ {
-    // TODO: fixme.
+
   }
 }`,
   rs: `use std::io::{self, BufRead};
@@ -306,7 +166,7 @@ fn main() {
   let mut lines = stdin.lock().lines();
   let t: i32 = lines.next().unwrap().unwrap().trim().parse().unwrap();
   for _ in 0..t {
-    // TODO: fixme.
+
   }
 }`,
   js: `const readline = require('readline');
@@ -319,81 +179,29 @@ const rl = readline.createInterface({
 rl.question('', (t) => {
   t = parseInt(t);
   for (let i = 0; i < t; i++) {
-    // TODO: fixme.
+
   }
   rl.close();
 });`,
+  cat: '',
 };
+
 export const originalInteractiveTemplates: Record<string, string> = {
   c: `#include "sumas.h"
 
 long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'c11-gcc': `#include "sumas.h"
 
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'c11-clang': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
   return 0;
 }`,
   cpp: `#include "sumas.h"
 
 long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  cpp11: `#include "sumas.h"
 
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp11-gcc': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp11-clang': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp17-gcc': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp17-clang': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp20-gcc': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
-  return 0;
-}`,
-  'cpp20-clang': `#include "sumas.h"
-
-long long sumas(long long a, long long b) {
-  // FIXME
   return 0;
 }`,
   java: `public class sumas {
   public static long sumas(long a, long b) {
-    // FIXME
+
     return 0;
   }
 }`,
@@ -403,11 +211,8 @@ long long sumas(long long a, long long b) {
 import Main
 
 def sumas(a: int, b: int) -> int:
-    """ sumas """
-    # FIXME
+
     return 0`,
-  py2: '# not supported',
-  py3: '# not supported',
   rb: '# not supported',
   cs: '// not supported',
   pas: `unit sumas;
@@ -424,7 +229,7 @@ uses Main;
 
 function sumas(a: LongInt; b: LongInt): LongInt;
 begin
-  { FIXME }
+
   sumas := 0;
 end;
 
@@ -434,4 +239,5 @@ end.`,
   go: '// not supported',
   rs: '// not supported',
   js: '// not supported',
+  cat: '// not supported',
 };

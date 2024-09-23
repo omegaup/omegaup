@@ -7,11 +7,13 @@
           <textarea
             ref="markdownInput"
             v-model="currentMarkdown"
+            data-problem-creator-editor-markdown
             class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <omegaup-markdown
+            data-problem-creator-previewer-markdown
             :markdown="
               T.problemCreatorMarkdownPreviewInitialRender + currentMarkdown
             "
@@ -21,7 +23,12 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-primary" type="submit" @click="updateMarkdown">
+          <button
+            data-problem-creator-save-markdown
+            class="btn btn-primary"
+            type="submit"
+            @click="updateMarkdown"
+          >
             {{ T.problemCreatorMarkdownSave }}
           </button>
         </div>
@@ -31,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
@@ -52,11 +59,25 @@ export default class StatementTab extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
+  @Prop({ default: T.problemCreatorEmpty }) currentMarkdownProp!: string;
+
   T = T;
   ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
-  currentMarkdown: string = T.problemCreatorEmpty;
+  currentMarkdownInternal: string = T.problemCreatorEmpty;
+
+  get currentMarkdown(): string {
+    return this.currentMarkdownInternal;
+  }
+  set currentMarkdown(newMarkdown: string) {
+    this.currentMarkdownInternal = newMarkdown;
+  }
+
+  @Watch('currentMarkdownProp')
+  onCurrentMarkdownPropChanged() {
+    this.currentMarkdown = this.currentMarkdownProp;
+  }
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {

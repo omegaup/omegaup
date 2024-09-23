@@ -22,7 +22,10 @@ export default class TextEditor extends Vue {
   @Prop({ required: true }) extension!: string;
   @Prop({ default: 'NA' }) module!: string;
   @Prop({ default: false }) readOnly!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
+
+  get theme(): string {
+    return store.getters['theme'];
+  }
 
   get filename(): string {
     if (this.storeMapping.module) {
@@ -56,12 +59,13 @@ textarea {
   resize: none;
 
   &.vs {
-    background: var(--textarea-vs-background-color);
+    background: var(--vs-background-color);
+    color: var(--vs-font-color);
   }
 
   &.vs-dark {
-    background: var(--textarea-vs-dark-background-color);
-    color: var(--textarea-vs-dark-font-color);
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
   }
 }
 </style>
