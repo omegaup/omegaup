@@ -1,8 +1,6 @@
 <template>
   <div class="card">
-    <h2 class="card-header text-white bg-primary">
-      {{ T.omegaupTitleReportStats }}
-    </h2>
+    <h2 class="card-header text-white bg-primary">Report stats</h2>
     <div class="card-body">
       <form>
         <div class="form-row">
