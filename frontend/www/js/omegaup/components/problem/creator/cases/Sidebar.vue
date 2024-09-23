@@ -199,12 +199,12 @@
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="edit group"
               @click="editGroupModal[groupID] = !editGroupModal[groupID]"
-              ><b-row
-                ><div class="ml-6">
-                  <BIconPencilFill variant="info" font-scale=".95" />
+              ><b-row>
+                <div class="ml-6">
+                  <BIconPencil variant="info" font-scale=".95" />
                 </div>
-                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div></b-row
-              >
+                <div class="ml-8">{{ T.omegaupTitleGroupsEdit }}</div>
+              </b-row>
             </b-dropdown-item>
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="delete group"
@@ -227,6 +227,30 @@
                 </div>
                 <div class="ml-8">
                   {{ T.problemCreatorDeleteCases }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="download .in"
+              @click="downloadGroupInput(groupID, '.in')"
+              ><b-row>
+                <div class="ml-6">
+                  <BIconBoxArrowDown variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadIn }}
+                </div>
+              </b-row>
+            </b-dropdown-item>
+            <b-dropdown-item
+              data-sidebar-edit-group-dropdown="download .txt"
+              @click="downloadGroupInput(groupID, '.txt')"
+              ><b-row>
+                <div class="ml-6">
+                  <BIconTextLeft variant="info" font-scale=".95" />
+                </div>
+                <div class="ml-8">
+                  {{ T.problemCraetorGroupDownloadTxt }}
                 </div>
               </b-row>
             </b-dropdown-item>
@@ -346,6 +370,7 @@ import {
   CaseID,
   CaseGroupID,
 } from '@/js/omegaup/problem/creator/types';
+import JSZip from 'jszip';
 
 const casesStore = namespace('casesStore');
 
@@ -388,6 +413,8 @@ export default class Sidebar extends Vue {
     newName,
     newPoints,
   ]: [GroupID, string, number | null]) => void;
+  @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
+  getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
@@ -436,6 +463,29 @@ export default class Sidebar extends Vue {
       caseID: caseID,
     });
     this.$emit('open-case-edit-window');
+  }
+
+  downloadGroupInput(groupID: GroupID, ext: '.in' | '.txt') {
+    const groupZip: JSZip = new JSZip();
+    const targetGroup = this.groups.find(
+      (_group: Group) => _group.groupID === groupID,
+    );
+    if (!targetGroup) return;
+
+    targetGroup.cases.forEach((_case) => {
+      let fileName = _case.name;
+      const caseGroupID: CaseGroupID = {
+        groupID: targetGroup.groupID,
+        caseID: _case.caseID,
+      };
+      const input = this.getStringifiedLinesFromCaseGroupID(caseGroupID);
+      groupZip?.file(`${fileName}${ext}`, input);
+    });
+
+    this.$emit('download-zip-file', {
+      fileName: targetGroup.name,
+      zipContent: groupZip,
+    });
   }
 }
 </script>

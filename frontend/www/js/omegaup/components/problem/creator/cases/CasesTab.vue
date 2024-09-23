@@ -5,6 +5,9 @@
         :show-window="shouldShowAddWindow"
         @open-add-window="openAddWindow"
         @open-case-edit-window="openCaseEditWindow"
+        @download-zip-file="
+          (zipObject) => $emit('download-zip-file', zipObject)
+        "
       />
     </b-col>
     <b-col>
