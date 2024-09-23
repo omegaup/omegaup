@@ -2627,7 +2627,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contestParams = self::convertRequestToContestParams($r);
 
-        if ($contestParams->admissionMode === \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PUBLIC) {
+        if (
+            $contestParams->admissionMode === \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_PUBLIC
+            || $contestParams->admissionMode === \OmegaUp\ContestParams::CONTEST_ADMISSION_MODE_REGISTRATION
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestMustBeCreatedInPrivateMode'
             );
