@@ -15,7 +15,6 @@ export default class MonacoEditor extends Vue {
   @Prop({ required: true }) storeMapping!: {
     [key: string]: string;
   };
-  @Prop({ default: 'vs-dark' }) theme!: string;
   @Prop({ default: false }) readOnly!: boolean;
 
   _editor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -24,6 +23,10 @@ export default class MonacoEditor extends Vue {
   // default font size and line height
   readonly baseFontSize: number = 14;
   readonly baseLineHeight: number = 19;
+
+  get theme(): string {
+    return store.getters['theme'];
+  }
 
   get language(): string {
     return store.getters[this.storeMapping.language];
@@ -63,6 +66,14 @@ export default class MonacoEditor extends Vue {
   onContentsChange(value: string): void {
     if (this._model && this._model.getValue() !== value) {
       this._model.setValue(value);
+    }
+  }
+  @Watch('theme')
+  onThemeChange(value: string): void {
+    if (this._editor) {
+      this._editor.updateOptions({
+        theme: value,
+      });
     }
   }
 
