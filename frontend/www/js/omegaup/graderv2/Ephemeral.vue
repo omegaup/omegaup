@@ -1,31 +1,54 @@
 <template>
-  <div>
-    <div class="navbar navbar-light bg-light py-0 border-bottom">
+  <div class="d-flex flex-column h-100">
+    <div class="navbar py-0" :class="theme">
       <span class="navbar-brand">
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
       </span>
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
-        <label v-if="isUploadButton" for="upload">
-          <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <span
-              class="fa fa-upload"
-              :title="T.wordsUpload"
-              aria-hidden="true"
-            ></span>
-          </a>
-        </label>
-
-        <label v-if="isDownloadButton" for="download">
-          <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
-            <span
-              class="fa fa-download"
-              :title="T.wordsDownload"
-              aria-hidden="true"
-            ></span>
-          </a>
-        </label>
-
+        <template v-if="!isEmbedded">
+          <label>
+            <a class="btn btn-secondary btn-sm mr-sm-2" role="button">
+              <font-awesome-icon
+                :icon="['fas', 'upload']"
+                :title="T.wordsUpload"
+                aria-hidden="true"
+              />
+            </a>
+            <input
+              type="file"
+              accept=".zip"
+              class="d-none"
+              @change="handleUpload"
+            />
+          </label>
+          <label>
+            <a
+              class="btn btn-secondary btn-sm mr-sm-2"
+              role="button"
+              :href="zipHref"
+              :download="zipDownload"
+              @click="handleDownload"
+            >
+              <font-awesome-icon
+                :icon="isDirty ? ['fas', 'file-archive'] : ['fas', 'download']"
+                :title="isDirty ? T.zipPrepare : T.wordsDownload"
+                aria-hidden="true"
+              />
+            </a>
+          </label>
+          <label>
+            <button
+              class="btn btn-secondary btn-sm mr-2"
+              @click.prevent="toggleTheme"
+            >
+              <font-awesome-icon
+                :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
+                aria-hidden="true"
+              />
+            </button>
+          </label>
+        </template>
         <select
           v-model="selectedLanguage"
           class="form-control form-control-sm mr-sm-2"
@@ -70,7 +93,7 @@
         </button>
       </form>
     </div>
-    <section ref="layout-root" class="col px-0"></section>
+    <section ref="layout-root" class="col px-0 flex-grow-1"></section>
   </div>
 </template>
 
@@ -100,6 +123,18 @@ import {
   ZIP_VIEWER_COMPONENT_NAME,
   SETTINGS_COMPONENT_NAME,
 } from './GoldenLayoutConfigs';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faUpload,
+  faFileArchive,
+  faDownload,
+  faSun,
+  faMoon,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
+
 import T from '../lang';
 
 interface GraderComponent extends Vue {
@@ -113,37 +148,47 @@ interface ComponentState {
   [key: string]: any;
 }
 
-@Component
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class Ephemeral extends Vue {
-  @Prop({ default: true }) isEmbedded!: boolean;
-  @Prop({ default: 'vs' }) theme!: string;
-
-  @Prop() problem!: types.ProblemInfo;
-  @Prop({ default: 'cpp17-gcc' }) initialLanguage!: string;
-  @Prop({ default: '' }) initialSource!: string;
-  @Prop({ default: () => [] }) acceptedLanguages!: string[];
-  @Prop({ default: false }) canSubmit!: boolean;
-  @Prop({ default: true }) canRun!: boolean;
+  @Prop({ required: true }) acceptedLanguages!: string[];
+  @Prop({ required: true }) isEmbedded!: boolean;
+  @Prop({ required: true }) canRun!: boolean;
+  @Prop({ required: true }) canSubmit!: boolean;
+  @Prop({ required: true }) initialLanguage!: string;
+  @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
+  @Prop({ required: true }) problem!: types.ProblemInfo;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
+  readonly themeToRef: { [key: string]: string } = {
+    [Util.MonacoThemes
+      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    [Util.MonacoThemes
+      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+  };
   goldenLayout: GoldenLayout | null = null;
-  componentMapping: { [key: string]: VueComponent } = {};
+  componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
   isRunLoading = false;
   isSubmitLoading = false;
+  zipHref: string | null = null;
+  zipDownload: string | null = null;
 
-  get isUploadButton() {
-    return !this.isEmbedded;
-  }
-  get isDownloadButton() {
-    return !this.isEmbedded;
-  }
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
   }
   get isRunButton() {
     return store.getters['showRunButton'];
+  }
+  get isDirty() {
+    return store.getters['isDirty'];
+  }
+  get theme() {
+    return store.getters['theme'];
   }
 
   get selectedLanguage() {
@@ -161,7 +206,18 @@ export default class Ephemeral extends Vue {
   get currentCase(): string {
     return store.getters['currentCase'];
   }
+  get isDark() {
+    return this.theme === Util.MonacoThemes.VSDark;
+  }
 
+  toggleTheme() {
+    store.dispatch(
+      'theme',
+      this.theme === Util.MonacoThemes.VSLight
+        ? Util.MonacoThemes.VSDark
+        : Util.MonacoThemes.VSLight,
+    );
+  }
   initProblem() {
     // use commits for synchronous behavior
     // or else bugs occur where layout toggles cases column
@@ -170,6 +226,7 @@ export default class Ephemeral extends Vue {
     store
       .dispatch('initProblem', {
         initialLanguage: this.initialLanguage,
+        initialTheme: this.initialTheme,
         languages: this.acceptedLanguages,
         problem: this.problem,
         showRunButton: this.canRun,
@@ -178,7 +235,7 @@ export default class Ephemeral extends Vue {
       .then(() => {
         store.commit('updatingSettings', false);
         this.$nextTick(() => {
-          if (!this.goldenLayout?.isInitialised) return;
+          if (!this.isEmbedded || !this.goldenLayout?.isInitialised) return;
           let mainColumn = this.goldenLayout.root.getItemsById(
             'main-column',
           )[0];
@@ -190,9 +247,7 @@ export default class Ephemeral extends Vue {
   @Watch('problem')
   @Watch('initialLanguage')
   onProblemChange() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    }
+    this.initProblem();
   }
   @Watch('currentCase', { immediate: true })
   onCurrentCaseChange() {
@@ -200,6 +255,22 @@ export default class Ephemeral extends Vue {
     const casesColumn = this.goldenLayout?.root.getItemsById('cases-column')[0];
     if (!casesColumn) return;
     casesColumn.parent.setActiveContentItem(casesColumn);
+  }
+  @Watch('isDirty')
+  onDirtyChange(value: boolean) {
+    if (!value || this.isEmbedded) return;
+    this.zipHref = null;
+    this.zipDownload = null;
+  }
+  @Watch('theme')
+  onThemeChange() {
+    // remove old theme
+    for (const theme in this.themeToRef) {
+      if (theme === this.theme) continue;
+      const link = document.getElementById(this.themeToRef[theme]);
+      if (link) link.remove();
+    }
+    this.downloadThemeStylesheet(this.theme);
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -344,7 +415,211 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleDownload(e: Event) {
+    // the state is dirty when we need to re-configure zip file
+    // if not, download the url (continue default behavior)
+    if (!this.isDirty) return true;
 
+    e.preventDefault();
+    const zip = new JSZip();
+    const cases = zip.folder('cases');
+    if (!cases) {
+      console.error('could not create cases folder');
+      return;
+    }
+
+    const inputCases = store.getters['inputCases'];
+    let testplan = '';
+    for (const caseName in inputCases) {
+      if (!inputCases[caseName]) continue;
+      cases.file(`${caseName}.in`, inputCases[caseName].in);
+      cases.file(`${caseName}.out`, inputCases[caseName].out);
+      testplan += `${caseName} ${inputCases[caseName].weight || 1}\n`;
+    }
+    zip.file('testplan', testplan);
+
+    const customValidator = store.getters['customValidator'];
+    const settingsJson: Partial<types.ProblemSettings> = {
+      Cases: store.getters['settingsCases'],
+      Limits: store.getters['limits'],
+      Validator: {
+        Name: store.getters['Validator'],
+        Tolerance: store.getters['Tolerance'] || 0,
+        // Lang only appears if language exists
+        ...(customValidator?.language
+          ? { Lang: customValidator?.language }
+          : {}),
+      },
+    };
+    zip.file('settings.json', JSON.stringify(settingsJson, null, '  '));
+
+    const interactive: undefined | types.InteractiveSettingsDistrib =
+      store.getters['Interactive'];
+    if (interactive) {
+      const interactiveFolder = zip.folder('interactive');
+      if (!interactiveFolder) {
+        console.error('could not create interactive folder');
+        return;
+      }
+
+      interactiveFolder.file(`${interactive.module_name}.idl`, interactive.idl);
+      interactiveFolder.file(
+        `Main.${Util.supportedLanguages[interactive.language].extension}`,
+        interactive.main_source,
+      );
+      interactiveFolder.file('examples/sample.in', inputCases.sample?.in || '');
+    }
+
+    if (customValidator) {
+      zip.file(
+        `validator.${
+          Util.supportedLanguages[customValidator.language].extension
+        }`,
+        customValidator.source,
+      );
+    }
+
+    zip
+      .generateAsync({ type: 'blob' })
+      .then((blob) => {
+        this.zipDownload = `${store.getters['moduleName']}.zip`;
+        this.zipHref = window.URL.createObjectURL(blob);
+
+        store.dispatch('isDirty', false);
+      })
+      .catch(Util.asyncError);
+  }
+  handleUpload(e: Event) {
+    const files = (e.target as HTMLInputElement)?.files;
+    if (!files || files.length !== 1) return;
+
+    const reader = new FileReader();
+    reader.addEventListener('loadend', async (e) => {
+      if (e.target?.readyState != FileReader.DONE) return;
+      // due to the way files are strcutured
+      // to work as intended i use async awaits instead of promisses
+
+      JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
+        await store.dispatch('reset');
+        await store.dispatch('removeCase', 'long');
+
+        // testplan is only used to give weights to cases
+        // we need to get weights before creating the cases
+        const testplanValue = await zip.file('testplan')?.async('string');
+        const casesWeights: { [key: string]: number } = {};
+        if (testplanValue) {
+          for (const line of testplanValue.split('\n')) {
+            if (line.startsWith('#') || line.trim() === '') continue;
+            const tokens = line.split(/\s+/);
+
+            if (tokens.length !== 2) continue;
+            const [caseName, weight] = tokens;
+            casesWeights[caseName] = parseFloat(weight);
+          }
+        }
+
+        for (const fileName in zip.files) {
+          if (!zip.files[fileName]) continue;
+
+          if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+            const caseName = fileName.substring(
+              'cases/'.length,
+              fileName.length - '.in'.length,
+            );
+            const caseInFileName = fileName;
+            const caseOutFileName = `cases/${caseName}.out`;
+
+            // both casename.in and casename.out must exist
+            Promise.all([
+              zip.file(caseInFileName)?.async('string'),
+              zip.file(caseOutFileName)?.async('string'),
+            ])
+              .then(([caseIn, caseOut]) => {
+                store.dispatch('createCase', {
+                  name: caseName,
+                  in: caseIn,
+                  out: caseOut,
+                  weight: casesWeights[caseName] || 1,
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('validator.')) {
+            const extension = fileName.substring('validator.'.length);
+            if (!Util.supportedExtensions.includes(extension)) continue;
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                // the validator need to be set first
+                // before updaing language and source
+                store.dispatch('Validator', 'custom').then(() => {
+                  store.dispatch(
+                    'request.input.validator.custom_validator.language',
+                    extension,
+                  );
+                  store.dispatch(
+                    'request.input.validator.custom_validator.source',
+                    value,
+                  );
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (
+            fileName.startsWith('interactive/') &&
+            fileName.endsWith('.idl')
+          ) {
+            const moduleName = fileName.substring(
+              'interactive/'.length,
+              fileName.length - '.idl'.length,
+            );
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                store.dispatch('Interactive', {
+                  idl: value,
+                  module_name: moduleName,
+                });
+              })
+              .catch(Util.asyncError);
+          } else if (fileName.startsWith('interactive/Main.')) {
+            const extension = fileName.substring('interactive/Main.'.length);
+            if (!Util.supportedExtensions.includes(extension)) continue;
+
+            zip
+              .file(fileName)
+              ?.async('string')
+              .then((value) => {
+                store.dispatch('Interactive', {
+                  language: extension,
+                  main_source: value,
+                });
+              })
+              .catch(Util.asyncError);
+          }
+        }
+        zip
+          .file('settings.json')
+          ?.async('string')
+          .then((value) => {
+            const settings: Partial<types.ProblemSettings> = JSON.parse(value);
+            if (settings.Limits) {
+              store.dispatch('limits', settings.Limits);
+            }
+            if (settings.Validator?.Name) {
+              store.dispatch('Validator', settings.Validator.Name);
+            }
+            if (settings.Validator?.Tolerance) {
+              store.dispatch('Tolerance', settings.Validator.Tolerance);
+            }
+          })
+          .catch(Util.asyncError);
+      });
+    });
+    reader.readAsArrayBuffer(files[0]);
+  }
   RegisterVueComponent(componentName: string, component: VueComponent) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
@@ -360,7 +635,6 @@ export default class Ephemeral extends Vue {
         container.on('open', () => {
           const props: ComponentProps = {
             storeMapping: componentState.storeMapping,
-            theme: self.theme,
           };
           for (const k in componentState) {
             if (k === 'id' || !componentState[k]) continue;
@@ -389,26 +663,28 @@ export default class Ephemeral extends Vue {
           if (vueComponent.onResize) {
             container.on('resize', () => vueComponent.onResize?.());
           }
+          self.componentMapping[componentState.id] = vueComponent;
         });
-
-        self.componentMapping[componentState.id] = component;
       },
     );
   }
 
-  beforeMount() {
-    if (this.isEmbedded) {
-      this.initProblem();
-    } else {
-      store.dispatch('reset');
-    }
-  }
   onResized() {
     if (!this.layoutRoot.clientWidth) return;
     if (!this.goldenLayout?.isInitialised) {
       this.goldenLayout?.init();
     }
     this.goldenLayout?.updateSize();
+  }
+  downloadThemeStylesheet(theme: string) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[theme];
+    document.head.appendChild(link);
+  }
+  beforeMount() {
+    this.initProblem();
+    this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(
@@ -434,10 +710,25 @@ export default class Ephemeral extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
+
 div > section {
-  min-height: 70em;
+  min-height: 60em;
+}
+div {
+  &.vs-dark {
+    background: var(--vs-dark-background-color);
+    color: var(--vs-dark-font-color);
+    border-bottom: 1px solid var(--vs-dark-background-color);
+  }
+  &.vs {
+    background: var(--vs-background-color);
+    border-bottom: 1px solid var(--vs-background-color);
+  }
+}
+a:hover {
+  color: var(--zip-button-color--hover);
 }
 @import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
-@import url('https://golden-layout.com/assets/css/goldenlayout-light-theme.css');
 </style>

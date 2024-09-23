@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="root d-flex flex-column h-100"
-    :class="{ 'bg-dark': theme == 'vs-dark', 'text-white': theme == 'vs-dark' }"
-  >
+  <div class="root d-flex flex-column h-100">
     <div class="summary">
       {{ summary }}
     </div>
@@ -41,7 +38,8 @@
             type="button"
             :class="{
               'in-group': group.explicit,
-              active: currentCase == item.name,
+              active: currentCase == item.name && theme == 'vs',
+              'vs-dark': currentCase == item.name && theme == 'vs-dark',
             }"
             @click="selectCase(item.name)"
           >
@@ -79,9 +77,13 @@
         <input v-model="newCaseName" class="form-control" type="text" />
         <div class="input-group-append">
           <button
-            class="btn btn-secondary"
+            class="btn"
+            :class="{
+              'btn-primary': theme == 'vs',
+              'btn-secondary': theme == 'vs-dark',
+            }"
             type="submit"
-            :disabled="newCaseName.length == 1"
+            :disabled="!newCaseName.length"
             @click="createCase()"
           >
             +
@@ -93,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import store from './GraderStore';
 import { types } from '../api_types';
 import { GraderResults, CaseSelectorGroup } from './GraderStore';
@@ -101,18 +103,15 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  @Prop({ default: 'vs-dark' }) theme!: string;
-
   newCaseWeight: number = 1;
   newCaseName: string = '';
   T = T;
 
+  get theme(): string {
+    return store.getters['theme'];
+  }
   get summary(): string {
-    if (
-      store.state.dirty ||
-      !store.state.results ||
-      !store.state.results.verdict
-    ) {
+    if (!store.state.results || !store.state.results.verdict) {
       return '…';
     }
     return `${store.state.results.verdict} ${this.score(store.state.results)}`;
@@ -132,13 +131,13 @@ export default class CaseSelector extends Vue {
 
   caseResult(caseName: string): null | types.CaseResult {
     const flatCaseResults = store.getters.flatCaseResults;
-    if (store.state.dirty || !flatCaseResults[caseName]) return null;
+    if (!flatCaseResults[caseName]) return null;
     return flatCaseResults[caseName];
   }
 
   groupResult(groupName: string): null | types.RunDetailsGroup {
     const results = store.state.results;
-    if (store.state.dirty || !results || !results.groups) return null;
+    if (!results || !results.groups) return null;
     for (const group of results.groups) {
       if (group.group == groupName) return group;
     }
@@ -221,7 +220,9 @@ export default class CaseSelector extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
+
 button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
@@ -262,5 +263,10 @@ input[type='number'].case-weight {
   font-weight: bold;
   border-left-width: 6px;
   padding-left: 15px;
+}
+
+.vs-dark {
+  background: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
 }
 </style>

@@ -1,3 +1,5 @@
+import { types } from '../api_types';
+
 export function vuexGet(store: any, name: string) {
   if (typeof store.getters[name] !== 'undefined') return store.getters[name];
   let o = store.state;
@@ -61,7 +63,6 @@ export interface LanguageInfo {
   language: string;
 }
 export const supportedLanguages: Record<string, LanguageInfo> = {
-  '': { extension: '', name: '', modelMapping: '', language: '' },
   kp: {
     extension: 'kp',
     name: 'Karel (Pascal)',
@@ -74,12 +75,6 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     modelMapping: '',
     language: 'kj',
   },
-  c: {
-    extension: 'c',
-    name: 'C11 (gcc 10.3)',
-    modelMapping: 'cpp',
-    language: 'c',
-  },
   'c11-gcc': {
     extension: 'c',
     name: 'C11 (gcc 10.3)',
@@ -91,18 +86,6 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     name: 'C11 (clang 10.0)',
     modelMapping: 'cpp',
     language: 'c11-clang',
-  },
-  cpp: {
-    extension: 'cpp',
-    name: 'C++03 (g++ 10.3)',
-    modelMapping: 'cpp',
-    language: 'cpp',
-  },
-  cpp11: {
-    extension: 'cpp',
-    name: 'C++11 (g++ 10.3)',
-    modelMapping: 'cpp',
-    language: 'cpp11',
   },
   'cpp11-gcc': {
     extension: 'cpp',
@@ -152,20 +135,14 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     modelMapping: 'kotlin',
     language: 'kt',
   },
-  py: {
-    extension: 'py',
-    name: 'Python (2.7)',
-    modelMapping: 'python',
-    language: 'py',
-  },
   py2: {
-    extension: 'py2',
+    extension: 'py',
     name: 'Python (2.7)',
     modelMapping: 'python',
     language: 'py2',
   },
   py3: {
-    extension: 'py3',
+    extension: 'py',
     name: 'Python (3.9)',
     modelMapping: 'python',
     language: 'py3',
@@ -217,6 +194,12 @@ export const supportedLanguages: Record<string, LanguageInfo> = {
     name: 'JavaScript (Node.js 16)',
     modelMapping: 'javascript',
     language: 'js',
+  },
+  cat: {
+    extension: 'cat',
+    name: 'Output Only',
+    modelMapping: '',
+    language: 'cat',
   },
 };
 export const supportedExtensions: string[] = [
@@ -297,3 +280,77 @@ export function throttle<T extends any[]>(
 
   return throttled;
 }
+
+export enum MonacoThemes {
+  VSLight = 'vs',
+  VSDark = 'vs-dark',
+}
+export const DUMMY_PROBLEM: types.ProblemInfo = {
+  alias: 'dummy-problem',
+  settings: {
+    cases: {
+      sample: {
+        in: '1 2\n',
+        out: '3\n',
+        weight: 1,
+      },
+      long: {
+        in: '123456789012345678 123456789012345678\n',
+        out: '246913578024691356\n',
+        weight: 1,
+      },
+    },
+    limits: {
+      ExtraWallTime: '5s',
+      MemoryLimit: 33554432,
+      OutputLimit: 10240,
+      OverallWallTimeLimit: '3s',
+      TimeLimit: '1s',
+    },
+    validator: {
+      name: 'token-numeric',
+      tolerance: 1e-9,
+    },
+  },
+  // the only attributes required for full IDE are the above
+  accepts_submissions: false,
+  karel_problem: false,
+  commit: 'NA',
+  languages: [],
+  limits: {
+    input_limit: '10 KiB',
+    memory_limit: '32 MiB',
+    overall_wall_time_limit: '1s',
+    time_limit: '1s',
+  },
+  points: 100,
+  problem_id: 1,
+  problemsetter: {
+    classname: 'user-rank-unranked',
+    creation_date: new Date(),
+    name: 'omegaUp admin',
+    username: 'omegaup',
+  },
+  quality_seal: false,
+  sample_input: undefined,
+  source: 'omegaUp classics',
+  statement: {
+    images: {},
+    sources: {},
+    language: 'en',
+    markdown: `# test with embed code
+Here we can add code.
+<details>
+<summary>
+  Example:
+</summary>
+
+{{sample.cpp}}
+
+</details>
+    `,
+  },
+  title: 'Dummy Problem',
+  visibility: 2,
+  input_limit: 1000,
+};
