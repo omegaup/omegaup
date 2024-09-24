@@ -136,6 +136,24 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testPublicContestsForv2() {
+        $this->createContests();
+
+        foreach (self::TIMES as $time) {
+            $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'tab_name' => $time,
+                ])
+            )['templateProperties']['payload']['contests'];
+
+            $this->assertCount(1, $contestListPayload);
+            $this->assertSame(
+                "{$time}-public",
+                $contestListPayload[0]['alias']
+            );
+        }
+    }
+
     public function testPrivateContestsForInvitedUser() {
         [
             'invitedUserIdentity' => $invitedUserIdentity,

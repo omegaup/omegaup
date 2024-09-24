@@ -113,26 +113,6 @@ def _main() -> None:
 
 if __name__ == '__main__':
   _main()`,
-  py2: `#!/usr/bin/python
-
-def _main():
-  t = int(raw_input())
-  for _ in range(t):
-
-  pass
-
-if __name__ == '__main__':
-  _main()`,
-  py3: `#!/usr/bin/python3
-
-def _main() -> None:
-  t = int(input())
-  for _ in range(t):
-
-  pass
-
-if __name__ == '__main__':
-  _main()`,
   rb: `t = gets.to_i
 t.times do
 
@@ -233,8 +213,6 @@ import Main
 def sumas(a: int, b: int) -> int:
 
     return 0`,
-  py2: '# not supported',
-  py3: '# not supported',
   rb: '# not supported',
   cs: '// not supported',
   pas: `unit sumas;
