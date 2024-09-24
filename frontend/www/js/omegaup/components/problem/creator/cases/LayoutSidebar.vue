@@ -25,7 +25,7 @@
       >
         <b-form-input
           v-model="editLayoutModalName[layout.layoutID]"
-          data-layout-sidebar-edit-layout-modal="edit name"
+          data-layout-sidebar-rename-layout
         />
       </b-modal>
       <b-card no-body class="w-84 mb-2">

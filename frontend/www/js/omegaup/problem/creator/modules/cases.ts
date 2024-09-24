@@ -327,7 +327,6 @@ export const casesStore: Module<CasesState, RootState> = {
       if (!targetLayout) {
         return;
       }
-      console.log(newValue);
       targetLayout.name = newValue;
     },
     removeLayout(state, layoutIDToBeDeleted: LineID) {
