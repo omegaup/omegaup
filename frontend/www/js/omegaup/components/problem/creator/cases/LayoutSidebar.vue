@@ -5,6 +5,29 @@
       :key="layout.layoutID"
       class="d-flex justify-content-center"
     >
+      <b-modal
+        v-model="showRenameModal[layout.layoutID]"
+        size="sm"
+        data-layout-dropdown-rename-modal
+        :title="T.problemCreatorRenameModalTitle"
+        :ok-title="T.problemCreatorRenameModalRename"
+        ok-variant="success"
+        :cancel-title="T.problemCreatorRenameModalBack"
+        cancel-variant="danger"
+        static
+        lazy
+        @ok="
+          editLayoutName([
+            layout.layoutID,
+            editLayoutModalName[layout.layoutID],
+          ])
+        "
+      >
+        <b-form-input
+          v-model="editLayoutModalName[layout.layoutID]"
+          data-layout-sidebar-edit-layout-modal="edit name"
+        />
+      </b-modal>
       <b-card no-body class="w-84 mb-2">
         <b-card-header class="p-0">
           <b-dropdown
@@ -16,6 +39,23 @@
             variant="primary"
             @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"
           >
+            <b-dropdown-item
+              data-layout-dropdown-rename-layout
+              @click="
+                showRenameModal[layout.layoutID] = !showRenameModal[
+                  layout.layoutID
+                ]
+              "
+            >
+              <div class="d-flex">
+                <BIconPencil
+                  variant="success"
+                  class="pt-1 mr-3"
+                  font-scale="1.2"
+                />
+                {{ T.problemCreatorRenameLayout }}
+              </div>
+            </b-dropdown-item>
             <b-dropdown-item
               data-layout-dropdown-enforce-to-selected
               @click="enforceLayoutToTheSelectedCase(layout.layoutID)"
@@ -175,7 +215,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
 import {
@@ -215,8 +255,28 @@ export default class Sidebar extends Vue {
     LayoutID,
     LineInfoID,
   ]) => void;
+  @casesStore.Mutation('editLayoutName')
+  editLayoutName!: ([layoutID, newValue]: [LayoutID, string]) => void;
 
   showLayout: { [key: LayoutID]: boolean } = {};
+  showRenameModal: { [key: LayoutID]: boolean } = {};
+  editLayoutModalName: { [key: LayoutID]: string } = {};
+
+  @Watch('getAllLayouts')
+  onGroupsChanged() {
+    this.showLayout = this.getAllLayouts.reduce((acc, layout) => {
+      acc[layout.layoutID] = false;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    this.showRenameModal = this.getAllLayouts.reduce((acc, layout) => {
+      acc[layout.layoutID] = false;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    this.editLayoutModalName = this.getAllLayouts.reduce((acc, layout) => {
+      acc[layout.layoutID] = layout.name;
+      return acc;
+    }, {} as { [key: string]: string });
+  }
 
   EditIconDisplayOption = Object.freeze({
     EDIT_ICON: 'edit_icon',

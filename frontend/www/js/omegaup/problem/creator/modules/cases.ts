@@ -320,6 +320,16 @@ export const casesStore: Module<CasesState, RootState> = {
       };
       state.layouts.push(layoutFromSelectedCase);
     },
+    editLayoutName(state, [layoutID, newValue]: [LayoutID, string]) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) {
+        return;
+      }
+      console.log(newValue);
+      targetLayout.name = newValue;
+    },
     removeLayout(state, layoutIDToBeDeleted: LineID) {
       state.layouts = state.layouts.filter(
         (layout) => layout.layoutID !== layoutIDToBeDeleted,
