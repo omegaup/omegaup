@@ -117,29 +117,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $tabName = $r->ensureOptionalEnum(
             'tab_name',
-            [
-                'current',
-                'future',
-                'past',
-            ]
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
         );
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 20;
-        $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(
-            intval($r['active'] ?? \OmegaUp\DAO\Enum\ActiveStatus::ALL)
+        $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
+            $tabName
         );
-        if (!is_null($tabName)) {
-            if ($tabName === 'current') {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif ($tabName === 'future') {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } else {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
-            }
-        }
-        // If the parameter was not set, the default should be ALL which is
-        // a number and should pass this check.
-        \OmegaUp\Validators::validateNumber($activeContests, 'active');
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
             intval(
                 $r['recommended'] ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL
@@ -189,28 +173,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             required: false
         );
 
-        $orderBy = 0;
-        if (!is_null($order)) {
-            $index = array_search(
-                $order,
-                \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS
-            );
-            if ($index === false) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'sort_order'
-                );
-            }
-            $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::getIntValue(
-                $index
-            );
-            if (is_null($orderBy)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'sort_order'
-                );
-            }
-        }
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt($order);
 
         [
             'contests' => $contests,
@@ -247,7 +210,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?int $participating = null,
         int $orderBy = 0
     ) {
-        $cacheKey = "0-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
+        $identityId = $identity?->identity_id ?? 0;
+        $cacheKey = "{$identityId}-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
@@ -5596,34 +5560,29 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'sort_order',
             \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
             required: false
-        ) ?? \OmegaUp\DAO\Enum\ContestOrderStatus::NONE;
-        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::getIntValue(
-            $order
-        ) ?? \OmegaUp\DAO\Enum\ContestOrderStatus::NONE;
+        );
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt($order);
+
         $filter = $r->ensureOptionalEnum(
             'filter',
-            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS,
-            required: false
-        ) ?? \OmegaUp\DAO\Enum\ContestFilterStatus::ALL;
-        $activeFilterStatus = \OmegaUp\DAO\Enum\ContestFilterStatus::getIntValue(
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
+        );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
             $filter
-        ) ?? \OmegaUp\DAO\Enum\ContestFilterStatus::ALL;
-        $tab = $r->ensureOptionalEnum(
+        );
+        $tabName = $r->ensureOptionalEnum(
             'tab_name',
-            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS,
-            required: false
-        ) ?? \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT;
-        $activeTabStatus = \OmegaUp\DAO\Enum\ContestTabStatus::getIntValue(
-            $tab
-        ) ?? \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT;
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+        );
+        $activeTab = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt($tabName);
 
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
-        if ($activeFilterStatus === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
             $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
         }
 
         $participating = null;
-        if ($activeFilterStatus === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
             $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
         }
 
@@ -5635,7 +5594,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $query,
             $page,
             $pageSize,
-            $activeTabStatus,
+            $activeTab,
             $recommended,
             public: false,
             participating: $participating,

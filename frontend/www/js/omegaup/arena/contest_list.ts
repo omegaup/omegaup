@@ -17,7 +17,6 @@ OmegaUp.on('ready', () => {
   if (contestIDs.length > 0) {
     api.Contest.getNumberOfContestants({ contest_ids: contestIDs })
       .then(({ response }) => {
-        console.log(response);
         payload.contests.forEach((contest) => {
           contest.contestants = response[contest.contest_id] ?? 0;
         });

@@ -36,4 +36,28 @@ class ContestOrderStatus extends \OmegaUp\DAO\Enum\StatusBase {
         self::CONTESTANTS => 'contestants',
         self::SIGNED_UP => 'signedup',
     ];
+
+    public static function convertToInt(?string $order): int {
+        if (is_null($order)) {
+            return self::NONE;
+        }
+        $index = array_search(
+            $order,
+            self::NAME_FOR_STATUS
+        );
+        if ($index === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'sort_order'
+            );
+        }
+        $orderBy = self::getIntValue($index);
+        if (is_null($orderBy)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'sort_order'
+            );
+        }
+        return $orderBy;
+    }
 }
