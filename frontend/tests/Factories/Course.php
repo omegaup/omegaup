@@ -17,8 +17,11 @@ class Course {
         ?int $courseDuration = 120,
         ?string $courseAlias = null,
         ?bool $needsBasicInformation = false,
-        ?array $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
+        ?array $languages = []
     ): array {
+        if (is_array($languages) && empty($languages)) {
+            $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES();
+        }
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
