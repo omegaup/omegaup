@@ -70,6 +70,7 @@ Cypress.Commands.add(
     publicAccess = false,
     firstTimeVisited = true,
     languagesValue,
+    zipFile = 'testproblem.zip',
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -85,7 +86,7 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
-    cy.get('[name="problem_contents"]').attachFile('testproblem.zip');
+    cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
     if (languagesValue === 'cat') {
