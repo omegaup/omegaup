@@ -59,6 +59,7 @@ export interface GraderStore {
   // new attributes separate from refactored code
   zipContent: string;
   showRunButton: boolean;
+  theme: Util.MonacoThemes;
 }
 export interface SettingsCase {
   Name: string;
@@ -156,6 +157,7 @@ const storeOptions: StoreOptions<GraderStore> = {
     updatingSettings: false,
     zipContent: '',
     showRunButton: true,
+    theme: Util.MonacoThemes.VSLight,
   },
   getters: {
     alias(state: GraderStore) {
@@ -362,6 +364,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     limits(state: GraderStore) {
       return state.request.input.limits;
+    },
+    theme(state: GraderStore) {
+      return state.theme;
     },
   },
   mutations: {
@@ -623,20 +628,12 @@ const storeOptions: StoreOptions<GraderStore> = {
         return;
       }
 
-      // update with interactive problem templates for each language
-      // dont forget to update all cppxx and pyx templates
-      for (const lang in templates) {
-        const extension = Util.supportedLanguages[lang].extension;
-
+      for (const extension in originalInteractiveTemplates) {
         if (templates[extension]) {
-          for (const language of Util.extensionToLanguages[extension]) {
-            interactiveTemplates[language] = templates[extension];
-          }
+          interactiveTemplates[language] = templates[extension];
         } else {
-          for (const language of Util.extensionToLanguages[extension]) {
-            interactiveTemplates[language] =
-              originalInteractiveTemplates[extension];
-          }
+          interactiveTemplates[language] =
+            originalInteractiveTemplates[extension];
         }
       }
       store.commit('request.language', state.request.language);
@@ -721,6 +718,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     },
     isDirty(state: GraderStore, value: boolean) {
       state.dirty = value;
+    },
+    theme(state: GraderStore, value: Util.MonacoThemes) {
+      state.theme = value;
     },
   },
   actions: {
@@ -813,6 +813,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     Toleration({ commit }: { commit: Commit }, value: number) {
       commit('Toleration', value);
     },
+    theme({ commit }: { commit: Commit }, value: string) {
+      commit('theme', value);
+    },
     reset({ commit }: { commit: Commit }) {
       commit(
         'languages',
@@ -858,6 +861,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       {
         initialLanguage,
         initialSource = '',
+        initialTheme,
         languages,
         problem,
         showRunButton,
@@ -865,6 +869,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       }: {
         initialLanguage: string;
         initialSource: string;
+        initialTheme: Util.MonacoThemes;
         languages: string[];
         problem: types.ProblemInfo;
         showRunButton: boolean;
@@ -887,6 +892,7 @@ const storeOptions: StoreOptions<GraderStore> = {
 
       commit('showSubmitButton', showSubmitButton);
       commit('showRunButton', showRunButton);
+      commit('theme', initialTheme);
       commit('limits', settings.limits);
       commit('Validator', settings.validator.name);
       commit('Tolerance', settings.validator.tolerance);

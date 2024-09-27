@@ -131,10 +131,14 @@ import T from '../lang';
   },
 })
 export default class IDESettings extends Vue {
-  @Prop({ required: true }) storeMapping!: any;
-  @Prop({ default: 'vs' }) theme!: string;
+  @Prop({ required: true }) storeMapping!: { [key: string]: any };
 
   T = T;
+
+  get theme(): string {
+    return store.getters['theme'];
+  }
+
   get timeLimit(): number {
     return Util.parseDuration(store.state.request.input.limits.TimeLimit);
   }
