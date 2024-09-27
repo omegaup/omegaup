@@ -50,7 +50,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 'fullWidth' => true,
                 'hideFooterAndHeader' => true,
                 'payload' => [
-                    'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES,
+                    'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
                     'preferredLanguage' => $preferredLanguage,
                 ],
             ],
