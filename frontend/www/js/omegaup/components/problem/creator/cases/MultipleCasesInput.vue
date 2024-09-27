@@ -11,6 +11,7 @@
         >
           <b-form-input
             v-model="multipleCasesPrefix"
+            data-problem-creator-multiple-cases-input="prefix"
             lazy-formatter
             :formatter="formatter"
             name="multiple-cases-prefix"
@@ -26,6 +27,7 @@
         >
           <b-form-input
             v-model="multipleCasesSuffix"
+            data-problem-creator-multiple-cases-input="suffix"
             lazy-formatter
             :formatter="formatter"
             name="multiple-cases-suffix"
@@ -41,6 +43,7 @@
     >
       <b-form-input
         v-model="multipleCasesCount"
+        data-problem-creator-multiple-cases-input="count"
         lazy-formatter
         :formatter="numberFormatter"
         name="multiple-cases-count"
