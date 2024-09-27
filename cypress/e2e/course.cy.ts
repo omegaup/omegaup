@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { coursePage } from '../support/pageObjects/coursePage';
-import * as Util from '../../frontend/www/js/omegaup/graderv2/util';
+import * as Util from '../../frontend/www/js/omegaup/grader/util';
 import {
   CourseOptions,
   LoginOptions,
