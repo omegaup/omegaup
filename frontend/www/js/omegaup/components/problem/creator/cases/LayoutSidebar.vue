@@ -90,12 +90,16 @@
                         </b-col>
                         <b-col cols="6" class="pl-0 pr-0 text-center">
                           <b-dropdown
+                            data-line-info-dropdown
                             :text="getLineNameFromKind(lineInfo.data.kind)"
                             variant="light"
                           >
                             <b-dropdown-item
                               v-for="lineKindOption in lineKindOptions"
                               :key="lineKindOption.kind"
+                              :data-line-info-dropdown-item="
+                                lineKindOption.kind
+                              "
                               @click="
                                 editLineInfoKind([
                                   layout.layoutID,
