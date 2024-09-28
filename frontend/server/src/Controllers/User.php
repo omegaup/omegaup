@@ -626,7 +626,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
-                        'verificationEmailSuccesfully'
+                        'verificationEmailSuccessfully'
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
