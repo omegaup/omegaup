@@ -15,65 +15,13 @@
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
-    // All languages that runs can have.
-    public const SUPPORTED_LANGUAGES = [
-        'kp' => 'Karel (Pascal)',
-        'kj' => 'Karel (Java)',
-        'c11-gcc' => 'C11 (gcc 10.3)',
-        'c11-clang' => 'C11 (clang 10.0)',
-        'cpp11-gcc' => 'C++11 (g++ 10.3)',
-        'cpp11-clang' => 'C++11 (clang++ 10.0)',
-        'cpp17-gcc' => 'C++17 (g++ 10.3)',
-        'cpp17-clang' => 'C++17 (clang++ 10.0)',
-        'cpp20-gcc' => 'C++20 (g++ 10.3)',
-        'cpp20-clang' => 'C++20 (clang++ 10.0)',
-        'java' => 'Java (openjdk 16.0)',
-        'kt' => 'Kotlin (1.6.10)',
-        'py2' => 'Python (2.7)',
-        'py3' => 'Python (3.9)',
-        'rb' => 'Ruby (2.7)',
-        'cs' => 'C# (10, dotnet 6.0)',
-        'pas' => 'Pascal (fpc 3.0)',
-        'cat' => 'Output Only',
-        'hs' => 'Haskell (ghc 8.8)',
-        'lua' => 'Lua (5.3)',
-        'go' => 'Go (1.18.beta2)',
-        'rs' => 'Rust (1.56.1)',
-        'js' => 'JavaScript (Node.js 16)',
-    ];
-
-    // These languages are aliases. They can be shown to the user, but should
-    // not appear as selectable mostly anywhere.
+    // this variable is not used anywhere
     public const LANGUAGE_ALIASES = [
         'c' => 'C11 (gcc 9.3)',
         'cpp' => 'C++03 (gcc 9.3)',
         'cpp11' => 'C++11 (gcc 9.3)',
         'py' => 'Python 2.7',
     ];
-
-    public const DEFAULT_LANGUAGES = [
-        'c11-gcc',
-        'c11-clang',
-        'cpp11-gcc',
-        'cpp11-clang',
-        'cpp17-gcc',
-        'cpp17-clang',
-        'cpp20-gcc',
-        'cpp20-clang',
-        'java',
-        'kt',
-        'py2',
-        'py3',
-        'rb',
-        'cs',
-        'pas',
-        'hs',
-        'lua',
-        'go',
-        'rs',
-        'js',
-    ];
-
     /** @var int */
     public static $defaultSubmissionGap = 60; // seconds.
 
@@ -101,6 +49,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         'EXECUTION_VALIDATOR_ERROR' => ['VE'],
         'EXECUTION_JUDGE_ERROR' => ['JE'],
     ];
+
     public const OUTPUT = [
         'OUTPUT_INTERRUPTED' => ['JE', 'VE', 'CE', 'FO', 'RFE', 'RE', 'RTE', 'MLE', 'TLE'],
         'OUTPUT_CORRECT' => ['AC'],
@@ -109,6 +58,51 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
+
+    /**
+     *
+     * @return array<string, string>
+     */
+    public static function SUPPORTED_LANGUAGES(): array {
+        static $supportedLanguages = [];
+
+        if (empty($supportedLanguages)) {
+            $languagesFile = __DIR__ . '/../../../data/languages.json';
+            $languagesJsonArray = json_decode(
+                file_get_contents(
+                    $languagesFile
+                ),
+                true
+            );
+            foreach ($languagesJsonArray as $key => $languageInfo) {
+                $supportedLanguages[$key] = $languageInfo['name'];
+            }
+        }
+
+        return $supportedLanguages;
+    }
+
+    /**
+     *
+     * @return list<string>
+     */
+    public static function DEFAULT_LANGUAGES(): array {
+        static $defaultLanguages = [];
+
+        if (empty($defaultLanguages)) {
+            $supportedLanguages = self::SUPPORTED_LANGUAGES();
+            $filterList = ['cat', 'kp', 'kj'];
+
+            $defaultLanguages = array_keys(array_filter($supportedLanguages, function (
+                $languageName,
+                $key
+            ) use ($filterList) {
+                return !in_array($key, $filterList);
+            }, ARRAY_FILTER_USE_BOTH));
+        }
+
+        return $defaultLanguages;
+    }
 
     /**
      * Validates that a run is happening within the submission gap.
@@ -190,7 +184,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         /** @var list<string> $allowedLanguages */
         $allowedLanguages = array_intersect(
-            array_keys(self::SUPPORTED_LANGUAGES),
+            array_keys(self::SUPPORTED_LANGUAGES()),
             explode(',', $problem->languages)
         );
         $language = $r->ensureString('language');
@@ -1811,7 +1805,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
+        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES());
         [
             'runs' => $runs,
             'totalRuns' => $totalRuns,
