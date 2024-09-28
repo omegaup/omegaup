@@ -1362,7 +1362,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => [
-                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
                     ),
@@ -2122,7 +2122,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             intval($adminIdentity->identity_id),
             $contest->problemset_id
         );
-        $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
+        $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES();
         $result['admin'] = true;
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
@@ -2899,19 +2899,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($languagesAsString)) {
             return;
         }
+
         $languages = explode(',', $languagesAsString);
-        foreach ($languages as $language) {
-            if (empty($language)) {
-                continue;
-            }
-            \OmegaUp\Validators::validateInEnum(
-                $language,
-                'languages',
-                array_keys(
-                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                )
-            );
-        }
+
+        $supportedLanguages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
+        \OmegaUp\Validators::validateValidSubset(
+            array_values(array_filter($languages, function ($language) {
+                return !empty($language);
+            })),
+            'langauges',
+            $supportedLanguages
+        );
     }
 
     /**
@@ -5191,7 +5191,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
+        $languages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
 
         // Get our runs
         return self::getAllRuns(

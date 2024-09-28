@@ -118,3 +118,6 @@ cypress/screenshots/*
 # Ignore the generated HTML files
 frontend/www/grader/ephemeral/index-light.html
 frontend/www/grader/ephemeral/index.html
+
+# Ignore cypress downloads
+cypress/downloads/*
