@@ -1128,7 +1128,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorValidatePointsBack: "Back",
   problemCreatorValidatePointsButton: "Validate points",
   problemCreatorValidatePointsContinue: "Continue",
-  problemCreatorValidatePointsWarning: "Please continue to validate and fix the points distribution across all the groups.",
+  problemCreatorValidatePointsWarning: "The points of a group should be equal to the sum of the points of the cases in it. Please continue to validate and fix the points distribution across all the groups.",
   problemCreatorZipFileIsNotComplete: "The zip file must contain cdp.data file",
   problemCreatorZipFileIsNotValid: "The uploaded file is not a valid zip file",
   problemCreatorZipFileUpload: "Upload zip file",

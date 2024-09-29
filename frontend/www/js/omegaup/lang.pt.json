@@ -1127,7 +1127,7 @@
 	"problemCreatorValidatePointsBack": "Voltar",
 	"problemCreatorValidatePointsButton": "Validar pontos",
 	"problemCreatorValidatePointsContinue": "Continuar",
-	"problemCreatorValidatePointsWarning": "Por favor, continue validando e corrigindo a distribui\u00e7\u00e3o de pontos em todos os grupos.",
+	"problemCreatorValidatePointsWarning": "Os pontos de um grupo devem ser iguais \u00e0 soma dos pontos dos casos nele. Por favor, continue validando e corrigindo a distribui\u00e7\u00e3o de pontos em todos os grupos.",
 	"problemCreatorZipFileIsNotComplete": "O arquivo zip deve conter o arquivo cdp.data",
 	"problemCreatorZipFileIsNotValid": "O arquivo enviado n\u00e3o \u00e9 um arquivo zip v\u00e1lido",
 	"problemCreatorZipFileUpload": "Enviar arquivo zip",
