@@ -47,7 +47,7 @@ describe('Problem creator Test', () => {
     );
   });
 
-  it('Should upload code and verify the problem code', () => {
+  it('Should upload and verify the problem code', () => {
     cy.login(loginOptions);
 
     cy.visit('/problem/creator/');
@@ -58,7 +58,7 @@ describe('Problem creator Test', () => {
       '../fixtures/main.rs',
     );
 
-    // CodeMirror takes some time to load the uploaded code, so we will wait for 2 seconds.
+    // CodeMirror takes some time to load the uploaded code, so we will wait for 1 second.
     cy.wait(1000).then(() => {
       cy.get('.CodeMirror-line').then((rawHTMLElements) => {
         const intendedLine = rawHTMLElements[1];
@@ -69,5 +69,61 @@ describe('Problem creator Test', () => {
         .find('option:selected')
         .should('contain', 'Rust (1.56.1)');
     });
+  });
+
+  it('Should add groups, cases and multiple cases', () => {
+    cy.login(loginOptions);
+
+    cy.visit('/problem/creator/');
+
+    cy.get('[data-problem-creator-tab="cases"]').click();
+
+    cy.get('[data-add-window]').click();
+
+    cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+
+    cy.get('[data-problem-creator-case-input="name"]').type("Hello case");
+    cy.get('[data-problem-creator-case-input="name"]').should(
+      'have.value',
+      'hellocase',
+    );
+
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-problem-creator-tab="cases"]').click();
+
+    cy.get('[data-add-window]').click();
+
+    cy.get('[data-problem-creator-add-panel-tab="group"]').click();
+
+    cy.get('[data-problem-creator-group-input="name"]').type("Hello group!");
+    cy.get('[data-problem-creator-group-input="name"]').should(
+      'have.value',
+      'hellogroup',
+    );
+
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-add-window]').click();
+
+    cy.get('[data-problem-creator-add-panel-tab="multiple-cases"]').click();
+
+    cy.get('[data-problem-creator-multiple-cases-input="prefix"]').type("hello");
+    cy.get('[data-problem-creator-multiple-cases-input="suffix"]').type("there");
+    cy.get('[data-problem-creator-multiple-cases-input="count"]').clear();
+    cy.get('[data-problem-creator-multiple-cases-input="count"]').type('10');
+
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-sidebar-ungrouped-cases="count"]').invoke('text').then((text) => {
+        expect(text.trim()).contain('11')
+    });
+
+    cy.get('[data-sidebar-groups="grouped"]').should('have.length', 1);
+
+    cy.get('[data-sidebar-groups="count"]').invoke('text').then((text) => {
+      expect(text.trim()).contain('0')
+  });
+
   });
 });

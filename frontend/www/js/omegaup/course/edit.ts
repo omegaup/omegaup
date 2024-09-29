@@ -484,7 +484,7 @@ OmegaUp.on('ready', () => {
               usernameOrEmail: username,
             })
               .then(() => {
-                ui.success(T.courseEditTeachingAssistantAddedSuccesfully);
+                ui.success(T.courseEditTeachingAssistantAddedSuccessfully);
                 this.refreshCourseAdminsAndTeachingAssistants();
               })
               .catch(ui.apiError);
@@ -507,7 +507,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.refreshCourseAdminsAndTeachingAssistants();
-                ui.success(T.courseEditTeachingAssistantRemovedSuccesfully);
+                ui.success(T.courseEditTeachingAssistantRemovedSuccessfully);
               })
               .catch(ui.apiError);
           },
