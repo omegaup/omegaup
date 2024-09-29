@@ -122,7 +122,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         $group->name = $r->ensureString('name');
         $group->description = $r->ensureString('description');
         \OmegaUp\DAO\Groups::update($group);
-        self::$log->info("Group {$group->alias} updated succesfully.");
+        self::$log->info("Group {$group->alias} updated successfully.");
 
         return ['status' => 'ok'];
     }

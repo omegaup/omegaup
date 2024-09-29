@@ -49,6 +49,7 @@ export interface ProblemOptions {
   publicAccess?: boolean;
   firstTimeVisited?: boolean;
   languagesValue?: string;
+  zipFile?: string;
 }
 
 export interface CourseOptions {
