@@ -626,7 +626,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
-                        'verificationEmailSuccesfully'
+                        'verificationEmailSuccessfully'
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
@@ -3744,7 +3744,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getSupportedProgrammingLanguages(): array {
         return array_filter(
-            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
             fn($key) => $key !== 'cat',
             ARRAY_FILTER_USE_KEY
         );

@@ -98,6 +98,7 @@
       <b-card class="border-0">
         <b-row class="mb-1">
           <b-button
+            data-sidebar-groups="ungrouped"
             variant="light"
             data-placement="top"
             :title="T.problemCreatorUngroupedCases"
@@ -109,10 +110,13 @@
                 {{ T.problemCreatorUngrouped }}
               </div>
               <div class="d-inline-block text-nowrap">
-                <b-badge variant="primary" class="mr-1">{{
-                  ungroupedCases.length
-                }}</b-badge>
-                <b-badge variant="info">
+                <b-badge
+                  data-sidebar-ungrouped-cases="count"
+                  variant="primary"
+                  class="mr-1"
+                  >{{ ungroupedCases.length }}</b-badge
+                >
+                <b-badge data-sidebar-ungrouped-cases="points" variant="info">
                   {{ Math.round(getTotalPointsForUngroupedCases) }}
                   {{ T.problemCreatorPointsAbbreviation }}</b-badge
                 >
@@ -193,6 +197,7 @@
           class="mb-1"
         >
           <b-button
+            data-sidebar-groups="grouped"
             variant="light"
             data-placement="top"
             :title="name"
@@ -202,10 +207,13 @@
             <div class="d-flex justify-content-between">
               <div class="mr-2 text-truncate">{{ name }}</div>
               <div class="d-inline-block text-nowrap">
-                <b-badge variant="primary" class="mr-1">{{
-                  cases.length
-                }}</b-badge>
-                <b-badge variant="info"
+                <b-badge
+                  data-sidebar-groups="count"
+                  variant="primary"
+                  class="mr-1"
+                  >{{ cases.length }}</b-badge
+                >
+                <b-badge data-sidebar-groups="points" variant="info"
                   >{{ Math.round(points || 0) }}
                   {{ T.problemCreatorPointsAbbreviation }}</b-badge
                 >
