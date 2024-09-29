@@ -1,7 +1,6 @@
 import { LoginOptions } from '../support/types';
 
 describe('Problem creator Test', () => {
-
   const loginOptions: LoginOptions = {
     username: 'user',
     password: 'user',
@@ -82,7 +81,7 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-add-panel-tab="case"]').click();
 
-    cy.get('[data-problem-creator-case-input="name"]').type("Hello case");
+    cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
     cy.get('[data-problem-creator-case-input="name"]').should(
       'have.value',
       'hellocase',
@@ -96,7 +95,7 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-add-panel-tab="group"]').click();
 
-    cy.get('[data-problem-creator-group-input="name"]').type("Hello group!");
+    cy.get('[data-problem-creator-group-input="name"]').type('Hello group!');
     cy.get('[data-problem-creator-group-input="name"]').should(
       'have.value',
       'hellogroup',
@@ -108,22 +107,29 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-problem-creator-add-panel-tab="multiple-cases"]').click();
 
-    cy.get('[data-problem-creator-multiple-cases-input="prefix"]').type("hello");
-    cy.get('[data-problem-creator-multiple-cases-input="suffix"]').type("there");
+    cy.get('[data-problem-creator-multiple-cases-input="prefix"]').type(
+      'hello',
+    );
+    cy.get('[data-problem-creator-multiple-cases-input="suffix"]').type(
+      'there',
+    );
     cy.get('[data-problem-creator-multiple-cases-input="count"]').clear();
     cy.get('[data-problem-creator-multiple-cases-input="count"]').type('10');
 
     cy.get('[data-problem-creator-add-panel-submit]').click();
 
-    cy.get('[data-sidebar-ungrouped-cases="count"]').invoke('text').then((text) => {
-        expect(text.trim()).contain('11')
-    });
+    cy.get('[data-sidebar-ungrouped-cases="count"]')
+      .invoke('text')
+      .then((text) => {
+        expect(text.trim()).contain('11');
+      });
 
     cy.get('[data-sidebar-groups="grouped"]').should('have.length', 1);
 
-    cy.get('[data-sidebar-groups="count"]').invoke('text').then((text) => {
-      expect(text.trim()).contain('0')
-  });
-
+    cy.get('[data-sidebar-groups="count"]')
+      .invoke('text')
+      .then((text) => {
+        expect(text.trim()).contain('0');
+      });
   });
 });
