@@ -55,9 +55,7 @@
 			"allowlist": [
 				"frontend/www/.*\\.ts$",
 				"frontend/www/.*\\.vue$",
-				"cypress/e2e/.*\\.ts$",
-				"cypress/support/.*\\.ts$",
-				"cypress/support/pageObjects/.*\\.ts$"
+				"cypress/.*\\.ts$"
 			],
 			"denylist": [
 				".*js/omegaup/lang\\..*",
