@@ -121,6 +121,26 @@ describe('Test IDE', () => {
     cy.logout();
   });
 
+  it('Should check that interactive problem template loads properly', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[2].problemAlias}/`);
+    cy.reload();
+
+    cy.get('.view-line span span').then(($spans) => {
+      const concatText = Array.from($spans, (span) =>
+        span.innerText.replace(/\s/g, ''),
+      ).join('');
+
+      cy.fixture('interactive_template.cpp').then((fileContent) => {
+        expect(concatText).to.equal(fileContent.replace(/\s/g, ''));
+        cy.task('log', fileContent);
+      });
+    });
+
+    cy.logout();
+  });
+
   it('Should display full list of supported languages in profile prefrences page', () => {
     cy.login(loginOptions[0]);
 
