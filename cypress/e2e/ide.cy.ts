@@ -177,19 +177,13 @@ describe('Test IDE', () => {
       .type(caseOutput);
     cy.get(`li[title="diff"]`).should('be.visible').click();
 
-    let concatText = '';
     cy.get('.editor.original .view-line span span') // lhs is the original text
-      .each((span, index, $list) => {
-        cy.wrap(span)
-          .invoke('text')
-          .then((text) => {
-            concatText += text + (index === $list.length - 1 ? '' : '\n');
-          });
-      })
-      .then(() => {
+      .then(($spans) => {
+        const concatText = Array.from($spans, (span) => span.innerText).join(
+          '\n',
+        );
         expect(concatText).to.equal(caseOutput);
       });
-
     cy.logout();
   });
 
