@@ -87,9 +87,7 @@
 			],
 			"allowlist": [
 				"frontend/www/.*\\.ts$",
-				"cypress/e2e/.*\\.ts$",
-				"cypress/support/.*\\.ts$",
-				"cypress/support/pageObjects/.*\\.ts$"
+				"cypress/.*\\.ts$"
 			],
 			"denylist": [
 				".*third_party.*",
