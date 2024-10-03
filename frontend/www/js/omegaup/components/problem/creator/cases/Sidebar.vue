@@ -4,6 +4,7 @@
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
       <div>
         <b-button
+          data-toggle-layout-sidebar
           size="sm"
           variant="primary"
           class="mr-2"
@@ -24,6 +25,7 @@
             <b-container>
               <b-row class="justify-content-center">
                 <b-button
+                  data-add-layout-from-selected-case
                   class="w-84 mb-2"
                   variant="success"
                   @click="addLayoutFromSelectedCase"
@@ -42,6 +44,7 @@
               </b-row>
               <b-row class="justify-content-center">
                 <b-button
+                  data-close-layout-sidebar
                   class="w-84 mb-3"
                   variant="danger"
                   @click="showLayoutSidebar = false"
@@ -132,6 +135,7 @@
                 <b-button
                   variant="light"
                   data-placement="top"
+                  data-sidebar-cases="ungrouped"
                   :title="name"
                   class="w-82"
                   @click="editCase(groupID, cases[0].caseID)"
