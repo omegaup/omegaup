@@ -5,6 +5,7 @@
       class="col pl-1"
       :class="theme"
       :disabled="readOnly"
+      :data-title="title"
     ></textarea>
   </div>
 </template>
