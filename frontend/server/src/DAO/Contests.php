@@ -1207,9 +1207,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 ON
                     a.owner_id = organizer.user_id
                 WHERE $recommendedCheck AND $endCheck AND $queryCheck AND archived = 0
-                GROUP BY
-                    Contests.contest_id
                 ";
+        $sqlGroupBy = 'GROUP BY Contests.contest_id';
 
         $params = [];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -1238,7 +1237,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($rowsPerPage);
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$select} {$sql} {$limits}",
+            "{$select} {$sql} {$sqlGroupBy} {$limits}",
             $params
         );
 
@@ -1511,13 +1510,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         string $defaultOrder = '`original_finish_time`',
         string $orderMode = 'DESC'
     ): string {
-        if ($orderBy === 0) {
-            $order = $defaultOrder;
-        } else {
-            $order = \OmegaUp\DAO\Enum\ContestOrderStatus::sql(
-                $orderBy
-            );
-        }
+        $order = \OmegaUp\DAO\Enum\ContestOrderStatus::sql(
+            $orderBy
+        ) ?: $defaultOrder;
 
         return "{$order} {$orderMode}";
     }
