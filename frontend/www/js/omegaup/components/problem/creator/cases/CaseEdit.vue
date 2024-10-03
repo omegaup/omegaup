@@ -174,7 +174,7 @@
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
-                        :data-array-modal-dropdown="lineKindOption.type"
+                        :data-array-modal-dropdown="lineKindOption.kind"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
@@ -439,7 +439,12 @@
       </table>
     </div>
     <div class="text-center">
-      <b-button variant="light" class="mr-2" @click="addNewLine">
+      <b-button
+        data-edit-case-add-line
+        variant="light"
+        class="mr-2"
+        @click="addNewLine"
+      >
         <div class="container">
           <div class="row">
             <BIconPlusSquare
