@@ -2,7 +2,7 @@ import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import * as api from '../api';
 import * as ui from '../ui';
-import { types } from '../api_types';
+import { messages, types } from '../api_types';
 import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
@@ -133,6 +133,14 @@ OmegaUp.on('ready', () => {
           page,
           sortOrder,
           filter,
+        },
+        on: {
+          'fetch-page': (params: messages.ContestListRequest) => {
+            contestStore.dispatch('fetchContestList', {
+              requestParams: params,
+              name: params.tab_name,
+            });
+          },
         },
       });
     },

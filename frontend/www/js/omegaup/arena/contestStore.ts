@@ -49,7 +49,10 @@ export const contestStoreConfig = {
       payload: NamedContestListRequest,
     ) {
       api.Contest.list(payload.requestParams).then((response) => {
-        commit('updateList', { name: payload.name, response });
+        commit('updateList', {
+          name: payload.name,
+          response: response.results,
+        });
       });
     },
   },

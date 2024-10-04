@@ -379,9 +379,9 @@ describe('ContestListv2.vue', () => {
           },
         });
         expect(wrapper.vm.currentOrder).toBe(field);
-        expect(
-          wrapper.vm.sortedContestList.map((contest) => contest.alias),
-        ).toEqual(expectedOrder);
+        expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
+          expectedOrder,
+        );
       });
     },
   );
