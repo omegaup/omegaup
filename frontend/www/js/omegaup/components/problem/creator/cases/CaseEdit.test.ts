@@ -706,7 +706,7 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
 
     const dropdownsMultiline = wrapper.findAll(
-      `a[data-array-modal-dropdown="${T.problemCreatorLineMultiline}"]`,
+      `a[data-array-modal-dropdown="multiline"]`,
     );
 
     // There are two dropdown items for multiline, one for each line.

@@ -4,6 +4,7 @@
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
       <div>
         <b-button
+          data-toggle-layout-sidebar
           size="sm"
           variant="primary"
           class="mr-2"
@@ -24,6 +25,7 @@
             <b-container>
               <b-row class="justify-content-center">
                 <b-button
+                  data-add-layout-from-selected-case
                   class="w-84 mb-2"
                   variant="success"
                   @click="addLayoutFromSelectedCase"
@@ -42,6 +44,7 @@
               </b-row>
               <b-row class="justify-content-center">
                 <b-button
+                  data-close-layout-sidebar
                   class="w-84 mb-3"
                   variant="danger"
                   @click="showLayoutSidebar = false"
@@ -63,11 +66,37 @@
           <span class="d-none d-xl-inline">{{ T.problemCreatorAdd }}</span>
           <BIconPlusCircle class="d-inline d-xl-none" />
         </b-button>
-        <b-button variant="light" size="sm">
-          <BIconThreeDotsVertical />
-        </b-button>
+        <b-dropdown variant="light" size="sm" right no-caret>
+          <template #button-content>
+            <BIconThreeDotsVertical />
+          </template>
+          <b-dropdown-item
+            data-sidebar-validate-points-dropdown-item
+            @click="validateAndFixPointsModal = !validateAndFixPointsModal"
+            ><b-row>
+              <div class="ml-6">
+                <BIconBroadcast variant="info" font-scale="1.05" />
+              </div>
+              <div class="ml-8">{{ T.problemCreatorValidatePointsButton }}</div>
+            </b-row>
+          </b-dropdown-item>
+        </b-dropdown>
       </div>
     </div>
+    <b-modal
+      v-model="validateAndFixPointsModal"
+      data-sidebar-validate-points-modal
+      :title="T.problemCreatorValidatePoints"
+      :ok-title="T.problemCreatorValidatePointsContinue"
+      ok-variant="success"
+      :cancel-title="T.problemCreatorValidatePointsBack"
+      cancel-variant="danger"
+      static
+      lazy
+      @ok="validateAndFixPoints"
+    >
+      {{ T.problemCreatorValidatePointsWarning }}
+    </b-modal>
     <div>
       <b-card class="border-0">
         <b-row class="mb-1">
@@ -132,6 +161,7 @@
                 <b-button
                   variant="light"
                   data-placement="top"
+                  data-sidebar-cases="ungrouped"
                   :title="name"
                   class="w-82"
                   @click="editCase(groupID, cases[0].caseID)"
@@ -332,7 +362,7 @@
                 />
               </b-form-group>
               <b-form-group
-                v-show="editGroupPoints[groupID] !== null"
+                v-show="!editGroupAutoPoints[groupID]"
                 :label="T.problemCreatorPoints"
               >
                 <b-form-input
@@ -342,7 +372,6 @@
                   type="number"
                   number
                   min="0"
-                  max="100"
                 />
               </b-form-group>
               <b-form-group
@@ -350,12 +379,9 @@
                 :description="T.problemCreatorAutomaticPointsHelperGroup"
               >
                 <b-form-checkbox
-                  data-sidebar-edit-group-modal="edit nullpoint"
-                  :checked="editGroupPoints[groupID] === null"
-                  @change="
-                    editGroupPoints[groupID] =
-                      editGroupPoints[groupID] === null ? 0 : null
-                  "
+                  data-sidebar-edit-group-modal="edit autoPoints"
+                  :checked="editGroupAutoPoints[groupID]"
+                  @change="toggleGroupAutoPoints(groupID)"
                 >
                 </b-form-checkbox>
               </b-form-group>
@@ -404,6 +430,8 @@ export default class Sidebar extends Vue {
   addLayoutFromSelectedCase!: () => void;
   @casesStore.Mutation('addNewLayout')
   addNewLayout!: () => void;
+  @casesStore.Mutation('validateAndFixPoints')
+  validateAndFixPoints!: () => void;
   @casesStore.Mutation('deleteCase') deleteCase!: ({
     groupID,
     caseID,
@@ -420,15 +448,17 @@ export default class Sidebar extends Vue {
     groupID,
     newName,
     newPoints,
-  ]: [GroupID, string, number | null]) => void;
+  ]: [GroupID, string, number]) => void;
   @casesStore.Getter('getStringifiedLinesFromCaseGroupID')
   getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
+  validateAndFixPointsModal: boolean = false;
   showUngroupedCases = false;
   showCases: { [key: string]: boolean } = {};
   editGroupModal: { [key: GroupID]: boolean } = {};
   editGroupName: { [key: GroupID]: string } = {};
-  editGroupPoints: { [key: GroupID]: number | null } = {};
+  editGroupPoints: { [key: GroupID]: number } = {};
+  editGroupAutoPoints: { [key: GroupID]: boolean } = {};
 
   @Watch('groups')
   onGroupsChanged() {
@@ -443,17 +473,25 @@ export default class Sidebar extends Vue {
     this.editGroupPoints = this.groups.reduce((acc, group) => {
       acc[group.groupID] = group.points;
       return acc;
-    }, {} as { [key: string]: number | null });
+    }, {} as { [key: string]: number });
+    this.editGroupAutoPoints = this.groups.reduce((acc, group) => {
+      acc[group.groupID] = group.autoPoints;
+      return acc;
+    }, {} as { [key: string]: boolean });
+  }
+
+  toggleGroupAutoPoints(groupID: GroupID) {
+    this.editGroupAutoPoints[groupID] = !this.editGroupAutoPoints[groupID];
+    if (this.editGroupAutoPoints[groupID]) {
+      this.editGroupPoints[groupID] = 100;
+    }
   }
 
   formatter(text: string) {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
-  pointsFormatter(points: number | null) {
-    if (points === null) {
-      return null;
-    }
+  pointsFormatter(points: number) {
     return Math.max(points, 0);
   }
 
