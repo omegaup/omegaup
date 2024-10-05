@@ -1,4 +1,5 @@
 import { LoginOptions } from '../support/types';
+import T from '../../frontend/www/js/omegaup/lang';
 
 describe('Problem creator Test', () => {
   const loginOptions: LoginOptions = {
@@ -131,5 +132,122 @@ describe('Problem creator Test', () => {
       .then((text) => {
         expect(text.trim()).contain('0');
       });
+  });
+
+  it('Should add and edit layouts', () => {
+    cy.login(loginOptions);
+
+    cy.visit('/problem/creator/');
+
+    cy.get('[data-problem-creator-tab="cases"]').click();
+
+    cy.get('[data-add-window]').click();
+
+    cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+
+    cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
+    cy.get('[data-problem-creator-case-input="name"]').should(
+      'have.value',
+      'hellocase',
+    );
+
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-sidebar-groups="ungrouped"]').click();
+
+    cy.get('[data-sidebar-cases="ungrouped"]').click();
+
+    cy.get('[data-edit-case-add-line]').click();
+    cy.get('[data-edit-case-add-line]').click();
+    cy.get('[data-edit-case-add-line]').click();
+    cy.get('[data-edit-case-add-line]').click();
+
+    cy.get('[data-array-modal-dropdown]').eq(0).click();
+    cy.get('[data-array-modal-dropdown="multiline"]').eq(0).click();
+
+    cy.get('[data-array-modal-dropdown]').eq(5).click();
+    cy.get('[data-array-modal-dropdown="array"]').eq(1).click();
+    cy.get('[data-line-edit-button]').eq(0).click();
+
+    cy.get('[data-array-modal-generate]').click();
+
+    cy.get('button[class="btn btn-success"]').eq(0).click();
+
+    cy.get('[data-array-modal-dropdown]').eq(10).click();
+    cy.get('[data-array-modal-dropdown="matrix"]').eq(2).click();
+    cy.get('[data-line-edit-button]').eq(1).click();
+
+    cy.get('[data-matrix-modal-generate]').click();
+    cy.get('button[class="btn btn-success"]').eq(0).click();
+
+    cy.get('[data-toggle-layout-sidebar]').click();
+
+    cy.get('[data-add-layout-from-selected-case]').click();
+
+    cy.get('[data-close-layout-sidebar]').click();
+
+    cy.get('[data-add-window]').click();
+
+    cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+
+    cy.get('[data-problem-creator-case-input="name"]').type('Hello case 2');
+
+    cy.get('[data-problem-creator-add-panel-submit]').click();
+
+    cy.get('[data-toggle-layout-sidebar]').click();
+
+    cy.get('button.dropdown-toggle-split').eq(1).click();
+    cy.get('[data-layout-dropdown-enforce-to-all]').click();
+
+    cy.get('[data-toggle-layout-sidebar]').click();
+
+    cy.get('[data-sidebar-cases="ungrouped"]').eq(1).click();
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(0)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineMultiline);
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(1)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineArray);
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(2)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineMatrix);
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(3)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineLine);
+
+    cy.get('[data-toggle-layout-sidebar]').click();
+
+    cy.get('button.dropdown-toggle-split').eq(1).click();
+    cy.get('[data-layout-dropdown-copy]').click();
+
+    cy.get('[data-layout-dropdown]').eq(1).click();
+
+    cy.get('[data-line-info-dropdown]').eq(4).click();
+    cy.get('[data-line-info-dropdown-item="array"]').eq(4).click();
+
+    cy.get('button.dropdown-toggle-split').eq(2).click();
+    cy.get('[data-layout-dropdown-enforce-to-selected]').eq(1).click();
+
+    cy.get('[data-sidebar-cases="ungrouped"]').eq(0).click();
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(0)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineMultiline);
+
+    cy.get('[data-sidebar-cases="ungrouped"]').eq(1).click();
+
+    cy.get('[data-array-modal-dropdown=""]')
+      .eq(0)
+      .find('button.dropdown-toggle')
+      .should('contain.text', T.problemCreatorLineArray);
   });
 });
