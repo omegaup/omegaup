@@ -40,6 +40,7 @@
             :name="getSelectedCase.name"
             :group="getSelectedGroup.groupID"
             :points="getSelectedCase.points"
+            :auto-points="getSelectedCase.autoPoints"
             :edit-mode="true"
           />
         </b-modal>
@@ -797,7 +798,7 @@ export default class CaseEdit extends Vue {
       caseID: this.getSelectedCase.caseID,
       name: this.caseInputRef.caseName,
       points: this.caseInputRef.casePoints,
-      autoPoints: this.caseInputRef.casePoints === null,
+      autoPoints: this.caseInputRef.caseAutoPoints,
     };
     const oldGroupID: GroupID = this.getSelectedGroup.groupID;
     this.updateCase([oldGroupID, updateCaseRequest]);
