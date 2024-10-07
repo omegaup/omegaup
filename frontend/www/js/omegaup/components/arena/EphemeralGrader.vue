@@ -14,8 +14,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as Util from '../../graderv2/util';
-import Ephemeral from '../../graderv2/Ephemeral.vue';
+import * as Util from '../../grader/util';
+import Ephemeral from '../../grader/Ephemeral.vue';
 
 @Component({
   components: {
