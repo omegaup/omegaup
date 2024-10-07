@@ -6,7 +6,7 @@ import Vue from 'vue';
 
 import * as Util from './util';
 import * as templates from './GraderTemplates';
-import { types } from './../api_types';
+import { types } from '../api_types';
 
 export type CaseKey = `${string}.${'err' | 'meta' | 'out'}`;
 export interface GraderOutputs {
