@@ -5,7 +5,6 @@ import { problemPage } from './problemPage';
 
 import {
   ContestOptions,
-  GroupOptions,
   LoginOptions,
   ProblemOptions,
   RunOptions,
@@ -86,7 +85,11 @@ export class ContestPage {
     });
   }
 
-  createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
+  createContest(
+    contestOptions: ContestOptions,
+    users: Array<string>,
+    shouldShowIntro: boolean = true,
+  ): void {
     cy.createContest(contestOptions, shouldShowIntro);
     cy.location('href').should('include', contestOptions.contestAlias);
     cy.get('a[data-contest-new-form]').trigger('click');
@@ -129,7 +132,7 @@ export class ContestPage {
     const contestProblems: ProblemOptions[] = [];
     const contestRuns: RunOptions[] = [];
 
-    problems.forEach( (problem: ProblemOptions) => {
+    problems.forEach((problem: ProblemOptions) => {
       problem.firstTimeVisited = firstTimeVisited;
 
       cy.login(loginOption);
