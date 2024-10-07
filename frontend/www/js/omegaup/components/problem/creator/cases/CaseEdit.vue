@@ -40,6 +40,7 @@
             :name="getSelectedCase.name"
             :group="getSelectedGroup.groupID"
             :points="getSelectedCase.points"
+            :auto-points="getSelectedCase.autoPoints"
             :edit-mode="true"
           />
         </b-modal>
@@ -174,7 +175,7 @@
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
-                        :data-array-modal-dropdown="lineKindOption.type"
+                        :data-array-modal-dropdown="lineKindOption.kind"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
@@ -439,7 +440,12 @@
       </table>
     </div>
     <div class="text-center">
-      <b-button variant="light" class="mr-2" @click="addNewLine">
+      <b-button
+        data-edit-case-add-line
+        variant="light"
+        class="mr-2"
+        @click="addNewLine"
+      >
         <div class="container">
           <div class="row">
             <BIconPlusSquare
@@ -792,7 +798,7 @@ export default class CaseEdit extends Vue {
       caseID: this.getSelectedCase.caseID,
       name: this.caseInputRef.caseName,
       points: this.caseInputRef.casePoints,
-      autoPoints: this.caseInputRef.casePoints === null,
+      autoPoints: this.caseInputRef.caseAutoPoints,
     };
     const oldGroupID: GroupID = this.getSelectedGroup.groupID;
     this.updateCase([oldGroupID, updateCaseRequest]);
