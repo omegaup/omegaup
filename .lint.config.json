@@ -54,7 +54,8 @@
 		"eslint": {
 			"allowlist": [
 				"frontend/www/.*\\.ts$",
-				"frontend/www/.*\\.vue$"
+				"frontend/www/.*\\.vue$",
+				"cypress/.*\\.ts$"
 			],
 			"denylist": [
 				".*js/omegaup/lang\\..*",
@@ -83,7 +84,8 @@
 				"yarn run refactor"
 			],
 			"allowlist": [
-				"frontend/www/.*\\.ts$"
+				"frontend/www/.*\\.ts$",
+				"cypress/.*\\.ts$"
 			],
 			"denylist": [
 				".*third_party.*",
