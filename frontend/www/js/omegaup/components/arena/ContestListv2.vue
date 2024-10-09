@@ -509,42 +509,42 @@ export default class ArenaContestList extends Vue {
 
   @Watch('currentOrder')
   onCurrentOrderChanged(newValue: ContestOrder) {
+    const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
+      tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
+      query: urlObj.searchParams.get('query') || '',
       sort_order: newValue,
-      filter: this.currentFilter,
+      filter: urlObj.searchParams.get('filter') as ContestFilter,
     };
-    const urlObj = new URL(window.location.href);
     this.currentPage = 1;
     this.fetchPage(params, urlObj);
   }
 
   @Watch('currentFilter')
   onCurrentFilterChanged(newValue: ContestFilter) {
+    const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name: this.currentTab,
-      query: this.currentQuery,
-      sort_order: this.sortOrder,
+      tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
       filter: newValue,
     };
-    const urlObj = new URL(window.location.href);
     this.currentPage = 1;
     this.fetchPage(params, urlObj);
   }
 
   @Watch('currentTab')
   onCurrentTabChanged(newValue: ContestTab) {
+    const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
       tab_name: newValue,
-      query: this.currentQuery,
-      sort_order: this.sortOrder,
-      filter: this.currentFilter,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
+      filter: urlObj.searchParams.get('filter') as ContestFilter,
     };
-    const urlObj = new URL(window.location.href);
     this.currentPage = 1;
     this.fetchPage(params, urlObj);
   }
