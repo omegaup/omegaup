@@ -294,12 +294,12 @@
       <b-pagination-nav
         ref="paginator"
         v-model="currentPage"
-        @click.native.prevent="handleClick"
+        @click.native="handleClick"
         base-url="#"
         first-number
         last-number
         size="lg"
-        align="center"
+        :align="'center'"
         :link-gen="linkGen"
         :number-of-pages="numberOfPages(currentTab)"
       ></b-pagination-nav>
@@ -308,8 +308,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { messages, types } from '../../api_types';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
 
@@ -358,6 +358,14 @@ export enum ContestFilter {
   All = 'all',
 }
 
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -372,6 +380,7 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop({ default: 10 }) pageSize!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -397,7 +406,7 @@ export default class ArenaContestList extends Vue {
       // Default value when there are no contests in the list
       return 1;
     }
-    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    const numberOfPages = Math.ceil(this.countContests[tab] / this.pageSize);
     return numberOfPages;
   }
 
@@ -418,22 +427,24 @@ export default class ArenaContestList extends Vue {
     };
   }
 
-  fetchPage(params: messages.ContestListRequest) {
-    this.$emit('fetch-page', params);
+  fetchPage(params: UrlParams, urlObj: URL) {
+    this.$emit('fetch-page', { params, urlObj });
   }
 
   handleClick(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
     const url = (event.target as HTMLAnchorElement).href;
     if (url) {
       const urlObj = new URL(url);
-      const params = {
+      const params: UrlParams = {
         page: parseInt(urlObj.searchParams.get('page') || '1', 10),
         tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
         query: urlObj.searchParams.get('query') || '',
         sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
         filter: urlObj.searchParams.get('filter') as ContestFilter,
       };
-      this.fetchPage(params);
+      this.fetchPage(params, urlObj);
     }
   }
 
@@ -494,6 +505,48 @@ export default class ArenaContestList extends Vue {
       default:
         return this.contests.current;
     }
+  }
+
+  @Watch('currentOrder')
+  onCurrentOrderChanged(newValue: ContestOrder) {
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: newValue,
+      filter: this.currentFilter,
+    };
+    const urlObj = new URL(window.location.href);
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentFilter')
+  onCurrentFilterChanged(newValue: ContestFilter) {
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.sortOrder,
+      filter: newValue,
+    };
+    const urlObj = new URL(window.location.href);
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentTab')
+  onCurrentTabChanged(newValue: ContestTab) {
+    const params: UrlParams = {
+      page: 1,
+      tab_name: newValue,
+      query: this.currentQuery,
+      sort_order: this.sortOrder,
+      filter: this.currentFilter,
+    };
+    const urlObj = new URL(window.location.href);
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
   }
 }
 </script>
