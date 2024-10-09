@@ -35,7 +35,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
- * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
+ * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, pageSize: int, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
@@ -120,7 +120,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
         );
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 20;
+        $pageSize = $r->ensureOptionalInt(
+            'page_size'
+        ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
         $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
             fieldName: 'tab_name',
             field: $tabName,
@@ -1248,6 +1250,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'contests' => $contests,
+                    'pageSize' => $pageSize,
                     'countContests' => $countContests,
                     'query' => $r->ensureOptionalString('query'),
                 ],
