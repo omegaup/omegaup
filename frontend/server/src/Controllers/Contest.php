@@ -106,15 +106,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         /** @var list<ContestListItem> */
         $contests = [];
-        \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['recommended'],
+        $recommended = $r->ensureOptionalInt(
             'recommended'
-        );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['participating'],
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        $participating = $r->ensureOptionalInt(
             'participating'
+        ) ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
         );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
+            fieldName: 'filter',
+            field: $filter,
+            defaultValue: \OmegaUp\DAO\Enum\ContestFilterStatus::ALL
+        );
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        } elseif ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
         $tabName = $r->ensureOptionalEnum(
             'tab_name',
             \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
@@ -129,16 +140,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
         );
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
-            intval(
-                $r['recommended'] ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-            )
+            $recommended
         );
-        // Same as above.
-        \OmegaUp\Validators::validateNumber($recommended, 'recommended');
         $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
-            intval(
-                $r['participating'] ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO
-            )
+            $participating
         );
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['admission_mode'],
