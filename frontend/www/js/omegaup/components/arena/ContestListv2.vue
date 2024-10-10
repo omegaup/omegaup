@@ -294,7 +294,6 @@
       <b-pagination-nav
         ref="paginator"
         v-model="currentPage"
-        @click.native="handleClick"
         base-url="#"
         first-number
         last-number
@@ -308,7 +307,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -373,6 +372,7 @@ export interface UrlParams {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Ref('paginator') readonly paginator!: Vue;
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
@@ -428,11 +428,25 @@ export default class ArenaContestList extends Vue {
     };
   }
 
+  mounted() {
+    (this.paginator.$el as HTMLElement).addEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
+  beforeDestroy() {
+    (this.paginator.$el as HTMLElement).removeEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
   }
 
-  handleClick(event: MouseEvent) {
+  handlePageClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
     const url = (event.target as HTMLAnchorElement).href;
