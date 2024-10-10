@@ -415,14 +415,15 @@ export default class ArenaContestList extends Vue {
   }
 
   linkGen(pageNum: number) {
+    const urlObj = new URL(window.location.href);
     return {
       path: `/arena/`,
       query: {
         page: pageNum,
-        tab_name: this.currentTab,
-        query: this.query,
-        sort_order: this.currentOrder,
-        filter: this.filter,
+        tab_name: urlObj.searchParams.get('tab_name') || ContestTab.Current,
+        query: urlObj.searchParams.get('query') || '',
+        sort_order: urlObj.searchParams.get('sort_order') || ContestOrder.None,
+        filter: urlObj.searchParams.get('filter') || ContestFilter.All,
       },
     };
   }
@@ -439,10 +440,16 @@ export default class ArenaContestList extends Vue {
       const urlObj = new URL(url);
       const params: UrlParams = {
         page: parseInt(urlObj.searchParams.get('page') || '1', 10),
-        tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
+        tab_name:
+          (urlObj.searchParams.get('tab_name') as ContestTab) ||
+          ContestTab.Current,
         query: urlObj.searchParams.get('query') || '',
-        sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
-        filter: urlObj.searchParams.get('filter') as ContestFilter,
+        sort_order:
+          (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+          ContestOrder.None,
+        filter:
+          (urlObj.searchParams.get('filter') as ContestFilter) ||
+          ContestFilter.All,
       };
       this.fetchPage(params, urlObj);
     }
@@ -512,10 +519,14 @@ export default class ArenaContestList extends Vue {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
       query: urlObj.searchParams.get('query') || '',
       sort_order: newValue,
-      filter: urlObj.searchParams.get('filter') as ContestFilter,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
     };
     this.currentPage = 1;
     this.fetchPage(params, urlObj);
@@ -526,9 +537,13 @@ export default class ArenaContestList extends Vue {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name: urlObj.searchParams.get('tab_name') as ContestTab,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
       query: urlObj.searchParams.get('query') || '',
-      sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
       filter: newValue,
     };
     this.currentPage = 1;
@@ -542,8 +557,12 @@ export default class ArenaContestList extends Vue {
       page: 1,
       tab_name: newValue,
       query: urlObj.searchParams.get('query') || '',
-      sort_order: urlObj.searchParams.get('sort_order') as ContestOrder,
-      filter: urlObj.searchParams.get('filter') as ContestFilter,
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
     };
     this.currentPage = 1;
     this.fetchPage(params, urlObj);
