@@ -8,6 +8,7 @@ import arena_ContestList, {
   ContestTab,
   ContestOrder,
   ContestFilter,
+  UrlParams,
 } from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
 
@@ -133,6 +134,29 @@ OmegaUp.on('ready', () => {
           page,
           sortOrder,
           filter,
+          pageSize: payload.pageSize,
+        },
+        on: {
+          'fetch-page': ({
+            params,
+            urlObj,
+          }: {
+            params: UrlParams;
+            urlObj: URL;
+          }) => {
+            for (const [key, value] of Object.entries(params)) {
+              if (value) {
+                urlObj.searchParams.set(key, value.toString());
+              } else {
+                urlObj.searchParams.delete(key);
+              }
+            }
+            window.history.pushState({}, '', urlObj);
+            contestStore.dispatch('fetchContestList', {
+              requestParams: params,
+              name: params.tab_name,
+            });
+          },
         },
       });
     },

@@ -40,7 +40,8 @@ export const contestStoreConfig = {
       state: ContestState,
       { name, response }: NamedContestListResponse,
     ) {
-      Vue.set(state.contests, name, response);
+      Vue.set(state.contests, name, response.results);
+      Vue.set(state.countContests, name, response.number_of_results);
     },
   },
   actions: {
@@ -49,7 +50,10 @@ export const contestStoreConfig = {
       payload: NamedContestListRequest,
     ) {
       api.Contest.list(payload.requestParams).then((response) => {
-        commit('updateList', { name: payload.name, response });
+        commit('updateList', {
+          name: payload.name,
+          response,
+        });
       });
     },
   },

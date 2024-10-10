@@ -167,7 +167,7 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -209,7 +209,7 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -254,7 +254,7 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -294,7 +294,7 @@
         first-number
         last-number
         size="lg"
-        align="center"
+        :align="'center'"
         :link-gen="linkGen"
         :number-of-pages="numberOfPages(currentTab)"
       ></b-pagination-nav>
@@ -303,7 +303,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -353,6 +353,14 @@ export enum ContestFilter {
   All = 'all',
 }
 
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -360,6 +368,7 @@ export enum ContestFilter {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Ref('paginator') readonly paginator!: Vue;
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
@@ -367,6 +376,7 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop({ default: 10 }) pageSize!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -392,7 +402,7 @@ export default class ArenaContestList extends Vue {
       // Default value when there are no contests in the list
       return 1;
     }
-    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    const numberOfPages = Math.ceil(this.countContests[tab] / this.pageSize);
     return numberOfPages;
   }
 
@@ -401,16 +411,58 @@ export default class ArenaContestList extends Vue {
   }
 
   linkGen(pageNum: number) {
+    const urlObj = new URL(window.location.href);
     return {
       path: `/arena/`,
       query: {
         page: pageNum,
-        tab_name: this.currentTab,
-        query: this.query,
-        sort_order: this.currentOrder,
-        filter: this.filter,
+        tab_name: urlObj.searchParams.get('tab_name') || ContestTab.Current,
+        query: urlObj.searchParams.get('query') || '',
+        sort_order: urlObj.searchParams.get('sort_order') || ContestOrder.None,
+        filter: urlObj.searchParams.get('filter') || ContestFilter.All,
       },
     };
+  }
+
+  mounted() {
+    (this.paginator.$el as HTMLElement).addEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
+  beforeDestroy() {
+    (this.paginator.$el as HTMLElement).removeEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
+  fetchPage(params: UrlParams, urlObj: URL) {
+    this.$emit('fetch-page', { params, urlObj });
+  }
+
+  handlePageClick(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const url = (event.target as HTMLAnchorElement).href;
+    if (url) {
+      const urlObj = new URL(url);
+      const params: UrlParams = {
+        page: parseInt(urlObj.searchParams.get('page') || '1', 10),
+        tab_name:
+          (urlObj.searchParams.get('tab_name') as ContestTab) ||
+          ContestTab.Current,
+        query: urlObj.searchParams.get('query') || '',
+        sort_order:
+          (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+          ContestOrder.None,
+        filter:
+          (urlObj.searchParams.get('filter') as ContestFilter) ||
+          ContestFilter.All,
+      };
+      this.fetchPage(params, urlObj);
+    }
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -459,65 +511,6 @@ export default class ArenaContestList extends Vue {
     this.currentFilter = ContestFilter.All;
   }
 
-  get filteredContestList(): types.ContestListItem[] {
-    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilter === ContestFilter.SignedUp) {
-      filters.push((item) => item.participating);
-    }
-    if (this.currentFilter === ContestFilter.OnlyRecommended) {
-      filters.push((item) => item.recommended);
-    }
-    return this.sortedContestList.slice().filter((contestItem) => {
-      for (const filter of filters) {
-        if (!filter(contestItem)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-
-  get sortedContestList(): types.ContestListItem[] {
-    function compareNumber(a: number, b: number): number {
-      if (a < b) {
-        return 1;
-      } else if (a > b) {
-        return -1;
-      }
-      return 0;
-    }
-    let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
-    switch (this.currentOrder) {
-      case ContestOrder.None:
-        return this.contestList.slice();
-      case ContestOrder.Title:
-        sortBy = (a, b) => a.title.localeCompare(b.title);
-        break;
-      case ContestOrder.Ends:
-        sortBy = (a, b) =>
-          compareNumber(a.finish_time.getTime(), b.finish_time.getTime());
-        break;
-      case ContestOrder.Duration:
-        sortBy = (a, b) =>
-          compareNumber(
-            a.finish_time.getTime() - a.start_time.getTime(),
-            b.finish_time.getTime() - b.start_time.getTime(),
-          );
-        break;
-      case ContestOrder.Organizer:
-        sortBy = (a, b) => a.organizer.localeCompare(b.organizer);
-        break;
-      case ContestOrder.Contestants:
-        sortBy = (a, b) => compareNumber(a.contestants, b.contestants);
-        break;
-      case ContestOrder.SignedUp:
-        sortBy = (a, b) =>
-          compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
-        break;
-    }
-    return this.contestList.slice().sort(sortBy);
-  }
-
   get contestList(): types.ContestListItem[] {
     switch (this.currentTab) {
       case ContestTab.Current:
@@ -529,6 +522,60 @@ export default class ArenaContestList extends Vue {
       default:
         return this.contests.current;
     }
+  }
+
+  @Watch('currentOrder')
+  onCurrentOrderChanged(newValue: ContestOrder) {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order: newValue,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentFilter')
+  onCurrentFilterChanged(newValue: ContestFilter) {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter: newValue,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentTab')
+  onCurrentTabChanged(newValue: ContestTab) {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: newValue,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
   }
 }
 </script>
