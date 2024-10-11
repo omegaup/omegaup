@@ -172,7 +172,7 @@
           </div>
           <template v-else>
             <omegaup-contest-card
-              v-for="contestItem in contestList"
+              v-for="contestItem in filteredContestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
             >
@@ -215,7 +215,7 @@
           </div>
           <template v-else>
             <omegaup-contest-card
-              v-for="contestItem in contestList"
+              v-for="contestItem in filteredContestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
             >
@@ -261,7 +261,7 @@
           </div>
           <template v-else>
             <omegaup-contest-card
-              v-for="contestItem in contestList"
+              v-for="contestItem in filteredContestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
             >
