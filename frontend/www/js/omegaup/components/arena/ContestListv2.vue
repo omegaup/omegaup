@@ -171,7 +171,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -213,7 +213,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -258,7 +258,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -373,7 +373,7 @@ export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
-  @Prop() sortOrder!: ContestOrder;
+  @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   @Prop({ default: 10 }) pageSize!: number;
@@ -479,26 +479,32 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
+    this.$forceUpdate();
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
+    this.$forceUpdate();
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
+    this.$forceUpdate();
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
+    this.$forceUpdate();
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
+    this.$forceUpdate();
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+    this.$forceUpdate();
   }
 
   filterBySignedUp() {
@@ -524,7 +530,7 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  @Watch('currentOrder')
+  @Watch('currentOrder', { immediate: true, deep: true })
   onCurrentOrderChanged(newValue: ContestOrder) {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -542,7 +548,7 @@ export default class ArenaContestList extends Vue {
     this.fetchPage(params, urlObj);
   }
 
-  @Watch('currentFilter')
+  @Watch('currentFilter', { immediate: true, deep: true })
   onCurrentFilterChanged(newValue: ContestFilter) {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -560,7 +566,7 @@ export default class ArenaContestList extends Vue {
     this.fetchPage(params, urlObj);
   }
 
-  @Watch('currentTab')
+  @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab) {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
