@@ -42,11 +42,12 @@ describe('LayoutSidebar.vue', () => {
   const groupedCaseCaseID = newCase.caseID;
 
   // Currently, there are 4 methods on layout:
+  // - Rename layout.
   // - Enforce layout to the selected case.
   // - Enforce layout to all the cases.
   // - Copy layout.
-  // - Delete Layout. .
-  const layoutDropdownButtonCounts = 4;
+  // - Delete Layout.
+  const layoutDropdownButtonCounts = 5;
 
   store.commit('casesStore/setSelected', {
     groupID: ungroupedCaseGroupID,
@@ -164,5 +165,51 @@ describe('LayoutSidebar.vue', () => {
     expect(layoutDropdownNew.text()).toContain(
       newUngroupedCasegroup.name + '_' + newUngroupedCase.name,
     );
+  });
+
+  it('Should rename layouts', async () => {
+    store.commit('casesStore/resetStore');
+    store.commit('casesStore/addNewLayout');
+    const wrapper = mount(LayoutSidebar, {
+      localVue,
+      store,
+    });
+
+    expect(wrapper.vm.getAllLayouts.length).toBe(1);
+    expect(
+      wrapper.vm.getAllLayouts.filter(
+        (_layout) => _layout.name === T.problemCreatorLayoutNew,
+      ).length,
+    ).toBe(1);
+
+    const layoutDropdown = wrapper.find('div[data-layout-dropdown]');
+    expect(layoutDropdown.text()).toContain(T.problemCreatorLayoutNew);
+
+    const renameLayout = wrapper.find('[data-layout-dropdown-rename-layout]');
+    await renameLayout.trigger('click');
+
+    const renameLayoutModal = wrapper.find(
+      '[data-layout-dropdown-rename-modal]',
+    );
+    expect(renameLayoutModal.exists).toBeTruthy();
+
+    const renameLayoutForm = wrapper.find(
+      '[data-layout-sidebar-rename-layout]',
+    );
+    const layoutName = 'Hello layout';
+    renameLayoutForm.setValue(layoutName);
+    expect((renameLayoutForm.element as HTMLInputElement).value).toBe(
+      layoutName,
+    );
+
+    const targetLayout = wrapper.vm.getAllLayouts[0];
+    wrapper.vm.editLayoutName([
+      targetLayout.layoutID,
+      (renameLayoutForm.element as HTMLInputElement).value,
+    ]);
+
+    await Vue.nextTick();
+    const layoutDropdownUpdated = wrapper.find('div[data-layout-dropdown]');
+    expect(layoutDropdownUpdated.text()).toContain(layoutName);
   });
 });
