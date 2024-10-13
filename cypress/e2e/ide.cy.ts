@@ -2,7 +2,7 @@ import { profilePage } from '../support/pageObjects/profilePage';
 import { problemPage } from '../support/pageObjects/problemPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { LoginOptions, ProblemOptions, RunOptions } from '../support/types';
-import * as Util from '../../frontend/www/js/omegaup/graderv2/util';
+import * as Util from '../../frontend/www/js/omegaup/grader/util';
 import * as JSZip from 'jszip';
 
 describe('Test IDE', () => {

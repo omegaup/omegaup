@@ -134,7 +134,10 @@ describe('Basic Commands Test', () => {
   it('Should create two contests and merge their scoreboard', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
-    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2], false);
+    const contestOptions2 = contestPage.generateContestOptions(
+      loginOptions[2],
+      false,
+    );
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 
