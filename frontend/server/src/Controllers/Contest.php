@@ -84,15 +84,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{number_of_results: int, results: list<ContestListItem>}
      *
-     * @omegaup-request-param int|null $active
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
-     * @omegaup-request-param null|string $sort_order
      * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param null|string $sort_order
+     * @omegaup-request-param string $tab_name
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Check who is visiting, but a not logged user can still view
@@ -141,25 +141,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
             $recommended
-        );
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
         $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
             $participating
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
+        $admissionMode = $r->ensureOptionalEnum(
             'admission_mode',
-            [
-                'public',
-                'private',
-                'registration',
-            ]
+            \OmegaUp\CourseParams::VALID_ADMISSION_MODES
         );
 
         // admission mode status in contest is public
-        $public = (
-            isset($r['admission_mode']) &&
-            self::isPublic(strval($r['admission_mode']))
-        );
+        $public = (!is_null($admissionMode) && self::isPublic($admissionMode));
 
         if (is_null($participating)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -6019,6 +6011,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function isPublic(string $admissionMode): bool {
-        return $admissionMode !== 'private';
+        return $admissionMode !== \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE;
     }
 }
