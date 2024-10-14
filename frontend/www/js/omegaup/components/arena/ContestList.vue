@@ -197,7 +197,7 @@
                 </b-card-text>
               </template>
               <template
-                v-if="tab.name === ContestTab.Future"
+                v-if="tab.name !== ContestTab.Current"
                 #contest-button-enter
               >
                 <div></div>
@@ -217,6 +217,7 @@
             v-if="refreshing"
             class="spinner mt-4"
             variant="primary"
+            :name="tab.name"
           ></b-spinner>
         </b-tab>
       </b-tabs>
@@ -343,7 +344,7 @@ export default class ArenaContestList extends Vue {
 
   linkGen(pageNum: number) {
     return {
-      path: `/arena/`,
+      path: `/arenav1/`,
       query: {
         page: pageNum,
         tab_name: this.currentTab,
@@ -390,11 +391,11 @@ export default class ArenaContestList extends Vue {
     });
 
     if (!query) {
-      return `/arena/?${queryString.toString()}`;
+      return `/arenav1/?${queryString.toString()}`;
     }
 
     queryString.set('query', query);
-    return `/arena/?${queryString.toString()}`;
+    return `/arenav1/?${queryString.toString()}`;
   }
 
   finishContestDate(contest: types.ContestListItem): string {
