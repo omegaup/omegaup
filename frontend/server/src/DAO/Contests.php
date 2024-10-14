@@ -611,8 +611,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $limits = "
             ORDER BY
-                {$order},
-                recommended DESC
+                recommended DESC,
+                {$order}
             LIMIT ?, ?;
         ";
         $params[] = max(0, $page - 1) * $pageSize;
@@ -1050,8 +1050,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $limits = "
             ORDER BY
-                {$order},
                 recommended DESC,
+                {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
             LIMIT ?, ?";
 
@@ -1143,9 +1143,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $order = self::getOrder($orderBy);
 
         $limits = "
-                ORDER BY
-                {$order},
+            ORDER BY
                 `recommended` DESC,
+                {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
             LIMIT ?, ?";
         $params[] = max(0, $page - 1) * $rowsPerPage;
@@ -1228,8 +1228,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $limits = "
             ORDER BY
-                {$order},
                 `recommended` DESC,
+                {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
             LIMIT ?, ?;";
 
