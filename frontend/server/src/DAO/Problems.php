@@ -1492,17 +1492,29 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $orderByClause = '';
 
         if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
+            $args[] = $minVisibility;
             $args[] = $query;
             $select .= ' 1.0 AS relevance
             ';
             $sql = "FROM
                         Problems p
                     WHERE
+                        p.visibility >= ? AND
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 5, $query);
             $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+
+            $args[] = $minVisibility;
+            $args[] = $query;
+            $args[] = $minVisibility;
+            $args[] = $query;
+            $args[] = $minVisibility;
+            $args = array_merge($args, array_fill(0, 3, $query));
+            $curatedQuery = preg_replace('/\W+/', ' ', $query);
+            $args[] = $curatedQuery;
+            $args[] = $minVisibility;
+            $args[] = $curatedQuery;
+            error_log(print_r($args, true));
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
             $sql = "FROM
@@ -1513,6 +1525,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         FROM
                             Problems p
                         WHERE
+                            p.visibility >= ? AND
                             alias = ?
                         UNION ALL
                         SELECT
@@ -1521,6 +1534,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         FROM
                             Problems p
                         WHERE
+                            p.visibility >= ? AND
                             title = ?
                         UNION ALL
                         SELECT
@@ -1529,6 +1543,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         FROM
                             Problems p
                         WHERE
+                            p.visibility >= ? AND
                             (
                                 title LIKE CONCAT('%', ?, '%') OR
                                 alias LIKE CONCAT('%', ?, '%') OR
@@ -1544,6 +1559,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         FROM
                             Problems p
                         WHERE
+                            p.visibility >= ? AND
                             MATCH(alias, title)
                             AGAINST (? IN BOOLEAN MODE)
                     ) AS p";
