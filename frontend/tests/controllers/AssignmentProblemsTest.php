@@ -62,7 +62,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                'visibility' => 'private',
                 'author' => $identity
             ]),
             $adminLogin
@@ -744,9 +744,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create problems
         $mappingProblemsVisibility = [
-            'problem_1' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-            'problem_2' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
-            'problem_3' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            'problem_1' => 'public',
+            'problem_2' => 'private',
+            'problem_3' => 'public',
         ];
         $problemsData = [];
         foreach ($mappingProblemsVisibility as $alias => $problemVisibility) {

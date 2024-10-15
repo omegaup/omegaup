@@ -87,7 +87,7 @@ class ProblemParams {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
         $this->languages = $params['languages'] ?? 'c11-gcc,c11-clang,cpp17-gcc,cpp17-clang,py2,py3';
-        $this->visibility = $params['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+        $this->visibility = $params['visibility'] ?? 'public';
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
@@ -200,7 +200,7 @@ class Problem {
         \OmegaUp\Test\ScopedLoginToken $login = null
     ): array {
         return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            'visibility' => 'public',
             'author' => $author,
         ]), $login);
     }
@@ -218,8 +218,8 @@ class Problem {
 
         $visibility = $params->visibility;
 
-        if ($params->visibility != \OmegaUp\ProblemParams::VISIBILITY_PRIVATE && $params->visibility != \OmegaUp\ProblemParams::VISIBILITY_PUBLIC) {
-            $params->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+        if ($params->visibility != 'private' && $params->visibility != 'public') {
+            $params->visibility = 'public';
         }
 
         // Get a user
