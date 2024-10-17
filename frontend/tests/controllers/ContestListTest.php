@@ -477,7 +477,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'page_size' => 1000,
+            'page_size' => 100,
         ]));
 
         // Assert that two contests are not recommended
@@ -508,7 +508,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'page_size' => 1000,
+            'page_size' => 100,
         ]));
         unset($login);
 
