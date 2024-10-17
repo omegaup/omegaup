@@ -1759,6 +1759,7 @@ const translations: { [key: string]: string; } = {
   userNextRegisteredContestButtonSeeDetails: "Ver detalhes",
   userNextRegisteredContestTitle: "Lembre-se de participar no concurso",
   userNotAllowed: "N\u00e3o tem permiss\u00f5es para executar essa a\u00e7\u00e3o",
+  userNotAllowedToAddPrivateProblem: "Somente os administradores de problemas podem adicionar seus pr\u00f3prios problemas privados em conjuntos de problemas",
   userNotExist: "A conta n\u00e3o existe",
   userNotInListOfRequests: "Esta conta n\u00e3o esteja pendente pedido",
   userObjectivesModalAnswerCompetitive: "concursos de programa\u00e7\u00e3o",

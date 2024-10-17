@@ -1759,6 +1759,7 @@ const translations: { [key: string]: string; } = {
   userNextRegisteredContestButtonSeeDetails: "See details",
   userNextRegisteredContestTitle: "Remember to participate in the contest",
   userNotAllowed: "You do not have the permits to perform this action.",
+  userNotAllowedToAddPrivateProblem: "Only problem admins are allowed to add their own private problems in problemsets",
   userNotExist: "Account does not exist.",
   userNotInListOfRequests: "This account does not have a pending request.",
   userObjectivesModalAnswerCompetitive: "programming contests",

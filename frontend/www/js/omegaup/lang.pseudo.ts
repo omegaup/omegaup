@@ -1759,6 +1759,7 @@ const translations: { [key: string]: string; } = {
   userNextRegisteredContestButtonSeeDetails: "(S33 d37ai15)",
   userNextRegisteredContestTitle: "(R3m3mb3r 70 par7icipa73 in 7h3 c0n7357)",
   userNotAllowed: "(Y0u d0 n07 hav3 7h3 p3rmi75 70 p3rf0rm 7hi5 ac7i0n.)",
+  userNotAllowedToAddPrivateProblem: "(On1y pr0b13m admin5 ar3 a110w3d 70 add 7h3ir 0wn priva73 pr0b13m5 in pr0b13m5375)",
   userNotExist: "(Acc0un7 d035 n07 3xi57.)",
   userNotInListOfRequests: "(Thi5 acc0un7 d035 n07 hav3 a p3nding r3qu357.)",
   userObjectivesModalAnswerCompetitive: "(pr0gramming c0n73575)",
