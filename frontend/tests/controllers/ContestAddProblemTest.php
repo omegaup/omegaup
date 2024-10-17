@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of ContestAddProblemTest
  */
@@ -69,9 +67,6 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
      * Add a problem to contest with invalid params
      */
     public function testAddProblemToContestInvalidProblem() {
-        // Get a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         // Build request
@@ -130,7 +125,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Log in as another random user
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
 
@@ -285,7 +280,10 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail because of the privileges');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame('userNotAllowed', $e->getMessage());
+            $this->assertSame(
+                'userNotAllowedToAddPrivateProblem',
+                $e->getMessage()
+            );
         }
 
         \OmegaUp\Controllers\Contest::apiAddProblem(
