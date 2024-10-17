@@ -125,7 +125,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt(
-            'page_size'
+            key: 'page_size',
+            lowerBound: 1,
+            upperBound: 100
         ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
         $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(
             intval($r['active'] ?? \OmegaUp\DAO\Enum\ActiveStatus::ALL)
