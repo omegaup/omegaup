@@ -170,31 +170,32 @@
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.finish_time)">
-                  {{
-                    ui.formatString(T.contestEndTime, {
-                      endDate: finishContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in filteredContestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.finish_time)">
+                    {{
+                      ui.formatString(T.contestEndTime, {
+                        endDate: finishContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
           <b-spinner
             v-if="refreshing"
             class="spinner mt-4"
@@ -212,34 +213,35 @@
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartTime, {
-                      startDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in filteredContestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartTime, {
+                        startDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
           <b-spinner
             v-if="refreshing"
             class="spinner mt-4"
@@ -257,34 +259,35 @@
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-enroll-status>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartedTime, {
-                      startedDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-button-see-details>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in filteredContestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-enroll-status>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartedTime, {
+                        startedDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-button-see-details>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
         </b-tab>
       </b-tabs>
       <b-pagination-nav
