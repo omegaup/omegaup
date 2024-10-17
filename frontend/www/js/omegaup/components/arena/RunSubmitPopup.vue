@@ -88,7 +88,7 @@ import {
   LanguageInfo,
   supportedExtensions,
   supportedLanguages,
-} from '../../graderv2/util';
+} from '../../grader/util';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,

@@ -185,6 +185,7 @@
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
               :preferred-language="preferredLanguage"
+              :last-run="lastRun"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -523,16 +524,23 @@ export default class ProblemDetails extends Vue {
     return tabs.filter((tab) => tab.visible);
   }
 
-  get preferredLanguage(): null | string {
-    if (!(this.runs?.length > 0)) {
-      return this.problem.preferred_language ?? null;
+  get lastRun(): types.Run | null {
+    const runs = this.runsByProblem;
+    if (!runs?.length) {
+      return null;
     }
-    const mostRecentRun = this.runs.reduce(function (prev, current) {
+    return runs.reduce(function (prev, current) {
       return prev && prev.time.getTime() > current.time.getTime()
         ? prev
         : current;
     });
-    return mostRecentRun.language;
+  }
+
+  get preferredLanguage(): null | string {
+    if (!this.lastRun) {
+      return this.problem.preferred_language ?? null;
+    }
+    return this.lastRun.language;
   }
 
   get clarificationsCount(): string {
