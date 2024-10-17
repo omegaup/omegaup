@@ -167,7 +167,7 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="contestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -209,7 +209,7 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="contestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -254,7 +254,7 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="contestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -530,8 +530,17 @@ export default class ArenaContestList extends Vue {
     }
   }
 
+  get contestListEmpty(): boolean {
+    if (!this.contestList) return true;
+    return this.contestList.length === 0;
+  }
+
   @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(newValue: ContestOrder) {
+  onCurrentOrderChanged(
+    newValue: ContestOrder,
+    oldValue: undefined | ContestOrder,
+  ) {
+    if (typeof oldValue === 'undefined') return;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -549,7 +558,11 @@ export default class ArenaContestList extends Vue {
   }
 
   @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(newValue: ContestFilter) {
+  onCurrentFilterChanged(
+    newValue: ContestFilter,
+    oldValue: undefined | ContestFilter,
+  ) {
+    if (typeof oldValue === 'undefined') return;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -567,7 +580,8 @@ export default class ArenaContestList extends Vue {
   }
 
   @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab) {
+  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
+    if (typeof oldValue === 'undefined') return;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
