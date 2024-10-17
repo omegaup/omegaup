@@ -914,17 +914,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type           | Description |
-| ---------------- | -------------- | ----------- |
-| `page`           | `int`          |             |
-| `page_size`      | `int`          |             |
-| `query`          | `string`       |             |
-| `tab_name`       | `string`       |             |
-| `active`         | `int\|null`    |             |
-| `admission_mode` | `mixed`        |             |
-| `participating`  | `int\|null`    |             |
-| `recommended`    | `int\|null`    |             |
-| `sort_order`     | `null\|string` |             |
+| Name             | Type                                        | Description |
+| ---------------- | ------------------------------------------- | ----------- |
+| `page`           | `int`                                       |             |
+| `page_size`      | `int`                                       |             |
+| `query`          | `string`                                    |             |
+| `tab_name`       | `string`                                    |             |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |
+| `participating`  | `int\|null`                                 |             |
+| `recommended`    | `int\|null`                                 |             |
+| `sort_order`     | `null\|string`                              |             |
 
 ### Returns
 
