@@ -1,7 +1,6 @@
 import {
   LoginOptions,
   SchoolDetails,
-  TeamGroupOptions,
   UserInformation,
   UserPreferences,
 } from '../types';

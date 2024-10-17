@@ -14,8 +14,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as Util from '../../graderv2/util';
-import Ephemeral from '../../graderv2/Ephemeral.vue';
+import * as Util from '../../grader/util';
+import Ephemeral from '../../grader/Ephemeral.vue';
 
 @Component({
   components: {
@@ -34,14 +34,17 @@ export default class EphemeralGrader extends Vue {
       ),
   })
   acceptedLanguages!: string[];
-  @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string;
+  @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string | null;
   @Prop({ default: true }) isEmbedded!: boolean;
   @Prop({ default: Util.MonacoThemes.VSLight })
   initialTheme!: Util.MonacoThemes;
 
   // note: initial source is for the IDE is also supported
   get initialLanguage() {
-    if (!this.acceptedLanguages.includes(this.preferredLanguage)) {
+    if (
+      !this.preferredLanguage ||
+      !this.acceptedLanguages.includes(this.preferredLanguage)
+    ) {
       return this.acceptedLanguages[0];
     }
     return this.preferredLanguage;
