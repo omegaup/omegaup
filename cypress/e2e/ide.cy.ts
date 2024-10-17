@@ -121,6 +121,26 @@ describe('Test IDE', () => {
     cy.logout();
   });
 
+  it('Should check that interactive problem template loads properly', () => {
+    cy.login(loginOptions[0]);
+
+    cy.visit(`arena/problem/${problemOptions[2].problemAlias}/`);
+    cy.reload();
+
+    cy.get('.view-line span span').then(($spans) => {
+      const concatText = Array.from($spans, (span) =>
+        span.innerText.replace(/\s/g, ''),
+      ).join('');
+
+      cy.fixture('interactive_template.cpp').then((fileContent) => {
+        expect(concatText).to.equal(fileContent.replace(/\s/g, ''));
+        cy.task('log', fileContent);
+      });
+    });
+
+    cy.logout();
+  });
+
   it('Should display full list of supported languages in profile prefrences page', () => {
     cy.login(loginOptions[0]);
 
@@ -157,19 +177,13 @@ describe('Test IDE', () => {
       .type(caseOutput);
     cy.get(`li[title="diff"]`).should('be.visible').click();
 
-    let concatText = '';
     cy.get('.editor.original .view-line span span') // lhs is the original text
-      .each((span, index, $list) => {
-        cy.wrap(span)
-          .invoke('text')
-          .then((text) => {
-            concatText += text + (index === $list.length - 1 ? '' : '\n');
-          });
-      })
-      .then(() => {
+      .then(($spans) => {
+        const concatText = Array.from($spans, (span) => span.innerText).join(
+          '\n',
+        );
         expect(concatText).to.equal(caseOutput);
       });
-
     cy.logout();
   });
 
