@@ -18,7 +18,7 @@
                 <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
-                      v-model="currentQuery"
+                      v-model.lazy="currentQuery"
                       class="form-control nav-link"
                       type="text"
                       name="query"
@@ -39,9 +39,8 @@
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-style btn-md btn-block active nav-link"
-                        type="button"
+                        type="submit"
                         :value="T.wordsSearch"
-                        @click.prevent="onSearchQuery"
                       />
                     </div>
                   </div>
@@ -507,32 +506,26 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
-    this.$forceUpdate();
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
-    this.$forceUpdate();
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
-    this.$forceUpdate();
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
-    this.$forceUpdate();
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
-    this.$forceUpdate();
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
-    this.$forceUpdate();
   }
 
   filterBySignedUp() {
