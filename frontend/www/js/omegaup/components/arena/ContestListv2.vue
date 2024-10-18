@@ -16,7 +16,7 @@
             <b-row class="justify-content-between" align-v="center">
               <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
                 <form :action="queryURL" method="GET">
-                  <div class="input-group">
+                  <div class="input-group introjs-search">
                     <input
                       v-model.lazy="currentQuery"
                       class="form-control nav-link"
@@ -42,7 +42,7 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret>
+                <b-dropdown ref="dropdownOrderBy" no-caret class="introjs-sort">
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
@@ -116,7 +116,11 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
+                <b-dropdown
+                  ref="dropdownFilterBy"
+                  class="mr-0 introjs-filter"
+                  no-caret
+                >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
@@ -161,7 +165,7 @@
         </b-card>
         <b-tab
           ref="currentContestTab"
-          class="scroll-content"
+          class="scroll-content introjs-contest-list"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
           :active="currentTab === ContestTab.Current"
@@ -310,6 +314,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -370,6 +378,8 @@ export default class ArenaContestList extends Vue {
   @Prop() sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop() hasVisitedSection!: boolean;
+
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -381,6 +391,64 @@ export default class ArenaContestList extends Vue {
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
+
+  mounted() {
+    const title = T.joinContestInteractiveGuideTitle;
+    if (!this.hasVisitedSection) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title,
+              intro: T.joinContestInteractiveGuideWelcome,
+            },
+            {
+              title,
+              intro: T.joinContestInteractiveGuideTime,
+            },
+            {
+              title,
+              intro: T.joinContestInteractiveGuideTimeCurrent,
+            },
+            {
+              title,
+              intro: T.joinContestInteractiveGuideTimePast,
+            },
+            {
+              title,
+              intro: T.joinContestInteractiveGuideTimeFuture,
+            },
+            {
+              element: document.querySelector('.introjs-search') as Element,
+              title,
+              intro: T.joinContestInteractiveGuideSearch,
+            },
+            {
+              element: document.querySelector('.introjs-sort') as Element,
+              title,
+              intro: T.joinContestInteractiveGuideSort,
+            },
+            {
+              element: document.querySelector('.introjs-filter') as Element,
+              title,
+              intro: T.joinContestInteractiveGuideFilter,
+            },
+            {
+              element: document.querySelector(
+                '.introjs-contest-list',
+              ) as Element,
+              title,
+              intro: T.joinContestInteractiveGuideContestList,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-join-contest', true, -1);
+    }
+  }
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
