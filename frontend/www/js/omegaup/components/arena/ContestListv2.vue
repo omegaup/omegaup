@@ -15,10 +15,10 @@
           <b-container>
             <b-row class="justify-content-between" align-v="center">
               <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-                <form :action="queryURL" method="GET">
+                <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
-                      v-model.lazy="currentQuery"
+                      v-model="currentQuery"
                       class="form-control nav-link"
                       type="text"
                       name="query"
@@ -27,15 +27,21 @@
                       autocapitalize="off"
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
+                      @keyup.enter="onSearchQuery"
                     />
-                    <button class="btn reset-btn nav-link" type="reset">
+                    <button
+                      class="btn reset-btn nav-link"
+                      type="reset"
+                      @click="onReset"
+                    >
                       &times;
                     </button>
                     <div class="input-group-append">
                       <input
                         class="btn btn-primary btn-style btn-md btn-block active nav-link"
-                        type="submit"
+                        type="button"
                         :value="T.wordsSearch"
+                        @click.prevent="onSearchQuery"
                       />
                     </div>
                   </div>
@@ -409,8 +415,27 @@ export default class ArenaContestList extends Vue {
     return numberOfPages;
   }
 
-  get queryURL(): string {
-    return `/arena/#${this.currentTab}`;
+  onSearchQuery() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: this.currentQuery,
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  onReset() {
+    this.currentQuery = '';
   }
 
   linkGen(pageNum: number) {
