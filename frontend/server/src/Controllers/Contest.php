@@ -1175,7 +1175,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param int|null $participating
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param int|null $recommended
      * @omegaup-request-param null|string $sort_order
      * @omegaup-request-param string $tab_name
      */
@@ -1263,6 +1265,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
         $countContests = [
             $tabName => $countContests,
+        ];
+
+        $contests = [
+            'current' => $contests['current'] ?? [],
+            'past' => $contests['past'] ?? [],
+            'future' => $contests['future'] ?? []
+        ];
+
+        $countContests = [
+            'current' => $countContests['current'] ?? 0,
+            'past' => $countContests['past'] ?? 0,
+            'future' => $countContests['future'] ?? 0
         ];
 
         return [

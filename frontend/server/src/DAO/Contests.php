@@ -34,6 +34,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 Contests.rerun_id
                                 ';
 
+    /** @var string */
     private static $cteContestContestants = 'WITH pic AS (
         SELECT
             pp.contest_id,
@@ -603,7 +604,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $activeCondition AND
                 $queryCondition AND
                 archived = 0
-            GROUP BY Contests.contest_id
+            GROUP BY Contests.contest_id, pic.contestants
         ";
         $params = [
             // Direct participation
@@ -1045,7 +1046,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             pic ON pic.contest_id = Contests.contest_id
         WHERE
             $recommendedCheck AND $endCheck AND $queryCheck
-            AND archived = 0";
+            AND archived = 0
+        GROUP BY
+            Contests.contest_id, pic.contestants
+        ";
 
         $params = [
             $identityId,    // Organizer
