@@ -3123,6 +3123,7 @@ export namespace types {
   export interface ContestListv2Payload {
     contests: types.ContestList;
     countContests: { current: number; future: number; past: number };
+    pageSize: number;
     query?: string;
   }
 

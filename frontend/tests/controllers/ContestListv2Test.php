@@ -120,17 +120,14 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayload['contests']
         );
 
+        // Now, only contests in the current tab should be shown
         $this->assertEqualsCanonicalizing(
             [
                 'current' => [
                     'current-public',
                 ],
-                'future' => [
-                    'future-public',
-                ],
-                'past' => [
-                    'past-public'
-                ]
+                'future' => [],
+                'past' => [],
             ],
             $contestListPayloadAliases
         );
@@ -178,14 +175,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                     'current-private',
                     'current-public',
                 ],
-                'future' => [
-                    'future-private',
-                    'future-public',
-                ],
-                'past' => [
-                    'past-private',
-                    'past-public',
-                ]
+                'future' => [],
+                'past' => [],
             ],
             $contestListPayloadAliases
         );
@@ -215,12 +206,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                 'current' => [
                     'current-public',
                 ],
-                'future' => [
-                    'future-public',
-                ],
-                'past' => [
-                    'past-public'
-                ]
+                'future' => [],
+                'past' => [],
             ],
             $contestListPayloadAliases,
         );
@@ -251,14 +238,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                     'current-private',
                     'current-public',
                 ],
-                'future' => [
-                    'future-private',
-                    'future-public',
-                ],
-                'past' => [
-                    'past-private',
-                    'past-public',
-                ]
+                'future' => [],
+                'past' => [],
             ],
             $contestListPayloadAliases
         );
@@ -349,8 +330,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEqualsCanonicalizing(
             [
                 'current-public' => 0,
-                'past-public' => 0,
-                'future-public' => 0,
             ],
             $contestContestants,
         );

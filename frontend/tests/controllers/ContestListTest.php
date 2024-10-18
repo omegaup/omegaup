@@ -405,8 +405,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that contests with recommended flag show first in list.
      */
     public function testRecommendedShowsOnTop() {
-        $r = new \OmegaUp\Request();
-
         // Create 2 contests, with the not-recommended.finish_time > recommended.finish_time
         $recommendedContestData = \OmegaUp\Test\Factories\Contest::createContest();
         $notRecommendedContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams(
@@ -421,22 +419,20 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Turn recommended ON
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
+        \OmegaUp\Controllers\Contest::apiSetRecommended(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $recommendedContestData['request']['alias'],
             'value' => 1,
-        ]);
-        \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+        ]));
         unset($login);
 
         // Get list of contests
         $login = self::login($contestantIdentity);
-        $r = new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiList($r);
+        ]));
 
-        // Check that recommended contest is earlier in list han not-recommended
+        // Check that recommended contest is earlier in list than not-recommended
         $recommendedPosition = 0;
         $notRecommendedPosition = 0;
 
@@ -459,6 +455,28 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($recommendedPosition < $notRecommendedPosition);
     }
 
+    public function testExtenseContestsList() {
+        // Create a contest
+        \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get a user for our scenario
+        [
+            'identity' => $contestantIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Get list of contests
+        $login = self::login($contestantIdentity);
+        try {
+            \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'page_size' => 1000,
+            ]));
+            $this->fail('Should have failed because of the page size limit');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterNumberTooLarge', $e->getMessage());
+        }
+    }
+
     /**
      * Test to set recommended value in two contests.
      */
@@ -477,7 +495,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'page_size' => 1000,
+            'page_size' => 100,
         ]));
 
         // Assert that two contests are not recommended
@@ -508,7 +526,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestantIdentity);
         $response = \OmegaUp\Controllers\Contest::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'page_size' => 1000,
+            'page_size' => 100,
         ]));
         unset($login);
 
