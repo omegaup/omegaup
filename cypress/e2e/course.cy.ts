@@ -277,6 +277,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = problemPage.generateProblemOptions(1);
+
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
