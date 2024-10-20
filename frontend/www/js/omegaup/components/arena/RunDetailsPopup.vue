@@ -9,7 +9,7 @@
           :is-admin="data.admin"
         ></slot>
         <div class="source_code">
-          <h3>{{ T.wordsSource }}</h3>
+          <h3>{{ T.wordsCode }}</h3>
           <a v-if="data.source_link" download="data.zip" :href="data.source">{{
             T.wordsDownload
           }}</a>
