@@ -774,7 +774,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        validateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -1005,7 +1005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $addedProblem['alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $identity,
-                        validateVisibility: false,
+                        shouldValidateVisibility: true,
                         isExtraProblem: $addedProblem['is_extra_problem'] ?? false,
                         points: $addedProblem['points'],
                         commit: $addedProblem['commit'] ?? null,
@@ -1040,7 +1040,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param string $problemAlias
      * @param int $problemsetId
      * @param int $userId
-     * @param bool $validateVisibility validations no needed when it is a clone
+     * @param bool $shouldValidateVisibility validations no needed when it is a clone
      * @param ?string $commit
      * @param ?int $order = 1
      */
@@ -1048,7 +1048,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         string $problemAlias,
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $validateVisibility,
+        bool $shouldValidateVisibility,
         bool $isExtraProblem = false,
         ?float $points = 100,
         ?string $commit = null,
@@ -1080,7 +1080,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $problemToAdd,
-            $validateVisibility,
+            $shouldValidateVisibility,
             $isExtraProblem
         );
     }
@@ -1442,21 +1442,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
             $problemset
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureOptionalString(
             'commit',
-            1,
-            40,
-            false
+            required: false,
+            validator: fn (string $commit) => \OmegaUp\Validators::objectId(
+                $commit
+            )
         );
         self::addProblemToAssignment(
             problemAlias: $problemAlias,
             problemsetId: $problemset->problemset_id,
             identity: $r->identity,
-            validateVisibility: true,
+            shouldValidateVisibility: true,
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
-            commit: $r['commit'],
+            commit: $commit,
             order: $countProblems + 1,
         );
 
