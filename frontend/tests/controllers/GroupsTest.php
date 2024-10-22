@@ -650,7 +650,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * apiDetails with only AC and Weights
      */
-    public function testScoreboardDetailsForTypescript() {
+    public function testScoreboardDetailsForTypeScript() {
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
         $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
             $groupData
