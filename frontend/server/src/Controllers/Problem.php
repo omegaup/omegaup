@@ -3853,10 +3853,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             $programmingLanguages = [];
         }
-        $someTags = $r->ensureOptionalBool('some_tags') ?? false;
-        $requireAllTags = $r->ensureOptionalBool(
-            'require_all_tags'
-        ) ?? $someTags;
+        $someTags = $r->ensureOptionalBool('some_tags');
+        $requireAllTags = $r->ensureOptionalBool('require_all_tags');
 
         return [
             'sortOrder' => $sortOrder,
@@ -3865,7 +3863,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'language' => $language,
             'tags' => $tags,
             'keyword' => $keyword,
-            'requireAllTags' => $requireAllTags,
+            'requireAllTags' => is_null(
+                $requireAllTags
+            ) ? is_null(
+                $someTags
+            ) : $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
