@@ -3,15 +3,6 @@ import type { types } from '../../api_types';
 
 import arena_EphemeralGrader from './EphemeralGrader.vue';
 
-type SetSettingsMessage = {
-  method: 'setSettings';
-  params: {
-    alias: string;
-    settings: types.ProblemSettingsDistrib;
-    languages: string[];
-  };
-};
-
 describe('EphemeralGrader.vue', () => {
   beforeEach(() => {
     const div = document.createElement('div');
@@ -96,25 +87,17 @@ Here we can add code.
       attachTo: '#root',
       propsData: {
         problem,
+        acceptedLanguages: ['py3'],
+        preferredLanguage: 'py3',
       },
     });
-    const contentWindow: Window = (wrapper.findComponent({ ref: 'grader' })
-      .element as HTMLIFrameElement).contentWindow as Window;
-
-    const postPromise = new Promise<SetSettingsMessage>((accept) => {
-      contentWindow.postMessage = jest.fn(accept);
-    });
-    wrapper.vm.iframeLoaded();
-    const settingsMessage = await postPromise;
-    expect({
-      method: settingsMessage.method,
-      params: { alias: settingsMessage.params.alias },
-    }).toEqual({
-      method: 'setSettings',
-      params: {
-        alias: problem.alias,
-      },
-    });
+    expect(wrapper.text()).toContain('triangulos');
+    expect(wrapper.text()).toContain('in');
+    expect(wrapper.text()).toContain('out');
+    expect(wrapper.text()).toContain('code');
+    expect(wrapper.text()).toContain('diff');
+    expect(wrapper.get('[data-run-button]').exists()).toBe(true);
+    expect(wrapper.get('option[value="py3"]').exists()).toBe(true);
 
     wrapper.destroy();
   });
@@ -124,37 +107,31 @@ Here we can add code.
       attachTo: '#root',
       propsData: {
         problem,
+        acceptedLanguages: ['py3'],
+        preferredLanguage: 'py3',
+        canSubmit: false,
       },
     });
-    const contentWindow: Window = (wrapper.findComponent({ ref: 'grader' })
-      .element as HTMLIFrameElement).contentWindow as Window;
 
-    wrapper.vm.iframeLoaded();
-
-    const postPromise = new Promise<SetSettingsMessage>((accept) => {
-      contentWindow.postMessage = jest.fn(accept);
-    });
     const newAlias = 'sumas2';
     await wrapper.setProps({
       problem: {
         ...problem,
         alias: newAlias,
       },
+      acceptedLanguages: ['cpp17-gcc'],
+      preferredLanguage: 'cpp17-gcc',
+      canSubmit: true,
     });
-    const settingsMessage = await postPromise;
-    expect({
-      method: settingsMessage.method,
-      params: {
-        alias: settingsMessage.params.alias,
-        languages: settingsMessage.params.languages,
-      },
-    }).toEqual({
-      method: 'setSettings',
-      params: {
-        alias: newAlias,
-        languages: [],
-      },
-    });
+
+    expect(wrapper.text()).toContain('sumas2');
+    expect(wrapper.text()).toContain('in');
+    expect(wrapper.text()).toContain('out');
+    expect(wrapper.text()).toContain('code');
+    expect(wrapper.text()).toContain('diff');
+    expect(wrapper.get('[data-run-button]').exists()).toBe(true);
+    expect(wrapper.get('[data-submit-button]').exists()).toBe(true);
+    expect(wrapper.get('option[value="cpp17-gcc"]').exists()).toBe(true);
 
     wrapper.destroy();
   });

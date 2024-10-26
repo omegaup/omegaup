@@ -196,7 +196,7 @@
           >
           <a
             class="dropdown-item text-wrap"
-            href="https://omegaup.com/docs/assets/libroluisvargas.pdf"
+            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >

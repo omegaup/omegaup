@@ -207,7 +207,9 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
 - [Submission](#submission)
+  - [`/api/submission/list/`](#apisubmissionlist)
   - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
+  - [`/api/submission/setFeedbackList/`](#apisubmissionsetfeedbacklist)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -820,31 +822,31 @@ Creates a new contest
 
 ### Parameters
 
-| Name                        | Type           | Description |
-| --------------------------- | -------------- | ----------- |
-| `admission_mode`            | `mixed`        |             |
-| `alias`                     | `mixed`        |             |
-| `check_plagiarism`          | `bool\|null`   |             |
-| `contest_for_teams`         | `bool\|null`   |             |
-| `description`               | `mixed`        |             |
-| `feedback`                  | `mixed`        |             |
-| `finish_time`               | `mixed`        |             |
-| `languages`                 | `mixed`        |             |
-| `needs_basic_information`   | `bool\|null`   |             |
-| `penalty`                   | `mixed`        |             |
-| `penalty_calc_policy`       | `mixed`        |             |
-| `penalty_type`              | `mixed`        |             |
-| `points_decay_factor`       | `mixed`        |             |
-| `problems`                  | `null\|string` |             |
-| `requests_user_information` | `mixed`        |             |
-| `score_mode`                | `null\|string` |             |
-| `scoreboard`                | `mixed`        |             |
-| `show_scoreboard_after`     | `mixed`        |             |
-| `start_time`                | `mixed`        |             |
-| `submissions_gap`           | `mixed`        |             |
-| `teams_group_alias`         | `null\|string` |             |
-| `title`                     | `mixed`        |             |
-| `window_length`             | `int\|null`    |             |
+| Name                        | Type                                                       | Description |
+| --------------------------- | ---------------------------------------------------------- | ----------- |
+| `finish_time`               | `int`                                                      |             |
+| `start_time`                | `int`                                                      |             |
+| `submissions_gap`           | `int`                                                      |             |
+| `window_length`             | `int`                                                      |             |
+| `admission_mode`            | `'private'\|'public'\|'registration'\|null`                |             |
+| `alias`                     | `null\|string`                                             |             |
+| `check_plagiarism`          | `bool\|null`                                               |             |
+| `contest_for_teams`         | `bool\|null`                                               |             |
+| `description`               | `null\|string`                                             |             |
+| `feedback`                  | `'detailed'\|'none'\|'summary'\|null`                      |             |
+| `languages`                 | `null\|string`                                             |             |
+| `needs_basic_information`   | `bool\|null`                                               |             |
+| `penalty`                   | `int\|null`                                                |             |
+| `penalty_calc_policy`       | `'max'\|'sum'\|null`                                       |             |
+| `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
+| `points_decay_factor`       | `float\|null`                                              |             |
+| `problems`                  | `null\|string`                                             |             |
+| `requests_user_information` | `bool\|null`                                               |             |
+| `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
+| `scoreboard`                | `float\|null`                                              |             |
+| `show_scoreboard_after`     | `bool\|null`                                               |             |
+| `teams_group_alias`         | `null\|string`                                             |             |
+| `title`                     | `null\|string`                                             |             |
 
 ### Returns
 
@@ -912,16 +914,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type        | Description |
-| ---------------- | ----------- | ----------- |
-| `page`           | `int`       |             |
-| `page_size`      | `int`       |             |
-| `query`          | `string`    |             |
-| `tab_name`       | `string`    |             |
-| `active`         | `int\|null` |             |
-| `admission_mode` | `mixed`     |             |
-| `participating`  | `int\|null` |             |
-| `recommended`    | `int\|null` |             |
+| Name             | Type                                        | Description |
+| ---------------- | ------------------------------------------- | ----------- |
+| `page`           | `int`                                       |             |
+| `page_size`      | `int`                                       |             |
+| `query`          | `string`                                    |             |
+| `tab_name`       | `string`                                    |             |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |
+| `participating`  | `int\|null`                                 |             |
+| `recommended`    | `int\|null`                                 |             |
+| `sort_order`     | `null\|string`                              |             |
 
 ### Returns
 
@@ -1398,33 +1401,33 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                                                 | Description |
-| -------------------------------------------- | ---------------------------------------------------- | ----------- |
-| `contest_alias`                              | `string`                                             |             |
-| `finish_time`                                | `int`                                                |             |
-| `submissions_gap`                            | `int`                                                |             |
-| `window_length`                              | `int`                                                |             |
-| `admission_mode`                             | `null\|string`                                       |             |
-| `alias`                                      | `null\|string`                                       |             |
-| `check_plagiarism`                           | `bool\|null`                                         |             |
-| `contest_for_teams`                          | `bool\|null`                                         |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                         |             |
-| `description`                                | `null\|string`                                       |             |
-| `feedback`                                   | `mixed`                                              |             |
-| `languages`                                  | `mixed`                                              |             |
-| `needs_basic_information`                    | `bool\|null`                                         |             |
-| `penalty`                                    | `int\|null`                                          |             |
-| `penalty_calc_policy`                        | `mixed`                                              |             |
-| `penalty_type`                               | `mixed`                                              |             |
-| `points_decay_factor`                        | `float\|null`                                        |             |
-| `problems`                                   | `null\|string`                                       |             |
-| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                 |             |
-| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null` |             |
-| `scoreboard`                                 | `float\|null`                                        |             |
-| `show_scoreboard_after`                      | `bool\|null`                                         |             |
-| `start_time`                                 | `\OmegaUp\Timestamp\|null`                           |             |
-| `teams_group_alias`                          | `null\|string`                                       |             |
-| `title`                                      | `null\|string`                                       |             |
+| Name                                         | Type                                                       | Description |
+| -------------------------------------------- | ---------------------------------------------------------- | ----------- |
+| `contest_alias`                              | `string`                                                   |             |
+| `finish_time`                                | `int`                                                      |             |
+| `start_time`                                 | `int`                                                      |             |
+| `submissions_gap`                            | `int`                                                      |             |
+| `window_length`                              | `int`                                                      |             |
+| `admission_mode`                             | `null\|string`                                             |             |
+| `alias`                                      | `null\|string`                                             |             |
+| `check_plagiarism`                           | `bool\|null`                                               |             |
+| `contest_for_teams`                          | `bool\|null`                                               |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                                               |             |
+| `description`                                | `null\|string`                                             |             |
+| `feedback`                                   | `'detailed'\|'none'\|'summary'\|null`                      |             |
+| `languages`                                  | `null\|string`                                             |             |
+| `needs_basic_information`                    | `bool\|null`                                               |             |
+| `penalty`                                    | `int\|null`                                                |             |
+| `penalty_calc_policy`                        | `'max'\|'sum'\|null`                                       |             |
+| `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
+| `points_decay_factor`                        | `float\|null`                                              |             |
+| `problems`                                   | `null\|string`                                             |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
+| `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
+| `scoreboard`                                 | `float\|null`                                              |             |
+| `show_scoreboard_after`                      | `bool\|null`                                               |             |
+| `teams_group_alias`                          | `null\|string`                                             |             |
+| `title`                                      | `null\|string`                                             |             |
 
 ### Returns
 
@@ -1834,19 +1837,19 @@ API to Create an assignment
 
 ### Parameters
 
-| Name                 | Type           | Description |
-| -------------------- | -------------- | ----------- |
-| `course_alias`       | `string`       |             |
-| `alias`              | `mixed`        |             |
-| `assignment_type`    | `mixed`        |             |
-| `description`        | `mixed`        |             |
-| `finish_time`        | `mixed`        |             |
-| `name`               | `mixed`        |             |
-| `order`              | `int\|null`    |             |
-| `problems`           | `null\|string` |             |
-| `publish_time_delay` | `mixed`        |             |
-| `start_time`         | `mixed`        |             |
-| `unlimited_duration` | `bool\|null`   |             |
+| Name                 | Type                           | Description |
+| -------------------- | ------------------------------ | ----------- |
+| `alias`              | `string`                       |             |
+| `assignment_type`    | `'homework'\|'lesson'\|'test'` |             |
+| `course_alias`       | `string`                       |             |
+| `description`        | `string`                       |             |
+| `name`               | `string`                       |             |
+| `start_time`         | `\OmegaUp\Timestamp`           |             |
+| `finish_time`        | `\OmegaUp\Timestamp\|null`     |             |
+| `order`              | `int\|null`                    |             |
+| `problems`           | `null\|string`                 |             |
+| `publish_time_delay` | `int\|null`                    |             |
+| `unlimited_duration` | `bool\|null`                   |             |
 
 ### Returns
 
@@ -2173,7 +2176,7 @@ _Nothing_
 
 ### Description
 
-Request feedback
+Request feedback and its corresponding notification
 
 ### Parameters
 
@@ -2312,6 +2315,7 @@ Edit Course contents
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
+| `recommended`               | `bool\|null`                                |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `\OmegaUp\Timestamp\|null`                  |             |
@@ -2964,25 +2968,25 @@ Create a new problem
 | Name                      | Type           | Description |
 | ------------------------- | -------------- | ----------- |
 | `problem_alias`           | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 
@@ -3333,25 +3337,25 @@ Update problem contents
 | ------------------------- | -------------- | ----------- |
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
+| `redirect`                | `bool\|string` |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
-| `redirect`                | `mixed`        |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
 | `visibility`              | `null\|string` |             |
 
 ### Returns
@@ -3390,26 +3394,26 @@ Updates problem solution only
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
 | `solution`                | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
 | `lang`                    | `null\|string` |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 
@@ -3425,29 +3429,29 @@ Updates problem statement only
 
 | Name                      | Type           | Description |
 | ------------------------- | -------------- | ----------- |
+| `lang`                    | `string`       |             |
 | `message`                 | `string`       |             |
 | `problem_alias`           | `string`       |             |
 | `statement`               | `string`       |             |
-| `visibility`              | `string`       |             |
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
-| `extra_wall_time`         | `mixed`        |             |
+| `extra_wall_time`         | `int\|null`    |             |
 | `group_score_policy`      | `null\|string` |             |
-| `input_limit`             | `mixed`        |             |
-| `lang`                    | `mixed`        |             |
-| `languages`               | `mixed`        |             |
-| `memory_limit`            | `mixed`        |             |
-| `output_limit`            | `mixed`        |             |
-| `overall_wall_time_limit` | `mixed`        |             |
+| `input_limit`             | `int\|null`    |             |
+| `languages`               | `null\|string` |             |
+| `memory_limit`            | `int\|null`    |             |
+| `output_limit`            | `int\|null`    |             |
+| `overall_wall_time_limit` | `int\|null`    |             |
 | `problem_level`           | `null\|string` |             |
 | `selected_tags`           | `null\|string` |             |
 | `show_diff`               | `null\|string` |             |
 | `source`                  | `null\|string` |             |
-| `time_limit`              | `mixed`        |             |
+| `time_limit`              | `int\|null`    |             |
 | `title`                   | `null\|string` |             |
 | `update_published`        | `null\|string` |             |
 | `validator`               | `null\|string` |             |
-| `validator_time_limit`    | `mixed`        |             |
+| `validator_time_limit`    | `int\|null`    |             |
+| `visibility`              | `null\|string` |             |
 
 ### Returns
 
@@ -4134,11 +4138,33 @@ contestant's machine and the server.
 
 SubmissionController
 
+## `/api/submission/list/`
+
+### Description
+
+Returns a list of submissions in the last 24 hours
+for given page and username.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int\|null`    |             |
+| `pageSize` | `int\|null`    |             |
+| `username` | `string\|null` |             |
+
+### Returns
+
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `submissions` | `types.Submission[]` |
+
 ## `/api/submission/setFeedback/`
 
 ### Description
 
-Updates the admin feedback for a submission or creates the request feedback
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
 
 ### Parameters
 
@@ -4158,6 +4184,26 @@ Updates the admin feedback for a submission or creates the request feedback
 | -------------------------- | ------------------------------ |
 | `submissionFeedback`       | `dao.SubmissionFeedback`       |
 | `submissionFeedbackThread` | `dao.SubmissionFeedbackThread` |
+
+## `/api/submission/setFeedbackList/`
+
+### Description
+
+Updates the admin feedback for a submission or creates the request feedback,
+also it creates a notification
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback_list`    | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Tag
 
@@ -4654,22 +4700,25 @@ Gets extra information of the identity:
 - last password change request
 - verify status
 - birth date to verify the user identity
+- roles assigned to user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `usernameOrEmail` | `string` |             |
 
 ### Returns
 
-| Name              | Type      |
-| ----------------- | --------- |
-| `birth_date`      | `Date`    |
-| `last_login`      | `Date`    |
-| `username`        | `string`  |
-| `verified`        | `boolean` |
-| `within_last_day` | `boolean` |
+| Name              | Type       |
+| ----------------- | ---------- |
+| `birth_date`      | `Date`     |
+| `email`           | `string`   |
+| `last_login`      | `Date`     |
+| `roles`           | `string[]` |
+| `username`        | `string`   |
+| `verified`        | `boolean`  |
+| `within_last_day` | `boolean`  |
 
 ## `/api/user/generateGitToken/`
 

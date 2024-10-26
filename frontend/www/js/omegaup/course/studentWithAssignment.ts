@@ -86,8 +86,8 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(
                   isUpdate
-                    ? T.feedbackSuccesfullyUpdated
-                    : T.feedbackSuccesfullyAdded,
+                    ? T.feedbackSuccessfullyUpdated
+                    : T.feedbackSuccessfullyAdded,
                 );
                 viewStudent.refreshStudentProgress(
                   studentUsername,

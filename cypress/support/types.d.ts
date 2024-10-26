@@ -48,6 +48,8 @@ export interface ProblemOptions {
   problemLevelIndex: number;
   publicAccess?: boolean;
   firstTimeVisited?: boolean;
+  languagesValue?: string;
+  zipFile?: string;
 }
 
 export interface CourseOptions {
@@ -86,6 +88,8 @@ export interface ContestOptions {
   problems: Array<ProblemOptions>;
   runs: Array<RunOptions>;
   statusCheck?: boolean;
+  contestForTeams?: boolean;
+  teamGroupAlias?: string;
 }
 
 export interface RunOptions {

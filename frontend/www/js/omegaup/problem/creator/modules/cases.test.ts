@@ -16,6 +16,7 @@ describe('cases.ts', () => {
       autoPoints: true,
     };
     store.commit('casesStore/addCase', newCaseRequest);
+    newCase.points = 100;
     const groupID = store.state.casesStore.groups[0].groupID;
     const ungroupedGroup = generateGroup({
       name: newCase.name,
@@ -204,7 +205,7 @@ describe('cases.ts', () => {
     store.commit('casesStore/deleteGroup', newGroup.groupID);
     expect(store.state.casesStore.groups[1]).toBeUndefined();
   });
-  it('Should calculate case points based on how many groups are in the store', () => {
+  it('Should calculate the group points individually', () => {
     const newCase1 = generateCase({ name: 'case1' });
     const newCaseRequest1: CaseRequest = {
       ...newCase1,
@@ -220,10 +221,10 @@ describe('cases.ts', () => {
       autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest2);
-    expect(store.state.casesStore.groups[0].points).toBe(80);
+    expect(store.state.casesStore.groups[0].points).toBe(100);
     expect(store.state.casesStore.groups[1].points).toBe(20);
   });
-  it('Should not divide by 0. All groups are defined', () => {
+  it('Should modify the points if autoPoints is true', () => {
     const newCase1 = generateCase({
       name: 'case1',
     });
@@ -239,18 +240,25 @@ describe('cases.ts', () => {
     const newCaseRequest2: CaseRequest = {
       ...newCase2,
       points: 50,
-      autoPoints: true,
+      autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest2);
-    expect(store.state.casesStore.groups[0].points).toBe(50);
+    expect(store.state.casesStore.groups[0].points).toBe(100);
     expect(store.state.casesStore.groups[1].points).toBe(50);
   });
   it('Should not assign negative points', () => {
+    const newGroup = generateGroup({
+      name: 'group1',
+      points: 100,
+      autoPoints: true,
+    });
+    store.commit('casesStore/addGroup', newGroup);
     const newCase1 = generateCase({
       name: 'case1',
     });
     const newCaseRequest1: CaseRequest = {
       ...newCase1,
+      groupID: newGroup.groupID,
       points: 50,
       autoPoints: false,
     };
@@ -260,6 +268,7 @@ describe('cases.ts', () => {
     });
     const newCaseRequest2: CaseRequest = {
       ...newCase2,
+      groupID: newGroup.groupID,
       points: 70,
       autoPoints: false,
     };
@@ -269,13 +278,15 @@ describe('cases.ts', () => {
     });
     const newCaseRequest3: CaseRequest = {
       ...newCase3,
-      points: 0,
-      autoPoints: true,
+      groupID: newGroup.groupID,
+      points: 20,
+      autoPoints: false,
     };
     store.commit('casesStore/addCase', newCaseRequest3);
-    expect(store.state.casesStore.groups[0].points).toBe(50);
-    expect(store.state.casesStore.groups[1].points).toBe(70);
-    expect(store.state.casesStore.groups[2].points).toBe(0);
+    expect(store.state.casesStore.groups[0].points).toBe(140);
+    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
+    expect(store.state.casesStore.groups[0].cases[1].points).toBe(70);
+    expect(store.state.casesStore.groups[0].cases[2].points).toBe(20);
   });
   it('Should create multiple ungrouped cases', () => {
     const multipleCaseRequest: MultipleCaseAddRequest = {
@@ -355,9 +366,15 @@ describe('cases.ts', () => {
       caseID: newCase.caseID,
     });
     const lines: CaseLine[] = [
-      { lineID: uuid(), label: 'line1', data: { kind: 'line', value: '1' } },
       {
         lineID: uuid(),
+        caseID: newCase.caseID,
+        label: 'line1',
+        data: { kind: 'line', value: '1' },
+      },
+      {
+        lineID: uuid(),
+        caseID: newCase.caseID,
         label: 'line2',
         data: {
           kind: 'array',
@@ -365,7 +382,7 @@ describe('cases.ts', () => {
           max: 10,
           min: 1,
           size: 2,
-          value: [1, 2],
+          value: '1 2',
         },
       },
     ];
@@ -389,7 +406,8 @@ describe('cases.ts', () => {
     const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
     const lineToBeExpected: CaseLine = {
       lineID: lineID,
-      label: 'NEW',
+      caseID: store.state.casesStore.groups[0].cases[0].caseID,
+      label: '',
       data: { kind: 'line', value: '' },
     };
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(1);
@@ -420,7 +438,7 @@ describe('cases.ts', () => {
         max: 10,
         min: 1,
         size: 2,
-        value: [1, 2],
+        value: '1 2',
       },
     };
     store.dispatch('casesStore/updateLine', updatedLine);
@@ -445,5 +463,69 @@ describe('cases.ts', () => {
     const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
     store.dispatch('casesStore/deleteLine', lineID);
     expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(0);
+  });
+
+  it('should create and modify a layout', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      autoPoints: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+
+    const groupID = store.state.casesStore.groups[0].groupID;
+
+    store.commit('casesStore/addLayoutFromSelectedCase');
+    expect(store.state.casesStore.layouts.length).toBe(0);
+
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+
+    store.commit('casesStore/addLayoutFromSelectedCase');
+
+    const layoutID = store.state.casesStore.layouts[0].layoutID;
+    store.commit('casesStore/addNewLineInfoToLayout', layoutID);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'line',
+    );
+
+    const lineInfoID =
+      store.state.casesStore.layouts[0].caseLineInfos[0].lineInfoID;
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'multiline',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'multiline',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'array',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'array',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [
+      layoutID,
+      lineInfoID,
+      'matrix',
+    ]);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'matrix',
+    );
+
+    store.commit('casesStore/editLineInfoKind', [layoutID, lineInfoID, 'line']);
+    expect(store.state.casesStore.layouts[0].caseLineInfos[0].data.kind).toBe(
+      'line',
+    );
+
+    store.commit('casesStore/removeLineInfoFromLayout', [layoutID, lineInfoID]);
   });
 });
