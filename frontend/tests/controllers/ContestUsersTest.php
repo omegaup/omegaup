@@ -197,7 +197,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testContestDataForTypescript() {
+    public function testContestDataForTypeScript() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
