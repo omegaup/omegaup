@@ -1361,7 +1361,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param LimitsSettings $a
      * @param LimitsSettings $b
      */
-    private static function diffLimitsSettings(array $a, array $b): bool {
+    private static function diffLimitsSettings($a, $b): bool {
         if (
             self::parseDuration($a['TimeLimit']) !==
             self::parseDuration($b['TimeLimit'])
@@ -1401,7 +1401,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $a
      * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $b
      */
-    private static function diffProblemSettings(array $a, array $b): bool {
+    private static function diffProblemSettings($a, $b): bool {
         if (self::diffLimitsSettings($a['Limits'], $b['Limits'])) {
             return true;
         }
@@ -2320,7 +2320,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
@@ -4463,7 +4463,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['Validator']['Limit']
      */
     private static function updateProblemSettings(
-        array &$problemSettings,
+        &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
         if (!is_null($params->extraWallTime)) {
