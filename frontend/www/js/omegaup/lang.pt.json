@@ -855,6 +855,8 @@
 	"mustRegisterToJoinCourse": "voc\u00ea deve se registrar para entrar curso",
 	"mustUpdateBasicInfoToFilterUsers": "N\u00e3o \u00e9 poss\u00edvel utilizar os filtros de classifica\u00e7\u00e3o se as informa\u00e7\u00f5es do seu perfil n\u00e3o estiverem completas.",
 	"myproblemsListCreateProblem": "Criar Problema",
+	"myproblemsListCreateProblemWithExistingZipFile": "Eu tenho um arquivo zip",
+	"myproblemsListCreateZipFileProblem": "Criar arquivo zip",
 	"myproblemsListMyProblems": "Meus Problemas",
 	"navAlgorithmsBook": "Livro tutorial \"Problemas y Algoritmos\" de Luis Vargas",
 	"navAllCourses": "Todos os cursos",

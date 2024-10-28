@@ -118,13 +118,35 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
-            <a
+            <form
               v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
-              class="dropdown-item"
-              href="/problem/new/"
-              data-nav-problems-create
-              >{{ T.myproblemsListCreateProblem }}</a
+              class="collapse-submenu"
             >
+              <div class="btn-group">
+                <a
+                  class="dropdown-item"
+                  href="/problem/new/"
+                  data-nav-problems-create
+                  >{{ T.myproblemsListCreateProblem }}</a
+                >
+                <button
+                  type="button"
+                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
+                ></button>
+              </div>
+              <div class="collapse collapse-links pl-3">
+                <a class="dropdown-item" href="/problem/creator/">{{
+                  T.myproblemsListCreateZipFileProblem
+                }}</a>
+                <a class="dropdown-item" href="/problem/new/">{{
+                  T.myproblemsListCreateProblemWithExistingZipFile
+                }}</a>
+              </div>
+            </form>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
             }}</a>
