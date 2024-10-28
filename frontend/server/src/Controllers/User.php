@@ -1564,6 +1564,13 @@ class User extends \OmegaUp\Controllers\Controller {
                 'Identity'
             );
         }
+            if (self::shouldUserInformationBeHidden($r->identity, $identity, null)) {
+        // For private profiles, send a different object
+               return self::getPrivateUserProfile($identity);
+          } else {
+        // For public profiles, send a different object
+            return self::getPublicUserProfile($r, $identity, $category);
+        }
         return self::getUserProfile(
             $r->identity,
             $identity,
