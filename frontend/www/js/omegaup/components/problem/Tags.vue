@@ -243,7 +243,14 @@ export default class ProblemTags extends Vue {
 
   publicTagsSerializer(tagname: string): string {
     if (Object.prototype.hasOwnProperty.call(T, tagname)) {
-      return T[tagname];
+      let complete = `${T[tagname]} ( ${this.removeSpecialCharacters(
+        T[tagname],
+      )})`;
+      return `${
+        this.removeSpecialCharacters(T[tagname]).includes(T[tagname])
+          ? T[tagname]
+          : complete
+      }`;
     }
     return tagname;
   }
@@ -259,6 +266,16 @@ export default class ProblemTags extends Vue {
       this.title,
       newValue,
     );
+  }
+
+  removeSpecialCharacters(cadena: string): string {
+    let de = 'ÁÃÀÄÂÉËÈÊÍÏÌÎÓÖÒÔÚÜÙÛÑÇáãàäâéëèêíïìîóöòôúüùûñç',
+      a = 'AAAAAEEEEIIIIOOOOUUUUNCaaaaaeeeeiiiioooouuuunc',
+      re = new RegExp('[' + de + ']', 'ug');
+
+    cadena = cadena.replace(re, (match) => a.charAt(de.indexOf(match)));
+
+    return cadena;
   }
 }
 </script>
