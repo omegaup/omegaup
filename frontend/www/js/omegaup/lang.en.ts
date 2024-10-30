@@ -968,7 +968,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleParentalVerificationToken: "Parental verification token",
   omegaupTitlePrivacyPolicy: "Privacy Policy",
   omegaupTitleProblem: "Problem",
-  omegaupTitleProblemCreator: "Problem Creator",
+  omegaupTitleProblemCreator: "Problem creator",
   omegaupTitleProblemEdit: "Edit problem",
   omegaupTitleProblemNew: "New problem",
   omegaupTitleProblemPrint: "Problem (Print mode) - %(problemTitle)",

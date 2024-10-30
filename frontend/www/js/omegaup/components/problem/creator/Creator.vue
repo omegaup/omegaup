@@ -1,20 +1,36 @@
 <template>
   <b-container fluid="lg">
-    <creator-header
-      @download-zip-file="(zipObject) => $emit('download-zip-file', zipObject)"
-      @upload-zip-file="populateProps"
-    />
-    <creator-tabs
-      :code-prop="codeProp"
-      :extension-prop="extensionProp"
-      :current-solution-markdown-prop="currentSolutionMarkdownProp"
-      :current-markdown-prop="currentMarkdownProp"
-      @show-update-success-message="() => $emit('show-update-success-message')"
-      @download-zip-file="(zipObject) => $emit('download-zip-file', zipObject)"
-      @download-input-file="
-        (fileObject) => $emit('download-input-file', fileObject)
-      "
-    />
+    <b-row>
+      <b-col>
+        <b-card
+          header-bg-variant="primary"
+          header-text-variant="white"
+          :header="T.omegaupTitleProblemCreator"
+        >
+          <creator-header
+            @download-zip-file="
+              (zipObject) => $emit('download-zip-file', zipObject)
+            "
+            @upload-zip-file="populateProps"
+          />
+          <creator-tabs
+            :code-prop="codeProp"
+            :extension-prop="extensionProp"
+            :current-solution-markdown-prop="currentSolutionMarkdownProp"
+            :current-markdown-prop="currentMarkdownProp"
+            @show-update-success-message="
+              () => $emit('show-update-success-message')
+            "
+            @download-zip-file="
+              (zipObject) => $emit('download-zip-file', zipObject)
+            "
+            @download-input-file="
+              (fileObject) => $emit('download-input-file', fileObject)
+            "
+          />
+        </b-card>
+      </b-col>
+    </b-row>
   </b-container>
 </template>
 
