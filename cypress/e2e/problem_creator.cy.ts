@@ -1,6 +1,7 @@
 import { LoginOptions } from '../support/types';
 import T from '../../frontend/www/js/omegaup/lang';
 import { problemCreatorPage } from '../support/pageObjects/problemCreatorPage';
+import { profilePage } from '../support/pageObjects/profilePage';
 
 describe('Problem creator Test', () => {
   const loginOptions: LoginOptions = {
@@ -12,12 +13,15 @@ describe('Problem creator Test', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
+    cy.login(loginOptions);
+    profilePage.updatePreferredLanguage('es');
+    cy.logout();
   });
 
   it('Should write and verify the problem statement', () => {
     cy.login(loginOptions);
 
-    cy.visit('/problem/creator/');
+    problemCreatorPage.visit();
 
     cy.get('[data-problem-creator-tab="statement"]').click();
 
@@ -33,7 +37,7 @@ describe('Problem creator Test', () => {
   it('Should write and verify the problem solution', () => {
     cy.login(loginOptions);
 
-    cy.visit('/problem/creator/');
+    problemCreatorPage.visit();
 
     cy.get('[data-problem-creator-tab="solution"]').click();
 
@@ -51,7 +55,7 @@ describe('Problem creator Test', () => {
   it('Should upload and verify the problem code', () => {
     cy.login(loginOptions);
 
-    cy.visit('/problem/creator/');
+    problemCreatorPage.visit();
 
     cy.get('[data-problem-creator-tab="code"]').click();
 
@@ -75,7 +79,7 @@ describe('Problem creator Test', () => {
   it('Should add groups, cases and multiple cases', () => {
     cy.login(loginOptions);
 
-    cy.visit('/problem/creator/');
+    problemCreatorPage.visit();
 
     cy.get('[data-problem-creator-tab="cases"]').click();
 
@@ -138,7 +142,7 @@ describe('Problem creator Test', () => {
   it('Should add and edit layouts', () => {
     cy.login(loginOptions);
 
-    cy.visit('/problem/creator/');
+    problemCreatorPage.visit();
 
     cy.get('[data-problem-creator-tab="cases"]').click();
 
@@ -165,9 +169,9 @@ describe('Problem creator Test', () => {
       { type: 'line', text: T.problemCreatorLineLine },
     ];
 
-    for (const caseType of caseTypes) {
+    caseTypes.forEach(() => {
       cy.get('[data-edit-case-add-line]').click();
-    }
+    });
 
     problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
       lineCases.forEach((lineCase) => {

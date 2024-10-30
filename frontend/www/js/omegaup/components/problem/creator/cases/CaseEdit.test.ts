@@ -711,7 +711,7 @@ describe('CaseEdit.vue', () => {
 
     // There are two dropdown items for multiline, one for each line.
     const fragment = 'multiline';
-    const filteredDropdowns = dropdownsMultiline.filter(node => {
+    const filteredDropdowns = dropdownsMultiline.filter((node) => {
       const nodeAttribute = node.attributes('data-array-modal-dropdown-kind');
       return nodeAttribute?.includes(fragment);
     });

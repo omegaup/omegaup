@@ -31,6 +31,12 @@ export class ProblemCreatorPage {
     cy.get(`[data-${type}-modal-generate]`).click();
     cy.get('button[class="btn btn-success"]').eq(0).click();
   }
+
+  visit(): void {
+    cy.get('[data-nav-problems]').click();
+    cy.get('[data-nav-problems-create-options]').click();
+    cy.get('a[href="/problem/creator/"]').click();
+  }
 }
 
 export const problemCreatorPage = new ProblemCreatorPage();

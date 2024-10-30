@@ -18,6 +18,13 @@ export class ProfilePage {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preference-language]').select(preferredLanguage);
+    cy.get('[data-preference-save-button]').click();
+  }
+  updatePreferredProgrammingLanguage(preferredLanguage: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preferred-language]').select(preferredLanguage);
     cy.get('[data-preference-save-button]').click();
   }

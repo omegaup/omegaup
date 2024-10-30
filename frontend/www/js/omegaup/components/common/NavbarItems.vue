@@ -134,6 +134,7 @@
                   class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
                   data-toggle="collapse"
                   data-target=".collapse-links"
+                  data-nav-problems-create-options
                   aria-expanded="false"
                   aria-controls="collapse-links"
                 ></button>
