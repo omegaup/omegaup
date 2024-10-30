@@ -1,5 +1,6 @@
 import { LoginOptions } from '../support/types';
 import T from '../../frontend/www/js/omegaup/lang';
+import { problemCreatorPage } from '../support/pageObjects/problemCreatorPage';
 
 describe('Problem creator Test', () => {
   const loginOptions: LoginOptions = {
@@ -155,30 +156,29 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-sidebar-groups="ungrouped"]').click();
 
-    cy.get('[data-sidebar-cases="ungrouped"]').click();
+    cy.get('[data-sidebar-cases-ungrouped]').first().click();
 
-    cy.get('[data-edit-case-add-line]').click();
-    cy.get('[data-edit-case-add-line]').click();
-    cy.get('[data-edit-case-add-line]').click();
-    cy.get('[data-edit-case-add-line]').click();
+    const caseTypes = [
+      { type: 'multiline', text: T.problemCreatorLineMultiline },
+      { type: 'array', text: T.problemCreatorLineArray },
+      { type: 'matrix', text: T.problemCreatorLineMatrix },
+      { type: 'line', text: T.problemCreatorLineLine },
+    ];
 
-    cy.get('[data-array-modal-dropdown]').eq(0).click();
-    cy.get('[data-array-modal-dropdown="multiline"]').eq(0).click();
+    for (const caseType of caseTypes) {
+      cy.get('[data-edit-case-add-line]').click();
+    }
 
-    cy.get('[data-array-modal-dropdown]').eq(5).click();
-    cy.get('[data-array-modal-dropdown="array"]').eq(1).click();
-    cy.get('[data-line-edit-button]').eq(0).click();
+    problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+      lineCases.forEach((lineCase) => {
+        cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`).click();
+        cy.get(
+          `[data-array-modal-dropdown-kind="${lineCase.id}-${lineCase.type}"]`,
+        ).click();
 
-    cy.get('[data-array-modal-generate]').click();
-
-    cy.get('button[class="btn btn-success"]').eq(0).click();
-
-    cy.get('[data-array-modal-dropdown]').eq(10).click();
-    cy.get('[data-array-modal-dropdown="matrix"]').eq(2).click();
-    cy.get('[data-line-edit-button]').eq(1).click();
-
-    cy.get('[data-matrix-modal-generate]').click();
-    cy.get('button[class="btn btn-success"]').eq(0).click();
+        problemCreatorPage.fillInformationForCaseType(lineCase);
+      });
+    });
 
     cy.get('[data-toggle-layout-sidebar]').click();
 
@@ -196,36 +196,24 @@ describe('Problem creator Test', () => {
 
     cy.get('[data-toggle-layout-sidebar]').click();
 
-    cy.get('button.dropdown-toggle-split').eq(1).click();
+    cy.get('[data-layout-dropdown]>button.dropdown-toggle-split').click();
     cy.get('[data-layout-dropdown-enforce-to-all]').click();
 
     cy.get('[data-toggle-layout-sidebar]').click();
 
-    cy.get('[data-sidebar-cases="ungrouped"]').eq(1).click();
+    cy.get('[data-sidebar-cases-ungrouped]').last().click();
 
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(0)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineMultiline);
-
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(1)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineArray);
-
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(2)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineMatrix);
-
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(3)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineLine);
+    problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+      lineCases.forEach((lineCase) => {
+        cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+          .find('button.dropdown-toggle')
+          .should('contain.text', lineCase.text);
+      });
+    });
 
     cy.get('[data-toggle-layout-sidebar]').click();
 
-    cy.get('button.dropdown-toggle-split').eq(1).click();
+    cy.get('[data-layout-dropdown]>button.dropdown-toggle-split').click();
     cy.get('[data-layout-dropdown-copy]').click();
 
     cy.get('[data-layout-dropdown]').eq(1).click();
@@ -233,21 +221,34 @@ describe('Problem creator Test', () => {
     cy.get('[data-line-info-dropdown]').eq(4).click();
     cy.get('[data-line-info-dropdown-item="array"]').eq(4).click();
 
-    cy.get('button.dropdown-toggle-split').eq(2).click();
+    cy.get('button.dropdown-toggle-split').eq(3).click();
     cy.get('[data-layout-dropdown-enforce-to-selected]').eq(1).click();
 
-    cy.get('[data-sidebar-cases="ungrouped"]').eq(0).click();
+    cy.get('[data-sidebar-cases-ungrouped]').first().click();
 
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(0)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineMultiline);
+    problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+      lineCases.forEach((lineCase) => {
+        cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+          .find('button.dropdown-toggle')
+          .should('contain.text', lineCase.text);
+      });
+    });
 
-    cy.get('[data-sidebar-cases="ungrouped"]').eq(1).click();
+    cy.get('[data-sidebar-cases-ungrouped]').last().click();
 
-    cy.get('[data-array-modal-dropdown=""]')
-      .eq(0)
-      .find('button.dropdown-toggle')
-      .should('contain.text', T.problemCreatorLineArray);
+    const caseTypesUpdated = [
+      { type: 'multiline', text: T.problemCreatorLineArray },
+      { type: 'array', text: T.problemCreatorLineArray },
+      { type: 'matrix', text: T.problemCreatorLineMatrix },
+      { type: 'line', text: T.problemCreatorLineLine },
+    ];
+
+    problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
+      lineCases.forEach((lineCase) => {
+        cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+          .find('button.dropdown-toggle')
+          .should('contain.text', lineCase.text);
+      });
+    });
   });
 });
