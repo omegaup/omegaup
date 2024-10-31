@@ -6,7 +6,15 @@
   >
     <div class="form-group">
       <label>{{ T.username }}</label>
-      <input v-model="username" data-username class="form-control" />
+      <input
+        v-model="username"
+        data-username
+        class="form-control"
+        :class="{ 'is-invalid': !isValidUsername }"
+      />
+      <div v-if="!isValidUsername" class="invalid-feedback">
+        {{ T.userEditUsernameNoSpaces }}
+      </div>
     </div>
     <div class="form-group">
       <label>{{ T.wordsName }}</label>
@@ -118,7 +126,18 @@ export default class UserBasicInformationEdit extends Vue {
     return subdivisions;
   }
 
+  get isValidUsername(): boolean {
+    return !this.username.includes(' ');
+  }
+
   onUpdateUserBasicInformation(): void {
+    if (!this.isValidUsername) {
+      this.$emit('update-user-basic-information-error', {
+        description: T.userEditUsernameNoSpaces,
+      });
+      return;
+    }
+
     if (this.name && this.name.length > 50) {
       this.$emit('update-user-basic-information-error', {
         description: T.userEditNameTooLong,
@@ -146,3 +165,16 @@ export default class UserBasicInformationEdit extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.is-invalid {
+  border-color: var(--danger) !important;
+}
+
+.invalid-feedback {
+  display: block;
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+</style>

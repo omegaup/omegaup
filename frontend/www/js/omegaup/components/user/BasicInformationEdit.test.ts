@@ -140,4 +140,26 @@ describe('BasicInformationEdit.vue', () => {
       ],
     ]);
   });
+
+  it('Should show error when username contains spaces', async () => {
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: basicInformationEditProps,
+    });
+
+    await wrapper.find('input[data-username]').setValue('invalid username');
+    await wrapper.find('button[type="submit"]').trigger('submit');
+
+    expect(
+      wrapper.emitted('update-user-basic-information-error'),
+    ).toBeDefined();
+    expect(wrapper.emitted('update-user-basic-information-error')).toEqual([
+      [
+        {
+          description: T.userEditUsernameNoSpaces,
+        },
+      ],
+    ]);
+    
+    expect(wrapper.find('input[data-username]').classes()).toContain('is-invalid');
+  });
 });
