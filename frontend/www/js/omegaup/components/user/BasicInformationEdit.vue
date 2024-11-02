@@ -13,7 +13,7 @@
         :class="{ 'is-invalid': !isValidUsername }"
       />
       <div v-if="!isValidUsername" class="invalid-feedback">
-        {{ T.userEditUsernameNoSpaces }}
+        {{ T.parameterInvalidAlias }}
       </div>
     </div>
     <div class="form-group">
@@ -127,13 +127,17 @@ export default class UserBasicInformationEdit extends Vue {
   }
 
   get isValidUsername(): boolean {
-    return !this.username.includes(' ');
+    if (!this.username || this.username.length < 2) {
+      return false;
+    }
+    // Using the same regex pattern as the server
+    return !/[^a-zA-Z0-9_.-]/.test(this.username);
   }
 
   onUpdateUserBasicInformation(): void {
     if (!this.isValidUsername) {
       this.$emit('update-user-basic-information-error', {
-        description: T.userEditUsernameNoSpaces,
+        description: T.parameterInvalidAlias,
       });
       return;
     }
@@ -165,16 +169,3 @@ export default class UserBasicInformationEdit extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.is-invalid {
-  border-color: var(--danger) !important;
-}
-
-.invalid-feedback {
-  display: block;
-  color: var(--danger);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-</style>

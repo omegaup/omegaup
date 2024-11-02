@@ -141,25 +141,31 @@ describe('BasicInformationEdit.vue', () => {
     ]);
   });
 
-  it('Should show error when username contains spaces', async () => {
+  it('Should show error when username is invalid', async () => {
     const wrapper = mount(user_Basic_Information_Edit, {
       propsData: basicInformationEditProps,
     });
 
-    await wrapper.find('input[data-username]').setValue('invalid username');
+    // Test invalid characters
+    await wrapper.find('input[data-username]').setValue('invalid@username');
     await wrapper.find('button[type="submit"]').trigger('submit');
-
-    expect(
-      wrapper.emitted('update-user-basic-information-error'),
-    ).toBeDefined();
     expect(wrapper.emitted('update-user-basic-information-error')).toEqual([
-      [
-        {
-          description: T.userEditUsernameNoSpaces,
-        },
-      ],
+      [{ description: T.parameterInvalidAlias }],
     ]);
-    
-    expect(wrapper.find('input[data-username]').classes()).toContain('is-invalid');
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
+
+    // Test too short username
+    await wrapper.find('input[data-username]').setValue('a');
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
+
+    // Test empty username
+    await wrapper.find('input[data-username]').setValue('');
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
   });
 });
