@@ -5,6 +5,9 @@
         :show-window="shouldShowAddWindow"
         @open-add-window="openAddWindow"
         @open-case-edit-window="openCaseEditWindow"
+        @download-zip-file="
+          (zipObject) => $emit('download-zip-file', zipObject)
+        "
       />
     </b-col>
     <b-col>
@@ -15,6 +18,9 @@
       />
       <omegaup-problem-creator-cases-case-edit
         v-if="shouldShowCaseEditWindow"
+        @download-input-file="
+          (fileObject) => $emit('download-input-file', fileObject)
+        "
       />
     </b-col>
   </b-row>

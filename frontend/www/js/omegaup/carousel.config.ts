@@ -71,31 +71,6 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/carousel_slide_4.svg',
-    title: {
-      en: 'Solve a new problem every week',
-      es: 'Resuelve un problema nuevo cada semana',
-      pt: 'Resolva um novo problema a cada semana',
-    },
-    description: {
-      en:
-        'Enroll in the "Solving problems in omegaUp 2022" course, learn tips about programming contests and earn prizes.',
-      es:
-        'Únete al curso "Resolviendo problemas en omegaUp 2022", aprende tips sobre concursos de programación y gana premios.',
-      pt:
-        'Inscreva-se no curso "Resolvendo problemas no omegaUp 2022", aprenda dicas sobre concursos de programação e ganhe prêmios.',
-    },
-    button: {
-      text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
-      },
-      href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
-      target: '_self',
-    },
-  },
-  {
     image: '/media/homepage/discord_logo.svg',
     title: {
       en: 'Join our coders community',

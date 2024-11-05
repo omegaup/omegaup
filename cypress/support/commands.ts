@@ -10,7 +10,7 @@ import {
   Status,
 } from './types';
 
-const MAX_TIMEOUT_TO_WAIT = 10000;
+// const MAX_TIMEOUT_TO_WAIT = 10000;
 
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
@@ -71,6 +71,8 @@ Cypress.Commands.add(
     problemLevelIndex,
     publicAccess = false,
     firstTimeVisited = true,
+    languagesValue,
+    zipFile = 'testproblem.zip',
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
@@ -86,15 +88,18 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
-    cy.get('[name="problem_contents"]').attachFile('testproblem.zip');
+    cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
+    if (languagesValue === 'cat') {
+      cy.get('select[name="languages"]').should('exist').select(languagesValue);
+    }
     // Tags panel
     cy.waitUntil(() =>
       cy
         .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
-        .click(),
+        .click({ force: true }),
     );
 
     if (publicAccess) {
@@ -193,6 +198,8 @@ Cypress.Commands.add(
       requestParticipantInformation = 'no',
       differentStart = false,
       differentStartTime = '',
+      contestForTeams = false,
+      teamGroupAlias = '',
     },
     shouldShowIntro: boolean = true,
   ) => {
@@ -220,6 +227,11 @@ Cypress.Commands.add(
     cy.get('[data-request-user-information]').select(
       requestParticipantInformation,
     ); // no | optional | required
+    if (contestForTeams) {
+      cy.get('[data-contest-for-teams]').click();
+      cy.get('.tags-input input[type="text"]').first().type(teamGroupAlias);
+      cy.get('.typeahead-dropdown li').first().click();
+    }
     cy.get('button[type="submit"]').click();
   },
 );
@@ -228,32 +240,9 @@ Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
   cy.visit(`contest/${contestAlias}/edit/`);
   cy.get('a.nav-link.problems').click();
 
-  cy.intercept({
-    method: 'POST',
-    url: '/api/problem/listForTypeahead/',
-    times: 100,
-  }).as('problemListForTypeahead');
-
   for (const idx in problems) {
-    const typeChunks = problems[idx].problemAlias.split('-');
-    // print the problem alias
-    cy.log(`Adding problem ${problems[idx].problemAlias}`);
-    // type the problem alias
-    cy.waitUntil(() =>
-      cy
-        .get('.tags-input input[type="text"]')
-        .type(typeChunks[0])
-        .type('-')
-        .type(typeChunks[1]),
-    );
-    cy.clock().tick(510);
-    // After the user types, we should wait until the autocomplete is visible
-    cy.wait(['@problemListForTypeahead'], { timeout: MAX_TIMEOUT_TO_WAIT * 10 })
-      .its('response.statusCode')
-      .should('eq', 200);
-
+    cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
     cy.get('.typeahead-dropdown li').first().click();
-
     cy.get('.add-problem').click();
   }
 });

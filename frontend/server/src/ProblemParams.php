@@ -2,7 +2,7 @@
 
 namespace OmegaUp;
 
-class ProblemParams {
+class ProblemParams extends BaseParams {
     // Constants for problem visibility.
     const VISIBILITY_DELETED = -10; // Problem that was logically deleted by its owner
     const VISIBILITY_PRIVATE_BANNED = -3; // Problem that was private before it was banned
@@ -44,6 +44,15 @@ class ProblemParams {
     const SHOW_DIFFS_EXAMPLES = 'examples';
     const SHOW_DIFFS_ALL = 'all';
 
+    // Group score policy
+    const GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO = 'sum-if-not-zero';
+    const GROUP_SCORE_POLICY_MIN = 'min';
+
+    const VALID_GROUP_SCORE_POLICY_VALUES = [
+        self::GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO,
+        self::GROUP_SCORE_POLICY_MIN,
+    ];
+
     /**
      * @readonly
      * @var string
@@ -63,7 +72,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var null|list<string>
+     * @var null|string
      */
     public $languages;
 
@@ -171,7 +180,7 @@ class ProblemParams {
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, group_score_policy?: string, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, group_score_policy?: string, input_limit?: int, languages?: string, memory_limit?: int|null, order?: string, output_limit?: int|null, overall_wall_time_limit?: int|null, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int|null, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int|null, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
         $isUpdate = !$isRequired;
@@ -205,7 +214,7 @@ class ProblemParams {
             \OmegaUp\Validators::validateInEnum(
                 $params['group_score_policy'],
                 'group_score_policy',
-                ['sum-if-not-zero', 'min']
+                self::VALID_GROUP_SCORE_POLICY_VALUES
             );
         }
         if (isset($params['validator'])) {
@@ -278,12 +287,7 @@ class ProblemParams {
         $this->problemAlias = $params['problem_alias'];
         $this->title = $params['title'] ?? null;
         $this->visibility = $params['visibility'] ?? null;
-        $this->languages = isset(
-            $params['languages']
-        ) ? explode(
-            ',',
-            $params['languages']
-        ) : null;
+        $this->languages = $params['languages'] ?? null;
         $this->updatePublished = $params['update_published'] ?? \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
         $this->problemLevel = $params['problem_level'] ?? null;
         $this->selectedTagsAsJSON = $params['selected_tags'] ?? null;
@@ -300,59 +304,7 @@ class ProblemParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->order = $params['order'] ?? 'normal';
         $this->showDiff = $params['show_diff'] ?? 'none';
-        $this->groupScorePolicy = $params['group_score_policy'] ?? null;
-    }
-
-    /**
-     * Update properties of $object based on what is provided in this class.
-     *
-     * @param object $object
-     * @param array<int|string, string|array{transform?: callable(mixed):mixed, important?: bool, alias?: string}> $properties
-     * @return bool True if there were changes to any property marked as 'important'.
-     */
-    public function updateValueParams(
-        object $object,
-        array $properties
-    ): bool {
-        $importantChange = false;
-        foreach ($properties as $source => $info) {
-            /** @var null|callable(mixed):mixed */
-            $transform = null;
-            $important = false;
-            if (is_int($source)) {
-                $thisFieldName = $info;
-                $objectFieldName = $info;
-            } else {
-                $thisFieldName = $source;
-                if (isset($info['transform'])) {
-                    $transform = $info['transform'];
-                }
-                if (isset($info['important']) && $info['important'] === true) {
-                    $important = $info['important'];
-                }
-                if (!empty($info['alias'])) {
-                    $objectFieldName = $info['alias'];
-                } else {
-                    $objectFieldName = $thisFieldName;
-                }
-            }
-            // Get or calculate new value.
-            /** @var null|mixed */
-            $value = $this->$thisFieldName;
-            if (is_null($value)) {
-                continue;
-            }
-            if (!is_null($transform)) {
-                /** @var mixed */
-                $value = $transform($value);
-            }
-            // Important property, so check if it changes.
-            if ($important && !$importantChange) {
-                $importantChange = ($value != $object->$objectFieldName);
-            }
-            $object->$objectFieldName = $value;
-        }
-        return $importantChange;
+        $this->groupScorePolicy = $params['group_score_policy'] ?? self::GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO;
     }
 
     /**

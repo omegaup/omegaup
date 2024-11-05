@@ -9,7 +9,7 @@
           :is-admin="data.admin"
         ></slot>
         <div class="source_code">
-          <h3>{{ T.wordsSource }}</h3>
+          <h3>{{ T.wordsCode }}</h3>
           <a v-if="data.source_link" download="data.zip" :href="data.source">{{
             T.wordsDownload
           }}</a>
@@ -181,7 +181,9 @@
       </form>
     </div>
     <div v-else>
-      <clip-loader :color="'#678dd7'" :size="'3rem'"></clip-loader>
+      <div class="spinner-border text-info big" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
     </div>
   </omegaup-overlay-popup>
 </template>
@@ -192,7 +194,6 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
 import { ArenaCourseFeedback } from './Feedback.vue';
 import arena_FeedbackCodeView from './FeedbackCodeView.vue';
 
@@ -214,7 +215,6 @@ const EMPTY_FIELD = '∅';
 @Component({
   components: {
     FontAwesomeIcon,
-    'clip-loader': ClipLoader,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-arena-feedback-code-view': arena_FeedbackCodeView,
@@ -289,3 +289,10 @@ export default class ArenaRunDetailsPopup extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.big {
+  height: 3rem;
+  width: 3rem;
+}
+</style>

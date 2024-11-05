@@ -8,6 +8,7 @@
         <div class="col-sm-4">
           <select
             v-model="selectedLanguage"
+            data-problem-creator-code-language
             class="form-control"
             name="language"
           >
@@ -27,6 +28,7 @@
           <div class="h-100">
             <omegaup-creator-code-view
               v-model="code"
+              data-problem-creator-code-editor
               :language="selectedLanguage"
               :readonly="false"
               @change-language="handleChangeLanguage($event)"
@@ -40,6 +42,7 @@
         </label>
         <div class="col-sm-7">
           <input
+            data-problem-creator-code-input
             class="w-100"
             type="file"
             name="file"
@@ -59,12 +62,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import creator_CodeView from '../../../arena/CodeView.vue';
-import { LanguageInfo, supportedLanguages } from '../../../../graderv2/util';
+import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
 
 @Component({
   components: {
@@ -72,13 +75,50 @@ import { LanguageInfo, supportedLanguages } from '../../../../graderv2/util';
   },
 })
 export default class CodeTab extends Vue {
+  @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
+  @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
+
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
   ui = ui;
   omegaup = omegaup;
-  selectedLanguage = '';
-  code = '';
-  extension = '';
+  selectedLanguage = T.problemCreatorEmpty;
+  codeInternal = T.problemCreatorEmpty;
+  extensionInternal = T.problemCreatorEmpty;
+
+  get code(): string {
+    return this.codeInternal;
+  }
+  set code(newCode: string) {
+    this.codeInternal = newCode;
+  }
+
+  get extension(): string {
+    return this.extensionInternal;
+  }
+  set extension(newExtension: string) {
+    this.extensionInternal = newExtension;
+  }
+
+  @Watch('codeProp')
+  onCodePropChanged() {
+    this.code = this.codeProp;
+  }
+
+  @Watch('extensionProp')
+  onextensionPropChanged() {
+    if (
+      this.extensionProp &&
+      this.allowedExtensions.includes(this.extensionProp)
+    ) {
+      const languageInfo = Object.values(supportedLanguages).find(
+        (language) => language.extension === this.extensionProp,
+      );
+      if (languageInfo) {
+        this.selectedLanguage = languageInfo.language;
+      }
+    }
+  }
 
   get allowedLanguages(): omegaup.Languages {
     let allowedLanguages: omegaup.Languages = {};

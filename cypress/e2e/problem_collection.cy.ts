@@ -1,4 +1,3 @@
-import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { problemPage } from '../support/pageObjects/problemPage';
 import { profilePage } from '../support/pageObjects/profilePage';
@@ -50,10 +49,7 @@ describe('Problem Collection Test', () => {
     cy.logout();
   });
 
-  // Unskip this test when the following issue is fixed
-  // https://github.com/omegaup/omegaup/issues/7218
-
-  it.skip('Should add additional tags to a problem as admin', () => {
+  it('Should add additional tags to a problem as admin', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = problemPage.generateProblemOptions(1);
     problemOptions[0].problemLevelIndex = 5;
@@ -101,7 +97,6 @@ describe('Problem Collection Test', () => {
     cy.logout();
   });
 
-
   it('Should be able to remove problems with no submissions', () => {
     const numberOfProblems = 3;
     const numberOfUsers = 1;
@@ -130,7 +125,9 @@ describe('Problem Collection Test', () => {
 
     // Delete problems in batch
     const problemAliases = problemOptions
-      .filter((problem) => problem.problemAlias !== problemOptions[0].problemAlias)
+      .filter(
+        (problem) => problem.problemAlias !== problemOptions[0].problemAlias,
+      )
       .map((problem) => problem.problemAlias);
     profilePage.deleteProblemsInBatch(problemAliases);
 

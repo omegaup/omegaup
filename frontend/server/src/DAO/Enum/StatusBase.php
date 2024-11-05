@@ -9,6 +9,8 @@ namespace OmegaUp\DAO\Enum;
  * and getting the corresponding SQL snippet for them.
  */
 class StatusBase {
+    public const NAME_FOR_STATUS = [];
+
     /**
      * @param int|string $status Numeric or named constant.
      * @return null|int value on success, null otherwise.
@@ -68,6 +70,31 @@ class StatusBase {
             ];
         }
         return self::$_constCache[$className];
+    }
+
+    public static function convertToInt(
+        string $fieldName,
+        ?string $field,
+        int $defaultValue
+    ): int {
+        if (is_null($field)) {
+            return $defaultValue;
+        }
+        $index = array_search($field, static::NAME_FOR_STATUS);
+        if ($index === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $fieldName
+            );
+        }
+        $convertedValue = static::getIntValue($index);
+        if (is_null($convertedValue)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $fieldName
+            );
+        }
+        return $convertedValue;
     }
 
     /** @var array<string, array{constants: array<string, int>, min: int, max: int}> */

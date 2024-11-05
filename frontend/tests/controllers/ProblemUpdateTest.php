@@ -1679,7 +1679,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Create a contest in the past with one run.
             $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
                 new \OmegaUp\Test\Factories\ContestParams([
-                    'startTime' => $originalTime - 60 * 60,
+                    'startTime' => $originalTime - 120 * 60,
                     'finishTime' => $originalTime - 5 * 60,
                     'contestDirector' => $contestDirector,
                 ])
@@ -2136,13 +2136,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Asserts default values
             $this->assertSame(
-                $problemData['request']['time_limit'],
+                floatval($problemData['request']['time_limit']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
             $this->assertSame(
-                $problemData['request']['extra_wall_time'],
+                floatval($problemData['request']['extra_wall_time']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
@@ -2156,7 +2156,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemSettings->Limits->OutputLimit
             );
             $this->assertSame(
-                $problemData['request']['overall_wall_time_limit'],
+                floatval($problemData['request']['overall_wall_time_limit']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
                 )
