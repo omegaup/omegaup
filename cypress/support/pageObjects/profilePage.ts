@@ -8,6 +8,9 @@ import {
 export class ProfilePage {
   addUsername(userName: string): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-basic-information"]').click();
     cy.get('[data-name]').type(userName);
@@ -16,6 +19,9 @@ export class ProfilePage {
   }
   updatePreferredLanguage(preferredLanguage: string): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preferred-language]').select(preferredLanguage);
@@ -24,6 +30,9 @@ export class ProfilePage {
 
   navigateToMyProblemsPage(): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('a[href="/profile/#created-content"]').click();
     cy.get('a[href="/problem/mine/"]').click();
   }
@@ -54,6 +63,9 @@ export class ProfilePage {
 
   changePassword(oldPassword: string, newPassword: string): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#change-password"]').click();
     cy.get('[data-old-password]').type(oldPassword);
@@ -82,6 +94,9 @@ export class ProfilePage {
 
   verifyProfileInformation(userBasicInformation: UserInformation): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="#data"]').click();
     cy.get('[data-user-name]').should('contain', userBasicInformation.name);
@@ -94,6 +109,9 @@ export class ProfilePage {
 
   updatePreferences(userPreferences: UserPreferences): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preference-language]').select(userPreferences.language);
@@ -112,6 +130,9 @@ export class ProfilePage {
 
   updateSchoolDetails(schoolDetails: SchoolDetails): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#manage-schools"]').click();
     cy.get('[data-school-name]').click();
@@ -132,6 +153,9 @@ export class ProfilePage {
   verifySchoolDetails(schoolDetails: SchoolDetails): void {
     cy.reload();
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="#data"]').click();
     cy.get('[data-user-school]').should('contain', schoolDetails.name);
@@ -145,6 +169,9 @@ export class ProfilePage {
 
   mergeIdentities(identityLogin: LoginOptions): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#manage-identities"]').click();
     cy.get('[data-identity-username]').type(identityLogin.username);
@@ -160,6 +187,9 @@ export class ProfilePage {
 
   changeIdentity(username: string): void {
     cy.get('[data-nav-user]').click();
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
     cy.get('button').contains(username).click();
   }
 }
