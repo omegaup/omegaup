@@ -84,7 +84,7 @@ describe('BasicInformationEdit.vue', () => {
       propsData: basicInformationEditProps,
     });
 
-    await wrapper.find('input[data-username]').setValue('omegaup modified');
+    await wrapper.find('input[data-username]').setValue('omegaup_modified');
     await wrapper.find('input[data-name]').setValue('omegaUp admin modified');
     await wrapper.findComponent(date_Picker).setValue('2001-01-01');
     await wrapper
@@ -105,7 +105,7 @@ describe('BasicInformationEdit.vue', () => {
     expect(wrapper.emitted('update-user-basic-information')).toEqual([
       [
         {
-          username: 'omegaup modified',
+          username: 'omegaup_modified',
           name: 'omegaUp admin modified',
           gender: 'other',
           country_id: 'CA',
