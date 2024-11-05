@@ -64,6 +64,12 @@ export class ProfilePage {
 
   updateProfileInformation(userBasicInformation: UserInformation): void {
     cy.get('[data-nav-user]').click();
+
+    // wait until [data-dropdown-menu] has class show
+    cy.waitUntil(() =>
+      cy.get('[data-dropdown-menu]').should('have.class', 'show'),
+    );
+
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-basic-information"]').click();
     cy.get('[data-name]').type(userBasicInformation.name);

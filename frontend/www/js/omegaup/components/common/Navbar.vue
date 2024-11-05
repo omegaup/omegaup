@@ -164,6 +164,7 @@
               </a>
               <div
                 class="dropdown-menu dropdown-menu-right allow-overflow h-auto overflow-auto"
+                data-dropdown-menu
               >
                 <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
