@@ -37,7 +37,7 @@ class Utils {
      */
     public static function gradeRun(
         ?int $runId = null,
-        ?string $runGuid,
+        ?string $runGuid = null,
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,

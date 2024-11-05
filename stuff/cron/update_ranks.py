@@ -6,7 +6,7 @@ import datetime
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence
+from typing import List, NamedTuple, Optional, Sequence
 
 import mysql.connector
 import mysql.connector.cursor
@@ -22,6 +22,15 @@ import lib.logs  # pylint: disable=wrong-import-position
 class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     percentile: float
+    classname: str
+
+
+class User(NamedTuple):
+    '''User information for coder of the month candidates'''
+    user_id: int
+    username: str
+    country_id: str
+    school_id: Optional[int]
     classname: str
 
 
@@ -540,6 +549,75 @@ def update_school_of_the_month_candidates(
                           row['score']))
 
 
+def get_eligible_users(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+    gender_clause: str,
+) -> List[User]:
+    '''Returns the list of eligible users for coder of the month'''
+
+    logging.info('Getting the list of eligible users for coder of the month')
+    sql = f'''
+         SELECT DISTINCT
+            IFNULL(i.user_id, 0) AS user_id,
+            i.username,
+            IFNULL(i.country_id, 'xx') AS country_id,
+            isc.school_id,
+            IFNULL(
+                (
+                    SELECT urc.classname FROM
+                        User_Rank_Cutoffs urc
+                    WHERE
+                        urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                    ORDER BY
+                        urc.percentile ASC
+                    LIMIT
+                        1
+                ),
+                'user-rank-unranked'
+            ) AS classname
+         FROM
+            Identities i
+         INNER JOIN
+            Submissions s ON s.identity_id = i.identity_id
+         INNER JOIN
+            Problems p ON p.problem_id = s.problem_id
+         WHERE
+            s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
+            i.user_id IS NOT NULL {gender_clause}
+         GROUP BY
+            up.identity_id
+         LIMIT 100;
+        '''
+    cur_readonly.execute(sql, (
+        first_day_of_current_month,
+        first_day_of_next_month,
+    ))
+
+    usernames: List[User] = []
+    for _, row in enumerate(cur_readonly.fetchall()):
+        usernames.append(User(
+            user_id=row['user_id'],
+            username=row['username'],
+            country_id=row['country_id'],
+            school_id=row['school_id'],
+            classname=row['classname']
+        ))
+
+    cur_readonly.close()
+
+    return usernames
+
+
 def update_coder_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
@@ -696,6 +774,25 @@ def update_coder_of_the_month_candidates(
                     ''',
             (row['user_id'], first_day_of_next_month, index + 1,
              row['school_id'], category, row['score'], row['ProblemsSolved']))
+
+    # This block of code is used to get the list of eligible users for coder
+    # of the month until the coder of the month refactoring is done
+
+    users = get_eligible_users(cur_readonly, first_day_of_current_month,
+                               first_day_of_next_month, gender_clause)
+    candidate_users = list(cur_readonly.fetchall())
+
+    assert len(users) == len(candidate_users), 'Mismatch in the users count'
+
+    usernames = [user.username for user in users]
+    candidate_usernames = [user['username'] for user in candidate_users]
+
+    usernames.sort()
+    candidate_usernames.sort()
+
+    assert usernames == candidate_usernames, 'Mismatch in the users'
+
+    logging.info('Candidates to coder of the month updated')
 
 
 def update_users_stats(
