@@ -559,45 +559,54 @@ def get_eligible_users(
 
     logging.info('Getting the list of eligible users for coder of the month')
     sql = f'''
-         SELECT DISTINCT
-            IFNULL(i.user_id, 0) AS user_id,
-            i.username,
-            IFNULL(i.country_id, 'xx') AS country_id,
-            isc.school_id,
-            IFNULL(
-                (
-                    SELECT urc.classname FROM
-                        User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT
-                        1
-                ),
-                'user-rank-unranked'
-            ) AS classname
-         FROM
-            Identities i
-         INNER JOIN
-            Submissions s ON s.identity_id = i.identity_id
-         INNER JOIN
-            Problems p ON p.problem_id = s.problem_id
-         WHERE
-            s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
-            i.user_id IS NOT NULL {gender_clause}
-         GROUP BY
-            up.identity_id
-         LIMIT 100;
-        '''
+            SELECT DISTINCT
+                IFNULL(i.user_id, 0) AS user_id,
+                i.username,
+                IFNULL(i.country_id, 'xx') AS country_id,
+                isc.school_id,
+                IFNULL(
+                    (
+                        SELECT urc.classname FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                    SELECT
+                                        ur.score
+                                    FROM
+                                        User_Rank ur
+                                    WHERE
+                                        ur.user_id = i.user_id
+                                )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    'user-rank-unranked'
+                ) AS classname
+            FROM
+                Identities i
+            INNER JOIN
+                Submissions s
+            ON
+                s.identity_id = i.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            LEFT JOIN
+                Identities_Schools isc
+            ON
+                isc.identity_school_id = i.current_identity_school_id
+            WHERE
+                s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+                s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
+                i.user_id IS NOT NULL
+                {gender_clause}
+            GROUP BY
+                i.identity_id
+            LIMIT 100;
+            '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
         first_day_of_next_month,
@@ -612,8 +621,6 @@ def get_eligible_users(
             school_id=row['school_id'],
             classname=row['classname']
         ))
-
-    cur_readonly.close()
 
     return usernames
 
@@ -749,7 +756,11 @@ def update_coder_of_the_month_candidates(
         first_day_of_next_month,
     ))
 
-    for index, row in enumerate(cur_readonly.fetchall()):
+    candidate_users = cur_readonly.fetchall()
+    candidate_users_list = list(candidate_users)
+    candidate_users_count = len(candidate_users_list)
+
+    for index, row in enumerate(candidate_users):
         cur.execute(
             '''
                     INSERT INTO
@@ -780,12 +791,11 @@ def update_coder_of_the_month_candidates(
 
     users = get_eligible_users(cur_readonly, first_day_of_current_month,
                                first_day_of_next_month, gender_clause)
-    candidate_users = list(cur_readonly.fetchall())
 
-    assert len(users) == len(candidate_users), 'Mismatch in the users count'
+    assert len(users) == candidate_users_count, 'Mismatch in the users count'
 
     usernames = [user.username for user in users]
-    candidate_usernames = [user['username'] for user in candidate_users]
+    candidate_usernames = [user['username'] for user in candidate_users_list]
 
     usernames.sort()
     candidate_usernames.sort()
