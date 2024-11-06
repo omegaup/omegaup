@@ -154,7 +154,6 @@ export class ProfilePage {
 
   changeIdentity(username: string): void {
     cy.get('[data-nav-user]').click();
-
     cy.get('button').contains(username).click();
   }
 }
