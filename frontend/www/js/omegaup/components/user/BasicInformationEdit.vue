@@ -6,7 +6,15 @@
   >
     <div class="form-group">
       <label>{{ T.username }}</label>
-      <input v-model="username" data-username class="form-control" />
+      <input
+        v-model="username"
+        data-username
+        class="form-control"
+        :class="{ 'is-invalid': !isValidUsername }"
+      />
+      <div v-if="!isValidUsername" class="invalid-feedback">
+        {{ T.parameterInvalidAlias }}
+      </div>
     </div>
     <div class="form-group">
       <label>{{ T.wordsName }}</label>
@@ -118,7 +126,22 @@ export default class UserBasicInformationEdit extends Vue {
     return subdivisions;
   }
 
+  get isValidUsername(): boolean {
+    if (!this.username || this.username.length < 2) {
+      return false;
+    }
+    // Using the same regex pattern as the server
+    return !/[^a-zA-Z0-9_.-]/.test(this.username);
+  }
+
   onUpdateUserBasicInformation(): void {
+    if (!this.isValidUsername) {
+      this.$emit('update-user-basic-information-error', {
+        description: T.parameterInvalidAlias,
+      });
+      return;
+    }
+
     if (this.name && this.name.length > 50) {
       this.$emit('update-user-basic-information-error', {
         description: T.userEditNameTooLong,
