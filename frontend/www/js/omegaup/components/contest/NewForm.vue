@@ -1,6 +1,10 @@
 <template>
   <div class="card">
-    <div v-if="!update" class="card-header bg-primary text-white panel-heading">
+    <div
+      v-if="!update"
+      class="card-header"
+      style="background-color: rgba(0, 0, 0, 0.03); color: #212529"
+    >
       <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
