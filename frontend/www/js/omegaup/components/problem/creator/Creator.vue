@@ -2,11 +2,7 @@
   <b-container fluid="lg">
     <b-row>
       <b-col>
-        <b-card
-          header-bg-variant="primary"
-          header-text-variant="white"
-          :header="T.omegaupTitleProblemCreator"
-        >
+        <b-card :header="T.problemCreatorTitle" header-class="h3">
           <creator-header
             @download-zip-file="
               (zipObject) => $emit('download-zip-file', zipObject)
