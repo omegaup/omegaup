@@ -161,7 +161,7 @@
                 <b-button
                   variant="light"
                   data-placement="top"
-                  data-sidebar-cases="ungrouped"
+                  :data-sidebar-cases-ungrouped="groupID"
                   :title="name"
                   class="w-82"
                   @click="editCase(groupID, cases[0].caseID)"

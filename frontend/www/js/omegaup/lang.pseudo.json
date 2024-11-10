@@ -855,6 +855,8 @@
 	"mustRegisterToJoinCourse": "(Y0u mu57 r3gi573r 70 j0in 7hi5 c0ur53.)",
 	"mustUpdateBasicInfoToFilterUsers": "(Y0u cann07 u53 7h3 ranking fi173r5 if y0ur pr0fi13 inf0rma7i0n i5 n07 c0mp1373.)",
 	"myproblemsListCreateProblem": "(Cr3a73 Pr0b13m)",
+	"myproblemsListCreateProblemWithExistingZipFile": "(I hav3 a zip fi13)",
+	"myproblemsListCreateZipFileProblem": "(Cr3a73 zip fi13)",
 	"myproblemsListMyProblems": "(My Pr0b13m5)",
 	"navAlgorithmsBook": "(Tu70ria1 B00k \"Pr0b13ma5 y A1g0ri7m05\" by Lui5 Varga5)",
 	"navAllCourses": "(A11 c0ur535)",
