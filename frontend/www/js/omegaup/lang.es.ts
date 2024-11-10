@@ -1123,6 +1123,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorStatement: "Redacci\u00f3n",
   problemCreatorSuffix: "Sufijo",
   problemCreatorTestCases: "Casos de prueba",
+  problemCreatorTitle: "Creador de problemas",
   problemCreatorUngrouped: "Sin_grupo",
   problemCreatorUngroupedCases: "Casos sin grupo",
   problemCreatorUpdateAlert: "El problema se ha actualizado correctamente.",

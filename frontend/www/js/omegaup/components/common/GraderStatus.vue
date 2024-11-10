@@ -24,7 +24,7 @@
       <!-- eslint-disable vue/no-v-html -->
       <pre
         v-if="graderInfo !== null"
-        style="width: 50em"
+        style="width: 250px"
         v-html="ui.prettyPrintJSON(graderInfo.queue)"
       ></pre>
       <!-- eslint-enable -->
