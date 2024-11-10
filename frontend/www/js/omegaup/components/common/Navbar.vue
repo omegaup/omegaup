@@ -162,7 +162,10 @@
                   class="mr-1"
                 ></omegaup-common-grader-badge>
               </a>
-              <div class="dropdown-menu dropdown-menu-right allow-overflow">
+              <div
+                class="dropdown-menu dropdown-menu-right allow-overflow h-auto overflow-auto"
+                data-dropdown-menu
+              >
                 <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
                     <img
