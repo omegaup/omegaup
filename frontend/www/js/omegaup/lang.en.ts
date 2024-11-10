@@ -1125,6 +1125,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorStatement: "Statement",
   problemCreatorSuffix: "Suffix",
   problemCreatorTestCases: "Test cases",
+  problemCreatorTitle: "Problem creator",
   problemCreatorUngrouped: "Ungrouped",
   problemCreatorUngroupedCases: "Ungrouped cases",
   problemCreatorUpdateAlert: "The problem has been updated successfully.",
