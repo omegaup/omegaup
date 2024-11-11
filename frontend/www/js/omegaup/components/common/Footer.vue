@@ -1,5 +1,5 @@
 <template>
-  <footer class="common-footer text-center">
+  <footer class="common-footer text-center mt-5">
     <div class="container-xl">
       <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
         <div class="footer-brand mb-4 mb-lg-0 max-width-logo">
@@ -129,7 +129,7 @@
         </div>
       </div>
     </div>
-    <div class="copy">
+    <div class="copy mt-3">
       <div
         class="container-xl d-md-flex justify-content-between align-items-center py-3"
       >
