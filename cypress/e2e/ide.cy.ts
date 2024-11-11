@@ -244,7 +244,7 @@ describe('Test IDE', () => {
     cy.login(loginOptions[0]);
 
     // update preferred langauge to py2
-    profilePage.updatePreferredLanguage('py2');
+    profilePage.updatePreferredProgrammingLanguage('py2');
     // go to the link with the editor
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
 
