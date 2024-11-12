@@ -25,19 +25,23 @@ class Cutoff(NamedTuple):
     classname: str
 
 
-class User(NamedTuple):
+class UserScore(NamedTuple):
     '''User information for coder of the month candidates'''
     user_id: int
+    identity_id: int
     username: str
     country_id: str
     school_id: Optional[int]
     classname: str
+    problems_solved: Optional[int]
+    score: float
 
 
 class Problem(NamedTuple):
     '''Information for solved problems in the selected month'''
     problem_id: int
     alias: str
+    accepted: int
 
 
 def _default_date() -> datetime.date:
@@ -560,13 +564,14 @@ def get_cotm_eligible_users(
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
     gender_clause: str,
-) -> List[User]:
+) -> List[UserScore]:
     '''Returns the list of eligible users for coder of the month'''
 
     logging.info('Getting the list of eligible users for coder of the month')
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
+                i.identity_id,
                 i.username,
                 IFNULL(i.country_id, 'xx') AS country_id,
                 isc.school_id,
@@ -618,14 +623,17 @@ def get_cotm_eligible_users(
         first_day_of_next_month,
     ))
 
-    usernames: List[User] = []
+    usernames: List[UserScore] = []
     for _, row in enumerate(cur_readonly.fetchall()):
-        usernames.append(User(
+        usernames.append(UserScore(
             user_id=row['user_id'],
+            identity_id=row['identity_id'],
             username=row['username'],
             country_id=row['country_id'],
             school_id=row['school_id'],
-            classname=row['classname']
+            classname=row['classname'],
+            problems_solved=None,
+            score=0.0,
         ))
 
     return usernames
@@ -643,7 +651,7 @@ def get_eligible_problems(
     )
     sql = '''
         SELECT DISTINCT
-            p.problem_id, p.alias
+            p.problem_id, p.alias, p.accepted
         FROM
             Submissions s
         INNER JOIN
@@ -664,6 +672,7 @@ def get_eligible_problems(
         problems.append(Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
+            accepted=row['accepted'],
         ))
 
     return problems
