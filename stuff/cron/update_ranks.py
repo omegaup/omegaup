@@ -630,6 +630,7 @@ def get_eligible_users(
 
     return usernames
 
+
 def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
