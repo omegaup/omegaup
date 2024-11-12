@@ -630,7 +630,7 @@ def get_eligible_users(
 
     return usernames
 
-def get_eligible_problems(
+def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
@@ -847,8 +847,9 @@ def update_coder_of_the_month_candidates(
 
     logging.info('Candidates to coder of the month updated')
 
-    problems = get_eligible_problems(cur_readonly, first_day_of_current_month,
-                                     first_day_of_next_month)
+    problems = get_cotm_eligible_users(cur_readonly,
+                                       first_day_of_current_month,
+                                       first_day_of_next_month)
 
     logging.info(problems)
 
