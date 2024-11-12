@@ -555,7 +555,7 @@ def update_school_of_the_month_candidates(
                           row['score']))
 
 
-def get_eligible_users(
+def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
@@ -631,7 +631,7 @@ def get_eligible_users(
     return usernames
 
 
-def get_cotm_eligible_users(
+def get_eligible_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
@@ -833,8 +833,8 @@ def update_coder_of_the_month_candidates(
     # This block of code is used to get the list of eligible users for coder
     # of the month until the coder of the month refactoring is done
 
-    users = get_eligible_users(cur_readonly, first_day_of_current_month,
-                               first_day_of_next_month, gender_clause)
+    users = get_cotm_eligible_users(cur_readonly, first_day_of_current_month,
+                                    first_day_of_next_month, gender_clause)
 
     assert len(users) == candidate_users_count, 'Mismatch in the users count'
 
@@ -848,9 +848,8 @@ def update_coder_of_the_month_candidates(
 
     logging.info('Candidates to coder of the month updated')
 
-    problems = get_cotm_eligible_users(cur_readonly,
-                                       first_day_of_current_month,
-                                       first_day_of_next_month)
+    problems = get_eligible_problems(cur_readonly, first_day_of_current_month,
+                                     first_day_of_next_month)
 
     logging.info(problems)
 
