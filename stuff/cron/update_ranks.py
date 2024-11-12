@@ -6,7 +6,7 @@ import datetime
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence
+from typing import List, NamedTuple, Optional, Sequence
 
 import mysql.connector
 import mysql.connector.cursor
@@ -23,6 +23,25 @@ class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
     percentile: float
     classname: str
+
+
+class UserScore(NamedTuple):
+    '''User information for coder of the month candidates'''
+    user_id: int
+    identity_id: int
+    username: str
+    country_id: str
+    school_id: Optional[int]
+    classname: str
+    problems_solved: Optional[int]
+    score: float
+
+
+class Problem(NamedTuple):
+    '''Information for solved problems in the selected month'''
+    problem_id: int
+    alias: str
+    accepted: int
 
 
 def _default_date() -> datetime.date:
@@ -540,6 +559,192 @@ def update_school_of_the_month_candidates(
                           row['score']))
 
 
+def get_eligible_users(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+    gender_clause: str,
+) -> List[UserScore]:
+    '''Returns the list of eligible users for coder of the month'''
+
+    logging.info('Getting the list of eligible users for coder of the month')
+    sql = f'''
+            SELECT DISTINCT
+                IFNULL(i.user_id, 0) AS user_id,
+                i.identity_id,
+                i.username,
+                IFNULL(i.country_id, 'xx') AS country_id,
+                isc.school_id,
+                IFNULL(
+                    (
+                        SELECT urc.classname FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                    SELECT
+                                        ur.score
+                                    FROM
+                                        User_Rank ur
+                                    WHERE
+                                        ur.user_id = i.user_id
+                                )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    'user-rank-unranked'
+                ) AS classname
+            FROM
+                Identities i
+            INNER JOIN
+                Submissions s
+            ON
+                s.identity_id = i.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            LEFT JOIN
+                Identities_Schools isc
+            ON
+                isc.identity_school_id = i.current_identity_school_id
+            WHERE
+                s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+                s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
+                i.user_id IS NOT NULL
+                {gender_clause}
+            GROUP BY
+                i.identity_id
+            LIMIT 100;
+            '''
+    cur_readonly.execute(sql, (
+        first_day_of_current_month,
+        first_day_of_next_month,
+    ))
+
+    usernames: List[UserScore] = []
+    for _, row in enumerate(cur_readonly.fetchall()):
+        usernames.append(UserScore(
+            user_id=row['user_id'],
+            identity_id=row['identity_id'],
+            username=row['username'],
+            country_id=row['country_id'],
+            school_id=row['school_id'],
+            classname=row['classname'],
+            problems_solved=None,
+            score=0.0
+        ))
+
+    return usernames
+
+
+def get_eligible_problems(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+) -> List[Problem]:
+    '''Returns the list of eligible problems for coder of the month'''
+
+    logging.info(
+        'Getting the list of eligible problems for coder of the month'
+    )
+    sql = '''
+        SELECT DISTINCT
+            p.problem_id, p.alias, p.accepted
+        FROM
+            Submissions s
+        INNER JOIN
+            Problems p
+        ON
+            p.problem_id = s.problem_id
+        WHERE
+            s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1;
+        '''
+    cur_readonly.execute(sql, (
+        first_day_of_current_month,
+        first_day_of_next_month,
+    ))
+
+    problems: List[Problem] = []
+    for _, row in enumerate(cur_readonly.fetchall()):
+        problems.append(Problem(
+            problem_id=row['problem_id'],
+            alias=row['alias'],
+            accepted=row['accepted']
+        ))
+
+    return problems
+
+
+def compute_points_for_user(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+    gender_clause: str,
+) -> List[UserScore]:
+    '''Computes the points for each eligible user'''
+
+    eligible_users = get_eligible_users(
+        cur_readonly,
+        first_day_of_current_month,
+        first_day_of_next_month,
+        gender_clause
+    )
+
+    eligible_problems = get_eligible_problems(
+        cur_readonly,
+        first_day_of_current_month,
+        first_day_of_next_month
+    )
+
+    user_points = {
+        user.identity_id:
+            {'ProblemsSolved': 0, 'score': 0.0} for user in eligible_users}
+
+    identity_ids = list(user_points.keys())
+    for problem in eligible_problems:
+        cur_readonly.execute('''
+            SELECT
+                s.identity_id,
+                COUNT(DISTINCT s.problem_id) AS ProblemsSolved,
+                SUM(ROUND(100 / LOG(2, %s + 1), 0)) AS score
+            FROM
+                Submissions s
+            WHERE
+                s.problem_id = %s AND
+                s.verdict = 'AC' AND
+                s.type = 'normal' AND
+                s.time >= %s AND
+                s.time <= %s
+            GROUP BY
+                s.identity_id
+        ''', (problem.accepted,
+              problem.problem_id,
+              first_day_of_current_month,
+              first_day_of_next_month))
+
+        for row in cur_readonly.fetchall():
+            identity_id = row['identity_id']
+            if identity_id in identity_ids:
+                user_points[identity_id]['ProblemsSolved'] += int(
+                    row['ProblemsSolved'])
+                user_points[identity_id]['score'] += row['score']
+
+    updated_users: List[UserScore] = []
+    for user in eligible_users:
+        updated_user = user._replace(
+            score=user_points[user.identity_id]['score'],
+            problems_solved=int(
+                user_points[user.identity_id]['ProblemsSolved'])
+        )
+        updated_users.append(updated_user)
+    updated_users_sorted = sorted(
+        updated_users, key=lambda user: user.score, reverse=True)
+    return updated_users_sorted
+
+
 def update_coder_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
@@ -586,92 +791,12 @@ def update_coder_of_the_month_candidates(
     else:
         gender_clause = ""
 
-    sql = f'''
-         SELECT DISTINCT
-            IFNULL(i.user_id, 0) AS user_id,
-            i.username,
-            IFNULL(i.country_id, 'xx') AS country_id,
-            isc.school_id,
-            COUNT(ps.problem_id) ProblemsSolved,
-            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
-            IFNULL(
-                (
-                    SELECT urc.classname FROM
-                        User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT
-                        1
-                ),
-                'user-rank-unranked'
-            ) AS classname
-          FROM
-            (
-              SELECT DISTINCT
-                s.identity_id, s.problem_id
-              FROM
-                Submissions s
-              WHERE
-                s.verdict = 'AC' AND s.type= 'normal' AND
-                s.time >= %s AND s.time <= %s
-            ) AS up
-          INNER JOIN
-            Problems ps ON
-            ps.problem_id = up.problem_id
-            AND ps.visibility >= 1
-            AND ps.quality_seal = 1
-          INNER JOIN
-            Identities i ON i.identity_id = up.identity_id
-          LEFT JOIN
-            Identities_Schools isc ON isc.identity_school_id =
-            i.current_identity_school_id
-          LEFT JOIN
-            (
-              SELECT
-                user_id,
-                MIN(ranking) best_ranking,
-                time,
-                selected_by
-              FROM
-                Coder_Of_The_Month
-              WHERE
-                category = %s
-              GROUP BY
-                user_id,
-                selected_by,
-                time
-              HAVING
-                best_ranking = 1
-            ) AS cm on i.user_id = cm.user_id
-          WHERE
-            (cm.user_id IS NULL OR
-            DATE_ADD(cm.time, INTERVAL 1 YEAR) < %s) AND
-            i.user_id IS NOT NULL
-            {gender_clause}
-          GROUP BY
-            up.identity_id
-          ORDER BY
-            score DESC,
-            ProblemsSolved DESC
-          LIMIT 100;
-        '''
-    cur_readonly.execute(sql, (
-        first_day_of_current_month,
-        first_day_of_next_month,
-        category,
-        first_day_of_next_month,
-    ))
+    candidates = compute_points_for_user(cur_readonly,
+                                         first_day_of_current_month,
+                                         first_day_of_next_month,
+                                         gender_clause)
 
-    for index, row in enumerate(cur_readonly.fetchall()):
+    for index, candidate in enumerate(candidates):
         cur.execute(
             '''
                     INSERT INTO
@@ -694,8 +819,9 @@ def update_coder_of_the_month_candidates(
                         %s
                     );
                     ''',
-            (row['user_id'], first_day_of_next_month, index + 1,
-             row['school_id'], category, row['score'], row['ProblemsSolved']))
+            (candidate.user_id, first_day_of_next_month, index + 1,
+             candidate.school_id, category, candidate.score,
+             candidate.problems_solved))
 
 
 def update_users_stats(
