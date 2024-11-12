@@ -34,6 +34,12 @@ class User(NamedTuple):
     classname: str
 
 
+class Problem(NamedTuple):
+    '''Information for solved problems in the selected month'''
+    problem_id: int
+    alias: str
+
+
 def _default_date() -> datetime.date:
     today = datetime.date.today()
     return today.replace(day=1)
@@ -624,6 +630,43 @@ def get_eligible_users(
 
     return usernames
 
+def get_eligible_problems(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+) -> List[Problem]:
+    '''Returns the list of eligible problems for coder of the month'''
+
+    logging.info(
+        'Getting the list of eligible problems for coder of the month'
+    )
+    sql = '''
+        SELECT DISTINCT
+            p.problem_id, p.alias
+        FROM
+            Submissions s
+        INNER JOIN
+            Problems p
+        ON
+            p.problem_id = s.problem_id
+        WHERE
+            s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1;
+        '''
+    cur_readonly.execute(sql, (
+        first_day_of_current_month,
+        first_day_of_next_month,
+    ))
+
+    problems: List[Problem] = []
+    for _, row in enumerate(cur_readonly.fetchall()):
+        problems.append(Problem(
+            problem_id=row['problem_id'],
+            alias=row['alias'],
+        ))
+
+    return problems
+
 
 def update_coder_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
@@ -803,6 +846,11 @@ def update_coder_of_the_month_candidates(
     assert usernames == candidate_usernames, 'Mismatch in the users'
 
     logging.info('Candidates to coder of the month updated')
+
+    problems = get_eligible_problems(cur_readonly, first_day_of_current_month,
+                                     first_day_of_next_month)
+
+    logging.info(problems)
 
 
 def update_users_stats(
