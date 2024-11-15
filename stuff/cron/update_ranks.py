@@ -4,9 +4,10 @@
 import argparse
 import datetime
 import logging
+import math
 import os
 import sys
-from typing import List, NamedTuple, Optional, Sequence
+from typing import Dict, List, NamedTuple, Optional, Sequence, TypedDict
 
 import mysql.connector
 import mysql.connector.cursor
@@ -33,7 +34,7 @@ class UserScore(NamedTuple):
     country_id: str
     school_id: Optional[int]
     classname: str
-    problems_solved: Optional[int]
+    problems_solved: int
     score: float
 
 
@@ -42,6 +43,12 @@ class Problem(NamedTuple):
     problem_id: int
     alias: str
     accepted: int
+
+
+class UserPoints(TypedDict):
+    '''User points for problems solved in the selected month'''
+    ProblemsSolved: List[int]
+    score: float
 
 
 def _default_date() -> datetime.date:
@@ -624,7 +631,7 @@ def get_eligible_users(
     ))
 
     usernames: List[UserScore] = []
-    for _, row in enumerate(cur_readonly.fetchall()):
+    for row in cur_readonly.fetchall():
         usernames.append(UserScore(
             user_id=row['user_id'],
             identity_id=row['identity_id'],
@@ -632,7 +639,7 @@ def get_eligible_users(
             country_id=row['country_id'],
             school_id=row['school_id'],
             classname=row['classname'],
-            problems_solved=None,
+            problems_solved=0,
             score=0.0
         ))
 
@@ -668,7 +675,7 @@ def get_eligible_problems(
     ))
 
     problems: List[Problem] = []
-    for _, row in enumerate(cur_readonly.fetchall()):
+    for row in cur_readonly.fetchall():
         problems.append(Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
@@ -699,47 +706,62 @@ def compute_points_for_user(
         first_day_of_next_month
     )
 
-    user_points = {
+    # Initialize a dictionary to store the problems solved and the score for
+    # each user
+    user_points: Dict[int, UserPoints] = {
         user.identity_id:
-            {'ProblemsSolved': 0, 'score': 0.0} for user in eligible_users}
+            {'ProblemsSolved': [], 'score': 0.0} for user in eligible_users}
 
-    identity_ids = list(user_points.keys())
-    for problem in eligible_problems:
-        cur_readonly.execute('''
-            SELECT
-                s.identity_id,
-                COUNT(DISTINCT s.problem_id) AS ProblemsSolved,
-                SUM(ROUND(100 / LOG(2, %s + 1), 0)) AS score
-            FROM
-                Submissions s
-            WHERE
-                s.problem_id = %s AND
-                s.verdict = 'AC' AND
-                s.type = 'normal' AND
-                s.time >= %s AND
-                s.time <= %s
-            GROUP BY
-                s.identity_id
-        ''', (problem.accepted,
-              problem.problem_id,
-              first_day_of_current_month,
-              first_day_of_next_month))
+    # Get the list of identity IDs for eligible users
+    identity_ids = [user.identity_id for user in eligible_users]
 
-        for row in cur_readonly.fetchall():
-            identity_id = row['identity_id']
-            if identity_id in identity_ids:
-                user_points[identity_id]['ProblemsSolved'] += int(
-                    row['ProblemsSolved'])
-                user_points[identity_id]['score'] += row['score']
+    if not identity_ids:
+        logging.info('No eligible users found.')
+        return []
 
+    # Convert the list of identity IDs to a comma-separated string
+    identity_ids_str = ', '.join(map(str, identity_ids))
+
+    cur_readonly.execute(f'''
+        SELECT DISTINCT
+            identity_id,
+            problem_id
+        FROM
+            Submissions
+        WHERE
+            identity_id IN ({identity_ids_str})
+            AND time >= %s
+            AND time <= %s
+    ''', (first_day_of_current_month, first_day_of_next_month))
+
+    # Populate the user_points dictionary with the problems solved by each user
+    for row in cur_readonly.fetchall():
+        identity_id = row['identity_id']
+        problem_id = row['problem_id']
+        if identity_id in user_points:
+            user_points[identity_id]['ProblemsSolved'].append(problem_id)
+
+    # Calculate the score for each user based on the problems they have solved
+    for _, points in user_points.items():
+        for problem_id in points['ProblemsSolved']:
+            problem = None
+            for eligible_problem in eligible_problems:
+                if eligible_problem.problem_id == problem_id:
+                    problem = eligible_problem
+                    break
+            if problem:
+                points['score'] += round(100 / math.log2(problem.accepted + 1))
+
+    # Create a list of updated users with their scores and problems solved
     updated_users: List[UserScore] = []
     for user in eligible_users:
         updated_user = user._replace(
             score=user_points[user.identity_id]['score'],
-            problems_solved=int(
+            problems_solved=len(
                 user_points[user.identity_id]['ProblemsSolved'])
         )
         updated_users.append(updated_user)
+    # Sort the updated users by score in descending order
     updated_users_sorted = sorted(
         updated_users, key=lambda user: user.score, reverse=True)
     return updated_users_sorted
