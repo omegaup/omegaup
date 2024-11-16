@@ -162,6 +162,32 @@ CREATE TABLE `Coder_Of_The_Month` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Coder_Of_The_Month_Winners` (
+  `coder_of_the_month_winners_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `comment` tinytext COMMENT 'Útil cuando se selecciona manualmente a un usuario que no obtuvo el primer lugar para dar una explicación breve de por qué se seleccionó.',
+  `time` date NOT NULL DEFAULT '2000-01-01' COMMENT 'Primer día del mes en el que el usuario fue seleccionado. Ejemplo: 2024-08-01 para el coder que mas puntos obtuvo en julio de 2024.',
+  `ranking` int NOT NULL COMMENT 'El lugar en el que el usuario estuvo durante ese mes. Útil cuando se selecciona manualmente a un usuario que no obtuvo el primer lugar.',
+  `selected_by` int DEFAULT NULL COMMENT 'Id de la identidad que seleccionó al coder del mes manualmente.',
+  `school_id` int DEFAULT NULL,
+  `category` enum('all','female') NOT NULL DEFAULT 'all',
+  `score` double NOT NULL DEFAULT '0',
+  `problems_solved` int NOT NULL DEFAULT '0',
+  `certificate_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
+  PRIMARY KEY (`coder_of_the_month_winners_id`),
+  KEY `coder_of_the_month_winners_id` (`coder_of_the_month_winners_id`),
+  KEY `user_id` (`user_id`),
+  KEY `selected_by` (`selected_by`),
+  KEY `school_id` (`school_id`),
+  KEY `rank_time_category` (`category`,`ranking`,`time`),
+  KEY `time_category` (`category`,`time`),
+  CONSTRAINT `fk_cotmwi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_cotmws_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
+  CONSTRAINT `fk_cotmwu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guardar histórico de coders del mes por categoría de forma sencilla.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Contest_Log` (
   `public_contest_id` int NOT NULL AUTO_INCREMENT,
   `contest_id` int NOT NULL,
