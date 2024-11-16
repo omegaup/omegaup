@@ -37,7 +37,7 @@ class Utils {
      */
     public static function gradeRun(
         ?int $runId = null,
-        ?string $runGuid,
+        ?string $runGuid = null,
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,
@@ -408,7 +408,7 @@ class Utils {
              $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-            ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS) .
             $date)
         );
     }

@@ -566,7 +566,7 @@ def update_school_of_the_month_candidates(
                           row['score']))
 
 
-def get_eligible_users(
+def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
@@ -679,7 +679,7 @@ def get_eligible_problems(
         problems.append(Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
-            accepted=row['accepted']
+            accepted=row['accepted'],
         ))
 
     return problems
@@ -693,7 +693,7 @@ def compute_points_for_user(
 ) -> List[UserScore]:
     '''Computes the points for each eligible user'''
 
-    eligible_users = get_eligible_users(
+    eligible_users = get_cotm_eligible_users(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month,
