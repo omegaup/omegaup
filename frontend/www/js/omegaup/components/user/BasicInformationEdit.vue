@@ -107,6 +107,7 @@ export default class UserBasicInformationEdit extends Vue {
   birthDate = this.profile.birth_date
     ? time.convertLocalDateToGMTDate(this.profile.birth_date)
     : new Date('');
+  updateKey = 0;
 
   get isCountrySelected(): boolean {
     return Boolean(this.countryId);
@@ -155,7 +156,13 @@ export default class UserBasicInformationEdit extends Vue {
       country_id: this.countryId,
       state_id: this.stateId,
       birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+      update_key: this.updateKey,
     });
+    this.updateKey++;
+
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
   }
 
   @Watch('countryId')
