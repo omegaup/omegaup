@@ -13,6 +13,7 @@ import mysql.connector.cursor
 
 from database.coder_of_the_month import check_existing_coder_of_the_month
 from database.coder_of_the_month import get_coder_of_the_month_candidates
+from database.coder_of_the_month import get_cotm_eligible_users
 from database.coder_of_the_month import get_eligible_problems
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
@@ -578,6 +579,9 @@ def update_coder_of_the_month_candidates(
                                                    first_day_of_next_month,
                                                    category)
 
+    candidate_users_list = list(candidates)
+    candidate_users_count = len(candidate_users_list)
+
     for index, candidate in enumerate(candidates):
         ranking = index + 1
         insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
@@ -585,6 +589,26 @@ def update_coder_of_the_month_candidates(
 
     # This block of code is used to get the list of eligible users for coder
     # of the month until the coder of the month refactoring is done
+
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
+    users = get_cotm_eligible_users(cur_readonly, first_day_of_current_month,
+                                    first_day_of_next_month, gender_clause)
+
+    assert len(users) == candidate_users_count, 'Mismatch in the users count'
+
+    usernames = [user.username for user in users]
+    candidate_usernames = [user.username for user in candidate_users_list]
+
+    usernames.sort()
+    candidate_usernames.sort()
+
+    assert usernames == candidate_usernames, 'Mismatch in the users'
+
+    logging.info('Candidates to coder of the month updated')
 
     problems = get_eligible_problems(cur_readonly, first_day_of_current_month,
                                      first_day_of_next_month)

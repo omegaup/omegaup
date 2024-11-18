@@ -4,7 +4,7 @@
 
 import datetime
 import logging
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import mysql.connector
 import mysql.connector.cursor
@@ -20,11 +20,12 @@ class Problem(NamedTuple):
 class UserRank(NamedTuple):
     '''Information for user rank'''
     user_id: int
+    identity_id: int
     username: str
     country_id: str
-    school_id: int
+    school_id: Optional[int]
     problems_solved: int
-    score: int
+    score: float
     classname: str
 
 
@@ -90,6 +91,7 @@ def get_coder_of_the_month_candidates(
          SELECT DISTINCT
             IFNULL(i.user_id, 0) AS user_id,
             i.username,
+            i.identity_id,
             IFNULL(i.country_id, 'xx') AS country_id,
             isc.school_id,
             COUNT(ps.problem_id) ProblemsSolved,
@@ -175,6 +177,7 @@ def get_coder_of_the_month_candidates(
     for row in cur_readonly.fetchall():
         candidates.append(UserRank(
             user_id=row['user_id'],
+            identity_id=row['identity_id'],
             username=row['username'],
             country_id=row['country_id'],
             school_id=row['school_id'],
@@ -222,6 +225,86 @@ def insert_coder_of_the_month_candidates(
          candidate.problems_solved))
 
 
+def get_cotm_eligible_users(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date,
+    gender_clause: str,
+) -> List[UserRank]:
+    '''Returns the list of eligible users for coder of the month'''
+
+    logging.info('Getting the list of eligible users for coder of the month')
+    sql = f'''
+            SELECT DISTINCT
+                IFNULL(i.user_id, 0) AS user_id,
+                i.identity_id,
+                i.username,
+                IFNULL(i.country_id, 'xx') AS country_id,
+                isc.school_id,
+                IFNULL(
+                    (
+                        SELECT urc.classname FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                    SELECT
+                                        ur.score
+                                    FROM
+                                        User_Rank ur
+                                    WHERE
+                                        ur.user_id = i.user_id
+                                )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    'user-rank-unranked'
+                ) AS classname
+            FROM
+                Identities i
+            INNER JOIN
+                Submissions s
+            ON
+                s.identity_id = i.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            LEFT JOIN
+                Identities_Schools isc
+            ON
+                isc.identity_school_id = i.current_identity_school_id
+            WHERE
+                s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
+                s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
+                i.user_id IS NOT NULL
+                {gender_clause}
+            GROUP BY
+                i.identity_id
+            LIMIT 100;
+            '''
+    cur_readonly.execute(sql, (
+        first_day_of_current_month,
+        first_day_of_next_month,
+    ))
+
+    usernames: List[UserRank] = []
+    for row in cur_readonly.fetchall():
+        usernames.append(UserRank(
+            user_id=row['user_id'],
+            identity_id=row['identity_id'],
+            username=row['username'],
+            country_id=row['country_id'],
+            school_id=row['school_id'],
+            classname=row['classname'],
+            problems_solved=0,
+            score=0.0,
+        ))
+
+    return usernames
+
+
 def get_eligible_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
@@ -251,7 +334,7 @@ def get_eligible_problems(
     ))
 
     problems: List[Problem] = []
-    for _, row in enumerate(cur_readonly.fetchall()):
+    for row in cur_readonly.fetchall():
         problems.append(Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
