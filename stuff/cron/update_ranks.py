@@ -45,9 +45,9 @@ class Problem(NamedTuple):
     accepted: int
 
 
-class UserPoints(TypedDict):
-    '''User points for problems solved in the selected month'''
-    ProblemsSolved: List[int]
+class UserProblems(TypedDict):
+    '''Problems solved by a user and their calculated score'''
+    solved: List[int]
     score: float
 
 
@@ -708,9 +708,9 @@ def compute_points_for_user(
 
     # Initialize a dictionary to store the problems solved and the score for
     # each user
-    user_points: Dict[int, UserPoints] = {
+    user_problems: Dict[int, UserProblems] = {
         user.identity_id:
-            {'ProblemsSolved': [], 'score': 0.0} for user in eligible_users}
+            {'solved': [], 'score': 0.0} for user in eligible_users}
 
     # Get the list of identity IDs for eligible users
     identity_ids = [user.identity_id for user in eligible_users]
@@ -731,34 +731,40 @@ def compute_points_for_user(
         WHERE
             identity_id IN ({identity_ids_str})
             AND time >= %s
-            AND time <= %s
+            AND time < %s
     ''', (first_day_of_current_month, first_day_of_next_month))
 
-    # Populate the user_points dictionary with the problems solved by each user
+    # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']
         problem_id = row['problem_id']
-        if identity_id in user_points:
-            user_points[identity_id]['ProblemsSolved'].append(problem_id)
+        assert identity_id in user_problems, (
+            'Identity %s not found in user_problems', identity_id)
+        user_problems[identity_id]['solved'].append(problem_id)
 
     # Calculate the score for each user based on the problems they have solved
-    for _, points in user_points.items():
-        for problem_id in points['ProblemsSolved']:
-            problem = None
-            for eligible_problem in eligible_problems:
-                if eligible_problem.problem_id == problem_id:
-                    problem = eligible_problem
+    for _, points in user_problems.items():
+        # Iterate over each problem solved by the user
+        for problem_id in points['solved']:
+            solved_problem_by_user = None
+            # Search for the solved problem in the list of eligible problems
+            for problem in eligible_problems:
+                if problem.problem_id == problem_id:
+                    solved_problem_by_user = problem
                     break
-            if problem:
-                points['score'] += round(100 / math.log2(problem.accepted + 1))
+            # If the selected user solved the problem, then calculate and add
+            # the score
+            if solved_problem_by_user is not None:
+                points['score'] += round(100 / math.log2(
+                    solved_problem_by_user.accepted + 1))
 
     # Create a list of updated users with their scores and problems solved
     updated_users: List[UserScore] = []
     for user in eligible_users:
         updated_user = user._replace(
-            score=user_points[user.identity_id]['score'],
+            score=user_problems[user.identity_id]['score'],
             problems_solved=len(
-                user_points[user.identity_id]['ProblemsSolved'])
+                user_problems[user.identity_id]['solved'])
         )
         updated_users.append(updated_user)
     # Sort the updated users by score in descending order
