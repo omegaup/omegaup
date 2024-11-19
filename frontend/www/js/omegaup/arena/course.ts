@@ -436,8 +436,8 @@ OmegaUp.on('ready', async () => {
                 component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.success(
                   isUpdate
-                    ? T.feedbackSuccesfullyUpdated
-                    : T.feedbackSuccesfullyAdded,
+                    ? T.feedbackSuccessfullyUpdated
+                    : T.feedbackSuccessfullyAdded,
                 );
               })
               .catch(ui.error);
@@ -462,7 +462,7 @@ OmegaUp.on('ready', async () => {
               feedback_list: JSON.stringify(feedbackList),
             })
               .then(() => {
-                ui.success(T.feedbackSuccesfullyAdded);
+                ui.success(T.feedbackSuccessfullyAdded);
                 resetHash('runs', null);
                 api.Run.getSubmissionFeedback({
                   run_alias: guid,
@@ -495,7 +495,7 @@ OmegaUp.on('ready', async () => {
               submission_feedback_id: feedback.submissionFeedbackId,
             })
               .then(({ submissionFeedbackThread }) => {
-                ui.success(T.feedbackSuccesfullyAdded);
+                ui.success(T.feedbackSuccessfullyAdded);
                 resetHash('runs', null);
                 if (
                   submissionFeedbackThread &&

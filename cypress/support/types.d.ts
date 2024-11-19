@@ -48,6 +48,8 @@ export interface ProblemOptions {
   problemLevelIndex: number;
   publicAccess?: boolean;
   firstTimeVisited?: boolean;
+  languagesValue?: string;
+  zipFile?: string;
 }
 
 export interface CourseOptions {

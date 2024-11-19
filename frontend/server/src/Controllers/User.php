@@ -42,8 +42,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
- * @psalm-type UserRole=array{name: string}
+ * @psalm-type UserRole=array{name: string, description: null|string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
+ * @psalm-type SupportDetailsPayload=array{roleNamesWithDescription: list<UserRole>}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
@@ -625,7 +626,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
-                        'verificationEmailSuccesfully'
+                        'verificationEmailSuccessfully'
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
@@ -1698,36 +1699,57 @@ class User extends \OmegaUp\Controllers\Controller {
             'username' => $response['username']
         ];
     }
+
     /**
      * Gets extra information of the identity:
      * - last password change request
      * - verify status
      * - birth date to verify the user identity
+     * - roles assigned to user
      *
-     * @omegaup-request-param string $email
+     * @omegaup-request-param string $usernameOrEmail
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, email: null|string, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool, roles: list<string>}
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $email = $r->ensureString(
-            'email',
-            fn (string $email) => \OmegaUp\Validators::email($email)
+        $usernameOrEmail = $r->ensureString(
+            'usernameOrEmail',
+            fn (string $usernameOrEmail) => \OmegaUp\Validators::usernameOrEmail(
+                $usernameOrEmail
+            )
         );
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = \OmegaUp\DAO\Identities::getExtraInformation($email);
+        $response = \OmegaUp\DAO\Identities::getExtraInformation(
+            $usernameOrEmail
+        );
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
         }
+
+        $user = self::resolveUser($usernameOrEmail);
+        if (is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidUser'
+            );
+        }
+        $response = array_merge(
+            $response,
+            [
+                'roles' => \OmegaUp\DAO\UserRoles::getSystemRoles(
+                    $user->user_id
+                ),
+            ]
+        );
         return $response;
     }
 
@@ -3234,7 +3256,7 @@ class User extends \OmegaUp\Controllers\Controller {
         string $roleName
     ): \OmegaUp\DAO\VO\Roles {
         if (
-            !\OmegaUp\Authorization::isSystemAdmin($identity) &&
+            !\OmegaUp\Authorization::isSupportTeamMember($identity) &&
             !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -3722,7 +3744,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getSupportedProgrammingLanguages(): array {
         return array_filter(
-            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
             fn($key) => $key !== 'cat',
             ARRAY_FILTER_USE_KEY
         );
@@ -4432,7 +4454,10 @@ class User extends \OmegaUp\Controllers\Controller {
             if (is_null($role->name)) {
                 continue;
             }
-            $rolesList[] = ['name' => $role->name];
+            $rolesList[] = [
+                'name' => $role->name,
+                'description' => $role->description,
+            ];
         }
 
         $systemExperiments = [];
@@ -4465,6 +4490,42 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'admin_user',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: SupportDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getSupportDetailsForTypeScript(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'adminSupportPageNotFound'
+            );
+        }
+
+        $roles = \OmegaUp\DAO\Roles::getAll();
+        $rolesList = [];
+        foreach ($roles as $role) {
+            if (is_null($role->name) || $role->name == 'Admin') {
+                continue;
+            }
+            $rolesList[] = [
+                'name' => $role->name,
+                'description' => $role->description,
+            ];
+        }
+
+        return [
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSupportDashboard'
+                ),
+                'payload' => [
+                    'roleNamesWithDescription' => $rolesList,
+                ],
+            ],
+            'entrypoint' => 'admin_support',
         ];
     }
 

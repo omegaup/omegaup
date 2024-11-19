@@ -8,7 +8,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddRemoveRoles() {
         $username = 'testuserrole';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => $username]
             )
@@ -16,11 +16,16 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         // Call to API Add Role
-        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'username' => $username,
-            'role' => 'Admin'
-        ]));
+        // User has already the admin role
+        try {
+            \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+                'role' => 'Admin'
+            ]));
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertSame($e->getMessage(), 'userAlreadyHasSelectedRole');
+        }
         \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
@@ -95,21 +100,14 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testPreviouslyAddedRoles() {
         $username = 'testuserrole';
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => $username]
             )
         );
 
         $login = self::login($identity);
-        // Call to API Add Role
-        \OmegaUp\Controllers\User::apiAddRole(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => $username,
-                'role' => 'Admin'
-            ])
-        );
+        // Call to API Add Role to add a mentor role only, since the user already has the admin role
         \OmegaUp\Controllers\User::apiAddRole(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -132,24 +130,16 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddPreviouslyAddedRoles() {
         $username = 'testuserrole';
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => $username]
             )
         );
 
         $login = self::login($identity);
-        // Call to API Add Role
-        \OmegaUp\Controllers\User::apiAddRole(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => $username,
-                'role' => 'Admin'
-            ])
-        );
 
         try {
-            // Trying to add the same role
+            // Trying to add the same role when the user already has it
             \OmegaUp\Controllers\User::apiAddRole(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
@@ -302,6 +292,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(5, $response['identities']);
 
         // Call to API Remove Role
+        $adminLogin = self::login($admin);
         $response = \OmegaUp\Controllers\User::apiRemoveRole(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -315,6 +306,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotContains('GroupIdentityCreator', $systemRoles);
 
         try {
+            $creatorLogin = self::login($creator);
             \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
                 'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(

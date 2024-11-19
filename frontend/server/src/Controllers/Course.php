@@ -483,7 +483,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateValidSubset(
                 $languagesSet,
                 'languages',
-                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES())
             );
         }
 
@@ -774,7 +774,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        validateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -1005,7 +1005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $addedProblem['alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $identity,
-                        validateVisibility: false,
+                        shouldValidateVisibility: true,
                         isExtraProblem: $addedProblem['is_extra_problem'] ?? false,
                         points: $addedProblem['points'],
                         commit: $addedProblem['commit'] ?? null,
@@ -1040,7 +1040,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param string $problemAlias
      * @param int $problemsetId
      * @param int $userId
-     * @param bool $validateVisibility validations no needed when it is a clone
+     * @param bool $shouldValidateVisibility validations no needed when it is a clone
      * @param ?string $commit
      * @param ?int $order = 1
      */
@@ -1048,7 +1048,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         string $problemAlias,
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $validateVisibility,
+        bool $shouldValidateVisibility,
         bool $isExtraProblem = false,
         ?float $points = 100,
         ?string $commit = null,
@@ -1080,7 +1080,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
             $problemToAdd,
-            $validateVisibility,
+            $shouldValidateVisibility,
             $isExtraProblem
         );
     }
@@ -1136,16 +1136,16 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $assignment_type
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param 'homework'|'lesson'|'test' $assignment_type
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param string $description
+     * @omegaup-request-param \OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param string $name
      * @omegaup-request-param int|null $order
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param mixed $publish_time_delay
-     * @omegaup-request-param mixed $start_time
+     * @omegaup-request-param int|null $publish_time_delay
+     * @omegaup-request-param \OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiCreateAssignment(\OmegaUp\Request $r): array {
@@ -1156,11 +1156,38 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $assignmentAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias(
+                $alias
+            )
+        );
+        $assignmentType = $r->ensureEnum(
+            'assignment_type',
+            ['homework', 'test', 'lesson']
+        );
+        $name = $r->ensureString('name');
+        $description = $r->ensureString('description');
         $order = $r->ensureOptionalInt('order');
         $course = self::validateCourseExists($courseAlias);
         [
             'addedProblems' => $addedProblems,
         ] = self::validateCreateAssignment($r, $course);
+        $startTime = $r->ensureTimestamp(
+            'start_time',
+            lowerBound: null,
+            upperBound: $course->finish_time?->time
+        );
+        $unlimitedDuration = $r->ensureOptionalBool(
+            'unlimited_duration'
+        ) ?? false;
+        $finishTime = $r->ensureOptionalTimestamp(
+            'finish_time',
+            lowerBound: null,
+            upperBound: $course->finish_time?->time,
+            required: !is_null($course->finish_time) || !$unlimitedDuration,
+        );
+        $publishTimeDelay = $r->ensureOptionalInt('publish_time_delay');
 
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1176,13 +1203,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             new \OmegaUp\DAO\VO\Assignments([
                 'course_id' => $course->course_id,
                 'acl_id' => $course->acl_id,
-                'name' => $r['name'],
-                'description' => $r['description'],
-                'alias' => $r['alias'],
-                'publish_time_delay' => $r['publish_time_delay'],
-                'assignment_type' => $r['assignment_type'],
-                'start_time' => $r['start_time'],
-                'finish_time' => $r['finish_time'],
+                'name' => $name,
+                'description' => $description,
+                'alias' => $assignmentAlias,
+                'publish_time_delay' => $publishTimeDelay,
+                'assignment_type' => $assignmentType,
+                'start_time' => $startTime,
+                'finish_time' => $finishTime,
                 'order' => $order ?? \OmegaUp\DAO\Assignments::getNextPositionOrder(
                     $course->course_id
                 ),
@@ -1193,7 +1220,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         self::sendNotificationToStudent(
             $course,
-            $r['alias'],
+            $assignmentAlias,
             \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
         );
 
@@ -1415,21 +1442,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         $countProblems = \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
             $problemset
         );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['commit'],
+        $commit = $r->ensureOptionalString(
             'commit',
-            1,
-            40,
-            false
+            required: false,
+            validator: fn (string $commit) => \OmegaUp\Validators::objectId(
+                $commit
+            )
         );
         self::addProblemToAssignment(
             problemAlias: $problemAlias,
             problemsetId: $problemset->problemset_id,
             identity: $r->identity,
-            validateVisibility: true,
+            shouldValidateVisibility: true,
             isExtraProblem: $isExtraProblem,
             points: $r->ensureOptionalFloat('points') ?? 100.0,
-            commit: $r['commit'],
+            commit: $commit,
             order: $countProblems + 1,
         );
 
@@ -1483,10 +1510,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problems'],
-            'problems'
-        );
+        $problems = $r->ensureString('problems');
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1509,26 +1533,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var null|mixed */
-        $rawAliases = json_decode($r['problems'], true);
-        if (!is_array($rawAliases) || empty($rawAliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'problems'
-            );
-        }
-
-        $aliases = [];
-        /** @var mixed $alias */
-        foreach ($rawAliases as $alias) {
-            if (!is_string($alias)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'problems'
-                );
-            }
-            $aliases[] = $alias;
-        }
+        /** @var list<string> */
+        $aliases = json_decode($problems, true);
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
@@ -1578,6 +1584,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $assignments = $r->ensureString('assignments');
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['assignments'],
             'assignments'
@@ -1593,26 +1600,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var null|mixed */
-        $rawAliases = json_decode($r['assignments'], true);
-        if (!is_array($rawAliases) || empty($rawAliases)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                'assignments'
-            );
-        }
-
-        $aliases = [];
-        /** @var mixed $alias */
-        foreach ($rawAliases as $alias) {
-            if (!is_string($alias)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'assignments'
-                );
-            }
-            $aliases[] = $alias;
-        }
+        /** @var list<string> */
+        $aliases = json_decode($assignments, true);
 
         \OmegaUp\DAO\DAO::transBegin();
         try {
@@ -3681,7 +3670,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{title: \OmegaUp\TranslationString, payload: array<string, mixed>}}
+     * @return array{entrypoint: string, templateProperties: array{title: \OmegaUp\TranslationString, payload: array<string, string|null>}}
      */
     public static function getCoursesHomepageForTypeScript(\OmegaUp\Request $r): array {
         return [
@@ -3755,7 +3744,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'is_admin' => true,
-                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-course'
                     ),
@@ -3847,7 +3836,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 intval($course->course_id),
                 intval($course->group_id)
             ),
-            'allLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            'allLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
             'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 intval($course->course_id)
             ),
@@ -5857,7 +5846,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
+        $languages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
         // Get our runs
         return self::getAllRuns(
             $assignment->problemset_id,

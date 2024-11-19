@@ -8,7 +8,6 @@ import {
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import getEditorIframeBody from '../support/pageObjects/util';
 import { problemPage } from '../support/pageObjects/problemPage';
 
 describe('Course Test', () => {
@@ -49,77 +48,6 @@ describe('Course Test', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
-  });
-  it('Should change preferred language for user and follow hierarchical order to define the programming language', () => {
-    const loginOptions = loginPage.registerMultipleUsers(2);
-    const users = [loginOptions[0].username];
-    const courseOptions = coursePage.generateCourseOptions();
-    const assignmentAlias = 'ut_rank_hw_' + uuid();
-    const shortAlias = assignmentAlias.slice(0, 12);
-    const problemOptions = problemPage.generateProblemOptions(1);
-    cy.login(loginOptions[1]);
-    cy.createProblem(problemOptions[0]);
-    coursePage.createCourse(courseOptions);
-    coursePage.addStudents(users);
-    coursePage.addAssignmentWithProblems(
-      assignmentAlias,
-      shortAlias,
-      problemOptions,
-    );
-    cy.logout();
-
-    cy.login(loginOptions[0]);
-    // update preferred langauge to py2
-    profilePage.updatePreferredLanguage('py2');
-    // go to the link with the editor
-    coursePage.enterCourse(courseOptions.courseAlias);
-    cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
-
-    let iframeBody = getEditorIframeBody();
-    // should have py2 as selected language language
-    iframeBody
-      .find('#language')
-      .should('be.visible')
-      .find('option:selected')
-      .should('have.value', 'py2');
-
-    // language of the modal should be py2 aswell
-    cy.get('[data-new-run]').click();
-    cy.get('[name="language"]').should('have.value', 'py2');
-    // close the modal using close button that is visible
-    // (there is 4, only one of them is visible at a time)
-    cy.get('.close').each(($button) => {
-      const isVisible = Cypress.$($button).is(':visible');
-      if (isVisible) {
-        cy.wrap($button).click();
-      }
-    });
-
-    // make the submission with cpp20
-    const runOptions: RunOptions = {
-      problemAlias: problemOptions[0].problemAlias,
-      fixturePath: 'main.cpp',
-      language: 'cpp20-gcc',
-      valid: true,
-      status: 'AC',
-    };
-    coursePage.createSubmission(problemOptions[0], runOptions);
-    coursePage.closePopup(problemOptions[0]);
-    // reload the page, check the language again
-    // clear session storage before reloading
-    cy.clearAllSessionStorage();
-    cy.reload();
-    cy.get(`a[data-problem="${problemOptions[0].problemAlias}"]`).click();
-    iframeBody = getEditorIframeBody();
-
-    // the language should be cpp20 per hierarchy
-    iframeBody
-      .find('#language')
-      .should('be.visible')
-      .find('option:selected')
-      .should('have.value', 'cpp20-gcc');
-
-    cy.logout();
   });
   it('Should create a course and add students to it as participants make submits to problems', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
@@ -278,11 +206,11 @@ describe('Course Test', () => {
 
     cy.login(loginOptions[1]);
     coursePage.enterCourseAssignmentPage(courseOptions.courseAlias);
-    const suggestions: { line: number; text: string; }[] = [
+    const suggestions: { line: number; text: string }[] = [
       { line: 1, text: 'Solution is not optimal' },
       { line: 3, text: 'This code could be improved' },
       { line: 5, text: 'This line could be removed' },
-    ]
+    ];
     coursePage.leaveFeedbackOnSolution(suggestions);
     cy.logout();
 
@@ -349,6 +277,7 @@ describe('Course Test', () => {
     const assignmentAlias = 'ut_rank_hw_' + uuid();
     const shortAlias = assignmentAlias.slice(0, 12);
     const problemOptions = problemPage.generateProblemOptions(1);
+
     const runOptions: RunOptions = {
       problemAlias: problemOptions[0].problemAlias,
       fixturePath: 'main.cpp',
@@ -597,7 +526,6 @@ describe('Course Test', () => {
       });
     cy.logout();
   });
-
 
   it('Should create a public course and share the link to allow joining it', () => {
     const loginOptions = loginPage.registerMultipleUsers(2);

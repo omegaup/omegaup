@@ -21,11 +21,7 @@ for (const entryname of Object.keys(frontendConfig.entry)) {
   );
 }
 
-const config = [
-  frontendConfig,
-  require('./webpack.config-style.js'),
-  require('./webpack.config-graderv2.js'),
-];
+const config = [frontendConfig, require('./webpack.config-style.js')];
 
 module.exports = (env, argv) => {
   const devtool =

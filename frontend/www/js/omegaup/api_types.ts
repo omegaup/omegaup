@@ -734,31 +734,20 @@ export namespace types {
     ): types.ContestListPayload {
       return ((x) => {
         x.contests = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  if (!Array.isArray(x)) {
-                    return x;
-                  }
-                  return x.map((x) => {
-                    x.finish_time = ((x: number) => new Date(x * 1000))(
-                      x.finish_time,
-                    );
-                    x.last_updated = ((x: number) => new Date(x * 1000))(
-                      x.last_updated,
-                    );
-                    x.original_finish_time = ((x: number) =>
-                      new Date(x * 1000))(x.original_finish_time);
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  });
-                })(x[y])),
-            );
+          if (!Array.isArray(x)) {
+            return x;
           }
-          return x;
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
         })(x.contests);
         return x;
       })(
@@ -1567,6 +1556,14 @@ export namespace types {
       );
     }
 
+    export function FullIDEPayload(
+      elementId: string = 'payload',
+    ): types.FullIDEPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -2268,6 +2265,14 @@ export namespace types {
         JSON.parse(
           (document.getElementById(elementId) as HTMLElement).innerText,
         ),
+      );
+    }
+
+    export function SupportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.SupportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -3110,15 +3115,15 @@ export namespace types {
   }
 
   export interface ContestListPayload {
-    contests: types.TimeTypeContests;
-    countContests: { [key: string]: number };
-    isLogged: boolean;
+    contests: types.ContestListItem[];
+    countContests: number;
     query?: string;
   }
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
     countContests: { current: number; future: number; past: number };
+    pageSize: number;
     query?: string;
   }
 
@@ -3565,6 +3570,11 @@ export namespace types {
     progress?: number;
     school_name?: string;
     start_time: Date;
+  }
+
+  export interface FullIDEPayload {
+    acceptedLanguages: string[];
+    preferredLanguage?: string;
   }
 
   export interface GraderStatus {
@@ -4717,6 +4727,11 @@ export namespace types {
   export interface SubmissionsListPayload {
     includeUser: boolean;
     submissions: types.Submission[];
+    username?: string;
+  }
+
+  export interface SupportDetailsPayload {
+    roleNamesWithDescription: types.UserRole[];
   }
 
   export interface Tag {
@@ -4915,6 +4930,7 @@ export namespace types {
   }
 
   export interface UserRole {
+    description?: string;
     name: string;
   }
 
@@ -5787,7 +5803,9 @@ export namespace messages {
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
     birth_date?: Date;
+    email?: string;
     last_login?: Date;
+    roles: string[];
     username: string;
     verified: boolean;
     within_last_day: boolean;

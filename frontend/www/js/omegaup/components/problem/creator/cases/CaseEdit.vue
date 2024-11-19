@@ -40,10 +40,21 @@
             :name="getSelectedCase.name"
             :group="getSelectedGroup.groupID"
             :points="getSelectedCase.points"
+            :auto-points="getSelectedCase.autoPoints"
             :edit-mode="true"
           />
         </b-modal>
-        <b-button variant="light" class="mr-2">
+        <b-button
+          data-delete-case
+          variant="light"
+          class="mr-2"
+          @click="
+            deleteCase({
+              groupID: getSelectedGroup.groupID,
+              caseID: getSelectedCase.caseID,
+            })
+          "
+        >
           <div class="container">
             <div class="row">
               <BIconTrashFill
@@ -157,14 +168,14 @@
                   </b-col>
                   <b-col cols="3" class="pl-2 pr-0 text-center">
                     <b-dropdown
-                      data-array-modal-dropdown
+                      :data-array-modal-dropdown="line.lineID"
                       :text="getLineNameFromKind(line.data.kind)"
                       variant="light"
                     >
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
-                        :data-array-modal-dropdown="lineKindOption.type"
+                        :data-array-modal-dropdown-kind="`${line.lineID}-${lineKindOption.kind}`"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
@@ -177,7 +188,7 @@
                         getEditIconDisplay(line) ===
                         EditIconDisplayOption.EDIT_ICON
                       "
-                      data-line-edit-button
+                      :data-line-edit-button="line.lineID"
                       size="sm"
                       type="button"
                       :title="T.problemCreatorLineEdit"
@@ -394,11 +405,47 @@
               </b-container>
             </td>
           </tr>
+          <tr>
+            <td>
+              <b-container fluid class="bg-light">
+                <b-row class="d-flex justify-content-between" align-v="center">
+                  <b-col class="pr-1 text-center">
+                    <b-form-textarea
+                      v-model="getSelectedCase.output"
+                      data-output-textarea
+                      class="mt-3 mb-3 text-nowrap overflow-auto w-100"
+                      rows="2"
+                      max-rows="3"
+                      :placeholder="T.problemCreatorOutputPlaceHolder"
+                    >
+                    </b-form-textarea>
+                  </b-col>
+                  <b-col cols="1.5">
+                    <b-button
+                      data-erase-output
+                      class="btn text-danger btn-lg"
+                      type="button"
+                      :title="T.problemCreatorEraseOutput"
+                      variant="light"
+                      @click="getSelectedCase.output = ''"
+                    >
+                      <font-awesome-icon icon="eraser" />
+                    </b-button>
+                  </b-col>
+                </b-row>
+              </b-container>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
     <div class="text-center">
-      <b-button variant="light" class="mr-2" @click="addNewLine">
+      <b-button
+        data-edit-case-add-line
+        variant="light"
+        class="mr-2"
+        @click="addNewLine"
+      >
         <div class="container">
           <div class="row">
             <BIconPlusSquare
@@ -480,6 +527,10 @@ export default class CaseEdit extends Vue {
     LineID,
     string,
   ]) => void;
+  @casesStore.Mutation('deleteCase') deleteCase!: ({
+    groupID,
+    caseID,
+  }: CaseGroupID) => void;
   @casesStore.Mutation('updateCase') updateCase!: ([
     oldGroupID,
     updateCaseRequest,
@@ -747,7 +798,7 @@ export default class CaseEdit extends Vue {
       caseID: this.getSelectedCase.caseID,
       name: this.caseInputRef.caseName,
       points: this.caseInputRef.casePoints,
-      autoPoints: this.caseInputRef.casePoints === null,
+      autoPoints: this.caseInputRef.caseAutoPoints,
     };
     const oldGroupID: GroupID = this.getSelectedGroup.groupID;
     this.updateCase([oldGroupID, updateCaseRequest]);

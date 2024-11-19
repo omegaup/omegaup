@@ -1,7 +1,11 @@
 import { getISODate } from '../support/commands';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import { SchoolDetails, UserInformation, UserPreferences } from '../support/types';
+import {
+  SchoolDetails,
+  UserInformation,
+  UserPreferences,
+} from '../support/types';
 
 describe('Navigation Test', () => {
   beforeEach(() => {
@@ -61,7 +65,7 @@ describe('Navigation Test', () => {
       name: 'MIT',
       grade: 'bachelors',
       enrolledStatus: true,
-    }
+    };
 
     cy.login(loginOptions[0]);
     profilePage.updateSchoolDetails(schoolDetails);

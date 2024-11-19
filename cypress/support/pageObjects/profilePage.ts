@@ -1,7 +1,6 @@
 import {
   LoginOptions,
   SchoolDetails,
-  TeamGroupOptions,
   UserInformation,
   UserPreferences,
 } from '../types';
@@ -19,9 +18,15 @@ export class ProfilePage {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
+    cy.get('[data-preference-language]').select(preferredLanguage);
+    cy.get('[data-preference-save-button]').click();
+  }
+  updatePreferredProgrammingLanguage(preferredLanguage: string): void {
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-profile]').click();
+    cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preferred-language]').select(preferredLanguage);
     cy.get('[data-preference-save-button]').click();
-    cy.get('#alert-close').click();
   }
 
   navigateToMyProblemsPage(): void {
@@ -45,10 +50,12 @@ export class ProfilePage {
 
   deleteProblemsInBatch(problemAliases: string[]): void {
     problemAliases.forEach((problemAlias) => {
-      cy.get(`input[type="checkbox"][data-selected-problem="${problemAlias}"]`).click();
+      cy.get(
+        `input[type="checkbox"][data-selected-problem="${problemAlias}"]`,
+      ).click();
     });
-    cy.get('select[data-selected-problems]').select("2");
-    cy.get("[data-visibility-action]").click();
+    cy.get('select[data-selected-problems]').select('2');
+    cy.get('[data-visibility-action]').click();
     cy.get('.modal-footer>button.btn-danger').click();
   }
 

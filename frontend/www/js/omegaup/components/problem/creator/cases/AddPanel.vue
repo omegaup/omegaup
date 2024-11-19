@@ -5,10 +5,14 @@
         <b-tabs small pills lazy>
           <b-tab
             :active="tab === 'case'"
-            :title="T.problemCreatorCase"
             name="modal-form"
             @click="tab = 'case'"
           >
+            <template #title>
+              <span name="group" data-problem-creator-add-panel-tab="case">
+                {{ T.problemCreatorCase }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidCaseName"
               variant="danger"
@@ -21,10 +25,14 @@
           </b-tab>
           <b-tab
             :active="tab === 'group'"
-            :title="T.problemCreatorGroup"
             name="modal-form"
             @click="tab = 'group'"
           >
+            <template #title>
+              <span name="group" data-problem-creator-add-panel-tab="group">
+                {{ T.problemCreatorGroup }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidGroupName"
               variant="danger"
@@ -37,10 +45,17 @@
           </b-tab>
           <b-tab
             :active="tab === 'multiplecases'"
-            :title="T.problemCreatorMultipleCases"
             name="modal-form"
             @click="tab = 'multiplecases'"
           >
+            <template #title>
+              <span
+                name="multiple-cases"
+                data-problem-creator-add-panel-tab="multiple-cases"
+              >
+                {{ T.problemCreatorMultipleCases }}</span
+              >
+            </template>
             <b-alert
               v-model="invalidCaseName"
               variant="danger"
@@ -62,9 +77,13 @@
         @click="$emit('close-add-window')"
         >{{ T.wordsCancel }}</b-button
       >
-      <b-button type="submit" variant="success" size="sm">{{
-        T.problemCreatorAdd
-      }}</b-button>
+      <b-button
+        data-problem-creator-add-panel-submit
+        type="submit"
+        variant="success"
+        size="sm"
+        >{{ T.problemCreatorAdd }}</b-button
+      >
     </form>
   </b-card>
 </template>
@@ -121,7 +140,7 @@ export default class AddPanel extends Vue {
       const caseName = this.caseInputRef.caseName;
       const caseGroup = this.caseInputRef.caseGroup;
       const casePoints = this.caseInputRef.casePoints;
-      const caseAutoPoints = casePoints === null;
+      const caseAutoPoints = this.caseInputRef.caseAutoPoints;
 
       // Check if there is a group/case with the same name already
       if (caseGroup === NIL) {
@@ -151,7 +170,7 @@ export default class AddPanel extends Vue {
     } else if (this.tab === 'group') {
       const groupName = this.groupInputRef.groupName;
       const groupPoints = this.groupInputRef.groupPoints;
-      const groupAutoPoints = groupPoints === null;
+      const groupAutoPoints = this.groupInputRef.groupAutoPoints;
 
       // Check if there is a group with the same name already
       const nameAlreadyExists = this.groups.find((g) => g.name === groupName);

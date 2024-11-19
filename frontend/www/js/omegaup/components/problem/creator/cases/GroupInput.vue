@@ -8,6 +8,7 @@
     >
       <b-form-input
         v-model="groupName"
+        data-problem-creator-group-input="name"
         :formatter="formatter"
         required
         autocomplete="off"
@@ -15,7 +16,7 @@
       />
     </b-form-group>
     <b-form-group
-      v-show="groupPoints !== null"
+      v-show="!groupAutoPoints"
       :label="T.problemCreatorPoints"
       label-for="case-points"
     >
@@ -26,7 +27,6 @@
         type="number"
         number
         min="0"
-        max="100"
       />
     </b-form-group>
     <b-form-group
@@ -34,9 +34,9 @@
       :description="T.problemCreatorAutomaticPointsHelperGroup"
     >
       <b-form-checkbox
-        :checked="groupPoints === null"
-        name="auto-points"
-        @change="groupPoints = groupPoints === null ? 0 : null"
+        :checked="groupAutoPoints"
+        name="group-auto-points"
+        @change="toggleGroupAutoPoints"
       >
       </b-form-checkbox>
     </b-form-group>
@@ -50,10 +50,12 @@ import T from '../../../../lang';
 @Component
 export default class GroupInput extends Vue {
   @Prop({ default: '' }) name!: string;
-  @Prop({ default: 0 }) points!: number | null;
+  @Prop({ default: 100 }) points!: number;
+  @Prop({ default: true }) autoPoints!: boolean;
 
   groupName = this.name;
-  groupPoints: number | null = this.points;
+  groupPoints: number = this.points;
+  groupAutoPoints: boolean = this.autoPoints;
 
   T = T;
 
@@ -61,11 +63,15 @@ export default class GroupInput extends Vue {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
-  pointsFormatter(points: number | null) {
-    if (points === null) {
-      return null;
-    }
+  pointsFormatter(points: number) {
     return Math.max(points, 0);
+  }
+
+  toggleGroupAutoPoints() {
+    this.groupAutoPoints = !this.groupAutoPoints;
+    if (this.groupAutoPoints) {
+      this.groupPoints = 100;
+    }
   }
 }
 </script>

@@ -3,6 +3,8 @@ import { CasesState } from './modules/cases';
 export type CaseID = string;
 export type GroupID = string;
 export type LineID = string;
+export type LineInfoID = string;
+export type LayoutID = string;
 
 /**
  * StoreState
@@ -102,6 +104,19 @@ export interface CaseLine {
 }
 
 /**
+ * CaseLifeInfo
+ * Info of a CaseLine
+ * @alias CaseLineInfo
+ * @typedef {object}
+ * @property {LineInfoID} lineInfoID UUID of the lineInfo
+ * @property {string} label Label of the line
+ * @property {CaseLineData} content content of the line
+ */
+export interface CaseLineInfo extends Omit<CaseLine, 'lineID' | 'caseID'> {
+  lineInfoID: LineInfoID;
+}
+
+/**
  * Case
  * Contains all the information of a case
  * @alias Case
@@ -111,19 +126,23 @@ export interface CaseLine {
  * @property {stirng} name Name of the case
  * @property {number | null} points Points of the case
  * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
+ * @property {string} output output of the case
+ * @property {boolean} autoPoints Whether the points are gonna be calculated automatically
  */
 export interface Case {
   caseID: string;
   groupID: string;
   name: string;
   lines: CaseLine[];
-  points: number | null;
+  output: string;
+  points: number;
+  autoPoints: boolean;
 }
 
 /**
  * Group
  * Contains all the information of a group
- * @alis Group
+ * @alias Group
  * @typedef {object}
  * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
@@ -135,10 +154,25 @@ export interface Case {
 export interface Group {
   groupID: GroupID;
   name: string;
-  points: number | null;
+  points: number;
   autoPoints: boolean;
   ungroupedCase: boolean;
   cases: Case[];
+}
+
+/**
+ * Layout
+ * Contains all the information of a Layout
+ * @alias Group
+ * @typedef {object}
+ * @property {LayoutID} layoutID UUID of the layout
+ * @property {string} name Name of the Layout
+ * @property {Array<CaseLineInfo>} caseLineInfos Line infos of the Layout
+ */
+export interface Layout {
+  layoutID: LayoutID;
+  name: string;
+  caseLineInfos: CaseLineInfo[];
 }
 
 /**
@@ -176,7 +210,7 @@ export interface CaseRequest {
   caseID: CaseID;
   name: string;
   autoPoints: boolean;
-  points: number | null;
+  points: number;
   lines?: CaseLine[];
 }
 

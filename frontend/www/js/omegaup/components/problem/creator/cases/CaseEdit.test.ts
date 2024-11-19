@@ -4,6 +4,7 @@ import CaseEdit from './CaseEdit.vue';
 import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
+import { NIL as UUID_NIL } from 'uuid';
 import {
   generateCase,
   generateGroup,
@@ -52,14 +53,15 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    // There are currently 6 bootstrap buttons on the page.
+    // There are currently 7 bootstrap buttons on the page.
     // - Edit case
     // - Delete case
     // - Download .in
     // - Download .txt
     // - Delete lines
     // - Add new line
-    const initialBButtonsCount = 6;
+    // - Erase output
+    const initialBButtonsCount = 7;
 
     const buttons = wrapper.findAllComponents(BButton);
     expect(buttons.length).toBe(initialBButtonsCount);
@@ -97,6 +99,33 @@ describe('CaseEdit.vue', () => {
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
     expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+  });
+
+  it('Should delete a case', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const caseDeleteButton = wrapper.find('button[data-delete-case]');
+    expect(caseDeleteButton.exists()).toBeTruthy();
+
+    await caseDeleteButton.trigger('click');
+    expect(
+      wrapper.vm.groups.find((_group) => _group.groupID === newGroup.groupID),
+    ).toBeTruthy();
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === newGroup.groupID)
+        ?.cases.find((_case) => _case.caseID === newCase.caseID),
+    ).toBeFalsy();
+    expect(store.state.casesStore.selected.caseID).toBe(UUID_NIL);
+    expect(store.state.casesStore.selected.groupID).toBe(UUID_NIL);
   });
 
   it('Should add, modify and delete a line', async () => {
@@ -153,6 +182,43 @@ describe('CaseEdit.vue', () => {
 
     // The input element should be replaced by textarea element
     expect(formInputsUpdated.length).toBe(0);
+  });
+
+  it('Should write and erase outputs', async () => {
+    const wrapper = mount(CaseEdit, { localVue, store: store });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const outputTextarea = wrapper.find('textarea[data-output-textarea]');
+    expect(outputTextarea.exists()).toBeTruthy();
+
+    const testOutput = 'Hello omegaUp';
+    await outputTextarea.setValue(testOutput);
+
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === newGroup.groupID)
+        ?.cases.find((_case) => _case.caseID === newCase.caseID)?.output,
+    ).toBe(testOutput);
+
+    expect((outputTextarea.element as HTMLInputElement).value).toBe(testOutput);
+
+    const eraseOutputButton = wrapper.find('button[data-erase-output]');
+    expect(eraseOutputButton.exists()).toBeTruthy();
+
+    await eraseOutputButton.trigger('click');
+    expect(
+      wrapper.vm.groups
+        .find((_group) => _group.groupID === newGroup.groupID)
+        ?.cases.find((_case) => _case.caseID === newCase.caseID)?.output,
+    ).toBe('');
+    expect((outputTextarea.element as HTMLInputElement).value).toBe('');
   });
 
   it('Should modify and move a case', async () => {
@@ -409,7 +475,7 @@ describe('CaseEdit.vue', () => {
     const modalInputs = modalBody.findAll('input');
 
     const modalButton = modalBody.find('button[data-array-modal-generate]');
-    expect(modalButton.exists).toBeTruthy();
+    expect(modalButton.exists()).toBeTruthy();
 
     const mockGenerate = jest.spyOn(wrapper.vm, 'getArrayContent');
 
@@ -640,13 +706,18 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
 
     const dropdownsMultiline = wrapper.findAll(
-      `a[data-array-modal-dropdown="${T.problemCreatorLineMultiline}"]`,
+      `a[data-array-modal-dropdown-kind]`,
     );
 
     // There are two dropdown items for multiline, one for each line.
-    expect(dropdownsMultiline.length).toBe(2);
+    const fragment = 'multiline';
+    const filteredDropdowns = dropdownsMultiline.filter((node) => {
+      const nodeAttribute = node.attributes('data-array-modal-dropdown-kind');
+      return nodeAttribute?.includes(fragment);
+    });
+    expect(filteredDropdowns.length).toBe(2);
 
-    await dropdownsMultiline.at(1).trigger('click');
+    await filteredDropdowns.at(1).trigger('click');
 
     const formInputs = wrapper.findAll('input');
     const formTextArea = wrapper.find('textarea');

@@ -15,7 +15,7 @@
           <b-container>
             <b-row class="justify-content-between" align-v="center">
               <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-                <form :action="queryURL" method="GET">
+                <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
                       v-model.lazy="currentQuery"
@@ -27,8 +27,13 @@
                       autocapitalize="off"
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
+                      @keyup.enter="onSearchQuery"
                     />
-                    <button class="btn reset-btn nav-link" type="reset">
+                    <button
+                      class="btn reset-btn nav-link"
+                      type="reset"
+                      @click="onReset"
+                    >
                       &times;
                     </button>
                     <div class="input-group-append">
@@ -167,34 +172,35 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.finish_time)">
-                  {{
-                    ui.formatString(T.contestEndTime, {
-                      endDate: finishContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.finish_time)">
+                    {{
+                      ui.formatString(T.contestEndTime, {
+                        endDate: finishContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
           <b-spinner
             v-if="refreshing"
             class="spinner mt-4"
@@ -209,37 +215,38 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartTime, {
-                      startDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartTime, {
+                        startDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
           <b-spinner
             v-if="refreshing"
             class="spinner mt-4"
@@ -254,37 +261,38 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="filteredContestList.length === 0">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-          >
-            <template #contest-enroll-status>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartedTime, {
-                      startedDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-button-see-details>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-enroll-status>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartedTime, {
+                        startedDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-button-see-details>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
         </b-tab>
       </b-tabs>
       <b-pagination-nav
@@ -294,7 +302,7 @@
         first-number
         last-number
         size="lg"
-        align="center"
+        :align="'center'"
         :link-gen="linkGen"
         :number-of-pages="numberOfPages(currentTab)"
       ></b-pagination-nav>
@@ -303,7 +311,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -353,6 +361,14 @@ export enum ContestFilter {
   All = 'all',
 }
 
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -360,13 +376,15 @@ export enum ContestFilter {
   },
 })
 export default class ArenaContestList extends Vue {
+  @Ref('paginator') readonly paginator!: Vue;
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
-  @Prop() sortOrder!: ContestOrder;
+  @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop({ default: 10 }) pageSize!: number;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -392,25 +410,86 @@ export default class ArenaContestList extends Vue {
       // Default value when there are no contests in the list
       return 1;
     }
-    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
+    const numberOfPages = Math.ceil(this.countContests[tab] / this.pageSize);
     return numberOfPages;
   }
 
-  get queryURL(): string {
-    return `/arena/#${this.currentTab}`;
+  onSearchQuery() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: this.currentQuery,
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  onReset() {
+    this.currentQuery = '';
   }
 
   linkGen(pageNum: number) {
+    const urlObj = new URL(window.location.href);
     return {
       path: `/arena/`,
       query: {
         page: pageNum,
-        tab_name: this.currentTab,
-        query: this.query,
-        sort_order: this.currentOrder,
-        filter: this.filter,
+        tab_name: urlObj.searchParams.get('tab_name') || ContestTab.Current,
+        query: urlObj.searchParams.get('query') || '',
+        sort_order: urlObj.searchParams.get('sort_order') || ContestOrder.None,
+        filter: urlObj.searchParams.get('filter') || ContestFilter.All,
       },
     };
+  }
+
+  mounted() {
+    (this.paginator.$el as HTMLElement).addEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
+  beforeDestroy() {
+    (this.paginator.$el as HTMLElement).removeEventListener(
+      'click',
+      this.handlePageClick,
+    );
+  }
+
+  fetchPage(params: UrlParams, urlObj: URL) {
+    this.$emit('fetch-page', { params, urlObj });
+  }
+
+  handlePageClick(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const url = (event.target as HTMLAnchorElement).href;
+    if (url) {
+      const urlObj = new URL(url);
+      const params: UrlParams = {
+        page: parseInt(urlObj.searchParams.get('page') || '1', 10),
+        tab_name:
+          (urlObj.searchParams.get('tab_name') as ContestTab) ||
+          ContestTab.Current,
+        query: urlObj.searchParams.get('query') || '',
+        sort_order:
+          (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+          ContestOrder.None,
+        filter:
+          (urlObj.searchParams.get('filter') as ContestFilter) ||
+          ContestFilter.All,
+      };
+      this.fetchPage(params, urlObj);
+    }
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -459,65 +538,6 @@ export default class ArenaContestList extends Vue {
     this.currentFilter = ContestFilter.All;
   }
 
-  get filteredContestList(): types.ContestListItem[] {
-    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilter === ContestFilter.SignedUp) {
-      filters.push((item) => item.participating);
-    }
-    if (this.currentFilter === ContestFilter.OnlyRecommended) {
-      filters.push((item) => item.recommended);
-    }
-    return this.sortedContestList.slice().filter((contestItem) => {
-      for (const filter of filters) {
-        if (!filter(contestItem)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-
-  get sortedContestList(): types.ContestListItem[] {
-    function compareNumber(a: number, b: number): number {
-      if (a < b) {
-        return 1;
-      } else if (a > b) {
-        return -1;
-      }
-      return 0;
-    }
-    let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
-    switch (this.currentOrder) {
-      case ContestOrder.None:
-        return this.contestList.slice();
-      case ContestOrder.Title:
-        sortBy = (a, b) => a.title.localeCompare(b.title);
-        break;
-      case ContestOrder.Ends:
-        sortBy = (a, b) =>
-          compareNumber(a.finish_time.getTime(), b.finish_time.getTime());
-        break;
-      case ContestOrder.Duration:
-        sortBy = (a, b) =>
-          compareNumber(
-            a.finish_time.getTime() - a.start_time.getTime(),
-            b.finish_time.getTime() - b.start_time.getTime(),
-          );
-        break;
-      case ContestOrder.Organizer:
-        sortBy = (a, b) => a.organizer.localeCompare(b.organizer);
-        break;
-      case ContestOrder.Contestants:
-        sortBy = (a, b) => compareNumber(a.contestants, b.contestants);
-        break;
-      case ContestOrder.SignedUp:
-        sortBy = (a, b) =>
-          compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
-        break;
-    }
-    return this.contestList.slice().sort(sortBy);
-  }
-
   get contestList(): types.ContestListItem[] {
     switch (this.currentTab) {
       case ContestTab.Current:
@@ -529,6 +549,74 @@ export default class ArenaContestList extends Vue {
       default:
         return this.contests.current;
     }
+  }
+
+  get contestListEmpty(): boolean {
+    if (!this.contestList) return true;
+    return this.contestList.length === 0;
+  }
+
+  @Watch('currentOrder', { immediate: true, deep: true })
+  onCurrentOrderChanged(
+    newValue: ContestOrder,
+    oldValue: undefined | ContestOrder,
+  ) {
+    if (typeof oldValue === 'undefined') return;
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order: newValue,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentFilter', { immediate: true, deep: true })
+  onCurrentFilterChanged(
+    newValue: ContestFilter,
+    oldValue: undefined | ContestFilter,
+  ) {
+    if (typeof oldValue === 'undefined') return;
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name:
+        (urlObj.searchParams.get('tab_name') as ContestTab) ||
+        ContestTab.Current,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter: newValue,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
+  }
+
+  @Watch('currentTab', { immediate: true, deep: true })
+  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
+    if (typeof oldValue === 'undefined') return;
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: newValue,
+      query: urlObj.searchParams.get('query') || '',
+      sort_order:
+        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
+        ContestOrder.None,
+      filter:
+        (urlObj.searchParams.get('filter') as ContestFilter) ||
+        ContestFilter.All,
+    };
+    this.currentPage = 1;
+    this.fetchPage(params, urlObj);
   }
 }
 </script>
