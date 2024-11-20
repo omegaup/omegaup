@@ -730,8 +730,7 @@ def compute_points_for_user(
             Submissions
         WHERE
             identity_id IN ({identity_ids_str})
-            AND time >= %s
-            AND time < %s
+            AND verdict = 'AC' AND type = 'normal' AND time >= %s AND time < %s
     ''', (first_day_of_current_month, first_day_of_next_month))
 
     # Populate user_problems dictionary with the problems solved by each user
