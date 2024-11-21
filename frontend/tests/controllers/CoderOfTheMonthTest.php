@@ -150,29 +150,29 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // should not be considered for the current month.
         $submissionsMapping = [
             0 => [
-                ['username' => 'user_01', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_02', 'numRuns' => [0, 1, 1]],
-                ['username' => 'user_03', 'numRuns' => [0, 1, 0]],
+                ['username' => 'user_01', 'numRuns' => [0, 0, 0]], // 0
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 0
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
             ],
             1 => [
-                ['username' => 'user_01', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_02', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_03', 'numRuns' => [1, 0, 0]],
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 1
+                ['username' => 'user_02', 'numRuns' => [0, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
             ],
             2 => [
-                ['username' => 'user_01', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_02', 'numRuns' => [0, 1, 1]],
-                ['username' => 'user_03', 'numRuns' => [1, 1, 0]],
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 2
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
             ],
             3 => [
-                ['username' => 'user_01', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_02', 'numRuns' => [1, 0, 1]],
-                ['username' => 'user_03', 'numRuns' => [0, 0, 1]],
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 3
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [0, 1, 1]], // 1
             ],
             4 => [
-                ['username' => 'user_01', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_02', 'numRuns' => [0, 0, 1]],
-                ['username' => 'user_03', 'numRuns' => [1, 1, 0]],
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 4
+                ['username' => 'user_02', 'numRuns' => [0, 1, 1]], // 2
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 1
             ],
         ];
 
@@ -192,8 +192,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $runCreationDate = self::setFirstDayOfTheCurrentMonth();
 
         $problemData = [];
-        foreach ($submissionsMapping as $index => $problemSubmissions) {
-            $problemData[$index] = \OmegaUp\Test\Factories\Problem::createProblem();
+        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
+            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => 'problem_' . $indexProblem,
+                ])
+            );
             foreach ($problemSubmissions as $indexUser => $submissionsUser) {
                 foreach ($submissionsUser['numRuns'] as $month => $shouldCreateRun) {
                     if ($shouldCreateRun == 0) {
@@ -212,44 +217,26 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     }
                     \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
                         $identities[$indexUser],
-                        $problemData[$index],
+                        $problemData[$indexProblem],
                         $runCreationDate
                     );
                 }
             }
         }
-
-        // Create admin to get the runs
-        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
-        $adminLogin = self::login($admin);
-
-        $runsList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-        ]))['runs'];
-
-        foreach ($runsList as $run) {
-            error_log(
-                print_r(
-                    $run['alias'],
-                    true
-                ) . ': ' . print_r(
-                    \OmegaUp\ApiUtils::getStringTime(
-                        $run['time']->time
-                    ),
-                    true
-                )
-            );
-        }
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
 
         $today = date('Y-m-01', \OmegaUp\Time::get());
 
-        $responseCoder = $this->getCoderOfTheMonth(
+        $response = $this->getCoderOfTheMonth(
             $today,
-            '1 month',
+            'this month',
             $category
         );
 
-        error_log(print_r($responseCoder, true));
+        $this->assertSame(
+            $identities[0]->username,
+            $response['coderinfo']['username']
+        );
     }
 
     /**

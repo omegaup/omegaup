@@ -723,15 +723,35 @@ def compute_points_for_user(
     identity_ids_str = ', '.join(map(str, identity_ids))
 
     cur_readonly.execute(f'''
-        SELECT DISTINCT
-            identity_id,
-            problem_id
+        WITH FirstSubmissions AS (
+            SELECT
+                identity_id,
+                problem_id,
+                MIN(time) AS first_time_solved
+            FROM
+                Submissions
+            WHERE
+                verdict = 'AC' AND type = 'normal'
+            GROUP BY
+                identity_id, problem_id
+        )
+        SELECT
+            s.identity_id,
+            s.problem_id,
+            fs.first_time_solved
         FROM
-            Submissions
+            Submissions s
+        INNER JOIN
+            FirstSubmissions fs
+        ON
+            s.identity_id = fs.identity_id AND s.problem_id = fs.problem_id
         WHERE
-            identity_id IN ({identity_ids_str})
-            AND verdict = 'AC' AND type = 'normal' AND time >= %s AND time < %s
-    ''', (first_day_of_current_month, first_day_of_next_month))
+            s.identity_id IN ({identity_ids_str})
+            AND s.verdict = 'AC' AND s.type = 'normal'
+            AND s.time >= %s AND s.time < %s
+            AND fs.first_time_solved >= %s AND fs.first_time_solved < %s;
+    ''', (first_day_of_current_month, first_day_of_next_month,
+          first_day_of_current_month, first_day_of_next_month))
 
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
