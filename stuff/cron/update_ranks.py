@@ -862,6 +862,68 @@ def update_coder_of_the_month_candidates(
 
     logging.info(problems)
 
+    coders = get_last_12_coders_of_the_month(cur_readonly, category)
+
+    logging.info(coders)
+
+
+def get_last_12_coders_of_the_month(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    category: str,
+) -> List[str]:
+    '''Returns the last 12 coders of the month, to avoid repeating users'''
+
+    first_day_of_current_month = _default_date()
+
+    # Note: This query should be always syncronized with the one in the
+    # function getCodersOfTheMonth located in the /DAO/CoderOfTheMonth.php file
+    sql = '''
+          SELECT
+              cm.time,
+              i.username,
+              IFNULL(i.country_id, 'xx') AS country_id,
+              e.email,
+              IFNULL(ur.classname, 'user-rank-unranked') AS classname
+          FROM
+              Coder_Of_The_Month cm
+          INNER JOIN
+              Users u ON u.user_id = cm.user_id
+          INNER JOIN
+              Identities i ON i.identity_id = u.main_identity_id
+          LEFT JOIN
+              Emails e ON e.user_id = u.user_id
+          LEFT JOIN
+              User_Rank ur ON ur.user_id = cm.user_id
+          WHERE
+              (cm.selected_by IS NOT NULL
+              OR (
+                  cm.`ranking` = 1 AND
+                  NOT EXISTS (
+                      SELECT
+                          *
+                      FROM
+                          Coder_Of_The_Month
+                      WHERE
+                          time = cm.time AND
+                          selected_by IS NOT NULL AND
+                          category = %s
+                  )
+              ))
+              AND cm.category = %s
+              AND cm.time <= %s
+          ORDER BY
+              cm.time DESC
+          LIMIT
+              0, 12;
+    '''
+    cur_readonly.execute(sql, (category, category, first_day_of_current_month))
+
+    coders = []
+    for row in cur_readonly.fetchall():
+        coders.append(row['username'])
+
+    return coders
+
 
 def update_users_stats(
     cur: mysql.connector.cursor.MySQLCursorDict,
