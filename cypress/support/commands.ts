@@ -10,6 +10,8 @@ import {
   Status,
 } from './types';
 
+// const MAX_TIMEOUT_TO_WAIT = 10000;
+
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   const URL =
@@ -146,7 +148,9 @@ Cypress.Commands.add(
       cy.get('[name="end-date"]').should('be.disabled');
     }
     cy.get('.tags-input input[type="text"]').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.waitUntil(() =>
+      cy.get('.typeahead-dropdown li').should('exist').first().click(),
+    );
     cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
       .eq(basicInformation ? 0 : 1)
       .click();
@@ -276,6 +280,7 @@ Cypress.Commands.add(
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
+        cy.log('Only the first submission is created because of validations');
         cy.fixture(runs[idx].fixturePath).then((fileContent) => {
           cy.get('.CodeMirror-line').first().type(fileContent);
           cy.get('[data-submit-run]').should('be.disabled');
@@ -283,16 +288,26 @@ Cypress.Commands.add(
         break;
       }
 
+      cy.intercept({ method: 'POST', url: '/api/run/create/' }).as('runCreate');
+
       cy.fixture(runs[idx].fixturePath).then((fileContent) => {
         cy.get('.CodeMirror-line').first().type(fileContent);
         cy.get('[data-submit-run]').click();
       });
 
+      // Wait until the run is created
+      cy.wait(['@runCreate'], { timeout: 10000 });
+
       if (statusCheck) {
         continue;
       }
+
+      // Check the status of the run
       const expectedStatus: Status = runs[idx].status;
-      cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+      cy.intercept({
+        method: 'POST',
+        url: '/api/problemset/scoreboardEvents/',
+      }).as('runStatus');
 
       cy.wait(['@runStatus'], { timeout: 10000 })
         .its('response.statusCode')
