@@ -974,7 +974,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function coderOfTheMonthDuringOneYear(string $category) {
+    /**
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfTheMonthDuringOneYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
 
         // Create a submissions mapping for different users solving problems
@@ -989,7 +992,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_06', 'numRuns' => 0],
                 ['username' => 'user_07', 'numRuns' => 0],
                 ['username' => 'user_08', 'numRuns' => 0],
-                ['username' => 'user_09', 'numRuns' => 2],
+                ['username' => 'user_09', 'numRuns' => 1],
                 ['username' => 'user_10', 'numRuns' => 0],
                 ['username' => 'user_11', 'numRuns' => 0],
                 ['username' => 'user_12', 'numRuns' => 0],
@@ -998,7 +1001,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             1 => [
                 ['username' => 'user_01', 'numRuns' => 0],
                 ['username' => 'user_02', 'numRuns' => 0],
-                ['username' => 'user_03', 'numRuns' => 2],
+                ['username' => 'user_03', 'numRuns' => 1],
                 ['username' => 'user_04', 'numRuns' => 0],
                 ['username' => 'user_05', 'numRuns' => 0],
                 ['username' => 'user_06', 'numRuns' => 0],
@@ -1020,14 +1023,14 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_07', 'numRuns' => 0],
                 ['username' => 'user_08', 'numRuns' => 0],
                 ['username' => 'user_09', 'numRuns' => 0],
-                ['username' => 'user_10', 'numRuns' => 2],
+                ['username' => 'user_10', 'numRuns' => 1],
                 ['username' => 'user_11', 'numRuns' => 0],
                 ['username' => 'user_12', 'numRuns' => 0],
                 ['username' => 'user_13', 'numRuns' => 0],
             ],
             3 => [
                 ['username' => 'user_01', 'numRuns' => 0],
-                ['username' => 'user_02', 'numRuns' => 2],
+                ['username' => 'user_02', 'numRuns' => 1],
                 ['username' => 'user_03', 'numRuns' => 0],
                 ['username' => 'user_04', 'numRuns' => 0],
                 ['username' => 'user_05', 'numRuns' => 0],
@@ -1063,7 +1066,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_05', 'numRuns' => 0],
                 ['username' => 'user_06', 'numRuns' => 0],
                 ['username' => 'user_07', 'numRuns' => 0],
-                ['username' => 'user_08', 'numRuns' => 8],
+                ['username' => 'user_08', 'numRuns' => 1],
                 ['username' => 'user_09', 'numRuns' => 0],
                 ['username' => 'user_10', 'numRuns' => 0],
                 ['username' => 'user_11', 'numRuns' => 0],
@@ -1076,12 +1079,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_03', 'numRuns' => 0],
                 ['username' => 'user_04', 'numRuns' => 0],
                 ['username' => 'user_05', 'numRuns' => 0],
-                ['username' => 'user_06', 'numRuns' => 2],
+                ['username' => 'user_06', 'numRuns' => 0],
                 ['username' => 'user_07', 'numRuns' => 0],
                 ['username' => 'user_08', 'numRuns' => 0],
                 ['username' => 'user_09', 'numRuns' => 0],
                 ['username' => 'user_10', 'numRuns' => 0],
-                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 1],
                 ['username' => 'user_12', 'numRuns' => 0],
                 ['username' => 'user_13', 'numRuns' => 0],
             ],
@@ -1089,7 +1092,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_01', 'numRuns' => 0],
                 ['username' => 'user_02', 'numRuns' => 0],
                 ['username' => 'user_03', 'numRuns' => 0],
-                ['username' => 'user_04', 'numRuns' => 2],
+                ['username' => 'user_04', 'numRuns' => 1],
                 ['username' => 'user_05', 'numRuns' => 0],
                 ['username' => 'user_06', 'numRuns' => 0],
                 ['username' => 'user_07', 'numRuns' => 0],
@@ -1105,7 +1108,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_02', 'numRuns' => 0],
                 ['username' => 'user_03', 'numRuns' => 0],
                 ['username' => 'user_04', 'numRuns' => 0],
-                ['username' => 'user_05', 'numRuns' => 2],
+                ['username' => 'user_05', 'numRuns' => 1],
                 ['username' => 'user_06', 'numRuns' => 0],
                 ['username' => 'user_07', 'numRuns' => 0],
                 ['username' => 'user_08', 'numRuns' => 0],
@@ -1127,7 +1130,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_09', 'numRuns' => 0],
                 ['username' => 'user_10', 'numRuns' => 0],
                 ['username' => 'user_11', 'numRuns' => 0],
-                ['username' => 'user_12', 'numRuns' => 2],
+                ['username' => 'user_12', 'numRuns' => 1],
                 ['username' => 'user_13', 'numRuns' => 0],
             ],
             10 => [
@@ -1136,7 +1139,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_03', 'numRuns' => 0],
                 ['username' => 'user_04', 'numRuns' => 0],
                 ['username' => 'user_05', 'numRuns' => 0],
-                ['username' => 'user_06', 'numRuns' => 2],
+                ['username' => 'user_06', 'numRuns' => 1],
                 ['username' => 'user_07', 'numRuns' => 0],
                 ['username' => 'user_08', 'numRuns' => 0],
                 ['username' => 'user_09', 'numRuns' => 0],
@@ -1152,7 +1155,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_04', 'numRuns' => 0],
                 ['username' => 'user_05', 'numRuns' => 0],
                 ['username' => 'user_06', 'numRuns' => 0],
-                ['username' => 'user_07', 'numRuns' => 2],
+                ['username' => 'user_07', 'numRuns' => 1],
                 ['username' => 'user_08', 'numRuns' => 0],
                 ['username' => 'user_09', 'numRuns' => 0],
                 ['username' => 'user_10', 'numRuns' => 0],
@@ -1161,18 +1164,18 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 ['username' => 'user_13', 'numRuns' => 0],
             ],
             12 => [
-                ['username' => 'user_01', 'numRuns' => 5],
-                ['username' => 'user_02', 'numRuns' => 8],
-                ['username' => 'user_03', 'numRuns' => 3],
-                ['username' => 'user_04', 'numRuns' => 4],
-                ['username' => 'user_05', 'numRuns' => 9],
+                ['username' => 'user_01', 'numRuns' => 2],
+                ['username' => 'user_02', 'numRuns' => 2],
+                ['username' => 'user_03', 'numRuns' => 2],
+                ['username' => 'user_04', 'numRuns' => 2],
+                ['username' => 'user_05', 'numRuns' => 2],
                 ['username' => 'user_06', 'numRuns' => 2],
-                ['username' => 'user_07', 'numRuns' => 6],
-                ['username' => 'user_08', 'numRuns' => 4],
+                ['username' => 'user_07', 'numRuns' => 2],
+                ['username' => 'user_08', 'numRuns' => 2],
                 ['username' => 'user_09', 'numRuns' => 2],
-                ['username' => 'user_10', 'numRuns' => 5],
-                ['username' => 'user_11', 'numRuns' => 6],
-                ['username' => 'user_12', 'numRuns' => 3],
+                ['username' => 'user_10', 'numRuns' => 2],
+                ['username' => 'user_11', 'numRuns' => 2],
+                ['username' => 'user_12', 'numRuns' => 2],
                 ['username' => 'user_13', 'numRuns' => 1],
             ],
         ];
@@ -1184,12 +1187,15 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             3 => 'user_02',
             4 => 'user_01',
             5 => 'user_08',
-            6 => 'user_06',
+            6 => 'user_11',
             7 => 'user_04',
             8 => 'user_05',
             9 => 'user_12',
             10 => 'user_06',
             11 => 'user_07',
+            // user_13 is the only one who has solved a problem in the last month
+            // and hasn't won in the last 12 months, even when they have solved
+            // less number of problems than the other users.
             12 => 'user_13',
         ];
 
@@ -1206,51 +1212,33 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             );
             self::updateIdentity($identities[$index], $gender);
         }
-        foreach ($submissionsMapping as $month => $submissions) {
-            /*foreach ($submissions as $submission) {
-                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-                self::updateIdentity($identity, $gender);
-                $identities[$submission['username']] = $identity;
-            }*/
-        }
 
-        $runCreationDate = self::setFirstDayOfTheCurrentMonth();
-        foreach ($submissionsMapping as $months) {
-            foreach ($months as $index => $submissions) {
+        $initialMonth = 14;
+        $runCreationDate = self::setFirstDayOfCustomMonths($initialMonth);
+        foreach ($submissionsMapping as $month => $months) {
+            foreach ($months as $submissionIndex => $submissions) {
                 $this->createRuns(
-                    $identities[$index],
+                    $identities[$submissionIndex],
                     $runCreationDate,
                     $submissions['numRuns']
                 );
             }
-            $runCreationDate = date(
-                'Y-m-d',
-                strtotime(
-                    $runCreationDate . ' +1 day'
-                )
+            $submissions = \OmegaUp\DAO\Submissions::getAll();
+
+            \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+            $coderOfTheMonth = $this->getCoderOfTheMonth(
+                $runCreationDate,
+                '1 month',
+                $category
+            )['coderinfo'];
+
+            $this->assertSame(
+                $coderOfTheMonth['username'],
+                $expectedWinners[$month]
             );
 
-            \OmegaUp\Test\Utils::runUpdateRanks();
-            /*$response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
-                new \OmegaUp\Request([
-                    'category' => $category,
-                ])
-            )['templateProperties']['payload'];
-
-            foreach ($response['candidatesToCoderOfTheMonth'] as $index => $candidate) {
-                $expectedCandidates = array_filter(
-                    $submissions,
-                    fn($element) => $element['expectedPosition'] === $index
-                );
-                $expectedCandidate = array_pop($expectedCandidates);
-                $this->assertSame(
-                    $expectedCandidate['username'],
-                    $candidate['username'],
-                    "Failed in the iteration for the day {$runCreationDate}, user {$candidate['username']}"
-                );
-            }*/
+            $runCreationDate = self::setFirstDayOfTheCurrentMonth();
         }
-        //['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
     }
 
     /**
@@ -1396,7 +1384,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    private static function setFirstDayOfCustomMonths(int $monthsLeft = 2) {
+    private static function setFirstDayOfCustomMonths(int $monthsLeft) {
         return (new DateTimeImmutable(
             date(
                 'Y-m-d',
