@@ -16,6 +16,7 @@ from database.coder_of_the_month import check_existing_coder_of_the_month
 from database.coder_of_the_month import get_cotm_eligible_users
 from database.coder_of_the_month import get_eligible_problems
 from database.coder_of_the_month import get_user_problems
+from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
@@ -433,13 +434,8 @@ def update_school_of_the_month_candidates(
     '''Updates the list of candidates to school of the current month'''
 
     logging.info('Updating the candidates to school of the month...')
-    if first_day_of_current_month.month == 12:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year + 1, 1, 1)
-    else:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year,
-            first_day_of_current_month.month + 1, 1)
+    first_day_of_next_month = get_first_day_of_next_month(
+        first_day_of_current_month)
 
     # First make sure there are not already selected schools of the month
     cur.execute(
@@ -573,18 +569,28 @@ def compute_points_for_user(
     # Get the list of identity IDs for eligible users
     identity_ids = [user.identity_id for user in eligible_users]
 
+    # Get the list of problem IDs for eligible problems
+    problem_ids = [problem.problem_id for problem in eligible_problems]
+
     if not identity_ids:
         logging.info('No eligible users found.')
+        return []
+
+    if not problem_ids:
+        logging.info('No eligible problems found.')
         return []
 
     # Convert the list of identity IDs to a comma-separated string
     identity_ids_str = ', '.join(map(str, identity_ids))
 
+    # Convert the list of problem IDs to a comma-separated string
+    problem_ids_str = ', '.join(map(str, problem_ids))
+
     user_problems = get_user_problems(cur_readonly,
                                       identity_ids_str,
+                                      problem_ids_str,
                                       eligible_users,
                                       first_day_of_current_month,
-                                      first_day_of_next_month,
                                       )
 
     # Calculate the score for each user based on the problems they have solved
@@ -627,20 +633,15 @@ def update_coder_of_the_month_candidates(
     '''Updates the list of candidates to coder of the current month'''
 
     logging.info('Updating the candidates to coder of the month...')
-    if first_day_of_current_month.month == 12:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year + 1, 1, 1)
-    else:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year,
-            first_day_of_current_month.month + 1, 1)
+    first_day_of_next_month = get_first_day_of_next_month(
+        first_day_of_current_month)
 
-        # First make sure there are not already selected coder of the month
-        if check_existing_coder_of_the_month(cur_readonly,
-                                             first_day_of_next_month,
-                                             category):
-            logging.info('Skipping because already exist selected coder')
-            return
+    # First make sure there are not already selected coder of the month
+    if check_existing_coder_of_the_month(cur_readonly,
+                                         first_day_of_next_month,
+                                         category):
+        logging.info('Skipping because already exist selected coder')
+        return
 
     remove_coder_of_the_month_candidates(cur, first_day_of_next_month,
                                          category)

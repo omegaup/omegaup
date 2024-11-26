@@ -35,6 +35,22 @@ class UserProblems(TypedDict):
     score: float
 
 
+def get_first_day_of_next_month(
+    first_day_of_current_month: datetime.date
+) -> datetime.date:
+    '''Get the first day of the next month'''
+
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1, 1, 1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1, 1)
+
+    return first_day_of_next_month
+
+
 def check_existing_coder_of_the_month(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_the_next_month: datetime.date,
@@ -238,9 +254,9 @@ def get_eligible_problems(
 def get_user_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     identity_ids_str: str,
+    problem_ids_str: str,
     eligible_users: List[UserRank],
     first_day_of_current_month: datetime.date,
-    first_day_of_next_month: datetime.date,
 ) -> Dict[int, UserProblems]:
     '''Returns the problems solved by a user'''
 
@@ -249,6 +265,9 @@ def get_user_problems(
     user_problems: Dict[int, UserProblems] = {
         user.identity_id:
             {'solved': [], 'score': 0.0} for user in eligible_users}
+
+    first_day_of_next_month = get_first_day_of_next_month(
+        first_day_of_current_month)
 
     cur_readonly.execute(f'''
         WITH FirstSubmissions AS (
@@ -259,7 +278,10 @@ def get_user_problems(
             FROM
                 Submissions
             WHERE
-                verdict = 'AC' AND type = 'normal'
+                identity_id IN ({identity_ids_str})
+                AND problem_id IN ({problem_ids_str})
+                AND verdict = 'AC'
+                AND type = 'normal'
             GROUP BY
                 identity_id, problem_id
         )
@@ -275,6 +297,7 @@ def get_user_problems(
             s.identity_id = fs.identity_id AND s.problem_id = fs.problem_id
         WHERE
             s.identity_id IN ({identity_ids_str})
+            AND s.problem_id IN ({problem_ids_str})
             AND s.verdict = 'AC' AND s.type = 'normal'
             AND s.time >= %s AND s.time < %s
             AND fs.first_time_solved >= %s AND fs.first_time_solved < %s;
