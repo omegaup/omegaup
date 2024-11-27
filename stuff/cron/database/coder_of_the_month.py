@@ -14,7 +14,7 @@ class Problem(NamedTuple):
     '''Information for solved problems in the selected month'''
     problem_id: int
     alias: str
-    accepted: int
+    score: float
 
 
 class UserRank(NamedTuple):
@@ -216,7 +216,7 @@ def get_eligible_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-) -> List[Problem]:
+) -> Dict[int, Problem]:
     '''Returns the list of eligible problems for coder of the month'''
 
     logging.info(
@@ -224,7 +224,9 @@ def get_eligible_problems(
     )
     sql = '''
         SELECT DISTINCT
-            p.problem_id, p.alias, p.accepted
+            p.problem_id,
+            p.alias,
+            IFNULL(SUM(ROUND(100 / LOG(2, p.accepted+1) , 0)), 0) AS score
         FROM
             Submissions s
         INNER JOIN
@@ -233,20 +235,22 @@ def get_eligible_problems(
             p.problem_id = s.problem_id
         WHERE
             s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1;
+            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1
+        GROUP BY
+            p.problem_id;
         '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
         first_day_of_next_month,
     ))
 
-    problems: List[Problem] = []
+    problems: Dict[int, Problem] = {}
     for row in cur_readonly.fetchall():
-        problems.append(Problem(
+        problems[row['problem_id']] = Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
-            accepted=row['accepted'],
-        ))
+            score=row['score'],
+        )
 
     return problems
 

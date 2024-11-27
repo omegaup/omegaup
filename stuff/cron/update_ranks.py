@@ -4,7 +4,6 @@
 import argparse
 import datetime
 import logging
-import math
 import os
 import sys
 from typing import List, NamedTuple, Sequence
@@ -570,7 +569,7 @@ def compute_points_for_user(
     identity_ids = [user.identity_id for user in eligible_users]
 
     # Get the list of problem IDs for eligible problems
-    problem_ids = [problem.problem_id for problem in eligible_problems]
+    problem_ids = list(eligible_problems.keys())
 
     if not identity_ids:
         logging.info('No eligible users found.')
@@ -595,19 +594,10 @@ def compute_points_for_user(
 
     # Calculate the score for each user based on the problems they have solved
     for _, points in user_problems.items():
-        # Iterate over each problem solved by the user
+        # Iterate over each problem solved by the user to get the score and add
+        # it to the total score
         for problem_id in points['solved']:
-            solved_problem_by_user = None
-            # Search for the solved problem in the list of eligible problems
-            for problem in eligible_problems:
-                if problem.problem_id == problem_id:
-                    solved_problem_by_user = problem
-                    break
-            # If the selected user solved the problem, then calculate and add
-            # the score
-            if solved_problem_by_user is not None:
-                points['score'] += round(100 / math.log2(
-                    solved_problem_by_user.accepted + 1))
+            points['score'] += eligible_problems[problem_id].score
 
     # Create a list of updated users with their scores and problems solved
     updated_users: List[UserRank] = []
