@@ -235,7 +235,7 @@ def get_eligible_problems(
             p.problem_id = s.problem_id
         WHERE
             s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1
+            s.time < %s AND p.visibility >= 1 AND p.quality_seal = 1
         GROUP BY
             p.problem_id;
         '''
