@@ -270,7 +270,6 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
-        WITH FirstSubmissions AS (
             SELECT
                 identity_id,
                 problem_id,
@@ -283,34 +282,18 @@ def get_user_problems(
                 AND verdict = 'AC'
                 AND type = 'normal'
             GROUP BY
-                identity_id, problem_id
-        )
-        SELECT
-            s.identity_id,
-            s.problem_id,
-            fs.first_time_solved
-        FROM
-            Submissions s
-        INNER JOIN
-            FirstSubmissions fs
-        ON
-            s.identity_id = fs.identity_id AND s.problem_id = fs.problem_id
-        WHERE
-            s.identity_id IN ({identity_ids_str})
-            AND s.problem_id IN ({problem_ids_str})
-            AND s.verdict = 'AC' AND s.type = 'normal'
-            AND s.time >= %s AND s.time < %s
-            AND fs.first_time_solved >= %s AND fs.first_time_solved < %s;
-    ''', (first_day_of_current_month, first_day_of_next_month,
-          first_day_of_current_month, first_day_of_next_month))
+                identity_id, problem_id;
+    ''')
 
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
         identity_id = row['identity_id']
         problem_id = row['problem_id']
+        solved = row['first_time_solved'].date()
         assert identity_id in user_problems, (
             'Identity %s not found in user_problems', identity_id)
-        user_problems[identity_id]['solved'].append(problem_id)
+        if first_day_of_current_month <= solved < first_day_of_next_month:
+            user_problems[identity_id]['solved'].append(problem_id)
 
     return user_problems
 
