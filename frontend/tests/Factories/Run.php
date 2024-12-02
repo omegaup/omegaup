@@ -270,6 +270,56 @@ class Run {
     }
 
     /**
+     * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
+     *
+     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}
+     */
+    public static function createRunForSpecificProblem(
+        \OmegaUp\DAO\VO\Identities $identity,
+        array $problemData,
+        string $runCreationDate,
+    ): array {
+        $r = self::createRequestCommon(
+            $problemData,
+            contestData: null,
+            contestant: $identity
+        );
+
+        // Call API
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+
+        $runData = [
+            'request' => $r,
+            'participant' => $identity,
+            'response' => $response,
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Force the submission to be in any date
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+        if (is_null($submission) || is_null($submission->current_run_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $submission->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $runCreationDate
+        );
+        \OmegaUp\DAO\Submissions::update($submission);
+        $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $run->time = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $runCreationDate
+        );
+        \OmegaUp\DAO\Runs::update($run);
+
+        return $runData;
+    }
+
+    /**
      * Creates a run to the given problem
      *
      * @param array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request} $problemData
