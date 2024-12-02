@@ -137,6 +137,109 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test the API behavior when there is more than one candidate for Coder of
+     * the Month during the first days of the current month
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCodersOfTheMonthWithSubmissionsInDifferentMonths(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        // Create a submissions mapping for different users, months, and problems.
+        // The winner for the current month should be user_01 because all their
+        // submissions are in the current month. Submissions from past months
+        // should not be considered for the current month.
+        $submissionsMapping = [
+            0 => [
+                ['username' => 'user_01', 'numRuns' => [0, 0, 0]], // 0
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 0
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
+            ],
+            1 => [
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 1
+                ['username' => 'user_02', 'numRuns' => [0, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
+            ],
+            2 => [
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 2
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 0
+            ],
+            3 => [
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 3
+                ['username' => 'user_02', 'numRuns' => [1, 1, 1]], // 1
+                ['username' => 'user_03', 'numRuns' => [0, 1, 1]], // 1
+            ],
+            4 => [
+                ['username' => 'user_01', 'numRuns' => [0, 1, 1]], // 4
+                ['username' => 'user_02', 'numRuns' => [0, 1, 1]], // 2
+                ['username' => 'user_03', 'numRuns' => [1, 1, 0]], // 1
+            ],
+        ];
+
+        // Create 3 users and their identities
+        $identities = [];
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identities[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identities[$index], $gender);
+        }
+
+        $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+
+        $problemData = [];
+        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
+            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => 'problem_' . $indexProblem,
+                ])
+            );
+            foreach ($problemSubmissions as $indexUser => $submissionsUser) {
+                foreach ($submissionsUser['numRuns'] as $month => $shouldCreateRun) {
+                    if ($shouldCreateRun == 0) {
+                        continue;
+                    }
+                    switch ($month) {
+                        case 0:
+                            $runCreationDate = self::setFirstDayOfTwoMonthsAgo();
+                            break;
+                        case 1:
+                            $runCreationDate = self::setFirstDayOfTheLastMonth();
+                            break;
+                        case 2:
+                            $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+                            break;
+                    }
+                    \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                        $identities[$indexUser],
+                        $problemData[$indexProblem],
+                        $runCreationDate
+                    );
+                }
+            }
+        }
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+        $today = date('Y-m-01', \OmegaUp\Time::get());
+
+        $response = $this->getCoderOfTheMonth(
+            $today,
+            'this month',
+            $category
+        );
+
+        $this->assertSame(
+            $identities[0]->username,
+            $response['coderinfo']['username']
+        );
+    }
+
+    /**
      * @dataProvider coderOfTheMonthCategoryProvider
      */
     public function testCoderOfTheMonthCalc(string $category) {
@@ -1112,6 +1215,19 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         ))->modify(
             'first day of this month'
+        )->format(
+            'Y-m-d'
+        );
+    }
+
+    private static function setFirstDayOfTwoMonthsAgo() {
+        return (new DateTimeImmutable(
+            date(
+                'Y-m-d',
+                \OmegaUp\Time::get()
+            )
+        ))->modify(
+            'first day of -2 months'
         )->format(
             'Y-m-d'
         );
