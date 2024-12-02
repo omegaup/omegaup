@@ -1,7 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of ContestArchiveContest
  */
@@ -9,8 +6,9 @@ class ContestArchiveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testArchiveContest() {
         // Create 5 contests
         $numberOfContests = 5;
+        $contestData = [];
         foreach (range(0, $numberOfContests - 1) as $i) {
-            $contestData[] = \OmegaUp\Test\Factories\Contest::createContest();
+            $contestData[$i] = \OmegaUp\Test\Factories\Contest::createContest();
         }
 
         // Archive one contest.
