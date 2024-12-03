@@ -549,15 +549,27 @@ def compute_points_for_user(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
 ) -> List[UserRank]:
     '''Computes the points for each eligible user'''
+
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
+    last_12_coders = get_last_12_coders_of_the_month(
+        cur_readonly,
+        _default_date(),
+        category
+    )
 
     eligible_users = get_cotm_eligible_users(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month,
-        gender_clause
+        gender_clause,
+        last_12_coders
     )
 
     eligible_problems = get_eligible_problems(
@@ -637,28 +649,15 @@ def update_coder_of_the_month_candidates(
     remove_coder_of_the_month_candidates(cur, first_day_of_next_month,
                                          category)
 
-    if category == 'female':
-        gender_clause = " AND i.gender = 'female'"
-    else:
-        gender_clause = ""
-
     candidates = compute_points_for_user(cur_readonly,
                                          first_day_of_current_month,
                                          first_day_of_next_month,
-                                         gender_clause)
+                                         category)
 
     for index, candidate in enumerate(candidates):
         ranking = index + 1
         insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
                                              ranking, category, candidate)
-
-    coders = get_last_12_coders_of_the_month(
-        cur_readonly,
-        _default_date(),
-        category
-    )
-
-    logging.info(coders)
 
 
 def update_users_stats(
