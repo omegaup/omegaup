@@ -98,12 +98,10 @@ def remove_coder_of_the_month_candidates(
 
 def get_last_12_coders_of_the_month(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    date: datetime.date,
+    first_day_of_current_month: datetime.date,
     category: str,
 ) -> List[str]:
     '''Returns the last 12 coders of the month, to avoid repeating users'''
-
-    first_day_of_current_month = date
 
     # Note: This query should be always syncronized with the one in the
     # function getCodersOfTheMonth located in the /DAO/CoderOfTheMonth.php file

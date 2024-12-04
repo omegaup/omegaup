@@ -560,7 +560,7 @@ def compute_points_for_user(
 
     last_12_coders = get_last_12_coders_of_the_month(
         cur_readonly,
-        _default_date(),
+        first_day_of_current_month,
         category
     )
 

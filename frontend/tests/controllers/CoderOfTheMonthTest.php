@@ -572,15 +572,20 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider coderOfTheMonthCategoryProvider
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
-        $this->markTestSkipped(
-            'This test is skipped until all the rules are applied.'
-        );
         $gender = $category == 'all' ? 'male' : 'female';
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'identityA']
+            )
+        );
         self::updateIdentity($identity, $gender);
 
         // User "B" is always the second one in the ranking based on score
-        ['identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'identityB']
+            )
+        );
         self::updateIdentity($identityB, $gender);
 
         // Using the first day of the month as "today" to avoid failures near
