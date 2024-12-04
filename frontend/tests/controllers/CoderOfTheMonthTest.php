@@ -206,7 +206,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     }
                     switch ($month) {
                         case 0:
-                            $runCreationDate = self::setFirstDayOfTwoMonthsAgo();
+                            $runCreationDate = self::setFirstDayOfCustomMonths(
+                                monthsLeft: 2
+                            );
                             break;
                         case 1:
                             $runCreationDate = self::setFirstDayOfTheLastMonth();
@@ -570,15 +572,20 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider coderOfTheMonthCategoryProvider
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
-        $this->markTestSkipped(
-            'This test is skipped until all the rules are applied.'
-        );
         $gender = $category == 'all' ? 'male' : 'female';
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'identityA']
+            )
+        );
         self::updateIdentity($identity, $gender);
 
         // User "B" is always the second one in the ranking based on score
-        ['identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityB] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'identityB']
+            )
+        );
         self::updateIdentity($identityB, $gender);
 
         // Using the first day of the month as "today" to avoid failures near
@@ -1078,6 +1085,273 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfTheMonthDuringOneYear(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a submissions mapping for different users solving problems
+        // in different months during a year
+        $submissionsMapping = [
+            0 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 1],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            1 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 1],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            2 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 1],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            3 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 1],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            4 => [
+                ['username' => 'user_01', 'numRuns' => 1],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            5 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 1],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            6 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 1],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            7 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 1],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            8 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 1],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            9 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 1],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            10 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 1],
+                ['username' => 'user_07', 'numRuns' => 0],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            11 => [
+                ['username' => 'user_01', 'numRuns' => 0],
+                ['username' => 'user_02', 'numRuns' => 0],
+                ['username' => 'user_03', 'numRuns' => 0],
+                ['username' => 'user_04', 'numRuns' => 0],
+                ['username' => 'user_05', 'numRuns' => 0],
+                ['username' => 'user_06', 'numRuns' => 0],
+                ['username' => 'user_07', 'numRuns' => 1],
+                ['username' => 'user_08', 'numRuns' => 0],
+                ['username' => 'user_09', 'numRuns' => 0],
+                ['username' => 'user_10', 'numRuns' => 0],
+                ['username' => 'user_11', 'numRuns' => 0],
+                ['username' => 'user_12', 'numRuns' => 0],
+                ['username' => 'user_13', 'numRuns' => 0],
+            ],
+            12 => [
+                ['username' => 'user_01', 'numRuns' => 2],
+                ['username' => 'user_02', 'numRuns' => 2],
+                ['username' => 'user_03', 'numRuns' => 2],
+                ['username' => 'user_04', 'numRuns' => 2],
+                ['username' => 'user_05', 'numRuns' => 2],
+                ['username' => 'user_06', 'numRuns' => 2],
+                ['username' => 'user_07', 'numRuns' => 2],
+                ['username' => 'user_08', 'numRuns' => 2],
+                ['username' => 'user_09', 'numRuns' => 2],
+                ['username' => 'user_10', 'numRuns' => 2],
+                ['username' => 'user_11', 'numRuns' => 2],
+                ['username' => 'user_12', 'numRuns' => 2],
+                ['username' => 'user_13', 'numRuns' => 1],
+            ],
+        ];
+
+        $expectedWinners = [
+            0 => 'user_09',
+            1 => 'user_03',
+            2 => 'user_10',
+            3 => 'user_02',
+            4 => 'user_01',
+            5 => 'user_08',
+            6 => 'user_11',
+            7 => 'user_04',
+            8 => 'user_05',
+            9 => 'user_12',
+            10 => 'user_06',
+            11 => 'user_07',
+            // user_13 is the only one who has solved a problem in the last month
+            // and hasn't won in the last 12 months, even when they have solved
+            // less number of problems than the other users.
+            12 => 'user_13',
+        ];
+
+        // Create the identities
+        $identities = [];
+
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identities[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identities[$index], $gender);
+        }
+
+        $initialMonth = 14;
+        $runCreationDate = self::setFirstDayOfCustomMonths($initialMonth);
+        foreach ($submissionsMapping as $month => $months) {
+            foreach ($months as $submissionIndex => $submissions) {
+                $this->createRuns(
+                    $identities[$submissionIndex],
+                    $runCreationDate,
+                    $submissions['numRuns']
+                );
+            }
+            $submissions = \OmegaUp\DAO\Submissions::getAll();
+
+            \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+            $coderOfTheMonth = $this->getCoderOfTheMonth(
+                $runCreationDate,
+                '1 month',
+                $category
+            )['coderinfo'];
+
+            $this->assertSame(
+                $coderOfTheMonth['username'],
+                $expectedWinners[$month]
+            );
+
+            $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+        }
+    }
+
+    /**
      * Test the API behavior when there is more than one candidate for Coder of
      * the Month during the first days of the current month
      *
@@ -1220,16 +1494,12 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    private static function setFirstDayOfTwoMonthsAgo() {
+    private static function setFirstDayOfCustomMonths(int $monthsLeft) {
         return (new DateTimeImmutable(
             date(
                 'Y-m-d',
                 \OmegaUp\Time::get()
             )
-        ))->modify(
-            'first day of -2 months'
-        )->format(
-            'Y-m-d'
-        );
+        ))->modify("first day of -{$monthsLeft} months")->format('Y-m-d');
     }
 }
