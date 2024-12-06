@@ -25,7 +25,7 @@
             >
               <template #icon>
                 <font-awesome-icon
-                class="mt-3"
+                  class="mt-3"
                   :icon="['fas', getProblemLevelIcon(collection.name)]"
                 ></font-awesome-icon>
               </template>
@@ -66,9 +66,7 @@
           <div class="row d-flex justify-content-center">
             <omegaup-problem-collection :title="T.problemCollectionAuthors">
               <template #icon>
-                <font-awesome-icon
-                class="mt-3"
-                :icon="['fas', 'users']">
+                <font-awesome-icon class="mt-3" :icon="['fas', 'users']">
                 </font-awesome-icon>
               </template>
               <template #button>
@@ -81,9 +79,7 @@
               :title="T.problemCollectionRandomLanguageProblem"
             >
               <template #icon>
-                <font-awesome-icon
-                class="mt-3"
-                :icon="['fas', 'cogs']" />
+                <font-awesome-icon class="mt-3" :icon="['fas', 'cogs']" />
               </template>
               <template #button>
                 <a class="btn btn-primary" href="/problem/random/language/">{{
@@ -96,7 +92,7 @@
             >
               <template #icon>
                 <font-awesome-icon
-                class="mt-3"
+                  class="mt-3"
                   :icon="['fas', 'random']"
                 ></font-awesome-icon>
               </template>
@@ -111,7 +107,7 @@
             >
               <template #icon>
                 <font-awesome-icon
-                class="mt-3"
+                  class="mt-3"
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>

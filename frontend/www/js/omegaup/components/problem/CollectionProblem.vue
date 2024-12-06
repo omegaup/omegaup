@@ -63,7 +63,7 @@ export default class CollectionProblem extends Vue {
   [omegaup-collection-problem] {
     width: 180px;
   }
-  
+
   [omegaup-collection-problem] .card-body {
     min-height: 140px;
   }
