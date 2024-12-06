@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Tests for ProblemForfeitedController
  */
@@ -25,9 +23,8 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetSolution() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problems = [];
 
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
 
@@ -65,7 +62,7 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetSolutionForbiddenAccessException() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problems = [];
 
@@ -103,9 +100,8 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetNonexistentSolution() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $problems = [];
 
         $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
