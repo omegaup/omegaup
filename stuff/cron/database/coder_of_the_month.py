@@ -344,18 +344,28 @@ def get_user_problems(
 
     cur_readonly.execute(f'''
             SELECT
-                identity_id,
-                problem_id,
+                s.identity_id,
+                s.problem_id,
                 MIN(time) AS first_time_solved
             FROM
-                Submissions
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf
+            ON
+                pf.user_id = i.user_id
+                AND pf.problem_id = s.problem_id
             WHERE
-                identity_id IN ({identity_ids_str})
-                AND problem_id IN ({problem_ids_str})
+                s.identity_id IN ({identity_ids_str})
+                AND s.problem_id IN ({problem_ids_str})
                 AND verdict = 'AC'
                 AND type = 'normal'
+                AND forfeited_date IS NULL
             GROUP BY
-                identity_id, problem_id;
+                s.identity_id, s.problem_id;
     ''')
 
     # Populate user_problems dictionary with the problems solved by each user
