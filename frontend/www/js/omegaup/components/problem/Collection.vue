@@ -21,9 +21,11 @@
               v-for="(collection, idx) in problemCount"
               :key="idx"
               :title="getName(collection.name)"
+              class="educational-level-card"
             >
               <template #icon>
                 <font-awesome-icon
+                class="mt-3"
                   :icon="['fas', getProblemLevelIcon(collection.name)]"
                 ></font-awesome-icon>
               </template>
@@ -37,13 +39,16 @@
                 </p>
               </template>
               <template #button>
-                <a
-                  class="btn btn-primary"
-                  :href="`/problem/collection/${encodeURIComponent(
-                    collection.name,
-                  )}/`"
-                  >{{ T.problemcollectionViewProblems }}</a
-                >
+                <div class="btn-container">
+                  <a
+                    class="btn btn-primary"
+                    :class="{ disabled: collection.problems_per_tag == 0 }"
+                    :href="`/problem/collection/${encodeURIComponent(
+                      collection.name,
+                    )}/`"
+                    >{{ T.problemcollectionViewProblems }}</a
+                  >
+                </div>
               </template>
             </omegaup-problem-collection>
           </div>
@@ -61,7 +66,10 @@
           <div class="row d-flex justify-content-center">
             <omegaup-problem-collection :title="T.problemCollectionAuthors">
               <template #icon>
-                <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
+                <font-awesome-icon
+                class="mt-3"
+                :icon="['fas', 'users']">
+                </font-awesome-icon>
               </template>
               <template #button>
                 <a class="btn btn-primary" href="/problem/collection/author/">{{
@@ -74,8 +82,8 @@
             >
               <template #icon>
                 <font-awesome-icon
-                  :icon="['fas', 'random']"
-                ></font-awesome-icon>
+                class="mt-3"
+                :icon="['fas', 'cogs']" />
               </template>
               <template #button>
                 <a class="btn btn-primary" href="/problem/random/language/">{{
@@ -88,6 +96,7 @@
             >
               <template #icon>
                 <font-awesome-icon
+                class="mt-3"
                   :icon="['fas', 'random']"
                 ></font-awesome-icon>
               </template>
@@ -102,6 +111,7 @@
             >
               <template #icon>
                 <font-awesome-icon
+                class="mt-3"
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>
@@ -149,6 +159,7 @@ import {
   faUsers,
   faRandom,
   faSearch,
+  faCogs,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faRobot);
 library.add(faLaptopCode);
@@ -160,6 +171,7 @@ library.add(faCode);
 library.add(faUsers);
 library.add(faRandom);
 library.add(faSearch);
+library.add(faCogs);
 
 const problemLevelIcons: { [key: string]: string } = {
   problemLevelBasicKarel: 'robot',
@@ -183,7 +195,7 @@ const problemLevelIcons: { [key: string]: string } = {
 })
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
-  @Prop() problemCount!: string[];
+  @Prop() problemCount!: { name: string; problems_per_tag: number }[];
   @Prop() allTags!: types.Tag[];
   T = T;
   ui = ui;
@@ -200,3 +212,45 @@ export default class Collection extends Vue {
   }
 }
 </script>
+
+<style>
+.educational-level-card[omegaup-collection-problem] {
+  width: 200px !important;
+  height: 200px !important;
+  position: relative;
+  transition: box-shadow 0.3s ease-in-out !important;
+}
+
+.educational-level-card[omegaup-collection-problem]:hover {
+  box-shadow: 0 0 10px rgba(103, 141, 215, 0.5) !important;
+}
+
+/* Apply same hover effect to other collection cards */
+[omegaup-collection-problem] {
+  transition: box-shadow 0.3s ease-in-out !important;
+}
+
+[omegaup-collection-problem]:hover {
+  box-shadow: 0 0 10px rgba(103, 141, 215, 0.5) !important;
+}
+
+.educational-level-card[omegaup-collection-problem] .card-body {
+  min-height: 200px !important;
+  height: 200px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.educational-level-card[omegaup-collection-problem] .btn-container {
+  position: absolute !important;
+  bottom: 1rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: auto !important;
+}
+
+/* Adjust spacing for problem count to not overlap with button */
+.educational-level-card[omegaup-collection-problem] .card-text {
+  margin-bottom: 3rem !important;
+}
+</style>
