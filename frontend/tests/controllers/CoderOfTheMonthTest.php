@@ -1468,6 +1468,131 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Test the API behavior when problem admins resolve their own problems
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testProblemAdminsResolvingOwnProblems(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a submissions mapping for different users solving problems
+        // Some users are the admins of the problems they solve
+        // The test will cover four scenarios:
+        // 1. A user solves problems they created
+        // 2. A user solves problems which the admin add them as an admin
+        // 3. A user solves problems which the admin add the group admin where the user is a member
+        // 4. A user solves sproblem which they aren't the admin
+        $submissionsMapping = [
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 1],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 1],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 0],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 0],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 0],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+        ];
+
+        $identities = [];
+        foreach ($submissionsMapping[0] as $indexUser => $submissionsUser) {
+            [
+                'identity' => $identities[$indexUser],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $submissionsUser['username']]
+                )
+            );
+            self::updateIdentity($identities[$indexUser], $gender);
+        }
+
+        // user_admin_creator creates 5 problems and invites user_admin_invited
+        // and user_group_admin_invited is a member of the group where
+        // user_admin_creator add as group admin
+        $problems = [];
+
+        $login = self::login($identities[0]);
+
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $identities[0],
+            name: 'prblem_admin_group_name',
+            description: 'problem admin group_description',
+            alias: 'problem_admin_group_alias',
+            login: $login
+        );
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $identities[2]->username,
+            'group_alias' => $group['group']->alias
+        ]));
+
+        foreach ($submissionsMapping as $indexProblem => $submissionsProblem) {
+            $login = self::login($identities[0]);
+            $problems[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identities[0],
+                $login
+            );
+
+            \OmegaUp\Test\Factories\Problem::addAdminUser(
+                $problems[$indexProblem],
+                $identities[1]
+            );
+
+            \OmegaUp\Test\Factories\Problem::addGroupAdmin(
+                $problems[$indexProblem],
+                $group['group']
+            );
+        }
+
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+        foreach ($submissionsMapping as $indexProblem => $submissionsProblem) {
+            foreach ($submissionsProblem as $indexUser => $submissionsUser) {
+                if ($submissionsUser['run'] == 0) {
+                    continue;
+                }
+                \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                    $identities[$indexUser],
+                    $problems[$indexProblem],
+                    $runCreationDate
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $coderOfTheMonth = $this->getCoderOfTheMonth(
+            $runCreationDate,
+            '1 month',
+            $category
+        )['coderinfo'];
+
+        $this->assertSame(
+            $identities[3]->username,
+            $coderOfTheMonth['username']
+        );
+    }
+
     private static function setFirstDayOfTheLastMonth() {
         return (new DateTimeImmutable(
             date(

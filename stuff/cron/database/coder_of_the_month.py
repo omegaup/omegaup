@@ -348,12 +348,39 @@ def get_user_problems(
                 problem_id,
                 MIN(time) AS first_time_solved
             FROM
-                Submissions
+                Submissions s
             WHERE
                 identity_id IN ({identity_ids_str})
                 AND problem_id IN ({problem_ids_str})
                 AND verdict = 'AC'
                 AND type = 'normal'
+                AND CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM
+                            Problems AS p
+                        INNER JOIN
+                            ACLs AS a ON a.acl_id = p.acl_id
+                        INNER JOIN
+                            Identities AS ai ON a.owner_id = ai.user_id
+                        LEFT JOIN
+                            User_Roles ur ON ur.acl_id = p.acl_id
+                        LEFT JOIN
+                            Identities uri ON ur.user_id = uri.user_id
+                        LEFT JOIN
+                            Group_Roles gr ON gr.acl_id = p.acl_id
+                        LEFT JOIN
+                            Groups_Identities gi ON gi.group_id = gr.group_id
+                        WHERE
+                            p.problem_id = s.problem_id AND
+                            (ai.identity_id = s.identity_id OR
+                            (ur.role_id = 1
+                                AND uri.identity_id = s.identity_id) OR
+                            (gr.role_id = 1
+                                AND gi.identity_id = s.identity_id))
+                    ) THEN 1
+                    ELSE 0
+                END = 0
             GROUP BY
                 identity_id, problem_id;
     ''')
