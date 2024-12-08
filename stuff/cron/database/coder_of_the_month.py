@@ -4,7 +4,7 @@
 
 import datetime
 import logging
-from typing import List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional, TypedDict
 
 import mysql.connector
 import mysql.connector.cursor
@@ -14,11 +14,11 @@ class Problem(NamedTuple):
     '''Information for solved problems in the selected month'''
     problem_id: int
     alias: str
-    accepted: int
+    score: float
 
 
 class UserRank(NamedTuple):
-    '''Information for user rank'''
+    '''User information for coder of the month candidates'''
     user_id: int
     identity_id: int
     username: str
@@ -27,6 +27,28 @@ class UserRank(NamedTuple):
     problems_solved: int
     score: float
     classname: str
+
+
+class UserProblems(TypedDict):
+    '''Problems solved by a user and their calculated score'''
+    solved: List[int]
+    score: float
+
+
+def get_first_day_of_next_month(
+    first_day_of_current_month: datetime.date
+) -> datetime.date:
+    '''Get the first day of the next month'''
+
+    if first_day_of_current_month.month == 12:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year + 1, 1, 1)
+    else:
+        first_day_of_next_month = datetime.date(
+            first_day_of_current_month.year,
+            first_day_of_current_month.month + 1, 1)
+
+    return first_day_of_next_month
 
 
 def check_existing_coder_of_the_month(
@@ -74,119 +96,64 @@ def remove_coder_of_the_month_candidates(
             ''', (first_day_of_the_next_month, category))
 
 
-def get_coder_of_the_month_candidates(
+def get_last_12_coders_of_the_month(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
-    first_day_of_next_month: datetime.date,
     category: str,
-) -> List[UserRank]:
-    ''' Returns the list of candidates for coder of the month'''
+) -> List[str]:
+    '''Returns the last 12 coders of the month, to avoid repeating users'''
 
-    if category == 'female':
-        gender_clause = " AND i.gender = 'female'"
-    else:
-        gender_clause = ""
-
-    sql = f'''
-         SELECT DISTINCT
-            IFNULL(i.user_id, 0) AS user_id,
-            i.username,
-            i.identity_id,
-            IFNULL(i.country_id, 'xx') AS country_id,
-            isc.school_id,
-            COUNT(ps.problem_id) ProblemsSolved,
-            IFNULL(SUM(ROUND(100 / LOG(2, ps.accepted+1) , 0)), 0) AS score,
-            IFNULL(
-                (
-                    SELECT urc.classname FROM
-                        User_Rank_Cutoffs urc
-                    WHERE
-                        urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT
-                        1
-                ),
-                'user-rank-unranked'
-            ) AS classname
+    # Note: This query should be always syncronized with the one in the
+    # function getCodersOfTheMonth located in the /DAO/CoderOfTheMonth.php file
+    sql = '''
+          SELECT
+              cm.time,
+              i.username,
+              IFNULL(i.country_id, 'xx') AS country_id,
+              e.email,
+              IFNULL(ur.classname, 'user-rank-unranked') AS classname
           FROM
-            (
-              SELECT DISTINCT
-                s.identity_id, s.problem_id
-              FROM
-                Submissions s
-              WHERE
-                s.verdict = 'AC' AND s.type= 'normal' AND
-                s.time >= %s AND s.time <= %s
-            ) AS up
+              Coder_Of_The_Month cm
           INNER JOIN
-            Problems ps ON
-            ps.problem_id = up.problem_id
-            AND ps.visibility >= 1
-            AND ps.quality_seal = 1
+              Users u ON u.user_id = cm.user_id
           INNER JOIN
-            Identities i ON i.identity_id = up.identity_id
+              Identities i ON i.identity_id = u.main_identity_id
           LEFT JOIN
-            Identities_Schools isc ON isc.identity_school_id =
-            i.current_identity_school_id
+              Emails e ON e.user_id = u.user_id
           LEFT JOIN
-            (
-              SELECT
-                user_id,
-                MIN(ranking) best_ranking,
-                time,
-                selected_by
-              FROM
-                Coder_Of_The_Month
-              WHERE
-                category = %s
-              GROUP BY
-                user_id,
-                selected_by,
-                time
-              HAVING
-                best_ranking = 1
-            ) AS cm on i.user_id = cm.user_id
+              User_Rank ur ON ur.user_id = cm.user_id
           WHERE
-            (cm.user_id IS NULL OR
-            DATE_ADD(cm.time, INTERVAL 1 YEAR) < %s) AND
-            i.user_id IS NOT NULL
-            {gender_clause}
-          GROUP BY
-            up.identity_id
+              (cm.selected_by IS NOT NULL
+              OR (
+                  cm.`ranking` = 1 AND
+                  NOT EXISTS (
+                      SELECT
+                          *
+                      FROM
+                          Coder_Of_The_Month
+                      WHERE
+                          time = cm.time AND
+                          selected_by IS NOT NULL AND
+                          category = %s
+                  )
+              ))
+              AND cm.category = %s
+              AND cm.time <= %s
+              AND cm.time > DATE_SUB(%s, INTERVAL 12 MONTH)
           ORDER BY
-            score DESC,
-            ProblemsSolved DESC
-          LIMIT 100;
-        '''
-    cur_readonly.execute(sql, (
-        first_day_of_current_month,
-        first_day_of_next_month,
-        category,
-        first_day_of_next_month,
-    ))
+              cm.time DESC
+          LIMIT
+              0, 12;
+    '''
+    cur_readonly.execute(sql, (category, category,
+                               first_day_of_current_month,
+                               first_day_of_current_month))
 
-    candidates: List[UserRank] = []
+    coders = []
     for row in cur_readonly.fetchall():
-        candidates.append(UserRank(
-            user_id=row['user_id'],
-            identity_id=row['identity_id'],
-            username=row['username'],
-            country_id=row['country_id'],
-            school_id=row['school_id'],
-            problems_solved=row['ProblemsSolved'],
-            score=row['score'],
-            classname=row['classname'],
-        ))
+        coders.append(row['username'])
 
-    return candidates
+    return coders
 
 
 def insert_coder_of_the_month_candidates(
@@ -230,9 +197,17 @@ def get_cotm_eligible_users(
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
     gender_clause: str,
+    last_12_coders: List[str],
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
+    last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
+
+    if not last_12_coders:
+        last_12_coders_clause = ''
+    else:
+        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
+            last_12_coders_str)
     logging.info('Getting the list of eligible users for coder of the month')
     sql = f'''
             SELECT DISTINCT
@@ -279,6 +254,7 @@ def get_cotm_eligible_users(
                 s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
                 s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
                 i.user_id IS NOT NULL
+                {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
                 i.identity_id
@@ -309,7 +285,7 @@ def get_eligible_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-) -> List[Problem]:
+) -> Dict[int, Problem]:
     '''Returns the list of eligible problems for coder of the month'''
 
     logging.info(
@@ -317,7 +293,9 @@ def get_eligible_problems(
     )
     sql = '''
         SELECT DISTINCT
-            p.problem_id, p.alias, p.accepted
+            p.problem_id,
+            p.alias,
+            IFNULL(SUM(ROUND(100 / LOG(2, p.accepted+1) , 0)), 0) AS score
         FROM
             Submissions s
         INNER JOIN
@@ -326,22 +304,71 @@ def get_eligible_problems(
             p.problem_id = s.problem_id
         WHERE
             s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-            s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1;
+            s.time < %s AND p.visibility >= 1 AND p.quality_seal = 1
+        GROUP BY
+            p.problem_id;
         '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
         first_day_of_next_month,
     ))
 
-    problems: List[Problem] = []
+    problems: Dict[int, Problem] = {}
     for row in cur_readonly.fetchall():
-        problems.append(Problem(
+        problems[row['problem_id']] = Problem(
             problem_id=row['problem_id'],
             alias=row['alias'],
-            accepted=row['accepted'],
-        ))
+            score=row['score'],
+        )
 
     return problems
+
+
+def get_user_problems(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    identity_ids_str: str,
+    problem_ids_str: str,
+    eligible_users: List[UserRank],
+    first_day_of_current_month: datetime.date,
+) -> Dict[int, UserProblems]:
+    '''Returns the problems solved by a user'''
+
+    # Initialize a dictionary to store the problems solved and the score for
+    # each user
+    user_problems: Dict[int, UserProblems] = {
+        user.identity_id:
+            {'solved': [], 'score': 0.0} for user in eligible_users}
+
+    first_day_of_next_month = get_first_day_of_next_month(
+        first_day_of_current_month)
+
+    cur_readonly.execute(f'''
+            SELECT
+                identity_id,
+                problem_id,
+                MIN(time) AS first_time_solved
+            FROM
+                Submissions
+            WHERE
+                identity_id IN ({identity_ids_str})
+                AND problem_id IN ({problem_ids_str})
+                AND verdict = 'AC'
+                AND type = 'normal'
+            GROUP BY
+                identity_id, problem_id;
+    ''')
+
+    # Populate user_problems dictionary with the problems solved by each user
+    for row in cur_readonly.fetchall():
+        identity_id = row['identity_id']
+        problem_id = row['problem_id']
+        solved = row['first_time_solved'].date()
+        assert identity_id in user_problems, (
+            'Identity %s not found in user_problems', identity_id)
+        if first_day_of_current_month <= solved < first_day_of_next_month:
+            user_problems[identity_id]['solved'].append(problem_id)
+
+    return user_problems
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
