@@ -53,12 +53,7 @@ OmegaUp.on('ready', async () => {
 
   trackClarifications(payload.clarifications ?? []);
 
-  let nextSubmissionTimestamp: null | Date = null;
-  if (payload.problem.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      payload.problem.nextSubmissionTimestamp.getTime(),
-    );
-  }
+  const secondsToNextSubmission = payload.problem.secondsToNextSubmission;
 
   const problemDetailsView = new Vue({
     el: '#main-container',
@@ -78,7 +73,7 @@ OmegaUp.on('ready', async () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid,
-      nextSubmissionTimestamp,
+      secondsToNextSubmission,
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
     }),
@@ -109,7 +104,7 @@ OmegaUp.on('ready', async () => {
           guid: this.guid,
           isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
-          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          secondsToNextSubmission: this.secondsToNextSubmission,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
           searchResultProblems: this.searchResultProblems,
@@ -173,8 +168,8 @@ OmegaUp.on('ready', async () => {
             })
               .then(time.remoteTimeAdapter)
               .then((response) => {
-                problemDetailsView.nextSubmissionTimestamp =
-                  response.nextSubmissionTimestamp;
+                problemDetailsView.secondsToNextSubmission =
+                  response.secondsToNextSubmission;
 
                 submitRun({
                   guid: response.guid,
@@ -438,8 +433,8 @@ OmegaUp.on('ready', async () => {
           api.Run.create(e.data.params)
             .then(time.remoteTimeAdapter)
             .then((response) => {
-              problemDetailsView.nextSubmissionTimestamp =
-                response.nextSubmissionTimestamp;
+              problemDetailsView.secondsToNextSubmission =
+                response.secondsToNextSubmission;
               submitRun({
                 guid: response.guid,
                 submitDelay: response.submit_delay,
