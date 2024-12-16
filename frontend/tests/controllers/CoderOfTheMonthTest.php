@@ -1191,6 +1191,121 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test the API behavior when the submissions are made by unassociated
+     * identities. Only one identity belongs to a user. The user should be the
+     * coder of the month even if they have fewer accepted submissions.
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testUnassociatedIdentities(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $groupAlias = 'submissions-group';
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            name: 'Group for submissions',
+            description: 'This group will be used to create identities',
+            alias: $groupAlias,
+            login: $creatorLogin
+        );
+
+        $submissionsMapping = [
+            ['username' => 'id_1', 'numRuns' => 3, 'password' => 'password_1'],
+            ['username' => 'id_2', 'numRuns' => 4, 'password' => 'password_2'],
+            ['username' => 'id_3', 'numRuns' => 2, 'password' => 'password_3'],
+            ['username' => 'id_4', 'numRuns' => 6, 'password' => 'password_4'],
+            ['username' => 'id_5', 'numRuns' => 5, 'password' => 'password_5'],
+        ];
+
+        $identities = [];
+
+        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        foreach ($submissionsMapping as $index => $submissionsByUser) {
+            $identityName = $submissionsByUser['username'];
+            $identityPassword = $submissionsByUser['password'];
+            $numRuns = $submissionsByUser['numRuns'];
+            // Call api using identity creator group member
+            \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => "{$group['group']->alias}:{$identityName}",
+                'name' => $identityName,
+                'password' => $identityPassword,
+                'country_id' => 'MX',
+                'state_id' => 'QUE',
+                'gender' => $gender,
+                'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+                'group_alias' => $group['group']->alias,
+            ]));
+            $identities[$index] = \OmegaUp\DAO\Identities::findByUsername(
+                "{$group['group']->alias}:{$identityName}"
+            );
+            $identities[$index]->password = $identityPassword;
+
+            [
+                'identity' => $users[$index],
+                ] = \OmegaUp\Test\Factories\User::createUser();
+            self::updateIdentity($users[$index], $gender);
+
+            $runCreationDate = self::setFirstDayOfTheLastMonth();
+            $this->createRuns(
+                $identities[$index],
+                $runCreationDate,
+                numRuns: $numRuns
+            );
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertNull($response['coderinfo']);
+
+        // Create 5 user accounts and associate them with their corresponding
+        // identities.
+        $users = [];
+        foreach ($identities as $index => $identity) {
+            $username = $identity->name;
+            $identityUsername = $identity->username;
+            $identityPassword = $submissionsMapping[$index]['password'];
+
+            [
+                'identity' => $users[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    [
+                        'username' => $username,
+                        'name' => $username,
+                    ]
+                )
+            );
+
+            $login = self::login($users[$index]);
+            \OmegaUp\Controllers\User::apiAssociateIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $identityUsername,
+                    'password' => $identityPassword,
+                ])
+            );
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertSame(
+            $response['coderinfo']['username'],
+            $identities[3]->name
+        );
+    }
+
+    /**
      * @dataProvider coderOfTheMonthCategoryProvider
      */
     public function testCoderOfTheMonthDuringOneYear(string $category) {
