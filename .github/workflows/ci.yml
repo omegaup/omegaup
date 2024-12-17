@@ -245,8 +245,7 @@ jobs:
             python3 -m venv /opt/omegaup/stuff/venv && \
             . /opt/omegaup/stuff/venv/bin/activate && \
             python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt && \
-            python3 -m pip install --upgrade python-json-logger==3.2.1"
+            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
 
       - name: Run Psalm
