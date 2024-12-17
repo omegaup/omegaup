@@ -201,6 +201,7 @@ class Problem {
     ): array {
         return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'public',
+            'quality_seal' => true,
             'author' => $author,
         ]), $login);
     }
