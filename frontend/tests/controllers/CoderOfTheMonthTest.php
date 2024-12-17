@@ -137,6 +137,112 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test the API behavior when user has solved problems in the last month
+     * that has been seen the solutions
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfTheMonthWithSolutionsSeenOnProblems(
+        string $category
+    ) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a submissions mapping for 3 different users solving 5 problems
+        $submissionsMapping = [
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => false],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 0, 'seenSolution' => false],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+        ];
+
+        // Create 3 users
+        $identities = [];
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identities[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identities[$index], $gender);
+        }
+
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+        // Create 5 problems and submissions for some users depending on the
+        // submissions mapping
+        $problemData = [];
+        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
+            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => 'problem_' . ($indexProblem + 1),
+                ])
+            );
+
+            foreach ($problemSubmissions as $indexUser => $submissionsUser) {
+                if ($submissionsUser['seenSolution']) {
+                    continue;
+                }
+                $login = self::login($identities[$indexUser]);
+                \OmegaUp\Controllers\Problem::apiSolution(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                        'problem_alias' => $problemData[$indexProblem]['problem']->alias,
+                        'forfeit_problem' => true,
+                    ])
+                );
+                if (!$submissionsUser['run']) {
+                    continue;
+                }
+                \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                    $identities[$indexUser],
+                    $problemData[$indexProblem],
+                    $runCreationDate
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+        $today = date('Y-m-01', \OmegaUp\Time::get());
+
+        $response = $this->getCoderOfTheMonth(
+            $today,
+            'this month',
+            $category
+        );
+
+        // user_02 should be the coder of the month because they have solved
+        // all the problems without seeing the solutions
+        $this->assertSame(
+            $identities[1]->username,
+            $response['coderinfo']['username']
+        );
+    }
+
+    /**
      * Test the API behavior when there is more than one candidate for Coder of
      * the Month during the first days of the current month
      *
