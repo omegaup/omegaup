@@ -156,13 +156,7 @@ export default class UserBasicInformationEdit extends Vue {
       country_id: this.countryId,
       state_id: this.stateId,
       birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
-      update_key: this.updateKey,
     });
-    this.updateKey++;
-
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
   }
 
   @Watch('countryId')
