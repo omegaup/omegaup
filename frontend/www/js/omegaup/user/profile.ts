@@ -14,12 +14,21 @@ OmegaUp.on('ready', () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substring(1).split('#');
   const searchResultSchools: types.SchoolListItem[] = [];
+
+  // Show success message if we just reloaded from a username change
+  const reloadedFromUsernameChange = sessionStorage.getItem('username_updated');
+  if (reloadedFromUsernameChange === 'true') {
+    ui.success(T.userEditSuccess);
+    sessionStorage.removeItem('username_updated');
+  }
+
   if (payload.profile.school && payload.profile.school_id) {
     searchResultSchools.push({
       key: payload.profile.school_id,
       value: payload.profile.school,
     });
   }
+
   let selectedTab = locationHash[0] || 'view-profile';
   let viewProfileSelectedTab: string | null = null;
   if (selectedTab === 'locale-changed') {
@@ -75,10 +84,16 @@ OmegaUp.on('ready', () => {
         on: {
           'update-user-basic-information': (
             userBasicInformation: Partial<types.UserProfileInfo>,
+            usernameChanged: boolean,
           ) => {
             api.User.update(userBasicInformation)
               .then(() => {
-                ui.success(T.userEditSuccess);
+                if (usernameChanged) {
+                  sessionStorage.setItem('username_updated', 'true');
+                  window.location.reload();
+                } else {
+                  ui.success(T.userEditSuccess);
+                }
               })
               .catch(ui.apiError);
           },
