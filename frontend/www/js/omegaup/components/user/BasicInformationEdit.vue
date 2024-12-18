@@ -72,6 +72,8 @@
         type="submit"
         class="btn btn-primary mr-2"
         data-save-profile-changes-button
+        :class="{ 'disabled': !hasChanges }"
+        :disabled="!hasChanges"
       >
         {{ T.wordsSaveChanges }}
       </button>
@@ -107,7 +109,6 @@ export default class UserBasicInformationEdit extends Vue {
   birthDate = this.profile.birth_date
     ? time.convertLocalDateToGMTDate(this.profile.birth_date)
     : new Date('');
-  updateKey = 0;
 
   get isCountrySelected(): boolean {
     return Boolean(this.countryId);
@@ -135,6 +136,19 @@ export default class UserBasicInformationEdit extends Vue {
     return !/[^a-zA-Z0-9_.-]/.test(this.username);
   }
 
+  get hasChanges(): boolean {
+    return (
+      this.username !== this.profile.username ||
+      this.name !== this.profile.name ||
+      this.gender !== this.profile.gender ||
+      this.countryId !== (this.profile.country_id ?? null) ||
+      this.stateId !== (this.profile.state_id ?? null) ||
+      this.birthDate.getTime() !== (this.profile.birth_date ? 
+        time.convertLocalDateToGMTDate(this.profile.birth_date).getTime() : 
+        new Date('').getTime())
+    );
+  }
+
   onUpdateUserBasicInformation(): void {
     if (!this.isValidUsername) {
       this.$emit('update-user-basic-information-error', {
@@ -149,6 +163,9 @@ export default class UserBasicInformationEdit extends Vue {
       });
       return;
     }
+
+    const usernameChanged = this.username !== this.profile.username;
+    
     this.$emit('update-user-basic-information', {
       username: this.username,
       name: this.name,
@@ -156,7 +173,7 @@ export default class UserBasicInformationEdit extends Vue {
       country_id: this.countryId,
       state_id: this.stateId,
       birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
-    });
+    }, usernameChanged);
   }
 
   @Watch('countryId')
