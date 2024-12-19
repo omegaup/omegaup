@@ -3,7 +3,6 @@
 
 import argparse
 import datetime
-import json
 import logging
 import os
 import sys
@@ -19,6 +18,7 @@ from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
 from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
+from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
 
 sys.path.insert(
@@ -553,6 +553,11 @@ def compute_points_for_user(
 ) -> List[UserRank]:
     '''Computes the points for each eligible user'''
 
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
     last_12_coders = get_last_12_coders_of_the_month(
         cur_readonly,
         first_day_of_current_month,
@@ -563,7 +568,7 @@ def compute_points_for_user(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month,
-        category,
+        gender_clause,
         last_12_coders
     )
 
@@ -580,7 +585,7 @@ def compute_points_for_user(
     problem_ids = list(eligible_problems.keys())
 
     if not identity_ids:
-        logging.info('No eligible users found in category [%s].', category)
+        logging.info('No eligible users found.')
         return []
 
     if not problem_ids:
@@ -649,37 +654,10 @@ def update_coder_of_the_month_candidates(
                                          first_day_of_next_month,
                                          category)
 
-    # TODO: We need to insert the candidates in the database after the
-    # manual tests are done
-    # for ranking, candidate in enumerate(candidates, start=1):
-    #     insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
-    #                                          ranking, category, candidate)
-    debug_coder_of_the_month_candidates(first_day_of_next_month, category,
-                                        candidates)
-
-
-def debug_coder_of_the_month_candidates(
-    first_day_of_next_month: datetime.date,
-    category: str,
-    candidates: List[UserRank],
-) -> None:
-    '''Log coder of the month candidates'''
-
-    log_entries = []
-    for ranking, candidate in enumerate(candidates, start=1):
-        log_entry = {
-            "user_id": candidate.user_id,
-            "time": first_day_of_next_month.isoformat(),
-            "ranking": ranking,
-            "school_id": candidate.school_id,
-            "category": category,
-            "score": candidate.score,
-            "problems_solved": candidate.problems_solved
-        }
-        log_entries.append(log_entry)
-
-    log_message = json.dumps(log_entries, indent=4)
-    logging.info(log_message)
+    for index, candidate in enumerate(candidates):
+        ranking = index + 1
+        insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
+                                             ranking, category, candidate)
 
 
 def update_users_stats(
@@ -687,6 +665,7 @@ def update_users_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
+    update_coder_of_the_month: bool
 ) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
@@ -708,23 +687,26 @@ def update_users_stats(
         # transaction since both are stored in the same DB table.
         dbconn.commit()
 
-        try:
-            update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                 'all')
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month')
-            raise
+        if update_coder_of_the_month:
+            try:
+                update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                     'all')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month')
+                raise
 
-        try:
-            update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                 'female')
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month female')
-            raise
+            try:
+                update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                     'female')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month female')
+                raise
+        else:
+            logging.info('Skipping updating Coder of the Month')
 
         logging.info('Users stats updated')
     except:  # noqa: bare-except
@@ -777,6 +759,9 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
+    parser.add_argument('--update-coder-of-the-month',
+                        action='store_true',
+                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -789,7 +774,8 @@ def main() -> None:
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
-            update_users_stats(cur, cur_readonly, dbconn.conn, args.date)
+            update_users_stats(cur, cur_readonly, dbconn.conn, args.date,
+                               args.update_coder_of_the_month)
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
     finally:
         dbconn.conn.close()
