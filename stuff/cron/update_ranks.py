@@ -19,6 +19,7 @@ from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
 from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
+from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
 
 sys.path.insert(
@@ -627,6 +628,7 @@ def update_coder_of_the_month_candidates(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     category: str,
+    update_coder_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to coder of the current month'''
 
@@ -649,13 +651,15 @@ def update_coder_of_the_month_candidates(
                                          first_day_of_next_month,
                                          category)
 
-    # TODO: We need to insert the candidates in the database after the
-    # manual tests are done
-    # for ranking, candidate in enumerate(candidates, start=1):
-    #     insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
-    #                                          ranking, category, candidate)
-    debug_coder_of_the_month_candidates(first_day_of_next_month, category,
-                                        candidates)
+    if update_coder_of_the_month:
+        # TODO: We need to insert the candidates in the database for testing
+        # purposes. This condition will be removed in the future.
+        for ranking, candidate in enumerate(candidates, start=1):
+            insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
+                                                 ranking, category, candidate)
+    else:
+        debug_coder_of_the_month_candidates(first_day_of_next_month, category,
+                                            candidates)
 
 
 def debug_coder_of_the_month_candidates(
@@ -687,6 +691,7 @@ def update_users_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
+    update_coder_of_the_month: bool,
 ) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
@@ -710,7 +715,8 @@ def update_users_stats(
 
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                 'all')
+                                                 'all',
+                                                 update_coder_of_the_month)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -719,7 +725,8 @@ def update_users_stats(
 
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                 'female')
+                                                 'female',
+                                                 update_coder_of_the_month)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -777,6 +784,9 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
+    parser.add_argument('--update-coder-of-the-month',
+                        action='store_true',
+                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -789,7 +799,8 @@ def main() -> None:
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
-            update_users_stats(cur, cur_readonly, dbconn.conn, args.date)
+            update_users_stats(cur, cur_readonly, dbconn.conn, args.date,
+                               args.update_coder_of_the_month)
             update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
     finally:
         dbconn.conn.close()
