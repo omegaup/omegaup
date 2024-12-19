@@ -12,16 +12,11 @@ import logging
 
 from typing import Any, Dict
 
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import jsonlogger  # type: ignore
 
 
-class _CustomJsonFormatter(jsonlogger.JsonFormatter):
+class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
     """A JSON formatter that adds the level."""
-
-    def __init__(self) -> None:
-        # TODO(https://github.com/madzak/python-json-logger/pull/170): Remove
-        # the type: ignore annotation when v2.0.8 is released.
-        super().__init__()  # type: ignore
 
     def add_fields(
             self,
