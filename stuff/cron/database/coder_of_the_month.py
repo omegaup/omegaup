@@ -343,19 +343,39 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
+            WITH ProblemsForfeitedByUser AS (
+                SELECT
+                    pf.user_id,
+                    pf.problem_id,
+                    pf.forfeited_date
+                FROM
+                    Problems_Forfeited pf
+                WHERE
+                    forfeited_date IS NULL
+            )
             SELECT
-                identity_id,
-                problem_id,
-                MIN(time) AS first_time_solved
+                s.identity_id,
+                s.problem_id,
+                MIN(s.time) AS first_time_solved
             FROM
-                Submissions
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                ProblemsForfeitedByUser pfbu
+            ON
+                pfbu.user_id = i.user_id
+                AND pfbu.problem_id = s.problem_id
             WHERE
-                identity_id IN ({identity_ids_str})
-                AND problem_id IN ({problem_ids_str})
-                AND verdict = 'AC'
-                AND type = 'normal'
+                s.identity_id IN ({identity_ids_str})
+                AND s.problem_id IN ({problem_ids_str})
+                AND s.verdict = 'AC'
+                AND s.type = 'normal'
+                AND pfbu.forfeited_date IS NULL
             GROUP BY
-                identity_id, problem_id;
+                s.identity_id, s.problem_id;
     ''')
 
     # Populate user_problems dictionary with the problems solved by each user
