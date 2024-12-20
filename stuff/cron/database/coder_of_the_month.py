@@ -196,19 +196,27 @@ def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
     last_12_coders: List[str],
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
     last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
 
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
         last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
             last_12_coders_str)
-    logging.info('Getting the list of eligible users for coder of the month')
+    logging.info(
+        'Getting the list of eligible users in the category [%s] for coder of '
+        'the month', category
+    )
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
@@ -343,27 +351,40 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
-            WITH ProblemsAdministeredByUser AS (
-                SELECT
-                    p.problem_id,
-                    ai.identity_id AS owner_identity_id,
-                    uri.identity_id AS user_identity_id,
-                    gi.identity_id AS group_identity_id
-                FROM
-                    Problems AS p
-                INNER JOIN
-                    ACLs AS a ON a.acl_id = p.acl_id
-                INNER JOIN
-                    Identities AS ai ON a.owner_id = ai.user_id
-                LEFT JOIN
-                    User_Roles ur ON ur.acl_id = p.acl_id AND ur.role_id = 1
-                LEFT JOIN
-                    Identities uri ON ur.user_id = uri.user_id
-                LEFT JOIN
-                    Group_Roles gr ON gr.acl_id = p.acl_id AND gr.role_id = 1
-                LEFT JOIN
-                    Groups_Identities gi ON gi.group_id = gr.group_id
-            )
+            WITH
+                ProblemsAdministeredByUser AS (
+                    SELECT
+                        p.problem_id,
+                        ai.identity_id AS owner_identity_id,
+                        uri.identity_id AS user_identity_id,
+                        gi.identity_id AS group_identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
+                        ACLs AS a ON a.acl_id = p.acl_id
+                    INNER JOIN
+                        Identities AS ai ON a.owner_id = ai.user_id
+                    LEFT JOIN
+                        User_Roles ur ON ur.acl_id = p.acl_id
+                        AND ur.role_id = 1
+                    LEFT JOIN
+                        Identities uri ON ur.user_id = uri.user_id
+                    LEFT JOIN
+                        Group_Roles gr ON gr.acl_id = p.acl_id
+                        AND gr.role_id = 1
+                    LEFT JOIN
+                        Groups_Identities gi ON gi.group_id = gr.group_id
+                ),
+                ProblemsForfeitedByUser AS (
+                    SELECT
+                        pf.user_id,
+                        pf.problem_id,
+                        pf.forfeited_date
+                    FROM
+                        Problems_Forfeited pf
+                    WHERE
+                        forfeited_date IS NULL
+                )
             SELECT
                 s.identity_id,
                 s.problem_id,
@@ -377,12 +398,22 @@ def get_user_problems(
                     OR s.identity_id = pabu.user_identity_id
                     OR s.identity_id = pabu.group_identity_id
                 )
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                ProblemsForfeitedByUser pfbu
+            ON
+                pfbu.user_id = i.user_id
+                AND pfbu.problem_id = s.problem_id
             WHERE
                 s.identity_id IN ({identity_ids_str})
                 AND s.problem_id IN ({problem_ids_str})
                 AND s.verdict = 'AC'
                 AND s.type = 'normal'
                 AND pabu.problem_id IS NULL
+                AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
     ''')
