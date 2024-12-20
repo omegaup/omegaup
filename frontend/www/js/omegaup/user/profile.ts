@@ -1,10 +1,10 @@
 import Vue from 'vue';
-
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
+import mainStore from '../mainStore';
 
 import user_Profile from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
@@ -14,13 +14,6 @@ OmegaUp.on('ready', () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substring(1).split('#');
   const searchResultSchools: types.SchoolListItem[] = [];
-
-  // Show success message if we just reloaded from a username change
-  const reloadedFromUsernameChange = sessionStorage.getItem('username_updated');
-  if (reloadedFromUsernameChange === 'true') {
-    ui.success(T.userEditSuccess);
-    sessionStorage.removeItem('username_updated');
-  }
 
   if (payload.profile.school && payload.profile.school_id) {
     searchResultSchools.push({
@@ -84,15 +77,16 @@ OmegaUp.on('ready', () => {
         on: {
           'update-user-basic-information': (
             userBasicInformation: Partial<types.UserProfileInfo>,
-            usernameChanged: boolean,
           ) => {
             api.User.update(userBasicInformation)
               .then(() => {
-                if (usernameChanged) {
-                  sessionStorage.setItem('username_updated', 'true');
+                mainStore.commit(
+                  'updateUsername',
+                  userBasicInformation.username,
+                );
+                ui.success(T.userEditSuccess);
+                if (userBasicInformation.username !== payload.profile.username) {
                   window.location.reload();
-                } else {
-                  ui.success(T.userEditSuccess);
                 }
               })
               .catch(ui.apiError);
