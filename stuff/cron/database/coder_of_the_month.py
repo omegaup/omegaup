@@ -96,6 +96,66 @@ def remove_coder_of_the_month_candidates(
             ''', (first_day_of_the_next_month, category))
 
 
+def get_last_12_coders_of_the_month(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    category: str,
+) -> List[str]:
+    '''Returns the last 12 coders of the month, to avoid repeating users'''
+
+    # Note: This query should be always syncronized with the one in the
+    # function getCodersOfTheMonth located in the /DAO/CoderOfTheMonth.php file
+    sql = '''
+          SELECT
+              cm.time,
+              i.username,
+              IFNULL(i.country_id, 'xx') AS country_id,
+              e.email,
+              IFNULL(ur.classname, 'user-rank-unranked') AS classname
+          FROM
+              Coder_Of_The_Month cm
+          INNER JOIN
+              Users u ON u.user_id = cm.user_id
+          INNER JOIN
+              Identities i ON i.identity_id = u.main_identity_id
+          LEFT JOIN
+              Emails e ON e.user_id = u.user_id
+          LEFT JOIN
+              User_Rank ur ON ur.user_id = cm.user_id
+          WHERE
+              (cm.selected_by IS NOT NULL
+              OR (
+                  cm.`ranking` = 1 AND
+                  NOT EXISTS (
+                      SELECT
+                          *
+                      FROM
+                          Coder_Of_The_Month
+                      WHERE
+                          time = cm.time AND
+                          selected_by IS NOT NULL AND
+                          category = %s
+                  )
+              ))
+              AND cm.category = %s
+              AND cm.time <= %s
+              AND cm.time > DATE_SUB(%s, INTERVAL 12 MONTH)
+          ORDER BY
+              cm.time DESC
+          LIMIT
+              0, 12;
+    '''
+    cur_readonly.execute(sql, (category, category,
+                               first_day_of_current_month,
+                               first_day_of_current_month))
+
+    coders = []
+    for row in cur_readonly.fetchall():
+        coders.append(row['username'])
+
+    return coders
+
+
 def insert_coder_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_next_month: datetime.date,
@@ -136,11 +196,27 @@ def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
+    last_12_coders: List[str],
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
-    logging.info('Getting the list of eligible users for coder of the month')
+    last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
+
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
+    if not last_12_coders:
+        last_12_coders_clause = ''
+    else:
+        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
+            last_12_coders_str)
+    logging.info(
+        'Getting the list of eligible users in the category [%s] for coder of '
+        'the month', category
+    )
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
@@ -186,6 +262,7 @@ def get_cotm_eligible_users(
                 s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
                 s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
                 i.user_id IS NOT NULL
+                {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
                 i.identity_id
@@ -274,19 +351,39 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
+            WITH ProblemsForfeitedByUser AS (
+                SELECT
+                    pf.user_id,
+                    pf.problem_id,
+                    pf.forfeited_date
+                FROM
+                    Problems_Forfeited pf
+                WHERE
+                    forfeited_date IS NULL
+            )
             SELECT
-                identity_id,
-                problem_id,
-                MIN(time) AS first_time_solved
+                s.identity_id,
+                s.problem_id,
+                MIN(s.time) AS first_time_solved
             FROM
-                Submissions
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                ProblemsForfeitedByUser pfbu
+            ON
+                pfbu.user_id = i.user_id
+                AND pfbu.problem_id = s.problem_id
             WHERE
-                identity_id IN ({identity_ids_str})
-                AND problem_id IN ({problem_ids_str})
-                AND verdict = 'AC'
-                AND type = 'normal'
+                s.identity_id IN ({identity_ids_str})
+                AND s.problem_id IN ({problem_ids_str})
+                AND s.verdict = 'AC'
+                AND s.type = 'normal'
+                AND pfbu.forfeited_date IS NULL
             GROUP BY
-                identity_id, problem_id;
+                s.identity_id, s.problem_id;
     ''')
 
     # Populate user_problems dictionary with the problems solved by each user

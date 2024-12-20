@@ -3,6 +3,7 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 import sys
@@ -14,6 +15,7 @@ import mysql.connector.cursor
 from database.coder_of_the_month import check_existing_coder_of_the_month
 from database.coder_of_the_month import get_cotm_eligible_users
 from database.coder_of_the_month import get_eligible_problems
+from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
 from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
@@ -548,15 +550,22 @@ def compute_points_for_user(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
 ) -> List[UserRank]:
     '''Computes the points for each eligible user'''
+
+    last_12_coders = get_last_12_coders_of_the_month(
+        cur_readonly,
+        first_day_of_current_month,
+        category
+    )
 
     eligible_users = get_cotm_eligible_users(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month,
-        gender_clause
+        category,
+        last_12_coders
     )
 
     eligible_problems = get_eligible_problems(
@@ -572,7 +581,7 @@ def compute_points_for_user(
     problem_ids = list(eligible_problems.keys())
 
     if not identity_ids:
-        logging.info('No eligible users found.')
+        logging.info('No eligible users found in category [%s].', category)
         return []
 
     if not problem_ids:
@@ -619,6 +628,7 @@ def update_coder_of_the_month_candidates(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     category: str,
+    update_coder_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to coder of the current month'''
 
@@ -636,20 +646,44 @@ def update_coder_of_the_month_candidates(
     remove_coder_of_the_month_candidates(cur, first_day_of_next_month,
                                          category)
 
-    if category == 'female':
-        gender_clause = " AND i.gender = 'female'"
-    else:
-        gender_clause = ""
-
     candidates = compute_points_for_user(cur_readonly,
                                          first_day_of_current_month,
                                          first_day_of_next_month,
-                                         gender_clause)
+                                         category)
 
-    for index, candidate in enumerate(candidates):
-        ranking = index + 1
-        insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
-                                             ranking, category, candidate)
+    if update_coder_of_the_month:
+        # TODO: We need to insert the candidates in the database for testing
+        # purposes. This condition will be removed in the future.
+        for ranking, candidate in enumerate(candidates, start=1):
+            insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
+                                                 ranking, category, candidate)
+    else:
+        debug_coder_of_the_month_candidates(first_day_of_next_month, category,
+                                            candidates)
+
+
+def debug_coder_of_the_month_candidates(
+    first_day_of_next_month: datetime.date,
+    category: str,
+    candidates: List[UserRank],
+) -> None:
+    '''Log coder of the month candidates'''
+
+    log_entries = []
+    for ranking, candidate in enumerate(candidates, start=1):
+        log_entry = {
+            "user_id": candidate.user_id,
+            "time": first_day_of_next_month.isoformat(),
+            "ranking": ranking,
+            "school_id": candidate.school_id,
+            "category": category,
+            "score": candidate.score,
+            "problems_solved": candidate.problems_solved
+        }
+        log_entries.append(log_entry)
+
+    log_message = json.dumps(log_entries, indent=4)
+    logging.info(log_message)
 
 
 def update_users_stats(
@@ -657,7 +691,7 @@ def update_users_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
-    update_coder_of_the_month: bool
+    update_coder_of_the_month: bool,
 ) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
@@ -679,26 +713,25 @@ def update_users_stats(
         # transaction since both are stored in the same DB table.
         dbconn.commit()
 
-        if update_coder_of_the_month:
-            try:
-                update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                     'all')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month')
-                raise
+        try:
+            update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                 'all',
+                                                 update_coder_of_the_month)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month')
+            raise
 
-            try:
-                update_coder_of_the_month_candidates(cur, cur_readonly, date,
-                                                     'female')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month female')
-                raise
-        else:
-            logging.info('Skipping updating Coder of the Month')
+        try:
+            update_coder_of_the_month_candidates(cur, cur_readonly, date,
+                                                 'female',
+                                                 update_coder_of_the_month)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month female')
+            raise
 
         logging.info('Users stats updated')
     except:  # noqa: bare-except
