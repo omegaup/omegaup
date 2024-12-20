@@ -351,22 +351,59 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
-            WITH ProblemsForfeitedByUser AS (
-                SELECT
-                    pf.user_id,
-                    pf.problem_id,
-                    pf.forfeited_date
-                FROM
-                    Problems_Forfeited pf
-                WHERE
-                    forfeited_date IS NULL
-            )
+            WITH
+                ProblemsAdministeredByUser AS (
+                    SELECT
+                        p.problem_id,
+                        ai.identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
+                        ACLs AS a ON a.acl_id = p.acl_id
+                    INNER JOIN
+                        Identities AS ai ON a.owner_id = ai.user_id
+                    UNION
+                    SELECT
+                        p.problem_id,
+                        uri.identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
+                        User_Roles ur ON ur.acl_id = p.acl_id
+                        AND ur.role_id = 1
+                    INNER JOIN
+                        Identities uri ON ur.user_id = uri.user_id
+                    UNION
+                    SELECT
+                        p.problem_id,
+                        gi.identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
+                        Group_Roles gr ON gr.acl_id = p.acl_id
+                        AND gr.role_id = 1
+                    INNER JOIN
+                        Groups_Identities gi ON gi.group_id = gr.group_id
+                ),
+                ProblemsForfeitedByUser AS (
+                    SELECT
+                        pf.user_id,
+                        pf.problem_id,
+                        pf.forfeited_date
+                    FROM
+                        Problems_Forfeited pf
+                    WHERE
+                        forfeited_date IS NULL
+                )
             SELECT
                 s.identity_id,
                 s.problem_id,
                 MIN(s.time) AS first_time_solved
             FROM
                 Submissions s
+            LEFT JOIN ProblemsAdministeredByUser pabu
+                ON s.problem_id = pabu.problem_id
+                AND s.identity_id = pabu.identity_id
             INNER JOIN
                 Identities i
             ON
@@ -381,6 +418,7 @@ def get_user_problems(
                 AND s.problem_id IN ({problem_ids_str})
                 AND s.verdict = 'AC'
                 AND s.type = 'normal'
+                AND pabu.problem_id IS NULL
                 AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
