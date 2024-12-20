@@ -355,24 +355,34 @@ def get_user_problems(
                 ProblemsAdministeredByUser AS (
                     SELECT
                         p.problem_id,
-                        ai.identity_id AS owner_identity_id,
-                        uri.identity_id AS user_identity_id,
-                        gi.identity_id AS group_identity_id
+                        ai.identity_id
                     FROM
                         Problems AS p
                     INNER JOIN
                         ACLs AS a ON a.acl_id = p.acl_id
                     INNER JOIN
                         Identities AS ai ON a.owner_id = ai.user_id
-                    LEFT JOIN
+                    UNION
+                    SELECT
+                        p.problem_id,
+                        uri.identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
                         User_Roles ur ON ur.acl_id = p.acl_id
                         AND ur.role_id = 1
-                    LEFT JOIN
+                    INNER JOIN
                         Identities uri ON ur.user_id = uri.user_id
-                    LEFT JOIN
+                    UNION
+                    SELECT
+                        p.problem_id,
+                        gi.identity_id
+                    FROM
+                        Problems AS p
+                    INNER JOIN
                         Group_Roles gr ON gr.acl_id = p.acl_id
                         AND gr.role_id = 1
-                    LEFT JOIN
+                    INNER JOIN
                         Groups_Identities gi ON gi.group_id = gr.group_id
                 ),
                 ProblemsForfeitedByUser AS (
@@ -393,11 +403,7 @@ def get_user_problems(
                 Submissions s
             LEFT JOIN ProblemsAdministeredByUser pabu
                 ON s.problem_id = pabu.problem_id
-                AND (
-                    s.identity_id = pabu.owner_identity_id
-                    OR s.identity_id = pabu.user_identity_id
-                    OR s.identity_id = pabu.group_identity_id
-                )
+                AND s.identity_id = pabu.identity_id
             INNER JOIN
                 Identities i
             ON
