@@ -196,19 +196,27 @@ def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
     last_12_coders: List[str],
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
     last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
 
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
         last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
             last_12_coders_str)
-    logging.info('Getting the list of eligible users for coder of the month')
+    logging.info(
+        'Getting the list of eligible users in the category [%s] for coder of '
+        'the month', category
+    )
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
