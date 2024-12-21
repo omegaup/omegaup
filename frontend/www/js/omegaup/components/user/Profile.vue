@@ -30,7 +30,8 @@
             :profile="profile"
             :countries="countries"
             @update-user-basic-information="
-              (request) => $emit('update-user-basic-information', request)
+              (request, usernameChanged) =>
+                $emit('update-user-basic-information', request, usernameChanged)
             "
             @update-user-basic-information-error="
               (request) => $emit('update-user-basic-information-error', request)
