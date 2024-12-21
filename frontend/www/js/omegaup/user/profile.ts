@@ -85,7 +85,9 @@ OmegaUp.on('ready', () => {
                   userBasicInformation.username,
                 );
                 ui.success(T.userEditSuccess);
-                if (userBasicInformation.username !== payload.profile.username) {
+                if (
+                  userBasicInformation.username !== payload.profile.username
+                ) {
                   window.location.reload();
                 }
               })
