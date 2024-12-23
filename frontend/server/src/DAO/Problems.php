@@ -1421,8 +1421,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 GROUP BY
                     t.name;";
 
-        /** @var list<array{name: string, problems_per_tag: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        /** @var list<array{name: string, problems_per_tag: float}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        $problems = [];
+        foreach ($result as $problem) {
+            $problems[] = [
+                'name' => $problem['name'],
+                'problems_per_tag' => intval($problem['problems_per_tag']),
+            ];
+        }
+        return $problems;
     }
 
     final public static function getRandomLanguageProblemAlias(): string {
