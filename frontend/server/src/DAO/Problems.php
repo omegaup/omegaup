@@ -1421,7 +1421,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 GROUP BY
                     t.name;";
 
-        /** @var list<array{name: string, problems_per_tag: float}> */
+        /** @var list<array{name: string, problems_per_tag: float|null}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
         $problems = [];
         foreach ($result as $problem) {
