@@ -165,20 +165,14 @@ export default class UserBasicInformationEdit extends Vue {
       return;
     }
 
-    const usernameChanged = this.username !== this.profile.username;
-
-    this.$emit(
-      'update-user-basic-information',
-      {
-        username: this.username,
-        name: this.name,
-        gender: this.gender,
-        country_id: this.countryId,
-        state_id: this.stateId,
-        birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
-      },
-      usernameChanged,
-    );
+    this.$emit('update-user-basic-information', {
+      username: this.username,
+      name: this.name,
+      gender: this.gender,
+      country_id: this.countryId,
+      state_id: this.stateId,
+      birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+    });
   }
 
   @Watch('countryId')

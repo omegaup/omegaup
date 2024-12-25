@@ -84,12 +84,13 @@ OmegaUp.on('ready', () => {
                   'updateUsername',
                   userBasicInformation.username,
                 );
-                ui.success(T.userEditSuccess);
-                if (
-                  userBasicInformation.username !== payload.profile.username
-                ) {
-                  window.location.reload();
+                if (userBasicInformation.username) {
+                  userProfile.profile = {
+                    ...userProfile.profile,
+                    username: userBasicInformation.username,
+                  };
                 }
+                ui.success(T.userEditSuccess);
               })
               .catch(ui.apiError);
           },
