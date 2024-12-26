@@ -1404,25 +1404,33 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getQualityProblemsPerTagCount(): array {
         $sql = "SELECT
-                    t.name, COUNT(p.problem_id) AS problems_per_tag
+                    t.name,
+                    SUM(IF(p.quality_seal = 1, 1, 0)) AS problems_per_tag
                 FROM
-                    Problems p
-                INNER JOIN
+                    Tags t
+                LEFT JOIN
                     Problems_Tags pt
                 ON
-                    p.problem_id = pt.problem_id
-                INNER JOIN
-                    Tags t
-                ON
                     t.tag_id = pt.tag_id
+                LEFT JOIN
+                    Problems p
+                ON
+                    p.problem_id = pt.problem_id
                 WHERE
                     t.name LIKE CONCAT('problemLevel','%')
-                    AND p.quality_seal = 1
                 GROUP BY
                     t.name;";
 
-        /** @var list<array{name: string, problems_per_tag: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        /** @var list<array{name: string, problems_per_tag: float|null}> */
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        $problems = [];
+        foreach ($result as $problem) {
+            $problems[] = [
+                'name' => $problem['name'],
+                'problems_per_tag' => intval($problem['problems_per_tag']),
+            ];
+        }
+        return $problems;
     }
 
     final public static function getRandomLanguageProblemAlias(): string {
