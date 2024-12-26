@@ -196,19 +196,27 @@ def get_cotm_eligible_users(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date,
-    gender_clause: str,
+    category: str,
     last_12_coders: List[str],
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
     last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
 
+    if category == 'female':
+        gender_clause = " AND i.gender = 'female'"
+    else:
+        gender_clause = ""
+
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
         last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
             last_12_coders_str)
-    logging.info('Getting the list of eligible users for coder of the month')
+    logging.info(
+        'Getting the list of eligible users in the category [%s] for coder of '
+        'the month', category
+    )
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
@@ -343,19 +351,39 @@ def get_user_problems(
         first_day_of_current_month)
 
     cur_readonly.execute(f'''
+            WITH ProblemsForfeitedByUser AS (
+                SELECT
+                    pf.user_id,
+                    pf.problem_id,
+                    pf.forfeited_date
+                FROM
+                    Problems_Forfeited pf
+                WHERE
+                    forfeited_date IS NULL
+            )
             SELECT
-                identity_id,
-                problem_id,
-                MIN(time) AS first_time_solved
+                s.identity_id,
+                s.problem_id,
+                MIN(s.time) AS first_time_solved
             FROM
-                Submissions
+                Submissions s
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            LEFT JOIN
+                ProblemsForfeitedByUser pfbu
+            ON
+                pfbu.user_id = i.user_id
+                AND pfbu.problem_id = s.problem_id
             WHERE
-                identity_id IN ({identity_ids_str})
-                AND problem_id IN ({problem_ids_str})
-                AND verdict = 'AC'
-                AND type = 'normal'
+                s.identity_id IN ({identity_ids_str})
+                AND s.problem_id IN ({problem_ids_str})
+                AND s.verdict = 'AC'
+                AND s.type = 'normal'
+                AND pfbu.forfeited_date IS NULL
             GROUP BY
-                identity_id, problem_id;
+                s.identity_id, s.problem_id;
     ''')
 
     # Populate user_problems dictionary with the problems solved by each user
