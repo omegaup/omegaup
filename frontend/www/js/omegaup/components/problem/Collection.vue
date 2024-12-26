@@ -39,6 +39,7 @@
               <template #button>
                 <a
                   class="btn btn-primary"
+                  :class="{ disabled: collection.problems_per_tag == 0 }"
                   :href="`/problem/collection/${encodeURIComponent(
                     collection.name,
                   )}/`"
@@ -183,7 +184,7 @@ const problemLevelIcons: { [key: string]: string } = {
 })
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
-  @Prop() problemCount!: string[];
+  @Prop() problemCount!: { name: string; problems_per_tag: number }[];
   @Prop() allTags!: types.Tag[];
   T = T;
   ui = ui;
