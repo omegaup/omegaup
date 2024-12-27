@@ -504,6 +504,12 @@ nav.navbar {
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
   }
+
+  .dropdown-menu {
+    overflow-y: auto;
+    max-height: 400 px;
+    scrollbar-width: none;
+  }
 }
 
 .allow-overflow {
