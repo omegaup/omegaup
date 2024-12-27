@@ -1200,28 +1200,24 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the time of the next submission to the current problem
+     * Returns the remaining time for the next submission to the current problem,
+     * expressed in seconds
      */
-    final public static function nextSubmissionTimestamp(
+    final public static function getSecondsToNextSubmission(
         ?\OmegaUp\DAO\VO\Contests $contest = null,
         ?\OmegaUp\Timestamp $lastSubmissionTime = null
-    ): \OmegaUp\Timestamp {
-        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        if (!is_null($contest)) {
-            // Get submissions gap
-            $submissionGap = max(
-                $submissionGap,
-                intval($contest->submissions_gap)
-            );
-        }
+    ): int {
+        $defaultSubmissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+
+        $submissionGap = is_null($contest)
+            ? $defaultSubmissionGap
+            : max($defaultSubmissionGap, intval($contest->submissions_gap));
 
         if (is_null($lastSubmissionTime)) {
-            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+            return 0;
         }
 
-        return new \OmegaUp\Timestamp(
-            $lastSubmissionTime->time + $submissionGap
-        );
+        return ($lastSubmissionTime->time + $submissionGap) - \OmegaUp\Time::get();
     }
 
     /**

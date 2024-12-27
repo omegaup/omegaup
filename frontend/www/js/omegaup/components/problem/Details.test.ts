@@ -33,6 +33,7 @@ describe('Details.vue', () => {
     },
     quality_seal: false,
     sample_input: undefined,
+    secondsToNextSubmission: 0,
     settings: {
       cases: {
         statement_001: {

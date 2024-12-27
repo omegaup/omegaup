@@ -109,10 +109,7 @@ OmegaUp.on('ready', async () => {
     }
   }
 
-  let nextSubmissionTimestamp: null | Date = null;
-  if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = problemDetails?.nextSubmissionTimestamp;
-  }
+  const secondsToNextSubmission = problemDetails?.secondsToNextSubmission ?? 0;
 
   const contestContestant = new Vue({
     el: '#main-container',
@@ -128,7 +125,7 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
-      nextSubmissionTimestamp,
+      secondsToNextSubmission,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -161,7 +158,7 @@ OmegaUp.on('ready', async () => {
           totalRuns: runsStore.state.totalRuns,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
-          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          secondsToNextSubmission: this.secondsToNextSubmission,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
@@ -224,12 +221,10 @@ OmegaUp.on('ready', async () => {
             problem,
             code,
             language,
-            target,
           }: {
             problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               contest_alias: payload.contest.alias,
@@ -247,8 +242,6 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentNextSubmissionTimestamp =
-                  response.nextSubmissionTimestamp;
 
                 if (
                   Object.prototype.hasOwnProperty.call(
@@ -258,8 +251,9 @@ OmegaUp.on('ready', async () => {
                 ) {
                   const problemInfo =
                     problemsStore.state.problems[problem.alias];
-                  problemInfo.nextSubmissionTimestamp =
-                    response.nextSubmissionTimestamp;
+                  problemInfo.secondsToNextSubmission =
+                    response.secondsToNextSubmission;
+                  problemInfo.lastOpenedTimestamp = Date.now();
                   problemsStore.commit('addProblem', problemInfo);
                 }
               })
@@ -395,11 +389,29 @@ OmegaUp.on('ready', async () => {
               `#${selectedTab}/${alias}`,
             );
           },
-          'new-submission-popup-displayed': () => {
+          'new-submission-popup-displayed': ({
+            target,
+            problemAlias,
+          }: {
+            target: Vue & {
+              currentSecondsToNextSubmission: number;
+            };
+            problemAlias: string;
+          }) => {
             if (this.shouldShowFirstAssociatedIdentityRunWarning) {
               this.shouldShowFirstAssociatedIdentityRunWarning = false;
               ui.warning(T.firstSumbissionWithIdentity);
             }
+            const submitTimestamp = Date.now();
+            const activeProblem = problemsStore.state.problems[problemAlias];
+            if (activeProblem.lastOpenedTimestamp == null) {
+              return;
+            }
+            target.currentSecondsToNextSubmission =
+              activeProblem.secondsToNextSubmission -
+              Math.ceil(
+                (submitTimestamp - activeProblem.lastOpenedTimestamp) / 1000,
+              );
           },
           'apply-filter': ({
             filter,
