@@ -362,7 +362,7 @@ def get_user_problems(
                         ACLs AS a ON a.acl_id = p.acl_id
                     INNER JOIN
                         Identities AS ai ON a.owner_id = ai.user_id
-                    UNION
+                    UNION DISTINCT
                     SELECT
                         p.problem_id,
                         uri.identity_id
@@ -373,7 +373,7 @@ def get_user_problems(
                         AND ur.role_id = 1
                     INNER JOIN
                         Identities uri ON ur.user_id = uri.user_id
-                    UNION
+                    UNION DISTINCT
                     SELECT
                         p.problem_id,
                         gi.identity_id
@@ -401,25 +401,29 @@ def get_user_problems(
                 MIN(s.time) AS first_time_solved
             FROM
                 Submissions s
-            LEFT JOIN ProblemsAdministeredByUser pabu
-                ON s.problem_id = pabu.problem_id
-                AND s.identity_id = pabu.identity_id
             INNER JOIN
                 Identities i
             ON
                 i.identity_id = s.identity_id
+            CROSS JOIN
+                Problems p
             LEFT JOIN
-                ProblemsForfeitedByUser pfbu
+                ProblemsAdministeredByUser pau
             ON
-                pfbu.user_id = i.user_id
-                AND pfbu.problem_id = s.problem_id
+                p.problem_id = pau.problem_id
+                AND i.identity_id = pau.identity_id
+            LEFT JOIN
+                ProblemsForfeitedByUser pfu
+            ON
+                pfu.user_id = i.user_id
+                AND pfu.problem_id = s.problem_id
             WHERE
                 s.identity_id IN ({identity_ids_str})
                 AND s.problem_id IN ({problem_ids_str})
                 AND s.verdict = 'AC'
                 AND s.type = 'normal'
-                AND pabu.problem_id IS NULL
-                AND pfbu.forfeited_date IS NULL
+                AND CASE WHEN pau.identity_id IS NOT NULL THEN 1 ELSE 0 END = 0
+                AND pfu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
     ''')
