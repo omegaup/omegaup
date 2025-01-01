@@ -132,6 +132,7 @@
         type="submit"
         class="btn btn-primary mr-2"
         data-preference-save-button
+        :disabled="!hasChanges"
       >
         {{ T.wordsSaveChanges }}
       </button>
@@ -259,6 +260,23 @@ export default class UserPreferencesEdit extends Vue {
         this.hasCompetitiveObjective = false;
         break;
     }
+  }
+
+  get hasChanges(): boolean {
+    return (
+      this.locale !== this.profile.locale ||
+      this.preferredLanguage !== this.profile.preferred_language ||
+      this.isPrivate !== this.profile.is_private ||
+      this.hideProblemTags !== this.profile.hide_problem_tags ||
+      this.hasCompetitiveObjective !==
+        (this.profile.has_competitive_objective ?? false) ||
+      this.hasLearningObjective !==
+        (this.profile.has_learning_objective ?? true) ||
+      this.hasScholarObjective !==
+        (this.profile.has_scholar_objective ?? true) ||
+      this.hasTeachingObjective !==
+        (this.profile.has_teaching_objective ?? false)
+    );
   }
 
   onUpdateUserPreferences(): void {
