@@ -346,7 +346,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
                 $feedback,
                 1,
-                200
+                1000
             )
         );
 
