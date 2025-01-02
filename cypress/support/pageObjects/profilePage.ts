@@ -163,6 +163,16 @@ export class ProfilePage {
     cy.get('[data-nav-user]').click();
     cy.get('button').contains(username).click();
   }
+
+  validateStateSelection(): void {
+    cy.get('[data-save-profile-changes-button]').click();
+    cy.get('[data-states]').then(($stateSelect) => {
+      const selectedState = $stateSelect.val();
+      if (!selectedState) {
+        cy.get('[data-state-warning]').should('be.visible');
+      }
+    });
+  }
 }
 
 export const profilePage = new ProfilePage();

@@ -45,6 +45,24 @@ describe('Navigation Test', () => {
     cy.logout();
   });
 
+  it('Should display warning if state is not selected', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const userBasicInformation: UserInformation = {
+      name: 'Test User',
+      gender: 'male',
+      country: 'Mexico',
+      state: '',
+      dateOfBirth: getISODate(
+        new Date(new Date().setFullYear(new Date().getFullYear() - 20)),
+      ),
+    };
+
+    cy.login(loginOptions[0]);
+    profilePage.updateProfileInformation(userBasicInformation);
+    profilePage.validateStateSelection();
+    cy.logout();
+  });
+
   it('Should update preferences', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const userPreferences: UserPreferences = {
