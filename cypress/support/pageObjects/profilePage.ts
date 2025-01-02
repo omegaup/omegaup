@@ -79,6 +79,12 @@ export class ProfilePage {
     cy.get('[data-states]').select(userBasicInformation.state);
     cy.get('[data-date-of-birth]').type(userBasicInformation.dateOfBirth);
     cy.get('[data-save-profile-changes-button]').click();
+
+    // Add validation mechanism to check if the state is selected
+    if (userBasicInformation.state === '') {
+      // Display a warning message if the state is not selected
+      cy.get('[data-state-warning]').should('be.visible');
+    }
   }
 
   verifyProfileInformation(userBasicInformation: UserInformation): void {
