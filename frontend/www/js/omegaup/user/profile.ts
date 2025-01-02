@@ -1,10 +1,10 @@
 import Vue from 'vue';
-
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
+import mainStore from '../mainStore';
 
 import user_Profile from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
@@ -14,12 +14,14 @@ OmegaUp.on('ready', () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substring(1).split('#');
   const searchResultSchools: types.SchoolListItem[] = [];
+
   if (payload.profile.school && payload.profile.school_id) {
     searchResultSchools.push({
       key: payload.profile.school_id,
       value: payload.profile.school,
     });
   }
+
   let selectedTab = locationHash[0] || 'view-profile';
   let viewProfileSelectedTab: string | null = null;
   if (selectedTab === 'locale-changed') {
@@ -78,6 +80,15 @@ OmegaUp.on('ready', () => {
           ) => {
             api.User.update(userBasicInformation)
               .then(() => {
+                mainStore.commit(
+                  'updateUsername',
+                  userBasicInformation.username,
+                );
+
+                userProfile.profile.username = userBasicInformation.username;
+                userProfile.profile.country_id =
+                  userBasicInformation.country_id;
+
                 ui.success(T.userEditSuccess);
               })
               .catch(ui.apiError);
