@@ -51,7 +51,7 @@
                   >{{ problemCardFooterLabel }}
                   <omegaup-common-typeahead
                     :existing-options="searchResultProblems"
-                    :activation-threshold="2"
+                    :activation-threshold="1"
                     :value.sync="problemAlias"
                     @update-existing-options="
                       (query) => $emit('update-search-result-problems', query)
