@@ -39,16 +39,14 @@
                 </p>
               </template>
               <template #button>
-                <div class="btn-container">
-                  <a
-                    class="btn btn-primary"
-                    :class="{ disabled: collection.problems_per_tag == 0 }"
-                    :href="`/problem/collection/${encodeURIComponent(
-                      collection.name,
-                    )}/`"
-                    >{{ T.problemcollectionViewProblems }}</a
-                  >
-                </div>
+                <a
+                  class="btn btn-primary"
+                  :class="{ disabled: collection.problems_per_tag == 0 }"
+                  :href="`/problem/collection/${encodeURIComponent(
+                    collection.name,
+                  )}/`"
+                  >{{ T.problemcollectionViewProblems }}</a
+                >
               </template>
             </omegaup-problem-collection>
           </div>

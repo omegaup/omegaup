@@ -137,6 +137,112 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test the API behavior when user has solved problems in the last month
+     * that has been seen the solutions
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfTheMonthWithSolutionsSeenOnProblems(
+        string $category
+    ) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a submissions mapping for 3 different users solving 5 problems
+        $submissionsMapping = [
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => false],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 0, 'seenSolution' => false],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_02', 'run' => 0, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+            [
+                ['username' => 'user_01', 'run' => 1, 'seenSolution' => true],
+                ['username' => 'user_02', 'run' => 1, 'seenSolution' => false],
+                ['username' => 'user_03', 'run' => 1, 'seenSolution' => true],
+            ],
+        ];
+
+        // Create 3 users
+        $identities = [];
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identities[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identities[$index], $gender);
+        }
+
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+        // Create 5 problems and submissions for some users depending on the
+        // submissions mapping
+        $problemData = [];
+        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
+            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => 'problem_' . ($indexProblem + 1),
+                ])
+            );
+
+            foreach ($problemSubmissions as $indexUser => $submissionsUser) {
+                if ($submissionsUser['seenSolution']) {
+                    continue;
+                }
+                $login = self::login($identities[$indexUser]);
+                \OmegaUp\Controllers\Problem::apiSolution(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                        'problem_alias' => $problemData[$indexProblem]['problem']->alias,
+                        'forfeit_problem' => true,
+                    ])
+                );
+                if (!$submissionsUser['run']) {
+                    continue;
+                }
+                \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                    $identities[$indexUser],
+                    $problemData[$indexProblem],
+                    $runCreationDate
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+        $today = date('Y-m-01', \OmegaUp\Time::get());
+
+        $response = $this->getCoderOfTheMonth(
+            $today,
+            'this month',
+            $category
+        );
+
+        // user_02 should be the coder of the month because they have solved
+        // all the problems without seeing the solutions
+        $this->assertSame(
+            $identities[1]->username,
+            $response['coderinfo']['username']
+        );
+    }
+
+    /**
      * Test the API behavior when there is more than one candidate for Coder of
      * the Month during the first days of the current month
      *
@@ -1081,6 +1187,121 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             $user2->username,
             $response['coderinfo']['username']
+        );
+    }
+
+    /**
+     * Test the API behavior when the submissions are made by unassociated
+     * identities. Only one identity belongs to a user. The user should be the
+     * coder of the month even if they have fewer accepted submissions.
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testUnassociatedIdentities(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $groupAlias = 'submissions-group';
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            name: 'Group for submissions',
+            description: 'This group will be used to create identities',
+            alias: $groupAlias,
+            login: $creatorLogin
+        );
+
+        $submissionsMapping = [
+            ['username' => 'id_1', 'numRuns' => 3, 'password' => 'password_1'],
+            ['username' => 'id_2', 'numRuns' => 4, 'password' => 'password_2'],
+            ['username' => 'id_3', 'numRuns' => 2, 'password' => 'password_3'],
+            ['username' => 'id_4', 'numRuns' => 6, 'password' => 'password_4'],
+            ['username' => 'id_5', 'numRuns' => 5, 'password' => 'password_5'],
+        ];
+
+        $identities = [];
+
+        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        foreach ($submissionsMapping as $index => $submissionsByUser) {
+            $identityName = $submissionsByUser['username'];
+            $identityPassword = $submissionsByUser['password'];
+            $numRuns = $submissionsByUser['numRuns'];
+            // Call api using identity creator group member
+            \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'username' => "{$group['group']->alias}:{$identityName}",
+                'name' => $identityName,
+                'password' => $identityPassword,
+                'country_id' => 'MX',
+                'state_id' => 'QUE',
+                'gender' => $gender,
+                'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+                'group_alias' => $group['group']->alias,
+            ]));
+            $identities[$index] = \OmegaUp\DAO\Identities::findByUsername(
+                "{$group['group']->alias}:{$identityName}"
+            );
+            $identities[$index]->password = $identityPassword;
+
+            [
+                'identity' => $users[$index],
+                ] = \OmegaUp\Test\Factories\User::createUser();
+            self::updateIdentity($users[$index], $gender);
+
+            $runCreationDate = self::setFirstDayOfTheLastMonth();
+            $this->createRuns(
+                $identities[$index],
+                $runCreationDate,
+                numRuns: $numRuns
+            );
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertNull($response['coderinfo']);
+
+        // Create 5 user accounts and associate them with their corresponding
+        // identities.
+        $users = [];
+        foreach ($identities as $index => $identity) {
+            $username = $identity->name;
+            $identityUsername = $identity->username;
+            $identityPassword = $submissionsMapping[$index]['password'];
+
+            [
+                'identity' => $users[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    [
+                        'username' => $username,
+                        'name' => $username,
+                    ]
+                )
+            );
+
+            $login = self::login($users[$index]);
+            \OmegaUp\Controllers\User::apiAssociateIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $identityUsername,
+                    'password' => $identityPassword,
+                ])
+            );
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertSame(
+            $response['coderinfo']['username'],
+            $identities[3]->name
         );
     }
 
