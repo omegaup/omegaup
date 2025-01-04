@@ -6,6 +6,7 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import T from '../lang';
 import clarificationsStore from '../arena/clarificationsStore';
+import mainStore from '../mainStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
@@ -40,7 +41,7 @@ OmegaUp.on('ready', () => {
           associatedIdentities: payload.associatedIdentities,
           currentEmail: payload.currentEmail,
           currentName: payload.currentName,
-          currentUsername: payload.currentUsername,
+          currentUsername: mainStore.state.username,
           isAdmin: payload.isAdmin,
           isMainUserIdentity: payload.isMainUserIdentity,
           lockDownImage: payload.lockDownImage,
@@ -116,6 +117,7 @@ OmegaUp.on('ready', () => {
   });
 
   if (payload.isLoggedIn) {
+    mainStore.commit('updateUsername', payload.currentUsername);
     api.Notification.myList()
       .then((data) => {
         commonNavbar.notifications = data.notifications;
