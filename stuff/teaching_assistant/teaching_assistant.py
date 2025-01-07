@@ -85,6 +85,7 @@ def set_submission_feedback_list_endpoint(
 
 def get_contents_from_url(get_endpoint_fn, args=None):
     """hit the endpoint with GET request"""
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     global COOKIES
     global BASE_URL
 
@@ -119,6 +120,7 @@ def extract_show_run_ids():
     Returns:
         list: List of show-run IDs that need feedback
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     notifications = get_contents_from_url(get_notifications_endpoint)["notifications"]
     submission_feedback_requests = []
 
@@ -178,6 +180,7 @@ def extract_feedback_thread(run_alias):
     Returns:
     list: List of feedback threads
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     submission_feedback_requests = get_contents_from_url(
         get_runs_submission_feedback_endpoint, {"run_alias": run_alias}
     )
@@ -213,6 +216,7 @@ def conjure_query(
     Returns:
     string: Conjured query
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     conjured_query = ""
     if is_conversation:
         conjured_query = (
@@ -242,6 +246,7 @@ def query_LLM(query_content, is_initial_feedback=True, temperature=0):
     Returns:
     string: Response from the LLM
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
 
     prompt = f"You are a teaching assistant, and your goal is to help students with specific programming-related queries without directly providing full solutions. Follow these steps to guide users based on their query type: \
 1) When a student asks for a topic explanation (for example, \"Binary Search\"), provide a detailed breakdown of the concept without solving any specific problems. \
@@ -290,6 +295,7 @@ def process_initial_feedback(TA_feedback, show_run_id, course_alias, assignment_
     Returns:
     None
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     for line, feedback in TA_feedback.items():
         if line == "general advices":
             continue
@@ -314,6 +320,7 @@ def process_feedbacks():
     Returns:
     None
     """
+    global USERNAME, PASSWORD, COURSE_ALIAS, LANGUAGE, KEY, client
     get_contents_from_url(
         get_login_endpoint, {"username": USERNAME, "password": PASSWORD}
     )
