@@ -507,7 +507,7 @@ nav.navbar {
 
   .dropdown-menu {
     overflow-y: auto;
-    max-height: 25rem;
+    max-height: 75vh;
     scrollbar-width: none;
   }
 }
