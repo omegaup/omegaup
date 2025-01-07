@@ -1210,7 +1210,7 @@ const translations: { [key: string]: string; } = {
   problemEditLimits: "Limits (optional)",
   problemEditSolution: "Edit Solution",
   problemEditSource: "Problem source",
-  problemEditTagPublicRequired: "It's required to select at least one public tag",
+  problemEditTagPublicRequired: "It's required to select at least one public tag and a problem level",
   problemEditTags: "Tags",
   problemEditUpdatedSuccessfully: "Problem updated successfully!",
   problemEditValidation: "Validation",
