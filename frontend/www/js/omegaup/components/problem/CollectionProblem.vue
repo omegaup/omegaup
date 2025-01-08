@@ -1,5 +1,5 @@
 <template>
-  <div class="card text-center mx-2 my-2" omegaup-collection-problem>
+  <div class="card text-center mx-2 my-2 bg-light" omegaup-collection-problem>
     <div class="card-body d-flex flex-column align-items-center p-2">
       <div class="icon-container mb-1">
         <h1 class="mb-0">

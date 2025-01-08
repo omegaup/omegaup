@@ -25,7 +25,6 @@
             >
               <template #icon>
                 <font-awesome-icon
-                  class="mt-3"
                   :icon="['fas', getProblemLevelIcon(collection.name)]"
                 ></font-awesome-icon>
               </template>
@@ -233,18 +232,15 @@ export default class Collection extends Vue {
   height: 200px !important;
   display: flex !important;
   flex-direction: column !important;
-}
-
-.educational-level-card[omegaup-collection-problem] .btn-container {
-  position: absolute !important;
-  bottom: 1rem !important;
-  left: 0 !important;
-  right: 0 !important;
-  margin: auto !important;
+  padding: 1rem !important;
 }
 
 /* Adjust spacing for problem count to not overlap with button */
 .educational-level-card[omegaup-collection-problem] .card-text {
-  margin-bottom: 3rem !important;
+  margin-bottom: 0 !important;
+}
+
+.educational-level-card[omegaup-collection-problem] .mt-1 {
+  margin-top: auto !important;
 }
 </style>
