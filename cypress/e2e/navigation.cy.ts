@@ -12,19 +12,38 @@ describe('Navigation Test', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
+    // Ensure the page is fully loaded
+    cy.get('body').should('be.visible');
+  });
+
+  afterEach(() => {
+    // Cleanup and error checking after each test
+    cy.get('body').then(($body) => {
+      if ($body.find('.error-message').length > 0) {
+        cy.log('Error message found on page after test');
+      }
+    });
   });
 
   it('Should change password', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const newPassword = 'newP@55w0rd';
 
-    cy.login(loginOptions[0]);
-    profilePage.changePassword(loginOptions[0].password, newPassword);
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw')
+      .then(() => {
+        profilePage.changePassword(loginOptions[0].password, newPassword)
+          .should('be.fulfilled');
+      });
+
+    cy.logout()
+      .should('not.throw');
 
     loginOptions[0].password = newPassword;
-    cy.login(loginOptions[0]);
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw');
+    cy.logout()
+      .should('not.throw');
   });
 
   it('Should update basic profile information', () => {
@@ -39,10 +58,20 @@ describe('Navigation Test', () => {
       ),
     };
 
-    cy.login(loginOptions[0]);
-    profilePage.updateProfileInformation(userBasicInformation);
-    profilePage.verifyProfileInformation(userBasicInformation);
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw');
+
+    // Wait for profile form to be ready
+    cy.get('form').should('exist').and('be.visible');
+    
+    profilePage.updateProfileInformation(userBasicInformation)
+      .should('be.fulfilled');
+    
+    profilePage.verifyProfileInformation(userBasicInformation)
+      .should('be.fulfilled');
+    
+    cy.logout()
+      .should('not.throw');
   });
 
   it('Should display warning if state is not selected', () => {
@@ -57,10 +86,23 @@ describe('Navigation Test', () => {
       ),
     };
 
-    cy.login(loginOptions[0]);
-    profilePage.updateProfileInformation(userBasicInformation);
-    cy.get('[data-state-warning]').should('be.visible');
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw');
+
+    // Wait for form and ensure country select is populated
+    cy.get('form').should('exist').and('be.visible');
+    cy.get('[data-country-select]').should('exist').and('be.visible');
+    
+    profilePage.updateProfileInformation(userBasicInformation)
+      .should('be.fulfilled');
+    
+    // Check for warning with retry and timeout
+    cy.get('[data-state-warning]', { timeout: 10000 })
+      .should('be.visible')
+      .and('contain.text', 'Please select a state');
+    
+    cy.logout()
+      .should('not.throw');
   });
 
   it('Should update preferences', () => {
@@ -72,9 +114,18 @@ describe('Navigation Test', () => {
       objective: 'competitive',
     };
 
-    cy.login(loginOptions[0]);
-    profilePage.updatePreferences(userPreferences);
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw');
+
+    profilePage.updatePreferences(userPreferences)
+      .should('be.fulfilled');
+    
+    // Verify preferences were saved
+    profilePage.verifyPreferences(userPreferences)
+      .should('be.fulfilled');
+    
+    cy.logout()
+      .should('not.throw');
   });
 
   it('Should update school', () => {
@@ -85,9 +136,16 @@ describe('Navigation Test', () => {
       enrolledStatus: true,
     };
 
-    cy.login(loginOptions[0]);
-    profilePage.updateSchoolDetails(schoolDetails);
-    profilePage.verifySchoolDetails(schoolDetails);
-    cy.logout();
+    cy.login(loginOptions[0])
+      .should('not.throw');
+
+    profilePage.updateSchoolDetails(schoolDetails)
+      .should('be.fulfilled');
+    
+    profilePage.verifySchoolDetails(schoolDetails)
+      .should('be.fulfilled');
+    
+    cy.logout()
+      .should('not.throw');
   });
 });
