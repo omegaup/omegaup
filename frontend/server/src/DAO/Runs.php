@@ -360,7 +360,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= 'WHERE ' . implode(' AND ', $where);
         }
         $sql .= '
-            ORDER BY s.submission_id DESC
+            ORDER BY s.time DESC
             LIMIT ?, ?;
         ';
         $val[] = $offset * $rowCount;
