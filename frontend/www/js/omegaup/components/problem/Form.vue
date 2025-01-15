@@ -115,7 +115,10 @@
               </div>
               <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
+                  v-show="
+                    (selectedPublicTags.length === 0 || !problemLevel) &&
+                    currentLanguages !== ''
+                  "
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
