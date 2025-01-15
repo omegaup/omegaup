@@ -1697,12 +1697,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemAdminsResolvingOwnProblems(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
 
-        // Create a submissions mapping for different users solving problems
+        // Create a submissions' mapping for different users solving problems
         // Some users are the admins of the problems they solve
         // The test will cover four scenarios:
         // 1. A user solves problems they created
         // 2. A user solves problems which the admin add them as an admin
-        // 3. A user solves problems which the admin add the group admin where the user is a member
+        // 3. A user solves problems which the admin add the group admin where
+        //    the user is a member
         // 4. A user solves sproblem which they aren't the admin
         $submissionsMapping = [
             [
