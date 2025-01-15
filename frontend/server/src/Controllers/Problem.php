@@ -4102,15 +4102,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset(
-            $r['page_size']
-        ) ? intval(
-            $r['page_size']
-        ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt(
+            'page_size'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         $query = substr(
             $r->ensureOptionalString('query') ?? '',
