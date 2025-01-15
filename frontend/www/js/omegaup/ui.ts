@@ -239,11 +239,16 @@ export function copyToClipboard(value: string): void {
   if (navigator.clipboard && window.isSecureContext) {
     // Use the Clipboard API if available and in a secure context
     navigator.clipboard.writeText(value).catch((err) => {
-      console.error('Failed to copy text: ', err);
+      console.error('Failed to copy text in a secure context: ', err);
+      fallbackCopyToclipboard(value);
     });
     return;
   }
 
+  fallbackCopyToclipboard(value);
+}
+
+function fallbackCopyToclipboard(value: string): void {
   // Fallback to the deprecated method for older browsers
   const tempInput = document.createElement('textarea');
 
