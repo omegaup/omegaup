@@ -673,6 +673,7 @@ def debug_coder_of_the_month_candidates(
     for ranking, candidate in enumerate(candidates, start=1):
         log_entry = {
             "user_id": candidate.user_id,
+            "username": candidate.username,
             "time": first_day_of_next_month.isoformat(),
             "ranking": ranking,
             "school_id": candidate.school_id,
