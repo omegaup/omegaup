@@ -331,6 +331,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 }
             }
         }
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
 
         $today = date('Y-m-01', \OmegaUp\Time::get());
@@ -1812,6 +1813,119 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             $identities[3]->username,
             $coderOfTheMonth['username']
+        );
+    }
+
+    /**
+     * Test the API behavior when there is more than one candidate for Coder of
+     * the Month during the first days of the latest three months when the
+     * verdict is different
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCodersOfTheMonthWithSubmissionsInDifferentMonthsAndVerdicts(
+        string $category
+    ) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        // Create a submissions mapping for different users, months, verdicts
+        // and problems. The winner for the current month should be user_01
+        // because all their submissions are in the current month. Submissions
+        // with verdict AC from past months should not be considered for the
+        // current month.
+        $submissionsMapping = [
+            0 => [
+                ['username' => 'user_01', 'runs' => [['WA', 0.0], ['WA', 0.0], ['PA', 0.6]]], // 0
+                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 0
+                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['WA', 0.0]]], // 0
+            ],
+            1 => [
+                ['username' => 'user_01', 'runs' => [['PA', 0.5], ['WA', 0.0], ['AC', 1.0]]], // 0
+                ['username' => 'user_02', 'runs' => [['PA', 0.3], ['AC', 1.0], ['AC', 1.0]]], // 1
+                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['WA', 0.0]]], // 0
+            ],
+            2 => [
+                ['username' => 'user_01', 'runs' => [['CE', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 1
+                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 1
+                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['PA', 0.2]]], // 0
+            ],
+            3 => [
+                ['username' => 'user_01', 'runs' => [['WA', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 2
+                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 1
+                ['username' => 'user_03', 'runs' => [['PA', 0.9], ['AC', 1.0], ['AC', 1.0]]], // 1
+            ],
+            4 => [
+                ['username' => 'user_01', 'runs' => [['PA', 0.2], ['AC', 1.0], ['AC', 1.0]]], // 3
+                ['username' => 'user_02', 'runs' => [['WA', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 2
+                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['CE', 0.0]]], // 1
+            ],
+        ];
+
+        // Create 3 users and their identities
+        $identities = [];
+        foreach ($submissionsMapping[0] as $index => $user) {
+            [
+                'identity' => $identities[$index],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $user['username']]
+                )
+            );
+            self::updateIdentity($identities[$index], $gender);
+        }
+
+        $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+
+        $problemData = [];
+        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
+            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => 'problem_' . $indexProblem,
+                ])
+            );
+            foreach ($problemSubmissions as $indexUser => $submissionsUser) {
+                foreach ($submissionsUser['runs'] as $month => $runInfo) {
+                    [$verdict, $points] = $runInfo;
+                    if (is_null($points)) {
+                        continue;
+                    }
+                    switch ($month) {
+                        case 0:
+                            $runCreationDate = self::setFirstDayOfCustomMonths(
+                                monthsLeft: 2
+                            );
+                            break;
+                        case 1:
+                            $runCreationDate = self::setFirstDayOfTheLastMonth();
+                            break;
+                        case 2:
+                            $runCreationDate = self::setFirstDayOfTheCurrentMonth();
+                            break;
+                    }
+                    \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                        $identities[$indexUser],
+                        $problemData[$indexProblem],
+                        $runCreationDate,
+                        $points,
+                        $verdict
+                    );
+                }
+            }
+        }
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+        $today = date('Y-m-01', \OmegaUp\Time::get());
+
+        $response = $this->getCoderOfTheMonth(
+            $today,
+            'this month',
+            $category
+        );
+
+        $this->assertSame(
+            $identities[0]->username,
+            $response['coderinfo']['username']
         );
     }
 
