@@ -1,10 +1,12 @@
 # mypy: ignore-errors
+# pylint: skip-file
 
 import json
 import time
 import argparse
 from getpass import getpass
 import urllib.parse
+import logging
 import requests
 from tqdm import tqdm
 from openai import OpenAI
@@ -47,7 +49,7 @@ def get_runs_submission_feedback_endpoint(run_alias):
     return f"api/run/getSubmissionFeedback?run_alias={run_alias}"
 
 
-def set_submission_feedback_endpoint(
+def set_submission_feedback_endpoint(  # pylint: disable=R0913
     run_alias,
     course_alias,
     assignment_alias,
@@ -83,6 +85,9 @@ def set_submission_feedback_list_endpoint(
 def get_runs_from_course_endpoint(
     course_alias, assignment_alias, rowcount=None, offset=None
 ):
+    """
+    returns the list of run_ids and corresponding_users from last 30 days.
+    """
     endpoint = (
         f"/api/course/runs?"
         f"course_alias={course_alias}&"
@@ -98,30 +103,31 @@ def get_runs_from_course_endpoint(
 
 def get_contents_from_url(get_endpoint_fn, args=None):
     """hit the endpoint with GET request"""
-    global COOKIES
-    global BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     if args is None:
         args = {}
     endpoint = get_endpoint_fn(**args)
     url = f"{BASE_URL}/{endpoint}"
 
-    if get_endpoint_fn == get_login_endpoint:
+    if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
         COOKIES = None
 
     try:
         if COOKIES is None:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies
         else:
-            response = requests.get(url, COOKIES)
+            response = requests.get(url, COOKIES, timeout=10)
             response.raise_for_status()
         data = response.json()
         return data
     except requests.exceptions.RequestException as e:
+        logging.error("An error occurred during the request: %s", e)
         raise
     except json.JSONDecodeError as e:
+        logging.error("JSON decoding failed: %s", e)
         raise
 
 
@@ -183,7 +189,7 @@ def extract_feedback_thread(run_alias):
     return conversations
 
 
-def conjure_query(
+def conjure_query(  # pylint: disable=R0913
     problem_statement,
     solution_statement,
     source_code,
@@ -224,12 +230,15 @@ def conjure_query(
 
 
 def get_prompt(query_content):
-    with open("./teaching_assistant_prompt.txt", "r") as file:
+    """Get the prompt from the .\teaching_assistant_prompt.txt file"""
+    with open(
+        "./teaching_assistant_prompt.txt", "r", encoding='utf-8'
+    ) as file:
         prompt = file.read()
     return prompt.format(LANGUAGE=LANGUAGE, query_content=query_content)
 
 
-def query_LLM(query_content, is_initial_feedback=True, temperature=0):
+def query_llm(query_content, is_initial_feedback=True, temperature=0):
     """
     Queries the LLM and returns the response.
 
@@ -265,7 +274,7 @@ def query_LLM(query_content, is_initial_feedback=True, temperature=0):
 
 
 def process_initial_feedback(
-    TA_feedback, show_run_id, course_alias, assignment_alias
+    ta_feedback, show_run_id, course_alias, assignment_alias
 ):
 
     """
@@ -275,7 +284,7 @@ def process_initial_feedback(
     Returns:
     None
     """
-    for line, feedback in TA_feedback.items():
+    for line, feedback in ta_feedback.items():
         if line == "general advices":
             continue
         feedback_list = (
@@ -344,7 +353,7 @@ def process_feedbacks():
                 line_number is not None,
             )
             if line_number is not None:
-                oracle_feedback = query_LLM(
+                oracle_feedback = query_llm(
                     conjured_query, is_initial_feedback=False
                 )
                 get_contents_from_url(
@@ -360,7 +369,7 @@ def process_feedbacks():
                 )
             else:
                 if is_initial_feedback:
-                    oracle_feedback = query_LLM(
+                    oracle_feedback = query_llm(
                         conjured_query,
                     )
                     oracle_feedback = json.loads(oracle_feedback)
@@ -370,8 +379,12 @@ def process_feedbacks():
 
 
 def main():
-    global USERNAME, PASSWORD, COURSE_ALIAS, ASSIGNMENT_ALIAS
-    global LANGUAGE, KEY, CLIENT
+    """
+    Takes input and process the feedbacks
+    """
+    global USERNAME, PASSWORD  # pylint: disable=W0603
+    global COURSE_ALIAS, ASSIGNMENT_ALIAS  # pylint: disable=W0603
+    global LANGUAGE, KEY, CLIENT  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
