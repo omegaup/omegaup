@@ -1828,105 +1828,223 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     ) {
         $gender = $category == 'all' ? 'male' : 'female';
         // Create a submissions mapping for different users, months, verdicts
-        // and problems. The winner for the current month should be user_01
-        // because all their submissions are in the current month. Submissions
-        // with verdict AC from past months should not be considered for the
-        // current month.
+        // and problems.
+        $usernames = ['user_01', 'user_02', 'user_03'];
+        $problems = ['problem_0', 'problem_1', 'problem_2', 'problem_3', 'problem_4'];
         $submissionsMapping = [
             0 => [
-                ['username' => 'user_01', 'runs' => [['WA', 0.0], ['WA', 0.0], ['PA', 0.6]]], // 0
-                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 0
-                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['WA', 0.0]]], // 0
+                'problem_0' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_1' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_2' => [
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.6],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_3' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_4' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 0
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 5
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0], // 4
+                ],
+                // First month: user_2 solved 5 problems for the first time
             ],
             1 => [
-                ['username' => 'user_01', 'runs' => [['PA', 0.5], ['WA', 0.0], ['AC', 1.0]]], // 0
-                ['username' => 'user_02', 'runs' => [['PA', 0.3], ['AC', 1.0], ['AC', 1.0]]], // 1
-                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['WA', 0.0]]], // 0
+                'problem_0' => [
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_1' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_2' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_3' => [
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_4' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 1
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 0
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0], // 0
+                ],
+                // Second month: user_1 solved 1 problem for the first time
             ],
             2 => [
-                ['username' => 'user_01', 'runs' => [['CE', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 1
-                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 1
-                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['PA', 0.2]]], // 0
+                'problem_0' => [
+                    ['username' => 'user_01', 'verdict' => 'CE', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_1' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2],
+                ],
+                'problem_2' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_3' => [
+                    ['username' => 'user_01', 'verdict' => 'CE', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_4' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 2
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 0
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 1
+                ],
+                // Third month: user_3 is the winner even though user_1 solved
+                // more problems, because user_1 has already won the CoTM prize
             ],
-            3 => [
-                ['username' => 'user_01', 'runs' => [['WA', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 2
-                ['username' => 'user_02', 'runs' => [['AC', 1.0], ['AC', 1.0], ['AC', 1.0]]], // 1
-                ['username' => 'user_03', 'runs' => [['PA', 0.9], ['AC', 1.0], ['AC', 1.0]]], // 1
+        ];
+        $expectedWinners = [
+            0 => [
+                ['username' => 'user_02', 'problems_solved' => 5],
+                ['username' => 'user_03', 'problems_solved' => 4],
+                // user_01 is not considered because they don't have any AC
             ],
-            4 => [
-                ['username' => 'user_01', 'runs' => [['PA', 0.2], ['AC', 1.0], ['AC', 1.0]]], // 3
-                ['username' => 'user_02', 'runs' => [['WA', 0.0], ['AC', 1.0], ['AC', 1.0]]], // 2
-                ['username' => 'user_03', 'runs' => [['AC', 1.0], ['AC', 1.0], ['CE', 0.0]]], // 1
+            1 => [
+                ['username' => 'user_01', 'problems_solved' => 1],
+                ['username' => 'user_03', 'problems_solved' => 0],
+                // user_02 is not considered because they have already won the
+                // CoTM prize
+            ],
+            2 => [
+                ['username' => 'user_03', 'problems_solved' => 1],
+                // user_01 and user_02 are not considered because they have
+                // already won the CoTM prize
             ],
         ];
 
         // Create 3 users and their identities
         $identities = [];
-        foreach ($submissionsMapping[0] as $index => $user) {
+        foreach ($usernames as $username) {
             [
-                'identity' => $identities[$index],
+                'identity' => $identities[$username],
             ] = \OmegaUp\Test\Factories\User::createUser(
                 new \OmegaUp\Test\Factories\UserParams(
-                    ['username' => $user['username']]
+                    ['username' => $username]
                 )
             );
-            self::updateIdentity($identities[$index], $gender);
+            self::updateIdentity($identities[$username], $gender);
         }
 
-        $runCreationDate = self::setFirstDayOfTheCurrentMonth();
-
+        // Create the problems
         $problemData = [];
-        foreach ($submissionsMapping as $indexProblem => $problemSubmissions) {
-            $problemData[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblem(
+        foreach ($problems as $problemAlias) {
+            $problemData[
+                $problemAlias
+            ] = \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams([
                     'quality_seal' => true,
-                    'alias' => 'problem_' . $indexProblem,
+                    'alias' => $problemAlias,
                 ])
             );
-            foreach ($problemSubmissions as $indexUser => $submissionsUser) {
-                foreach ($submissionsUser['runs'] as $month => $runInfo) {
-                    [$verdict, $points] = $runInfo;
+        }
+
+        $originalTime = \OmegaUp\Time::get();
+        // Create the runs by month
+        foreach ($submissionsMapping as $month => $problemsRuns) {
+            switch ($month) {
+                case 0:
+                    $runCreationDate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 3
+                    );
+                    $dateToCalculate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 2
+                    );
+                    break;
+                case 1:
+                    $runCreationDate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 2
+                    );
+                    $dateToCalculate = self::setFirstDayOfTheLastMonth();
+                    break;
+                case 2:
+                    $runCreationDate = self::setFirstDayOfTheLastMonth();
+                    $dateToCalculate = self::setFirstDayOfTheCurrentMonth();
+                    break;
+            }
+            foreach ($problemsRuns as $problemAlias => $submissionsProblem) {
+                foreach ($submissionsProblem as $runInfo) {
+                    [
+                        'username' => $username,
+                        'verdict' => $verdict,
+                        'points' => $points,
+                    ] = $runInfo;
                     if (is_null($points)) {
                         continue;
                     }
-                    switch ($month) {
-                        case 0:
-                            $runCreationDate = self::setFirstDayOfCustomMonths(
-                                monthsLeft: 2
-                            );
-                            break;
-                        case 1:
-                            $runCreationDate = self::setFirstDayOfTheLastMonth();
-                            break;
-                        case 2:
-                            $runCreationDate = self::setFirstDayOfTheCurrentMonth();
-                            break;
-                    }
                     \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
-                        $identities[$indexUser],
-                        $problemData[$indexProblem],
+                        $identities[$username],
+                        $problemData[$problemAlias],
                         $runCreationDate,
                         $points,
                         $verdict
                     );
                 }
             }
+
+            // Update the rankings
+            \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+            // Getting the coder of the month regarding the date
+            \OmegaUp\Time::setTimeForTesting(
+                strtotime($dateToCalculate) + (60 * 60 * 24)
+            );
+            $coder = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+                new \OmegaUp\Request([
+                    'category' => $category,
+                ])
+            )['coderinfo'];
+            $this->assertSame(
+                $coder['username'],
+                $expectedWinners[$month][0]['username']
+            );
+            $codersList = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+                new \OmegaUp\Request([
+                    'date' => $dateToCalculate,
+                    'category' => $category,
+                ])
+            )['coders'];
+            $this->assertSameSize($expectedWinners[$month], $codersList);
+            foreach ($expectedWinners[$month] as $index => $expectedWinner) {
+                $this->assertSame(
+                    $expectedWinner['username'],
+                    $codersList[$index]['username']
+                );
+                $this->assertSame(
+                    $expectedWinner['problems_solved'],
+                    $codersList[$index]['problems_solved']
+                );
+            }
+            $this->assertSame(
+                $expectedWinners[$month][0]['problems_solved'],
+                $codersList[0]['problems_solved']
+            );
+            \OmegaUp\Time::setTimeForTesting($originalTime);
         }
-        $runCreationDate = self::setFirstDayOfTheLastMonth();
-        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
-
-        $today = date('Y-m-01', \OmegaUp\Time::get());
-
-        $response = $this->getCoderOfTheMonth(
-            $today,
-            'this month',
-            $category
-        );
-
-        $this->assertSame(
-            $identities[0]->username,
-            $response['coderinfo']['username']
-        );
     }
 
     private static function setFirstDayOfTheLastMonth() {

@@ -29,16 +29,10 @@ class UserRank(NamedTuple):
     classname: str
 
 
-class UserProblemsSolvedScore(TypedDict):
+class UserProblems(TypedDict):
     '''Problems solved by a user and their calculated score'''
     solved: List[int]
     score: float
-
-
-class UserProblemsSolved(TypedDict):
-    '''Problems solved by a user in the selected month'''
-    problem_id: int
-    identity_id: int
 
 
 def get_first_day_of_next_month(
@@ -223,23 +217,10 @@ def get_cotm_eligible_users(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
     )
-
-    get_first_time_solved_problem_by_user = get_first_time_solved(
-        cur_readonly,
-        first_day_of_current_month,
-        first_day_of_next_month
-    )
-
-    solved_problems_set = {
-        (item['identity_id'], item['problem_id'])
-        for item in get_first_time_solved_problem_by_user
-    }
-
     sql = f'''
             SELECT DISTINCT
                 IFNULL(i.user_id, 0) AS user_id,
                 i.identity_id,
-                p.problem_id,
                 i.username,
                 IFNULL(i.country_id, 'xx') AS country_id,
                 isc.school_id,
@@ -284,7 +265,7 @@ def get_cotm_eligible_users(
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
-                i.identity_id, p.problem_id
+                i.identity_id
             LIMIT 100;
             '''
     cur_readonly.execute(sql, (
@@ -292,14 +273,9 @@ def get_cotm_eligible_users(
         first_day_of_next_month,
     ))
 
-    eligible_users: List[UserRank] = []
-    added_users = set()
+    usernames: List[UserRank] = []
     for row in cur_readonly.fetchall():
-        if (row['identity_id'], row['problem_id']) not in solved_problems_set:
-            continue
-        if row['identity_id'] in added_users:
-            continue
-        eligible_users.append(UserRank(
+        usernames.append(UserRank(
             user_id=row['user_id'],
             identity_id=row['identity_id'],
             username=row['username'],
@@ -309,46 +285,8 @@ def get_cotm_eligible_users(
             problems_solved=0,
             score=0.0,
         ))
-        added_users.add(row['identity_id'])
-    return eligible_users
 
-
-def get_first_time_solved(
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    first_day_of_current_month: datetime.date,
-    first_day_of_next_month: datetime.date,
-) -> List[UserProblemsSolved]:
-    '''Get the first time a problem was solved by a user'''
-
-    sql = '''
-        SELECT
-            s.identity_id,
-            s.problem_id,
-            MIN(s.time) AS first_time_solved
-        FROM
-            Submissions s
-        WHERE
-            s.verdict = 'AC'
-            AND s.type = 'normal'
-        GROUP BY
-            s.identity_id, s.problem_id
-    '''
-
-    cur_readonly.execute(sql)
-    result = cur_readonly.fetchall()
-
-    filtered_result = [
-        row for row in result
-        if (first_day_of_current_month <= row['first_time_solved'].date() <
-            first_day_of_next_month)
-    ]
-
-    user_problems: List[UserProblemsSolved] = [
-        {'problem_id': row['problem_id'], 'identity_id': row['identity_id']}
-        for row in filtered_result
-    ]
-
-    return user_problems
+    return usernames
 
 
 def get_eligible_problems(
@@ -400,12 +338,12 @@ def get_user_problems(
     problem_ids_str: str,
     eligible_users: List[UserRank],
     first_day_of_current_month: datetime.date,
-) -> Dict[int, UserProblemsSolvedScore]:
+) -> Dict[int, UserProblems]:
     '''Returns the problems solved by a user'''
 
     # Initialize a dictionary to store the problems solved and the score for
     # each user
-    user_problems: Dict[int, UserProblemsSolvedScore] = {
+    user_problems: Dict[int, UserProblems] = {
         user.identity_id:
             {'solved': [], 'score': 0.0} for user in eligible_users}
 
