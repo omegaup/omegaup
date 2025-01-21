@@ -914,17 +914,17 @@ Returns a list of contests
 
 ### Parameters
 
-| Name             | Type           | Description |
-| ---------------- | -------------- | ----------- |
-| `page`           | `int`          |             |
-| `page_size`      | `int`          |             |
-| `query`          | `string`       |             |
-| `tab_name`       | `string`       |             |
-| `active`         | `int\|null`    |             |
-| `admission_mode` | `mixed`        |             |
-| `participating`  | `int\|null`    |             |
-| `recommended`    | `int\|null`    |             |
-| `sort_order`     | `null\|string` |             |
+| Name             | Type                                        | Description |
+| ---------------- | ------------------------------------------- | ----------- |
+| `page`           | `int`                                       |             |
+| `page_size`      | `int`                                       |             |
+| `query`          | `string`                                    |             |
+| `tab_name`       | `string`                                    |             |
+| `admission_mode` | `'private'\|'public'\|'registration'\|null` |             |
+| `filter`         | `'all'\|'recommended'\|'signedup'\|null`    |             |
+| `participating`  | `int\|null`                                 |             |
+| `recommended`    | `int\|null`                                 |             |
+| `sort_order`     | `null\|string`                              |             |
 
 ### Returns
 
@@ -3040,26 +3040,26 @@ List of public and user's private problems
 
 ### Parameters
 
-| Name                    | Type           | Description |
-| ----------------------- | -------------- | ----------- |
-| `only_quality_seal`     | `bool`         |             |
-| `difficulty`            | `null\|string` |             |
-| `difficulty_range`      | `null\|string` |             |
-| `language`              | `mixed`        |             |
-| `level`                 | `null\|string` |             |
-| `max_difficulty`        | `int\|null`    |             |
-| `min_difficulty`        | `int\|null`    |             |
-| `min_visibility`        | `int\|null`    |             |
-| `offset`                | `int\|null`    |             |
-| `only_karel`            | `mixed`        |             |
-| `order_by`              | `mixed`        |             |
-| `page`                  | `int\|null`    |             |
-| `programming_languages` | `null\|string` |             |
-| `query`                 | `null\|string` |             |
-| `require_all_tags`      | `mixed`        |             |
-| `rowcount`              | `int\|null`    |             |
-| `some_tags`             | `mixed`        |             |
-| `sort_order`            | `mixed`        |             |
+| Name                    | Type                                                                                                                               | Description |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `only_quality_seal`     | `bool`                                                                                                                             |             |
+| `difficulty`            | `null\|string`                                                                                                                     |             |
+| `difficulty_range`      | `null\|string`                                                                                                                     |             |
+| `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |
+| `level`                 | `null\|string`                                                                                                                     |             |
+| `max_difficulty`        | `int\|null`                                                                                                                        |             |
+| `min_difficulty`        | `int\|null`                                                                                                                        |             |
+| `min_visibility`        | `int\|null`                                                                                                                        |             |
+| `offset`                | `int\|null`                                                                                                                        |             |
+| `only_karel`            | `bool\|null`                                                                                                                       |             |
+| `order_by`              | `''\|'accepted'\|'creation_date'\|'difficulty'\|'points'\|'problem_id'\|'quality'\|'ratio'\|'score'\|'submissions'\|'title'\|null` |             |
+| `page`                  | `int\|null`                                                                                                                        |             |
+| `programming_languages` | `null\|string`                                                                                                                     |             |
+| `query`                 | `null\|string`                                                                                                                     |             |
+| `require_all_tags`      | `bool\|null`                                                                                                                       |             |
+| `rowcount`              | `int\|null`                                                                                                                        |             |
+| `some_tags`             | `bool\|null`                                                                                                                       |             |
+| `sort_order`            | `''\|'asc'\|'desc'\|null`                                                                                                          |             |
 
 ### Returns
 

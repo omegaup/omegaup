@@ -63,6 +63,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
+
+        // This query should be always synchronized with the one in the cron
+        // update_ranks.py, specifically in the function get_last_12_coders_of_the_month.
         $sql = "
           SELECT
               cm.time,

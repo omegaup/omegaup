@@ -1361,7 +1361,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param LimitsSettings $a
      * @param LimitsSettings $b
      */
-    private static function diffLimitsSettings(array $a, array $b): bool {
+    private static function diffLimitsSettings($a, $b): bool {
         if (
             self::parseDuration($a['TimeLimit']) !==
             self::parseDuration($b['TimeLimit'])
@@ -1401,7 +1401,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $a
      * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $b
      */
-    private static function diffProblemSettings(array $a, array $b): bool {
+    private static function diffProblemSettings($a, $b): bool {
         if (self::diffLimitsSettings($a['Limits'], $b['Limits'])) {
             return true;
         }
@@ -2320,7 +2320,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
@@ -3780,45 +3780,39 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>, authors: list<string>}
      *
      * @omegaup-request-param null|string $difficulty_range
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $only_karel
-     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $some_tags
-     * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param bool|null $require_all_tags
+     * @omegaup-request-param bool|null $some_tags
+     * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
      */
     private static function validateListParams(\OmegaUp\Request $r) {
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['sort_order'],
+        $sortOrder = $r->ensureOptionalEnum(
             'sort_order',
-            array_merge(
-                [''],
-                \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
-            )
-        );
-        \OmegaUp\Validators::validateOptionalNumber($r['page'], 'page');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['order_by'],
+            array_merge([''], \OmegaUp\Controllers\Problem::VALID_SORTING_MODES)
+        ) ?? '';
+        $orderBy = $r->ensureOptionalEnum(
             'order_by',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS
             )
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
+        ) ?? '';
+        $page = $r->ensureOptionalInt('page') ?? 0;
+        $language = $r->ensureOptionalEnum(
             'language',
             array_merge(
                 ['all', ''],
                 \OmegaUp\Controllers\Problem::VALID_LANGUAGES
             )
-        );
+        ) ?? '';
 
         $tags = $r->getStringList('tag', []);
         $authors = $r->getStringList('author', []);
@@ -3827,23 +3821,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!$keyword) {
             $keyword = '';
         }
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['min_difficulty'],
-            'min_difficulty'
-        );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['max_difficulty'],
-            'max_difficulty'
-        );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['min_visibility'],
+        $minDifficulty = $r->ensureOptionalInt('min_difficulty');
+        $maxDifficulty = $r->ensureOptionalInt('max_difficulty');
+        $minVisibility = $r->ensureOptionalInt(
             'min_visibility'
-        );
-        $minVisibility = empty(
-            $r['min_visibility']
-        ) ? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC : intval(
-            $r['min_visibility']
-        );
+        ) ?? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+
         $difficultyRange = null;
         $difficultyRangeParam = $r->ensureOptionalString('difficulty_range');
         if (!empty($difficultyRangeParam)) {
@@ -3859,7 +3842,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $programmingLanguageParam = $r->ensureOptionalString(
             'programming_languages'
         );
-        if (isset($r['only_karel'])) {
+        $onlyKarel = $r->ensureOptionalBool('only_karel');
+        if ($onlyKarel) {
             $programmingLanguages = ['kp', 'kj'];
         } elseif (!empty($programmingLanguageParam)) {
             $programmingLanguages = explode(
@@ -3869,19 +3853,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             $programmingLanguages = [];
         }
+        $someTags = $r->ensureOptionalBool('some_tags');
+        $requireAllTags = $r->ensureOptionalBool('require_all_tags');
 
         return [
-            'sortOrder' => strval($r['sort_order']),
-            'page' => intval($r['page']),
-            'orderBy' => strval($r['order_by']),
-            'language' => strval($r['language']),
+            'sortOrder' => $sortOrder,
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'language' => $language,
             'tags' => $tags,
             'keyword' => $keyword,
-            'requireAllTags' => !isset(
-                $r['require_all_tags']
-            ) ? !isset(
-                $r['some_tags']
-            ) : boolval($r['require_all_tags']),
+            'requireAllTags' => is_null(
+                $requireAllTags
+            ) ? is_null(
+                $someTags
+            ) : $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
@@ -3939,22 +3925,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
      * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
-     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool|null $only_karel
      * @omegaup-request-param bool $only_quality_seal
-     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param mixed $some_tags
-     * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param bool|null $some_tags
+     * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -4116,15 +4102,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset(
-            $r['page_size']
-        ) ? intval(
-            $r['page_size']
-        ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt(
+            'page_size'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         $query = substr(
             $r->ensureOptionalString('query') ?? '',
@@ -4463,7 +4444,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['Validator']['Limit']
      */
     private static function updateProblemSettings(
-        array &$problemSettings,
+        &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
         if (!is_null($params->extraWallTime)) {
@@ -4841,21 +4822,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{templateProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty_range
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
-     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param bool|null $only_karel
      * @omegaup-request-param bool $only_quality_seal
-     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param mixed $some_tags
-     * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param bool|null $some_tags
+     * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
@@ -5312,7 +5293,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
     * @return array{templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}, entrypoint: string}
     */
-    public static function getCreatorForTypescript(
+    public static function getCreatorForTypeScript(
         \OmegaUp\Request $r
     ): array {
         return [
@@ -6058,27 +6039,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     *
      * @return array{templateProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
-     * @omegaup-request-param string $level
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
+     * @omegaup-request-param string $level
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
-     * @omegaup-request-param mixed $only_karel
-     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param mixed $some_tags
-     * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param bool|null $some_tags
+     * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
      */
     public static function getCollectionsDetailsByLevelForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -6303,26 +6283,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     *
      * @return array{templateProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
-     * @omegaup-request-param mixed $only_karel
-     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
-     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param bool|null $require_all_tags
      * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param mixed $some_tags
-     * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param bool|null $some_tags
+     * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate request
