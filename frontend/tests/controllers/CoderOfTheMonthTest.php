@@ -1829,110 +1829,170 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $gender = $category == 'all' ? 'male' : 'female';
         // Create a submissions mapping for different users, months, verdicts
         // and problems.
-        $usernames = ['user_01', 'user_02', 'user_03'];
+        $usernames = ['user_01', 'user_02', 'user_03', 'user_04', 'user_05', 'user_06'];
         $problems = ['problem_0', 'problem_1', 'problem_2', 'problem_3', 'problem_4'];
         $submissionsMapping = [
             0 => [
                 'problem_0' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
                 'problem_1' => [
                     ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
                 'problem_2' => [
-                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.6],
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
                 'problem_3' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
                 'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 0
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 5
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0], // 4
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 1 - 1
+                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.1], // 1 - 1
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 1 - 1
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 3 - 3
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3], // 4 - 4
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 1 - 1
                 ],
-                // First month: user_2 solved 5 problems for the first time
+                // First month: user_5 solved 4 problems for the first time
             ],
             1 => [
                 'problem_0' => [
-                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
-                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.3],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
-                ],
-                'problem_1' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
-                ],
-                'problem_2' => [
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
-                ],
-                'problem_3' => [
-                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
-                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.3],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
-                ],
-                'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 1
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 0
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0], // 0
-                ],
-                // Second month: user_1 solved 1 problem for the first time
-            ],
-            2 => [
-                'problem_0' => [
-                    ['username' => 'user_01', 'verdict' => 'CE', 'points' => 0.0],
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
-                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
                 'problem_1' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_2' => [
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.2],
+                ],
+                'problem_3' => [
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.2],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_4' => [
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 3 - 3
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0], // 3 - 2
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 0 - 0
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 3 - 1
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0], // 3 - 1
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 0.0], // 1 - 0
+                ],
+                // Second month: user_1 solved 3 problems for the first time
+            ],
+            2 => [
+                'problem_0' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_1' => [
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0],
                 ],
                 'problem_2' => [
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.3],
                 ],
                 'problem_3' => [
-                    ['username' => 'user_01', 'verdict' => 'CE', 'points' => 0.0],
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
                 'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 2
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 0
-                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 1
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 4 - 1
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 5 - 2
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 3 - 3
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5], // 2 - 1
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0], // 1 - 0
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 2 - 1
                 ],
                 // Third month: user_3 is the winner even though user_1 solved
-                // more problems, because user_1 has already won the CoTM prize
+                // more problems, because user_1 has already won the CoTM prize,
+                // and user_02 has resolved more problems but not for the first time
             ],
         ];
         $expectedWinners = [
             0 => [
-                ['username' => 'user_02', 'problems_solved' => 5],
-                ['username' => 'user_03', 'problems_solved' => 4],
-                // user_01 is not considered because they don't have any AC
+                ['username' => 'user_05', 'problems_solved' => 4],
+                ['username' => 'user_04', 'problems_solved' => 3],
+                ['username' => 'user_01', 'problems_solved' => 1],
+                ['username' => 'user_06', 'problems_solved' => 1],
+                ['username' => 'user_03', 'problems_solved' => 1],
+                //['username' => 'user_02', 'problems_solved' => 1],
+                // user_2 shouldn't be considered because only 5 users are set
+                // to be displayed
             ],
             1 => [
-                ['username' => 'user_01', 'problems_solved' => 1],
-                ['username' => 'user_03', 'problems_solved' => 0],
-                // user_02 is not considered because they have already won the
+                ['username' => 'user_01', 'problems_solved' => 3],
+                ['username' => 'user_02', 'problems_solved' => 2],
+                ['username' => 'user_04', 'problems_solved' => 1],
+                ['username' => 'user_06', 'problems_solved' => 0],
+                // user_05 is not considered because they have already won the
                 // CoTM prize
+                // user_03 is not considered because they don't have any AC run
+                // in the current month
+                // user_06 appears on the coders list because they have solved 1
+                // problem, but it was solved in the previous month
             ],
             2 => [
-                ['username' => 'user_03', 'problems_solved' => 1],
-                // user_01 and user_02 are not considered because they have
+                ['username' => 'user_03', 'problems_solved' => 3],
+                ['username' => 'user_02', 'problems_solved' => 2],
+                ['username' => 'user_06', 'problems_solved' => 1],
+                ['username' => 'user_04', 'problems_solved' => 1],
+                // user_01 and user_05 are not considered because they have
                 // already won the CoTM prize
             ],
         ];
@@ -2007,7 +2067,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             }
 
             // Update the rankings
-            \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+            \OmegaUp\Test\Utils::runUpdateRanks(
+                $runCreationDate,
+                codersListCount: 5
+            );
 
             // Getting the coder of the month regarding the date
             \OmegaUp\Time::setTimeForTesting(
@@ -2028,21 +2091,24 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     'category' => $category,
                 ])
             )['coders'];
-            $this->assertSameSize($expectedWinners[$month], $codersList);
+
+            $this->assertSameSize(
+                $expectedWinners[$month],
+                $codersList,
+                "Failed on month {$month}"
+            );
             foreach ($expectedWinners[$month] as $index => $expectedWinner) {
                 $this->assertSame(
                     $expectedWinner['username'],
-                    $codersList[$index]['username']
+                    $codersList[$index]['username'],
+                    "Failed the order of codersList on month {$month}"
                 );
                 $this->assertSame(
                     $expectedWinner['problems_solved'],
-                    $codersList[$index]['problems_solved']
+                    $codersList[$index]['problems_solved'],
+                    "Failed the number of problems solved on month {$month}"
                 );
             }
-            $this->assertSame(
-                $expectedWinners[$month][0]['problems_solved'],
-                $codersList[0]['problems_solved']
-            );
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
     }
