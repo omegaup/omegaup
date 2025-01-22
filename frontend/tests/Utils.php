@@ -405,7 +405,7 @@ class Utils {
              dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
              ' --update-coder-of-the-month ' .
-             ' --coders-list-count ' . escapeshellarg($codersListCount) .
+             ' --coders-list-count ' . escapeshellarg(strval($codersListCount)) .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              $host_arg .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
