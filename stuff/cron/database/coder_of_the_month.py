@@ -265,8 +265,7 @@ def get_cotm_eligible_users(
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
-                i.identity_id
-            LIMIT 100;
+                i.identity_id;
             '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
