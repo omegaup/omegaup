@@ -278,6 +278,8 @@ class Run {
         \OmegaUp\DAO\VO\Identities $identity,
         array $problemData,
         string $runCreationDate,
+        float $points = 1,
+        string $verdict = 'AC'
     ): array {
         $r = self::createRequestCommon(
             $problemData,
@@ -294,7 +296,7 @@ class Run {
             'response' => $response,
         ];
 
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, $points, $verdict);
 
         // Force the submission to be in any date
         $submission = \OmegaUp\DAO\Submissions::getByGuid(
