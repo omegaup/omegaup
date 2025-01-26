@@ -1,5 +1,6 @@
-# mypy: ignore-errors
-# pylint: skip-file
+"""
+This script adds a teaching assistant to the omegaup platform.
+"""
 
 import json
 import time
@@ -7,9 +8,10 @@ import argparse
 from getpass import getpass
 import urllib.parse
 import logging
+from typing import Callable, Any
 import requests
-from tqdm import tqdm
-from openai import OpenAI
+from tqdm import tqdm  # type: ignore
+from openai import OpenAI  # type: ignore
 
 
 KEY = None
@@ -24,39 +26,39 @@ COOKIES = None
 CLIENT = None
 
 
-def get_login_endpoint(username, password):
+def get_login_endpoint(username: str, password: str) -> str:
     """endpoint for logging in"""
     return f"api/user/login?usernameOrEmail={username}&password={password}"
 
 
-def get_problem_details_endpoint(problem_alias):
+def get_problem_details_endpoint(problem_alias: str) -> str:
     """endpoint for getting problem details"""
     return f"api/problem/details?problem_alias={problem_alias}"
 
 
-def get_problem_solution_endpoint(problem_alias):
+def get_problem_solution_endpoint(problem_alias: str) -> str:
     """endpoint for getting problem solution"""
     return f"api/problem/solution?problem_alias={problem_alias}"
 
 
-def get_runs_endpoint(run_alias):
+def get_runs_endpoint(run_alias: str) -> str:
     """endpoint for getting runs"""
     return f"api/run/details?run_alias={run_alias}"
 
 
-def get_runs_submission_feedback_endpoint(run_alias):
+def get_runs_submission_feedback_endpoint(run_alias: str) -> str:
     """endpoint for getting runs submission feedback"""
     return f"api/run/getSubmissionFeedback?run_alias={run_alias}"
 
 
 def set_submission_feedback_endpoint(  # pylint: disable=R0913
-    run_alias,
-    course_alias,
-    assignment_alias,
-    feedback,
-    line_number,
-    submission_feedback_id,
-):
+    run_alias: str,
+    course_alias: str,
+    assignment_alias: str,
+    feedback: str,
+    line_number: int,
+    submission_feedback_id: str,
+) -> str:
     """endpoint for setting submission feedback"""
     return (
         f"api/submission/setFeedback?"
@@ -70,8 +72,11 @@ def set_submission_feedback_endpoint(  # pylint: disable=R0913
 
 
 def set_submission_feedback_list_endpoint(
-    run_alias, course_alias, assignment_alias, feedback_list
-):
+    run_alias: str,
+    course_alias: str,
+    assignment_alias: str,
+    feedback_list: str,
+) -> str:
     """endpoint for setting submission feedback list"""
     return (
         f"api/submission/setFeedbackList?"
@@ -83,8 +88,11 @@ def set_submission_feedback_list_endpoint(
 
 
 def get_runs_from_course_endpoint(
-    course_alias, assignment_alias, rowcount=None, offset=None
-):
+    course_alias: str,
+    assignment_alias: str,
+    rowcount: int | None = None,
+    offset: int | None = None
+) -> str:
     """
     returns the list of run_ids and corresponding_users from last 30 days.
     """
@@ -101,7 +109,10 @@ def get_runs_from_course_endpoint(
     return endpoint
 
 
-def get_contents_from_url(get_endpoint_fn, args=None):
+def get_contents_from_url(
+    get_endpoint_fn: Callable[..., str],
+    args: dict[str, Any] | None = None
+) -> Any:
     """hit the endpoint with GET request"""
     global COOKIES  # pylint: disable=W0603
 
@@ -131,7 +142,7 @@ def get_contents_from_url(get_endpoint_fn, args=None):
         raise
 
 
-def extract_show_run_ids():
+def extract_show_run_ids() -> list[tuple[str, str]]:
     """
     Extracts show-run IDs and usernames from the course.
 
@@ -156,7 +167,7 @@ def extract_show_run_ids():
     return run_ids_and_usernames
 
 
-def extract_feedback_thread(run_alias):
+def extract_feedback_thread(run_alias: str) -> list[list[dict[str, Any]]]:
     """
     Extracts feedback thread from a run.
 
@@ -190,14 +201,14 @@ def extract_feedback_thread(run_alias):
 
 
 def conjure_query(  # pylint: disable=R0913
-    problem_statement,
-    solution_statement,
-    source_code,
-    feedback,
-    user_name,
-    line_number,
-    is_conversation,
-):
+    problem_statement: str,
+    solution_statement: str,
+    source_code: str,
+    feedback: str,
+    user_name: str,
+    line_number: int,
+    is_conversation: bool,
+) -> str:
     """
     Conjures a string that can be used as a prompt to the LLM.
 
@@ -213,7 +224,7 @@ def conjure_query(  # pylint: disable=R0913
             f"Note the line number: {line_number}\n"
             f"Remember that you are {USERNAME} "
             f"and the student is {user_name}\n"
-            f"The conversation is: {str(feedback)}"
+            f"The conversation is: {feedback}"
             f"Please just return text that continues the conversation, "
             f"return no json in this case."
         )
@@ -229,7 +240,7 @@ def conjure_query(  # pylint: disable=R0913
     return conjured_query
 
 
-def get_prompt(query_content):
+def get_prompt(query_content: str) -> str:
     """Get the prompt from the .\teaching_assistant_prompt.txt file"""
     with open(
         "./teaching_assistant_prompt.txt", "r", encoding='utf-8'
@@ -238,7 +249,11 @@ def get_prompt(query_content):
     return prompt.format(LANGUAGE=LANGUAGE, query_content=query_content)
 
 
-def query_llm(query_content, is_initial_feedback=True, temperature=0):
+def query_llm(
+    query_content: str,
+    is_initial_feedback: bool = True,
+    temperature: float = 0.0
+) -> Any:
     """
     Queries the LLM and returns the response.
 
@@ -248,7 +263,7 @@ def query_llm(query_content, is_initial_feedback=True, temperature=0):
 
     prompt = get_prompt(query_content=query_content)
 
-    response = CLIENT.chat.completions.create(
+    response = CLIENT.chat.completions.create(  # type: ignore[attr-defined]
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
         temperature=temperature,
@@ -262,11 +277,13 @@ def query_llm(query_content, is_initial_feedback=True, temperature=0):
             f"within 1000 characters? {response_text}"
         )
 
-        response = CLIENT.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": concise_request}],
-            temperature=temperature,
-            max_tokens=500,
+        response = (
+            CLIENT.chat.completions.create(  # type: ignore[attr-defined]
+                model="gpt-4o",
+                messages=[{"role": "user", "content": concise_request}],
+                temperature=temperature,
+                max_tokens=500,
+            )
         )
         response_text = response.choices[0].message.content
 
@@ -274,9 +291,11 @@ def query_llm(query_content, is_initial_feedback=True, temperature=0):
 
 
 def process_initial_feedback(
-    ta_feedback, show_run_id, course_alias, assignment_alias
-):
-
+    ta_feedback: dict[str, Any] | None,
+    show_run_id: str | None,
+    course_alias: str | None,
+    assignment_alias: str | None
+) -> None:
     """
     Gives initial feedback when a students asks for help to correct a
     submission
@@ -284,6 +303,8 @@ def process_initial_feedback(
     Returns:
     None
     """
+    if ta_feedback is None:
+        return
     for line, feedback in ta_feedback.items():
         if line == "general advices":
             continue
@@ -302,7 +323,7 @@ def process_initial_feedback(
         )
 
 
-def process_feedbacks():
+def process_feedbacks() -> None:
     """
     Processes feedback requests from students using LLM oracle.
 
@@ -347,7 +368,7 @@ def process_feedbacks():
                 problem_content,
                 problem_solution,
                 source_content,
-                feedback[2:],
+                str(feedback[2:]),
                 user_name,
                 line_number,
                 line_number is not None,
@@ -378,7 +399,7 @@ def process_feedbacks():
                     )
 
 
-def main():
+def main() -> None:
     """
     Takes input and process the feedbacks
     """
