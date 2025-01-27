@@ -21,6 +21,7 @@ import {
 } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
+  Actions,
   onRefreshRuns,
   showSubmission,
   SubmissionRequest,
@@ -309,7 +310,7 @@ OmegaUp.on('ready', async () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Rejudge });
               })
               .catch(ui.ignoreError);
           },
@@ -317,7 +318,7 @@ OmegaUp.on('ready', async () => {
             api.Run.requalify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'normal';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Requalify });
               })
               .catch(ui.ignoreError);
           },
@@ -366,7 +367,10 @@ OmegaUp.on('ready', async () => {
                 );
                 for (const disqualifiedRun of filteredRuns) {
                   disqualifiedRun.type = 'disqualified';
-                  updateRunFallback({ run: disqualifiedRun });
+                  updateRunFallback({
+                    run: disqualifiedRun,
+                    action: Actions.Disqualify,
+                  });
                 }
               })
               .catch(ui.ignoreError);

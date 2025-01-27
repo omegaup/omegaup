@@ -12,7 +12,7 @@
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: list<SubmissionFeedback>}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string, version?: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // this variable is not used anywhere
@@ -659,18 +659,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             'run_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $username = $r->ensureOptionalString(
-            'username',
-            false
-        );
+        $username = $r->ensureOptionalString('username', false);
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
         if (
             is_null(
-                $submission
+                $submission?->current_run_id
             ) || is_null(
-                $submission->current_run_id
-            ) || is_null(
-                $submission->guid
+                $submission?->guid
             )
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
@@ -744,6 +739,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'output' => strval($filtered['output']),
             'status_memory' => strval($filtered['status_memory']),
             'status_runtime' => strval($filtered['status_runtime']),
+            'version' => strval($filtered['version']),
         ];
         if (!is_null($filtered['contest_score'])) {
             if (
@@ -764,9 +760,80 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Re-sends a problem to Grader.
+     * Sends an alert to New Relic indicating that a run has been sent to the
+     * Grader and should be rejudged.
+     *
+     * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param float $original_score
+     * @omegaup-request-param float $current_score
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiAlert(\OmegaUp\Request $r): array {
+        // Get the user who is calling this API
+        $r->ensureMainUserIdentity();
+
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $originalScore = $r->ensureFloat('original_score');
+        $currentScore = $r->ensureFloat('current_score');
+        $problemVersion = $r->ensureString(
+            'version',
+            fn (string $version) => \OmegaUp\Validators::objectId($version)
+        );
+        $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
+        if (
+            is_null($submission?->current_run_id) ||
+            is_null($submission?->guid)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($submission->guid);
+        if (is_null($run)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            intval($submission->problem_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (
+            !\OmegaUp\Authorization::canViewSubmission(
+                $r->identity,
+                $submission
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        $exception = new \OmegaUp\Exceptions\ScoreMismatchException(
+            'scoreMismatchForSameVersion',
+            $originalScore,
+            $currentScore,
+            $problemVersion
+        );
+        \OmegaUp\ApiCaller::logException($exception);
+        throw $exception;
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Re-sends a problem to Grader.
+     *
+     * @return array{status: string, version: string, score: float}
      *
      * @omegaup-request-param bool|null $debug
      * @omegaup-request-param string $run_alias
@@ -830,7 +897,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
-        return ['status' => 'ok'];
+        return [
+            'status' => 'ok',
+            'version' => $run->version,
+            'score' => $run->version,
+        ];
     }
 
     /**

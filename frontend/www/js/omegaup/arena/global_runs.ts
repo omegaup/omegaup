@@ -8,6 +8,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 import { runsStore } from './runsStore';
 import {
+  Actions,
   onRefreshRuns,
   showSubmission,
   SubmissionRequest,
@@ -76,7 +77,7 @@ OmegaUp.on('ready', async () => {
             api.Run.requalify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'normal';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Requalify });
               })
               .catch(ui.ignoreError);
           },
@@ -87,7 +88,7 @@ OmegaUp.on('ready', async () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Disqualify });
               })
               .catch(ui.ignoreError);
           },
@@ -96,9 +97,10 @@ OmegaUp.on('ready', async () => {
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
-              .then(() => {
+              .then((response) => {
                 run.status = 'rejudging';
-                updateRunFallback({ run });
+                run.version = response.version;
+                updateRunFallback({ run, action: Actions.Rejudge });
               })
               .catch(ui.ignoreError);
           },

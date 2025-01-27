@@ -4316,6 +4316,7 @@ export namespace types {
     type?: string;
     username: string;
     verdict: string;
+    version?: string;
   }
 
   export interface RunDetails {
@@ -5634,6 +5635,8 @@ export namespace messages {
   export type ResetUpdateResponse = { message: string };
 
   // Run
+  export type RunAlertRequest = { [key: string]: any };
+  export type RunAlertResponse = {};
   export type RunCountsRequest = { [key: string]: any };
   export type RunCountsResponse = {
     ac: { [key: string]: number };
@@ -5661,7 +5664,7 @@ export namespace messages {
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };
   export type RunRejudgeRequest = { [key: string]: any };
-  export type RunRejudgeResponse = {};
+  export type RunRejudgeResponse = { score: number; version: string };
   export type RunRequalifyRequest = { [key: string]: any };
   export type RunRequalifyResponse = {};
   export type RunSourceRequest = { [key: string]: any };
@@ -6445,6 +6448,9 @@ export namespace controllers {
   }
 
   export interface Run {
+    alert: (
+      params?: messages.RunAlertRequest,
+    ) => Promise<messages.RunAlertResponse>;
     counts: (
       params?: messages.RunCountsRequest,
     ) => Promise<messages.RunCountsResponse>;
