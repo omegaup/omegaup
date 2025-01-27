@@ -272,6 +272,9 @@ def query_llm(
     response_text = response.choices[0].message.content
 
     if not is_initial_feedback and len(response_text) > 1000:
+        logging.warning(
+            "The response is too long. Trying to make it concise."
+        )
         concise_request = (
             f"Can you make the following response concise and try to limit it "
             f"within 1000 characters? {response_text}"
@@ -334,7 +337,8 @@ def process_feedbacks() -> None:
         get_login_endpoint, {"username": USERNAME, "password": PASSWORD}
     )
     run_ids_and_usernames = extract_show_run_ids()
-    for run_id, user_name in tqdm(run_ids_and_usernames):
+    total_runs = len(run_ids_and_usernames)
+    for index, (run_id, user_name) in enumerate(tqdm(run_ids_and_usernames)):
         course_alias = COURSE_ALIAS
         assignment_alias = ASSIGNMENT_ALIAS
         run_details = get_contents_from_url(
@@ -377,6 +381,11 @@ def process_feedbacks() -> None:
                 oracle_feedback = query_llm(
                     conjured_query, is_initial_feedback=False
                 )
+                if len(oracle_feedback) >= 1000:
+                    logging.error(
+                        "The response is still too long. "
+                        "Trimming it to the first 1000 characters."
+                    )
                 get_contents_from_url(
                     set_submission_feedback_endpoint,
                     {
@@ -386,7 +395,14 @@ def process_feedbacks() -> None:
                         "feedback": urllib.parse.quote(oracle_feedback[:1000]),
                         "line_number": line_number,
                         "submission_feedback_id": feedback_id,
-                    },
+                    }
+                )
+                logging.info(
+                    "Request %s out of %s from user %s on %s: DONE",
+                    index + 1,
+                    total_runs,
+                    user_name,
+                    problem_alias,
                 )
             else:
                 if is_initial_feedback:
@@ -396,6 +412,13 @@ def process_feedbacks() -> None:
                     oracle_feedback = json.loads(oracle_feedback)
                     process_initial_feedback(
                         oracle_feedback, run_id, course_alias, assignment_alias
+                    )
+                    logging.info(
+                        "Request %s out of %s from user %s on %s: DONE",
+                        index + 1,
+                        total_runs,
+                        user_name,
+                        problem_alias,
                     )
 
 
@@ -433,7 +456,9 @@ def main() -> None:
     ASSIGNMENT_ALIAS = (
         args.assignment_alias or input("Enter the assignment alias: ")
     )
-    LANGUAGE = args.language or input("Enter the language: ")
+    LANGUAGE = args.language or input(
+        'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
+    )
     KEY = args.key or getpass("Enter your OpenAI API key: ")
 
     CLIENT = OpenAI(api_key=KEY)
