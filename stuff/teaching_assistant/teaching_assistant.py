@@ -23,6 +23,7 @@ PASSWORD = None
 LANGUAGE = None
 COURSE_ALIAS = None
 ASSIGNMENT_ALIAS = None
+TA_FEEDBACK_INDICATOR = None
 
 BASE_URL = "https://omegaup.com"
 COOKIES = None
@@ -316,7 +317,7 @@ def process_initial_feedback(
             continue
         feedback_list = (
             '[{"lineNumber": ' + str(line) + ', "feedback": "'
-            + feedback[:1000] + '"}]'
+            + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
         )
         get_contents_from_url(
             set_submission_feedback_list_endpoint,
@@ -399,7 +400,13 @@ def process_feedbacks() -> None:
                             "course_alias": course_alias,
                             "assignment_alias": assignment_alias,
                             "feedback": urllib.parse.quote(
-                                oracle_feedback[:1000]
+                                (
+                                    str(TA_FEEDBACK_INDICATOR)
+                                    +
+                                    " "
+                                    +
+                                    oracle_feedback
+                                )[:1000]
                             ),
                             "line_number": line_number,
                             "submission_feedback_id": feedback_id,
@@ -438,8 +445,8 @@ def main() -> None:
     Takes input and process the feedbacks
     """
     global USERNAME, PASSWORD  # pylint: disable=W0603
-    global COURSE_ALIAS, ASSIGNMENT_ALIAS  # pylint: disable=W0603
-    global LANGUAGE, KEY, CLIENT  # pylint: disable=W0603
+    global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
+    global KEY, CLIENT, TA_FEEDBACK_INDICATOR  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
@@ -458,6 +465,11 @@ def main() -> None:
     parser.add_argument(
         "--language", type=str, help="Language to use for feedbacks"
     )
+    parser.add_argument(
+        "--ta_feedback_indicator",
+        type=str,
+        help="Indicates that it's a TA feedback"
+    )
     parser.add_argument("--key", type=str, help="API key for OpenAI")
     args = parser.parse_args()
 
@@ -470,6 +482,11 @@ def main() -> None:
     LANGUAGE = args.language or input(
         'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
     )
+    TA_FEEDBACK_INDICATOR = args.ta_feedback_indicator or input(
+        "As these feedbacks are AI generated, the input string will be"
+        " added to the feedback. \n(Default: Ese mensaje fue generado por un"
+        " modelo de inteligencia artificial.)\nPlease enter the string: "
+    ) or "Ese mensaje fue generado por un modelo de inteligencia artificial."
     KEY = args.key or getpass("Enter your OpenAI API key: ")
 
     CLIENT = OpenAI(api_key=KEY)
