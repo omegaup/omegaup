@@ -112,6 +112,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
   }
+
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
