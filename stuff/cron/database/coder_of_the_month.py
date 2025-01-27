@@ -265,8 +265,7 @@ def get_cotm_eligible_users(
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
-                i.identity_id
-            LIMIT 100;
+                i.identity_id;
             '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
@@ -350,17 +349,20 @@ def get_user_problems(
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
 
+    problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
+
     cur_readonly.execute(f'''
-            WITH ProblemsForfeitedByUser AS (
-                SELECT
-                    pf.user_id,
-                    pf.problem_id,
-                    pf.forfeited_date
-                FROM
-                    Problems_Forfeited pf
-                WHERE
-                    forfeited_date IS NULL
-            )
+            WITH
+                ProblemsForfeitedByUser AS (
+                    SELECT
+                        pf.user_id,
+                        pf.problem_id,
+                        pf.forfeited_date
+                    FROM
+                        Problems_Forfeited pf
+                    WHERE
+                        forfeited_date IS NULL
+                )
             SELECT
                 s.identity_id,
                 s.problem_id,
@@ -393,10 +395,72 @@ def get_user_problems(
         solved = row['first_time_solved'].date()
         assert identity_id in user_problems, (
             'Identity %s not found in user_problems', identity_id)
+        # Filter the problems solved for the first time in the selected month
         if first_day_of_current_month <= solved < first_day_of_next_month:
-            user_problems[identity_id]['solved'].append(problem_id)
+            # Filter the problems that are not administred by the user
+            if identity_id not in problems_admins.get(problem_id, []):
+                user_problems[identity_id]['solved'].append(problem_id)
 
     return user_problems
 
+
+def get_problems_admins(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    problem_ids_str: str,
+) -> Dict[int, List[int]]:
+    '''Get the list of problems admins'''
+
+    cur_readonly.execute(f'''
+        SELECT
+            p.problem_id,
+            ai.identity_id
+        FROM
+            Problems AS p
+        INNER JOIN
+            ACLs AS a ON a.acl_id = p.acl_id
+        INNER JOIN
+            Identities AS ai ON a.owner_id = ai.user_id
+        WHERE
+            p.problem_id IN ({problem_ids_str})
+        UNION DISTINCT
+        SELECT
+            p.problem_id,
+            uri.identity_id
+        FROM
+            Problems AS p
+        INNER JOIN
+            User_Roles ur ON ur.acl_id = p.acl_id
+            AND ur.role_id = 1
+        INNER JOIN
+            Identities uri ON ur.user_id = uri.user_id
+        WHERE
+            p.problem_id IN ({problem_ids_str})
+        UNION DISTINCT
+        SELECT
+            p.problem_id,
+            gi.identity_id
+        FROM
+            Problems AS p
+        INNER JOIN
+            Group_Roles gr ON gr.acl_id = p.acl_id
+            AND gr.role_id = 1
+        INNER JOIN
+            Groups_Identities gi ON gi.group_id = gr.group_id
+        WHERE
+            p.problem_id IN ({problem_ids_str})
+        ORDER BY
+            problem_id;
+    ''')
+
+    problems_admins: Dict[int, List[int]] = {}
+
+    for row in cur_readonly.fetchall():
+        problem_id = row['problem_id']
+        if problem_id not in problems_admins:
+            problems_admins[problem_id] = []
+        identity_id = row['identity_id']
+        problems_admins[problem_id].append(identity_id)
+
+    return problems_admins
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
