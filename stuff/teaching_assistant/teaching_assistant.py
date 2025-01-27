@@ -11,8 +11,11 @@ import logging
 from typing import Callable, Any
 import requests
 from tqdm import tqdm  # type: ignore
+from tqdm.contrib.logging import logging_redirect_tqdm  # type: ignore
 from openai import OpenAI  # type: ignore
 
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger(__name__)
 
 KEY = None
 USERNAME = None
@@ -135,10 +138,10 @@ def get_contents_from_url(
         data = response.json()
         return data
     except requests.exceptions.RequestException as e:
-        logging.error("An error occurred during the request: %s", e)
+        LOG.error("An error occurred during the request: %s", e)
         raise
     except json.JSONDecodeError as e:
-        logging.error("JSON decoding failed: %s", e)
+        LOG.error("JSON decoding failed: %s", e)
         raise
 
 
@@ -272,7 +275,7 @@ def query_llm(
     response_text = response.choices[0].message.content
 
     if not is_initial_feedback and len(response_text) > 1000:
-        logging.warning(
+        LOG.warning(
             "The response is too long. Trying to make it concise."
         )
         concise_request = (
@@ -338,88 +341,96 @@ def process_feedbacks() -> None:
     )
     run_ids_and_usernames = extract_show_run_ids()
     total_runs = len(run_ids_and_usernames)
-    for index, (run_id, user_name) in enumerate(tqdm(run_ids_and_usernames)):
-        course_alias = COURSE_ALIAS
-        assignment_alias = ASSIGNMENT_ALIAS
-        run_details = get_contents_from_url(
-            get_runs_endpoint, {"run_alias": run_id}
-        )
-
-        problem_alias = run_details["alias"]
-
-        source_content = run_details["source"]
-
-        problem_content = get_contents_from_url(
-            get_problem_details_endpoint, {"problem_alias": problem_alias}
-        )["statement"]["markdown"]
-        problem_solution = get_contents_from_url(
-            get_problem_solution_endpoint, {"problem_alias": problem_alias}
-        )["solution"]["markdown"]
-
-        feedbacks = extract_feedback_thread(run_id)
-
-        if len(feedbacks) == 0:
-            continue
-
-        is_initial_feedback = len(feedbacks) == 1
-
-        for feedback in feedbacks:
-            if user_name not in feedback[-1]:
-                continue
-            line_number = feedback[0]["line_number"]
-            feedback_id = feedback[1]["feedback_id"]
-            conjured_query = conjure_query(
-                problem_content,
-                problem_solution,
-                source_content,
-                str(feedback[2:]),
-                user_name,
-                line_number,
-                line_number is not None,
+    with logging_redirect_tqdm():
+        for index, (run_id, user_name) in enumerate(
+            tqdm(run_ids_and_usernames)
+        ):
+            course_alias = COURSE_ALIAS
+            assignment_alias = ASSIGNMENT_ALIAS
+            run_details = get_contents_from_url(
+                get_runs_endpoint, {"run_alias": run_id}
             )
-            if line_number is not None:
-                oracle_feedback = query_llm(
-                    conjured_query, is_initial_feedback=False
-                )
-                if len(oracle_feedback) >= 1000:
-                    logging.error(
-                        "The response is still too long. "
-                        "Trimming it to the first 1000 characters."
-                    )
-                get_contents_from_url(
-                    set_submission_feedback_endpoint,
-                    {
-                        "run_alias": run_id,
-                        "course_alias": course_alias,
-                        "assignment_alias": assignment_alias,
-                        "feedback": urllib.parse.quote(oracle_feedback[:1000]),
-                        "line_number": line_number,
-                        "submission_feedback_id": feedback_id,
-                    }
-                )
-                logging.info(
-                    "Request %s out of %s from user %s on %s: DONE",
-                    index + 1,
-                    total_runs,
+
+            problem_alias = run_details["alias"]
+
+            source_content = run_details["source"]
+
+            problem_content = get_contents_from_url(
+                get_problem_details_endpoint, {"problem_alias": problem_alias}
+            )["statement"]["markdown"]
+            problem_solution = get_contents_from_url(
+                get_problem_solution_endpoint, {"problem_alias": problem_alias}
+            )["solution"]["markdown"]
+
+            feedbacks = extract_feedback_thread(run_id)
+
+            if len(feedbacks) == 0:
+                continue
+
+            is_initial_feedback = len(feedbacks) == 1
+
+            for feedback in feedbacks:
+                if user_name not in feedback[-1]:
+                    continue
+                line_number = feedback[0]["line_number"]
+                feedback_id = feedback[1]["feedback_id"]
+                conjured_query = conjure_query(
+                    problem_content,
+                    problem_solution,
+                    source_content,
+                    str(feedback[2:]),
                     user_name,
-                    problem_alias,
+                    line_number,
+                    line_number is not None,
                 )
-            else:
-                if is_initial_feedback:
+                if line_number is not None:
                     oracle_feedback = query_llm(
-                        conjured_query,
+                        conjured_query, is_initial_feedback=False
                     )
-                    oracle_feedback = json.loads(oracle_feedback)
-                    process_initial_feedback(
-                        oracle_feedback, run_id, course_alias, assignment_alias
+                    if len(oracle_feedback) >= 1000:
+                        LOG.error(
+                            "The response is still too long. "
+                            "Trimming it to the first 1000 characters."
+                        )
+                    get_contents_from_url(
+                        set_submission_feedback_endpoint,
+                        {
+                            "run_alias": run_id,
+                            "course_alias": course_alias,
+                            "assignment_alias": assignment_alias,
+                            "feedback": urllib.parse.quote(
+                                oracle_feedback[:1000]
+                            ),
+                            "line_number": line_number,
+                            "submission_feedback_id": feedback_id,
+                        }
                     )
-                    logging.info(
-                        "Request %s out of %s from user %s on %s: DONE",
+                    LOG.info(
+                        "Feedback %s out of %s from user %s on %s: DONE",
                         index + 1,
                         total_runs,
                         user_name,
                         problem_alias,
                     )
+                else:
+                    if is_initial_feedback:
+                        oracle_feedback = query_llm(
+                            conjured_query,
+                        )
+                        oracle_feedback = json.loads(oracle_feedback)
+                        process_initial_feedback(
+                            oracle_feedback,
+                            run_id,
+                            course_alias,
+                            assignment_alias
+                        )
+                        LOG.info(
+                            "Request %s out of %s from user %s on %s: DONE",
+                            index + 1,
+                            total_runs,
+                            user_name,
+                            problem_alias,
+                        )
 
 
 def main() -> None:
