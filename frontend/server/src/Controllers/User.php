@@ -3979,7 +3979,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getRankToLoggedOutUserForTypeScript(\OmegaUp\Request $r){
+    public static function getRankToLoggedOutUserForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
         $filter = $r->ensureOptionalEnum(
@@ -4040,7 +4040,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getRankToLoggedInUserForTypeScript(\OmegaUp\Request $r){
+    public static function getRankToLoggedInUserForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
         $filter = $r->ensureOptionalEnum(
