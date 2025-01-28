@@ -5664,7 +5664,7 @@ export namespace messages {
   export type _RunListServerResponse = any;
   export type RunListResponse = { runs: types.Run[]; totalRuns: number };
   export type RunRejudgeRequest = { [key: string]: any };
-  export type RunRejudgeResponse = { score: number; version: string };
+  export type RunRejudgeResponse = { score?: number; version?: string };
   export type RunRequalifyRequest = { [key: string]: any };
   export type RunRequalifyResponse = {};
   export type RunSourceRequest = { [key: string]: any };

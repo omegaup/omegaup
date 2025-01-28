@@ -830,7 +830,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Re-sends a problem to Grader.
      *
-     * @return array{score: null|string, status: string, version: null|string}
+     * @return array{score: null|float, status: string, version: null|string}
      *
      * @omegaup-request-param bool|null $debug
      * @omegaup-request-param string $run_alias
@@ -901,7 +901,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'version' => $run->version,
-            'score' => $run->version,
+            'score' => $run->score,
         ];
     }
 

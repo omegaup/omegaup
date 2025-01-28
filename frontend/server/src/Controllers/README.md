@@ -3835,12 +3835,12 @@ Grader and should be rejudged.
 
 ### Parameters
 
-| Name             | Type           | Description |
-| ---------------- | -------------- | ----------- |
-| `current_score`  | `float`        |             |
-| `original_score` | `float`        |             |
-| `run_alias`      | `string`       |             |
-| `username`       | `null\|string` |             |
+| Name             | Type     | Description |
+| ---------------- | -------- | ----------- |
+| `current_score`  | `float`  |             |
+| `original_score` | `float`  |             |
+| `run_alias`      | `string` |             |
+| `version`        | `string` |             |
 
 ### Returns
 
