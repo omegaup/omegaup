@@ -6,12 +6,12 @@ class ScoreMismatchException extends \OmegaUp\Exceptions\ApiException {
     /**
      * @var float
      */
-    public string $originalScore;
+    public float $originalScore;
 
     /**
      * @var float
      */
-    public string $currentScore;
+    public float $currentScore;
 
     /**
      * @var string

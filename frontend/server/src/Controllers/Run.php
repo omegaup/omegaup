@@ -662,18 +662,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString('username', false);
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
         if (
-            is_null(
-                $submission?->current_run_id
-            ) || is_null(
-                $submission?->guid
-            )
+            is_null($submission) ||
+            is_null($submission->current_run_id) ||
+            is_null($submission->guid)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        $run = \OmegaUp\DAO\Runs::getByGUID(
-            $submission->guid
-        );
+        $run = \OmegaUp\DAO\Runs::getByGUID(strval($submission->guid));
         if (is_null($run)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
@@ -767,10 +763,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param string $run_alias
-     * @omegaup-request-param float $original_score
      * @omegaup-request-param float $current_score
-     * @omegaup-request-param null|string $username
+     * @omegaup-request-param float $original_score
+     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param string $version
      */
     public static function apiAlert(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -788,13 +784,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
         if (
-            is_null($submission?->current_run_id) ||
-            is_null($submission?->guid)
+            is_null($submission) ||
+            is_null($submission->current_run_id) ||
+            is_null($submission->guid)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        $run = \OmegaUp\DAO\Runs::getByGUID($submission->guid);
+        $run = \OmegaUp\DAO\Runs::getByGUID(strval($submission->guid));
         if (is_null($run)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
@@ -833,7 +830,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Re-sends a problem to Grader.
      *
-     * @return array{status: string, version: string, score: float}
+     * @return array{score: null|string, status: string, version: null|string}
      *
      * @omegaup-request-param bool|null $debug
      * @omegaup-request-param string $run_alias
@@ -864,7 +861,11 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         if ($run->status == 'new' || $run->status == 'waiting') {
             self::$log->info('Run already in the rejudge queue. Ignoring');
-            return ['status' => 'ok'];
+            return [
+                'status' => 'ok',
+                'version' => null,
+                'score' => null,
+            ];
         }
 
         self::$log->info("Run {$run->run_id} being rejudged");
