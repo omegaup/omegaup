@@ -5936,7 +5936,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiSetRecommended(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
