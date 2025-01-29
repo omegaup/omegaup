@@ -711,7 +711,8 @@ def update_users_stats(
         dbconn.commit()
 
         try:
-            update_coder_of_the_month_candidates(cur, cur_readonly, 'all', args)
+            update_coder_of_the_month_candidates(cur, cur_readonly, 'all',
+                                                 args)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -719,7 +720,8 @@ def update_users_stats(
             raise
 
         try:
-            update_coder_of_the_month_candidates(cur, cur_readonly, 'female', args)
+            update_coder_of_the_month_candidates(cur, cur_readonly, 'female',
+                                                 args)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
