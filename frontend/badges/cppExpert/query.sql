@@ -14,7 +14,10 @@ WHERE
     `r`.`verdict` = "AC" AND
     `s`.`type` = "normal" AND
     `p`.`visibility` >= 2 AND
-    FIND_IN_SET(`s`.`language`,'cpp,cpp11,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang')
+    FIND_IN_SET(
+        `s`.`language`,
+        'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang'
+    )
 GROUP BY
     `u`.`user_id`
 HAVING
