@@ -123,12 +123,9 @@
               class="collapse-submenu"
             >
               <div class="btn-group">
-                <a
-                  class="dropdown-item"
-                  href="/problem/new/"
-                  data-nav-problems-create
-                  >{{ T.myproblemsListCreateProblem }}</a
-                >
+                <span class="dropdown-item" data-nav-problems-create>
+                  {{ T.myproblemsListCreateProblem }}
+                </span>
                 <button
                   type="button"
                   class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
