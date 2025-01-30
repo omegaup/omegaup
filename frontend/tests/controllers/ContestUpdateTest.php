@@ -1928,4 +1928,86 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $this->assertSame($runs[0]['penalty'], $expectedPenalty);
     }
+
+    /**
+     * A PHPUnit data provider for testing contest recommended flag permissions.
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    public function contestRecommendedPermissionsProvider(): array {
+        return [
+            ['admin', true],
+            ['support', true],
+            ['normal', false],
+        ];
+    }
+
+    /**
+     * Test setting recommended flag with different user roles
+     *
+     * @dataProvider contestRecommendedPermissionsProvider
+     */
+    public function testSetRecommendedFlagPermissions(
+        string $userType,
+        bool $shouldHaveAccess
+    ) {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Create user with specified role
+        switch ($userType) {
+            case 'admin':
+                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+                break;
+            case 'support':
+                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+                \OmegaUp\Test\Factories\Groups::addUserToGroup(
+                    $identity,
+                    \OmegaUp\Authorization::SUPPORT_GROUP_ALIAS
+                );
+                break;
+            default:
+                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        // Add user as contest admin
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity);
+
+        // Login with the user
+        $login = self::login($identity);
+
+        try {
+            $r = new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'value' => true,
+            ]);
+
+            // Call API
+            \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+
+            if (!$shouldHaveAccess) {
+                $this->fail(
+                    'User should not have access to set recommended flag'
+                );
+            }
+
+            // Verify setting was applied
+            $contestData['request']['recommended'] = $r['value'];
+            $this->assertContest($contestData['request']);
+
+            // Try turning it off
+            $r['value'] = false;
+            \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+
+            // Verify setting was applied
+            $contestData['request']['recommended'] = $r['value'];
+            $this->assertContest($contestData['request']);
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            if ($shouldHaveAccess) {
+                $this->fail('User should have access to set recommended flag');
+            }
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+    }
 }
