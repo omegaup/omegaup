@@ -1961,10 +1961,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 break;
             case 'support':
                 ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-                \OmegaUp\Test\Factories\Groups::addUserToGroup(
-                    $identity,
-                    \OmegaUp\Authorization::SUPPORT_GROUP_ALIAS
-                );
+                \OmegaUp\Test\Factories\User::addSupportRole($identity);
                 break;
             default:
                 ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
