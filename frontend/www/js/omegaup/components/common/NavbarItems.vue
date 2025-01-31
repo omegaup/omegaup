@@ -122,13 +122,13 @@
               v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="collapse-submenu"
             >
-              <div class="btn-group">
+              <div class="btn-group d-flex">
                 <span class="dropdown-item" data-nav-problems-create>
                   {{ T.myproblemsListCreateProblem }}
                 </span>
                 <button
                   type="button"
-                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
                   data-toggle="collapse"
                   data-target=".collapse-links"
                   data-nav-problems-create-options
