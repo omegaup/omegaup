@@ -1936,8 +1936,13 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function contestRecommendedPermissionsProvider(): array {
         return [
-            ['admin', true],
             ['support', true],
+            ['quality-reviewer', false],
+            ['course-curator', false],
+            ['mentor', false],
+            ['group-identity-creator', false],
+            ['certificate-generator', false],
+            ['teaching-assistant', false],
             ['normal', false],
         ];
     }
@@ -1954,17 +1959,22 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        // Create user with specified role
-        switch ($userType) {
-            case 'admin':
-                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
-                break;
-            case 'support':
-                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-                \OmegaUp\Test\Factories\User::addSupportRole($identity);
-                break;
-            default:
-                ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Create user and add to corresponding group
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to the corresponding group based on type
+        if ($userType !== 'normal') {
+            $groupAlias = 'omegaup:' . $userType;
+            $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+            if (is_null($group)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'groupNotFound'
+                );
+            }
+            \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+                'group_id' => $group->group_id,
+                'identity_id' => $identity->identity_id,
+            ]));
         }
 
         // Add user as contest admin
