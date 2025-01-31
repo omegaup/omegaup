@@ -27,7 +27,7 @@
         </button>
       </div>
       <form class="contest-form" @submit.prevent="onSubmit">
-        <div class="row">
+        <div class="row">oooo
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
             <input
@@ -212,6 +212,20 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
+          <div class="form-group col-md-6" v-if="isSiteAdminOrSupport">
+          <label>{{ T.contestNewFormRecommended }}</label>
+          <div class="checkbox">
+           <label>
+            <input
+             v-model="recommended"
+             type="checkbox"
+           />
+        {{ T.wordsEnable }}
+      </label>
+      </div>
+      <p class="help-block">{{ T.contestNewFormRecommendedDesc }}</p>
+      </div>
+      </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormForTeams }}</label>
             <div class="checkbox">
@@ -425,6 +439,9 @@ export default class NewForm extends Vue {
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
   @Prop({ default: true }) hasVisitedSection!: boolean;
+  @Prop({ default: false }) initialRecommended!: boolean;
+  @Prop({ default: false }) isSiteAdminOrSupport!: boolean;
+
 
   T = T;
   ScoreMode = ScoreMode;
@@ -451,7 +468,7 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
-
+  recommended = this.initialRecommended;
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
@@ -608,6 +625,7 @@ export default class NewForm extends Vue {
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
+      recommended: this.recommended,
     };
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
