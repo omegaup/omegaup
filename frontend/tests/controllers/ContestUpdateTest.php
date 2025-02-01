@@ -1936,14 +1936,13 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function contestRecommendedPermissionsProvider(): array {
         return [
-            ['support', true],
-            ['quality-reviewer', false],
-            ['course-curator', false],
-            ['mentor', false],
-            ['group-identity-creator', false],
-            ['certificate-generator', false],
-            ['teaching-assistant', false],
-            ['normal', false],
+            [\OmegaUp\Authorization::SUPPORT_GROUP_ALIAS, true],
+            [\OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::MENTOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::IDENTITY_CREATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::CERTIFICATE_GENERATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::TEACHING_ASSISTANT_GROUP_ALIAS, false],
         ];
     }
 
@@ -1953,7 +1952,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * @dataProvider contestRecommendedPermissionsProvider
      */
     public function testSetRecommendedFlagPermissions(
-        string $userType,
+        string $groupAlias,
         bool $shouldHaveAccess
     ) {
         // Get a contest
@@ -1962,20 +1961,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Create user and add to corresponding group
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Add user to the corresponding group based on type
-        if ($userType !== 'normal') {
-            $groupAlias = 'omegaup:' . $userType;
-            $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
-            if (is_null($group)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'groupNotFound'
-                );
-            }
-            \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => $group->group_id,
-                'identity_id' => $identity->identity_id,
-            ]));
-        }
+        // Add user to the group
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+            'group_id' => $group?->group_id,
+            'identity_id' => $identity->identity_id,
+        ]));
 
         // Add user as contest admin
         \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity);
