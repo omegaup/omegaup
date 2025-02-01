@@ -4069,34 +4069,37 @@ class User extends \OmegaUp\Controllers\Controller {
             params: $params,
         );
 
-        if (!is_null($r->identity->country_id)) {
-            $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByCountry'
+        if(!is_null($r->identity)){
+            if (!is_null($r->identity->country_id)) {
+                $availableFilters['country'] =
+                    \OmegaUp\Translations::getInstance($r->identity)->get(
+                        'wordsFilterByCountry'
+                    );
+            }
+            if (!is_null($r->identity->state_id)) {
+                $availableFilters['state'] =
+                    \OmegaUp\Translations::getInstance($r->identity)->get(
+                        'wordsFilterByState'
+                    );
+            }
+    
+            $schoolId = null;
+            if (!is_null($r->identity->current_identity_school_id)) {
+                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                    $r->identity->current_identity_school_id
                 );
-        }
-        if (!is_null($r->identity->state_id)) {
-            $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByState'
-                );
-        }
-
-        $schoolId = null;
-        if (!is_null($r->identity->current_identity_school_id)) {
-            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $r->identity->current_identity_school_id
-            );
-            if (!is_null($identitySchool)) {
-                $schoolId = $identitySchool->school_id;
+                if (!is_null($identitySchool)) {
+                    $schoolId = $identitySchool->school_id;
+                }
+            }
+            if (!is_null($schoolId)) {
+                $availableFilters['school'] =
+                    \OmegaUp\Translations::getInstance($r->identity)->get(
+                        'wordsFilterBySchool'
+                    );
             }
         }
-        if (!is_null($schoolId)) {
-            $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterBySchool'
-                );
-        }
+
         [
             'ranking' => $ranking,
             'pager' => $pager,
