@@ -4069,7 +4069,7 @@ class User extends \OmegaUp\Controllers\Controller {
             params: $params,
         );
 
-        if(!is_null($r->identity)){
+        if (!is_null($r->identity)) {
             if (!is_null($r->identity->country_id)) {
                 $availableFilters['country'] =
                     \OmegaUp\Translations::getInstance($r->identity)->get(
@@ -4082,7 +4082,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'wordsFilterByState'
                     );
             }
-    
+
             $schoolId = null;
             if (!is_null($r->identity->current_identity_school_id)) {
                 $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
