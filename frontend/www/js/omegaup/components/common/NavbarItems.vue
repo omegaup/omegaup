@@ -123,7 +123,7 @@
               class="collapse-submenu"
             >
               <div class="btn-group d-flex">
-                <span class="dropdown-item" data-nav-problems-create>
+                <span class="dropdown-item">
                   {{ T.myproblemsListCreateProblem }}
                 </span>
                 <button
@@ -140,9 +140,12 @@
                 <a class="dropdown-item" href="/problem/creator/">{{
                   T.myproblemsListCreateZipFileProblem
                 }}</a>
-                <a class="dropdown-item" href="/problem/new/">{{
-                  T.myproblemsListCreateProblemWithExistingZipFile
-                }}</a>
+                <a
+                  class="dropdown-item"
+                  href="/problem/new/"
+                  data-nav-problems-create
+                  >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                >
               </div>
             </form>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
