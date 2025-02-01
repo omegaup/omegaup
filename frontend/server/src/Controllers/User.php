@@ -4058,7 +4058,7 @@ class User extends \OmegaUp\Controllers\Controller {
         int $rowCount,
         array $params
     ) {
-        if(is_null($loggedIdentity)){
+        if (is_null($loggedIdentity)) {
             return self::getRankToLoggedOutUser(
                 filteredBy: $filteredBy,
                 offset: $offset,
