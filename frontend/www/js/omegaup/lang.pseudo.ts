@@ -244,6 +244,7 @@ const translations: { [key: string]: string; } = {
   clarificationsRangeHeader: "(C1arifica7i0n5 (fr0m %(lowCount) 70 %(highCount)))",
   coderOfTheMonth: "(C0d3r 0f 7h3 M0n7h Ov3ra11)",
   coderOfTheMonthAlreadySelected: "(C0d3r 0f 7h3 m0n7h ha5 b33n pr3vi0u51y 5313c73d)",
+  coderOfTheMonthCanBeChosenManually: "(R3m3mb3r 7ha7 y0u can ch0053 7h3 winn3r5 0f C0d3r 0f 7h3 M0n7h f0r b07h ca73g0ri35 in 7h3 [C0d3r 0f 7h3 M0n7h](h77p5://0m3gaup.c0m/c0d3r0f7h3m0n7h/) 53c7i0n and 7h3 [C0d3r 0f 7h3 M0n7h f0r w0m3n](h77p5://0m3gaup.c0m/c0d3r0f7h3m0n7h/f3ma13/) 53c7i0n.)",
   coderOfTheMonthChooseAsCoder: "(Ch0053 a5 c0d3r 0f 7h3 m0n7h)",
   coderOfTheMonthFemale: "(C0d3r 0f 7h3 M0n7h f0r H3r)",
   coderOfTheMonthFemaleChooseAsCoder: "(Ch0053 a5 f3ma13 c0d3r 0f 7h3 m0n7h)",
