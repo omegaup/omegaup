@@ -404,6 +404,7 @@ class Utils {
             ('python3 ' .
              dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
+             ' --update-coder-of-the-month ' .
             ' --coders-list-count ' . escapeshellarg(
                 strval(
                     $codersListCount

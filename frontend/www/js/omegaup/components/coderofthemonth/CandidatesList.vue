@@ -79,7 +79,7 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() coders!: types.CoderOfTheMonthList[];
   @Prop() isMentor!: boolean;
   @Prop() selectedTab!: string;
-  @Prop({ default: false }) isDisabled!: boolean;
+  @Prop({ default: true }) isDisabled!: boolean;
 
   T = T;
 }
