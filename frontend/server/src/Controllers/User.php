@@ -3991,11 +3991,11 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         return self::getRankToLoggedInUser(
-            $r->identity,
-            $currentFilter,
-            $page,
-            $length,
-            $params,
+            loggedIdentity: $r->identity,
+            filteredBy: $currentFilter,
+            offset: $page,
+            rowCount: $length,
+            params: $params,
         );
     }
 
@@ -4058,6 +4058,14 @@ class User extends \OmegaUp\Controllers\Controller {
         int $rowCount,
         array $params
     ) {
+        if(is_null($loggedIdentity)){
+            return self::getRankToLoggedOutUser(
+                filteredBy: $filteredBy,
+                offset: $offset,
+                rowCount: $rowCount,
+                params: $params,
+            );
+        }
         $availableFilters = [];
         if (!is_null($loggedIdentity->country_id)) {
             $availableFilters['country'] =
