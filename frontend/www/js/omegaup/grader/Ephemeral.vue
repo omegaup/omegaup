@@ -81,17 +81,27 @@
         </button>
         <button
           v-if="isSubmitButton"
+          :disabled="!canSubmit"
+          :class="{ disabled: !canSubmit }"
           class="btn btn-sm btn-primary my-2 my-sm-0 ephemeral-button"
           data-submit-button
           @click.prevent="handleSubmit"
         >
-          <span>{{ T.wordsSubmit }}</span>
-          <span
-            v-if="isSubmitLoading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <omegaup-countdown
+            v-if="!canSubmit"
+            :target-time="nextSubmissionTimestamp"
+            :countdown-format="omegaup.CountdownFormat.EventCountdown"
+            @finish="now = Date.now()"
+          ></omegaup-countdown>
+          <template v-else>
+            <span>{{ T.wordsSubmit }}</span>
+            <span
+              v-if="isSubmitLoading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </template>
         </button>
       </form>
     </div>
@@ -101,7 +111,9 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
 import JSZip from 'jszip';
@@ -153,16 +165,18 @@ interface ComponentState {
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class Ephemeral extends Vue {
   @Prop({ required: true }) acceptedLanguages!: string[];
   @Prop({ required: true }) isEmbedded!: boolean;
   @Prop({ required: true }) canRun!: boolean;
-  @Prop({ required: true }) canSubmit!: boolean;
+  @Prop({ required: true }) shouldShowSubmitButton!: boolean;
   @Prop({ required: true }) initialLanguage!: string;
   @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
   @Prop({ required: true }) problem!: types.ProblemInfo;
+  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
@@ -175,10 +189,12 @@ export default class Ephemeral extends Vue {
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
+  omegaup = omegaup;
   isRunLoading = false;
   isSubmitLoading = false;
   zipHref: string | null = null;
   zipDownload: string | null = null;
+  now: number = Date.now();
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -211,6 +227,12 @@ export default class Ephemeral extends Vue {
   get isDark() {
     return this.theme === Util.MonacoThemes.VSDark;
   }
+  get canSubmit(): boolean {
+    if (!this.nextSubmissionTimestamp) {
+      return true;
+    }
+    return this.nextSubmissionTimestamp.getTime() <= this.now;
+  }
 
   toggleTheme() {
     store.dispatch(
@@ -232,7 +254,7 @@ export default class Ephemeral extends Vue {
         languages: this.acceptedLanguages,
         problem: this.problem,
         showRunButton: this.canRun,
-        showSubmitButton: this.canSubmit,
+        showSubmitButton: this.shouldShowSubmitButton,
       })
       .then(() => {
         store.commit('updatingSettings', false);
