@@ -61,7 +61,7 @@ library.add(faCogs);
 export default class CoderOfTheMonthList extends Vue {
   @Prop() coders!: types.CoderOfTheMonthList[];
   @Prop() selectedTab!: string;
-  @Prop({ default: true }) isDisabled!: boolean;
+  @Prop({ default: false }) isDisabled!: boolean;
 
   T = T;
 }
