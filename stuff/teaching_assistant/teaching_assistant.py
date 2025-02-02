@@ -15,6 +15,7 @@ from tqdm.contrib.logging import logging_redirect_tqdm  # type: ignore
 from openai import OpenAI  # type: ignore
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 LOG = logging.getLogger(__name__)
 
 KEY = None
@@ -330,6 +331,141 @@ def process_initial_feedback(
         )
 
 
+def handle_feedbacks(  # pylint: disable=R0913
+        user_name: str,
+        index: int,
+        total_runs: int,
+        run_id: str,
+        problem_alias: str,
+        source_content: str,
+        problem_content: str,
+        problem_solution: str,
+        feedbacks: list[list[dict[str, Any]]],
+) -> None:
+    """
+    Handles feedbacks for a single run
+
+    Returns:
+    None
+    """
+    if len(feedbacks) == 0:
+        return
+
+    is_initial_feedback = len(feedbacks) == 1
+
+    for feedback in feedbacks:
+        if user_name not in feedback[-1]:
+            continue
+        line_number = feedback[0]["line_number"]
+        feedback_id = feedback[1]["feedback_id"]
+        conjured_query = conjure_query(
+            problem_content,
+            problem_solution,
+            source_content,
+            str(feedback[2:]),
+            user_name,
+            line_number,
+            line_number is not None,
+        )
+        if line_number is not None:
+            oracle_feedback = query_llm(
+                conjured_query, is_initial_feedback=False
+            )
+            if len(oracle_feedback) >= 1000:
+                LOG.error(
+                    "The response is still too long. "
+                    "Trimming it to the first 1000 characters."
+                )
+            get_contents_from_url(
+                set_submission_feedback_endpoint,
+                {
+                    "run_alias": run_id,
+                    "course_alias": COURSE_ALIAS,
+                    "assignment_alias": ASSIGNMENT_ALIAS,
+                    "feedback": urllib.parse.quote(
+                        (
+                            str(TA_FEEDBACK_INDICATOR)
+                            +
+                            " "
+                            +
+                            oracle_feedback
+                        )[:1000]
+                    ),
+                    "line_number": line_number,
+                    "submission_feedback_id": feedback_id,
+                }
+            )
+            LOG.info(
+                "Request %s out of %s from user %s on %s: DONE",
+                index + 1,
+                total_runs,
+                user_name,
+                problem_alias,
+            )
+        else:
+            if is_initial_feedback:
+                oracle_feedback = query_llm(
+                    conjured_query,
+                )
+                oracle_feedback = json.loads(oracle_feedback)
+                process_initial_feedback(
+                    oracle_feedback,
+                    run_id,
+                    COURSE_ALIAS,
+                    ASSIGNMENT_ALIAS
+                )
+                LOG.info(
+                    "Request %s out of %s from user %s on %s: DONE",
+                    index + 1,
+                    total_runs,
+                    user_name,
+                    problem_alias,
+                )
+
+
+def process_single_run(
+    index: int,
+    run_id: str,
+    username: str,
+    total_runs: int
+) -> None:
+    """
+    Processes a single feedback
+
+    Returns:
+    None
+    """
+    run_details = get_contents_from_url(
+        get_runs_endpoint, {"run_alias": run_id}
+    )
+
+    problem_alias = run_details["alias"]
+
+    source_content = run_details["source"]
+
+    problem_content = get_contents_from_url(
+        get_problem_details_endpoint, {"problem_alias": problem_alias}
+    )["statement"]["markdown"]
+
+    problem_solution = get_contents_from_url(
+        get_problem_solution_endpoint, {"problem_alias": problem_alias}
+    )["solution"]["markdown"]
+
+    feedbacks = extract_feedback_thread(run_id)
+
+    handle_feedbacks(
+        username,
+        index,
+        total_runs,
+        run_id,
+        problem_alias,
+        source_content,
+        problem_content,
+        problem_solution,
+        feedbacks
+    )
+
+
 def process_feedbacks() -> None:
     """
     Processes feedback requests from students using LLM oracle.
@@ -346,107 +482,16 @@ def process_feedbacks() -> None:
         for index, (run_id, user_name) in enumerate(
             tqdm(run_ids_and_usernames)
         ):
-            course_alias = COURSE_ALIAS
-            assignment_alias = ASSIGNMENT_ALIAS
-            run_details = get_contents_from_url(
-                get_runs_endpoint, {"run_alias": run_id}
-            )
-
-            problem_alias = run_details["alias"]
-
-            source_content = run_details["source"]
-
-            problem_content = get_contents_from_url(
-                get_problem_details_endpoint, {"problem_alias": problem_alias}
-            )["statement"]["markdown"]
-            problem_solution = get_contents_from_url(
-                get_problem_solution_endpoint, {"problem_alias": problem_alias}
-            )["solution"]["markdown"]
-
-            feedbacks = extract_feedback_thread(run_id)
-
-            if len(feedbacks) == 0:
-                continue
-
-            is_initial_feedback = len(feedbacks) == 1
-
-            for feedback in feedbacks:
-                if user_name not in feedback[-1]:
-                    continue
-                line_number = feedback[0]["line_number"]
-                feedback_id = feedback[1]["feedback_id"]
-                conjured_query = conjure_query(
-                    problem_content,
-                    problem_solution,
-                    source_content,
-                    str(feedback[2:]),
-                    user_name,
-                    line_number,
-                    line_number is not None,
-                )
-                if line_number is not None:
-                    oracle_feedback = query_llm(
-                        conjured_query, is_initial_feedback=False
-                    )
-                    if len(oracle_feedback) >= 1000:
-                        LOG.error(
-                            "The response is still too long. "
-                            "Trimming it to the first 1000 characters."
-                        )
-                    get_contents_from_url(
-                        set_submission_feedback_endpoint,
-                        {
-                            "run_alias": run_id,
-                            "course_alias": course_alias,
-                            "assignment_alias": assignment_alias,
-                            "feedback": urllib.parse.quote(
-                                (
-                                    str(TA_FEEDBACK_INDICATOR)
-                                    +
-                                    " "
-                                    +
-                                    oracle_feedback
-                                )[:1000]
-                            ),
-                            "line_number": line_number,
-                            "submission_feedback_id": feedback_id,
-                        }
-                    )
-                    LOG.info(
-                        "Feedback %s out of %s from user %s on %s: DONE",
-                        index + 1,
-                        total_runs,
-                        user_name,
-                        problem_alias,
-                    )
-                else:
-                    if is_initial_feedback:
-                        oracle_feedback = query_llm(
-                            conjured_query,
-                        )
-                        oracle_feedback = json.loads(oracle_feedback)
-                        process_initial_feedback(
-                            oracle_feedback,
-                            run_id,
-                            course_alias,
-                            assignment_alias
-                        )
-                        LOG.info(
-                            "Request %s out of %s from user %s on %s: DONE",
-                            index + 1,
-                            total_runs,
-                            user_name,
-                            problem_alias,
-                        )
+            process_single_run(index, run_id, user_name, total_runs)
 
 
-def main() -> None:
+def handle_input() -> None:
     """
-    Takes input and process the feedbacks
+    Handles input from the user
     """
     global USERNAME, PASSWORD  # pylint: disable=W0603
     global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
-    global KEY, CLIENT, TA_FEEDBACK_INDICATOR  # pylint: disable=W0603
+    global KEY, TA_FEEDBACK_INDICATOR  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
@@ -488,6 +533,15 @@ def main() -> None:
         " modelo de inteligencia artificial.)\nPlease enter the string: "
     ) or "Ese mensaje fue generado por un modelo de inteligencia artificial."
     KEY = args.key or getpass("Enter your OpenAI API key: ")
+
+
+def main() -> None:
+    """
+    Takes input and process the feedbacks
+    """
+    global CLIENT  # pylint: disable=W0603
+
+    handle_input()
 
     CLIENT = OpenAI(api_key=KEY)
 
