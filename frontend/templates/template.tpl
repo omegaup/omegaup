@@ -69,6 +69,8 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
+    {% jsInclude 'common_scroll_to_top' omitRuntime %}
+      <div id="scroll-to-top"></div>
     {% jsInclude 'common_footer' omitRuntime %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
       <div id="common-footer"></div>
