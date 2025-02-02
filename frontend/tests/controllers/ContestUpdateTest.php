@@ -1968,9 +1968,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'identity_id' => $identity->identity_id,
         ]));
 
-        // Add user as contest admin
-        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $identity);
-
         // Login with the user
         $login = self::login($identity);
 
