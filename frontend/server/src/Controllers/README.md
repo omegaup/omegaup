@@ -3846,13 +3846,13 @@ Create a new run
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `language`      | `string` |             |
-| `problem_alias` | `string` |             |
-| `source`        | `string` |             |
-| `problemset_id` | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `source`        | `string`       |             |
+| `contest_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 

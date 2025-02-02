@@ -186,6 +186,7 @@
               :accepted-languages="filteredLanguages"
               :preferred-language="preferredLanguage"
               :last-run="lastRun"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -220,6 +221,8 @@
             :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
+            :created-guid="createdGuid"
+            :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
             @request-feedback="(guid) => $emit('request-feedback', guid)"
@@ -467,6 +470,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) inContestOrCourse!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) createdGuid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
