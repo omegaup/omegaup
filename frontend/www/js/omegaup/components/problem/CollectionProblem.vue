@@ -36,13 +36,13 @@ export default class CollectionProblem extends Vue {
 
 <style>
 [omegaup-collection-problem] {
-  width: 200px;
-  margin-right: 0.4em;
+  width: 12.5rem;
+  margin-right: 0.25em;
   height: 100%;
 }
 
 [omegaup-collection-problem] .card-body {
-  min-height: 150px;
+  min-height: 9.375rem;
 }
 
 [omegaup-collection-problem] .icon-container {
@@ -61,11 +61,11 @@ export default class CollectionProblem extends Vue {
 
 @media (max-width: 768px) {
   [omegaup-collection-problem] {
-    width: 180px;
+    width: 11.25rem;
   }
 
   [omegaup-collection-problem] .card-body {
-    min-height: 140px;
+    min-height: 8.75rem;
   }
 }
 </style>

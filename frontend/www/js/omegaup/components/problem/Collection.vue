@@ -208,14 +208,14 @@ export default class Collection extends Vue {
 
 <style>
 .educational-level-card[omegaup-collection-problem] {
-  width: 200px !important;
-  height: 200px !important;
+  width: 12.5rem !important;
+  height: 12.5rem !important;
   position: relative;
   transition: box-shadow 0.3s ease-in-out !important;
 }
 
 .educational-level-card[omegaup-collection-problem]:hover {
-  box-shadow: 0 0 10px rgba(103, 141, 215, 0.5) !important;
+  box-shadow: 0 0 0.625rem rgba(103, 141, 215, 0.5) !important;
 }
 
 /* Apply same hover effect to other collection cards */
@@ -224,12 +224,12 @@ export default class Collection extends Vue {
 }
 
 [omegaup-collection-problem]:hover {
-  box-shadow: 0 0 10px rgba(103, 141, 215, 0.5) !important;
+  box-shadow: 0 0 0.625rem rgba(103, 141, 215, 0.5) !important;
 }
 
 .educational-level-card[omegaup-collection-problem] .card-body {
-  min-height: 200px !important;
-  height: 200px !important;
+  min-height: 12.5rem !important;
+  height: 12.5rem !important;
   display: flex !important;
   flex-direction: column !important;
   padding: 1rem !important;
