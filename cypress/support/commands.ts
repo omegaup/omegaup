@@ -75,6 +75,8 @@ Cypress.Commands.add(
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
+    // Click the dropdown toggle to show options
+    cy.get('[data-nav-problems-create-options]').click();
     cy.get('[data-nav-problems-create]').click();
     if (firstTimeVisited) {
       cy.get('.introjs-skipbutton').click();
