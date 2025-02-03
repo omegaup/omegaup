@@ -79,6 +79,7 @@ OmegaUp.on('ready', async () => {
           !payload.nominationStatus?.solved),
       guid,
       nextSubmissionTimestamp,
+      createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
     }),
@@ -110,6 +111,7 @@ OmegaUp.on('ready', async () => {
           isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          createdGuid: this.createdGuid,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
           searchResultProblems: this.searchResultProblems,
@@ -175,6 +177,7 @@ OmegaUp.on('ready', async () => {
               .then((response) => {
                 problemDetailsView.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
+                problemDetailsView.createdGuid = response.guid;
 
                 submitRun({
                   guid: response.guid,
@@ -440,6 +443,7 @@ OmegaUp.on('ready', async () => {
             .then((response) => {
               problemDetailsView.nextSubmissionTimestamp =
                 response.nextSubmissionTimestamp;
+              problemDetailsView.createdGuid = response.guid;
               submitRun({
                 guid: response.guid,
                 submitDelay: response.submit_delay,
