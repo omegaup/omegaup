@@ -101,7 +101,7 @@
               <span>
                 <a
                   data-toggle="tooltip"
-                  href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+                  href="https://blog.omegaup.com/posts/el-nuevo-ranking-de-omegaup/"
                   rel="tooltip"
                   :title="T.wordsPointsForRank"
                   :data-original-title="T.wordsPointsForRankTooltip"
