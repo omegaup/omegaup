@@ -19,6 +19,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
+ * @psalm-type UserRankTableLoggedOutPayload=array{isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
  * @psalm-type UserDependentsPayload=array{dependents:list<UserDependent>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
@@ -3951,7 +3952,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: UserRankTablePayload|UserRankTableLoggedOutPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $filter
      * @omegaup-request-param int|null $length
@@ -3984,10 +3985,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (is_null($r->identity)) {
             return self::getRankToLoggedOutUser(
-                filteredBy: $currentFilter,
                 offset: $page,
                 rowCount: $length,
-                params: $params,
             );
         }
         return self::getRankToLoggedInUser(
@@ -4003,34 +4002,28 @@ class User extends \OmegaUp\Controllers\Controller {
      * when the user is logged out:
      * prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: UserRankTableLoggedOutPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      */
     public static function getRankToLoggedOutUser(
-        string $filteredBy,
         int $offset,
         int $rowCount,
-        array $params
     ) {
         [
             'ranking' => $ranking,
             'pager' => $pager,
         ] = self::getRankByProblemsSolvedWithPager(
             loggedIdentity: null,
-            filteredBy: $filteredBy,
+            filteredBy: \OmegaUp\DAO\Enum\RankFilter::NONE,
             offset: $offset,
             rowCount: $rowCount,
-            params: $params,
+            params: [],
         );
-        $availableFilters = [];
         return [
             'templateProperties' => [
                 'payload' => [
                     'page' => $offset,
                     'length' => $rowCount,
-                    'filter' => $filteredBy,
-                    'availableFilters' => $availableFilters,
-                    'isIndex' => false,
                     'isLogged' => false,
                     'ranking' => $ranking,
                     'pagerItems' => $pager,
@@ -4052,20 +4045,12 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      */
     public static function getRankToLoggedInUser(
-        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity,
         string $filteredBy,
         int $offset,
         int $rowCount,
         array $params
     ) {
-        if (is_null($loggedIdentity)) {
-            return self::getRankToLoggedOutUser(
-                filteredBy: $filteredBy,
-                offset: $offset,
-                rowCount: $rowCount,
-                params: $params,
-            );
-        }
         $availableFilters = [];
         if (!is_null($loggedIdentity->country_id)) {
             $availableFilters['country'] =

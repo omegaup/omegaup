@@ -2465,6 +2465,33 @@ export namespace types {
       );
     }
 
+    export function UserRankTableLoggedOutPayload(
+      elementId: string = 'payload',
+    ): types.UserRankTableLoggedOutPayload {
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -4915,6 +4942,15 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+  }
+
+  export interface UserRankTableLoggedOutPayload {
+    isLogged: boolean;
+    lastUpdated?: Date;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.UserRank;
   }
 
   export interface UserRankTablePayload {
