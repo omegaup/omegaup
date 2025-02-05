@@ -569,11 +569,7 @@ def compute_points_for_user(
         last_12_coders
     )
 
-    eligible_problems = get_eligible_problems(
-        cur_readonly,
-        first_day_of_current_month,
-        first_day_of_next_month
-    )
+    eligible_problems = get_eligible_problems(cur_readonly)
 
     # Get the list of identity IDs for eligible users
     identity_ids = [user.identity_id for user in eligible_users]
