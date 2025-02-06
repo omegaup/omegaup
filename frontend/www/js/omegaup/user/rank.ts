@@ -7,8 +7,12 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload();
-  let availableFilters = {};
-  let filter = null;
+  let availableFilters: {
+    country?: string;
+    school?: string;
+    state?: string;
+  } = {};
+  let filter: null | string = null;
   if (payload.isLogged) {
     availableFilters = payload.availableFilters;
     filter = payload.filter;
