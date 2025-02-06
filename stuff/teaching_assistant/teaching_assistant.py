@@ -447,9 +447,12 @@ def process_single_run(
         get_problem_details_endpoint, {"problem_alias": problem_alias}
     )["statement"]["markdown"]
 
-    problem_solution = get_contents_from_url(
-        get_problem_solution_endpoint, {"problem_alias": problem_alias}
-    )["solution"]["markdown"]
+    try:
+        problem_solution = get_contents_from_url(
+            get_problem_solution_endpoint, {"problem_alias": problem_alias}
+        )["solution"]["markdown"]
+    except requests.exceptions.HTTPError:
+        problem_solution = ""
 
     feedbacks = extract_feedback_thread(run_id)
 
