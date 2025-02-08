@@ -620,7 +620,7 @@ def compute_points_for_user(
     return updated_users_sorted[:coder_list_count]
 
 
-def update_cotm_candidates(
+def update_coder_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     category: str,
@@ -647,15 +647,12 @@ def update_cotm_candidates(
                                          category,
                                          args.coders_list_count)
 
-    if args.update_coder_of_the_month:
-        # TODO: We need to insert the candidates in the database for testing
-        # purposes. This condition will be removed in the future.
-        for ranking, candidate in enumerate(candidates, start=1):
-            insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
-                                                 ranking, category, candidate)
-    else:
-        debug_coder_of_the_month_candidates(first_day_of_next_month, category,
-                                            candidates)
+    for ranking, candidate in enumerate(candidates, start=1):
+        insert_coder_of_the_month_candidates(cur, first_day_of_next_month,
+                                             ranking, category, candidate)
+
+    debug_coder_of_the_month_candidates(first_day_of_next_month, category,
+                                        candidates)
 
 
 def debug_coder_of_the_month_candidates(
@@ -710,7 +707,8 @@ def update_users_stats(
         dbconn.commit()
 
         try:
-            update_cotm_candidates(cur, cur_readonly, 'all', args)
+            update_coder_of_the_month_candidates(cur, cur_readonly, 'all',
+                                                 args)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -718,7 +716,8 @@ def update_users_stats(
             raise
 
         try:
-            update_cotm_candidates(cur, cur_readonly, 'female', args)
+            update_coder_of_the_month_candidates(cur, cur_readonly, 'female',
+                                                 args)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -780,9 +779,6 @@ def main() -> None:
                         type=int,
                         default=100,
                         help='The number of candidates to save in the DB')
-    parser.add_argument('--update-coder-of-the-month',
-                        action='store_true',
-                        help='Update the Coder of the Month')
     args: argparse.Namespace = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
