@@ -184,10 +184,10 @@ interface Rank {
 export default class UserRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
-  @Prop() isIndex!: boolean;
+  @Prop({ default: false }) isIndex!: boolean;
   @Prop() isLogged!: boolean;
-  @Prop() availableFilters!: { [key: string]: string };
-  @Prop() filter!: string;
+  @Prop({ default: () => {} }) availableFilters!: { [key: string]: string };
+  @Prop({ default: null }) filter!: string | null;
   @Prop() ranking!: Rank[];
   @Prop() lastUpdated!: Date;
   @Prop() resultTotal!: number;

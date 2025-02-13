@@ -244,6 +244,7 @@ const translations: { [key: string]: string; } = {
   clarificationsRangeHeader: "Clarifica\u00e7\u00f5es (da %(lowCount) \u00e0 %(highCount))",
   coderOfTheMonth: "Coder do M\u00eas Geral",
   coderOfTheMonthAlreadySelected: "O programador do m\u00eas foi selecionado anteriormente",
+  coderOfTheMonthCanBeChosenManually: "Lembre-se de que voc\u00ea pode escolher os vencedores do Coder do M\u00eas para ambas as categorias na se\u00e7\u00e3o [Coder do M\u00eas](https://omegaup.com/coderofthemonth/) e na se\u00e7\u00e3o [Coder do M\u00eas para eles](https://omegaup.com/coderofthemonth/female/).",
   coderOfTheMonthChooseAsCoder: "Escolha como Programador do M\u00eas",
   coderOfTheMonthFemale: "Coder do M\u00eas para eles",
   coderOfTheMonthFemaleChooseAsCoder: "Escolha como Programador do M\u00eas feminino",
