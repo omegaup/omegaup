@@ -482,6 +482,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 public: true,
                 showUserTags: $row['allow_user_add_tags']
             );
+            $problem['difficulty_histogram'] = is_null(
+                $problem['difficulty_histogram']
+            ) ? [] : $problem['difficulty_histogram'];
+            $problem['quality_histogram'] = is_null(
+                $problem['quality_histogram']
+            ) ? [] : $problem['quality_histogram'];
             $problems[] = $problem;
         }
         return [
