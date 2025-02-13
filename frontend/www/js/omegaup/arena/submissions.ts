@@ -28,6 +28,20 @@ export interface SubmissionRequest {
   isAdmin: boolean;
 }
 
+export interface StatusRequest {
+  run_alias: string;
+  username: string;
+  version?: string;
+  score?: number;
+}
+
+export enum Actions {
+  Judge = 'judge',
+  Rejudge = 'rejudge',
+  Requalify = 'requalify',
+  Disqualify = 'disqualify',
+}
+
 export function submitRun({
   classname,
   username,
@@ -57,7 +71,7 @@ export function submitRun({
     score: 0,
     language,
   };
-  updateRun({ run });
+  updateRun({ run, action: Actions.Judge });
 }
 
 export function submitRunFailed({
@@ -213,20 +227,53 @@ function displayRunDetails({
   };
 }
 
-export function updateRun({ run }: { run: types.Run }): void {
+export function updateRun({
+  run,
+  action,
+}: {
+  run: types.Run;
+  action: Actions;
+}): void {
   trackRun({ run });
 
   if (run.status != 'ready') {
-    updateRunFallback({ run });
+    updateRunFallback({ run, action });
     return;
   }
 }
 
-export function updateRunFallback({ run }: { run: types.Run }): void {
+export function updateRunFallback({
+  run,
+  action,
+}: {
+  run: types.Run;
+  action: Actions;
+}): void {
   setTimeout(() => {
-    api.Run.status({ run_alias: run.guid, username: run.username })
+    const request: StatusRequest = {
+      run_alias: run.guid,
+      username: run.username,
+    };
+    if (action === Actions.Rejudge) {
+      request.score = run.score;
+      request.version = run.version;
+    }
+    api.Run.status(request)
       .then(time.remoteTimeAdapter)
-      .then((response) => updateRun({ run: response }))
+      .then((response) => {
+        if (run.score != response.score && run.version == response.version) {
+          api.Run.alert({
+            run_alias: run.guid,
+            original_score: run.score,
+            current_score: response.score,
+            version: response.version,
+            level: 'warning',
+          })
+            .then()
+            .catch(ui.ignoreError);
+        }
+        updateRun({ run: response, action });
+      })
       .catch(ui.ignoreError);
   }, 5000);
 }

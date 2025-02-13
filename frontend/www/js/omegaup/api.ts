@@ -1618,6 +1618,9 @@ export const Reset = {
 };
 
 export const Run = {
+  alert: apiCall<messages.RunAlertRequest, messages.RunAlertResponse>(
+    '/api/run/alert/',
+  ),
   counts: apiCall<messages.RunCountsRequest, messages.RunCountsResponse>(
     '/api/run/counts/',
   ),

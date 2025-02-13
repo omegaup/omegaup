@@ -22,6 +22,7 @@ import {
 } from '../arena/clarifications';
 import clarificationStore from '../arena/clarificationsStore';
 import {
+  Actions,
   onRefreshRuns,
   onSetNominationStatus,
   showSubmission,
@@ -375,7 +376,7 @@ OmegaUp.on('ready', async () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Rejudge });
               })
               .catch(ui.ignoreError);
           },
@@ -383,7 +384,7 @@ OmegaUp.on('ready', async () => {
             api.Run.requalify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'normal';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Requalify });
               })
               .catch(ui.ignoreError);
           },
@@ -394,7 +395,7 @@ OmegaUp.on('ready', async () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback({ run });
+                updateRunFallback({ run, action: Actions.Disqualify });
               })
               .catch(ui.ignoreError);
           },
