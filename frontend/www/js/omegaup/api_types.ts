@@ -2920,6 +2920,7 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
@@ -3548,6 +3549,7 @@ export namespace types {
     is_admin: boolean;
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
+    mentor_can_choose_coder: boolean;
     user?: dao.Users;
     user_verification_deadline?: Date;
     valid: boolean;
