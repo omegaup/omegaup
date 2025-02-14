@@ -482,21 +482,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 public: true,
                 showUserTags: $row['allow_user_add_tags']
             );
-            $problem['difficulty_histogram'] = is_null(
-                $problem['difficulty_histogram']
-            ) ? [] : $problem['difficulty_histogram'];
-            if (
-                count(
-                    $problem['difficulty_histogram']
-                ) != 0 && count(
-                    $problem['difficulty_histogram']
-                ) != 5
-            ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    'difficulty_histogram'
-                );
-            }
             $difficultyHistogram = [];
             if (!is_null($problem['difficulty_histogram'])) {
                 /** @var list<int> */
@@ -525,6 +510,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 }
             }
             $problem['quality_histogram'] = $qualityHistogram;
+            $problems[] = $problem;
             $problems[] = $problem;
         }
         return [
