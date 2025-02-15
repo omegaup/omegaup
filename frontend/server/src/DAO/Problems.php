@@ -481,12 +481,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $problemObject,
                 public: true,
                 showUserTags: $row['allow_user_add_tags']
-            );
+            ); 
             $difficultyHistogram = [];
-            if (!is_null($problem['difficulty_histogram'])) {
+            if (!is_null($row['difficulty_histogram'])) {
                 /** @var list<int> */
                 $difficultyHistogram = json_decode(
-                    $problem['difficulty_histogram']
+                    $row['difficulty_histogram']
                 );
                 if (count($difficultyHistogram) !== 5) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -496,11 +496,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 }
             }
             $problem['difficulty_histogram'] = $difficultyHistogram;
+
             $qualityHistogram = [];
-            if (!is_null($problem['quality_histogram'])) {
+            if (!is_null($row['quality_histogram'])) {
                 /** @var list<int> */
                 $qualityHistogram = json_decode(
-                    $problem['quality_histogram']
+                    $row['quality_histogram']
                 );
                 if (count($qualityHistogram) !== 5) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -509,9 +510,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     );
                 }
             }
-            $problem['quality_histogram'] = $qualityHistogram;
+            $problem['quality_histogram'] = $qualityHistogram;            
             $problems[] = $problem;
-            $problems[] = $problem;
+
         }
         return [
             'problems' => $problems,
