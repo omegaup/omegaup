@@ -481,7 +481,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $problemObject,
                 public: true,
                 showUserTags: $row['allow_user_add_tags']
-            ); 
+            );
             $difficultyHistogram = [];
             if (!is_null($row['difficulty_histogram'])) {
                 /** @var list<int> */
@@ -510,9 +510,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     );
                 }
             }
-            $problem['quality_histogram'] = $qualityHistogram;            
+            $problem['quality_histogram'] = $qualityHistogram;
             $problems[] = $problem;
-
         }
         return [
             'problems' => $problems,
