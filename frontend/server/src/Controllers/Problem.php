@@ -3932,7 +3932,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param bool|null $only_karel
-     * @omegaup-request-param bool $only_quality_seal
+     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
