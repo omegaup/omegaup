@@ -3,14 +3,14 @@
     <ul class="nav nav-tabs justify-content-arround" role="tablist">
       <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
-          href="#"
+          :href="getTabName(tab)"
           class="nav-link"
           data-toggle="tab"
           role="tab"
           :aria-controls="tab.id"
-          :class="{ active: selectedTab === tab.id }"
-          :aria-selected="selectedTab === tab.id"
-          @click="selectedTab = tab.id"
+          :class="{ active: currentSelectedTab === tab.id }"
+          :aria-selected="currentSelectedTab === tab.id"
+          @click="getSelectedTab(tab)"
         >
           {{ tab.title }}
         </a>
@@ -25,7 +25,7 @@
     >
       <template #button-select-coder="{ coder }">
         <td
-          v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+          v-if="currentSelectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
           class="text-center align-middle"
         >
           <button
@@ -72,9 +72,10 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() coderIsSelected!: boolean;
   @Prop() isMentor!: boolean;
   @Prop() category!: string;
+  @Prop() selectedTab!: string;
 
   T = T;
-  selectedTab = 'codersOfTheMonth';
+  currentSelectedTab = this.selectedTab;
 
   get availableTabs(): { id: string; component: string; title: string }[] {
     const availableTabs = [
@@ -108,7 +109,7 @@ export default class CoderOfTheMonthList extends Vue {
   }
 
   get visibleCoders(): types.CoderOfTheMonthList[] {
-    switch (this.selectedTab) {
+    switch (this.currentSelectedTab) {
       case 'codersOfTheMonth':
       default:
         return this.codersOfCurrentMonth;
@@ -121,9 +122,18 @@ export default class CoderOfTheMonthList extends Vue {
 
   get currentTabComponent(): string {
     return (
-      this.availableTabs.find((tab) => tab.id === this.selectedTab)
+      this.availableTabs.find((tab) => tab.id === this.currentSelectedTab)
         ?.component ?? 'codersOfTheMonth'
     );
+  }
+
+  getSelectedTab(tab: { id: string; component: string; title: string }): void {
+    this.currentSelectedTab = tab.id;
+    window.location.hash = tab.id;
+  }
+
+  getTabName(tab: { id: string; component: string; title: string }): string {
+    return `#${tab.id}`;
   }
 }
 </script>

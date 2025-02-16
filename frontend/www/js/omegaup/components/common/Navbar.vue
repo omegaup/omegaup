@@ -359,17 +359,29 @@
         }}
       </div>
     </div>
-    <omegaup-user-objectives-questions
-      v-if="
-        fromLogin && isLoggedIn && isMainUserIdentity && userTypes.length === 0
-      "
-      @submit="(objectives) => $emit('update-user-objectives', objectives)"
-    ></omegaup-user-objectives-questions>
-    <omegaup-user-next-registered-contest
-      v-if="fromLogin && isLoggedIn && nextRegisteredContest !== null"
-      :next-registered-contest="nextRegisteredContest"
-      @redirect="(alias) => $emit('redirect-next-registered-contest', alias)"
-    ></omegaup-user-next-registered-contest>
+    <template v-if="fromLogin">
+      <omegaup-user-objectives-questions
+        v-if="isLoggedIn && isMainUserIdentity && userTypes.length === 0"
+        @submit="(objectives) => $emit('update-user-objectives', objectives)"
+      ></omegaup-user-objectives-questions>
+      <omegaup-user-next-registered-contest
+        v-if="isLoggedIn && nextRegisteredContest !== null"
+        :next-registered-contest="nextRegisteredContest"
+        @redirect="(alias) => $emit('redirect-next-registered-contest', alias)"
+      ></omegaup-user-next-registered-contest>
+      <div
+        v-if="mentorCanChooseCoder"
+        class="alert alert-info alert-dismissible fade show"
+        role="alert"
+      >
+        <button type="button" class="close" data-dismiss="alert">
+          &times;
+        </button>
+        <omegaup-markdown
+          :markdown="T.coderOfTheMonthCanBeChosenManually"
+        ></omegaup-markdown>
+      </div>
+    </template>
   </header>
 </template>
 
@@ -380,6 +392,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
+import omegaup_Markdown from '../Markdown.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
@@ -401,6 +414,7 @@ library.add(faSignOutAlt, faUser);
     'omegaup-user-objectives-questions': user_objectives_questions,
     'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Navbar extends Vue {
@@ -428,6 +442,7 @@ export default class Navbar extends Vue {
   @Prop() userTypes!: string[];
   @Prop() nextRegisteredContest!: types.ContestListItem | null;
   @Prop() isUnder13User!: boolean;
+  @Prop() mentorCanChooseCoder!: boolean;
   @Prop() userVerificationDeadline!: Date | null;
 
   T = T;
@@ -476,6 +491,10 @@ export default class Navbar extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+
+.alert-info {
+  margin: 1rem;
+}
 
 .navbar-color .navbar-toggler {
   color: var(--header-navbar-primary-link-color);
