@@ -2979,6 +2979,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    check_plagiarism: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
@@ -3023,6 +3024,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     archived: boolean;
+    check_plagiarism: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;

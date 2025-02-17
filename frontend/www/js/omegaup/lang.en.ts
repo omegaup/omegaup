@@ -391,6 +391,8 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyDesc: "Integer amount of minutes to penalize an incorrect submission.",
   contestNewFormPenaltyType: "Penalty type",
   contestNewFormPenaltyTypeDesc: "Indicates how the submission penalty is calculated: minutes since the beginning of the contest, minutes since the problem was opened, or program execution time (milliseconds).",
+  contestNewFormPlagiarismRequired: "Plagiarism Required",
+  contestNewFormPlagiarismRequiredDesc: "Check the box if your require Plagiarism for the contest",
   contestNewFormPointDecrementFactor: "Score Decrement Factor",
   contestNewFormPointDecrementFactorDesc: "A number between 0 and 1, inclusive. If the number is different from 0, the score awarded for a correct submission will decay as time passes, according to the following formula: (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), where PT is the penalty of the submission in minutes and TT the total length of the contest in minutes.",
   contestNewFormScheduleContest: "Schedule contest",
