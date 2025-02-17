@@ -4859,6 +4859,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
+        if (\OmegaUp\Authorization::isUnderThirteenUser($r->user)) {
+            $onlyQualitySeal = true;
+        }
 
         [
             'sortOrder' => $sortOrder,
