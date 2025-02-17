@@ -166,9 +166,6 @@ export default class Profile extends Vue {
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
 
-  mounted() {
-      console.log("(((((((170)))))))))))",this.isAdmin)
-  }
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {

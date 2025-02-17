@@ -57,7 +57,6 @@ OmegaUp.on('ready', () => {
       };
     },
     mounted() {
-      console.log("(((((((60)))))))))))",this.isAdmin)
       if (this.selectedTab === 'manage-files') {
         this.fetchFiles();
       }

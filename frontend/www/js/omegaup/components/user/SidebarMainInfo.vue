@@ -132,10 +132,6 @@ export default class UserSidebarMainInfo extends Vue {
     this.currentUrlMapping,
   );
 
-  mounted() {
-      console.log("(((((((137)))))))))))",this.isAdmin)
-  }
-
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));

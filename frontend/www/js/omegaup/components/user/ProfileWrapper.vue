@@ -45,10 +45,6 @@ export default class ProfileWrapper extends Vue {
 
   currentSelectedTab = this.selectedTab;
 
-  mounted() {
-      console.log("(((((((49)))))))))))",this.isAdmin)
-  }
-
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);

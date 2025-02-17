@@ -2098,7 +2098,7 @@ export const File = {
       const formData = new FormData();
       formData.append('file', params.file);
 
-      fetch('/api/admin/UploadFile/', {
+      fetch('/api/admin/uploadFile/', {
         method: 'POST',
         body: formData,
       })
@@ -2116,7 +2116,7 @@ export const File = {
     });
   },
   download(params: { filename: string }) {
-    return fetch(`/api/admin/DownloadFile/?filename=${encodeURIComponent(params.filename)}`, {
+    return fetch(`/api/admin/downloadFile/?filename=${encodeURIComponent(params.filename)}`, {
       method: 'GET',
       credentials: 'include',
     }).then((response) => {
@@ -2132,9 +2132,9 @@ export const File = {
   list: apiCall<
     messages.FileListRequest,
     messages.FileListResponse
-  >('/api/admin/ListFiles/'),
+  >('/api/admin/listFiles/'),
   delete: apiCall<
     messages.FileDeleteRequest,
     messages.FileDeleteResponse
-  >('/api/admin/DeleteFile/'),
+  >('/api/admin/deleteFile/'),
 };
