@@ -4859,6 +4859,7 @@ export namespace types {
     identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
+    isAdmin?: boolean;
   }
 
   export interface UserProfileInfo {

@@ -5,6 +5,7 @@
       :data="data"
       :selected-tab.sync="currentSelectedTab"
       :has-password="hasPassword"
+      :is-admin="isAdmin"
     >
       <template #message>
         <h1 v-if="!profile.is_own_profile && profile.is_private">
@@ -89,11 +90,11 @@
         </template>
         <template v-else-if="currentSelectedTab === 'manage-files'">
           <omegaup-user-manage-files
-            @add-file="(file) => $emit('add-file', file)"
-            @delete-file="(filename) => $emit('delete-file', filename)"
-            @fetch-files="$emit('fetch-files')"
-            @download-file="(filename) => $emit('download-file', filename)"
-            :files="files"
+          @add-file="(file) => $emit('add-file', file)"
+          @delete-file="(filename) => $emit('delete-file', filename)"
+          @fetch-files="$emit('fetch-files')"
+          @download-file="(filename) => $emit('download-file', filename)"
+          :files="files"
           ></omegaup-user-manage-files>
         </template>
         <div v-else>
@@ -121,7 +122,6 @@ import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 import user_ManageFiles from './ManageFiles.vue'
-import { file } from 'jszip';
 
 
 interface FileItem {
@@ -158,11 +158,17 @@ export default class Profile extends Vue {
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop() files!: FileItem[];
+  @Prop() isAdmin!: boolean;
+
 
   T = T;
   ui = ui;
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
+
+  mounted() {
+      console.log("(((((((170)))))))))))",this.isAdmin)
+  }
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {

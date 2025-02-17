@@ -126,9 +126,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
         
-        self::$log->error(
-            "This is the root directory (((((((((((((()))))))))))))))))))))))))): {$uploadDir}"
-        );
 
         if (!is_dir($uploadDir)) {
             return ['files' => []];

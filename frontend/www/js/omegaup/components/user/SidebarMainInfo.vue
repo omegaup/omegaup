@@ -123,6 +123,7 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() selectedTab!: string;
   @Prop() hasPassword!: boolean;
+  @Prop() isAdmin!: boolean;
 
   T = T;
   urlMapping = urlMapping;
@@ -130,6 +131,10 @@ export default class UserSidebarMainInfo extends Vue {
     this.selectedTab,
     this.currentUrlMapping,
   );
+
+  mounted() {
+      console.log("(((((((137)))))))))))",this.isAdmin)
+  }
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
@@ -153,10 +158,6 @@ export default class UserSidebarMainInfo extends Vue {
     }
   }
 
-  get isAdmin(): boolean {
-    // return this.profile?.is_admin ?? false;
-    return true;
-  }
 
   get currentUrlMapping(): {
     key: string;

@@ -53,9 +53,11 @@ OmegaUp.on('ready', () => {
         selectedTab,
         searchResultSchools: searchResultSchools,
         files: [] as types.FileItem[],
+        isAdmin: payload.isAdmin
       };
     },
     mounted() {
+      console.log("(((((((60)))))))))))",this.isAdmin)
       if (this.selectedTab === 'manage-files') {
         this.fetchFiles();
       }
@@ -86,6 +88,7 @@ OmegaUp.on('ready', () => {
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
           files: this.files,
+          isAdmin: this.isAdmin
         },
         on: {
           'update-user-basic-information': (
