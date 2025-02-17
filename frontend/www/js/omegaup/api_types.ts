@@ -105,6 +105,13 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
+  export interface FileItem {
+    fileId: string;
+    fileName: string;
+    fileSize: number;
+    uploadedAt: string;
+  }
+  
   export namespace payloadParsers {
     export function ActivityFeedPayload(
       elementId: string = 'payload',
@@ -5873,6 +5880,48 @@ export namespace messages {
   };
   export type UserVerifyEmailRequest = { [key: string]: any };
   export type UserVerifyEmailResponse = {};
+
+  export type FileUploadRequest = {
+    file: File;
+    metadata?: { [key: string]: any };
+  };
+  export type FileUploadResponse = {
+    success: boolean;
+    fileId: string;
+    message?: string;
+  };
+
+  export type FileDownloadRequest = {
+    fileId: string;
+  };
+  export type FileDownloadResponse = {
+    success: boolean;
+    fileContent: Blob;
+    fileName: string;
+    message?: string;
+  };
+
+  export type FileListRequest = {
+    directory?: string;
+  };
+  export type FileListResponse = {
+    success: boolean;
+    files: {
+      fileId: string;
+      fileName: string;
+      fileSize: number;
+      uploadedAt: string;
+    }[];
+    message?: string;
+  };
+
+  export type FileDeleteRequest = {
+    filename: string;
+  };
+  export type FileDeleteResponse = {
+    success: boolean;
+    message: string;
+  };
 }
 
 // Controller interfaces

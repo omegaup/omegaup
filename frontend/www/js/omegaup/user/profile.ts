@@ -52,7 +52,18 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
+        files: [] as types.FileItem[],
       };
+    },
+    mounted() {
+      if (this.selectedTab === 'manage-files') {
+        this.fetchFiles();
+      }
+    },
+    methods: {
+      fetchFiles,
+      addFile,
+      deleteFile,
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -73,6 +84,7 @@ OmegaUp.on('ready', () => {
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
+          files: this.files,
         },
         on: {
           'update-user-basic-information': (
@@ -236,6 +248,15 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'fetch-files': () => {
+            this.fetchFiles();
+          },
+          'add-file': (file: File) => {
+            this.addFile(file);
+          },
+          'delete-file': (fileId: string) => {
+            this.deleteFile(fileId);
+          },
         },
       });
     },
@@ -252,6 +273,32 @@ OmegaUp.on('ready', () => {
     api.User.listAPITokens({})
       .then((data) => {
         userProfile.apiTokens = data.tokens;
+      })
+      .catch(ui.apiError);
+  }
+
+  function fetchFiles() {
+    api.File.list()
+      .then(({ files }) => {
+        userProfile.files = files;
+      })
+      .catch(ui.apiError);
+  }
+  
+  function addFile(file: File) {
+    api.File.upload({ file })
+      .then(() => {
+        ui.success(T.fileUploadSuccess);
+        fetchFiles();
+      })
+      .catch(ui.apiError);
+  }  
+  
+  function deleteFile(filename: string) {
+    api.File.delete({ filename })
+      .then(() => {
+        ui.success(T.fileDeleteSuccess);
+        fetchFiles();
       })
       .catch(ui.apiError);
   }

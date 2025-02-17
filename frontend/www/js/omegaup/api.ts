@@ -2089,3 +2089,42 @@ export const User = {
     messages.UserVerifyEmailResponse
   >('/api/user/verifyEmail/'),
 };
+
+
+
+export const File = {
+  upload(params: { file: File }) {
+    return new Promise((accept, reject) => {
+      const formData = new FormData();
+      formData.append('file', params.file);
+
+      fetch('/api/admin/UploadFile/', {
+        method: 'POST',
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status !== 'ok') {
+            reject(data);
+          } else {
+            accept(data);
+          }
+        })
+        .catch((err) => {
+          reject({ status: 'error', error: err });
+        });
+    });
+  },
+  download: apiCall<
+    messages.FileDownloadRequest,
+    messages.FileDownloadResponse
+  >('/api/admin/DownloadFile/'),
+  list: apiCall<
+    messages.FileListRequest,
+    messages.FileListResponse
+  >('/api/admin/ListFiles/'),
+  delete: apiCall<
+    messages.FileDeleteRequest,
+    messages.FileDeleteResponse
+  >('/api/admin/DeleteFile/'),
+};

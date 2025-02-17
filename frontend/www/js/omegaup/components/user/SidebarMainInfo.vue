@@ -109,6 +109,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
+  { key: 'manage-files', title: 'Manage Public Files', visible: false }, // New tab
 ];
 
 @Component({
@@ -134,6 +135,7 @@ export default class UserSidebarMainInfo extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
+
   get rank(): string {
     switch (this.profile.classname) {
       case 'user-rank-beginner':
@@ -151,31 +153,46 @@ export default class UserSidebarMainInfo extends Vue {
     }
   }
 
+  get isAdmin(): boolean {
+    // return this.profile?.is_admin ?? false;
+    return true;
+  }
+
   get currentUrlMapping(): {
     key: string;
     title: string;
     visible: boolean;
   }[] {
-    if (!this.profile.is_own_profile) {
-      return [];
+    const urlMappingsCopy = [...urlMapping];
+
+    const manageFilesTabIndex = urlMappingsCopy.findIndex(
+      (url) => url.key === 'manage-files',
+    );
+
+    if (manageFilesTabIndex >= 0) {
+      urlMappingsCopy[manageFilesTabIndex].visible = this.isAdmin;
     }
-    const changePasswordRowIndex = urlMapping.findIndex(
+
+    const changePasswordRowIndex = urlMappingsCopy.findIndex(
       (url) => url.key === 'change-password',
     );
-    const addPasswordRowIndex = urlMapping.findIndex(
+    const addPasswordRowIndex = urlMappingsCopy.findIndex(
       (url) => url.key === 'add-password',
     );
+
     if (!changePasswordRowIndex || !addPasswordRowIndex) {
-      return urlMapping;
+      return urlMappingsCopy;
     }
+
     if (this.hasPassword) {
-      urlMapping[changePasswordRowIndex].visible = true;
-      urlMapping[addPasswordRowIndex].visible = false;
-      return urlMapping;
+      urlMappingsCopy[changePasswordRowIndex].visible = true;
+      urlMappingsCopy[addPasswordRowIndex].visible = false;
+      return urlMappingsCopy;
     }
-    urlMapping[addPasswordRowIndex].visible = true;
-    urlMapping[changePasswordRowIndex].visible = false;
-    return urlMapping;
+
+    urlMappingsCopy[addPasswordRowIndex].visible = true;
+    urlMappingsCopy[changePasswordRowIndex].visible = false;
+    return urlMappingsCopy;
   }
 
   getSelectedValidTab(

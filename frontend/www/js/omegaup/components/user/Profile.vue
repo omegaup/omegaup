@@ -87,6 +87,14 @@
             @request-delete-account="$emit('request-delete-account')"
           ></omegaup-user-delete-account>
         </template>
+        <template v-else-if="currentSelectedTab === 'manage-files'">
+          <omegaup-user-manage-files
+            @add-file="(file) => $emit('add-file', file)"
+            @delete-file="(fileId) => $emit('delete-file', fileId)"
+            @fetch-files="$emit('fetch-files')"
+            :files="files"
+          ></omegaup-user-manage-files>
+        </template>
         <div v-else>
           {{ currentSelectedTab }}
         </div>
@@ -111,6 +119,13 @@ import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
+import user_ManageFiles from './ManageFiles.vue'
+
+
+interface FileItem {
+  id: number;
+  name: string;
+}
 
 @Component({
   components: {
@@ -124,6 +139,7 @@ import userDeleteAccount from './DeleteAccount.vue';
     'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
     'omegaup-user-delete-account': userDeleteAccount,
+    'omegaup-user-manage-files': user_ManageFiles
   },
 })
 export default class Profile extends Vue {
@@ -139,6 +155,7 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop() files!: FileItem[];
 
   T = T;
   ui = ui;
