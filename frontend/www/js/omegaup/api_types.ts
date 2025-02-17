@@ -5892,7 +5892,7 @@ export namespace messages {
   };
 
   export type FileDownloadRequest = {
-    fileId: string;
+    filename: string;
   };
   export type FileDownloadResponse = {
     success: boolean;

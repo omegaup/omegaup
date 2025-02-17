@@ -90,8 +90,9 @@
         <template v-else-if="currentSelectedTab === 'manage-files'">
           <omegaup-user-manage-files
             @add-file="(file) => $emit('add-file', file)"
-            @delete-file="(fileId) => $emit('delete-file', fileId)"
+            @delete-file="(filename) => $emit('delete-file', filename)"
             @fetch-files="$emit('fetch-files')"
+            @download-file="(filename) => $emit('download-file', filename)"
             :files="files"
           ></omegaup-user-manage-files>
         </template>
@@ -120,6 +121,7 @@ import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 import user_ManageFiles from './ManageFiles.vue'
+import { file } from 'jszip';
 
 
 interface FileItem {

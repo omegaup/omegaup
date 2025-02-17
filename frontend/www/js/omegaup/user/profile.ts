@@ -64,6 +64,7 @@ OmegaUp.on('ready', () => {
       fetchFiles,
       addFile,
       deleteFile,
+      downloadFile
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -257,6 +258,9 @@ OmegaUp.on('ready', () => {
           'delete-file': (fileId: string) => {
             this.deleteFile(fileId);
           },
+          'download-file': (fileName: string) => {
+            this.downloadFile(fileName);
+          },
         },
       });
     },
@@ -302,4 +306,21 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
+
+  function downloadFile(filename: string) {
+    api.File.download({ filename })
+      .then((response) => {
+        const blob = new Blob([response.fileContent]); // Convert response to Blob
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', response.fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(ui.apiError);
+  }
+  
 });

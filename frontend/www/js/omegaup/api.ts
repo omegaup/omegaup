@@ -2115,10 +2115,20 @@ export const File = {
         });
     });
   },
-  download: apiCall<
-    messages.FileDownloadRequest,
-    messages.FileDownloadResponse
-  >('/api/admin/DownloadFile/'),
+  download(params: { filename: string }) {
+    return fetch(`/api/admin/DownloadFile/?filename=${encodeURIComponent(params.filename)}`, {
+      method: 'GET',
+      credentials: 'include',
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('File download failed');
+      }
+      return response.blob().then((blob) => ({
+        fileContent: blob,
+        fileName: params.filename,
+      }));
+    });
+  },
   list: apiCall<
     messages.FileListRequest,
     messages.FileListResponse

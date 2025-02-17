@@ -15,7 +15,7 @@
         />
       </div>
       <button type="submit" class="btn btn-primary mr-2" :disabled="!selectedFile">
-        {{ T.wordsUpload }} here
+        {{ T.wordsUpload }}
       </button>
     </form>
 
@@ -25,9 +25,15 @@
       <ul class="list-group">
         <li v-for="(file, index) in files" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
           <span>{{ file }}</span>
-          <button class="btn btn-danger btn-sm" @click="onDeleteFile(file)">
-            {{ T.wordsDelete }}
-          </button>
+          <div>
+            <button class="btn btn-success btn-sm mr-2" @click="onDownloadFile(file)">
+              {{ T.wordsDownload }}
+            </button>
+
+            <button class="btn btn-danger btn-sm" @click="onDeleteFile(file)">
+              {{ T.wordsDelete }}
+            </button>
+          </div>
         </li>
       </ul>
     </div>
@@ -43,15 +49,12 @@ import T from '../../lang';
 
 @Component
 export default class ManageFiles extends Vue {
-  // Declare the type for 'files' as an array of strings (file names)
   @Prop({ type: Array, required: true }) files!: string[];
 
   T = T;
   selectedFile: File | null = null;
 
-  // Called when the component is mounted to the DOM
   mounted() {
-    // Trigger the fetch-files event when the component is rendered
     this.$emit('fetch-files');
   }
 
@@ -63,28 +66,25 @@ export default class ManageFiles extends Vue {
   onUploadFile() {
     if (!this.selectedFile) return;
 
-    // Add file to the list (file name as a string)
     const fileName = this.selectedFile.name;
-
-    // Emit event to handle file upload on the backend
     this.$emit('add-file', this.selectedFile);
-
-    // Add file name to the list
     this.files.push(fileName);
     this.selectedFile = null;
     (this.$refs.fileInput as HTMLInputElement).value = '';
   }
 
   onDeleteFile(fileName: string) {
-    // Emit event to handle file deletion on the backend
     this.$emit('delete-file', fileName);
-
-    // Remove file from the list locally
     this.files = this.files.filter((file) => file !== fileName);
   }
-}
 
+  onDownloadFile(filename: string) {
+    this.$emit('download-file', filename);
+  }
+
+}
 </script>
+
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';

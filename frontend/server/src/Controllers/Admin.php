@@ -3,8 +3,13 @@
 namespace OmegaUp\Controllers;
 
 class Admin extends \OmegaUp\Controllers\Controller {
-    /**
+     /**
      * Get stats for an overall platform report.
+     *
+     * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
+     *
+     * @omegaup-request-param int|null $end_time
+     * @omegaup-request-param int|null $start_time
      */
     public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -29,6 +34,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
         return [
             'report' => [
                 'activeUsers' => array_merge(...array_map(
+                    /**
+                     * @param array{gender: string, users: int} $row
+                     * @return array<string, int>
+                     */
                     fn (array $row) => [$row['gender'] => $row['users']],
                     \OmegaUp\DAO\Identities::countActiveUsersByGender(
                         $startTime,
@@ -78,7 +87,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        
+
 
         if (empty($_FILES['file'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('missingFile');
@@ -159,16 +168,17 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-
+    
         \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
-
+    
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
         $filePath = $uploadDir . basename($r['filename']);
-
+    
         if (!file_exists($filePath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
         }
-
+    
+        // Send headers for file download
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
@@ -176,7 +186,11 @@ class Admin extends \OmegaUp\Controllers\Controller {
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Content-Length: ' . filesize($filePath));
+        
+        // Flush output buffer and read the file
+        flush();
         readfile($filePath);
         exit;
     }
+    
 }
