@@ -88,6 +88,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
         $targetPath = $uploadDir . basename($file['name']);
 
+        // Check if file with the same name already exists
+        if (file_exists($targetPath)) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('fileAlreadyExists');
+        }    
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
             throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('failedToCreateDirectory');
         }
