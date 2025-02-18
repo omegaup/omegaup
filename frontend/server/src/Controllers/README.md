@@ -1355,7 +1355,7 @@ Search users in contest
 ### Description
 
 Given a contest_alias, sets the recommended flag on/off.
-Only omegaUp admins can call this API.
+Only omegaUp admins and support team members can call this API.
 
 ### Parameters
 
