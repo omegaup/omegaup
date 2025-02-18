@@ -331,6 +331,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 }
             }
         }
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
 
         $today = date('Y-m-01', \OmegaUp\Time::get());
@@ -1686,6 +1687,424 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     "Failed in the iteration for the day {$runCreationDate}, user {$candidate['username']}"
                 );
             }
+        }
+    }
+
+    /**
+     * Test the API behavior when problem admins resolve their own problems
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testProblemAdminsResolvingOwnProblems(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a submissions' mapping for different users solving problems
+        // Some users are the admins of the problems they solve
+        // The test will cover four scenarios:
+        // 1. A user solves problems they created
+        // 2. A user solves problems which the admin add them as an admin
+        // 3. A user solves problems which the admin add the group admin where
+        //    the user is a member
+        // 4. A user solves sproblem which they aren't the admin
+        $submissionsMapping = [
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 1],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 1],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 1],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 0],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 1],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+            [
+                ['username' => 'user_admin_creator',       'run' => 0],
+                ['username' => 'user_admin_invited',       'run' => 1],
+                ['username' => 'user_group_admin_invited', 'run' => 0],
+                ['username' => 'user_non_admin',           'run' => 0],
+            ],
+        ];
+
+        $identities = [];
+        foreach ($submissionsMapping[0] as $indexUser => $submissionsUser) {
+            [
+                'identity' => $identities[$indexUser],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $submissionsUser['username']]
+                )
+            );
+            self::updateIdentity($identities[$indexUser], $gender);
+        }
+
+        // user_admin_creator creates 5 problems and invites user_admin_invited
+        // and user_group_admin_invited is a member of the group where
+        // user_admin_creator add as group admin
+        $problems = [];
+
+        $login = self::login($identities[0]);
+
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $identities[0],
+            name: 'prblem_admin_group_name',
+            description: 'problem admin group_description',
+            alias: 'problem_admin_group_alias',
+            login: $login
+        );
+        \OmegaUp\Controllers\Group::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'usernameOrEmail' => $identities[2]->username,
+            'group_alias' => $group['group']->alias
+        ]));
+
+        foreach ($submissionsMapping as $indexProblem => $submissionsProblem) {
+            $login = self::login($identities[0]);
+            $problems[$indexProblem] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identities[0],
+                $login
+            );
+
+            \OmegaUp\Test\Factories\Problem::addAdminUser(
+                $problems[$indexProblem],
+                $identities[1]
+            );
+
+            \OmegaUp\Test\Factories\Problem::addGroupAdmin(
+                $problems[$indexProblem],
+                $group['group']
+            );
+        }
+
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+        foreach ($submissionsMapping as $indexProblem => $submissionsProblem) {
+            foreach ($submissionsProblem as $indexUser => $submissionsUser) {
+                if ($submissionsUser['run'] == 0) {
+                    continue;
+                }
+                \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                    $identities[$indexUser],
+                    $problems[$indexProblem],
+                    $runCreationDate
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $coderOfTheMonth = $this->getCoderOfTheMonth(
+            $runCreationDate,
+            '1 month',
+            $category
+        )['coderinfo'];
+
+        $this->assertSame(
+            $identities[3]->username,
+            $coderOfTheMonth['username']
+        );
+    }
+
+    /**
+     * Test the API behavior when there is more than one candidate for Coder of
+     * the Month during the first days of the latest three months when the
+     * verdict is different
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCodersOfTheMonthWithSubmissionsInDifferentMonthsAndVerdicts(
+        string $category
+    ) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        // Create a submissions mapping for different users, months, verdicts
+        // and problems.
+        $usernames = ['user_01', 'user_02', 'user_03', 'user_04', 'user_05', 'user_06'];
+        $problems = ['problem_0', 'problem_1', 'problem_2', 'problem_3', 'problem_4'];
+        $submissionsMapping = [
+            0 => [
+                'problem_0' => [ // 63 [3,5]
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_1' => [ // 63 [4,5]
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_2' => [ // 63 [4,5]
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_3' => [ // 63 [2,5]
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_4' => [ // 50 [1,4,6]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 50
+                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.1], // 63
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 63
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 176
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3], // 252
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 50
+                ],
+            ],
+            1 => [
+                'problem_0' => [ // 43 [1,2,3,5]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_1' => [ // 50 [1,4,5]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
+                ],
+                'problem_2' => [ // 50 [2,4,5]
+                    ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.2],
+                ],
+                'problem_3' => [ // 43 [1,2,4,5]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.2],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_4' => [ // 43 [1,4,5,6]
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 136
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0], // 93
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 0
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 43
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0], // 43
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 0.0], // 0
+                ],
+            ],
+            2 => [
+                'problem_0' => [ // 39 [1,2,3,4,5]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_1' => [ // 36 [1,2,3,4,5,6]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5],
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0],
+                ],
+                'problem_2' => [ // 39 [1,2,3,4,5]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.3],
+                ],
+                'problem_3' => [ // 39 [1,2,3,4,5]
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0],
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
+                    ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
+                ],
+                'problem_4' => [ // 39 [1,2,4,5,6]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 78
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 75
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 114
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5], // 39
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0], // 0
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 36
+                ],
+            ],
+        ];
+        $expectedWinners = [
+            0 => [
+                ['username' => 'user_05', 'score' => 252.0],
+                ['username' => 'user_04', 'score' => 176.0],
+                ['username' => 'user_03', 'score' => 63.0],
+                ['username' => 'user_02', 'score' => 63.0],
+                ['username' => 'user_01', 'score' => 50.0],
+                //['username' => 'user_06', 'score' => 50.0],
+                // user_6 shouldn't be considered because only 5 users are set
+                // to be displayed
+            ],
+            1 => [
+                ['username' => 'user_01', 'score' => 136.0],
+                ['username' => 'user_02', 'score' => 93.0],
+                ['username' => 'user_04', 'score' => 43.0],
+                ['username' => 'user_06', 'score' => 0.0],
+                // user_05 is not considered because they have already won the
+                // CoTM prize
+                // user_03 is not considered because they don't have any AC run
+                // in the current month
+                // user_06 appears on the coders list because they have solved 1
+                // problem, but it was solved in the previous month
+            ],
+            2 => [
+                ['username' => 'user_03', 'score' => 114.0],
+                ['username' => 'user_02', 'score' => 75.0],
+                ['username' => 'user_04', 'score' => 39.0],
+                ['username' => 'user_06', 'score' => 36.0],
+                // user_01 and user_05 are not considered because they have
+                // already won the CoTM prize
+            ],
+        ];
+
+        // Create 3 users and their identities
+        $identities = [];
+        foreach ($usernames as $username) {
+            [
+                'identity' => $identities[$username],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => $username]
+                )
+            );
+            self::updateIdentity($identities[$username], $gender);
+        }
+
+        // Create the problems
+        $problemData = [];
+        foreach ($problems as $problemAlias) {
+            $problemData[
+                $problemAlias
+            ] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    'alias' => $problemAlias,
+                ])
+            );
+        }
+
+        $originalTime = \OmegaUp\Time::get();
+        // Create the runs by month
+        foreach ($submissionsMapping as $month => $problemsRuns) {
+            switch ($month) {
+                case 0:
+                    $runCreationDate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 3
+                    );
+                    $dateToCalculate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 2
+                    );
+                    break;
+                case 1:
+                    $runCreationDate = self::setFirstDayOfCustomMonths(
+                        monthsLeft: 2
+                    );
+                    $dateToCalculate = self::setFirstDayOfTheLastMonth();
+                    break;
+                case 2:
+                    $runCreationDate = self::setFirstDayOfTheLastMonth();
+                    $dateToCalculate = self::setFirstDayOfTheCurrentMonth();
+                    break;
+            }
+            foreach ($problemsRuns as $problemAlias => $submissionsProblem) {
+                foreach ($submissionsProblem as $runInfo) {
+                    [
+                        'username' => $username,
+                        'verdict' => $verdict,
+                        'points' => $points,
+                    ] = $runInfo;
+                    if (is_null($points)) {
+                        continue;
+                    }
+                    \OmegaUp\Test\Factories\Run::createRunForSpecificProblem(
+                        $identities[$username],
+                        $problemData[$problemAlias],
+                        $runCreationDate,
+                        $points,
+                        $verdict
+                    );
+                }
+            }
+
+            // Update the rankings
+            \OmegaUp\Test\Utils::runUpdateRanks(
+                $runCreationDate,
+                codersListCount: 5
+            );
+
+            // Getting the coder of the month regarding the date
+            \OmegaUp\Time::setTimeForTesting(
+                strtotime($dateToCalculate) + (60 * 60 * 24)
+            );
+            $coder = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+                new \OmegaUp\Request([
+                    'category' => $category,
+                ])
+            )['coderinfo'];
+            $this->assertSame(
+                $coder['username'],
+                $expectedWinners[$month][0]['username']
+            );
+            $codersList = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+                new \OmegaUp\Request([
+                    'date' => $dateToCalculate,
+                    'category' => $category,
+                ])
+            )['coders'];
+
+            $this->assertSameSize(
+                $expectedWinners[$month],
+                $codersList,
+                "Failed on month {$month}"
+            );
+            foreach ($expectedWinners[$month] as $index => $expectedWinner) {
+                $this->assertSame(
+                    $expectedWinner['username'],
+                    $codersList[$index]['username'],
+                    "Failed the order of codersList on month {$month}"
+                );
+                $this->assertSame(
+                    $expectedWinner['score'],
+                    $codersList[$index]['score'],
+                    "Failed the score on month {$month}"
+                );
+            }
+            \OmegaUp\Time::setTimeForTesting($originalTime);
         }
     }
 
