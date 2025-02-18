@@ -243,6 +243,7 @@
 	"clarificationsRangeHeader": "Clarifications (from %(lowCount) to %(highCount))",
 	"coderOfTheMonth": "Coder of the Month Overall",
 	"coderOfTheMonthAlreadySelected": "Coder of the month has been previously selected",
+	"coderOfTheMonthCanBeChosenManually": "Remember that you can choose the winners of Coder of the Month for both categories in the [Coder of the Month](https://omegaup.com/coderofthemonth/) section and the [Coder of the Month for women](https://omegaup.com/coderofthemonth/female/) section.",
 	"coderOfTheMonthChooseAsCoder": "Choose as coder of the month",
 	"coderOfTheMonthFemale": "Coder of the Month for Her",
 	"coderOfTheMonthFemaleChooseAsCoder": "Choose as female coder of the month",
