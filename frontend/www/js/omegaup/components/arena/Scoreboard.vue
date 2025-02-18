@@ -117,6 +117,28 @@
         </tbody>
       </table>
     </div>
+    <div class="table-responsive mt-4">
+      <table class="table">
+        <thead>
+          <tr>
+           <th>Submission ID</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="submission in submissions" :key="submission.id">
+            <td>{{ submission.id }}</td>
+            <td>
+              <span :title="getVerdictTooltip(submission.verdict)">
+                {{ submission.verdict }}
+              </span>
+            </td>
+            <td>{{ submission.details }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="footer">
       {{ lastUpdatedString }}
     </div>
@@ -163,6 +185,13 @@ export default class ArenaScoreboard extends Vue {
     !this.showAllContestants && this.showInvitedUsersFilter;
   nameDisplayOptions: ui.NameDisplayOptions =
     ui.NameDisplayOptions.NameAndUsername;
+
+  submissions = [
+    { id: 12345, verdict: 'verdictTLE', details: 'Time limit exceeded' },
+    { id: 12346, verdict: 'verdictWA', details: 'Wrong answer on test case 3' },
+    { id: 12347, verdict: 'verdictRE', details: 'Runtime error in submission' },
+    // More submissions can be added here.
+  ];
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;
@@ -226,6 +255,24 @@ export default class ArenaScoreboard extends Vue {
     if (!this.showInvitedUsersFilter) return true;
     return userIsInvited || !this.onlyShowExplicitlyInvited;
   }
+getVerdictTooltip(verdict: string): string {
+    const tooltips = {
+      verdictJE: this.$t('verdictJE_tooltip'),
+      verdictML: this.$t('verdictML_tooltip'),
+      verdictMLE: this.$t('verdictMLE_tooltip'),
+      verdictOL: this.$t('verdictOL_tooltip'),
+      verdictOLE: this.$t('verdictOLE_tooltip'),
+      verdictPA: this.$t('verdictPA_tooltip'),
+      verdictRE: this.$t('verdictRE_tooltip'),
+      verdictRFE: this.$t('verdictRFE_tooltip'),
+      verdictRTE: this.$t('verdictRTE_tooltip'),
+      verdictTLE: this.$t('verdictTLE_tooltip'),
+      verdictTO: this.$t('verdictTO_tooltip'),
+      verdictVE: this.$t('verdictVE_tooltip'),
+      verdictWA: this.$t('verdictWA_tooltip'),
+    };
+    return tooltips[verdict] || 'No description available.';  
+}
 }
 </script>
 
@@ -276,7 +323,22 @@ export default class ArenaScoreboard extends Vue {
     overflow-wrap: break-word;
     max-width: 200px;
   }
+verdictTLE {
+  color: #f44336; 
+}
 
+.verdictWA {
+  color: #ff9800; 
+}
+
+.verdictRE {
+  color: #2196f3; 
+}
+span[title] {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted;
+}
   .accepted {
     background: var(--arena-scoreboard-accepted-background-color);
   }
