@@ -3676,7 +3676,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 'privacyStatementNotFound'
             );
         }
-        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $omegaupRoot = strval(OMEGAUP_ROOT);
         return [
             'templateProperties' => [
@@ -4944,6 +4943,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: UserDocumentPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $file
      */
     public static function getMarkdownViewerForTypeScript(\OmegaUp\Request $r) {
         $filename = $r->ensureString('file');
@@ -4974,8 +4975,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, templateProperties: array{payload: UserDocsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getDocsForTypeScript(\OmegaUp\Request $r) {
-        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $dir = strval(OMEGAUP_ROOT);
+        /** @var list<string> */
         $files = array_diff(scandir("{$dir}/www/docs/"), ['.', '..']);
 
         $docs = [
