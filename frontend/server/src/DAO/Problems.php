@@ -470,7 +470,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int, quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, submissions: int, problem_id: int} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, accepted: int, visibility: int, quality_histogram: null|list<int>, difficulty_histogram: null|list<int>, quality_seal: bool, submissions: int, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
@@ -482,6 +482,35 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 public: true,
                 showUserTags: $row['allow_user_add_tags']
             );
+            $difficultyHistogram = [];
+            if (!is_null($row['difficulty_histogram'])) {
+                /** @var list<int> */
+                $difficultyHistogram = json_decode(
+                    $row['difficulty_histogram']
+                );
+                if (count($difficultyHistogram) !== 5) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'difficulty_histogram'
+                    );
+                }
+            }
+            $problem['difficulty_histogram'] = $difficultyHistogram;
+
+            $qualityHistogram = [];
+            if (!is_null($row['quality_histogram'])) {
+                /** @var list<int> */
+                $qualityHistogram = json_decode(
+                    $row['quality_histogram']
+                );
+                if (count($qualityHistogram) !== 5) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'quality_histogram'
+                    );
+                }
+            }
+            $problem['quality_histogram'] = $qualityHistogram;
             $problems[] = $problem;
         }
         return [

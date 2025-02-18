@@ -5926,7 +5926,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Given a contest_alias, sets the recommended flag on/off.
-     * Only omegaUp admins can call this API.
+     * Only omegaUp admins and support team members can call this API.
      *
      * @return array{status: string}
      *
@@ -5936,7 +5936,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiSetRecommended(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
