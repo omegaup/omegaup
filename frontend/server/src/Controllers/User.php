@@ -50,9 +50,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
- * @psalm-type UserDocument=array{name: string, url: string}
- * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
- * @psalm-type UserDocumentPayload=array{content: string, filename: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3676,6 +3673,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'privacyStatementNotFound'
             );
         }
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
         $omegaupRoot = strval(OMEGAUP_ROOT);
         return [
             'templateProperties' => [
@@ -4939,83 +4937,6 @@ class User extends \OmegaUp\Controllers\Controller {
             self::$log->error($e);
             return $response;
         }
-    }
-
-    /**
-     * @return array{entrypoint: string, templateProperties: array{payload: UserDocumentPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param string $file
-     */
-    public static function getMarkdownViewerForTypeScript(\OmegaUp\Request $r) {
-        $filename = $r->ensureString('file');
-
-        $filePath = OMEGAUP_ROOT . "/www/docs/{$filename}.md";
-
-        if (!file_exists($filePath)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
-        }
-
-        $content = file_get_contents($filePath);
-
-        return [
-            'templateProperties' => [
-                'payload' => [
-                    'content' => $content,
-                    'filename' => $filename,
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleMarkdownViewer'
-                ),
-            ],
-            'entrypoint' => 'common_markdown_viewer',
-        ];
-    }
-
-    /**
-     * @return array{entrypoint: string, templateProperties: array{payload: UserDocsPayload, title: \OmegaUp\TranslationString}}
-     */
-    public static function getDocsForTypeScript(\OmegaUp\Request $r) {
-        $dir = strval(OMEGAUP_ROOT);
-        /** @var list<string> */
-        $files = array_diff(scandir("{$dir}/www/docs/"), ['.', '..']);
-
-        $docs = [
-            'pdf' => [],
-            'md' => [],
-            'dir' => [],
-        ];
-
-        foreach ($files as $file) {
-            if (is_file("$dir/www/docs/$file")) {
-                $name = preg_replace('/\.[^.]+$/', '', $file);
-                $name = str_replace('-', ' ', $name);
-                $name = ucwords($name);
-                if (preg_match('/\.pdf$/', $file)) {
-                    $docs['pdf'][] = [
-                        'name' => $name,
-                        'url' => "/docs/{$file}",
-                    ];
-                } elseif (preg_match('/\.md$/', $file)) {
-                    $docs['md'][] = [
-                        'name' => $name,
-                        'url' => "/docs/{$file}",
-                    ];
-                }
-            } else {
-                $docs['dir'][] = [
-                    'name' => $file,
-                    'url' => "/docs/{$file}",
-                ];
-            }
-        }
-
-        return [
-            'templateProperties' => [
-                'payload' => ['docs' => $docs],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
-            ],
-            'entrypoint' => 'common_docs',
-        ];
     }
 }
 

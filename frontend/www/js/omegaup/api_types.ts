@@ -2347,22 +2347,6 @@ export namespace types {
       );
     }
 
-    export function UserDocsPayload(
-      elementId: string = 'payload',
-    ): types.UserDocsPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
-      );
-    }
-
-    export function UserDocumentPayload(
-      elementId: string = 'payload',
-    ): types.UserDocumentPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
-      );
-    }
-
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -4851,20 +4835,6 @@ export namespace types {
     systemRoles: string[];
     username: string;
     verified: boolean;
-  }
-
-  export interface UserDocsPayload {
-    docs: { [key: string]: types.UserDocument[] };
-  }
-
-  export interface UserDocument {
-    name: string;
-    url: string;
-  }
-
-  export interface UserDocumentPayload {
-    content: string;
-    filename: string;
   }
 
   export interface UserInfoForProblem {
