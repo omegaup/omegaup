@@ -2347,6 +2347,14 @@ export namespace types {
       );
     }
 
+    export function UserDocumentPayload(
+      elementId: string = 'payload',
+    ): types.UserDocumentPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -4835,6 +4843,11 @@ export namespace types {
     systemRoles: string[];
     username: string;
     verified: boolean;
+  }
+
+  export interface UserDocumentPayload {
+    content: string;
+    filename: string;
   }
 
   export interface UserInfoForProblem {
