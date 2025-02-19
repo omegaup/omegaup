@@ -50,6 +50,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
+ * @psalm-type UserDocumentPayload=array{content: string, filename: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -4937,6 +4938,36 @@ class User extends \OmegaUp\Controllers\Controller {
             self::$log->error($e);
             return $response;
         }
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: UserDocumentPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $file
+     */
+    public static function getMarkdownViewerForTypeScript(\OmegaUp\Request $r) {
+        $filename = $r->ensureString('file');
+
+        $filePath = OMEGAUP_ROOT . "/www/docs/{$filename}.md";
+
+        if (!file_exists($filePath)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
+        }
+
+        $content = file_get_contents($filePath);
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'content' => $content,
+                    'filename' => $filename,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleMarkdownViewer'
+                ),
+            ],
+            'entrypoint' => 'common_markdown_viewer',
+        ];
     }
 }
 

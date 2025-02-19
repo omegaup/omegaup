@@ -41,6 +41,7 @@ module.exports = {
     common_scroll_to_top: './frontend/www/js/omegaup/common/scroll_to_top.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',
+    common_markdown_viewer: './frontend/www/js/omegaup/common/markdown_viewer.ts',
     common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
     contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
