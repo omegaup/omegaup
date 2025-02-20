@@ -13,17 +13,17 @@ Si no estás tan familiarizado con omegaUp, por favor considera primero visitar 
 
 ## Entorno de desarrollo
 El primer paso es la instalación del entorno de desarrollo. Usamos docker para montarlo y los sistemas operativos donde se ha usado principalmente son Windows y Ubuntu. Puede ejecutarse en macOS pero necesitaras configuraciones adicionales.
- - [Instalación del entorno de desarrollo](https://github.com/omegaup/omegaup/wiki/Instalaci%C3%B3n-de-m%C3%A1quina-virtual).
+ - [Instalación del entorno de desarrollo](/docs/Instalaci%C3%B3n-de-m%C3%A1quina-virtual.md).
 
 
 ## Arquitectura (resumen)
 Estos son los componentes de omegaUp y cómo se conectan entre sí _(los nombres son codenames temporales)_:
 
-* [UX](https://github.com/omegaup/omegaup/wiki/UX): Hay dos componentes de la interfaz de usuario: _UX_, que es la interfaz de _Arena_, y el resto de la página. El resto de la página, lo genera directamente _Frontend_. JS.
-* [Frontend](https://github.com/omegaup/omegaup/wiki/Frontend): _Frontend_ es una colección de controladores (del modelo MVC) que manejan toda la interacción con el sitio: administración de problemas y concursos, usuarios, rankings, problemas resueltos y faltantes, el scoreboard, etc. _Frontend_ se comunica con _Backend_ para compilar y ejecutar programas. PHP+MySQL.
+* [UX](/docs/UX.md): Hay dos componentes de la interfaz de usuario: _UX_, que es la interfaz de _Arena_, y el resto de la página. El resto de la página, lo genera directamente _Frontend_. JS.
+* [Frontend](/docs/Frontend.md): _Frontend_ es una colección de controladores (del modelo MVC) que manejan toda la interacción con el sitio: administración de problemas y concursos, usuarios, rankings, problemas resueltos y faltantes, el scoreboard, etc. _Frontend_ se comunica con _Backend_ para compilar y ejecutar programas. PHP+MySQL.
 * Backend: El subsistema de evaluación. Escrito en Go.
-  * [Grader](https://github.com/omegaup/omegaup/wiki/Grader): El encargado de mantener la cola de envíos y enviarlos a el/los _Runner_, recibir la respuesta y establecer un veredicto.
-  * [Runner](https://github.com/omegaup/omegaup/wiki/Runner): _Runner_ es un sistema des-centralizado y asíncrono de compilación y ejecución de programas. Los demás sistemas se pueden comunicar con _Runner_ mediante un API RESTful. Runner sabe cómo compilar, ejecutar y pasarle el _input_ a los programas que envíe el usuario, así como verificar si están bien o no. Es básicamente un frontend bonito y distribuido para _Minijail_.
+  * [Grader](/docs/Grader.md): El encargado de mantener la cola de envíos y enviarlos a el/los _Runner_, recibir la respuesta y establecer un veredicto.
+  * [Runner](/docs/Runner.md): _Runner_ es un sistema des-centralizado y asíncrono de compilación y ejecución de programas. Los demás sistemas se pueden comunicar con _Runner_ mediante un API RESTful. Runner sabe cómo compilar, ejecutar y pasarle el _input_ a los programas que envíe el usuario, así como verificar si están bien o no. Es básicamente un frontend bonito y distribuido para _Minijail_.
   * Minijail: Es un fork del sandbox de Linux de Chrome OS. Puede ejecutar código en C, C++, Perl, Python, Ruby, Java, Karel. Escrito en C.
 
 Para más detalles, puedes consultar los dos papers que han sido publicados en el journal del IOI:
@@ -49,8 +49,8 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
  - [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Aquí están los archivos de internacionalización para inglés, español y portugués.
 
 #### Te puede interesar:
- - [Coding guidelines](https://github.com/omegaup/omegaup/wiki/Coding-guidelines).
- - [Comandos utiles para el desarrollo](https://github.com/omegaup/omegaup/wiki/Comandos-%C3%BAtiles-para-el-desarrollo).
+ - [Coding guidelines](/docs/Coding-guidelines.md).
+ - [Comandos utiles para el desarrollo](/docs/Comandos-%C3%BAtiles-para-el-desarrollo.md).
 
 ## Decisiones de diseño
 
@@ -63,6 +63,6 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
-| [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request) | Configuraciones en git, cómo enviar un PR                    |
-| [Arquitectura](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | Arquitectura de software de omegaUp.com                      |
-| [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment)  | Cómo y cuándo es el deployment                               |
+| [Cómo empezar a desarrollar](/docs/C%C3%B3mo-Hacer-un-Pull-Request.md) | Configuraciones en git, cómo enviar un PR                    |
+| [Arquitectura](/docs/Arquitectura.md)  | Arquitectura de software de omegaUp.com                      |
+| [Release and Deployment](/docs/Release-&-deployment.md)  | Cómo y cuándo es el deployment                               |

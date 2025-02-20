@@ -12,7 +12,7 @@
       </h1>
       <p>
         <a
-          href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup"
+          href="/docs/C%C3%B3mo-escribir-problemas-para-Omegaup".md
           >{{ T.navHelp }}</a
         >
       </p>

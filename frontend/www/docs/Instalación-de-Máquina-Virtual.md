@@ -1,5 +1,5 @@
 
-[Also available in English](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English))
+[Also available in English](/docs/How-to-Set-Up-Your-Development-Environment-(English.md))
 
 ## Contenido
 * [Configuración de comandos de línea de Git](#configuración-de-comandos-de-línea-de-git)
