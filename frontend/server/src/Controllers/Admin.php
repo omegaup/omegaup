@@ -88,9 +88,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-
         if (empty($_FILES['file'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException('missingFile');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'missingFile'
+            );
         }
 
         $file = $_FILES['file'];
@@ -99,17 +100,24 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
         // Check if file with the same name already exists
         if (file_exists($targetPath)) {
-            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('fileAlreadyExists');
-        }    
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'fileAlreadyExists'
+            );
+        }
         if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
-            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('failedToCreateDirectory');
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'failedToCreateDirectory'
+            );
         }
 
         $fileUploader = \OmegaUp\FileHandler::getFileUploader();
-        if (!$fileUploader->isUploadedFile($file['tmp_name']) ||
+        if (
+            !$fileUploader->isUploadedFile($file['tmp_name']) ||
             !$fileUploader->moveUploadedFile($file['tmp_name'], $targetPath)
         ) {
-            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException('fileUploadFailed');
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'fileUploadFailed'
+            );
         }
 
         return ['status' => 'ok'];
@@ -125,7 +133,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-        
 
         if (!is_dir($uploadDir)) {
             return ['files' => []];
@@ -165,29 +172,32 @@ class Admin extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-    
+
         \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
-    
+
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
         $filePath = $uploadDir . basename($r['filename']);
-    
+
         if (!file_exists($filePath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
         }
-    
+
         // Send headers for file download
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+        header(
+            'Content-Disposition: attachment; filename="' . basename(
+                $filePath
+            ) . '"'
+        );
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Content-Length: ' . filesize($filePath));
-        
+
         // Flush output buffer and read the file
         flush();
         readfile($filePath);
         exit;
     }
-    
 }

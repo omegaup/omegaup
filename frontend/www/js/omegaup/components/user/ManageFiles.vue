@@ -1,20 +1,22 @@
 <template>
   <div>
-    <h3>{{ T.userManageFilesTitle }}</h3>
-
     <!-- File Upload Form -->
     <form @submit.prevent="onUploadFile">
       <div class="form-group">
         <label>{{ T.userManageFilesUploadFile }}</label>
         <input
-          type="file"
           ref="fileInput"
+          type="file"
           required
           class="form-control"
           @change="handleFileSelection"
         />
       </div>
-      <button type="submit" class="btn btn-primary mr-2" :disabled="!selectedFile">
+      <button
+        type="submit"
+        class="btn btn-primary mr-2"
+        :disabled="!selectedFile"
+      >
         {{ T.wordsUpload }}
       </button>
     </form>
@@ -23,10 +25,17 @@
     <div v-if="files.length > 0" class="mt-4">
       <h4>{{ T.userManageFilesListTitle }}</h4>
       <ul class="list-group">
-        <li v-for="(file, index) in files" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+        <li
+          v-for="(file, index) in files"
+          :key="index"
+          class="list-group-item d-flex justify-content-between align-items-center"
+        >
           <span>{{ file }}</span>
           <div>
-            <button class="btn btn-success btn-sm mr-2" @click="onDownloadFile(file)">
+            <button
+              class="btn btn-success btn-sm mr-2"
+              @click="onDownloadFile(file)"
+            >
               {{ T.wordsDownload }}
             </button>
 
@@ -81,10 +90,8 @@ export default class ManageFiles extends Vue {
   onDownloadFile(filename: string) {
     this.$emit('download-file', filename);
   }
-
 }
 </script>
-
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';

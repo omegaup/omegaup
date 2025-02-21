@@ -90,11 +90,11 @@
         </template>
         <template v-else-if="currentSelectedTab === 'manage-files'">
           <omegaup-user-manage-files
-          @add-file="(file) => $emit('add-file', file)"
-          @delete-file="(filename) => $emit('delete-file', filename)"
-          @fetch-files="$emit('fetch-files')"
-          @download-file="(filename) => $emit('download-file', filename)"
-          :files="files"
+            :files="files"
+            @add-file="(file) => $emit('add-file', file)"
+            @delete-file="(filename) => $emit('delete-file', filename)"
+            @fetch-files="$emit('fetch-files')"
+            @download-file="(filename) => $emit('download-file', filename)"
           ></omegaup-user-manage-files>
         </template>
         <div v-else>
@@ -121,8 +121,7 @@ import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
-import user_ManageFiles from './ManageFiles.vue'
-
+import user_ManageFiles from './ManageFiles.vue';
 
 interface FileItem {
   id: number;
@@ -141,7 +140,7 @@ interface FileItem {
     'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
     'omegaup-user-delete-account': userDeleteAccount,
-    'omegaup-user-manage-files': user_ManageFiles
+    'omegaup-user-manage-files': user_ManageFiles,
   },
 })
 export default class Profile extends Vue {
@@ -160,12 +159,10 @@ export default class Profile extends Vue {
   @Prop() files!: FileItem[];
   @Prop() isAdmin!: boolean;
 
-
   T = T;
   ui = ui;
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
-
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {

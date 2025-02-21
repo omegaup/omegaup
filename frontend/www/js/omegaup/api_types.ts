@@ -111,7 +111,7 @@ export namespace types {
     fileSize: number;
     uploadedAt: string;
   }
-  
+
   export namespace payloadParsers {
     export function ActivityFeedPayload(
       elementId: string = 'payload',

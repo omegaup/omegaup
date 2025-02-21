@@ -2090,8 +2090,6 @@ export const User = {
   >('/api/user/verifyEmail/'),
 };
 
-
-
 export const File = {
   upload(params: { file: File }) {
     return new Promise((accept, reject) => {
@@ -2116,10 +2114,15 @@ export const File = {
     });
   },
   download(params: { filename: string }) {
-    return fetch(`/api/admin/downloadFile/?filename=${encodeURIComponent(params.filename)}`, {
-      method: 'GET',
-      credentials: 'include',
-    }).then((response) => {
+    return fetch(
+      `/api/admin/downloadFile/?filename=${encodeURIComponent(
+        params.filename,
+      )}`,
+      {
+        method: 'GET',
+        credentials: 'include',
+      },
+    ).then((response) => {
       if (!response.ok) {
         throw new Error('File download failed');
       }
@@ -2129,12 +2132,10 @@ export const File = {
       }));
     });
   },
-  list: apiCall<
-    messages.FileListRequest,
-    messages.FileListResponse
-  >('/api/admin/listFiles/'),
-  delete: apiCall<
-    messages.FileDeleteRequest,
-    messages.FileDeleteResponse
-  >('/api/admin/deleteFile/'),
+  list: apiCall<messages.FileListRequest, messages.FileListResponse>(
+    '/api/admin/listFiles/',
+  ),
+  delete: apiCall<messages.FileDeleteRequest, messages.FileDeleteResponse>(
+    '/api/admin/deleteFile/',
+  ),
 };

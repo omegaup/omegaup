@@ -154,7 +154,6 @@ export default class UserSidebarMainInfo extends Vue {
     }
   }
 
-
   get currentUrlMapping(): {
     key: string;
     title: string;

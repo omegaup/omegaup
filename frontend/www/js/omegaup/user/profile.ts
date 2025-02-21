@@ -53,7 +53,7 @@ OmegaUp.on('ready', () => {
         selectedTab,
         searchResultSchools: searchResultSchools,
         files: [] as types.FileItem[],
-        isAdmin: payload.isAdmin
+        isAdmin: payload.isAdmin,
       };
     },
     mounted() {
@@ -65,7 +65,7 @@ OmegaUp.on('ready', () => {
       fetchFiles,
       addFile,
       deleteFile,
-      downloadFile
+      downloadFile,
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -87,7 +87,7 @@ OmegaUp.on('ready', () => {
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
           files: this.files,
-          isAdmin: this.isAdmin
+          isAdmin: this.isAdmin,
         },
         on: {
           'update-user-basic-information': (
@@ -290,7 +290,7 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
-  
+
   function addFile(file: File) {
     api.File.upload({ file })
       .then(() => {
@@ -298,8 +298,8 @@ OmegaUp.on('ready', () => {
         fetchFiles();
       })
       .catch(ui.apiError);
-  }  
-  
+  }
+
   function deleteFile(filename: string) {
     api.File.delete({ filename })
       .then(() => {
@@ -324,5 +324,4 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
-  
 });
