@@ -877,8 +877,6 @@ const translations: { [key: string]: string; } = {
   navLogIn: "Log in / Sign up",
   logoutConfirmationTitle: 'Confirm Logout',
   logoutConfirmationMessage: 'Do you really want to logout?',
-  yes: 'Yes',
-  no: 'No',
   navLogOut: "Log out",
   navMyContent: "My content",
   navMyContests: "My contests",
