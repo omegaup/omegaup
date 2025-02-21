@@ -1,4 +1,4 @@
- [Also available in English](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English))
+ [Also available in English](/docs/How-to-Set-Up-Your-Development-Environment-(English.md))
 
 
 - [Instalación con Docker](#instalaci%C3%B3n-con-docker)
@@ -158,13 +158,13 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 * [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): plantillas de Smarty utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués.
 * [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www): Los contenidos completos de la página de Internet.
 * [frontend/www/js/omegaup/components](https://github.com/omegaup/omegaup/tree/main/frontend/www/js/omegaup/components): Aquí se encuentran todos los componentes de Vue que se han estado migrando.
-Para más detalles, ver [aquí](https://github.com/omegaup/omegaup/wiki/Frontend).
+Para más detalles, ver [aquí](/docs/Frontend.md).
 # Cómo actualizar el código en la copia local #
-Antes de comenzar a hacer cambios en el código, es recomendable actualizar el código a su versión más reciente, eso se puede hacer siguiendo estos pasos: [Actualizar copia local](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-actualizar-y-configurar-tu-copia-local-de-omegaup-antes-de-hacer-cambios).
+Antes de comenzar a hacer cambios en el código, es recomendable actualizar el código a su versión más reciente, eso se puede hacer siguiendo estos pasos: [Actualizar copia local](/docs/C%C3%B3mo-actualizar-y-configurar-tu-copia-local-de-omegaup-antes-de-hacer-cambios.md).
 # Cómo proponer cambios al código #
-Cuando hayas hecho tus cambios al código, para que sean incorporados al repositorio de omegaUp, sigue [estos pasos](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request).
+Cuando hayas hecho tus cambios al código, para que sean incorporados al repositorio de omegaUp, sigue [estos pasos](/docs/C%C3%B3mo-Hacer-un-Pull-Request.md).
 # Sincronización con Windows #
-Si utilizas un equipo con cualquier versión de Windows, te puede interesar como hacer la [sincronización con Windows](https://github.com/omegaup/omegaup/wiki/Sincronizaci%C3%B3n-con-Windows).
+Si utilizas un equipo con cualquier versión de Windows, te puede interesar como hacer la [sincronización con Windows](/docs/Sincronizaci%C3%B3n-con-Windows.md).
 # Mis cambios no se ven reflejados!
 Necesitas tener una sesión con `yarn run dev` corriendo desde `/opt/omegaup`.
 # Mi VM no funciona :(

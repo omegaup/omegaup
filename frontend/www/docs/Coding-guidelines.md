@@ -108,7 +108,7 @@
 * Se debe evitar el uso de [lifecycle hooks](https://v3.vuejs.org/api/options-lifecycle-hooks.html) _a menos_ que haya algo en el componente que interactúe directamente con el DOM.
   - También se debe evitar la interacción directa con el DOM.
 * Se prefiere el uso de [propiedades computadas y watchers](https://vuejs.org/v2/guide/computed.html) en vez de manipular variables programáticamente.
-* Se recomienda agregar **storybook** stories para cada componente nuevo, y en caso de modificar un componente existente agregar o actualizar las stories relacionadas al mismo. [Ver más](https://github.com/omegaup/omegaup/wiki/Coding-Guidelines-%E2%80%90-Storybook)
+* Se recomienda agregar **storybook** stories para cada componente nuevo, y en caso de modificar un componente existente agregar o actualizar las stories relacionadas al mismo. [Ver más](/docs/Coding-Guidelines-%E2%80%90-Storybook.md)
 
 # TypeScript
 
