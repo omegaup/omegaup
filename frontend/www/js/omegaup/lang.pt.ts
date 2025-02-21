@@ -875,6 +875,8 @@ const translations: { [key: string]: string; } = {
   navDiscord: "Servidor de Discord",
   navHelp: "Ajuda",
   navLogIn: "Entrar / Inscrever-se",
+  logoutConfirmationTitle : "Confirmar logout",
+  logoutConfirmationMessage : "Tem certeza de que deseja sair?",
   navLogOut: "Sair",
   navMyContent: "Meu conte\u00fado",
   navMyContests: "Meus concursos",

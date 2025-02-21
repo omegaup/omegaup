@@ -316,10 +316,10 @@
                   }}</a>
                 </template>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/logout/" data-logout-button>
-                  <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
-                  {{ T.navLogOut }}
-                </a>
+                <a class="dropdown-item"
+                href="#"
+                @click.prevent="logoutModalVisible = true"
+                data-logout-button></a>
                 <omegaup-common-grader-status
                   v-show="isAdmin"
                   :status="errorMessage !== null ? 'down' : 'ok'"
@@ -331,19 +331,19 @@
           </ul>
 
           <a
-            v-if="isLoggedIn"
-            class="navbar justify-content-end mb-2 d-lg-none"
-            href="/logout/"
-          >
-            <font-awesome-icon :icon="['fas', 'power-off']" />
-          </a>
+          v-if="isLoggedIn"
+          class="navbar justify-content-end mb-2 d-lg-none"
+          href="#"
+          @click.prevent="logoutModalVisible = true">
+        <font-awesome-icon :icon="['fas', 'power-off']" />
+        </a>
         </div>
 
         <a
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block order-1"
-          href="/logout/"
-        >
+          href="#"
+          @click.prevent="logoutModalVisible = true">
           <font-awesome-icon :icon="['fas', 'power-off']" />
         </a>
       </div>
@@ -382,6 +382,8 @@
         ></omegaup-markdown>
       </div>
     </template>
+    <omegaup-logout-confirmation  v-model="logoutModalVisible">
+    </omegaup-logout-confirmation>
   </header>
 </template>
 
@@ -402,6 +404,7 @@ import navbar_items from './NavbarItems.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import LogoutConfirmation from './LogoutConfirmation.vue';
 library.add(faSignOutAlt, faUser);
 
 @Component({
@@ -415,6 +418,7 @@ library.add(faSignOutAlt, faUser);
     'omegaup-user-next-registered-contest': user_next_registered_contest,
     'omegaup-navbar-items': navbar_items,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-logout-confirmation': LogoutConfirmation,
   },
 })
 export default class Navbar extends Vue {
@@ -444,6 +448,7 @@ export default class Navbar extends Vue {
   @Prop() isUnder13User!: boolean;
   @Prop() mentorCanChooseCoder!: boolean;
   @Prop() userVerificationDeadline!: Date | null;
+  @Prop() logoutModalVisible: boolean = false;
 
   T = T;
   ui = ui;
