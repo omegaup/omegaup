@@ -1765,6 +1765,7 @@ const translations: { [key: string]: string; } = {
   userManageFilesListTitle: "Lista de archivos subidos.",
   userManageFilesNoFiles: "No se encontraron archivos en el directorio p\u00fablico.",
   userManageFilesUploadFile: "Sube archivos al directorio p\u00fablico.",
+  userManagePublicFiles: "Gestionar Archivos P\u00fablicos.",
   userNeverLoggedIn: "Nunca ha iniciado sesi\u00f3n.",
   userNextRegisteredContestButtonEnter: "Entrar",
   userNextRegisteredContestButtonSeeDetails: "Ver detalles",
