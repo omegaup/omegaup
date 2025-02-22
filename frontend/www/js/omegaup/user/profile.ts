@@ -289,28 +289,32 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
   
-  // function addFile(file: File) {
-  //   api.Admin.uploadFile({ file })
-  //     .then(() => {
-  //       ui.success(T.fileUploadSuccess);
-  //       fetchFiles();
-  //     })
-  //     .catch(ui.apiError);
-  // }
-  function addFile(file: File) {
-    const formData = new FormData();
-    formData.append('file', file); // Ensure the key matches $_FILES['file'] on the backend
-
-    api.Admin.uploadFile(formData)
-      .then(() => {
-        ui.success(T.fileUploadSuccess);
-        fetchFiles();
-      })
-      .catch(ui.apiError);
-}
-
+  async function addFile(file: File) {
+    try {
+      const fileBase64 = await fileToBase64(file);
   
+      api.Admin.uploadFile({ file: fileBase64, filename: file.name }) // Include original filename
+        .then(() => {
+          ui.success(T.fileUploadSuccess);
+          fetchFiles();
+        })
+        .catch(ui.apiError);
+    } catch (error: any) {
+      console.error('File conversion failed', error);
+      ui.apiError(error);
+    }
+  }
+  
+
   function deleteFile(filename: string) {
     api.Admin.deleteFile({ filename })
       .then(() => {
@@ -319,10 +323,12 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
-  
+
   function downloadFile(filename: string) {
-    const downloadUrl = `/api/admin/downloadFile?filename=${encodeURIComponent(filename)}`;
-  
+    const downloadUrl = `/api/admin/downloadFile?filename=${encodeURIComponent(
+      filename,
+    )}`;
+
     fetch(downloadUrl, { method: 'GET' })
       .then((response) => {
         if (!response.ok) {
@@ -342,5 +348,4 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
-  
 });

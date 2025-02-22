@@ -1,6 +1,5 @@
 - [Admin](#admin)
   - [`/api/admin/deleteFile/`](#apiadmindeletefile)
-  - [`/api/admin/downloadFile/`](#apiadmindownloadfile)
   - [`/api/admin/listFiles/`](#apiadminlistfiles)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
   - [`/api/admin/uploadFile/`](#apiadminuploadfile)
@@ -276,24 +275,6 @@
 ### Description
 
 Delete a file from the /docs directory.
-
-### Parameters
-
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `filename` | `string` |             |
-
-### Returns
-
-| Name      | Type     |
-| --------- | -------- |
-| `message` | `string` |
-
-## `/api/admin/downloadFile/`
-
-### Description
-
-Download a file from the /docs directory.
 
 ### Parameters
 

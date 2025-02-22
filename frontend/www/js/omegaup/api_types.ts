@@ -4952,8 +4952,6 @@ export namespace messages {
   // Admin
   export type AdminDeleteFileRequest = { [key: string]: any };
   export type AdminDeleteFileResponse = { message: string };
-  export type AdminDownloadFileRequest = { [key: string]: any };
-  export type AdminDownloadFileResponse = { message: string };
   export type AdminListFilesRequest = { [key: string]: any };
   export type AdminListFilesResponse = {
     files: string[];
@@ -5893,9 +5891,6 @@ export namespace controllers {
     deleteFile: (
       params?: messages.AdminDeleteFileRequest,
     ) => Promise<messages.AdminDeleteFileResponse>;
-    downloadFile: (
-      params?: messages.AdminDownloadFileRequest,
-    ) => Promise<messages.AdminDownloadFileResponse>;
     listFiles: (
       params?: messages.AdminListFilesRequest,
     ) => Promise<messages.AdminListFilesResponse>;

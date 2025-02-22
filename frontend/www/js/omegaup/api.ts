@@ -6,92 +6,8 @@ interface ApiCallOptions {
   quiet?: boolean;
 }
 
-// export function apiCall<
-//   RequestType extends { [key: string]: any },
-//   ServerResponseType,
-//   ResponseType = ServerResponseType
-// >(
-//   url: string,
-//   transform?: (result: ServerResponseType) => ResponseType,
-// ): (params?: RequestType, options?: ApiCallOptions) => Promise<ResponseType> {
-//   return (params?: RequestType, options?: ApiCallOptions) =>
-//     new Promise((accept, reject) => {
-//       let responseOk = true;
-//       let responseStatus = 200;
-//       fetch(
-//         url,
-//         params
-//           ? {
-//               method: 'POST',
-//               body: Object.keys(params)
-//                 .filter(
-//                   (key) =>
-//                     params[key] !== null && typeof params[key] !== 'undefined',
-//                 )
-//                 .map((key) => {
-//                   if (params[key] instanceof Date) {
-//                     return `${encodeURIComponent(key)}=${encodeURIComponent(
-//                       Math.round(params[key].getTime() / 1000),
-//                     )}`;
-//                   }
-//                   return `${encodeURIComponent(key)}=${encodeURIComponent(
-//                     params[key],
-//                   )}`;
-//                 })
-//                 .join('&'),
-//               headers: {
-//                 'Content-Type':
-//                   'application/x-www-form-urlencoded;charset=UTF-8',
-//               },
-//             }
-//           : undefined,
-//       )
-//         .then((response) => {
-//           if (response.status == 499) {
-//             // If we cancel the connection, let's just swallow the error since
-//             // the user is not going to see it.
-//             return;
-//           }
-//           responseOk = response.ok;
-//           responseStatus = response.status;
-//           return response.json();
-//         })
-//         .then((data) => {
-//           if (!responseOk) {
-//             if (typeof data === 'object' && !Array.isArray(data)) {
-//               data.status = 'error';
-//               data.httpStatusCode = responseStatus;
-//             }
-//             if (!options?.quiet) {
-//               addError(data);
-//               console.error(data);
-//             }
-//             reject(data);
-//             return;
-//           }
-//           if (transform) {
-//             accept(transform(data));
-//           } else {
-//             accept(data);
-//           }
-//         })
-//         .catch((err) => {
-//           const errorData = {
-//             status: 'error',
-//             error: err,
-//             httpStatusCode: responseStatus,
-//           };
-//           if (!options?.quiet) {
-//             addError(errorData);
-//             console.error(errorData);
-//           }
-//           reject(errorData);
-//         });
-//     });
-// }
-
 export function apiCall<
-  RequestType extends { [key: string]: any } | undefined,
+  RequestType extends { [key: string]: any },
   ServerResponseType,
   ResponseType = ServerResponseType
 >(
@@ -102,34 +18,38 @@ export function apiCall<
     new Promise((accept, reject) => {
       let responseOk = true;
       let responseStatus = 200;
-      
-      // Determine if we're sending FormData (for file uploads)
-      const isFormData = params instanceof FormData;
-      const fetchOptions: RequestInit = {
-        method: 'POST',
-        body: isFormData
-          ? params // Use FormData directly
-          : params
-          ? Object.keys(params)
-              .filter((key) => params && params[key] !== null && typeof params[key] !== 'undefined')
-              .map((key) => {
-                if (params && params[key] instanceof Date) {
+      fetch(
+        url,
+        params
+          ? {
+              method: 'POST',
+              body: Object.keys(params)
+                .filter(
+                  (key) =>
+                    params[key] !== null && typeof params[key] !== 'undefined',
+                )
+                .map((key) => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
                   return `${encodeURIComponent(key)}=${encodeURIComponent(
-                    Math.round((params[key] as Date).getTime() / 1000),
+                    params[key],
                   )}`;
-                }
-                return `${encodeURIComponent(key)}=${encodeURIComponent(params[key] as string)}`;
-              })
-              .join('&')
-          : undefined, // Handle undefined case
-        headers: isFormData
-          ? {} // Let the browser set 'Content-Type' for FormData
-          : { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-      };
-
-      fetch(url, fetchOptions)
+                })
+                .join('&'),
+              headers: {
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=UTF-8',
+              },
+            }
+          : undefined,
+      )
         .then((response) => {
           if (response.status == 499) {
+            // If we cancel the connection, let's just swallow the error since
+            // the user is not going to see it.
             return;
           }
           responseOk = response.ok;
@@ -149,7 +69,11 @@ export function apiCall<
             reject(data);
             return;
           }
-          accept(transform ? transform(data) : data);
+          if (transform) {
+            accept(transform(data));
+          } else {
+            accept(data);
+          }
         })
         .catch((err) => {
           const errorData = {
@@ -166,16 +90,11 @@ export function apiCall<
     });
 }
 
-
 export const Admin = {
   deleteFile: apiCall<
     messages.AdminDeleteFileRequest,
     messages.AdminDeleteFileResponse
   >('/api/admin/deleteFile/'),
-  downloadFile: apiCall<
-    messages.AdminDownloadFileRequest,
-    messages.AdminDownloadFileResponse
-  >('/api/admin/downloadFile/'),
   listFiles: apiCall<
     messages.AdminListFilesRequest,
     messages.AdminListFilesResponse
