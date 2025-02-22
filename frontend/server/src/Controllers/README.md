@@ -1,5 +1,9 @@
 - [Admin](#admin)
+  - [`/api/admin/deleteFile/`](#apiadmindeletefile)
+  - [`/api/admin/downloadFile/`](#apiadmindownloadfile)
+  - [`/api/admin/listFiles/`](#apiadminlistfiles)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/uploadFile/`](#apiadminuploadfile)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -267,6 +271,55 @@
 
 # Admin
 
+## `/api/admin/deleteFile/`
+
+### Description
+
+Delete a file from the /docs directory.
+
+### Parameters
+
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `filename` | `string` |             |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `message` | `string` |
+
+## `/api/admin/downloadFile/`
+
+### Description
+
+Download a file from the /docs directory.
+
+### Parameters
+
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `filename` | `string` |             |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `message` | `string` |
+
+## `/api/admin/listFiles/`
+
+### Description
+
+List all files in the /docs directory.
+
+### Returns
+
+| Name      | Type                         |
+| --------- | ---------------------------- |
+| `files`   | `{ [key: string]: string; }` |
+| `message` | `string`                     |
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -285,6 +338,24 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/uploadFile/`
+
+### Description
+
+Upload a file to the /docs directory (only for system admins).
+
+### Parameters
+
+| Name   | Type          | Description |
+| ------ | ------------- | ----------- |
+| `file` | `array\|null` |             |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `message` | `string` |
 
 # Authorization
 

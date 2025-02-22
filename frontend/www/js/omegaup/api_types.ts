@@ -105,10 +105,6 @@ export namespace dao {
 
 // Type aliases
 export namespace types {
-  export interface FileItem {
-    fileName: string;
-  }
-
   export namespace payloadParsers {
     export function ActivityFeedPayload(
       elementId: string = 'payload',
@@ -4954,6 +4950,15 @@ export namespace types {
 // API messages
 export namespace messages {
   // Admin
+  export type AdminDeleteFileRequest = { [key: string]: any };
+  export type AdminDeleteFileResponse = { message: string };
+  export type AdminDownloadFileRequest = { [key: string]: any };
+  export type AdminDownloadFileResponse = { message: string };
+  export type AdminListFilesRequest = { [key: string]: any };
+  export type AdminListFilesResponse = {
+    files: string[];
+    message: string;
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -4968,6 +4973,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminUploadFileRequest = { [key: string]: any };
+  export type AdminUploadFileResponse = { message: string };
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5878,53 +5885,26 @@ export namespace messages {
   };
   export type UserVerifyEmailRequest = { [key: string]: any };
   export type UserVerifyEmailResponse = {};
-
-  export type FileUploadRequest = {
-    file: File;
-    metadata?: { [key: string]: any };
-  };
-  export type FileUploadResponse = {
-    success: boolean;
-    fileId: string;
-    message?: string;
-  };
-
-  export type FileDownloadRequest = {
-    filename: string;
-  };
-  export type FileDownloadResponse = {
-    success: boolean;
-    fileContent: Blob;
-    fileName: string;
-    message?: string;
-  };
-
-  export type FileListRequest = {
-    directory?: string;
-  };
-  export type FileListResponse = {
-    success: boolean;
-    files: {
-      fileName: string;
-    }[];
-    message?: string;
-  };
-
-  export type FileDeleteRequest = {
-    filename: string;
-  };
-  export type FileDeleteResponse = {
-    success: boolean;
-    message: string;
-  };
 }
 
 // Controller interfaces
 export namespace controllers {
   export interface Admin {
+    deleteFile: (
+      params?: messages.AdminDeleteFileRequest,
+    ) => Promise<messages.AdminDeleteFileResponse>;
+    downloadFile: (
+      params?: messages.AdminDownloadFileRequest,
+    ) => Promise<messages.AdminDownloadFileResponse>;
+    listFiles: (
+      params?: messages.AdminListFilesRequest,
+    ) => Promise<messages.AdminListFilesResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    uploadFile: (
+      params?: messages.AdminUploadFileRequest,
+    ) => Promise<messages.AdminUploadFileResponse>;
   }
 
   export interface Authorization {

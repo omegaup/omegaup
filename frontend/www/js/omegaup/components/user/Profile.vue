@@ -151,7 +151,7 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop() files!: types.FileItem[];
+  @Prop() files!: any;
   @Prop() isAdmin!: boolean;
 
   T = T;

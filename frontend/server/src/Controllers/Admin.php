@@ -3,7 +3,7 @@
 namespace OmegaUp\Controllers;
 
 class Admin extends \OmegaUp\Controllers\Controller {
-     /**
+    /**
      * Get stats for an overall platform report.
      *
      * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
@@ -81,6 +81,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
     /**
      * Upload a file to the /docs directory (only for system admins).
+     *
+     * @return array{status: string, message: string}
+     *
+     * @omegaup-request-param array|null $file
      */
     public static function apiUploadFile(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -98,7 +102,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
         $targetPath = $uploadDir . basename($file['name']);
 
-        // Check if file with the same name already exists
         if (file_exists($targetPath)) {
             throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
                 'fileAlreadyExists'
@@ -112,19 +115,25 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
         $fileUploader = \OmegaUp\FileHandler::getFileUploader();
         if (
-            !$fileUploader->isUploadedFile($file['tmp_name']) ||
-            !$fileUploader->moveUploadedFile($file['tmp_name'], $targetPath)
+            !$fileUploader->isUploadedFile(
+                $file['tmp_name']
+            ) || !$fileUploader->moveUploadedFile(
+                $file['tmp_name'],
+                $targetPath
+            )
         ) {
             throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
                 'fileUploadFailed'
             );
         }
 
-        return ['status' => 'ok'];
+        return ['status' => 'ok', 'message' => 'File uploaded successfully.'];
     }
 
     /**
      * List all files in the /docs directory.
+     *
+     * @return array{status: string, message: string, files: array<string>}
      */
     public static function apiListFiles(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -133,17 +142,28 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-
-        if (!is_dir($uploadDir)) {
-            return ['files' => []];
-        }
-
-        $files = array_values(array_diff(scandir($uploadDir), ['.', '..']));
-        return ['files' => $files];
+        return [
+            'status' => 'ok',
+            'message' => 'File list retrieved successfully.',
+            'files' => is_dir(
+                $uploadDir
+            ) ? array_values(
+                array_diff(
+                    scandir(
+                        $uploadDir
+                    ),
+                    ['.', '..']
+                )
+            ) : []
+        ];
     }
 
     /**
      * Delete a file from the /docs directory.
+     *
+     * @return array{status: string, message: string}
+     *
+     * @omegaup-request-param string $filename
      */
     public static function apiDeleteFile(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -153,19 +173,19 @@ class Admin extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
 
-        $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-        $filePath = $uploadDir . basename($r['filename']);
-
+        $filePath = OMEGAUP_ROOT . '/www/docs/' . basename($r['filename']);
         if (!file_exists($filePath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
         }
 
         \OmegaUp\FileHandler::deleteFile($filePath);
-        return ['status' => 'ok'];
+        return ['status' => 'ok', 'message' => 'File deleted successfully.'];
     }
 
     /**
      * Download a file from the /docs directory.
+     *
+     * @omegaup-request-param string $filename
      */
     public static function apiDownloadFile(\OmegaUp\Request $r): void {
         $r->ensureMainUserIdentity();
@@ -173,34 +193,25 @@ class Admin extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // Get JSON input from the request body
-        $requestBody = file_get_contents('php://input');
-        $data = json_decode($requestBody, true);
-
-        if (!isset($data['filename']) || empty($data['filename'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
-        }
-
-        $filename = basename($data['filename']);
-        $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-        $filePath = $uploadDir . $filename;
+        \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
+        $filePath = OMEGAUP_ROOT . '/www/docs/' . basename($r['filename']);
 
         if (!file_exists($filePath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
         }
 
-        // Send headers for file download
+        // Set headers for file download
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+        header('Content-Length: ' . filesize($filePath));
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($filePath));
 
-        // Flush output buffer and read the file
-        flush();
+        // Read and output the file
         readfile($filePath);
         exit;
     }
+
 }

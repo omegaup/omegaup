@@ -6,8 +6,92 @@ interface ApiCallOptions {
   quiet?: boolean;
 }
 
+// export function apiCall<
+//   RequestType extends { [key: string]: any },
+//   ServerResponseType,
+//   ResponseType = ServerResponseType
+// >(
+//   url: string,
+//   transform?: (result: ServerResponseType) => ResponseType,
+// ): (params?: RequestType, options?: ApiCallOptions) => Promise<ResponseType> {
+//   return (params?: RequestType, options?: ApiCallOptions) =>
+//     new Promise((accept, reject) => {
+//       let responseOk = true;
+//       let responseStatus = 200;
+//       fetch(
+//         url,
+//         params
+//           ? {
+//               method: 'POST',
+//               body: Object.keys(params)
+//                 .filter(
+//                   (key) =>
+//                     params[key] !== null && typeof params[key] !== 'undefined',
+//                 )
+//                 .map((key) => {
+//                   if (params[key] instanceof Date) {
+//                     return `${encodeURIComponent(key)}=${encodeURIComponent(
+//                       Math.round(params[key].getTime() / 1000),
+//                     )}`;
+//                   }
+//                   return `${encodeURIComponent(key)}=${encodeURIComponent(
+//                     params[key],
+//                   )}`;
+//                 })
+//                 .join('&'),
+//               headers: {
+//                 'Content-Type':
+//                   'application/x-www-form-urlencoded;charset=UTF-8',
+//               },
+//             }
+//           : undefined,
+//       )
+//         .then((response) => {
+//           if (response.status == 499) {
+//             // If we cancel the connection, let's just swallow the error since
+//             // the user is not going to see it.
+//             return;
+//           }
+//           responseOk = response.ok;
+//           responseStatus = response.status;
+//           return response.json();
+//         })
+//         .then((data) => {
+//           if (!responseOk) {
+//             if (typeof data === 'object' && !Array.isArray(data)) {
+//               data.status = 'error';
+//               data.httpStatusCode = responseStatus;
+//             }
+//             if (!options?.quiet) {
+//               addError(data);
+//               console.error(data);
+//             }
+//             reject(data);
+//             return;
+//           }
+//           if (transform) {
+//             accept(transform(data));
+//           } else {
+//             accept(data);
+//           }
+//         })
+//         .catch((err) => {
+//           const errorData = {
+//             status: 'error',
+//             error: err,
+//             httpStatusCode: responseStatus,
+//           };
+//           if (!options?.quiet) {
+//             addError(errorData);
+//             console.error(errorData);
+//           }
+//           reject(errorData);
+//         });
+//     });
+// }
+
 export function apiCall<
-  RequestType extends { [key: string]: any },
+  RequestType extends { [key: string]: any } | undefined,
   ServerResponseType,
   ResponseType = ServerResponseType
 >(
@@ -18,38 +102,34 @@ export function apiCall<
     new Promise((accept, reject) => {
       let responseOk = true;
       let responseStatus = 200;
-      fetch(
-        url,
-        params
-          ? {
-              method: 'POST',
-              body: Object.keys(params)
-                .filter(
-                  (key) =>
-                    params[key] !== null && typeof params[key] !== 'undefined',
-                )
-                .map((key) => {
-                  if (params[key] instanceof Date) {
-                    return `${encodeURIComponent(key)}=${encodeURIComponent(
-                      Math.round(params[key].getTime() / 1000),
-                    )}`;
-                  }
+      
+      // Determine if we're sending FormData (for file uploads)
+      const isFormData = params instanceof FormData;
+      const fetchOptions: RequestInit = {
+        method: 'POST',
+        body: isFormData
+          ? params // Use FormData directly
+          : params
+          ? Object.keys(params)
+              .filter((key) => params && params[key] !== null && typeof params[key] !== 'undefined')
+              .map((key) => {
+                if (params && params[key] instanceof Date) {
                   return `${encodeURIComponent(key)}=${encodeURIComponent(
-                    params[key],
+                    Math.round((params[key] as Date).getTime() / 1000),
                   )}`;
-                })
-                .join('&'),
-              headers: {
-                'Content-Type':
-                  'application/x-www-form-urlencoded;charset=UTF-8',
-              },
-            }
-          : undefined,
-      )
+                }
+                return `${encodeURIComponent(key)}=${encodeURIComponent(params[key] as string)}`;
+              })
+              .join('&')
+          : undefined, // Handle undefined case
+        headers: isFormData
+          ? {} // Let the browser set 'Content-Type' for FormData
+          : { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      };
+
+      fetch(url, fetchOptions)
         .then((response) => {
           if (response.status == 499) {
-            // If we cancel the connection, let's just swallow the error since
-            // the user is not going to see it.
             return;
           }
           responseOk = response.ok;
@@ -69,11 +149,7 @@ export function apiCall<
             reject(data);
             return;
           }
-          if (transform) {
-            accept(transform(data));
-          } else {
-            accept(data);
-          }
+          accept(transform ? transform(data) : data);
         })
         .catch((err) => {
           const errorData = {
@@ -90,11 +166,28 @@ export function apiCall<
     });
 }
 
+
 export const Admin = {
+  deleteFile: apiCall<
+    messages.AdminDeleteFileRequest,
+    messages.AdminDeleteFileResponse
+  >('/api/admin/deleteFile/'),
+  downloadFile: apiCall<
+    messages.AdminDownloadFileRequest,
+    messages.AdminDownloadFileResponse
+  >('/api/admin/downloadFile/'),
+  listFiles: apiCall<
+    messages.AdminListFilesRequest,
+    messages.AdminListFilesResponse
+  >('/api/admin/listFiles/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  uploadFile: apiCall<
+    messages.AdminUploadFileRequest,
+    messages.AdminUploadFileResponse
+  >('/api/admin/uploadFile/'),
 };
 
 export const Authorization = {
@@ -2088,53 +2181,4 @@ export const User = {
     messages.UserVerifyEmailRequest,
     messages.UserVerifyEmailResponse
   >('/api/user/verifyEmail/'),
-};
-
-export const File = {
-  upload(params: { file: File }) {
-    return new Promise((accept, reject) => {
-      const formData = new FormData();
-      formData.append('file', params.file);
-
-      fetch('/api/admin/uploadFile/', {
-        method: 'POST',
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status !== 'ok') {
-            reject(data);
-          } else {
-            accept(data);
-          }
-        })
-        .catch((err) => {
-          reject({ status: 'error', error: err });
-        });
-    });
-  },
-  download(params: { filename: string }) {
-    return fetch('/api/admin/downloadFile/', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ filename: params.filename }),
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('File download failed');
-      }
-      return response.blob().then((blob) => ({
-        fileContent: blob,
-        fileName: params.filename,
-      }));
-    });
-  },
-  list: apiCall<messages.FileListRequest, messages.FileListResponse>(
-    '/api/admin/listFiles/',
-  ),
-  delete: apiCall<messages.FileDeleteRequest, messages.FileDeleteResponse>(
-    '/api/admin/deleteFile/',
-  ),
 };

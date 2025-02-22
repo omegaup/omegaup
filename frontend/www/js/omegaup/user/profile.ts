@@ -52,7 +52,7 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
-        files: [] as types.FileItem[],
+        files: [] as string[],
         isAdmin: payload.isAdmin,
       };
     },
@@ -282,41 +282,59 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
-
   function fetchFiles() {
-    api.File.list()
+    api.Admin.listFiles()
       .then(({ files }) => {
         userProfile.files = files;
       })
       .catch(ui.apiError);
   }
-
+  
+  // function addFile(file: File) {
+  //   api.Admin.uploadFile({ file })
+  //     .then(() => {
+  //       ui.success(T.fileUploadSuccess);
+  //       fetchFiles();
+  //     })
+  //     .catch(ui.apiError);
+  // }
   function addFile(file: File) {
-    api.File.upload({ file })
+    const formData = new FormData();
+    formData.append('file', file); // Ensure the key matches $_FILES['file'] on the backend
+
+    api.Admin.uploadFile(formData)
       .then(() => {
         ui.success(T.fileUploadSuccess);
         fetchFiles();
       })
       .catch(ui.apiError);
-  }
+}
 
+  
   function deleteFile(filename: string) {
-    api.File.delete({ filename })
+    api.Admin.deleteFile({ filename })
       .then(() => {
         ui.success(T.fileDeleteSuccess);
         fetchFiles();
       })
       .catch(ui.apiError);
   }
-
+  
   function downloadFile(filename: string) {
-    api.File.download({ filename })
+    const downloadUrl = `/api/admin/downloadFile?filename=${encodeURIComponent(filename)}`;
+  
+    fetch(downloadUrl, { method: 'GET' })
       .then((response) => {
-        const blob = new Blob([response.fileContent]); // Convert response to Blob
+        if (!response.ok) {
+          throw new Error('Failed to download file');
+        }
+        return response.blob();
+      })
+      .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', response.fileName);
+        link.setAttribute('download', filename); // Set correct filename
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -324,4 +342,5 @@ OmegaUp.on('ready', () => {
       })
       .catch(ui.apiError);
   }
+  
 });
