@@ -109,7 +109,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
-  { key: 'manage-files', title: 'Manage Public Files', visible: false }, // New tab
+  { key: 'manage-files', title: T.userManagePublicFiles, visible: false }, // New tab
 ];
 
 @Component({

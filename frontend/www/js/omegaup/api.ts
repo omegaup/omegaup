@@ -2114,15 +2114,14 @@ export const File = {
     });
   },
   download(params: { filename: string }) {
-    return fetch(
-      `/api/admin/downloadFile/?filename=${encodeURIComponent(
-        params.filename,
-      )}`,
-      {
-        method: 'GET',
-        credentials: 'include',
+    return fetch('/api/admin/downloadFile/', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    ).then((response) => {
+      body: JSON.stringify({ filename: params.filename }),
+    }).then((response) => {
       if (!response.ok) {
         throw new Error('File download failed');
       }

@@ -106,10 +106,7 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export interface FileItem {
-    fileId: string;
     fileName: string;
-    fileSize: number;
-    uploadedAt: string;
   }
 
   export namespace payloadParsers {
@@ -5908,10 +5905,7 @@ export namespace messages {
   export type FileListResponse = {
     success: boolean;
     files: {
-      fileId: string;
       fileName: string;
-      fileSize: number;
-      uploadedAt: string;
     }[];
     message?: string;
   };

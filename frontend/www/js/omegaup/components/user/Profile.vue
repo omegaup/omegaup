@@ -123,11 +123,6 @@ import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
 import user_ManageFiles from './ManageFiles.vue';
 
-interface FileItem {
-  id: number;
-  name: string;
-}
-
 @Component({
   components: {
     'omegaup-user-profile-wrapper': user_ProfileWrapper,
@@ -156,7 +151,7 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop() files!: FileItem[];
+  @Prop() files!: types.FileItem[];
   @Prop() isAdmin!: boolean;
 
   T = T;

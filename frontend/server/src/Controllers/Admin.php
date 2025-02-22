@@ -173,10 +173,17 @@ class Admin extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
+        // Get JSON input from the request body
+        $requestBody = file_get_contents('php://input');
+        $data = json_decode($requestBody, true);
 
+        if (!isset($data['filename']) || empty($data['filename'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
+        }
+
+        $filename = basename($data['filename']);
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-        $filePath = $uploadDir . basename($r['filename']);
+        $filePath = $uploadDir . $filename;
 
         if (!file_exists($filePath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
@@ -185,11 +192,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
         // Send headers for file download
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header(
-            'Content-Disposition: attachment; filename="' . basename(
-                $filePath
-            ) . '"'
-        );
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
