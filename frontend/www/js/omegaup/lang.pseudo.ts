@@ -1765,7 +1765,7 @@ const translations: { [key: string]: string; } = {
   userManageFilesListTitle: "(Li57 0f up10ad3d fi135.)",
   userManageFilesNoFiles: "(N0 fi135 in pub1ic dir3c70ry f0und.)",
   userManageFilesUploadFile: "(Up10ad fi135 70 pub1ic dir3c70ry.)",
-  userManagePublicFiles: "(Manag3 Pub1ic Fi135.)",
+  userManagePublicFiles: "(Manag3 Pub1ic Fi135)",
   userNeverLoggedIn: "(Ha5 n3v3r 10gg3d in.)",
   userNextRegisteredContestButtonEnter: "(En73r)",
   userNextRegisteredContestButtonSeeDetails: "(S33 d37ai15)",
