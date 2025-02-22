@@ -448,10 +448,10 @@ export default class Navbar extends Vue {
   @Prop() isUnder13User!: boolean;
   @Prop() mentorCanChooseCoder!: boolean;
   @Prop() userVerificationDeadline!: Date | null;
-  @Prop() logoutModalVisible: boolean = false;
 
   T = T;
   ui = ui;
+  logoutModalVisible = false;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),

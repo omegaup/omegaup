@@ -873,6 +873,8 @@ navDependents = "My dependents"
 navDiscord = "Discord Server"
 navHelp = "Help"
 navLogIn = "Log in / Sign up"
+logoutConfirmationTitle: 'Confirm Logout',
+logoutConfirmationMessage: 'Do you really want to logout?',
 navLogOut = "Log out"
 navMyContent = "My content"
 navMyContests = "My contests"
