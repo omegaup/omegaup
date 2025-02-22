@@ -296,10 +296,10 @@ List all files in the /docs directory.
 
 ### Returns
 
-| Name      | Type                         |
-| --------- | ---------------------------- |
-| `files`   | `{ [key: string]: string; }` |
-| `message` | `string`                     |
+| Name      | Type       |
+| --------- | ---------- |
+| `files`   | `string[]` |
+| `message` | `string`   |
 
 ## `/api/admin/platformReportStats/`
 

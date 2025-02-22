@@ -4952,10 +4952,7 @@ export namespace messages {
   export type AdminDeleteFileRequest = { [key: string]: any };
   export type AdminDeleteFileResponse = { message: string };
   export type AdminListFilesRequest = { [key: string]: any };
-  export type AdminListFilesResponse = {
-    files: { [key: string]: string };
-    message: string;
-  };
+  export type AdminListFilesResponse = { files: string[]; message: string };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {

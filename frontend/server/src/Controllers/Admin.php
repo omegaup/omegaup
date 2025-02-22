@@ -156,7 +156,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * List all files in the /docs directory.
      *
-     * @return array{status: string, message: string, files: array<string>}
+     * @return array{status: string, message: string, files: list<string>}
      */
     public static function apiListFiles(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
