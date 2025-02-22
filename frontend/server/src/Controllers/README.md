@@ -328,14 +328,16 @@ Upload a file to the /docs directory (only for system admins).
 
 ### Parameters
 
-| Name   | Type          | Description |
-| ------ | ------------- | ----------- |
-| `file` | `array\|null` |             |
+| Name       | Type           | Description         |
+| ---------- | -------------- | ------------------- |
+| `file`     | `string\|null` | Base64 encoded file |
+| `filename` | `string\|null` | Original filename   |
 
 ### Returns
 
 | Name      | Type     |
 | --------- | -------- |
+| `file`    | `string` |
 | `message` | `string` |
 
 # Authorization

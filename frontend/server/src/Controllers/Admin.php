@@ -79,117 +79,84 @@ class Admin extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    // /**
-    //  * Upload a file to the /docs directory (only for system admins).
-    //  *
-    //  * @return array{status: string, message: string}
-    //  *
-    //  * @omegaup-request-param array|null $file
-    //  */
-    // public static function apiUploadFile(\OmegaUp\Request $r): array {
-    //     $r->ensureMainUserIdentity();
-    //     if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-    //         throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-    //     }
-
-    //     if (empty($_FILES['file'])) {
-    //         throw new \OmegaUp\Exceptions\InvalidParameterException(
-    //             'missingFile'
-    //         );
-    //     }
-
-    //     $file = $_FILES['file'];
-    //     $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-    //     $targetPath = $uploadDir . basename($file['name']);
-
-    //     if (file_exists($targetPath)) {
-    //         throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
-    //             'fileAlreadyExists'
-    //         );
-    //     }
-    //     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
-    //         throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
-    //             'failedToCreateDirectory'
-    //         );
-    //     }
-
-    //     $fileUploader = \OmegaUp\FileHandler::getFileUploader();
-    //     if (
-    //         !$fileUploader->isUploadedFile(
-    //             $file['tmp_name']
-    //         ) || !$fileUploader->moveUploadedFile(
-    //             $file['tmp_name'],
-    //             $targetPath
-    //         )
-    //     ) {
-    //         throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
-    //             'fileUploadFailed'
-    //         );
-    //     }
-
-    //     return ['status' => 'ok', 'message' => 'File uploaded successfully.'];
-    // }
     /**
- * Upload a file to the /docs directory (only for system admins).
- *
- * @return array{status: string, message: string, file: string}
- *
- * @omegaup-request-param string|null $file Base64 encoded file
- * @omegaup-request-param string|null $filename Original filename
- */
-public static function apiUploadFile(\OmegaUp\Request $r): array {
-    $r->ensureMainUserIdentity();
-    if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-        throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+     * Upload a file to the /docs directory (only for system admins).
+     *
+     * @return array{status: string, message: string, file: string}
+     *
+     * @omegaup-request-param string|null $file Base64 encoded file
+     * @omegaup-request-param string|null $filename Original filename
+     */
+    public static function apiUploadFile(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (empty($r['file']) || empty($r['filename'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'missingFile'
+            );
+        }
+
+        $uploadDir = OMEGAUP_ROOT . '/www/docs/';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'failedToCreateDirectory'
+            );
+        }
+
+        // Extract Base64 data
+        if (!preg_match('/^data:(.+);base64,(.+)$/', $r['file'], $matches)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidFileFormat'
+            );
+        }
+
+        $fileData = base64_decode($matches[2]);
+        if ($fileData === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidFileData'
+            );
+        }
+
+        // Sanitize the filename to avoid security risks
+        $originalFileName = basename($r['filename']);
+        $originalFileName = preg_replace(
+            '/[^A-Za-z0-9.\-_]/',
+            '_',
+            $originalFileName
+        ); // Remove unsafe characters
+        $filePath = $uploadDir . $originalFileName;
+
+        // Prevent overwriting by appending a counter if the file exists
+        $counter = 1;
+        while (file_exists($filePath)) {
+            $filePath = $uploadDir . pathinfo(
+                $originalFileName,
+                PATHINFO_FILENAME
+            ) . "_{$counter}." . pathinfo(
+                $originalFileName,
+                PATHINFO_EXTENSION
+            );
+            $counter++;
+        }
+
+        if (file_put_contents($filePath, $fileData) === false) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'fileUploadFailed'
+            );
+        }
+
+        return ['status' => 'ok', 'message' => 'File uploaded successfully.', 'file' => basename(
+            $filePath
+        )];
     }
-
-    if (empty($r['file']) || empty($r['filename'])) {
-        throw new \OmegaUp\Exceptions\InvalidParameterException('missingFile');
-    }
-
-    $uploadDir = OMEGAUP_ROOT . '/www/docs/';
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
-        throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
-            'failedToCreateDirectory'
-        );
-    }
-
-    // Extract Base64 data
-    if (!preg_match('/^data:(.+);base64,(.+)$/', $r['file'], $matches)) {
-        throw new \OmegaUp\Exceptions\InvalidParameterException('invalidFileFormat');
-    }
-
-    $fileData = base64_decode($matches[2]);
-    if ($fileData === false) {
-        throw new \OmegaUp\Exceptions\InvalidParameterException('invalidFileData');
-    }
-
-    // Sanitize the filename to avoid security risks
-    $originalFileName = basename($r['filename']);
-    $originalFileName = preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalFileName); // Remove unsafe characters
-    $filePath = $uploadDir . $originalFileName;
-
-    // Prevent overwriting by appending a counter if the file exists
-    $counter = 1;
-    while (file_exists($filePath)) {
-        $filePath = $uploadDir . pathinfo($originalFileName, PATHINFO_FILENAME) . "_{$counter}." . pathinfo($originalFileName, PATHINFO_EXTENSION);
-        $counter++;
-    }
-
-    if (file_put_contents($filePath, $fileData) === false) {
-        throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
-            'fileUploadFailed'
-        );
-    }
-
-    return ['status' => 'ok', 'message' => 'File uploaded successfully.', 'file' => basename($filePath)];
-}
-
 
     /**
      * List all files in the /docs directory.
      *
-     * @return array{status: string, message: string, files: [string]}
+     * @return array{status: string, message: string, files: array<string>}
      */
     public static function apiListFiles(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();

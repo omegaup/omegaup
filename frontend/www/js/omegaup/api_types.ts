@@ -4852,7 +4852,6 @@ export namespace types {
     identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
-    isAdmin?: boolean;
   }
 
   export interface UserProfileInfo {
@@ -4954,7 +4953,7 @@ export namespace messages {
   export type AdminDeleteFileResponse = { message: string };
   export type AdminListFilesRequest = { [key: string]: any };
   export type AdminListFilesResponse = {
-    files: string[];
+    files: { [key: string]: string };
     message: string;
   };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
@@ -4972,7 +4971,7 @@ export namespace messages {
     };
   };
   export type AdminUploadFileRequest = { [key: string]: any };
-  export type AdminUploadFileResponse = { message: string };
+  export type AdminUploadFileResponse = { file: string; message: string };
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };

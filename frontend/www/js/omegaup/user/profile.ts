@@ -297,11 +297,11 @@ OmegaUp.on('ready', () => {
       reader.onerror = (error) => reject(error);
     });
   }
-  
+
   async function addFile(file: File) {
     try {
       const fileBase64 = await fileToBase64(file);
-  
+
       api.Admin.uploadFile({ file: fileBase64, filename: file.name }) // Include original filename
         .then(() => {
           ui.success(T.fileUploadSuccess);
@@ -313,7 +313,6 @@ OmegaUp.on('ready', () => {
       ui.apiError(error);
     }
   }
-  
 
   function deleteFile(filename: string) {
     api.Admin.deleteFile({ filename })
