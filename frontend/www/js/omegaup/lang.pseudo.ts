@@ -703,7 +703,6 @@ const translations: { [key: string]: string; } = {
   feedbackSuccessfullyAdded: "(Th3 f33dback ha5 b33n 5ucc355fu11y add3d.)",
   feedbackSuccessfullyUpdated: "(Th3 f33dback ha5 b33n 5ucc355fu11y upda73d.)",
   feedbackTitle: "(Submi55i0n f33dback)",
-  fileAlreadyExists: "(Fi13 a1r3ady 3xi57 in 7h3 dir3c70ry.)",
   fileDeleteSuccess: "(Fi13 d3137i0n wa5 5ucc355fu1)",
   fileNotFound: "(Fi13 n07 f0und)",
   fileUploadFailed: "(Fi13 up10ad fai13d)",

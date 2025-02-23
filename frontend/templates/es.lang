@@ -701,7 +701,6 @@ feedbackNotSentYet = "Aún no se ha enviado la retroalimentación para este env�
 feedbackSuccessfullyAdded = "La retroalimentación se agregó correctamente."
 feedbackSuccessfullyUpdated = "La retroalimentación se actualizó correctamente."
 feedbackTitle = "Retroalimentación sobre el envío"
-fileAlreadyExists = "El archivo ya existe en el directorio."
 fileDeleteSuccess = "La eliminación del archivo fue exitosa"
 fileNotFound = "Archivo no encontrado"
 fileUploadFailed = "Error al cargar el archivo"

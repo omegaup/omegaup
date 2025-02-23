@@ -701,7 +701,6 @@ feedbackNotSentYet = "Ainda não se tem enviado o feedback para esta submissão.
 feedbackSuccessfullyAdded = "O feedback tem sido satisfatóriamente adicionado."
 feedbackSuccessfullyUpdated = "O feedback tem sido satisfatóriamente atualizado."
 feedbackTitle = "Feedback sobre a submissão"
-fileAlreadyExists = "O arquivo já existe no diretório."
 fileDeleteSuccess = "A exclusão do arquivo foi bem-sucedida"
 fileNotFound = "Arquivo não encontrado"
 fileUploadFailed = "Falha no upload do arquivo"

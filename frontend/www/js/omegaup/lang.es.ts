@@ -703,7 +703,6 @@ const translations: { [key: string]: string; } = {
   feedbackSuccessfullyAdded: "La retroalimentaci\u00f3n se agreg\u00f3 correctamente.",
   feedbackSuccessfullyUpdated: "La retroalimentaci\u00f3n se actualiz\u00f3 correctamente.",
   feedbackTitle: "Retroalimentaci\u00f3n sobre el env\u00edo",
-  fileAlreadyExists: "El archivo ya existe en el directorio.",
   fileDeleteSuccess: "La eliminaci\u00f3n del archivo fue exitosa",
   fileNotFound: "Archivo no encontrado",
   fileUploadFailed: "Error al cargar el archivo",
