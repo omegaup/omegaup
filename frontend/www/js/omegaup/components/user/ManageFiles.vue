@@ -33,7 +33,7 @@
           <span>{{ file }}</span>
           <div>
             <button
-              class="btn btn-success btn-sm mr-2"
+              class="btn btn-primary btn-sm mr-2"
               @click="onDownloadFile(file)"
             >
               {{ T.wordsDownload }}
@@ -75,16 +75,13 @@ export default class ManageFiles extends Vue {
   onUploadFile() {
     if (!this.selectedFile) return;
 
-    const fileName = this.selectedFile.name;
     this.$emit('add-file', this.selectedFile);
-    this.files.push(fileName);
     this.selectedFile = null;
     (this.$refs.fileInput as HTMLInputElement).value = '';
   }
 
   onDeleteFile(fileName: string) {
     this.$emit('delete-file', fileName);
-    this.files = this.files.filter((file) => file !== fileName);
   }
 
   onDownloadFile(filename: string) {

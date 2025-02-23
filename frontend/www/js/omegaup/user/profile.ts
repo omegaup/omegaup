@@ -53,7 +53,7 @@ OmegaUp.on('ready', () => {
         selectedTab,
         searchResultSchools: searchResultSchools,
         files: [] as string[],
-        isAdmin: payload.isAdmin,
+        isAdmin: commonPayload.isAdmin,
       };
     },
     mounted() {
