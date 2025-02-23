@@ -165,19 +165,24 @@ class Admin extends \OmegaUp\Controllers\Controller {
         }
 
         $uploadDir = OMEGAUP_ROOT . '/www/docs/';
+        $files = is_dir($uploadDir)
+            ? array_values(
+                array_filter(
+                    array_diff(
+                        scandir(
+                            $uploadDir
+                        ),
+                        ['.', '..']
+                    ),
+                    'is_string'
+                )
+            )
+            : [];
+
         return [
             'status' => 'ok',
             'message' => 'File list retrieved successfully.',
-            'files' => is_dir(
-                $uploadDir
-            ) ? array_values(
-                array_diff(
-                    scandir(
-                        $uploadDir
-                    ),
-                    ['.', '..']
-                )
-            ) : []
+            'files' => $files,
         ];
     }
 
