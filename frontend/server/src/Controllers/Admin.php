@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 class Admin extends \OmegaUp\Controllers\Controller {
     /**
@@ -13,7 +13,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
      */
     public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
         $r->ensureMainUserIdentity();
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -78,5 +77,170 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 ],
             ],
         ];
+    }
+
+    /**
+     * Upload a file to the /docs directory (only for system admins).
+     *
+     * @return array{status: string, message: string, file: string}
+     *
+     * @omegaup-request-param string|null $file Base64 encoded file
+     * @omegaup-request-param string|null $filename Original filename
+     */
+    public static function apiUploadFile(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (empty($r['file']) || empty($r['filename'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'missingFile'
+            );
+        }
+
+        $uploadDir = OMEGAUP_ROOT . '/www/docs/';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'failedToCreateDirectory'
+            );
+        }
+
+        // Extract Base64 data
+        if (!preg_match('/^data:(.+);base64,(.+)$/', $r['file'], $matches)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidFileFormat'
+            );
+        }
+
+        $fileData = base64_decode($matches[2]);
+        if ($fileData === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidFileData'
+            );
+        }
+
+        // Sanitize the filename to avoid security risks
+        $originalFileName = basename($r['filename']);
+        $originalFileName = preg_replace(
+            '/[^A-Za-z0-9.\-_]/',
+            '_',
+            $originalFileName
+        ); // Remove unsafe characters
+        $filePath = $uploadDir . $originalFileName;
+
+        // Prevent overwriting by appending a counter if the file exists
+        $counter = 1;
+        while (file_exists($filePath)) {
+            $filePath = $uploadDir . pathinfo(
+                $originalFileName,
+                PATHINFO_FILENAME
+            ) . "_{$counter}." . pathinfo(
+                $originalFileName,
+                PATHINFO_EXTENSION
+            );
+            $counter++;
+        }
+
+        if (file_put_contents($filePath, $fileData) === false) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'fileUploadFailed'
+            );
+        }
+
+        return ['status' => 'ok', 'message' => 'File uploaded successfully.', 'file' => basename(
+            $filePath
+        )];
+    }
+
+    /**
+     * List all files in the /docs directory.
+     *
+     * @return array{status: string, message: string, files: list<string>}
+     */
+    public static function apiListFiles(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $uploadDir = OMEGAUP_ROOT . '/www/docs/';
+        $files = is_dir($uploadDir)
+            ? array_values(
+                array_map(
+                    fn (string $file): string => $file,
+                    array_filter(
+                        array_diff(scandir($uploadDir), ['.', '..']),
+                        'is_string'
+                    )
+                )
+            )
+            : [];
+
+        return [
+            'status' => 'ok',
+            'message' => 'File list retrieved successfully.',
+            'files' => $files,
+        ];
+    }
+
+    /**
+     * Delete a file from the /docs directory.
+     *
+     * @return array{status: string, message: string}
+     *
+     * @omegaup-request-param string $filename
+     */
+    public static function apiDeleteFile(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
+
+        $filePath = OMEGAUP_ROOT . '/www/docs/' . basename($r['filename']);
+        if (!file_exists($filePath)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
+        }
+
+        \OmegaUp\FileHandler::deleteFile($filePath);
+        return ['status' => 'ok', 'message' => 'File deleted successfully.'];
+    }
+
+    /**
+     * Download a file from the /docs directory.
+     *
+     * @omegaup-request-param string $filename
+     */
+    public static function apiDownloadFile(\OmegaUp\Request $r): void {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        \OmegaUp\Validators::validateStringNonEmpty($r['filename'], 'filename');
+        $filePath = OMEGAUP_ROOT . '/www/docs/' . basename($r['filename']);
+
+        if (!file_exists($filePath)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('fileNotFound');
+        }
+
+        // Set headers for file download
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header(
+            'Content-Disposition: attachment; filename="' . basename(
+                $filePath
+            ) . '"'
+        );
+        header('Content-Length: ' . filesize($filePath));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        // Read and output the file
+        readfile($filePath);
+        exit;
     }
 }

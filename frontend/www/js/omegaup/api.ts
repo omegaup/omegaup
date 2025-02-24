@@ -91,10 +91,22 @@ export function apiCall<
 }
 
 export const Admin = {
+  deleteFile: apiCall<
+    messages.AdminDeleteFileRequest,
+    messages.AdminDeleteFileResponse
+  >('/api/admin/deleteFile/'),
+  listFiles: apiCall<
+    messages.AdminListFilesRequest,
+    messages.AdminListFilesResponse
+  >('/api/admin/listFiles/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  uploadFile: apiCall<
+    messages.AdminUploadFileRequest,
+    messages.AdminUploadFileResponse
+  >('/api/admin/uploadFile/'),
 };
 
 export const Authorization = {

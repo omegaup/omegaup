@@ -52,7 +52,20 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
+        files: [] as string[],
+        isAdmin: commonPayload.isAdmin,
       };
+    },
+    mounted() {
+      if (this.selectedTab === 'manage-files') {
+        this.fetchFiles();
+      }
+    },
+    methods: {
+      fetchFiles,
+      addFile,
+      deleteFile,
+      downloadFile,
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -73,6 +86,8 @@ OmegaUp.on('ready', () => {
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
+          files: this.files,
+          isAdmin: this.isAdmin,
         },
         on: {
           'update-user-basic-information': (
@@ -236,6 +251,18 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'fetch-files': () => {
+            this.fetchFiles();
+          },
+          'add-file': (file: File) => {
+            this.addFile(file);
+          },
+          'delete-file': (fileId: string) => {
+            this.deleteFile(fileId);
+          },
+          'download-file': (fileName: string) => {
+            this.downloadFile(fileName);
+          },
         },
       });
     },
@@ -252,6 +279,71 @@ OmegaUp.on('ready', () => {
     api.User.listAPITokens({})
       .then((data) => {
         userProfile.apiTokens = data.tokens;
+      })
+      .catch(ui.apiError);
+  }
+  function fetchFiles() {
+    api.Admin.listFiles()
+      .then(({ files }) => {
+        userProfile.files = files;
+      })
+      .catch(ui.apiError);
+  }
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
+  async function addFile(file: File) {
+    try {
+      const fileBase64 = await fileToBase64(file);
+
+      api.Admin.uploadFile({ file: fileBase64, filename: file.name }) // Include original filename
+        .then(() => {
+          ui.success(T.fileUploadSuccess);
+          fetchFiles();
+        })
+        .catch(ui.apiError);
+    } catch (error: any) {
+      console.error('File conversion failed', error);
+      ui.apiError(error);
+    }
+  }
+
+  function deleteFile(filename: string) {
+    api.Admin.deleteFile({ filename })
+      .then(() => {
+        ui.success(T.fileDeleteSuccess);
+        fetchFiles();
+      })
+      .catch(ui.apiError);
+  }
+
+  function downloadFile(filename: string) {
+    const downloadUrl = `/api/admin/downloadFile?filename=${encodeURIComponent(
+      filename,
+    )}`;
+
+    fetch(downloadUrl, { method: 'GET' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to download file');
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename); // Set correct filename
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
       })
       .catch(ui.apiError);
   }
