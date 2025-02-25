@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# pylint: disable=invalid-name
+# This program is intended to be invoked from the console, not to be used as a
+# module.
 import mysql.connector
 from mysql.connector import Error
 
