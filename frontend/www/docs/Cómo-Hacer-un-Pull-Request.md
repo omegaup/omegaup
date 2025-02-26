@@ -12,7 +12,7 @@
 
 Cuando se envía un cambio el repositorio, no se pueden hacer commits a la rama **main**. Todo lo que desarrolles y envies en PRs debe hacerse en ramas.
 
-Una vez que [instalaste la máquina virtual](https://github.com/omegaup/omegaup/wiki/Instalaci%C3%B3n-de-m%C3%A1quina-virtual) sigue estas instrucciones (Las configuraciones de los remotes sólo las tendrás que realizar una vez):
+Una vez que [instalaste la máquina virtual](/docs/Instalaci%C3%B3n-de-m%C3%A1quina-virtual.md) sigue estas instrucciones (Las configuraciones de los remotes sólo las tendrás que realizar una vez):
 
 # Configuración del remote de omegaUp
 
@@ -58,7 +58,7 @@ Si `git push` falla, es porque violaste la regla de no hacer cambios en `main` -
 
 # Empezar un nuevo cambio
 
-Te invitamos a seguir nuestros lineamientos para escribir código en nuestro proyecto: https://github.com/omegaup/omegaup/wiki/Coding-guidelines. Al seguirlos será más sencillo que se revisen tus cambios y se integren a producción.
+Te invitamos a seguir nuestros lineamientos para escribir código en nuestro proyecto: /docs/Coding-guidelines..md Al seguirlos será más sencillo que se revisen tus cambios y se integren a producción.
 
 **Antes de empezar a hacer modificaciones** ejecuta estos comandos para crear una nueva rama que esté sincronizada con `omegaUp`:
 * `git checkout -b nombredelfeaturequequiereshacer upstream/main` # crea una rama nueva y la sincroniza con omegaup
@@ -157,14 +157,14 @@ Si vuelves a ejecutar el comando `git branch -a` notarás que ya desapareció to
 - Tu PR ha sido mergeado? Espera al deployment del fin de semana para ver tus cambios en producción
 
 #### Te puede interesar
- - [Coding guidelines](https://github.com/omegaup/omegaup/wiki/Coding-guidelines).
- - [Comandos útiles para el desarrollo](https://github.com/omegaup/omegaup/wiki/Comandos-%C3%BAtiles-para-el-desarrollo).
- - [Cómo desarrollar usando VSCode Remote](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-desarrollar-usando-VSCode-Remote)
- - [Cómo utilizar Cypress en omegaUp](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-utilizar-Cypress-en-omegaUp)
+ - [Coding guidelines](/docs/Coding-guidelines.md).
+ - [Comandos útiles para el desarrollo](/docs/Comandos-%C3%BAtiles-para-el-desarrollo.md).
+ - [Cómo desarrollar usando VSCode Remote](/docs/C%C3%B3mo-desarrollar-usando-VSCode-Remote.md)
+ - [Cómo utilizar Cypress en omegaUp](/docs/C%C3%B3mo-utilizar-Cypress-en-omegaUp.md)
 
 ### Continua...
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |                   
-| [Arquitectura](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | Arquitectura de software de omegaUp.com                      |
-| [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment)  | Cómo y cuándo es el deployment                               |
+| [Arquitectura](/docs/Arquitectura.md)  | Arquitectura de software de omegaUp.com                      |
+| [Release and Deployment](/docs/Release-&-deployment.md)  | Cómo y cuándo es el deployment                               |
 
