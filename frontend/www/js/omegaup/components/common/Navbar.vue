@@ -316,10 +316,12 @@
                   }}</a>
                 </template>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item"
-                href="#"
-                @click.prevent="logoutModalVisible = true"
-                data-logout-button></a>
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  data-logout-button
+                  @click.prevent="logoutModalVisible = true"
+                ></a>
                 <omegaup-common-grader-status
                   v-show="isAdmin"
                   :status="errorMessage !== null ? 'down' : 'ok'"
@@ -331,19 +333,21 @@
           </ul>
 
           <a
-          v-if="isLoggedIn"
-          class="navbar justify-content-end mb-2 d-lg-none"
-          href="#"
-          @click.prevent="logoutModalVisible = true">
-        <font-awesome-icon :icon="['fas', 'power-off']" />
-        </a>
+            v-if="isLoggedIn"
+            class="navbar justify-content-end mb-2 d-lg-none"
+            href="#"
+            @click.prevent="logoutModalVisible = true"
+          >
+            <font-awesome-icon :icon="['fas', 'power-off']" />
+          </a>
         </div>
 
         <a
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block order-1"
           href="#"
-          @click.prevent="logoutModalVisible = true">
+          @click.prevent="logoutModalVisible = true"
+        >
           <font-awesome-icon :icon="['fas', 'power-off']" />
         </a>
       </div>
@@ -382,7 +386,7 @@
         ></omegaup-markdown>
       </div>
     </template>
-    <omegaup-logout-confirmation  v-model="logoutModalVisible">
+    <omegaup-logout-confirmation v-model="logoutModalVisible">
     </omegaup-logout-confirmation>
   </header>
 </template>

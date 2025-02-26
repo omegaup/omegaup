@@ -1,4 +1,3 @@
-<!-- components/LogoutConfirmation.vue -->
 <template>
   <b-modal
     v-model="showModal"
@@ -7,9 +6,9 @@
     :no-title="T.wordsNo"
     ok-variant="primary"
     no-variant="secondary"
-    @ok="confirmLogout"
     static
     lazy
+    @ok="confirmLogout"
   >
     <div class="mb-4">{{ T.logoutConfirmationMessage }}</div>
   </b-modal>
