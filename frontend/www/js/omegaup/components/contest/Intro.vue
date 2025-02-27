@@ -32,14 +32,42 @@
               <p
                 v-if="
                   !needsBasicInformation && requestsUserInformation === 'no'
-                "
+                  "
               >
-                {{ T.aboutToStart }}
-              </p>
+              {{ T.aboutToStart }}
+            </p>
               <omegaup-markdown
                 v-if="needsBasicInformation"
                 :markdown="T.contestBasicInformationNeeded"
-              ></omegaup-markdown>
+                >
+              </omegaup-markdown>
+              <ul
+                v-if="needsBasicInformation"
+                :class="[
+                  'list-unstyled',
+                  'text-muted',
+                  'font-weight-light',
+                ]"
+              >
+                <li>
+                  {{ T.wordsCountry }}:
+                  <span :class="profile.country_id ? 'text-success' : 'text-danger'">
+                    {{ (profile.country_id ? profile.country : null) || T.editFieldRequired }} {{ profile.country_id ? "✔️" : "❌" }}
+                  </span>
+                </li>
+                <li>
+                  {{ T.profileState }}:
+                  <span :class="profile.state ? 'text-success' : 'text-danger'">
+                    {{ profile.state || T.editFieldRequired }} {{ profile.state ? "✔️" : "❌" }}
+                  </span>
+                </li>
+                <li>
+                  {{ T.wordsSchool }}:
+                  <span :class="profile.school ? 'text-success' : 'text-danger'">
+                    {{ profile.school || T.editFieldRequired }} {{ profile.school ? "✔️" : "❌" }}
+                  </span>
+                </li>
+              </ul>
               <template v-if="requestsUserInformation !== 'no'">
                 <omegaup-markdown
                   :markdown="(statement && statement.markdown) || ''"
@@ -186,6 +214,7 @@ export default class ContestIntro extends Vue {
   @Prop() statement!: types.PrivacyStatement;
   @Prop({ default: false })
   shouldShowModalToLoginWithRegisteredIdentity!: boolean;
+  @Prop() profile!: types.UserProfileInfo;
 
   T = T;
   ui = ui;

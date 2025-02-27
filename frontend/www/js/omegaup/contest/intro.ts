@@ -16,10 +16,22 @@ OmegaUp.on('ready', () => {
   if (payload.contest.finish_time) {
     payload.contest.finish_time = time.remoteDate(payload.contest.finish_time);
   }
+
   new Vue({
     el: '#main-container',
     components: {
       'omegaup-contest-intro': contest_Intro,
+    },
+    data: () => ({
+      profile: {} as types.UserProfileInfo,
+    }),
+    mounted() {
+      // Fetch user profile as soon as the component is mounted
+      api.User.profile()
+        .then((response) => {
+          this.profile = response;
+        })
+        .catch(ui.apiError);
     },
     render: function (createElement) {
       return createElement('omegaup-contest-intro', {
@@ -31,6 +43,7 @@ OmegaUp.on('ready', () => {
           contest: payload.contest,
           isLoggedIn: headerPayload.isLoggedIn,
           statement: payload.privacyStatement,
+          profile: this.profile,
         },
         on: {
           'open-contest': (request: types.ContestAdminDetails): void => {
