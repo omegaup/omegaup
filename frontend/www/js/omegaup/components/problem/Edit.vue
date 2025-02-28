@@ -226,11 +226,18 @@
           <div class="card-body">
             <form class="form" @submit.prevent="onDownload">
               <div class="form-group">
+                {{ T.problemDownloadZip }}:
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
                 </button>
               </div>
             </form>
+            <div class="form-group">
+              {{ T.problemPrintableVersion }}:
+              <button class="btn btn-primary" @click="onGotoPrintableVersion">
+                {{ T.contestPrintableVersion }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -344,6 +351,10 @@ export default class ProblemEdit extends Vue {
   @Watch('statement')
   onStatementChange(newStatement: types.ProblemStatement): void {
     this.currentStatement = newStatement;
+  }
+
+  onGotoPrintableVersion(): void {
+    window.location.href = `/arena/problem/${this.alias}/print/`;
   }
 }
 </script>
