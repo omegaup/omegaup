@@ -226,14 +226,25 @@
           <div class="card-body">
             <form class="form" @submit.prevent="onDownload">
               <div class="form-group">
+                Download the zip file for the problem:
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
                 </button>
               </div>
             </form>
+            <div class="form-group">
+              Get the printable version of the problem:
+              <button 
+              class="btn btn-secondary"
+              @click="onGotoPrintableVersion"
+              >
+                {{ T.contestPrintableVersion }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
 
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
@@ -344,6 +355,10 @@ export default class ProblemEdit extends Vue {
   @Watch('statement')
   onStatementChange(newStatement: types.ProblemStatement): void {
     this.currentStatement = newStatement;
+  }
+
+  onGotoPrintableVersion(): void {
+    window.location.href = `/arena/problem/${this.alias}/print/`;
   }
 }
 </script>
