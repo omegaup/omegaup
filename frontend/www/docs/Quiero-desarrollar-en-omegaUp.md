@@ -1,8 +1,8 @@
 # Quiero desarrollar en omegaUp
 
-Gracias por tu interés en contribuir a omegaUp. Aqui encontrarás información sobre el entorno de desarrollo y una descripción breve de nuestro proyecto.
+Gracias por tu interés en contribuir con omegaUp. Aquí encontrarás información sobre el entorno de desarrollo y una descripción breve de nuestro proyecto.
 
-Si no estás tan familiarizado con omegaUp, por favor considera primero visitar [omegaUp.com](https://omegaup.com/), crear una cuenta y resolver 1 o 2 problemas en la plataforma. Después puede visitar [omegaup.org](https://omegaup.org/) para aprender más acerca de la organización y las diferentes vertientes de nuestro trabajo.
+Si no estás tan familiarizado con omegaUp, por favor considera primero visitar [omegaUp.com](https://omegaup.com/), crear una cuenta y resolver 1 o 2 problemas en la plataforma. Después puedes visitar [omegaup.org](https://omegaup.org/) para aprender más acerca de la organización y las diferentes vertientes de nuestro trabajo.
 
 ## Contenido
 
@@ -12,7 +12,7 @@ Si no estás tan familiarizado con omegaUp, por favor considera primero visitar 
 - [Decisiones de diseño](#decisiones-de-diseño)
 
 ## Entorno de desarrollo
-El primer paso es la instalación del entorno de desarrollo. Usamos docker para montarlo y los sistemas operativos donde se ha usado principalmente son Windows y Ubuntu. Puede ejecutarse en macOS pero necesitaras configuraciones adicionales.
+El primer paso es la instalación del entorno de desarrollo. Usamos docker para montarlo y los sistemas operativos donde se ha usado principalmente son Windows y Ubuntu. Puede ejecutarse en macOS, pero necesitarás configuraciones adicionales.
  - [Instalación del entorno de desarrollo](https://github.com/omegaup/omegaup/wiki/Instalaci%C3%B3n-de-m%C3%A1quina-virtual).
 
 
@@ -41,12 +41,13 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 
  - [frontend/database](https://github.com/omegaup/omegaup/tree/main/frontend/database): contiene el archivo SQL principal para construir el esquema de la base de datos de la plataforma. También se incluyen todos los archivos SQL que se agregan cada vez que se realiza una modificación a la base de datos.
  - [frontend/server/src](https://github.com/omegaup/omegaup/tree/main/frontend/server/src): contiene todas las clases PHP y carpetas referentes al servidor, entre ellas:
-   - [frontend/server/src/DAO/VO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO/VO) Clases de Value Object (VO) que se utilizan para construir los diferentes objetos que se necesitan en omegaUp.com.
    - [frontend/server/src/DAO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO) Clases de Data Access Object (DAO) para manipular la base de datos: almacenar de forma permanente y recuperar instancias de objetos a través de las consultas de MySQL. Existen dos carpetas para los DAO. En una se encuentran todos los métodos que manipulan y consultan la base de datos con condiciones específicas, aquellas necesarias para presentarle la información al usuario dependiendo de acciones particulares. La otra carpeta se llama Base y contiene los métodos básicos de manipulación y consulta, estos son: crear, eliminar, actualizar, obtener un registro por su identificador, y obtener todos los registros.
+      - [frontend/server/src/DAO/VO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO/VO) Clases de Value Object (VO) que se utilizan para construir los diferentes objetos que se necesitan en omegaUp.com. No hay necesidad de modificarlos, ya que estos se crean automáticamente
+      - [frontend/server/src/DAO/Base](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO/Base) Estos objetos contienen métodos principales para interactuar con la base de datos, como lo son: crear, actualizar, eliminar y recuperar registros de cada uno de los objetos DAO. No hay necesidad de modificarlos, ya que estos se crean automáticamente
    - [frontend/server/src/Controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/Controllers): Clases de los controladores donde se encuentran los diferentes métodos para las API de la plataforma y que utilizan los DAO para obtener y manipular la información solicitada.
  - [frontend/tests](https://github.com/omegaup/omegaup/tree/main/frontend/tests): contiene las clases PHP donde se crean pruebas unitarias para probar el correcto funcionamiento de todos los controladores y sus métodos. Aquí también se encuentran clases Python donde se crean pruebas para probar el correcto flujo de las interacciones con la interfaz de usuario (UI).
- - [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www): contiene todos los archivos TS y Vue.js referentes al frontend. En los  archivos TS se hacen todas las llamadas necesarias a los controladores del servidor a través de las API y se reciben los datos solicitados. En estos archivos también se construyen los componentes de los archivos Vue.js que muestran la información al usuario a través del HMTL y CSS. Por cada componente de Vue se incluye un archivo de pruebas unitarias para probar que se muestren y oculten los elementos del componente necesarios cuando es requerido, y que emita los eventos con la información esperada, entre otras cosas.
- - [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Aquí están los archivos de internacionalización para inglés, español y portugués.
+ - [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www): contiene todos los archivos TS y Vue.js referentes al frontend. En los archivos TS se hacen todas las llamadas necesarias a los controladores del servidor a través de las API y se reciben los datos solicitados. En estos archivos también se construyen los componentes de los archivos Vue.js que muestran la información al usuario a través del HMTL y CSS. Por cada componente de Vue se incluye un archivo de pruebas unitarias para probar que se muestren y oculten los elementos del componente necesarios cuando es requerido, y que emita los eventos con la información esperada, entre otras cosas.
+ - [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Aquí están los archivos de internacionalización para inglés, español y portugués. Además de la plantilla principal donde se cargan las librerías que se utilizarán en todas las vistas (`Bootstrap` por ejemplo).
 
 #### Te puede interesar:
  - [Coding guidelines](https://github.com/omegaup/omegaup/wiki/Coding-guidelines).
@@ -59,9 +60,9 @@ Estos son los directorios que estamos usando activamente en el desarrollo:
 * Desacoplamiento de componentes: La razón de eso es que hay un plan de migración de parte de la funcionalidad de _Frontend_ hacia _Arena_ en un futuro y necesitamos que sea lo más fácil posible.
 * Lenguajes de programación: Todo el backend está escrito en Go/C, _Frontend_ está en PHP+MySQL, _UX_ está en VueJS+TypeScript.
 
-### Continua..
+### Continúa...
 
-| Topic                                                  | Description                                                  |
+| Tema                                                  | Descripción                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
 | [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request) | Configuraciones en git, cómo enviar un PR                    |
 | [Arquitectura](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | Arquitectura de software de omegaUp.com                      |
