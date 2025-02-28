@@ -188,6 +188,7 @@
   - [`/api/reset/generateToken/`](#apiresetgeneratetoken)
   - [`/api/reset/update/`](#apiresetupdate)
 - [Run](#run)
+  - [`/api/run/alert/`](#apirunalert)
   - [`/api/run/counts/`](#apiruncounts)
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
@@ -3825,6 +3826,26 @@ the correct parameters are suplied.
 
 RunController
 
+## `/api/run/alert/`
+
+### Description
+
+Sends an alert to New Relic indicating that a run has been sent to the
+Grader and should be rejudged.
+
+### Parameters
+
+| Name             | Type     | Description |
+| ---------------- | -------- | ----------- |
+| `current_score`  | `float`  |             |
+| `original_score` | `float`  |             |
+| `run_alias`      | `string` |             |
+| `version`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/run/counts/`
 
 ### Description
@@ -3969,7 +3990,10 @@ Re-sends a problem to Grader.
 
 ### Returns
 
-_Nothing_
+| Name      | Type     |
+| --------- | -------- |
+| `score`   | `number` |
+| `version` | `string` |
 
 ## `/api/run/requalify/`
 
