@@ -37,3 +37,4 @@ export default class LogoutConfirmation extends Vue {
   }
 }
 </script>
+
