@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# pylint: disable=invalid-name
-# This program is intended to be invoked from the console, not to be used as a
-# module.
 import mysql.connector
 from mysql.connector import Error
 
@@ -43,10 +39,7 @@ def get_queries_from_general_log(connection):
 # Function to run EXPLAIN on each query
 def explain_queries(connection, queries):
     cursor = connection.cursor()
-    q=1
     for query in queries:
-        #print("query no: ",q,"\n")
-        q=q+1
         query_text = query[0]
         try:
             cursor.execute(f"EXPLAIN {query_text}")
