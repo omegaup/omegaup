@@ -1515,18 +1515,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         return $result;
     }
 
-    /**
-     * Given a list of runs, returns a .zip file containing the source codes
-     * of each submission, organized into problem-based folders.
-     *
-     * Each problem (alias) gets its own folder, and inside it, each run is
-     * stored as a file named "{username}.{language}".
-     *
-     * @omegaup-request-param list<array{alias: string, guid: string, username: string, language: string, contest_alias: string}> $runs The list of runs to include in the ZIP file.
-     *
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     */
     public static function apiDownloadMultipleRuns(\OmegaUp\Request $r): void {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();

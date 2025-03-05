@@ -196,7 +196,6 @@
               <th v-else-if="showDetails || showDisqualify || showRejudge">
                 <div class="dropdown">
                   <button
-                    data-runs-actions-button
                     class="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-toggle="dropdown"
