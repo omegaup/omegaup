@@ -900,6 +900,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "Mi perfil",
   newPublicTagsNotAllowed: "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
   noCoders: "No hay coders",
+  noRunsProvided: "No se proporcionaron ejecuciones.",
   nominationsRangeHeader: "Reportes de problemas (del %(lowCount) al %(highCount))",
   notProblemLevelTag: "La etiqueta enviada no es una etiqueta de nivel.",
   notificationContestClarificationRequest: "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
@@ -2085,6 +2086,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tiempo-real (Seg)",
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
+  zipCreationFailed: "Fallo en la creaci\u00f3n del archivo zip.",
   zipPrepare: "Preparar archivo zip",
 };
 

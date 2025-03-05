@@ -899,6 +899,7 @@
 	"navViewProfile": "(My pr0fi13)",
 	"newPublicTagsNotAllowed": "(I7 i5 n07 a110w3d 70 add n3w pub1ic 7ag5)",
 	"noCoders": "(N0 c0d3r5.)",
+	"noRunsProvided": "(N0 run5 pr0vid3d.)",
 	"nominationsRangeHeader": "(Pr0b13m r3p0r75 (fr0m %(lowCount) 70 %(highCount)))",
 	"notProblemLevelTag": "(Th3 7ag 53n7 i5 n07 a 13v31 7ag.)",
 	"notificationContestClarificationRequest": "(A n3w c1arifica7i0n ha5 b33n r3qu3573d f0r pr0b13m %(problemAlias) 0f 7h3 c0n7357 %(contestAlias), 7ha7 y0u manag3.)",
@@ -2084,5 +2085,6 @@
 	"wordsWallTimeInSeconds": "(Wa11-7im3 (S3c))",
 	"wordsWarningProblem": "(K33p wi7h a warning)",
 	"wordsYes": "(Y35)",
+	"zipCreationFailed": "(Zip cr3a7i0n fai13d.)",
 	"zipPrepare": "(Pr3par3 zip fi13)"
 }

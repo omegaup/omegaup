@@ -900,6 +900,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "My profile",
   newPublicTagsNotAllowed: "It is not allowed to add new public tags",
   noCoders: "No coders.",
+  noRunsProvided: "No runs provided.",
   nominationsRangeHeader: "Problem reports (from %(lowCount) to %(highCount))",
   notProblemLevelTag: "The tag sent is not a level tag.",
   notificationContestClarificationRequest: "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage.",
@@ -2085,6 +2086,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
+  zipCreationFailed: "Zip creation failed.",
   zipPrepare: "Prepare zip file",
 };
 
