@@ -194,7 +194,26 @@
                 {{ T.arenaRunsActions }}
               </th>
               <th v-else-if="showDetails || showDisqualify || showRejudge">
-                <button @click="onDownloadAllCode()">Bulk Download</button>
+                <div class="dropdown">
+                  <button
+                    data-runs-actions-button
+                    class="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {{ T.bulkAction }}
+                  </button>
+                  <div class="dropdown-menu">
+                    <button
+                      class="btn-link dropdown-item"
+                      @click="onDownloadAllCode()"
+                    >
+                      {{ T.wordsDownloadCode }}
+                    </button>
+                  </div>
+                </div>
               </th>
               <th v-else></th>
             </tr>
