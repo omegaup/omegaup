@@ -1833,7 +1833,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = ['problem_0', 'problem_1', 'problem_2', 'problem_3', 'problem_4'];
         $submissionsMapping = [
             0 => [
-                'problem_0' => [
+                'problem_0' => [ // 63 [3,5]
                     ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
                     ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
@@ -1841,7 +1841,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
-                'problem_1' => [
+                'problem_1' => [ // 63 [4,5]
                     ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
@@ -1849,7 +1849,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
-                'problem_2' => [
+                'problem_2' => [ // 63 [4,5]
                     ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
@@ -1857,7 +1857,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
-                'problem_3' => [
+                'problem_3' => [ // 63 [2,5]
                     ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
@@ -1865,18 +1865,17 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
-                'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 1 - 1
-                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.1], // 1 - 1
-                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 1 - 1
-                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 3 - 3
-                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3], // 4 - 4
-                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 1 - 1
+                'problem_4' => [ // 50 [1,4,6]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 50
+                    ['username' => 'user_02', 'verdict' => 'PA', 'points' => 0.1], // 63
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 63
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 176
+                    ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3], // 252
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 50
                 ],
-                // First month: user_5 solved 4 problems for the first time
             ],
             1 => [
-                'problem_0' => [
+                'problem_0' => [ // 43 [1,2,3,5]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
@@ -1884,7 +1883,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
-                'problem_1' => [
+                'problem_1' => [ // 50 [1,4,5]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.5],
@@ -1892,7 +1891,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.5],
                 ],
-                'problem_2' => [
+                'problem_2' => [ // 50 [2,4,5]
                     ['username' => 'user_01', 'verdict' => 'PA', 'points' => 0.5],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0],
@@ -1900,7 +1899,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.2],
                 ],
-                'problem_3' => [
+                'problem_3' => [ // 43 [1,2,4,5]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2],
@@ -1908,18 +1907,17 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.2],
                     ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
-                'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 3 - 3
-                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0], // 3 - 2
-                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 0 - 0
-                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 3 - 1
-                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0], // 3 - 1
-                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 0.0], // 1 - 0
+                'problem_4' => [ // 43 [1,4,5,6]
+                    ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0], // 136
+                    ['username' => 'user_02', 'verdict' => 'WA', 'points' => 0.0], // 93
+                    ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.2], // 0
+                    ['username' => 'user_04', 'verdict' => 'AC', 'points' => 1.0], // 43
+                    ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0], // 43
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 0.0], // 0
                 ],
-                // Second month: user_1 solved 3 problems for the first time
             ],
             2 => [
-                'problem_0' => [
+                'problem_0' => [ // 39 [1,2,3,4,5]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'PA', 'points' => 0.3],
@@ -1927,7 +1925,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
                     ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
-                'problem_1' => [
+                'problem_1' => [ // 36 [1,2,3,4,5,6]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
@@ -1935,7 +1933,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0],
                 ],
-                'problem_2' => [
+                'problem_2' => [ // 39 [1,2,3,4,5]
                     ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
@@ -1943,7 +1941,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_06', 'verdict' => 'PA', 'points' => 0.3],
                 ],
-                'problem_3' => [
+                'problem_3' => [ // 39 [1,2,3,4,5]
                     ['username' => 'user_01', 'verdict' => 'WA', 'points' => 0.0],
                     ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0],
                     ['username' => 'user_03', 'verdict' => 'AC', 'points' => 1.0],
@@ -1951,35 +1949,32 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     ['username' => 'user_05', 'verdict' => 'PA', 'points' => 0.3],
                     ['username' => 'user_06', 'verdict' => 'WA', 'points' => 0.0],
                 ],
-                'problem_4' => [
-                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 4 - 1
-                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 5 - 2
-                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 3 - 3
-                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5], // 2 - 1
-                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0], // 1 - 0
-                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 2 - 1
+                'problem_4' => [ // 39 [1,2,4,5,6]
+                    ['username' => 'user_01', 'verdict' => 'AC', 'points' => 1.0], // 78
+                    ['username' => 'user_02', 'verdict' => 'AC', 'points' => 1.0], // 75
+                    ['username' => 'user_03', 'verdict' => 'WA', 'points' => 0.0], // 114
+                    ['username' => 'user_04', 'verdict' => 'PA', 'points' => 0.5], // 39
+                    ['username' => 'user_05', 'verdict' => 'WA', 'points' => 0.0], // 0
+                    ['username' => 'user_06', 'verdict' => 'AC', 'points' => 1.0], // 36
                 ],
-                // Third month: user_3 is the winner even though user_1 solved
-                // more problems, because user_1 has already won the CoTM prize,
-                // and user_02 has resolved more problems but not for the first time
             ],
         ];
         $expectedWinners = [
             0 => [
-                ['username' => 'user_05', 'problems_solved' => 4],
-                ['username' => 'user_04', 'problems_solved' => 3],
-                ['username' => 'user_01', 'problems_solved' => 1],
-                ['username' => 'user_06', 'problems_solved' => 1],
-                ['username' => 'user_03', 'problems_solved' => 1],
-                //['username' => 'user_02', 'problems_solved' => 1],
-                // user_2 shouldn't be considered because only 5 users are set
+                ['username' => 'user_05', 'score' => 252.0],
+                ['username' => 'user_04', 'score' => 176.0],
+                ['username' => 'user_03', 'score' => 63.0],
+                ['username' => 'user_02', 'score' => 63.0],
+                ['username' => 'user_01', 'score' => 50.0],
+                //['username' => 'user_06', 'score' => 50.0],
+                // user_6 shouldn't be considered because only 5 users are set
                 // to be displayed
             ],
             1 => [
-                ['username' => 'user_01', 'problems_solved' => 3],
-                ['username' => 'user_02', 'problems_solved' => 2],
-                ['username' => 'user_04', 'problems_solved' => 1],
-                ['username' => 'user_06', 'problems_solved' => 0],
+                ['username' => 'user_01', 'score' => 136.0],
+                ['username' => 'user_02', 'score' => 93.0],
+                ['username' => 'user_04', 'score' => 43.0],
+                ['username' => 'user_06', 'score' => 0.0],
                 // user_05 is not considered because they have already won the
                 // CoTM prize
                 // user_03 is not considered because they don't have any AC run
@@ -1988,10 +1983,10 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 // problem, but it was solved in the previous month
             ],
             2 => [
-                ['username' => 'user_03', 'problems_solved' => 3],
-                ['username' => 'user_02', 'problems_solved' => 2],
-                ['username' => 'user_06', 'problems_solved' => 1],
-                ['username' => 'user_04', 'problems_solved' => 1],
+                ['username' => 'user_03', 'score' => 114.0],
+                ['username' => 'user_02', 'score' => 75.0],
+                ['username' => 'user_04', 'score' => 39.0],
+                ['username' => 'user_06', 'score' => 36.0],
                 // user_01 and user_05 are not considered because they have
                 // already won the CoTM prize
             ],
@@ -2104,9 +2099,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     "Failed the order of codersList on month {$month}"
                 );
                 $this->assertSame(
-                    $expectedWinner['problems_solved'],
-                    $codersList[$index]['problems_solved'],
-                    "Failed the number of problems solved on month {$month}"
+                    $expectedWinner['score'],
+                    $codersList[$index]['score'],
+                    "Failed the score on month {$month}"
                 );
             }
             \OmegaUp\Time::setTimeForTesting($originalTime);

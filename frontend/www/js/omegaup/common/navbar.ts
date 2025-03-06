@@ -53,6 +53,7 @@ OmegaUp.on('ready', () => {
           errorMessage: this.errorMessage,
           clarifications: clarificationsStore.state.clarifications,
           fromLogin: fromLogin,
+          mentorCanChooseCoder: payload.mentorCanChooseCoder,
           userTypes: payload.userTypes,
           nextRegisteredContest: payload.nextRegisteredContestForUser,
           isUnder13User: payload.isUnder13User,
