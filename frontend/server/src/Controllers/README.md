@@ -293,17 +293,11 @@ Get stats for an overall platform report.
 
 Get a report listing users by profile, their assigned ACLs, and ACL types.
 
-### Parameters
-
-| Name     | Type    | Description |
-| -------- | ------- | ----------- |
-| `unused` | `mixed` |             |
-
 ### Returns
 
-| Name     | Type                                                                                                                                                                                 |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `report` | `{ [key: number]: { roles: { [key: number]: { acl_id: number; acl_type: string; alias: string; description: string; name: string; }; }; roles_count: number; username: string; }; }` |
+| Name     | Type                                                                                                                                             |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `report` | `{ roles: { acl_id: number; acl_type: string; alias: string; description: string; name: string; }[]; roles_count: number; username: string; }[]` |
 
 # Authorization
 

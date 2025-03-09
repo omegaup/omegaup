@@ -5004,20 +5004,16 @@ export namespace messages {
   export type AdminUserProfileReportRequest = { [key: string]: any };
   export type AdminUserProfileReportResponse = {
     report: {
-      [key: number]: {
-        roles: {
-          [key: number]: {
-            acl_id: number;
-            acl_type: string;
-            alias?: string;
-            description: string;
-            name: string;
-          };
-        };
-        roles_count: number;
-        username: string;
-      };
-    };
+      roles: {
+        acl_id: number;
+        acl_type: string;
+        alias?: string;
+        description: string;
+        name: string;
+      }[];
+      roles_count: number;
+      username: string;
+    }[];
   };
 
   // Authorization
