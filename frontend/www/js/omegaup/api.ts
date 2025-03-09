@@ -95,6 +95,10 @@ export const Admin = {
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  userProfileReport: apiCall<
+    messages.AdminUserProfileReportRequest,
+    messages.AdminUserProfileReportResponse
+  >('/api/admin/userProfileReport/'),
 };
 
 export const Authorization = {

@@ -1,5 +1,6 @@
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/userProfileReport/`](#apiadminuserprofilereport)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -285,6 +286,24 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/userProfileReport/`
+
+### Description
+
+Get a report listing users by profile, their assigned ACLs, and ACL types.
+
+### Parameters
+
+| Name     | Type    | Description |
+| -------- | ------- | ----------- |
+| `unused` | `mixed` |             |
+
+### Returns
+
+| Name     | Type                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `report` | `{ [key: number]: { roles: { [key: number]: { acl_id: number; acl_type: string; alias: string; description: string; name: string; }; }; roles_count: number; username: string; }; }` |
 
 # Authorization
 

@@ -1261,6 +1261,21 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return new \OmegaUp\DAO\VO\Courses($row);
     }
 
+    final public static function getByAclId(int $aclId): ?\OmegaUp\DAO\VO\Courses {
+        $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
+            'Courses'
+        ) . ' FROM Courses WHERE acl_id = ? LIMIT 1;';
+
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$aclId]);
+
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Courses($row);
+    }
+
     final public static function getAssignmentByAlias(
         \OmegaUp\DAO\VO\Courses $course,
         string $assignmentAlias
