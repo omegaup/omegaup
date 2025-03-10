@@ -315,16 +315,11 @@ def process_initial_feedback(
     if ta_feedback is None:
         return
     for line, feedback in ta_feedback.items():
-        if line == "general advices":
-            feedback_list = (
-                '[{"lineNumber": ' + str(0) + ', "feedback": "'
-                + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
-            )
-        else:
-            feedback_list = (
-                '[{"lineNumber": ' + str(line) + ', "feedback": "'
-                + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
-            )
+        targeted_line = "0" if line == "general advices" else line
+        feedback_list = (
+            '[{"lineNumber": ' + targeted_line + ', "feedback": "'
+            + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
+        )            
         if not SKIP_CONFIRM:
             print("It is an initial feedback.")
             print(f"The response is:\n {feedback_list}")
