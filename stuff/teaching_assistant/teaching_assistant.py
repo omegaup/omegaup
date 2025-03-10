@@ -319,7 +319,7 @@ def process_initial_feedback(
         feedback_list = (
             '[{"lineNumber": ' + targeted_line + ', "feedback": "'
             + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
-        )            
+        )
         if not SKIP_CONFIRM:
             print("It is an initial feedback.")
             print(f"The response is:\n {feedback_list}")
