@@ -25,6 +25,7 @@ LANGUAGE = None
 COURSE_ALIAS = None
 ASSIGNMENT_ALIAS = None
 TA_FEEDBACK_INDICATOR = None
+SKIP_CONFIRM = False
 
 BASE_URL = "https://omegaup.com"
 COOKIES = None
@@ -314,12 +315,20 @@ def process_initial_feedback(
     if ta_feedback is None:
         return
     for line, feedback in ta_feedback.items():
-        if line == "general advices":
-            continue
+        targeted_line = "0" if line == "general advices" else line
         feedback_list = (
-            '[{"lineNumber": ' + str(line) + ', "feedback": "'
+            '[{"lineNumber": ' + targeted_line + ', "feedback": "'
             + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
         )
+        if not SKIP_CONFIRM:
+            print("It is an initial feedback.")
+            print(f"The response is:\n {feedback_list}")
+            user_response = input(
+                "Do you want to post this response? (yes/no): "
+            ).strip().lower()
+            print_horizontal_line()
+            if user_response != "yes":
+                return
         get_contents_from_url(
             set_submission_feedback_list_endpoint,
             {
@@ -329,6 +338,16 @@ def process_initial_feedback(
                 "feedback_list": feedback_list,
             },
         )
+
+
+def print_horizontal_line() -> None:
+    """Prints a horizontal line"""
+    print("-" * 80)
+
+
+def print_horizontal_double_line() -> None:
+    """Prints a horizontal double line"""
+    print("=" * 80)
 
 
 def handle_feedbacks(  # pylint: disable=R0913
@@ -368,6 +387,12 @@ def handle_feedbacks(  # pylint: disable=R0913
             line_number is not None,
         )
         if line_number is not None:
+            if not SKIP_CONFIRM:
+                print_horizontal_double_line()
+                print(f"The question is:\n {problem_content}")
+                print_horizontal_line()
+                print(f"The solution is:\n {source_content}")
+                print_horizontal_line()
             oracle_feedback = query_llm(
                 conjured_query, is_initial_feedback=False
             )
@@ -376,6 +401,25 @@ def handle_feedbacks(  # pylint: disable=R0913
                     "The response is still too long. "
                     "Trimming it to the first 1000 characters."
                 )
+            if not SKIP_CONFIRM:
+                print(
+                    f"The last question asked was:\n {feedback[-1]}"
+                )
+                print_horizontal_line()
+                print(
+                    "The response is:\n "
+                    + str(TA_FEEDBACK_INDICATOR)
+                    + " "
+                    + oracle_feedback[:1000]
+                )
+                print_horizontal_line()
+
+                user_response = input(
+                    "Do you want to post this response? (yes/no): "
+                ).strip().lower()
+                print_horizontal_line()
+                if user_response != "yes":
+                    continue
             get_contents_from_url(
                 set_submission_feedback_endpoint,
                 {
@@ -404,6 +448,12 @@ def handle_feedbacks(  # pylint: disable=R0913
             )
         else:
             if is_initial_feedback:
+                if not SKIP_CONFIRM:
+                    print_horizontal_double_line()
+                    print(f"The question is:\n {problem_content}")
+                    print_horizontal_line()
+                    print(f"The solution is:\n {source_content}")
+                    print_horizontal_line()
                 oracle_feedback = query_llm(
                     conjured_query,
                 )
@@ -447,9 +497,12 @@ def process_single_run(
         get_problem_details_endpoint, {"problem_alias": problem_alias}
     )["statement"]["markdown"]
 
-    problem_solution = get_contents_from_url(
-        get_problem_solution_endpoint, {"problem_alias": problem_alias}
-    )["solution"]["markdown"]
+    try:
+        problem_solution = get_contents_from_url(
+            get_problem_solution_endpoint, {"problem_alias": problem_alias}
+        )["solution"]["markdown"]
+    except requests.exceptions.HTTPError:
+        problem_solution = ""
 
     feedbacks = extract_feedback_thread(run_id)
 
@@ -491,7 +544,7 @@ def handle_input() -> None:
     """
     global USERNAME, PASSWORD  # pylint: disable=W0603
     global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
-    global KEY, TA_FEEDBACK_INDICATOR  # pylint: disable=W0603
+    global KEY, TA_FEEDBACK_INDICATOR, SKIP_CONFIRM  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
@@ -516,6 +569,11 @@ def handle_input() -> None:
         help="Indicates that it's a TA feedback"
     )
     parser.add_argument("--key", type=str, help="API key for OpenAI")
+    parser.add_argument(
+        "--skip-confirm",
+        action="store_true",
+        help="Skip confirmation prompts"
+    )
     args = parser.parse_args()
 
     USERNAME = args.username or input("Enter your username: ")
@@ -533,6 +591,7 @@ def handle_input() -> None:
         " modelo de inteligencia artificial.)\nPlease enter the string: "
     ) or "Ese mensaje fue generado por un modelo de inteligencia artificial."
     KEY = args.key or getpass("Enter your OpenAI API key: ")
+    SKIP_CONFIRM = args.skip_confirm
 
 
 def main() -> None:
