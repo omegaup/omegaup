@@ -28,6 +28,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             WHERE
+                /*
+                Using LIKE CONCAT(?, \'%\') instead of LIKE CONCAT(\'%\', ?, \'%\') to utilize the index on the name column.
+                 */
                 s.name LIKE CONCAT(?, \'%\')
             LIMIT 10';
         $args = [$name];
