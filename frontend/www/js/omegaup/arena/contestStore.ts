@@ -11,6 +11,7 @@ export interface ContestState {
   contests: Record<string, types.ContestListItem[]>;
   countContests: Record<string, number>;
   cache: Record<string, messages.ContestListResponse>;
+  loading: boolean;
 }
 
 export interface NamedContestListRequest {
@@ -29,8 +30,13 @@ export const contestStoreConfig = {
     contests: {},
     countContests: {},
     cache: {},
+    loading: false,
   },
   mutations: {
+    setLoading(state: ContestState, isLoading: boolean) {
+      state.loading = isLoading;
+    },
+
     updateAll(state: ContestState, payloadContests: types.TimeTypeContests) {
       state.contests = { ...state.contests, ...payloadContests };
     },
@@ -44,9 +50,22 @@ export const contestStoreConfig = {
       state: ContestState,
       { name, cacheKey, response }: NamedContestListResponse,
     ) {
-      Vue.set(state.contests, name, response.results);
+      // Get the existing contests for this tab (or initialize as empty array)
+      const existingContests = state.contests[name] || [];
+
+      // Filter out duplicates by contest_id
+      const newContests = response.results.filter(
+        (newContest) =>
+          !existingContests.some(
+            (existing) => existing.contest_id === newContest.contest_id,
+          ),
+      );
+
+      // Append new contests to the existing list
+      Vue.set(state.contests, name, [...existingContests, ...newContests]);
       Vue.set(state.countContests, name, response.number_of_results);
 
+      // Update cache with the full response
       Vue.set(state.cache, cacheKey, {
         results: response.results,
         number_of_results: response.number_of_results,
@@ -67,13 +86,18 @@ export const contestStoreConfig = {
         });
         return;
       }
-      api.Contest.list(payload.requestParams).then((response) => {
-        commit('updateList', {
-          name: payload.name,
-          cacheKey,
-          response,
+      commit('setLoading', true);
+      api.Contest.list(payload.requestParams)
+        .then((response) => {
+          commit('updateList', {
+            name: payload.name,
+            cacheKey,
+            response,
+          });
+        })
+        .finally(() => {
+          commit('setLoading', false);
         });
-      });
     },
   },
 };

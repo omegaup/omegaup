@@ -115,6 +115,7 @@ OmegaUp.on('ready', () => {
           sortOrder,
           filter,
           pageSize: payload.pageSize,
+          loading: contestStore.state.loading,
         },
         on: {
           'fetch-page': ({
