@@ -5,6 +5,7 @@
       :data="data"
       :selected-tab.sync="currentSelectedTab"
       :has-password="hasPassword"
+      :is-admin="isAdmin"
     >
       <template #message>
         <h1 v-if="!profile.is_own_profile && profile.is_private">
@@ -87,6 +88,12 @@
             @request-delete-account="$emit('request-delete-account')"
           ></omegaup-user-delete-account>
         </template>
+        <template v-else-if="currentSelectedTab === 'view-acl-list'">
+          <omegaup-user-view-acl-list
+            :acl-list="aclList"
+            @fetch-acl-list="(request) => $emit('fetch-acl-list', request)"
+          ></omegaup-user-view-acl-list>
+        </template>
         <div v-else>
           {{ currentSelectedTab }}
         </div>
@@ -111,6 +118,7 @@ import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
+import userViewAclList from './userViewAclList.vue';
 
 @Component({
   components: {
@@ -124,6 +132,7 @@ import userDeleteAccount from './DeleteAccount.vue';
     'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
     'omegaup-user-delete-account': userDeleteAccount,
+    'omegaup-user-view-acl-list': userViewAclList,
   },
 })
 export default class Profile extends Vue {
@@ -139,6 +148,8 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: [] }) aclList!: [];
 
   T = T;
   ui = ui;
