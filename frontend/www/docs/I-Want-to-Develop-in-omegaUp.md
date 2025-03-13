@@ -65,14 +65,13 @@ These are the main directories actively used in development:
 ## Design Decisions  
 
 - **Encryption for everything**: All communication with omegaUp and its subsystems must be encrypted, both client-to-server and between components. This prevents cheating in contests (e.g., packet sniffing in a programming competition) and mitigates attacks like Firesheep.  
-- **Facebook Connect / OAuth / OpenID**: We aim to minimize the number of passwords in the system. Using any identity federation system makes the internet a better place. Users should be able to link multiple identities (e.g., a student registered with `user@email.com` via OpenID should be able to confirm ownership of `a0001@school.mx` and merge both accounts).  
-- **Component Decoupling**: Some _Frontend_ functionality will eventually migrate to _Arena_, so components must remain as independent as possible.  
+- **OAuth & Identity Management**: We support federated authentication to minimize password use. Users can link multiple identities (e.g., a student’s school email with an external OpenID account). 
 - **Programming Languages**:  
   - Backend: Go/C  
   - Frontend: PHP+MySQL  
   - UX: Vue.js+TypeScript  
 
-### Continue...  
+### Next steps
 
 | Topic | Description |  
 | ---------------------------- | ------------------------------------------------------------ |  
