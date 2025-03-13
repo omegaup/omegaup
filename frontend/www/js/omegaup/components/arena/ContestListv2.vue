@@ -172,7 +172,7 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="contestListEmpty && !isLoading">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <template v-else>
@@ -201,9 +201,11 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <div v-if="isLoading" class="loading-container">
-            <b-spinner class="spinner" variant="primary"></b-spinner>
-          </div>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -213,7 +215,7 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="contestListEmpty && !isLoading">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <template v-else>
@@ -245,9 +247,11 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <div v-if="isLoading" class="loading-container">
-            <b-spinner class="spinner" variant="primary"></b-spinner>
-          </div>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -257,7 +261,7 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="contestListEmpty && !isLoading">
+          <div v-if="contestListEmpty">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <template v-else>
@@ -289,9 +293,11 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <div v-if="isLoading" class="loading-container">
-            <b-spinner class="spinner" variant="primary"></b-spinner>
-          </div>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -317,14 +323,13 @@ import {
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
-  SpinnerPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
+import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(SpinnerPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -362,6 +367,9 @@ export interface UrlParams {
     'omegaup-contest-card': ContestCard,
     FontAwesomeIcon,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class ArenaContestList extends Vue {
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
@@ -372,6 +380,8 @@ export default class ArenaContestList extends Vue {
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   @Prop({ default: 10 }) pageSize!: number;
+  @Prop({ default: false }) loading!: boolean;
+
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -383,7 +393,7 @@ export default class ArenaContestList extends Vue {
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
-  isLoading: boolean = false;
+  isScrollLoading: boolean = false;
   hasMore: boolean = true;
 
   titleLinkClass(tab: ContestTab) {
@@ -445,14 +455,19 @@ export default class ArenaContestList extends Vue {
       window.innerHeight + window.scrollY >=
       document.documentElement.scrollHeight - 250;
 
-    if (bottomOfWindow && !this.isLoading && this.hasMore) {
+    if (
+      !this.contestListEmpty &&
+      bottomOfWindow &&
+      !this.isScrollLoading &&
+      this.hasMore
+    ) {
       this.loadMoreContests();
     }
   }
   async loadMoreContests() {
-    if (this.isLoading || !this.hasMore) return;
+    if (this.isScrollLoading || !this.hasMore) return;
 
-    this.isLoading = true;
+    this.isScrollLoading = true;
     const nextPage = this.currentPage + 1;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -470,7 +485,7 @@ export default class ArenaContestList extends Vue {
       // Check if there are more contests to load (based on pageSize)
       this.hasMore = this.contestList.length % this.pageSize === 0;
     } finally {
-      this.isLoading = false;
+      this.isScrollLoading = false;
     }
   }
 
@@ -617,16 +632,36 @@ export default class ArenaContestList extends Vue {
   align-items: center;
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
+.contest-card {
+  height: 150px;
   padding: 1rem;
-  margin-top: 1rem;
 }
 
-.spinner {
-  width: 2rem;
-  height: 2rem;
+.line {
+  height: 100%;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 
 .sidebar {

@@ -11,6 +11,7 @@ export interface ContestState {
   contests: Record<string, types.ContestListItem[]>;
   countContests: Record<string, number>;
   cache: Record<string, messages.ContestListResponse>;
+  loading: boolean;
 }
 
 export interface NamedContestListRequest {
@@ -29,8 +30,13 @@ export const contestStoreConfig = {
     contests: {},
     countContests: {},
     cache: {},
+    loading: false,
   },
   mutations: {
+    setLoading(state: ContestState, isLoading: boolean) {
+      state.loading = isLoading;
+    },
+
     updateAll(state: ContestState, payloadContests: types.TimeTypeContests) {
       state.contests = { ...state.contests, ...payloadContests };
     },
@@ -80,13 +86,18 @@ export const contestStoreConfig = {
         });
         return;
       }
-      api.Contest.list(payload.requestParams).then((response) => {
-        commit('updateList', {
-          name: payload.name,
-          cacheKey,
-          response,
+      commit('setLoading', true);
+      api.Contest.list(payload.requestParams)
+        .then((response) => {
+          commit('updateList', {
+            name: payload.name,
+            cacheKey,
+            response,
+          });
+        })
+        .finally(() => {
+          commit('setLoading', false);
         });
-      });
     },
   },
 };
