@@ -38,6 +38,9 @@ OmegaUp.on('ready', async () => {
       popupDisplayed,
       guid,
       runDetailsData: runDetails,
+      offset: 0,
+      loading: false,
+      endOfResults: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-runs', {
@@ -57,6 +60,9 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           runDetailsData: this.runDetailsData,
           totalRuns: runsStore.state.totalRuns,
+          offset: this.offset,
+          loading: this.loading,
+          endOfResults: this.endOfResults,
         },
         on: {
           details: (request: SubmissionRequest) => {
@@ -92,7 +98,23 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'filter-changed': () => {
+            this.offset = 0;
+            this.endOfResults = false;
+            runsStore.commit('setTotalRuns', 0);
+            console.log('filter changed');
             refreshRuns();
+          },
+          'fetch-more-data': () => {
+            if( this.loading || this.endOfResults) {
+              return;
+            }
+            this.loading = true;    
+            refreshRuns(this.offset);
+            if (this.offset * 10 > runsStore.state.totalRuns) {
+              this.endOfResults = true;
+            }
+            this.loading = false;
+            this.offset += 1;
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -161,25 +183,33 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  function refreshRuns(): void {
+  function refreshRuns(offset = 0): void {
+    console.log('refreshing runs');
+    console.log(offset);
     api.Run.list({
-      show_all: true,
-      offset: runsStore.state.filters?.offset,
-      rowcount: runsStore.state.filters?.rowcount,
-      verdict: runsStore.state.filters?.verdict,
-      language: runsStore.state.filters?.language,
-      username: runsStore.state.filters?.username,
-      status: runsStore.state.filters?.status,
+        show_all: true,
+        offset: offset,
+        rowcount: 10,
+        verdict: runsStore.state.filters?.verdict,
+        language: runsStore.state.filters?.language,
+        username: runsStore.state.filters?.username,
+        status: runsStore.state.filters?.status,
     })
-      .then(time.remoteTimeAdapter)
-      .then((response) => {
-        onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
-      })
-      .catch(ui.apiError);
+    .then(time.remoteTimeAdapter)
+    .then(response => {
+        if ( offset === 0 ) {
+          console.log('refreshing filterd');
+          console.log(response.runs);
+          onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
+        } else if (response.runs.length !== 0) {
+          console.log('refreshing filterd later');
+          console.log(response.runs)
+          runsStore.commit('addRuns', response.runs);
+        }
+        runsStore.commit('setTotalRuns', response.totalRuns);
+    })
+    .catch(ui.apiError);
   }
 
   refreshRuns();
-  setInterval(() => {
-    refreshRuns();
-  }, 5 * 60 * 1000);
 });
