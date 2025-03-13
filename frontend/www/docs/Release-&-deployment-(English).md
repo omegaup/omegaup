@@ -4,8 +4,8 @@
 
 We use **GitHub Actions** for our continuous integration. Our deployment flow is managed as follows:  
 
-- **Production deployment**: It is automatically performed on weekend nights (Central Mexico time). Before deployment, all automated tests are executed to ensure code stability.  
-- **Sandbox deployment**: Each time a merge is made to the main branch (`main`), the code is immediately deployed to [sandbox.omegaup.com](https://sandbox.omegaup.com). This instance serves as a testing environment before reaching production, giving us a buffer in case of errors in the latest changes. This allows for a rollback before a production deployment occurs.  
+- **Production deployment**: Automatically performed on weekend nights (Central Mexico time). Before deployment, all automated tests are executed to ensure code stability.  
+- **Sandbox deployment**: Each merge into the (`main`) branch triggers an immediate deployment to [sandbox.omegaup.com](https://sandbox.omegaup.com). This environment serves as a pre-production testing ground, allowing us to catch errors before they reach production and enabling rollbacks if necessary.  
 - **Hotfixes**: In case of critical errors in production, manual deployments can be performed following an internal validation process.  
 
 ## CI/CD Validations  
