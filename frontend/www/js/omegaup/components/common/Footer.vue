@@ -145,7 +145,10 @@
             </a>
           </li>
           <li>
-            <a href="https://blog.omegaup.com/policies/privacy-policy/" target="_blank">
+            <a
+              href="https://blog.omegaup.com/policies/privacy-policy/"
+              target="_blank"
+            >
               {{ T.frontPageFooterPrivacyPolicy }}
             </a>
           </li>
