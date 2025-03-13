@@ -2,7 +2,6 @@
   <div class="acl-container">
     <!-- Sidebar: List of Users -->
     <div class="sidebar">
-      <h5>{{ T.userEditManageAclList }}</h5>
       <b>{{ T.viewAclListUsernameTotalRoles }}</b>
       <ul>
         <li
@@ -19,7 +18,9 @@
 
     <!-- Main Content: Roles of Selected User -->
     <div class="main-content">
-      <h3 v-if="selectedUser" style="text-align: center;">{{ T.viewAclListRolesForUsername }} {{ selectedUser }}</h3>
+      <h3 v-if="selectedUser" style="text-align: center">
+        {{ T.viewAclListRolesForUsername }} {{ selectedUser }}
+      </h3>
       <ul v-if="selectedUserRoles.length">
         <li v-for="role in selectedUserRoles" :key="role.acl_id">
           <strong>{{ role.name }}</strong> - {{ role.description }}
@@ -37,9 +38,14 @@ import T from '../../lang';
 
 @Component
 export default class UserManageAclList extends Vue {
-  @Prop() aclList!: { 
-    username: string; 
-    roles: { name: string; description: string; acl_id: number; alias?: string }[] 
+  @Prop() aclList!: {
+    username: string;
+    roles: {
+      name: string;
+      description: string;
+      acl_id: number;
+      alias?: string;
+    }[];
   }[];
 
   T = T;
@@ -58,7 +64,7 @@ export default class UserManageAclList extends Vue {
   }
 
   get selectedUserRoles() {
-    const user = this.aclList.find(u => u.username === this.selectedUser);
+    const user = this.aclList.find((u) => u.username === this.selectedUser);
     return user ? user.roles : [];
   }
 }
@@ -98,7 +104,8 @@ export default class UserManageAclList extends Vue {
   border-radius: 5px;
 }
 
-.sidebar li:hover, .sidebar li.active {
+.sidebar li:hover,
+.sidebar li.active {
   background: #007bff;
   color: white;
 }
