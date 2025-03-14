@@ -219,7 +219,7 @@ If you are interested spending this summer collaborating with us, first of all, 
  - Join our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2019') and greet fellow candidates and omegaUp volunteers.
 
 # Communications
-## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-%28English%29) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) to effectively getting your question answered.
+## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) to effectively getting your question answered.
 
 Communication with our organization and fellow candidates is carried through our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2019'). We encourage you to join it :)
 
@@ -236,7 +236,7 @@ Communication with our organization and fellow candidates is carried through our
 
 We ask that you complete phase one before you start working with our codebase.
 
- - Follow these [instructions](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-%28English%29) to set up your development environment.
+ - Follow these [instructions](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) to set up your development environment.
  - Find yourself an interesting bug to solve from our [issue tracker](https://github.com/omegaup/omegaup/issues), or reach out to the [slack channel](https://omegaup-slack.herokuapp.com/) asking for one and we will be happy to find a good fit for you. Most of the conversations in the issue tracker are in Spanish, but feel free to switch the conversation to English on any issue. Alternatively, you can go and find bugs on omegaup.com    yourself, then report them in our issue tracker, and then fix them.
  - Implement your fix and submit is for review. Once it's merged you can move onto the third phase.
 

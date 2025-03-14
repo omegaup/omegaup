@@ -9,7 +9,7 @@ En esta tabla encontraras los temas más importantes para comenzar a programar.
 
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
-| [Primeros pasos](https://github.com/omegaup/omegaup/wiki/Quiero-desarrollar-en-omegaUp) |[Instalación de máquina virtual](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)), información técnica general  |
+| [Primeros pasos](https://github.com/omegaup/omegaup/wiki/Quiero-desarrollar-en-omegaUp) |[Instalación de máquina virtual](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process), información técnica general  |
 | [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request) | Configuraciones en git, cómo enviar un PR                    |
 | [Arquitectura](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | Arquitectura de software de omegaUp.com                      |
 | [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment)  | Cómo y cuándo es el deployment                               |

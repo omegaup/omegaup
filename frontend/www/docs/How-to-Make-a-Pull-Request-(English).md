@@ -1,6 +1,6 @@
 [También disponible en Español](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request)
 
-Once you [installed your dev environment](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)) and you made the changes you wish to propose, follow these steps:
+Once you [installed your dev environment](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) and you made the changes you wish to propose, follow these steps:
 
 # Previous settings
 
