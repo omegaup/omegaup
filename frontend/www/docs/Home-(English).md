@@ -9,7 +9,7 @@ In this table you will find the main topics about our project so you can start c
 
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
-| [First steps](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)) | VM installation, general technical information  |
+| [First steps](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) | VM installation, general technical information  |
 | [VM set-up](https://github.com/omegaup/omegaup/wiki/How-to-Make-a-Pull-Request-(English)) | Git configuration, how to send a PR                    |
 | [Architecture](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | omegaUp' software architecture                      |
 | [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment)  | When and how is the deployment                               |

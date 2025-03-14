@@ -104,7 +104,7 @@
           <ul>
             <li class="mt-1">
               <a
-                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                href="https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process"
                 target="_blank"
                 >{{ T.frontPageFooterHelpUs }}</a
               >

@@ -13,7 +13,7 @@
 - :mag: [How to get help](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help)
 
 ## Entorno de desarrollo
-- :computer: [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar)
+- :computer: [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process)
 
 - ⬇️ [Instalación del máquina virtual](https://github.com/omegaup/omegaup/wiki/Instalaci%C3%B3n-de-m%C3%A1quina-virtual)
 
