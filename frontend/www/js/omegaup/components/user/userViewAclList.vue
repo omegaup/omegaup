@@ -27,7 +27,7 @@
           <span v-if="role.alias">({{ role.alias }})</span>
         </li>
       </ul>
-      <p v-else>Select a user</p>
+      <p v-else>{{ T.viewAclListSelectAUser }}</p>
     </div>
   </div>
 </template>
