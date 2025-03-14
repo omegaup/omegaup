@@ -1626,7 +1626,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Get the source code
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
