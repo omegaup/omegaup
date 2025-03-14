@@ -109,6 +109,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
+  { key: 'view-acl-list', title: T.userViewAclList, visible: false },
 ];
 
 @Component({
@@ -122,6 +123,7 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() selectedTab!: string;
   @Prop() hasPassword!: boolean;
+  @Prop() isAdmin!: boolean;
 
   T = T;
   urlMapping = urlMapping;
@@ -134,6 +136,7 @@ export default class UserSidebarMainInfo extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
+
   get rank(): string {
     switch (this.profile.classname) {
       case 'user-rank-beginner':
@@ -156,8 +159,14 @@ export default class UserSidebarMainInfo extends Vue {
     title: string;
     visible: boolean;
   }[] {
-    if (!this.profile.is_own_profile) {
-      return [];
+    // const urlMappings = [...urlMapping];
+
+    const manageFilesTabIndex = urlMapping.findIndex(
+      (url) => url.key === 'view-acl-list',
+    );
+
+    if (manageFilesTabIndex >= 0) {
+      urlMapping[manageFilesTabIndex].visible = this.isAdmin;
     }
     const changePasswordRowIndex = urlMapping.findIndex(
       (url) => url.key === 'change-password',

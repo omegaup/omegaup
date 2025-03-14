@@ -8,6 +8,7 @@
           :data="data"
           :selected-tab.sync="currentSelectedTab"
           :has-password="hasPassword"
+          :is-admin="isAdmin"
         >
         </omegaup-user-maininfo>
       </div>
@@ -40,6 +41,7 @@ export default class ProfileWrapper extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) selectedTab!: null | string;
   @Prop() hasPassword!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
 
   currentSelectedTab = this.selectedTab;
 

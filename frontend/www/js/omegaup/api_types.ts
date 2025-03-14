@@ -5001,6 +5001,20 @@ export namespace messages {
       };
     };
   };
+  export type AdminUserProfileReportRequest = { [key: string]: any };
+  export type AdminUserProfileReportResponse = {
+    report: {
+      roles: {
+        acl_id: number;
+        acl_type: string;
+        alias?: string;
+        description: string;
+        name: string;
+      }[];
+      roles_count: number;
+      username: string;
+    }[];
+  };
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5919,6 +5933,9 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    userProfileReport: (
+      params?: messages.AdminUserProfileReportRequest,
+    ) => Promise<messages.AdminUserProfileReportResponse>;
   }
 
   export interface Authorization {
