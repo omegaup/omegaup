@@ -77,7 +77,7 @@ namespace OmegaUp\Controllers;
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
-    const CONTEST_LIST_PAGE_SIZE = 10;
+    const CONTEST_LIST_PAGE_SIZE =10;
 
     /**
      * Returns a list of contests
@@ -2368,8 +2368,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
-        ]);
+            'languages' => $originalContest->languages, // add langauges to cloned contest
 
+        ]);
+        
         \OmegaUp\DAO\DAO::transBegin();
         try {
             // Create the contest
