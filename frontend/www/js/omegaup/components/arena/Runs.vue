@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2" data-runs>
+  <div class="mt-2" data-runs v-infinite-scroll="fetchMoreData" :infinite-scroll-disabled="isScrollDisabled" infinite-scroll-distance="10">
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
@@ -13,29 +13,9 @@
       }"
     >
       <div>
-        <span class="font-weight-bold">{{ T.wordsSubmissions }}</span>
         <div v-if="showPager">
-          <div class="pager-controls">
-            <button
-              data-button-page-previous
-              :disabled="filterOffset <= 0"
-              @click="filterOffset--"
-            >
-              &lt;
-            </button>
-            {{ currentPage }}
-            <button
-              data-button-page-next
-              :disabled="
-                totalRuns && Math.ceil(totalRuns / rowCount) == currentPage
-              "
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-          </div>
 
-          <div class="filters row">
+          <div class="filters row mt-4">
             <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:
               <select
@@ -414,6 +394,9 @@
               </td>
               <td v-else></td>
             </tr>
+            <tr v-if="loading">
+              <td colspan="7" class="text-center">Loading...</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -440,6 +423,7 @@ import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
+import infiniteScroll from 'vue-infinite-scroll';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
@@ -496,6 +480,9 @@ export enum PopupDisplayed {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
@@ -524,6 +511,9 @@ export default class Runs extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() requestFeedback!: boolean;
   @Prop({ default: false }) inContest!: boolean;
+  @Prop() offset!: number;
+  @Prop() loading!: boolean;
+  @Prop() endOfResults!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -541,8 +531,13 @@ export default class Runs extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
 
-  get currentPage(): number {
-    return this.filterOffset + 1;
+  get isScrollDisabled() {
+    return this.loading || this.endOfResults;
+  }
+
+  fetchMoreData() {
+    if (this.isScrollDisabled) return;
+    this.$emit('fetch-more-data');
   }
 
   get filteredRuns(): types.Run[] {
