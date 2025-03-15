@@ -2515,15 +2515,18 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
                 $birthDate = strtotime($r['birth_date']);
             }
-
-            if ($birthDate >= strtotime('-5 year', \OmegaUp\Time::get())) {
+        
+            // Ensure birthDate is not in the future (fixing the offset issue)
+            if ($birthDate >= strtotime('-5 years', \OmegaUp\Time::get())) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'birthdayInTheFuture',
                     'birth_date'
                 );
             }
-            $r['birth_date'] = $birthDate;
-        }
+        
+            // Normalize to start of the day (to prevent accidental +1 day shifts)
+            $r['birth_date'] = strtotime(date('Y-m-d', $birthDate));
+        }        
 
         if (!is_null($r['locale'])) {
             // find language in Language
