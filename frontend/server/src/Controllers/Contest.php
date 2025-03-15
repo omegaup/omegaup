@@ -2368,6 +2368,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
+            'languages' => $originalContest->languages,
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
