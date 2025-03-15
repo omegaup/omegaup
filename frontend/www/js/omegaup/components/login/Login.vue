@@ -28,7 +28,6 @@
               <!-- id-lint on -->
             </div>
             <!-- FB login link deleted until privacy policy updated -->
-            <div class="col-xs-12 col-sm-4 text-center py-2"></div>
           </div>
         </div>
 
