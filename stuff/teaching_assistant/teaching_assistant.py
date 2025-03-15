@@ -315,10 +315,9 @@ def process_initial_feedback(
     if ta_feedback is None:
         return
     for line, feedback in ta_feedback.items():
-        if line == "general advices":
-            continue
+        targeted_line = "0" if line == "general advices" else line
         feedback_list = (
-            '[{"lineNumber": ' + str(line) + ', "feedback": "'
+            '[{"lineNumber": ' + targeted_line + ', "feedback": "'
             + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
         )
         if not SKIP_CONFIRM:
