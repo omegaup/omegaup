@@ -101,7 +101,6 @@ OmegaUp.on('ready', async () => {
             this.offset = 0;
             this.endOfResults = false;
             runsStore.commit('setTotalRuns', 0);
-            console.log('filter changed');
             refreshRuns();
           },
           'fetch-more-data': () => {
@@ -184,8 +183,6 @@ OmegaUp.on('ready', async () => {
   });
 
   function refreshRuns(offset = 0): void {
-    console.log('refreshing runs');
-    console.log(offset);
     api.Run.list({
         show_all: true,
         offset: offset,
@@ -198,12 +195,8 @@ OmegaUp.on('ready', async () => {
     .then(time.remoteTimeAdapter)
     .then(response => {
         if ( offset === 0 ) {
-          console.log('refreshing filterd');
-          console.log(response.runs);
           onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
         } else if (response.runs.length !== 0) {
-          console.log('refreshing filterd later');
-          console.log(response.runs)
           runsStore.commit('addRuns', response.runs);
         }
         runsStore.commit('setTotalRuns', response.totalRuns);
