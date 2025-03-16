@@ -1,5 +1,11 @@
 <template>
-  <div class="mt-2" data-runs v-infinite-scroll="fetchMoreData" :infinite-scroll-disabled="isScrollDisabled" infinite-scroll-distance="10">
+  <div
+    v-infinite-scroll="fetchMoreData"
+    class="mt-2"
+    data-runs
+    :infinite-scroll-disabled="isScrollDisabled"
+    infinite-scroll-distance="10"
+  >
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
@@ -14,7 +20,6 @@
     >
       <div>
         <div v-if="showPager">
-
           <div class="filters row mt-4">
             <label class="col-3 col-sm pr-0 font-weight-bold"
               >{{ T.wordsVerdict }}:

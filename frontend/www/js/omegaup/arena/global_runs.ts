@@ -104,10 +104,10 @@ OmegaUp.on('ready', async () => {
             refreshRuns();
           },
           'fetch-more-data': () => {
-            if( this.loading || this.endOfResults) {
+            if (this.loading || this.endOfResults) {
               return;
             }
-            this.loading = true;    
+            this.loading = true;
             refreshRuns(this.offset);
             if (this.offset * 10 > runsStore.state.totalRuns) {
               this.endOfResults = true;
@@ -184,24 +184,24 @@ OmegaUp.on('ready', async () => {
 
   function refreshRuns(offset = 0): void {
     api.Run.list({
-        show_all: true,
-        offset: offset,
-        rowcount: 10,
-        verdict: runsStore.state.filters?.verdict,
-        language: runsStore.state.filters?.language,
-        username: runsStore.state.filters?.username,
-        status: runsStore.state.filters?.status,
+      show_all: true,
+      offset: offset,
+      rowcount: 10,
+      verdict: runsStore.state.filters?.verdict,
+      language: runsStore.state.filters?.language,
+      username: runsStore.state.filters?.username,
+      status: runsStore.state.filters?.status,
     })
-    .then(time.remoteTimeAdapter)
-    .then(response => {
-        if ( offset === 0 ) {
+      .then(time.remoteTimeAdapter)
+      .then((response) => {
+        if (offset === 0) {
           onRefreshRuns({ runs: response.runs, totalRuns: response.totalRuns });
         } else if (response.runs.length !== 0) {
           runsStore.commit('addRuns', response.runs);
         }
         runsStore.commit('setTotalRuns', response.totalRuns);
-    })
-    .catch(ui.apiError);
+      })
+      .catch(ui.apiError);
   }
 
   refreshRuns();

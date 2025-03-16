@@ -52,7 +52,7 @@ export const runsStoreConfig = {
         return;
       }
       Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);    
+      state.runs.push(run);
     },
     addRuns(state: RunsState, newRuns: types.Run[]) {
       state.runs = [...state.runs, ...newRuns];
@@ -107,7 +107,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
         return;
       }
       Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);    
+      state.runs.push(run);
     },
     addRuns(state, runs: types.Run[]) {
       state.runs = [...state.runs, ...runs];
