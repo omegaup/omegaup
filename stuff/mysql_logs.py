@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #  this script checks the MySQL log to identify inefficient
 #  queries that might cause trouble in highly demanding conditions,
-#  inefficient queries are determined by having an 'ALL' on the query type  
+#  inefficient queries are determined by having an 'ALL' on the query type
 '''Looking for inefficient queries in the MySQL log.'''
 from typing import Any, Iterable, Tuple
 import mysql.connector
