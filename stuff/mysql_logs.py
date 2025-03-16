@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+#  this script checks the MySQL log to identify inefficient
+#  queries that might cause trouble in highly demanding conditions,
+#  inefficient queries are determined by having an 'ALL' on the query type  
 '''Looking for inefficient queries in the MySQL log.'''
-#  #from typing import Iterable, Tuple
 from typing import Any, Iterable, Tuple
 import mysql.connector
 from mysql.connector import Error  # type: ignore
@@ -90,12 +92,6 @@ def explain_queries(
                     continue
                 if (query_text.startswith('DELETE ') and
                     ' WHERE ' not in query_text):
-                    continue
-                if (str("Users u") in query_text and
-                    str("verification_id = ") in query_text):
-                    continue
-                if (str("Users_Badges") in query_text and
-                    str("badge_alias = ") in query_text):
                     continue
                 query_count += 1
                 print(f"Found query with full table scan: {query_text}")
