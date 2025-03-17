@@ -165,13 +165,22 @@ export default class UserBasicInformationEdit extends Vue {
       return;
     }
 
+    // Ensure birthDate is converted to a UTC Date object or set to null if invalid
+    const formattedBirthDate = this.birthDate
+      ? new Date(Date.UTC(
+          this.birthDate.getFullYear(),
+          this.birthDate.getMonth(),
+          this.birthDate.getDate()
+        ))
+      : null;
+
     this.$emit('update-user-basic-information', {
       username: this.username,
       name: this.name,
       gender: this.gender,
       country_id: this.countryId,
       state_id: this.stateId,
-      birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+      birth_date: formattedBirthDate,
     });
   }
 
