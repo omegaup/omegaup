@@ -122,16 +122,13 @@
               v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="collapse-submenu"
             >
-              <div class="btn-group">
-                <a
-                  class="dropdown-item"
-                  href="/problem/new/"
-                  data-nav-problems-create
-                  >{{ T.myproblemsListCreateProblem }}</a
-                >
+              <div class="btn-group d-flex">
+                <span class="dropdown-item">
+                  {{ T.myproblemsListCreateProblem }}
+                </span>
                 <button
                   type="button"
-                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
                   data-toggle="collapse"
                   data-target=".collapse-links"
                   data-nav-problems-create-options
@@ -143,9 +140,12 @@
                 <a class="dropdown-item" href="/problem/creator/">{{
                   T.myproblemsListCreateZipFileProblem
                 }}</a>
-                <a class="dropdown-item" href="/problem/new/">{{
-                  T.myproblemsListCreateProblemWithExistingZipFile
-                }}</a>
+                <a
+                  class="dropdown-item"
+                  href="/problem/new/"
+                  data-nav-problems-create
+                  >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                >
               </div>
             </form>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
