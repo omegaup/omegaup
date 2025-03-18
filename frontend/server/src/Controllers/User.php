@@ -2523,8 +2523,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             $r['birth_date'] = $birthDate;
-        }       
-
+        }
         if (!is_null($r['locale'])) {
             // find language in Language
             \OmegaUp\Validators::validateStringNonEmpty(
