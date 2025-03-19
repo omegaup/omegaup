@@ -1355,7 +1355,7 @@ Search users in contest
 ### Description
 
 Given a contest_alias, sets the recommended flag on/off.
-Only omegaUp admins can call this API.
+Only omegaUp admins and support team members can call this API.
 
 ### Parameters
 
@@ -3042,7 +3042,6 @@ List of public and user's private problems
 
 | Name                    | Type                                                                                                                               | Description |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `only_quality_seal`     | `bool`                                                                                                                             |             |
 | `difficulty`            | `null\|string`                                                                                                                     |             |
 | `difficulty_range`      | `null\|string`                                                                                                                     |             |
 | `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |
@@ -3052,6 +3051,7 @@ List of public and user's private problems
 | `min_visibility`        | `int\|null`                                                                                                                        |             |
 | `offset`                | `int\|null`                                                                                                                        |             |
 | `only_karel`            | `bool\|null`                                                                                                                       |             |
+| `only_quality_seal`     | `bool\|null`                                                                                                                       |             |
 | `order_by`              | `''\|'accepted'\|'creation_date'\|'difficulty'\|'points'\|'problem_id'\|'quality'\|'ratio'\|'score'\|'submissions'\|'title'\|null` |             |
 | `page`                  | `int\|null`                                                                                                                        |             |
 | `programming_languages` | `null\|string`                                                                                                                     |             |
@@ -3846,13 +3846,13 @@ Create a new run
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `language`      | `string` |             |
-| `problem_alias` | `string` |             |
-| `source`        | `string` |             |
-| `problemset_id` | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `source`        | `string`       |             |
+| `contest_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 

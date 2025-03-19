@@ -265,8 +265,7 @@ def get_cotm_eligible_users(
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
-                i.identity_id
-            LIMIT 100;
+                i.identity_id;
             '''
     cur_readonly.execute(sql, (
         first_day_of_current_month,
@@ -291,8 +290,6 @@ def get_cotm_eligible_users(
 
 def get_eligible_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    first_day_of_current_month: datetime.date,
-    first_day_of_next_month: datetime.date,
 ) -> Dict[int, Problem]:
     '''Returns the list of eligible problems for coder of the month'''
 
@@ -303,23 +300,13 @@ def get_eligible_problems(
         SELECT DISTINCT
             p.problem_id,
             p.alias,
-            IFNULL(SUM(ROUND(100 / LOG(2, p.accepted+1) , 0)), 0) AS score
+            IFNULL(ROUND(100 / LOG(2, p.accepted+1)), 0) AS score
         FROM
-            Submissions s
-        INNER JOIN
             Problems p
-        ON
-            p.problem_id = s.problem_id
         WHERE
-            s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-            s.time < %s AND p.visibility >= 1 AND p.quality_seal = 1
-        GROUP BY
-            p.problem_id;
-        '''
-    cur_readonly.execute(sql, (
-        first_day_of_current_month,
-        first_day_of_next_month,
-    ))
+            p.visibility >= 1 AND p.quality_seal = 1;
+    '''
+    cur_readonly.execute(sql)
 
     problems: Dict[int, Problem] = {}
     for row in cur_readonly.fetchall():

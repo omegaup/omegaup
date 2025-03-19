@@ -48,7 +48,7 @@
         <td class="text-center align-middle">
           {{ coder.score }}
         </td>
-        <slot name="button-select-coder"></slot>
+        <slot name="button-select-coder" :coder="coder"></slot>
       </tr>
     </tbody>
   </table>
@@ -79,7 +79,7 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() coders!: types.CoderOfTheMonthList[];
   @Prop() isMentor!: boolean;
   @Prop() selectedTab!: string;
-  @Prop({ default: true }) isDisabled!: boolean;
+  @Prop({ default: false }) isDisabled!: boolean;
 
   T = T;
 }

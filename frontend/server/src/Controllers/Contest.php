@@ -2368,6 +2368,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
+            'languages' => $originalContest->languages, // Cloned contests start with the same languages
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -5926,7 +5927,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Given a contest_alias, sets the recommended flag on/off.
-     * Only omegaUp admins can call this API.
+     * Only omegaUp admins and support team members can call this API.
      *
      * @return array{status: string}
      *
@@ -5936,7 +5937,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiSetRecommended(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
