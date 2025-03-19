@@ -1,16 +1,16 @@
 <template>
   <div>
-    <!-- Font Size Dropdown -->
-    <label for="font-size">Font Size: </label>
-    <select id="font-size" v-model="selectedFontSize" @change="onFontSizeChange">
-      <option v-for="size in fontSizes" :key="size" :value="size">{{ size }}px</option>
+    <label>Font Size: </label>
+    <select ref="fontSizeDropdown" v-model="selectedFontSize" @change="onFontSizeChange">
+      <option v-for="size in fontSizes" :key="size" :value="size">
+        {{ size }}px
+      </option>
     </select>
-    <!-- Editor Container -->
-    <div ref="editorContainer" style="width: 100%; height: 100%;"></div>
+
+    <div ref="editorContainer" style="width: 100%; height: 100%"></div>
   </div>
 </template>
 
-// TODO: replace all instances of any with correct type
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
@@ -38,12 +38,41 @@ export default class MonacoEditor extends Vue {
     return store.getters[this.storeMapping.language];
   }
 
+  get module(): string {
+    return store.getters[this.storeMapping.module];
+  }
+
   get contents(): string {
     return store.getters[this.storeMapping.contents];
   }
 
   set contents(value: string) {
     store.dispatch(this.storeMapping.contents, value);
+  }
+
+  get filename(): string {
+    return `${this.module}.${Util.supportedLanguages[this.language].extension}`;
+  }
+
+  get title(): string {
+    return this.filename;
+  }
+
+  @Watch('language')
+  onLanguageChange(value: string): void {
+    if (this._model) {
+      monaco.editor.setModelLanguage(
+        this._model,
+        Util.supportedLanguages[value].modelMapping,
+      );
+    }
+  }
+
+  @Watch('contents')
+  onContentsChange(value: string): void {
+    if (this._model && this._model.getValue() !== value) {
+      this._model.setValue(value);
+    }
   }
 
   @Watch('theme')
@@ -56,16 +85,19 @@ export default class MonacoEditor extends Vue {
   mounted(): void {
     window.addEventListener('code-and-language-set', this.onCodeAndLanguageSet);
 
-    this._editor = monaco.editor.create(this.$refs.editorContainer as HTMLElement, {
-      autoIndent: 'brackets',
-      formatOnPaste: true,
-      formatOnType: true,
-      language: Util.supportedLanguages[this.language].modelMapping,
-      readOnly: this.readOnly,
-      theme: this.theme,
-      value: this.contents,
-      fontSize: this.selectedFontSize,
-    });
+    this._editor = monaco.editor.create(
+      this.$refs.editorContainer as HTMLElement,
+      {
+        autoIndent: 'brackets',
+        formatOnPaste: true,
+        formatOnType: true,
+        language: Util.supportedLanguages[this.language].modelMapping,
+        readOnly: this.readOnly,
+        theme: this.theme,
+        value: this.contents,
+        fontSize: this.selectedFontSize,
+      } as monaco.editor.IStandaloneEditorConstructionOptions,
+    );
 
     this._model = this._editor.getModel();
     if (!this._model) return;
@@ -85,7 +117,10 @@ export default class MonacoEditor extends Vue {
   }
 
   unmounted(): void {
-    window.removeEventListener('code-and-language-set', this.onCodeAndLanguageSet);
+    window.removeEventListener(
+      'code-and-language-set',
+      this.onCodeAndLanguageSet,
+    );
     window.removeEventListener('resize', this.onResize);
   }
 
@@ -104,7 +139,6 @@ export default class MonacoEditor extends Vue {
   }
 }
 </script>
-
 
 <style scoped>
 div {
