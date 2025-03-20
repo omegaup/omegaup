@@ -126,6 +126,64 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     }
 
     /**
+     * Retrieves the filtered rank of schools based on the given parameters.
+     *
+     * @param int $offset
+     * @param int $rowCount
+     * @param string $filterBy
+     * @param array<string, string> $availableFilters
+     * @return array{rank: list<\OmegaUp\DAO\VO\Schools>, totalRows: int}
+     */
+    public static function getFilteredRank(
+        int $offset,
+        int $rowCount,
+        string $filterBy,
+        array $availableFilters
+    ): array {
+        $sql = 'SELECT
+                    ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Schools::FIELD_NAMES,
+            's'
+        ) . '
+                FROM
+                    Schools s
+                WHERE
+                    s.score != 0';
+        $args = [];
+
+        if ($filterBy === \OmegaUp\DAO\Enum\RankFilter::COUNTRY) {
+            $sql .= ' AND s.country_id = ?';
+            $args[] = $availableFilters['country'];
+        } elseif ($filterBy === \OmegaUp\DAO\Enum\RankFilter::STATE) {
+            $sql .= ' AND s.state_id = ?';
+            $args[] = $availableFilters['state'];
+        }
+
+        $sql .= ' ORDER BY s.ranking ASC LIMIT ?, ?';
+        $args[] = max(0, $offset - 1) * $rowCount;
+        $args[] = $rowCount;
+
+        /** @var list<\OmegaUp\DAO\VO\Schools> */
+        $rank = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args) as $row
+        ) {
+            $rank[] = new \OmegaUp\DAO\VO\Schools($row);
+        }
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT COUNT(*) FROM Schools s WHERE s.score != 0',
+            []
+        );
+
+        return [
+            'rank' => $rank,
+            'totalRows' => intval($totalRows),
+        ];
+    }
+
+    /**
      * Gets the users from school, and their number of problems created, solved and
      * organized contests.
      *
