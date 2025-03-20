@@ -1,11 +1,7 @@
 <template>
   <div>
     <label>Font Size: </label>
-    <select
-      ref="fontSizeDropdown"
-      v-model="selectedFontSize"
-      @change="onFontSizeChange"
-    >
+    <select ref="fontSizeDropdown" v-model="selectedFontSize" @change="onFontSizeChange">
       <option v-for="size in fontSizes" :key="size" :value="size">
         {{ size }}px
       </option>
