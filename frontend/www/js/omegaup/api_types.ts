@@ -4992,7 +4992,6 @@ export namespace messages {
     acls: { acl_id: number; alias?: string; type: string }[];
     roles: {
       acl_id: number;
-      acl_name: string;
       role_description: string;
       role_id: number;
       role_name: string;
