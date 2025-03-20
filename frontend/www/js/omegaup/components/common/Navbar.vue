@@ -254,7 +254,7 @@
                     >
                     <a
                       class="dropdown-item"
-                      href="/arena/?filter=participating"
+                      href="/arena/?filter=signedup"
                       data-nav-user-contests
                       >{{ T.navContestsEnrolled }}</a
                     >
