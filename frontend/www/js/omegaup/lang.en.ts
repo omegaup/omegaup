@@ -1798,6 +1798,7 @@ const translations: { [key: string]: string; } = {
   userRoles: "Roles",
   userVerified: "Account has been verified",
   userVerify: "Verify account",
+  userViewAclListTag: "View ACLs",
   username: "Account name",
   usernameInUse: "This account name has already been used.",
   usernameOrPassIsWrong: "Account name or password are wrong. Please check your credentials.",

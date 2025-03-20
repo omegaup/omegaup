@@ -1798,6 +1798,7 @@ const translations: { [key: string]: string; } = {
   userRoles: "(R0135)",
   userVerified: "(Acc0un7 ha5 b33n v3rifi3d)",
   userVerify: "(V3rify acc0un7)",
+  userViewAclListTag: "(Vi3w ACL5)",
   username: "(Acc0un7 nam3)",
   usernameInUse: "(Thi5 acc0un7 nam3 ha5 a1r3ady b33n u53d.)",
   usernameOrPassIsWrong: "(Acc0un7 nam3 0r pa55w0rd ar3 wr0ng. P13a53 ch3ck y0ur cr3d3n7ia15.)",
