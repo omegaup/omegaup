@@ -2044,6 +2044,14 @@ export namespace types {
       );
     }
 
+    export function SchoolRankLoggedOutPayload(
+      elementId: string = 'payload',
+    ): types.SchoolRankLoggedOutPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function SchoolRankPayload(
       elementId: string = 'payload',
     ): types.SchoolRankPayload {
@@ -4517,10 +4525,24 @@ export namespace types {
     state_name?: string;
   }
 
-  export interface SchoolRankPayload {
+  export interface SchoolRankLoggedOutPayload {
+    isLogged: boolean;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
+    rank: types.School[];
+    showHeader: boolean;
+    totalRows: number;
+  }
+
+  export interface SchoolRankPayload {
+    availableFilters: { country?: string; state?: string };
+    filter: string;
+    isLogged: boolean;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    profileComplete: boolean;
     rank: types.School[];
     showHeader: boolean;
     totalRows: number;

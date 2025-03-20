@@ -849,6 +849,7 @@ messageMakeYourProblemsPublic = "Tienes problemas privados que ya han sido utili
 modalConsentCookiesAccept = "Aceptar todas las cookies"
 modalConsentCookiesDecline = "Aceptar solo las cookies esenciales"
 modalConsentCookiesDescription = "Usamos cookies para asegurar que tengas la mejor experiencia en nuestro sitio."
+mustLoginToFilterSchools = "Para filtrar a escuelas del ranking debes iniciar sesión."
 mustLoginToFilterUsers = "Para filtrar a coders del ranking debes iniciar sesión."
 mustLoginToJoinContest = "Debes iniciar sesión para poder participar en este concurso"
 mustRegisterToJoinContest = "Para participar en este concurso debes registrarte"
