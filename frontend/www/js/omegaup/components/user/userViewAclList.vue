@@ -2,7 +2,6 @@
   <div class="acl-container">
     <!-- Sidebar: List of ACLs Owned by the User -->
     <div class="sidebar">
-      <b>{{ T.viewAclListOwnedAcls }}</b>
       <ul>
         <li
           v-for="acl in allAcls"
@@ -25,7 +24,9 @@
       <ul v-if="selectedAclUsers.length">
         <li v-for="user in selectedAclUsers" :key="user.user_id">
           <strong>{{ user.username }}</strong> - {{ user.role_name }}
-          <span v-if="user.role_description">({{ user.role_description }})</span>
+          <span v-if="user.role_description"
+            >({{ user.role_description }})</span
+          >
         </li>
       </ul>
       <p v-else>{{ T.viewAclListSelectAnAcl }}</p>
@@ -34,8 +35,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import T from "../../lang";
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
 
 @Component
 export default class UserManageAclList extends Vue {
@@ -59,7 +60,7 @@ export default class UserManageAclList extends Vue {
   selectedAcl: number | null = null;
 
   mounted() {
-    this.$emit("fetch-acl-list", {});
+    this.$emit('fetch-acl-list', {});
     // Auto-select the first ACL if available
     setTimeout(() => {
       if (this.allAcls.length > 0) {
@@ -76,7 +77,9 @@ export default class UserManageAclList extends Vue {
   // Get users in the selected ACL
   get selectedAclUsers() {
     if (!this.selectedAcl) return [];
-    return this.aclList?.roles?.filter((role) => role.acl_id === this.selectedAcl);
+    return this.aclList?.roles?.filter(
+      (role) => role.acl_id === this.selectedAcl,
+    );
   }
 
   // Select an ACL when clicked
@@ -92,7 +95,9 @@ export default class UserManageAclList extends Vue {
 
   // Get number of users in an ACL
   getUserCount(aclId: number) {
-    return this.aclList?.roles?.filter((role) => role.acl_id === aclId).length || 0;
+    return (
+      this.aclList?.roles?.filter((role) => role.acl_id === aclId).length || 0
+    );
   }
 }
 </script>

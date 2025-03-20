@@ -109,7 +109,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
-  { key: 'view-acl-list', title: T.userViewAclListTag, visible: true },
+  { key: 'view-acl-list', title: T.userAcLs, visible: true },
 ];
 
 @Component({
