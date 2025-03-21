@@ -1,9 +1,21 @@
 <template>
-  <div></div>
+  <div>
+    <label>Font Size: </label>
+    <select
+      ref="fontSizeDropdown"
+      v-model="selectedFontSize"
+      @change="onFontSizeChange"
+    >
+      <option v-for="size in fontSizes" :key="size" :value="size">
+        {{ size }}px
+      </option>
+    </select>
+
+    <div ref="editorContainer" style="width: 100%; height: 100%"></div>
+  </div>
 </template>
 
 <script lang="ts">
-// TODO: replace all instances of any with correct type
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
 import * as Util from './util';
@@ -12,17 +24,15 @@ import * as monaco from 'monaco-editor';
 @Component
 export default class MonacoEditor extends Vue {
   // TODO: place more restrictions on value of keys inside storeMapping
-  @Prop({ required: true }) storeMapping!: {
-    [key: string]: string;
-  };
+  @Prop({ required: true }) storeMapping!: { [key: string]: string };
   @Prop({ default: false }) readOnly!: boolean;
 
   _editor: monaco.editor.IStandaloneCodeEditor | null = null;
   _model: monaco.editor.ITextModel | null = null;
 
-  // default font size and line height
-  readonly baseFontSize: number = 14;
-  readonly baseLineHeight: number = 19;
+  // default font size
+  selectedFontSize: number = 14;
+  fontSizes: number[] = [12, 14, 16, 18, 20, 22, 24, 26];
 
   get theme(): string {
     return store.getters['theme'];
@@ -68,12 +78,11 @@ export default class MonacoEditor extends Vue {
       this._model.setValue(value);
     }
   }
+
   @Watch('theme')
   onThemeChange(value: string): void {
     if (this._editor) {
-      this._editor.updateOptions({
-        theme: value,
-      });
+      this._editor.updateOptions({ theme: value });
     }
   }
 
@@ -81,7 +90,7 @@ export default class MonacoEditor extends Vue {
     window.addEventListener('code-and-language-set', this.onCodeAndLanguageSet);
 
     this._editor = monaco.editor.create(
-      this.$el as HTMLElement,
+      this.$refs.editorContainer as HTMLElement,
       {
         autoIndent: 'brackets',
         formatOnPaste: true,
@@ -90,8 +99,10 @@ export default class MonacoEditor extends Vue {
         readOnly: this.readOnly,
         theme: this.theme,
         value: this.contents,
+        fontSize: this.selectedFontSize,
       } as monaco.editor.IStandaloneEditorConstructionOptions,
     );
+
     this._model = this._editor.getModel();
     if (!this._model) return;
 
@@ -103,6 +114,12 @@ export default class MonacoEditor extends Vue {
     this.onResize();
   }
 
+  onFontSizeChange(): void {
+    if (this._editor) {
+      this._editor.updateOptions({ fontSize: this.selectedFontSize });
+    }
+  }
+
   unmounted(): void {
     window.removeEventListener(
       'code-and-language-set',
@@ -112,15 +129,10 @@ export default class MonacoEditor extends Vue {
   }
 
   onResize(): void {
+    // scaling does not work as intended
+    // the cursor does not click where it's supposed to
+    // this is an alternative solution to zooming in/out
     if (this._editor) {
-      // scaling does not work as intended
-      // the cursor does not click where it's supposed to
-      // this is an alternative solution to zooming in/out
-
-      this._editor.updateOptions({
-        fontSize: this.baseFontSize * window.devicePixelRatio,
-        lineHeight: this.baseLineHeight * window.devicePixelRatio,
-      });
       this._editor.layout();
     }
   }
