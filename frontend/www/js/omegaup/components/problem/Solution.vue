@@ -2,7 +2,8 @@
   <div class="card">
     <div class="row p-3">
       <div class="col-12 text-right">
-        <a href="https://blog.omegaup.com/features/soluciones-de-problemas-en-omegaup/"
+        <a
+          href="https://blog.omegaup.com/features/soluciones-de-problemas-en-omegaup/"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a
         >
