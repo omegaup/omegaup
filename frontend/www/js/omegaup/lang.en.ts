@@ -851,6 +851,7 @@ const translations: { [key: string]: string; } = {
   modalConsentCookiesAccept: "Accept all cookies",
   modalConsentCookiesDecline: "Accept only essential cookies",
   modalConsentCookiesDescription: "We use cookies to ensure you get the best experience on our website.",
+  mustLoginToFilterSchools: "You must login to filter schools in the ranking.",
   mustLoginToFilterUsers: "You must login to filter coders in the ranking.",
   mustLoginToJoinContest: "You must login to join this contest",
   mustRegisterToJoinContest: "You must register to join this contest.",
