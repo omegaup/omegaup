@@ -50,6 +50,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
+ * @psalm-type UserDocument=array{name: string, url: string}
+ * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -4936,6 +4938,61 @@ class User extends \OmegaUp\Controllers\Controller {
             self::$log->error($e);
             return $response;
         }
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: UserDocsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getDocsForTypeScript(\OmegaUp\Request $r) {
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
+        $dir = strval(OMEGAUP_ROOT);
+        /** @var list<string> */
+        $files = array_diff(scandir("{$dir}/www/docs/"), ['.', '..']);
+
+        $docs = [
+            'pdf' => [],
+            'dir' => [],
+        ];
+
+        foreach ($files as $file) {
+            if (is_file("$dir/www/docs/$file")) {
+                $name = preg_replace('/\.[^.]+$/', '', $file);
+                $name = str_replace('-', ' ', $name);
+                $name = ucwords($name);
+                if (preg_match('/\.pdf$/', $file)) {
+                    $docs['pdf'][] = [
+                        'name' => $name,
+                        'url' => "/docs/{$file}",
+                    ];
+                }
+            } else {
+                $docs['dir'][] = [
+                    'name' => $file,
+                    'url' => "/docs/{$file}",
+                ];
+            }
+        }
+        // Adding three more directories ignored by git
+        $docs['dir'][] = [
+            'name' => 'C++',
+            'url' => '/docs/cpp/en/',
+        ];
+        $docs['dir'][] = [
+            'name' => 'Java',
+            'url' => '/docs/java/en/',
+        ];
+        $docs['dir'][] = [
+            'name' => 'Pascal',
+            'url' => '/docs/pas/en/',
+        ];
+
+        return [
+            'templateProperties' => [
+                'payload' => ['docs' => $docs],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
+            ],
+            'entrypoint' => 'common_docs',
+        ];
     }
 }
 
