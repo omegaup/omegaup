@@ -138,7 +138,7 @@
         >
           <li class="pr-2">
             <a
-              href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+              href="https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/"
               target="_blank"
             >
               {{ T.frontPageFooterCodeConduct }}

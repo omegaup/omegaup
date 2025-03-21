@@ -41,7 +41,7 @@ const carouselConfig: {
         es: 'Ve el tutorial',
         pt: 'Veja o tutorial',
       },
-      href: 'https://blog.omegaup.com/introduccion-a-omegaup-parte-0/',
+      href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
       target: '_blank',
     },
   },
