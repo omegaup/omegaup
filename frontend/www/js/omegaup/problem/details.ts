@@ -68,7 +68,7 @@ OmegaUp.on('ready', async () => {
     data: () => ({
       popupDisplayed,
       runDetailsData: runDetails,
-      solutionStatus: payload.solutionStatus,
+      solutionStatus: payload.solutionStatus|| 'not_logged_in',
       solution: null as types.ProblemStatement | null,
       allowedSolutionsToSee: payload.allowedSolutionsToSee,
       activeTab: window.location.hash ? locationHash[0] : 'problems',

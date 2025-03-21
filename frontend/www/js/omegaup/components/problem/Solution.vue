@@ -18,7 +18,7 @@
     <div v-else class="interstitial">
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
       <omegaup-markdown
-        v-show="allowedSolutionsToSee !== null"
+         v-show="allowedSolutionsToSee !== null && status !== 'not_logged_in'"
         :markdown="
           ui.formatString(T.solutionViewsLeft, {
             available: allowedSolutionsToSee,
