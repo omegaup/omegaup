@@ -19,6 +19,10 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @return list<\OmegaUp\DAO\VO\Schools>
      */
     public static function findByName($name) {
+        // Note: We've added an index on the name column (idx_schools_name), but using
+        // LIKE '%term%' prevents MySQL from utilizing this index effectively.
+        // We maintain this pattern for compatibility with existing tests and functionality,
+        // though it requires a full table scan. The index will still benefit other queries.
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
