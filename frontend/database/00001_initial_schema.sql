@@ -724,6 +724,22 @@ CREATE TABLE IF NOT EXISTS `Run_Counts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
 
 --
+-- Estructura de la tabla para la tabla de Noticias.
+--
+CREATE TABLE IF NOT EXISTS `News` (
+    `news_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NOT NULL,
+    `excerpt` TEXT NOT NULL,
+    `image_url` VARCHAR(255),
+    `link` VARCHAR(255),
+    `button_title` VARCHAR(100),
+    `expiration_date` DATETIME DEFAULT NULL,
+    `status` ENUM('active', 'inactive') DEFAULT 'active',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+--
 -- Restricciones para tablas volcadas
 --
 
@@ -942,6 +958,13 @@ ALTER TABLE `Groups_Scoreboards`
 ALTER TABLE `Groups_Scoreboards_Contests`
   ADD CONSTRAINT `fk_gsc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_gsc_group_scoreboard_id` FOREIGN KEY (`group_scoreboard_id`) REFERENCES `Groups_Scoreboards` (`group_scoreboard_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `News`
+--
+ALTER TABLE `News`
+  ADD COLUMN `user_id` INT NOT NULL COMMENT 'UserID del autor de esta noticia',
+  ADD CONSTRAINT `fk_news_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Update AC Count on grade
