@@ -214,4 +214,56 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('U13CannotPerform', $e->getMessage());
         }
     }
+
+    /**
+     * Check if the languages of the cloned contest match with the languages of
+     * the original contest
+        */
+    public function testLanguagesInClonedContest() {
+        // Create a contest with specific languages allowed
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'languages' => ['c11-gcc','c11-clang','cpp11-gcc']
+            ])
+        );
+
+        $clonedContestAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        // Login with director to clone the contest
+        $login = self::login($contestData['director']);
+
+        \OmegaUp\Controllers\Contest::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => $clonedContestAlias,
+                'description' => $clonedContestAlias,
+                'alias' => $clonedContestAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        // Get original contest languages
+        $originalContestResponse = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        // Get cloned contest languages
+        $clonedContestResponse = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $clonedContestAlias,
+            ])
+        );
+
+        // Assert that the languages match
+        $this->assertEquals(
+            $originalContestResponse['languages'],
+            $clonedContestResponse['languages'],
+            'Languages of the cloned contest do not match with languages of the original contest'
+        );
+    }
 }
