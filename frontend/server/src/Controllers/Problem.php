@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -62,7 +62,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const SOLUTION_NOT_FOUND = 'not_found';
     const SOLUTION_UNLOCKED = 'unlocked';
     const SOLUTION_LOCKED = 'locked';
-
+    const SOLUTION_NOT_LOGGED_IN = 'not_logged_in';
     const RESTRICTED_TAG_NAMES = [
         'problemRestrictedTagKarel',
         'problemRestrictedTagLanguage',
@@ -4670,7 +4670,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'admin' => false,
                         'reviewer' => false,
                     ],
-                    'allowedSolutionsToSee' => $allowedSolutionsToSee
+                    'allowedSolutionsToSee' => $allowedSolutionsToSee,
+                    'solutionStatus' => self::SOLUTION_NOT_LOGGED_IN,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblem'
