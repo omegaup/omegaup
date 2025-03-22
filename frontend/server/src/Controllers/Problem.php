@@ -62,7 +62,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const SOLUTION_NOT_FOUND = 'not_found';
     const SOLUTION_UNLOCKED = 'unlocked';
     const SOLUTION_LOCKED = 'locked';
-
+    const SOLUTION_NOT_LOGGED_IN = 'not_logged_in';
     const RESTRICTED_TAG_NAMES = [
         'problemRestrictedTagKarel',
         'problemRestrictedTagLanguage',
@@ -4670,7 +4670,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'admin' => false,
                         'reviewer' => false,
                     ],
-                    'allowedSolutionsToSee' => $allowedSolutionsToSee
+                    'allowedSolutionsToSee' => $allowedSolutionsToSee,
+                    'solutionStatus' => self::SOLUTION_NOT_LOGGED_IN,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblem'

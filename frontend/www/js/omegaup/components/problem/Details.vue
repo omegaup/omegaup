@@ -351,7 +351,7 @@
         :class="{ 'show active': selectedTab === 'solution' }"
       >
         <omegaup-problem-solution
-          :status="computedSolutionStatus"
+          :status="solutionStatus"
           :allowed-solutions-to-see="allowedSolutionsToSee"
           :solution="solution"
           @get-solution="$emit('get-solution')"
@@ -490,10 +490,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: true }) useNewVerdictTable!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
-  get computedSolutionStatus(): string {
-    if (!this.user.loggedIn) return 'not_logged_in';
-    return this.solutionStatus || 'locked';
-  }
+
   PopupDisplayed = PopupDisplayed;
   T = T;
   ui = ui;
