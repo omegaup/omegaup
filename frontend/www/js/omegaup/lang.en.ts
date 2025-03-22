@@ -877,7 +877,6 @@ const translations: { [key: string]: string; } = {
   navDiscord: "Discord Server",
   navHelp: "Help",
   navLogIn: "Log in / Sign up",
-  navLogOut: "Log out",
   navMyContent: "My content",
   navMyContests: "My contests",
   navMyCourses: "My courses",
