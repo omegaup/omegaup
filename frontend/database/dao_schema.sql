@@ -313,6 +313,7 @@ CREATE TABLE `Courses` (
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
+  KEY `idx_start_time` (`start_time`),
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Un curso/clase que un maestro da.';
