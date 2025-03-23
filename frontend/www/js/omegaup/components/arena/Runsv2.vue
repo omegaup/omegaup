@@ -248,6 +248,30 @@ export default class Runs extends Vue {
     if (run.verdict == 'AC') {
       return 'success';
     }
+    if (run.verdict == 'PA') {
+      return 'info';
+    }
+    if (run.verdict == 'PE') {
+      return 'warning';
+    }
+    if (run.verdict == 'WA') {
+      return 'danger';
+    }
+    if (run.verdict == 'TLE') {
+      return 'warning';
+    }
+    if (run.verdict == 'OLE') {
+      return 'warning';
+    }
+    if (run.verdict == 'MLE') {
+      return 'warning';
+    }
+    if (run.verdict == 'RTE') {
+      return 'warning';
+    }
+    if (run.verdict == 'RFE') {
+      return 'warning';
+    }
     if (run.verdict == 'CE') {
       return 'warning';
     }
