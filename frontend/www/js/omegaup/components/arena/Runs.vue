@@ -691,7 +691,8 @@ export default class Runs extends Vue {
     if (run.type == 'disqualified') return 'status-disqualified';
     if (run.verdict == 'AC') {
       return 'status-ac';
-    }if (run.verdict == 'TLE') {
+    }
+    if (run.verdict == 'TLE') {
       return 'status-tle';
     }
     if (run.verdict == 'MLE') {
