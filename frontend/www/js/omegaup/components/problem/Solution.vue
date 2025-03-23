@@ -2,7 +2,8 @@
   <div class="card">
     <div class="row p-3">
       <div class="col-12 text-right">
-        <a href="https://blog.omegaup.com/soluciones-de-problemas-en-omegaup/"
+        <a
+          href="https://blog.omegaup.com/features/soluciones-de-problemas-en-omegaup/"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a
         >
@@ -18,7 +19,7 @@
     <div v-else class="interstitial">
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
       <omegaup-markdown
-        v-show="allowedSolutionsToSee !== null"
+        v-show="showViewsLeft"
         :markdown="
           ui.formatString(T.solutionViewsLeft, {
             available: allowedSolutionsToSee,
@@ -106,6 +107,11 @@ export default class ProblemSolution extends Vue {
       default:
         return '';
     }
+  }
+  get showViewsLeft(): boolean {
+    return (
+      this.allowedSolutionsToSee !== null && this.status !== 'not_logged_in'
+    );
   }
 }
 </script>
