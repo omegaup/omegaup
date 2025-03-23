@@ -962,10 +962,6 @@ export default class Runs extends Vue {
   background: var(--arena-runs-table-status-pa-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
-.status-pe {
-  background: var(--arena-runs-table-status-pe-background-color);
-  color: var(--arena-runs-table-status-ac-font-color);
-}
 .status-ole {
   background: var(--arena-runs-table-status-ole-background-color);
   color: var(--arena-runs-table-status-ac-font-color);

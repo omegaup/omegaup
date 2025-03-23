@@ -251,9 +251,6 @@ export default class Runs extends Vue {
     if (run.verdict == 'PA') {
       return 'info';
     }
-    if (run.verdict == 'PE') {
-      return 'warning';
-    }
     if (run.verdict == 'WA') {
       return 'danger';
     }

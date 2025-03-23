@@ -210,10 +210,6 @@ table.submissions-table > tbody > tr > td {
   background: var(--arena-runs-table-status-pa-background-color);
 }
 
-.verdict-PE {
-  background: var(--arena-runs-table-status-pe-background-color);
-}
-
 .verdict-OLE {
   background: var(--arena-runs-table-status-ole-background-color);
 }
