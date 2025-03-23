@@ -6,6 +6,7 @@
     :no-title="T.wordsNo"
     ok-variant="primary"
     no-variant="secondary"
+    footer-class="logout-confirmation-modal"
     static
     lazy
     @ok="confirmLogout"
