@@ -19,7 +19,7 @@
     <div v-else class="interstitial">
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
       <omegaup-markdown
-        v-show="allowedSolutionsToSee !== null"
+        v-show="showViewsLeft"
         :markdown="
           ui.formatString(T.solutionViewsLeft, {
             available: allowedSolutionsToSee,
@@ -107,6 +107,11 @@ export default class ProblemSolution extends Vue {
       default:
         return '';
     }
+  }
+  get showViewsLeft(): boolean {
+    return (
+      this.allowedSolutionsToSee !== null && this.status !== 'not_logged_in'
+    );
   }
 }
 </script>
