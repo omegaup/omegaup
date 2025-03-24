@@ -4001,7 +4001,7 @@ export namespace types {
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
-    solutionStatus?: string;
+    solutionStatus: string;
     solvers: types.BestSolvers[];
     totalRuns?: number;
     user: types.UserInfoForProblem;
