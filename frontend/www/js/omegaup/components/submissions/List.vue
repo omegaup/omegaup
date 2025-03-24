@@ -198,7 +198,7 @@ table.submissions-table > tbody > tr > td {
 }
 
 .verdict-CE {
-  background: --arena-submissions-list-verdict-ce-background-color;
+  background: var(--arena-submissions-list-verdict-ce-background-color);
 }
 
 .verdict-JE,
