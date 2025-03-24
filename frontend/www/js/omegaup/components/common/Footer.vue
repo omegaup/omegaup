@@ -138,14 +138,17 @@
         >
           <li class="pr-2">
             <a
-              href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
+              href="https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/"
               target="_blank"
             >
               {{ T.frontPageFooterCodeConduct }}
             </a>
           </li>
           <li>
-            <a href="https://blog.omegaup.com/privacy-policy/" target="_blank">
+            <a
+              href="https://blog.omegaup.com/policies/privacy-policy/"
+              target="_blank"
+            >
               {{ T.frontPageFooterPrivacyPolicy }}
             </a>
           </li>
