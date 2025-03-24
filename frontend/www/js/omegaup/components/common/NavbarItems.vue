@@ -2,11 +2,11 @@
   <div class="mr-auto">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-center"
+      class="navbar-nav align-items-start px-3"
     >
       <li
         v-if="isLoggedIn"
-        class="nav-item dropdown nav-contests"
+        class="nav-item dropdown nav-contests nav-item-align"
         :class="{ active: navbarSection === 'contests' }"
       >
         <a
@@ -48,7 +48,7 @@
       </li>
       <li
         v-if="isLoggedIn"
-        class="nav-item dropdown nav-courses"
+        class="nav-item dropdown nav-courses nav-item-align"
         :class="{ active: navbarSection === 'courses' }"
       >
         <a
@@ -87,7 +87,7 @@
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
       <li
-        class="nav-item dropdown nav-problems"
+        class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
       >
         <a
@@ -155,7 +155,7 @@
         </div>
       </li>
       <li
-        class="nav-item dropdown nav-rank"
+        class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
       >
         <a
@@ -187,7 +187,7 @@
           }}</a>
         </div>
       </li>
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
           href="#"
