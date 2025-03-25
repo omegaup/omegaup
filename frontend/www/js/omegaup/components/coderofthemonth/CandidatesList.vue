@@ -48,7 +48,7 @@
         <td class="text-center align-middle">
           {{ coder.score }}
         </td>
-        <slot name="button-select-coder"></slot>
+        <slot name="button-select-coder" :coder="coder"></slot>
       </tr>
     </tbody>
   </table>

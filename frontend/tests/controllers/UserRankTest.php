@@ -261,7 +261,6 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'identity' => $identityWithNoCountry,
         ] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identityWithNoCountry);
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -273,6 +272,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // User should not have filters
+        $login = self::login($identityWithNoCountry);
         $availableFilters = \OmegaUp\Controllers\User::getRankForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,

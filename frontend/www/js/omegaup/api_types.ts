@@ -2347,6 +2347,14 @@ export namespace types {
       );
     }
 
+    export function UserDocsPayload(
+      elementId: string = 'payload',
+    ): types.UserDocsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -2457,6 +2465,33 @@ export namespace types {
             );
           return x;
         })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserRankTableLoggedOutPayload(
+      elementId: string = 'payload',
+    ): types.UserRankTableLoggedOutPayload {
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
         return x;
       })(
         JSON.parse(
@@ -2893,6 +2928,7 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
@@ -3521,6 +3557,7 @@ export namespace types {
     is_admin: boolean;
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
+    mentor_can_choose_coder: boolean;
     user?: dao.Users;
     user_verification_deadline?: Date;
     valid: boolean;
@@ -3964,7 +4001,7 @@ export namespace types {
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
-    solutionStatus?: string;
+    solutionStatus: string;
     solvers: types.BestSolvers[];
     totalRuns?: number;
     user: types.UserInfoForProblem;
@@ -4808,6 +4845,15 @@ export namespace types {
     verified: boolean;
   }
 
+  export interface UserDocsPayload {
+    docs: { [key: string]: types.UserDocument[] };
+  }
+
+  export interface UserDocument {
+    name: string;
+    url: string;
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -4915,6 +4961,15 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+  }
+
+  export interface UserRankTableLoggedOutPayload {
+    isLogged: boolean;
+    lastUpdated?: Date;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.UserRank;
   }
 
   export interface UserRankTablePayload {
