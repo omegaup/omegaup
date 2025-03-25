@@ -5,7 +5,7 @@
     :ok-title="T.wordsYes"
     :no-title="T.wordsNo"
     ok-variant="primary"
-    no-variant="secondary"
+    cancel-variant="secondary"
     footer-class="logout-confirmation-modal"
     static
     lazy
