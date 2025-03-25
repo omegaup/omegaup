@@ -103,10 +103,12 @@
             <div class="checkbox">
               <label
                 ><input
-                  v-model="windowLengthEnabled"
-                  data-different-start-check
-                  type="checkbox"
-                />
+  v-model="windowLengthEnabled"
+  data-different-start-check
+  type="checkbox"
+  :disabled="startTime <= Math.floor(Date.now() / 1000)"
+/>
+
                 {{ T.wordsEnable }}</label
               >
             </div>
@@ -119,7 +121,8 @@
               }"
               size="3"
               type="text"
-              :disabled="!windowLengthEnabled"
+              :disabled="!windowLengthEnabled || details.start_time <= Math.floor(Date.now() / 1000)"
+
             />
             <p class="help-block">{{ T.contestNewFormDifferentStartsDesc }}</p>
           </div>
@@ -609,9 +612,15 @@ export default class NewForm extends Vue {
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
     };
-    if (this.windowLengthEnabled && this.windowLength) {
-      contest.window_length = this.windowLength;
-    }
+if (this.details.start_time > Math.floor(Date.now() / 1000)) {
+  if (this.windowLengthEnabled && this.windowLength) {
+  contest.window_length = this.windowLength;
+} else {
+  contest.window_length = null;
+}
+
+
+
     const request = {
       contest,
       teamsGroupAlias: this.currentTeamsGroupAlias?.key,

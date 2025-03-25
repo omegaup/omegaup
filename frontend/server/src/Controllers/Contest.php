@@ -4925,6 +4925,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'contestNotFound'
             );
+            if (
+                $contest->window_length !== $originalContest->window_length &&
+                $originalContest->start_time <= \OmegaUp\Time::get()
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'Cannot change window_length after contest has started'
+                );
+            }
         }
         $result = [
             'status' => 'ok',
@@ -5129,6 +5137,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $contest
                 );
             } else {
+                
                 \OmegaUp\DAO\ProblemsetIdentities::recalculateEndTimeAsFinishTime(
                     $contest
                 );
