@@ -826,7 +826,6 @@ const translations: { [key: string]: string; } = {
   loginSignUp: "Registrar",
   loginSignupHeader: "Crea una cuenta omegaUp, \u00a1es f\u00e1cil y r\u00e1pido!",
   loginThroughThirdParty: "Tu cuenta fue creada mediante un login externo (Google, Facebook, etc.). Por favor inicia sesi\u00f3n usando el mismo m\u00e9todo para poder establecer una contrase\u00f1a.",
-  logoutConfirmationMessage: "\u00bfEst\u00e1s seguro de que quieres cerrar sesi\u00f3n?",
   logoutConfirmationTitle: "Confirmar cierre de sesi\u00f3n",
   mailFromUserLikelyRemoved: "Este correo ya est\u00e1 en uso. Probablemente este fue usado pero la cuenta fue eliminada. Si deseas utilizar el correo escribe a soporte@omegaup.com para obtener ayuda",
   mailInUse: "El email seleccionado ya est\u00e1 ocupado. Intenta con otro email v\u00e1lido.",

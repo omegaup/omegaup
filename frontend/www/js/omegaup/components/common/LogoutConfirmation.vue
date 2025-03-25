@@ -7,11 +7,11 @@
     ok-variant="primary"
     cancel-variant="secondary"
     footer-class="logout-confirmation-modal"
+    body-class="p-0"
     static
     lazy
     @ok="confirmLogout"
   >
-    <div class="mb-4">{{ T.logoutConfirmationMessage }}</div>
   </b-modal>
 </template>
 
