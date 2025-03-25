@@ -64,7 +64,7 @@
             </li>
           </ul>
         </div>
-        <div
+        <!-- <div
           class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto"
         >
           <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
@@ -79,7 +79,7 @@
               </a>
             </li>
           </ul>
-        </div>
+        </div> -->
         <div
           class="footer-list-section footer-organization d-inline-block w-50 mb-4"
         >
