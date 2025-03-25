@@ -997,6 +997,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         [
+            'needsBasicInformation' => $needsBasicInformation,
             'requestsUserInformation' => $requestsUserInformation,
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($contest->problemset_id);
 
@@ -1006,9 +1007,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'school' => $r->identity->current_identity_school_id ?: null,
         ];
 
-        $needsBasicInformation = is_null($userBasicInformation['country'])
-            || is_null($userBasicInformation['state'])
-            || is_null($userBasicInformation['school']);
+        $needsBasicInformation = $needsBasicInformation && (
+            is_null($userBasicInformation['country']) ||
+            is_null($userBasicInformation['state']) ||
+            is_null($userBasicInformation['school'])
+        );
 
         $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
         $result['templateProperties']['payload']['needsBasicInformation'] = $needsBasicInformation;
