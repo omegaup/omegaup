@@ -1,5 +1,15 @@
 <template>
-  <div></div>
+  <div class="editor-container">
+    <div class="editor-toolbar">
+      <label>{{ T.fontSize }}</label>
+      <select v-model="selectedFontSize" @change="onFontSizeChange">
+        <option v-for="size in fontSizes" :key="size" :value="size">
+          {{ size }}px
+        </option>
+      </select>
+    </div>
+    <div ref="editorContainer" class="editor"></div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -8,6 +18,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
+import T from '../lang';
 
 @Component
 export default class MonacoEditor extends Vue {
@@ -21,8 +32,11 @@ export default class MonacoEditor extends Vue {
   _model: monaco.editor.ITextModel | null = null;
 
   // default font size and line height
-  readonly baseFontSize: number = 14;
-  readonly baseLineHeight: number = 19;
+  selectedFontSize: number = 12;
+  fontSizes: number[] = [12, 14, 16, 18, 20];
+  // readonly baseLineHeight: number = 19;  Changing fontSize automatically resets the line-height
+
+  T = T; //getting translations
 
   get theme(): string {
     return store.getters['theme'];
@@ -90,6 +104,8 @@ export default class MonacoEditor extends Vue {
         readOnly: this.readOnly,
         theme: this.theme,
         value: this.contents,
+        fontSize: this.selectedFontSize,
+        // lineHeight: this.baseLineHeight => not required anymore
       } as monaco.editor.IStandaloneEditorConstructionOptions,
     );
     this._model = this._editor.getModel();
@@ -116,11 +132,6 @@ export default class MonacoEditor extends Vue {
       // scaling does not work as intended
       // the cursor does not click where it's supposed to
       // this is an alternative solution to zooming in/out
-
-      this._editor.updateOptions({
-        fontSize: this.baseFontSize * window.devicePixelRatio,
-        lineHeight: this.baseLineHeight * window.devicePixelRatio,
-      });
       this._editor.layout();
     }
   }
@@ -129,11 +140,50 @@ export default class MonacoEditor extends Vue {
     e.detail.code = this.contents;
     e.detail.language = this.language;
   }
+
+  onFontSizeChange(): void {
+    if (this._editor) {
+      this._editor.updateOptions({ fontSize: this.selectedFontSize });
+    }
+  }
 }
 </script>
 
 <style scoped>
-div {
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background: #f4f4f4;
+  border-bottom: 1px solid #ccc;
+}
+
+.editor-toolbar label {
+  margin-right: 4px;
+  font-size: 12px;
+  margin-bottom: 0px;
+  background: #e1e1e1;
+  color: #777777;
+  border: 1px solid #cccccc;
+  padding: 3px;
+}
+
+.editor-toolbar select {
+  padding: 3px;
+  font-size: 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: white;
+}
+
+.editor {
+  flex: 1;
   width: 100%;
   height: 100%;
 }
