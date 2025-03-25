@@ -3114,6 +3114,7 @@ export namespace types {
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
     shouldShowModalToLoginWithRegisteredIdentity: boolean;
+    userBasicInformation: { country?: string; school?: number; state?: string };
   }
 
   export interface ContestList {

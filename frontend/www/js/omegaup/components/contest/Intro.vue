@@ -48,29 +48,37 @@
                 <li>
                   {{ T.wordsCountry }}:
                   <span
-                    :class="profile.country_id ? 'text-success' : 'text-danger'"
+                    :class="
+                      userBasicInformation.country
+                        ? 'text-success'
+                        : 'text-danger'
+                    "
                   >
-                    {{
-                      (profile.country_id ? profile.country : null) ||
-                      T.editFieldRequired
-                    }}
-                    {{ profile.country_id ? '✔️' : '❌' }}
+                    {{ userBasicInformation.country ? '✔️' : '❌' }}
                   </span>
                 </li>
                 <li>
                   {{ T.profileState }}:
-                  <span :class="profile.state ? 'text-success' : 'text-danger'">
-                    {{ profile.state || T.editFieldRequired }}
-                    {{ profile.state ? '✔️' : '❌' }}
+                  <span
+                    :class="
+                      userBasicInformation.state
+                        ? 'text-success'
+                        : 'text-danger'
+                    "
+                  >
+                    {{ userBasicInformation.state ? '✔️' : '❌' }}
                   </span>
                 </li>
                 <li>
                   {{ T.wordsSchool }}:
                   <span
-                    :class="profile.school ? 'text-success' : 'text-danger'"
+                    :class="
+                      userBasicInformation.school
+                        ? 'text-success'
+                        : 'text-danger'
+                    "
                   >
-                    {{ profile.school || T.editFieldRequired }}
-                    {{ profile.school ? '✔️' : '❌' }}
+                    {{ userBasicInformation.school ? '✔️' : '❌' }}
                   </span>
                 </li>
               </ul>
@@ -220,7 +228,7 @@ export default class ContestIntro extends Vue {
   @Prop() statement!: types.PrivacyStatement;
   @Prop({ default: false })
   shouldShowModalToLoginWithRegisteredIdentity!: boolean;
-  @Prop() profile!: types.UserProfileInfo;
+  @Prop() userBasicInformation!: any;
 
   T = T;
   ui = ui;
