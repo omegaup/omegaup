@@ -3,7 +3,7 @@
     v-model="showModal"
     :title="T.logoutConfirmationTitle"
     :ok-title="T.wordsYes"
-    :no-title="T.wordsNo"
+    :cancel-title="T.wordsNo"
     ok-variant="primary"
     cancel-variant="secondary"
     footer-class="logout-confirmation-modal"
