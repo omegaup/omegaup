@@ -614,11 +614,11 @@ export default class NewForm extends Vue {
     };
 if (this.details.start_time > Math.floor(Date.now() / 1000)) {
   if (this.windowLengthEnabled && this.windowLength) {
-    contest.window_length = this.windowLength;
-  } else {
-    contest.window_length = null;
-  }
+  contest.window_length = this.windowLength;
+} else {
+  contest.window_length = null;
 }
+
 
 
     const request = {
