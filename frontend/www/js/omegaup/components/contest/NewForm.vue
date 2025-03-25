@@ -612,13 +612,14 @@ export default class NewForm extends Vue {
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
     };
-   if (
-  this.windowLengthEnabled &&
-  this.windowLength &&
-  this.details.start_time > Math.floor(Date.now() / 1000)
-) {
-  contest.window_length = this.windowLength;
+if (this.details.start_time > Math.floor(Date.now() / 1000)) {
+  if (this.windowLengthEnabled && this.windowLength) {
+    contest.window_length = this.windowLength;
+  } else {
+    contest.window_length = null;
+  }
 }
+
 
     const request = {
       contest,
