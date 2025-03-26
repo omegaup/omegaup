@@ -1,14 +1,18 @@
 <template>
-  <div class="editor-container">
-    <div class="editor-toolbar">
-      <label>{{ T.fontSize }}</label>
-      <select v-model="selectedFontSize" @change="onFontSizeChange">
+  <div class="h-100 d-flex flex-column">
+    <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
+      <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
+      <select
+        v-model="selectedFontSize"
+        class="custom-select-sm"
+        @change="onFontSizeChange"
+      >
         <option v-for="size in fontSizes" :key="size" :value="size">
           {{ size }}px
         </option>
       </select>
     </div>
-    <div ref="editorContainer" class="editor"></div>
+    <div ref="editorContainer" class="editor flex-grow-1 w-100 h-100"></div>
   </div>
 </template>
 
@@ -34,7 +38,6 @@ export default class MonacoEditor extends Vue {
   // default font size and line height
   selectedFontSize: number = 12;
   fontSizes: number[] = [12, 14, 16, 18, 20];
-  // readonly baseLineHeight: number = 19;  Changing fontSize automatically resets the line-height
 
   T = T; //getting translations
 
@@ -94,20 +97,19 @@ export default class MonacoEditor extends Vue {
   mounted(): void {
     window.addEventListener('code-and-language-set', this.onCodeAndLanguageSet);
 
-    this._editor = monaco.editor.create(
-      this.$el as HTMLElement,
-      {
-        autoIndent: 'brackets',
-        formatOnPaste: true,
-        formatOnType: true,
-        language: Util.supportedLanguages[this.language].modelMapping,
-        readOnly: this.readOnly,
-        theme: this.theme,
-        value: this.contents,
-        fontSize: this.selectedFontSize,
-        // lineHeight: this.baseLineHeight => not required anymore
-      } as monaco.editor.IStandaloneEditorConstructionOptions,
-    );
+    const container = this.$refs.editorContainer as HTMLElement;
+    if (!container) return;
+
+    this._editor = monaco.editor.create(container, {
+      autoIndent: 'brackets',
+      formatOnPaste: true,
+      formatOnType: true,
+      language: Util.supportedLanguages[this.language].modelMapping,
+      readOnly: this.readOnly,
+      theme: this.theme,
+      value: this.contents,
+      fontSize: this.selectedFontSize,
+    } as monaco.editor.IStandaloneEditorConstructionOptions);
     this._model = this._editor.getModel();
     if (!this._model) return;
 
@@ -149,42 +151,26 @@ export default class MonacoEditor extends Vue {
 }
 </script>
 
-<style scoped>
-.editor-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
 
 .editor-toolbar {
-  display: flex;
-  align-items: center;
-  padding: 5px;
-  background: #f4f4f4;
+  background: var(--moncao-editor-toolbar-background-color);
   border-bottom: 1px solid #ccc;
 }
 
 .editor-toolbar label {
-  margin-right: 4px;
   font-size: 12px;
-  margin-bottom: 0px;
-  background: #e1e1e1;
-  color: #777777;
-  border: 1px solid #cccccc;
-  padding: 3px;
+  background: var(--moncao-editor-toolbar-label-background-color);
+  color: var(--moncao-editor-toolbar-label-color);
+  border: 1px solid var(--moncao-editor-toolbar-label-border-color);
 }
 
 .editor-toolbar select {
-  padding: 3px;
   font-size: 10px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  background: white;
 }
 
 .editor {
-  flex: 1;
-  width: 100%;
-  height: 100%;
+  border: 1px solid var(--moncao-editor-toolbar-label-border-color);
 }
 </style>
