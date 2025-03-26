@@ -716,7 +716,6 @@ const translations: { [key: string]: string; } = {
   frontPageFooterOrganization: "(Organiza7i0n)",
   frontPageFooterPrivacyPolicy: "(Privacy p01icy)",
   frontPageFooterSite: "(Si73)",
-  frontPageFooterSponsors: "(Sp0n50r)",
   frontPageFooterTeam: "(T3am)",
   frontPageNextContests: "(Upc0ming c0n73575)",
   generalError: "(O0p5. I'v3 3nc0un73r3d an in73rna1 3rr0r. P13a53 7ry again.)",
