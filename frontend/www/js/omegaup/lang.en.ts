@@ -1588,6 +1588,7 @@ const translations: { [key: string]: string; } = {
   schoolsOfTheMonthCandidates: "Candidates to School of the Month",
   schoolsOfTheMonthRank: "Top 100 schools of previous month",
   schoolsStartUsingCourses: "Start using Courses",
+  scoreMismatchForSameVersion: "The original score of the submission has changed from %(originalScore) to %(currentScore) even though the problem version $(version) has not been updated.",
   scoreboardAccountName: "Account name",
   scoreboardLastUpdated: "Last time updated: %(datetime)",
   scoreboardNameAndAccountName: "Name and account name",

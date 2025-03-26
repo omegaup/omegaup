@@ -12,7 +12,7 @@ import {
   onRankingEvents,
   onVirtualRankingChanged,
 } from './ranking';
-import { updateRun } from './submissions';
+import { Actions, updateRun } from './submissions';
 import { types } from '../api_types';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
@@ -123,7 +123,7 @@ export class EventsSocket {
         ...run,
         time: time.remoteTime(run.time * 1000),
       };
-      updateRun({ run: updatedRun });
+      updateRun({ run: updatedRun, action: Actions.Judge });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
