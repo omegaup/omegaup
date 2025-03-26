@@ -156,7 +156,7 @@ export default class MonacoEditor extends Vue {
 
 .editor-toolbar {
   background: var(--moncao-editor-toolbar-background-color);
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--moncao-editor-toolbar-border-bottom-color);
 }
 
 .editor-toolbar label {
