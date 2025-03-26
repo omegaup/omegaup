@@ -456,6 +456,14 @@ export default class ArenaContestList extends Vue {
       'click',
       this.handlePageClick,
     );
+
+    // Check if we came from the profile menu link
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('filter') === 'signedup') {
+      this.currentFilter = ContestFilter.SignedUp;
+    } else {
+      this.currentFilter = ContestFilter.All;
+    }
   }
 
   beforeDestroy() {

@@ -72,4 +72,36 @@ describe('Navigation Test', () => {
     profilePage.verifySchoolDetails(schoolDetails);
     cy.logout();
   });
+
+  it('Should navigate to enrolled contests and verify filter', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    cy.login(userLoginOptions[0]);
+
+    cy.get('[data-nav-user]').should('be.visible');
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-user-contests]').should('be.visible');
+
+    cy.get('[data-nav-user-contests]').first().click();
+
+    cy.waitUntil(() =>
+      cy
+        .url()
+        .should(
+          'include',
+          '/arena/?page=1&tab_name=current&sort_order=none&filter=signedup',
+        ),
+    );
+
+    cy.get('button.dropdown-toggle-no-caret').eq(1).click();
+
+    cy.get('.dropdown-menu.show').should('be.visible');
+
+    cy.get('[data-filter-by-signed-up].dropdown-item')
+      .should('exist')
+      .and('be.visible')
+      .click();
+
+    cy.get('[data-filter-by-signed-up].dropdown-item svg.fa-check')
+      .should('exist',);
+  });
 });
