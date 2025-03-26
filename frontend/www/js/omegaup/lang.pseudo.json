@@ -390,6 +390,8 @@
 	"contestNewFormPenaltyDesc": "(In73g3r am0un7 0f minu735 70 p3na1iz3 an inc0rr3c7 5ubmi55i0n.)",
 	"contestNewFormPenaltyType": "(P3na17y 7yp3)",
 	"contestNewFormPenaltyTypeDesc": "(Indica735 h0w 7h3 5ubmi55i0n p3na17y i5 ca1cu1a73d: minu735 5inc3 7h3 b3ginning 0f 7h3 c0n7357, minu735 5inc3 7h3 pr0b13m wa5 0p3n3d, 0r pr0gram 3x3cu7i0n 7im3 (mi11i53c0nd5).)",
+	"contestNewFormPlagiarismRequired": "(P1agiari5m R3quir3d)",
+	"contestNewFormPlagiarismRequiredDesc": "(Ch3ck 7h3 b0x if y0ur r3quir3 P1agiari5m f0r 7h3 c0n7357)",
 	"contestNewFormPointDecrementFactor": "(Sc0r3 D3cr3m3n7 Fac70r)",
 	"contestNewFormPointDecrementFactorDesc": "(A numb3r b37w33n 0 and 1, inc1u5iv3. If 7h3 numb3r i5 diff3r3n7 fr0m 0, 7h3 5c0r3 award3d f0r a c0rr3c7 5ubmi55i0n wi11 d3cay a5 7im3 pa5535, acc0rding 70 7h3 f0110wing f0rmu1a: (1 - p0in75_d3cay_fac70r) + p0in75_d3cay_fac70r * TT^2 / (10 * PT^2 + TT^2), wh3r3 PT i5 7h3 p3na17y 0f 7h3 5ubmi55i0n in minu735 and TT 7h3 707a1 13ng7h 0f 7h3 c0n7357 in minu735.)",
 	"contestNewFormScheduleContest": "(Sch3du13 c0n7357)",

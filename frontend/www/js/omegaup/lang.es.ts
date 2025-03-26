@@ -391,6 +391,8 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyDesc: "Entero indicando el n\u00famero de minutos con que se penaliza por enviar una respuesta incorrecta.",
   contestNewFormPenaltyType: "Tipo de penalizaci\u00f3n",
   contestNewFormPenaltyTypeDesc: "Indica c\u00f3mo se calcula la penalizaci\u00f3n por env\u00edo: tiempo desde que inicia el concurso, tiempo desde que se abre el problema, o tiempo de ejecuci\u00f3n del programa.",
+  contestNewFormPlagiarismRequired: "Plagio requerido",
+  contestNewFormPlagiarismRequiredDesc: "Marque la casilla si necesita plagio para el concurso",
   contestNewFormPointDecrementFactor: "Factor de decremento de puntos",
   contestNewFormPointDecrementFactorDesc: "Un n\u00famero entre 0 y 1 inclusive. Si este n\u00famero es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estar\u00e1 dado por (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), donde PT es el penalty en minutos del env\u00edo y TT el tiempo total del concurso, en minutos.",
   contestNewFormScheduleContest: "Agendar concurso",
