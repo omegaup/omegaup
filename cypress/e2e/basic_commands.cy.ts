@@ -7,6 +7,7 @@ import { problemPage } from '../support/pageObjects/problemPage';
 
 describe('Basic Commands Test', () => {
   beforeEach(() => {
+    // check if user is logged in, so we logout before each test
     cy.clearCookies();
     cy.clearLocalStorage();
     cy.visit('/');
@@ -132,6 +133,7 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should create two contests and merge their scoreboard', () => {
+    cy.log('Should create two contests and merge their scoreboard');
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
     const contestOptions2 = contestPage.generateContestOptions(
@@ -141,6 +143,7 @@ describe('Basic Commands Test', () => {
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 
+    cy.log('Create first contest with two users');
     cy.login(loginOptions[1]);
     contestPage.createContest(contestOptions1, users1);
     cy.logout();
@@ -158,6 +161,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
 
     cy.login(loginOptions[2]);
+    cy.log('Create second contest with one user');
     contestPage.createContest(contestOptions2, users2, false);
     cy.logout();
 
