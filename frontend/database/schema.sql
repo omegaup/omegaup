@@ -1270,7 +1270,7 @@ CREATE TABLE `Users_Streaks` (
   `medium_solved` INT NOT NULL DEFAULT 0 COMMENT 'Total medio problema resuelto',
   `hard_solved` INT NOT NULL DEFAULT 0 COMMENT 'Total difícil problema resuelto',
   PRIMARY KEY (`user_id`),
-  CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_us_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
   INDEX `idx_submission_time` (`submission_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda la racha mantenida por los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
