@@ -2028,6 +2028,14 @@ export namespace types {
       );
     }
 
+    export function ReportStatsPayload(
+      elementId: string = 'payload',
+    ): types.ReportStatsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -4329,6 +4337,20 @@ export namespace types {
     score: number;
   }
 
+  export interface ReportStatsPayload {
+    report: {
+      acceptedSubmissions: number;
+      activeSchools: number;
+      activeUsers: { [key: string]: number };
+      courses: number;
+      omiCourse: {
+        attemptedUsers: number;
+        completedUsers: number;
+        passedUsers: number;
+      };
+    };
+  }
+
   export interface Run {
     alias: string;
     classname: string;
@@ -5005,19 +5027,7 @@ export namespace types {
 export namespace messages {
   // Admin
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
-  export type AdminPlatformReportStatsResponse = {
-    report: {
-      acceptedSubmissions: number;
-      activeSchools: number;
-      activeUsers: { [key: string]: number };
-      courses: number;
-      omiCourse: {
-        attemptedUsers: number;
-        completedUsers: number;
-        passedUsers: number;
-      };
-    };
-  };
+  export type AdminPlatformReportStatsResponse = types.ReportStatsPayload;
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
