@@ -557,8 +557,8 @@ nav.navbar {
   padding: auto;
 }
 
-.navbar-nav{
-  .nav-item{
+.navbar-nav {
+  .nav-item {
     width: 100% !important;
   }
 }

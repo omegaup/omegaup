@@ -1,10 +1,23 @@
 <template>
   <div class="mr-auto mt-2 mt-lg-0">
-    <ul v-if="!omegaUpLockDown && (!inContest || isAdmin)" class="navbar-nav align-items-start px-3">
-      <li v-if="isLoggedIn" class="nav-item dropdown nav-contests nav-item-align"
-        :class="{ active: navbarSection === 'contests' }">
-        <a class="nav-link px-2 dropdown-toggle" href="#" role="button" data-nav-contests data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
+    <ul
+      v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+      class="navbar-nav align-items-start px-3"
+    >
+      <li
+        v-if="isLoggedIn"
+        class="nav-item dropdown nav-contests nav-item-align"
+        :class="{ active: navbarSection === 'contests' }"
+      >
+        <a
+          class="nav-link px-2 dropdown-toggle"
+          href="#"
+          role="button"
+          data-nav-contests
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           {{ T.wordsContests }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
@@ -16,7 +29,12 @@
               <a class="dropdown-item" href="/scoreboardmerge/">
                 {{ T.contestsJoinScoreboards }}
               </a>
-              <a v-if="!isUnder13User" class="dropdown-item" href="/contest/new/" data-nav-contests-create>
+              <a
+                v-if="!isUnder13User"
+                class="dropdown-item"
+                href="/contest/new/"
+                data-nav-contests-create
+              >
                 {{ T.contestsCreate }}
               </a>
             </template>
@@ -26,12 +44,22 @@
       <li v-else :class="{ active: navbarSection === 'contests' }">
         <a class="nav-link px-2" href="/arena/" data-nav-contests-arena>{{
           T.wordsContests
-          }}</a>
+        }}</a>
       </li>
-      <li v-if="isLoggedIn" class="nav-item dropdown nav-courses nav-item-align"
-        :class="{ active: navbarSection === 'courses' }">
-        <a class="nav-link px-2 dropdown-toggle" href="#" role="button" data-nav-courses data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
+      <li
+        v-if="isLoggedIn"
+        class="nav-item dropdown nav-courses nav-item-align"
+        :class="{ active: navbarSection === 'courses' }"
+      >
+        <a
+          class="nav-link px-2 dropdown-toggle"
+          href="#"
+          role="button"
+          data-nav-courses
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           {{ T.navCourses }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
@@ -40,92 +68,161 @@
               {{ T.navViewCourses }}
             </a>
             <template v-if="isMainUserIdentity && !isUnder13User">
-              <a class="dropdown-item" href="/course/new/" data-nav-courses-create>
+              <a
+                class="dropdown-item"
+                href="/course/new/"
+                data-nav-courses-create
+              >
                 {{ T.courseCreate }}
               </a>
             </template>
           </slot>
         </div>
       </li>
-      <li v-else :class="{ active: navbarSection === 'course' }" data-nav-course>
+      <li
+        v-else
+        :class="{ active: navbarSection === 'course' }"
+        data-nav-course
+      >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
-      <li class="nav-item dropdown nav-problems nav-item-align" :class="{ active: navbarSection === 'problems' }">
-        <a class="nav-link px-2 dropdown-toggle" href="#" role="button" data-toggle="dropdown" data-nav-problems
-          aria-haspopup="true" aria-expanded="false">
+      <li
+        class="nav-item dropdown nav-problems nav-item-align"
+        :class="{ active: navbarSection === 'problems' }"
+      >
+        <a
+          class="nav-link px-2 dropdown-toggle"
+          href="#"
+          role="button"
+          data-toggle="dropdown"
+          data-nav-problems
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           {{ T.wordsProblems }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <slot name="problems-items">
-            <a class="dropdown-item" href="/problem/collection/" data-nav-problems-collection>{{ T.navViewProblems
-              }}</a>
+            <a
+              class="dropdown-item"
+              href="/problem/collection/"
+              data-nav-problems-collection
+              >{{ T.navViewProblems }}</a
+            >
             <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
               T.navViewProblemsAll
-              }}</a>
-            <hr style="margin-top: 0em; margin-bottom: 0em; border-width: 2px" />
+            }}</a>
+            <hr
+              style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
+            />
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
-              }}</a>
-            <form v-if="isLoggedIn && isMainUserIdentity && !isUnder13User" class="collapse-submenu">
+            }}</a>
+            <form
+              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
+              class="collapse-submenu"
+            >
               <div class="btn-group d-flex">
                 <span class="dropdown-item">
                   {{ T.myproblemsListCreateProblem }}
                 </span>
-                <button type="button" class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
-                  data-toggle="collapse" data-target=".collapse-links" data-nav-problems-create-options
-                  aria-expanded="false" aria-controls="collapse-links"></button>
+                <button
+                  type="button"
+                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
+                  data-nav-problems-create-options
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
+                ></button>
               </div>
               <div class="collapse collapse-links pl-3">
                 <a class="dropdown-item" href="/problem/creator/">{{
                   T.myproblemsListCreateZipFileProblem
-                  }}</a>
-                <a class="dropdown-item" href="/problem/new/" data-nav-problems-create>{{
-                  T.myproblemsListCreateProblemWithExistingZipFile }}</a>
+                }}</a>
+                <a
+                  class="dropdown-item"
+                  href="/problem/new/"
+                  data-nav-problems-create
+                  >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                >
               </div>
             </form>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
-              }}</a>
+            }}</a>
           </slot>
         </div>
       </li>
-      <li class="nav-item dropdown nav-rank nav-item-align" :class="{ active: navbarSection === 'rank' }">
-        <a class="nav-link px-2 dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
+      <li
+        class="nav-item dropdown nav-rank nav-item-align"
+        :class="{ active: navbarSection === 'rank' }"
+      >
+        <a
+          class="nav-link px-2 dropdown-toggle"
+          href="#"
+          role="button"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           {{ T.navRanking }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
-            }}</a>
+          }}</a>
           <a class="dropdown-item" href="/rank/schools/">{{
             T.navSchoolRanking
-            }}</a>
+          }}</a>
           <a class="dropdown-item" href="/coderofthemonth/">{{
             T.navCoderOfTheMonth
-            }}</a>
+          }}</a>
           <a href="/coderofthemonth/female/" class="dropdown-item">{{
             T.navCoderOfTheMonthFemale
-            }}</a>
+          }}</a>
           <a class="dropdown-item" href="/schoolofthemonth/">{{
             T.navSchoolOfTheMonth
-            }}</a>
+          }}</a>
         </div>
       </li>
       <li class="nav-item dropdown nav-item-align">
-        <a class="nav-link px-2 dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
+        <a
+          class="nav-link px-2 dropdown-toggle"
+          href="#"
+          role="button"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
-          <a class="dropdown-item" href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
-            target="_blank">{{ T.navTutorials }}</a>
-          <a class="dropdown-item" href="https://discord.com/invite/K3JFd9d3wk" target="_blank">{{ T.navDiscord }}</a>
-          <a class="dropdown-item" href="http://blog.omegaup.com/" target="_blank">{{ T.navBlog }}</a>
-          <a class="dropdown-item text-wrap"
-            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view" target="_blank">{{
-              T.navAlgorithmsBook }}</a>
+          <a
+            class="dropdown-item"
+            href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+            target="_blank"
+            >{{ T.navTutorials }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="https://discord.com/invite/K3JFd9d3wk"
+            target="_blank"
+            >{{ T.navDiscord }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="http://blog.omegaup.com/"
+            target="_blank"
+            >{{ T.navBlog }}</a
+          >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
+            target="_blank"
+            >{{ T.navAlgorithmsBook }}</a
+          >
         </div>
       </li>
     </ul>
