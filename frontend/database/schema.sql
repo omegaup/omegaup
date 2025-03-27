@@ -521,6 +521,25 @@ CREATE TABLE `Messages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `News` (
+  `news_id` int NOT NULL AUTO_INCREMENT,
+  `title` json NOT NULL,
+  `excerpt` json NOT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `button_title` json DEFAULT NULL,
+  `expiration_date` datetime DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `user_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`news_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `News_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar noticias en la plataforma';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Notifications` (
   `notification_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL COMMENT 'Identificador de usuario',
@@ -1260,22 +1279,6 @@ CREATE TABLE `Users_Experiments` (
   CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los experimentos habilitados para un usuario.';
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `News` (
-    `news_id` INT AUTO_INCREMENT PRIMARY KEY,
-    `title` JSON NOT NULL,
-    `excerpt` JSON NOT NULL,
-    `image_url` VARCHAR(255) NULL,
-    `link` VARCHAR(255) NULL,
-    `button_title` JSON NULL,
-    `expiration_date` DATETIME NULL,
-    `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
-    `user_id` INT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`user_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla para almacenar noticias en la plataforma';
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
