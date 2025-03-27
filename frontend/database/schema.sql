@@ -1264,16 +1264,18 @@ CREATE TABLE `Users_Experiments` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `News` (
     `news_id` INT AUTO_INCREMENT PRIMARY KEY,
-    `title` VARCHAR(255) NOT NULL,
-    `excerpt` TEXT NOT NULL,
+    `title` JSON NOT NULL,
+    `excerpt` JSON NOT NULL,
     `image_url` VARCHAR(255) NULL,
     `link` VARCHAR(255) NULL,
-    `button_title` VARCHAR(100) NULL,
+    `button_title` JSON NULL,
     `expiration_date` DATETIME NULL,
     `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    `user_id` INT NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `Users`(`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla para almacenar noticias en la plataforma';
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
