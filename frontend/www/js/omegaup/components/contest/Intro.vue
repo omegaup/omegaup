@@ -47,41 +47,24 @@
               >
                 <li>
                   {{ T.wordsCountry }}:
-                  <span
-                    :class="
-                      userBasicInformation.country
-                        ? 'text-success'
-                        : 'text-danger'
-                    "
-                  >
+                  <span :class="userInfoStatus.country">
                     {{ userBasicInformation.country ? '✔️' : '❌' }}
                   </span>
                 </li>
                 <li>
                   {{ T.profileState }}:
-                  <span
-                    :class="
-                      userBasicInformation.state
-                        ? 'text-success'
-                        : 'text-danger'
-                    "
-                  >
+                  <span :class="userInfoStatus.state">
                     {{ userBasicInformation.state ? '✔️' : '❌' }}
                   </span>
                 </li>
                 <li>
                   {{ T.wordsSchool }}:
-                  <span
-                    :class="
-                      userBasicInformation.school
-                        ? 'text-success'
-                        : 'text-danger'
-                    "
-                  >
+                  <span :class="userInfoStatus.school">
                     {{ userBasicInformation.school ? '✔️' : '❌' }}
                   </span>
                 </li>
               </ul>
+
               <template v-if="requestsUserInformation !== 'no'">
                 <omegaup-markdown
                   :markdown="(statement && statement.markdown) || ''"
@@ -228,7 +211,7 @@ export default class ContestIntro extends Vue {
   @Prop() statement!: types.PrivacyStatement;
   @Prop({ default: false })
   shouldShowModalToLoginWithRegisteredIdentity!: boolean;
-  @Prop() userBasicInformation!: any;
+  @Prop() userBasicInformation!: types.UserBasicInformation;
 
   T = T;
   ui = ui;
@@ -313,6 +296,18 @@ export default class ContestIntro extends Vue {
       (this.requestsUserInformation === 'required' &&
         !this.shareUserInformation)
     );
+  }
+
+  get userInfoStatus() {
+    return {
+      country: this.userBasicInformation?.country
+        ? 'text-success'
+        : 'text-danger',
+      state: this.userBasicInformation?.state ? 'text-success' : 'text-danger',
+      school: this.userBasicInformation?.school
+        ? 'text-success'
+        : 'text-danger',
+    };
   }
 
   formatTimeInRules(timeInMinutes?: number): string {

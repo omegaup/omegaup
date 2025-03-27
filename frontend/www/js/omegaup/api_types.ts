@@ -3114,7 +3114,7 @@ export namespace types {
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
     shouldShowModalToLoginWithRegisteredIdentity: boolean;
-    userBasicInformation: { country?: string; school?: number; state?: string };
+    userBasicInformation: types.UserBasicInformation;
   }
 
   export interface ContestList {
@@ -4822,6 +4822,12 @@ export namespace types {
 
   export interface TimeTypeContests {
     [key: string]: types.ContestListItem[];
+  }
+
+  export interface UserBasicInformation {
+    country?: string;
+    school?: number;
+    state?: string;
   }
 
   export interface UserDependent {
