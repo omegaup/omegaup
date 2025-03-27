@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of UserResetPassword
  */
@@ -10,7 +8,7 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testResetMyPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -29,6 +27,7 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Reset password failed');
         } catch (Exception $e) {
             // We are OK
+            $this->assertSame('usernameOrPassIsWrong', $e->getMessage());
         }
 
         // Set new password and try again, should succeed
@@ -41,7 +40,7 @@ class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testResetMyPasswordBadOldPassword() {
         // Create an user in omegaup
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
