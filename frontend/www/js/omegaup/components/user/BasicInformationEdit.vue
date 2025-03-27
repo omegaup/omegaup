@@ -88,11 +88,11 @@ import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
-import DatePicker from '../DatePicker.vue';
+import UpdatedDatePicker from '../UpdatedDatePicker.vue';
 
 @Component({
   components: {
-    'omegaup-datepicker': DatePicker,
+    'omegaup-datepicker': UpdatedDatePicker,
   },
 })
 export default class UserBasicInformationEdit extends Vue {
