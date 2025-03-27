@@ -557,6 +557,22 @@ nav.navbar {
   padding: auto;
 }
 
+.navbar-nav{
+  .nav-item{
+    width: 100% !important;
+  }
+}
+
+.fullwidth-mobile-fit-lg {
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .fullwidth-mobile-fit-lg {
+    width: fit-content;
+  }
+}
+
 @media only screen and (min-width: 385px) {
   .nav-login-text {
     font-size: inherit;
