@@ -201,11 +201,11 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -247,11 +247,11 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -293,25 +293,19 @@
               </template>
             </omegaup-contest-card>
           </template>
+          <template v-if="loading && !contestListEmpty">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
         </b-tab>
       </b-tabs>
-      <b-pagination-nav
-        ref="paginator"
-        v-model="currentPage"
-        base-url="#"
-        first-number
-        last-number
-        size="lg"
-        :align="'center'"
-        :link-gen="linkGen"
-        :number-of-pages="numberOfPages(currentTab)"
-      ></b-pagination-nav>
     </b-card>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -329,14 +323,13 @@ import {
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
-  PaginationNavPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
+import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(PaginationNavPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -374,9 +367,11 @@ export interface UrlParams {
     'omegaup-contest-card': ContestCard,
     FontAwesomeIcon,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class ArenaContestList extends Vue {
-  @Ref('paginator') readonly paginator!: Vue;
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
@@ -385,6 +380,8 @@ export default class ArenaContestList extends Vue {
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
   @Prop({ default: 10 }) pageSize!: number;
+  @Prop({ default: false }) loading!: boolean;
+
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -396,6 +393,8 @@ export default class ArenaContestList extends Vue {
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
+  isScrollLoading: boolean = false;
+  hasMore: boolean = true;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -403,15 +402,6 @@ export default class ArenaContestList extends Vue {
     } else {
       return ['text-center', 'title-link'];
     }
-  }
-
-  numberOfPages(tab: ContestTab): number {
-    if (!this.countContests || !this.countContests[tab]) {
-      // Default value when there are no contests in the list
-      return 1;
-    }
-    const numberOfPages = Math.ceil(this.countContests[tab] / this.pageSize);
-    return numberOfPages;
   }
 
   onSearchQuery() {
@@ -430,32 +420,29 @@ export default class ArenaContestList extends Vue {
         ContestFilter.All,
     };
     this.currentPage = 1;
+    this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
-
   onReset() {
     this.currentQuery = '';
   }
-
-  linkGen(pageNum: number) {
+  fetchInitialContests() {
     const urlObj = new URL(window.location.href);
-    return {
-      path: `/arena/`,
-      query: {
-        page: pageNum,
-        tab_name: urlObj.searchParams.get('tab_name') || ContestTab.Current,
-        query: urlObj.searchParams.get('query') || '',
-        sort_order: urlObj.searchParams.get('sort_order') || ContestOrder.None,
-        filter: urlObj.searchParams.get('filter') || ContestFilter.All,
-      },
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
     };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
+    this.currentPage = 1;
+    this.hasMore = true;
+    this.fetchPage(params, urlObj);
   }
-
   mounted() {
-    (this.paginator.$el as HTMLElement).addEventListener(
-      'click',
-      this.handlePageClick,
-    );
+    window.addEventListener('scroll', this.handleScroll);
 
     // Check if we came from the profile menu link
     const urlParams = new URLSearchParams(window.location.search);
@@ -464,40 +451,55 @@ export default class ArenaContestList extends Vue {
     } else {
       this.currentFilter = ContestFilter.All;
     }
+
+    this.fetchInitialContests();
   }
 
   beforeDestroy() {
-    (this.paginator.$el as HTMLElement).removeEventListener(
-      'click',
-      this.handlePageClick,
-    );
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  handleScroll() {
+    const bottomOfWindow =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 250;
+
+    if (
+      !this.contestListEmpty &&
+      bottomOfWindow &&
+      !this.isScrollLoading &&
+      this.hasMore
+    ) {
+      this.loadMoreContests();
+    }
+  }
+  async loadMoreContests() {
+    if (this.isScrollLoading || !this.hasMore) return;
+
+    this.isScrollLoading = true;
+    const nextPage = this.currentPage + 1;
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: nextPage,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
+    };
+
+    try {
+      await this.fetchPage(params, urlObj);
+      this.currentPage = nextPage;
+
+      // Check if there are more contests to load (based on pageSize)
+      this.hasMore = this.contestList.length % this.pageSize === 0;
+    } finally {
+      this.isScrollLoading = false;
+    }
   }
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
-  }
-
-  handlePageClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    const url = (event.target as HTMLAnchorElement).href;
-    if (url) {
-      const urlObj = new URL(url);
-      const params: UrlParams = {
-        page: parseInt(urlObj.searchParams.get('page') || '1', 10),
-        tab_name:
-          (urlObj.searchParams.get('tab_name') as ContestTab) ||
-          ContestTab.Current,
-        query: urlObj.searchParams.get('query') || '',
-        sort_order:
-          (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-          ContestOrder.None,
-        filter:
-          (urlObj.searchParams.get('filter') as ContestFilter) ||
-          ContestFilter.All,
-      };
-      this.fetchPage(params, urlObj);
-    }
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -563,6 +565,11 @@ export default class ArenaContestList extends Vue {
     if (!this.contestList) return true;
     return this.contestList.length === 0;
   }
+  @Watch('currentTab', { immediate: true, deep: true })
+  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
+    if (typeof oldValue === 'undefined') return;
+    this.fetchInitialContests();
+  }
 
   @Watch('currentOrder', { immediate: true, deep: true })
   onCurrentOrderChanged(
@@ -570,20 +577,7 @@ export default class ArenaContestList extends Vue {
     oldValue: undefined | ContestOrder,
   ) {
     if (typeof oldValue === 'undefined') return;
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
-      query: urlObj.searchParams.get('query') || '',
-      sort_order: newValue,
-      filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
-    };
-    this.currentPage = 1;
-    this.fetchPage(params, urlObj);
+    this.fetchInitialContests();
   }
 
   @Watch('currentFilter', { immediate: true, deep: true })
@@ -592,39 +586,7 @@ export default class ArenaContestList extends Vue {
     oldValue: undefined | ContestFilter,
   ) {
     if (typeof oldValue === 'undefined') return;
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
-      query: urlObj.searchParams.get('query') || '',
-      sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
-      filter: newValue,
-    };
-    this.currentPage = 1;
-    this.fetchPage(params, urlObj);
-  }
-
-  @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
-    if (typeof oldValue === 'undefined') return;
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
-      tab_name: newValue,
-      query: urlObj.searchParams.get('query') || '',
-      sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
-      filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
-    };
-    this.currentPage = 1;
-    this.fetchPage(params, urlObj);
+    this.fetchInitialContests();
   }
 }
 </script>
@@ -677,6 +639,38 @@ export default class ArenaContestList extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.contest-card {
+  height: 150px;
+  padding: 1rem;
+}
+
+.line {
+  height: 100%;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 
 .sidebar {
