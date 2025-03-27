@@ -255,7 +255,7 @@
                     <a
                       class="dropdown-item"
                       href="/arena/?page=1&tab_name=current&sort_order=none&filter=signedup"
-                      data-nav-user-contests
+                      data-nav-user-contests-enrolled
                       >{{ T.navContestsEnrolled }}</a
                     >
                     <a

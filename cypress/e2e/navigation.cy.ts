@@ -79,9 +79,9 @@ describe('Navigation Test', () => {
 
     cy.get('[data-nav-user]').should('be.visible');
     cy.get('[data-nav-user]').click();
-    cy.get('[data-nav-user-contests]').should('be.visible');
+    cy.get('[data-nav-user-contests-enrolled]').should('be.visible');
 
-    cy.get('[data-nav-user-contests]').first().click();
+    cy.get('[data-nav-user-contests-enrolled]').first().click();
 
     cy.waitUntil(() =>
       cy
@@ -92,16 +92,15 @@ describe('Navigation Test', () => {
         ),
     );
 
-    cy.get('button.dropdown-toggle-no-caret').eq(1).click();
+    cy.get('[data-dropdown-filter]>button').click();
 
     cy.get('.dropdown-menu.show').should('be.visible');
 
     cy.get('[data-filter-by-signed-up].dropdown-item')
       .should('exist')
       .and('be.visible')
-      .click();
 
-    cy.get('[data-filter-by-signed-up].dropdown-item svg.fa-check')
-      .should('exist',);
+    cy.get('[data-filter-by-signed-up].dropdown-item svg.fa-check').should(
+      'exist',);
   });
 });
