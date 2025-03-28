@@ -5004,6 +5004,10 @@ export namespace types {
 // API messages
 export namespace messages {
   // Admin
+  export type AdminDeleteFileRequest = { [key: string]: any };
+  export type AdminDeleteFileResponse = { message: string };
+  export type AdminListFilesRequest = { [key: string]: any };
+  export type AdminListFilesResponse = { files: string[]; message: string };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5018,6 +5022,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminUploadFileRequest = { [key: string]: any };
+  export type AdminUploadFileResponse = { file: string; message: string };
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5933,9 +5939,18 @@ export namespace messages {
 // Controller interfaces
 export namespace controllers {
   export interface Admin {
+    deleteFile: (
+      params?: messages.AdminDeleteFileRequest,
+    ) => Promise<messages.AdminDeleteFileResponse>;
+    listFiles: (
+      params?: messages.AdminListFilesRequest,
+    ) => Promise<messages.AdminListFilesResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    uploadFile: (
+      params?: messages.AdminUploadFileRequest,
+    ) => Promise<messages.AdminUploadFileResponse>;
   }
 
   export interface Authorization {
