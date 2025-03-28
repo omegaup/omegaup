@@ -5,6 +5,15 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolRankPayload();
+  let availableFilters: {
+    country?: string;
+    state?: string;
+  } = {};
+  let filter: null | string = null;
+  if (payload.isLogged) {
+    availableFilters = payload.availableFilters;
+    filter = payload.filter;
+  }
 
   new Vue({
     el: '#main-container',
@@ -20,6 +29,10 @@ OmegaUp.on('ready', () => {
           rank: payload.rank,
           totalRows: payload.totalRows,
           pagerItems: payload.pagerItems,
+          isLogged: payload.isLogged,
+          availableFilters,
+          filter,
+          profileComplete: payload.profileComplete, // Pass userProfile to the component
         },
       });
     },
