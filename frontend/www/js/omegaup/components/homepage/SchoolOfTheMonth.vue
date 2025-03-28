@@ -6,7 +6,7 @@
       </h5>
       <a
         class="card-header-help"
-        href="https://blog.omegaup.com/el-nuevo-ranking-de-escuelas-de-omegaup/"
+        href="https://blog.omegaup.com/features/el-nuevo-ranking-de-escuelas-de-omegaup/"
       >
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>

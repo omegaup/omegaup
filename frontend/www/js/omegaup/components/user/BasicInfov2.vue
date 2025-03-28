@@ -76,7 +76,7 @@
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileAuthorRank }}</strong
-            ><a href="https://blog.omegaup.com/categorias/" target="_blank"
+            ><a href="https://blog.omegaup.com/features/categorias/" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
             ></a>
           </div>

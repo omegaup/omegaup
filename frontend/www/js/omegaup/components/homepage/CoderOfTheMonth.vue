@@ -11,7 +11,7 @@
       </h5>
       <a
         class="card-header-help"
-        href="https://blog.omegaup.com/reglas-del-coder-del-mes/"
+        href="https://blog.omegaup.com/policies/reglas-del-coder-del-mes/"
       >
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>

@@ -6,7 +6,7 @@
         <div class="w-100 text-right">
           <a
             target="_blank"
-            href="https://blog.omegaup.com/administracion-de-identidades/"
+            href="https://blog.omegaup.com/features/administracion-de-identidades/"
           >
             {{ T.teamsGroupsCsvHelpMoreInfo }}
           </a>
