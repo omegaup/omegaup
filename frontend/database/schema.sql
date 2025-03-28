@@ -1262,8 +1262,48 @@ CREATE TABLE `Users_Experiments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+CREATE TABLE `Users_Streaks` (
+  `user_id` INT NOT NULL COMMENT 'Identificador de usuario',
+  `streak_count` INT NOT NULL DEFAULT 0 COMMENT 'Total de días de racha',
+  `submission_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Último envío de problema',
+  `easy_solved` INT NOT NULL DEFAULT 0 COMMENT 'Total fácil problema resuelto',
+  `medium_solved` INT NOT NULL DEFAULT 0 COMMENT 'Total medio problema resuelto',
+  `hard_solved` INT NOT NULL DEFAULT 0 COMMENT 'Total difícil problema resuelto',
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `fk_us_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE,
+  INDEX `idx_submission_time` (`submission_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda la racha mantenida por los usuarios.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Challenges` (
+  `challenge_id` INT NOT NULL AUTO_INCREMENT COMMENT 'Identificador único del desafío',
+  `challenge_name` VARCHAR(255) NOT NULL COMMENT 'Nombre del desafío',
+  `difficulty` ENUM('Fácil', 'Medio', 'Difícil') NOT NULL COMMENT 'Nivel de dificultad del desafío',
+  `start_time` DATETIME NOT NULL COMMENT 'Hora de inicio del desafío',
+  `end_time` DATETIME NOT NULL COMMENT 'Hora de finalización del desafío',
+  `completed_users` INT NOT NULL DEFAULT 0 COMMENT 'Número de usuarios que completaron el desafío',
+  PRIMARY KEY (`challenge_id`),
+  INDEX `idx_difficulty` (`difficulty`),
+  INDEX `idx_start_time` (`start_time`),
+  INDEX `idx_end_time` (`end_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena información sobre desafíos de programación.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+
+CREATE TABLE `User_Freezes` (
+  `user_id` INT NOT NULL COMMENT 'Identificador del usuario',
+  `freeze_available` INT NOT NULL DEFAULT 0 COMMENT 'Cantidad de freezes disponibles para el usuario',
+  `freeze_used` INT NOT NULL DEFAULT 0 COMMENT 'Cantidad de freezes usados por el usuario',
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `fk_freeze_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registra los freezes disponibles y usados por cada usuario.';
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
 
