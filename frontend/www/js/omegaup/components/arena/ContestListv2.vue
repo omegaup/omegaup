@@ -453,7 +453,6 @@ export default class ArenaContestList extends Vue {
 
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
-    this.fetchInitialContests();
   }
 
   handleScroll() {
