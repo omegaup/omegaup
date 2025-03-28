@@ -81,7 +81,7 @@ describe('Navigation Test', () => {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-user-contests-enrolled]').should('be.visible');
 
-    cy.get('[data-nav-user-contests-enrolled]').first().click();
+    cy.get('[data-nav-user-contests-enrolled]').click();
 
     cy.waitUntil(() =>
       cy
