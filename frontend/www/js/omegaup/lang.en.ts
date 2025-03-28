@@ -2088,6 +2088,8 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   zipPrepare: "Prepare zip file",
+  totalSubmissions: "Total submissions",
+  activityHeatmapFor: "Activity heatmap for %(alias)",
 };
 
 export {translations as default};

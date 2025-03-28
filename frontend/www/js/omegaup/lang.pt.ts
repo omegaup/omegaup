@@ -2088,6 +2088,8 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
   zipPrepare: "Preparar arquivo zip",
+  totalSubmissions: "Submissões totais",
+  activityHeatmapFor: "Mapa de calor de atividade para %(alias)",
 };
 
 export {translations as default};

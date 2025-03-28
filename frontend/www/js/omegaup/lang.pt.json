@@ -2086,5 +2086,7 @@
 	"wordsWallTimeInSeconds": "Tempo-real (Seg)",
 	"wordsWarningProblem": "Mantener com um aviso",
 	"wordsYes": "Sim",
-	"zipPrepare": "Preparar arquivo zip"
+	"zipPrepare": "Preparar arquivo zip",
+	"totalSubmissions": "Submissões totais",
+	"activityHeatmapFor": "Mapa de calor de atividade para %(alias)"
 }

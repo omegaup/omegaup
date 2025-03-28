@@ -2230,11 +2230,9 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param null|string $username
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<UserProfileStats>}
+    * @return array{runs: list<UserProfileStats>, heatmap: list<array{date: string, count: int}>}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2255,10 +2253,42 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $runs = \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+            $identity->identity_id
+        );
+
+        // Generate heatmap data (last 365 days)
+        $today = new \DateTime();
+        $oneYearAgo = (new \DateTime())->sub(new \DateInterval('P1Y'));
+
+        // Initialize all dates with zero count
+        $heatmapData = [];
+        $currentDate = clone $oneYearAgo;
+        while ($currentDate <= $today) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $heatmapData[$dateStr] = 0;
+            $currentDate->add(new \DateInterval('P1D'));
+        }
+
+        // Fill in actual run counts for AC submissions
+        foreach ($runs as $run) {
+            if ($run['verdict'] === 'AC' && !is_null($run['date'])) {
+                $runDate = new \DateTime($run['date']);
+                if ($runDate >= $oneYearAgo && $runDate <= $today) {
+                    $heatmapData[$run['date']] += $run['runs'];
+                }
+            }
+        }
+
+        // Format for frontend
+        $heatmapResult = [];
+        foreach ($heatmapData as $date => $count) {
+            $heatmapResult[] = ['date' => $date, 'count' => $count];
+        }
+
         return [
-            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                $identity->identity_id
-            ),
+            'runs' => $runs,
+            'heatmap' => $heatmapResult,
         ];
     }
 
