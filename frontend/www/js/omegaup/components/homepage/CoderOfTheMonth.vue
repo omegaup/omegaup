@@ -11,7 +11,7 @@
       </h5>
       <a
         class="card-header-help"
-        href="https://blog.omegaup.com/policies/reglas-del-coder-del-mes/"
+        :href="CoderOfTheMonthPolicyURL"
       >
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
@@ -68,6 +68,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
+import { getBlogUrl } from '../../omegaup';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -85,6 +86,9 @@ export default class CoderOfTheMonth extends Vue {
   @Prop() coderOfTheMonth!: types.UserProfile;
 
   T = T;
+  get CoderOfTheMonthPolicyURL(): string {
+    return getBlogUrl('CoderOfTheMonthPolicyURL');
+  }
 }
 </script>
 

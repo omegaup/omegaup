@@ -58,7 +58,7 @@
               <a href="/course/">{{ T.navCourses }} </a>
             </li>
             <li class="mt-1">
-              <a href="https://blog.omegaup.com" target="_blank">{{
+              <a :href="OmegaUpBlogURL" target="_blank">{{
                 T.navBlog
               }}</a>
             </li>
@@ -138,7 +138,7 @@
         >
           <li class="pr-2">
             <a
-              href="https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/"
+              :href="CodeOfConductURL"
               target="_blank"
             >
               {{ T.frontPageFooterCodeConduct }}
@@ -146,7 +146,7 @@
           </li>
           <li>
             <a
-              href="https://blog.omegaup.com/policies/privacy-policy/"
+              :href="PrivacyPolicyURL"
               target="_blank"
             >
               {{ T.frontPageFooterPrivacyPolicy }}
@@ -170,6 +170,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
+import { getBlogurl } from '../../omegaup';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -192,6 +193,19 @@ export default class Footer extends Vue {
   T = T;
   ui = ui;
   reportAnIssueURL = reportAnIssueURL;
+
+  get OmegaUpBlogURL(): string {
+    // Use the key defined in blog-links-config.json
+    return getBlogUrl('OmgeaUpBlogURL');
+  }
+
+  get PrivacyPolicyURL(): string {
+    return getBlogUrl('PrivacyPolicyURL');
+  }
+
+  get CodeOfConductURL(): string {
+    return getBlogUrl('CodeOfConductURL');
+  }
 }
 </script>
 

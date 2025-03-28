@@ -6,7 +6,7 @@
       </h5>
       <a
         class="card-header-help"
-        href="https://blog.omegaup.com/features/el-nuevo-ranking-de-escuelas-de-omegaup/"
+        :href="NewSchoolofTheMonthFeatureURL"
       >
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
@@ -59,6 +59,10 @@ export default class SchoolOfTheMonth extends Vue {
   @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
 
   T = T;
+
+  get NewSchoolofTheMonthFeatureURL(): string {
+    return getBlogurl('NewSchoolofTheMonthFeatureURL');
+  }
 }
 </script>
 
