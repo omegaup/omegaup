@@ -367,10 +367,12 @@ export default class Signup extends Vue {
     const conductUrl = getBlogUrl('CodeofConductPolicyURL');
 
     // Use ui.formatString to inject the fetched URLs into the translation string
-    return ui.formatString(T.acceptPrivacyPolicy, {
+    const formattedstring = ui.formatString(T.acceptPrivacyPolicy, {
       PrivacyPolicyURL: policyUrl,
       CodeofConductPolicyURL: conductUrl,
     });
+
+    return formattedstring;
   }
 
   get maxDateForTimepicker() {
