@@ -37,6 +37,7 @@ Cypress.Commands.add('loginAdmin', () => {
 Cypress.Commands.add('logout', () => {
   cy.get('a[data-nav-user]').click();
   cy.get('a[data-logout-button]').click({ force: true });
+  cy.get('footer.logout-confirmation-modal>button.btn-primary').click();
   cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 });
 
