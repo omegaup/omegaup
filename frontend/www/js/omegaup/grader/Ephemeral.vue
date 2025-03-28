@@ -68,6 +68,8 @@
         <button
           v-if="isRunButton"
           class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button"
+          :disabled="!canRun || !canSubmit"
+          :class="{ disabled: !canRun || !canSubmit }"
           data-run-button
           @click.prevent="handleRun"
         >
