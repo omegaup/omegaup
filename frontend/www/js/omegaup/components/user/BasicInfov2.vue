@@ -112,7 +112,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
 import * as ui from '../../ui';
-import { getBlogUrl } from '../../omegaup';
+import { getBlogUrl } from '../../urlHelper';
 @Component({
   components: {
     'omegaup-user-username': user_Username,

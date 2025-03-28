@@ -151,7 +151,6 @@ import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginator.vue';
 
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -204,10 +203,10 @@ export default class UserRank extends Vue {
   currentFilter = this.filter;
 
   get UserRankingFeatureGuideURL(): string {
-    // Use the key defined in links-config.json
+    // Use the key defined in blog.json
     return getBlogUrl('UserRankingFeatureGuideURL');
   }
-  
+
   get lastUpdatedText(): null | string {
     if (!this.lastUpdated) {
       return null;

@@ -4,10 +4,7 @@
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
         <div class="w-100 text-right">
-          <a
-            target="_blank"
-            :href="SolutionViewFeatureGuideURL"
-          >
+          <a target="_blank" :href="SolutionViewFeatureGuideURL">
             {{ T.teamsGroupsCsvHelpMoreInfo }}
           </a>
         </div>
@@ -134,7 +131,7 @@ import {
   faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
-import { getBlogUrl } from '../../omegaup';
+import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';

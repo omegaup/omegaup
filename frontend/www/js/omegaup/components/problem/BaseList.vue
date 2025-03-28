@@ -234,7 +234,7 @@ import common_SortControls from '../common/SortControls.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
-import { getBlogUrl } from '../../urlHelper'; 
+import { getBlogUrl } from '../../urlHelper';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';

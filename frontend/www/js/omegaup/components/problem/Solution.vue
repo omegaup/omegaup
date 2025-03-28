@@ -2,8 +2,7 @@
   <div class="card">
     <div class="row p-3">
       <div class="col-12 text-right">
-        <a
-          :href="SolutionViewFeatureGuideURL"
+        <a :href="SolutionViewFeatureGuideURL"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a
         >
@@ -69,7 +68,7 @@ import {
   faUnlock,
   faQuestionCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import { getBlogUrl } from '../../omegaup';
+import { getBlogUrl } from '../../urlHelper';
 library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);

@@ -66,7 +66,7 @@ import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { getBlogurl } from '../../urlHelper';
+import { getBlogUrl } from '../../urlHelper';
 
 @Component({
   components: {
@@ -87,7 +87,7 @@ export default class SchoolRank extends Vue {
   ui = ui;
 
   get SchoolRankingFeatureGuideURL(): string {
-    // Use the key defined in links-config.json
+    // Use the key defined in blog-links-config.json
     return getBlogUrl('SchoolRankingFeatureGuideURL');
   }
 }
