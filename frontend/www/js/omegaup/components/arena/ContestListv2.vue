@@ -121,7 +121,12 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret data-dropdown-filter>
+                <b-dropdown
+                  ref="dropdownFilterBy"
+                  class="mr-0"
+                  no-caret
+                  data-dropdown-filter
+                >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}

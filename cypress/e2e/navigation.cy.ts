@@ -98,9 +98,10 @@ describe('Navigation Test', () => {
 
     cy.get('[data-filter-by-signed-up].dropdown-item')
       .should('exist')
-      .and('be.visible')
+      .and('be.visible');
 
     cy.get('[data-filter-by-signed-up].dropdown-item svg.fa-check').should(
-      'exist',);
+      'exist',
+    );
   });
 });
