@@ -28,21 +28,14 @@
       <span data-author>
         <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
         <template v-if="clarification.receiver">
+          {{ clarificationAuthorReceiver }}
+        </template>
+        <template v-else>
           <omegaup-user-username
             :username="clarification.author"
             :classname="clarification.author_classname"
           ></omegaup-user-username>
-          {{ ' (on behalf ' }}
-          <omegaup-user-username
-            :username="clarification.receiver"
-          ></omegaup-user-username>
-          {{ ')' }}
         </template>
-        <omegaup-user-username
-          v-else
-          :username="clarification.author"
-          :classname="clarification.author_classname"
-        ></omegaup-user-username>
       </span>
       <span class="font-weight-bold">{{ T.clarificationTime }}</span>
       {{ time.formatDateTime(clarification.time) }}
