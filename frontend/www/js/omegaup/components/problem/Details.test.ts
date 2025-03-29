@@ -308,6 +308,7 @@ Here we can add code.
       {
         answer: undefined,
         author: 'omegaUp',
+        author_classname: 'user-rank-unranked',
         clarification_id: 1,
         contest_alias: 'Concurso de prueba',
         message: 'Clarificación de prueba 1',
@@ -319,6 +320,7 @@ Here we can add code.
       {
         answer: 'Ok',
         author: 'omegaUp',
+        author_classname: 'user-rank-unranked',
         clarification_id: 2,
         contest_alias: undefined,
         message: 'Clarificación de prueba 2',
