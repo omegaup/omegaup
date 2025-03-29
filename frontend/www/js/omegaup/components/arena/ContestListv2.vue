@@ -54,11 +54,7 @@
                       {{ T.contestOrderBy }}
                     </div>
                   </template>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-ends
-                    @click="orderByEnds"
-                  >
+                  <b-dropdown-item href="#" data-order-by-ends @click="orderByEnds">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Ends"
                       icon="check"
@@ -66,11 +62,7 @@
                     />
                     {{ T.contestOrderByEnds }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-title
-                    @click="orderByTitle"
-                  >
+                  <b-dropdown-item href="#" data-order-by-title @click="orderByTitle">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Title"
                       icon="check"
@@ -78,11 +70,7 @@
                     />
                     {{ T.contestOrderByTitle }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-duration
-                    @click="orderByDuration"
-                  >
+                  <b-dropdown-item href="#" data-order-by-duration @click="orderByDuration">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Duration"
                       icon="check"
@@ -90,11 +78,7 @@
                     />
                     {{ T.contestOrderByDuration }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-organizer
-                    @click="orderByOrganizer"
-                  >
+                  <b-dropdown-item href="#" data-order-by-organizer @click="orderByOrganizer">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Organizer"
                       icon="check"
@@ -102,11 +86,7 @@
                     />
                     {{ T.contestOrderByOrganizer }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-contestants
-                    @click="orderByContestants"
-                  >
+                  <b-dropdown-item href="#" data-order-by-contestants @click="orderByContestants">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.Contestants"
                       icon="check"
@@ -114,11 +94,7 @@
                     />
                     {{ T.contestOrderByContestants }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-order-by-signed-up
-                    @click="orderBySignedUp"
-                  >
+                  <b-dropdown-item href="#" data-order-by-signed-up @click="orderBySignedUp">
                     <font-awesome-icon
                       v-if="currentOrder === ContestOrder.SignedUp"
                       icon="check"
@@ -132,11 +108,7 @@
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
                   </template>
-                  <b-dropdown-item
-                    href="#"
-                    data-filter-by-all
-                    @click="filterByAll"
-                  >
+                  <b-dropdown-item href="#" data-filter-by-all @click="filterByAll">
                     <font-awesome-icon
                       v-if="currentFilter === ContestFilter.All"
                       icon="check"
@@ -144,11 +116,7 @@
                     />
                     {{ T.contestFilterByAll }}
                   </b-dropdown-item>
-                  <b-dropdown-item
-                    href="#"
-                    data-filter-by-signed-up
-                    @click="filterBySignedUp"
-                  >
+                  <b-dropdown-item href="#" data-filter-by-signed-up @click="filterBySignedUp">
                     <font-awesome-icon
                       v-if="currentFilter === ContestFilter.SignedUp"
                       icon="check"
@@ -183,11 +151,7 @@
           @click="currentTab = ContestTab.Current"
         >
           <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -221,11 +185,7 @@
             </omegaup-contest-card>
           </template>
           <template v-if="isScrollLoading">
-            <div
-              v-for="index in 3"
-              :key="'scroll-' + index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="'scroll-' + index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -240,11 +200,7 @@
           @click="currentTab = ContestTab.Future"
         >
           <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -281,11 +237,7 @@
             </omegaup-contest-card>
           </template>
           <template v-if="isScrollLoading">
-            <div
-              v-for="index in 3"
-              :key="'scroll-' + index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="'scroll-' + index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -300,11 +252,7 @@
           @click="currentTab = ContestTab.Past"
         >
           <template v-if="loading || refreshing">
-            <div
-              v-for="index in 3"
-              :key="index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -341,11 +289,7 @@
             </omegaup-contest-card>
           </template>
           <template v-if="isScrollLoading">
-            <div
-              v-for="index in 3"
-              :key="'scroll-' + index"
-              class="card contest-card mb-3"
-            >
+            <div v-for="index in 3" :key="'scroll-' + index" class="card contest-card mb-3">
               <div class="line"></div>
             </div>
           </template>
@@ -360,12 +304,9 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
-
-// Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-// Import Only Required Plugins
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -387,7 +328,7 @@ library.add(fas);
 export enum ContestTab {
   Current = 'current',
   Future = 'future',
-  Past = 'past',
+  Past = 'past'
 }
 
 export enum ContestOrder {
@@ -397,13 +338,13 @@ export enum ContestOrder {
   Duration = 'duration',
   Organizer = 'organizer',
   Contestants = 'contestants',
-  SignedUp = 'signedup',
+  SignedUp = 'signedup'
 }
 
 export enum ContestFilter {
   SignedUp = 'signedup',
   OnlyRecommended = 'recommended',
-  All = 'all',
+  All = 'all'
 }
 
 export interface UrlParams {
@@ -417,11 +358,11 @@ export interface UrlParams {
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
-    FontAwesomeIcon,
+    FontAwesomeIcon
   },
   directives: {
-    infiniteScroll,
-  },
+    infiniteScroll
+  }
 })
 export default class ArenaContestList extends Vue {
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
@@ -449,13 +390,13 @@ export default class ArenaContestList extends Vue {
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
 
-  titleLinkClass(tab: ContestTab) {
+  titleLinkClass(tab: ContestTab): string[] {
     return this.currentTab === tab
       ? ['text-center', 'active-title-link']
       : ['text-center', 'title-link'];
   }
 
-  onSearchQuery() {
+  onSearchQuery(): void {
     this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -466,18 +407,18 @@ export default class ArenaContestList extends Vue {
       sort_order:
         (urlObj.searchParams.get('sort_order') as ContestOrder) || ContestOrder.None,
       filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) || ContestFilter.All,
+        (urlObj.searchParams.get('filter') as ContestFilter) || ContestFilter.All
     };
     this.currentPage = 1;
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
 
-  onReset() {
+  onReset(): void {
     this.currentQuery = '';
   }
 
-  fetchInitialContests() {
+  fetchInitialContests(): void {
     this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -485,7 +426,7 @@ export default class ArenaContestList extends Vue {
       tab_name: this.currentTab,
       query: this.currentQuery,
       sort_order: this.currentOrder,
-      filter: this.currentFilter,
+      filter: this.currentFilter
     };
     // Reset the contest list for this tab to avoid stale data
     Vue.set(this.contests, this.currentTab, []);
@@ -494,26 +435,24 @@ export default class ArenaContestList extends Vue {
     this.fetchPage(params, urlObj);
   }
 
-  mounted() {
+  mounted(): void {
     window.addEventListener('scroll', this.handleScroll);
     this.fetchInitialContests();
   }
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     window.removeEventListener('scroll', this.handleScroll);
   }
 
-  handleScroll() {
+  handleScroll(): void {
     const bottomOfWindow =
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 250;
-
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 250;
     if (!this.contestListEmpty && bottomOfWindow && !this.isScrollLoading && this.hasMore) {
       this.loadMoreContests();
     }
   }
 
-  async loadMoreContests() {
+  async loadMoreContests(): Promise<void> {
     if (this.isScrollLoading || !this.hasMore) return;
     this.isScrollLoading = true;
     const nextPage = this.currentPage + 1;
@@ -523,7 +462,7 @@ export default class ArenaContestList extends Vue {
       tab_name: this.currentTab,
       query: this.currentQuery,
       sort_order: this.currentOrder,
-      filter: this.currentFilter,
+      filter: this.currentFilter
     };
 
     try {
@@ -536,9 +475,9 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  fetchPage(params: UrlParams, urlObj: URL) {
+  fetchPage(params: UrlParams, urlObj: URL): void {
     this.$emit('fetch-page', { params, urlObj });
-    // Set a timeout to turn off refreshing if it takes too long
+    // Turn off refreshing after 5 seconds if it hasn't been cleared already
     setTimeout(() => {
       this.refreshing = false;
     }, 5000);
@@ -556,47 +495,47 @@ export default class ArenaContestList extends Vue {
     return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
   }
 
-  orderByTitle() {
+  orderByTitle(): void {
     this.currentOrder = ContestOrder.Title;
     this.refreshing = true;
   }
 
-  orderByEnds() {
+  orderByEnds(): void {
     this.currentOrder = ContestOrder.Ends;
     this.refreshing = true;
   }
 
-  orderByDuration() {
+  orderByDuration(): void {
     this.currentOrder = ContestOrder.Duration;
     this.refreshing = true;
   }
 
-  orderByOrganizer() {
+  orderByOrganizer(): void {
     this.currentOrder = ContestOrder.Organizer;
     this.refreshing = true;
   }
 
-  orderByContestants() {
+  orderByContestants(): void {
     this.currentOrder = ContestOrder.Contestants;
     this.refreshing = true;
   }
 
-  orderBySignedUp() {
+  orderBySignedUp(): void {
     this.currentOrder = ContestOrder.SignedUp;
     this.refreshing = true;
   }
 
-  filterBySignedUp() {
+  filterBySignedUp(): void {
     this.currentFilter = ContestFilter.SignedUp;
     this.refreshing = true;
   }
 
-  filterByRecommended() {
+  filterByRecommended(): void {
     this.currentFilter = ContestFilter.OnlyRecommended;
     this.refreshing = true;
   }
 
-  filterByAll() {
+  filterByAll(): void {
     this.currentFilter = ContestFilter.All;
     this.refreshing = true;
   }
@@ -616,24 +555,23 @@ export default class ArenaContestList extends Vue {
 
   get contestListEmpty(): boolean {
     if (this.loading || this.refreshing) return false;
-    if (!this.contestList) return true;
-    return this.contestList.length === 0;
+    return !this.contestList || this.contestList.length === 0;
   }
 
   @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab, oldValue: ContestTab | undefined) {
+  onCurrentTabChanged(newValue: ContestTab, oldValue: ContestTab | undefined): void {
     if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
 
   @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(newValue: ContestOrder, oldValue: ContestOrder | undefined) {
+  onCurrentOrderChanged(newValue: ContestOrder, oldValue: ContestOrder | undefined): void {
     if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
 
   @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(newValue: ContestFilter, oldValue: ContestFilter | undefined) {
+  onCurrentFilterChanged(newValue: ContestFilter, oldValue: ContestFilter | undefined): void {
     if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
