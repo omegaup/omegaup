@@ -172,9 +172,24 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
+          <template v-else> </template>
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
           <template v-else>
             <omegaup-contest-card
               v-for="contestItem in contestList"
@@ -215,9 +230,25 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
+          <template v-else>
+          </template>
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
           <template v-else>
             <omegaup-contest-card
               v-for="contestItem in contestList"
@@ -261,9 +292,25 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
+          <template v-else>
+          </template>
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
           <template v-else>
             <omegaup-contest-card
               v-for="contestItem in contestList"
@@ -392,7 +439,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = this.sortOrder;
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
-  refreshing: boolean = false;
+  refreshing: boolean = true;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
 
@@ -405,6 +452,7 @@ export default class ArenaContestList extends Vue {
   }
 
   onSearchQuery() {
+    this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -427,6 +475,7 @@ export default class ArenaContestList extends Vue {
     this.currentQuery = '';
   }
   fetchInitialContests() {
+    this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -491,7 +540,11 @@ export default class ArenaContestList extends Vue {
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
+    setTimeout(() => {
+      this.refreshing = false;
+    }, 5000);
   }
+
 
   finishContestDate(contest: types.ContestListItem): string {
     return contest.finish_time.toLocaleDateString();
@@ -507,36 +560,45 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
+    this.refreshing = true;
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
+    this.refreshing = true;
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
+    this.refreshing = true;
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
+    this.refreshing = true;
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
+    this.refreshing = true;
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+    this.refreshing = true;
   }
 
   filterBySignedUp() {
     this.currentFilter = ContestFilter.SignedUp;
+    this.refreshing = true;
   }
   filterByRecommended() {
     this.currentFilter = ContestFilter.OnlyRecommended;
+    this.refreshing = true;
   }
   filterByAll() {
     this.currentFilter = ContestFilter.All;
+    this.refreshing = true;
   }
 
   get contestList(): types.ContestListItem[] {
