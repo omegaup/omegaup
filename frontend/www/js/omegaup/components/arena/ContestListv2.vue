@@ -63,8 +63,9 @@
                       v-if="currentOrder === ContestOrder.Ends"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderByEnds }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderByEnds }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-order-by-title
@@ -74,8 +75,9 @@
                       v-if="currentOrder === ContestOrder.Title"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderByTitle }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderByTitle }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-order-by-duration
@@ -85,8 +87,9 @@
                       v-if="currentOrder === ContestOrder.Duration"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderByDuration }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderByDuration }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-order-by-organizer
@@ -96,8 +99,9 @@
                       v-if="currentOrder === ContestOrder.Organizer"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderByOrganizer }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderByOrganizer }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-order-by-contestants
@@ -107,8 +111,9 @@
                       v-if="currentOrder === ContestOrder.Contestants"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderByContestants }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderByContestants }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-order-by-signed-up
@@ -118,8 +123,9 @@
                       v-if="currentOrder === ContestOrder.SignedUp"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestOrderBySignedUp }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestOrderBySignedUp }}
+                  </b-dropdown-item>
                 </b-dropdown>
                 <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
                   <template #button-content>
@@ -135,8 +141,9 @@
                       v-if="currentFilter === ContestFilter.All"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestFilterByAll }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestFilterByAll }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-filter-by-signed-up
@@ -146,8 +153,9 @@
                       v-if="currentFilter === ContestFilter.SignedUp"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestFilterBySignedUp }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestFilterBySignedUp }}
+                  </b-dropdown-item>
                   <b-dropdown-item
                     href="#"
                     data-filter-by-recommended
@@ -157,13 +165,15 @@
                       v-if="currentFilter === ContestFilter.OnlyRecommended"
                       icon="check"
                       class="mr-1"
-                    />{{ T.contestFilterByRecommended }}</b-dropdown-item
-                  >
+                    />
+                    {{ T.contestFilterByRecommended }}
+                  </b-dropdown-item>
                 </b-dropdown>
               </b-col>
             </b-row>
           </b-container>
         </b-card>
+        <!-- Current Contests Tab -->
         <b-tab
           ref="currentContestTab"
           class="scroll-content"
@@ -172,8 +182,17 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -201,12 +220,17 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
         </b-tab>
+        <!-- Future Contests Tab -->
         <b-tab
           ref="futureContestTab"
           class="scroll-content"
@@ -215,8 +239,17 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -247,12 +280,17 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
         </b-tab>
+        <!-- Past Contests Tab -->
         <b-tab
           ref="pastContestTab"
           class="scroll-content"
@@ -261,8 +299,17 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="index"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -293,8 +340,12 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+          <template v-if="isScrollLoading">
+            <div
+              v-for="index in 3"
+              :key="'scroll-' + index"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
@@ -310,7 +361,7 @@ import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
+// Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
@@ -326,6 +377,7 @@ import {
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 import infiniteScroll from 'vue-infinite-scroll';
+
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
@@ -387,46 +439,46 @@ export default class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
+
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = this.sortOrder;
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
-  refreshing: boolean = false;
+  refreshing: boolean = true;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
 
   titleLinkClass(tab: ContestTab) {
-    if (this.currentTab === tab) {
-      return ['text-center', 'active-title-link'];
-    } else {
-      return ['text-center', 'title-link'];
-    }
+    return this.currentTab === tab
+      ? ['text-center', 'active-title-link']
+      : ['text-center', 'title-link'];
   }
 
   onSearchQuery() {
+    this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
       tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
+        (urlObj.searchParams.get('tab_name') as ContestTab) || ContestTab.Current,
       query: this.currentQuery,
       sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
+        (urlObj.searchParams.get('sort_order') as ContestOrder) || ContestOrder.None,
       filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
+        (urlObj.searchParams.get('filter') as ContestFilter) || ContestFilter.All,
     };
     this.currentPage = 1;
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
+
   onReset() {
     this.currentQuery = '';
   }
+
   fetchInitialContests() {
+    this.refreshing = true;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -441,6 +493,7 @@ export default class ArenaContestList extends Vue {
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
+
   mounted() {
     window.addEventListener('scroll', this.handleScroll);
     this.fetchInitialContests();
@@ -455,18 +508,13 @@ export default class ArenaContestList extends Vue {
       window.innerHeight + window.scrollY >=
       document.documentElement.scrollHeight - 250;
 
-    if (
-      !this.contestListEmpty &&
-      bottomOfWindow &&
-      !this.isScrollLoading &&
-      this.hasMore
-    ) {
+    if (!this.contestListEmpty && bottomOfWindow && !this.isScrollLoading && this.hasMore) {
       this.loadMoreContests();
     }
   }
+
   async loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore) return;
-
     this.isScrollLoading = true;
     const nextPage = this.currentPage + 1;
     const urlObj = new URL(window.location.href);
@@ -481,7 +529,6 @@ export default class ArenaContestList extends Vue {
     try {
       await this.fetchPage(params, urlObj);
       this.currentPage = nextPage;
-
       // Check if there are more contests to load (based on pageSize)
       this.hasMore = this.contestList.length % this.pageSize === 0;
     } finally {
@@ -491,6 +538,10 @@ export default class ArenaContestList extends Vue {
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
+    // Set a timeout to turn off refreshing if it takes too long
+    setTimeout(() => {
+      this.refreshing = false;
+    }, 5000);
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -507,36 +558,47 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
+    this.refreshing = true;
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
+    this.refreshing = true;
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
+    this.refreshing = true;
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
+    this.refreshing = true;
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
+    this.refreshing = true;
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+    this.refreshing = true;
   }
 
   filterBySignedUp() {
     this.currentFilter = ContestFilter.SignedUp;
+    this.refreshing = true;
   }
+
   filterByRecommended() {
     this.currentFilter = ContestFilter.OnlyRecommended;
+    this.refreshing = true;
   }
+
   filterByAll() {
     this.currentFilter = ContestFilter.All;
+    this.refreshing = true;
   }
 
   get contestList(): types.ContestListItem[] {
@@ -553,30 +615,26 @@ export default class ArenaContestList extends Vue {
   }
 
   get contestListEmpty(): boolean {
+    if (this.loading || this.refreshing) return false;
     if (!this.contestList) return true;
     return this.contestList.length === 0;
   }
+
   @Watch('currentTab', { immediate: true, deep: true })
-  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
-    if (typeof oldValue === 'undefined') return;
+  onCurrentTabChanged(newValue: ContestTab, oldValue: ContestTab | undefined) {
+    if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
 
   @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(
-    newValue: ContestOrder,
-    oldValue: undefined | ContestOrder,
-  ) {
-    if (typeof oldValue === 'undefined') return;
+  onCurrentOrderChanged(newValue: ContestOrder, oldValue: ContestOrder | undefined) {
+    if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
 
   @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(
-    newValue: ContestFilter,
-    oldValue: undefined | ContestFilter,
-  ) {
-    if (typeof oldValue === 'undefined') return;
+  onCurrentFilterChanged(newValue: ContestFilter, oldValue: ContestFilter | undefined) {
+    if (oldValue === undefined) return;
     this.fetchInitialContests();
   }
 }
@@ -639,47 +697,33 @@ export default class ArenaContestList extends Vue {
 
 .line {
   height: 100%;
-  background: var(
-    --arena-submissions-list-skeletonloader-final-background-color
-  );
+  background: var(--arena-submissions-list-skeletonloader-final-background-color);
   border-radius: 8px;
   animation: loading 1.5s infinite;
 }
 
 @keyframes loading {
   0% {
-    background: var(
-      --arena-submissions-list-skeletonloader-initial-background-color
-    );
+    background: var(--arena-submissions-list-skeletonloader-initial-background-color);
   }
   50% {
-    background: var(
-      --arena-submissions-list-skeletonloader-final-background-color
-    );
+    background: var(--arena-submissions-list-skeletonloader-final-background-color);
   }
   100% {
-    background: var(
-      --arena-submissions-list-skeletonloader-initial-background-color
-    );
+    background: var(--arena-submissions-list-skeletonloader-initial-background-color);
   }
 }
 
 .sidebar {
   >>> .contest-list-nav {
-    background-color: var(
-      --arena-contest-list-sidebar-tab-list-background-color
-    );
+    background-color: var(--arena-contest-list-sidebar-tab-list-background-color);
 
     .active-title-link {
-      background-color: var(
-        --arena-contest-list-sidebar-tab-list-link-background-color--active
-      ) !important;
+      background-color: var(--arena-contest-list-sidebar-tab-list-link-background-color--active) !important;
     }
 
     .title-link {
-      color: var(
-        --arena-contest-list-sidebar-tab-list-link-font-color
-      ) !important;
+      color: var(--arena-contest-list-sidebar-tab-list-link-font-color) !important;
     }
   }
 }
