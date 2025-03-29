@@ -2826,6 +2826,7 @@ export namespace types {
     answer?: string;
     assignment_alias?: string;
     author: string;
+    author_classname: string;
     clarification_id: number;
     contest_alias?: string;
     message: string;
