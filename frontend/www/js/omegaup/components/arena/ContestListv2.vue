@@ -1,6 +1,3 @@
-Here's the formatted code with changes highlighted for GitHub:
-
-```vue
 <template>
   <div>
     <div class="col-sm-12">
