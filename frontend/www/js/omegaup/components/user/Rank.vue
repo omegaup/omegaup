@@ -11,7 +11,7 @@
               highCount: page * length,
             })
       }}
-      <a href="https://blog.omegaup.com/posts/el-nuevo-ranking-de-omegaup/"
+      <a href="https://blog.omegaup.com/features/el-nuevo-ranking-de-omegaup/"
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
