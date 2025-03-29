@@ -9,6 +9,7 @@ describe('Clarifications.vue', () => {
     {
       answer: 'yes',
       author: 'user',
+      author_classname: 'user-rank-unranked',
       clarification_id: 1,
       message: 'Is this the question?',
       problem_alias: 'problem',
@@ -18,6 +19,7 @@ describe('Clarifications.vue', () => {
     {
       answer: 'yes',
       author: 'user',
+      author_classname: 'user-rank-unranked',
       clarification_id: 2,
       message: 'Is this another question?',
       problem_alias: 'problem',

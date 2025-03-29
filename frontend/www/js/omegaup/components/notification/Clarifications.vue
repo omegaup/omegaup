@@ -41,7 +41,10 @@
           <div class="w-100 align-items-center pt-1 notification-link">
             <a :href="anchor(clarification)">
               <span>{{ clarification.problem_alias }}</span> —
-              <span>{{ clarification.author }}</span>
+              <omegaup-user-username
+                :username="clarification.author"
+                :classname="clarification.author_classname"
+              ></omegaup-user-username>
               <pre>{{ clarification.message }}</pre>
               <template v-if="clarification.answer">
                 <hr />
@@ -68,6 +71,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
+import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -77,6 +81,7 @@ library.add(faBell, faAlignRight);
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Clarifications extends Vue {

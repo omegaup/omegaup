@@ -208,6 +208,7 @@ describe('EventsSocket', () => {
         answer: 'some answer',
         assignment_alias: 'assignment_01',
         author: 'user_1',
+        author_classname: 'user-rank-unranked',
         clarification_id: 1,
         contest_alias: 'contest_alias',
         message: 'some message',

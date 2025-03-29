@@ -27,7 +27,22 @@
       }}
       <span data-author>
         <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
-        {{ clarificationAuthorReceiver }}
+        <template v-if="clarification.receiver">
+          <omegaup-user-username
+            :username="clarification.author"
+            :classname="clarification.author_classname"
+          ></omegaup-user-username>
+          {{ ' (on behalf ' }}
+          <omegaup-user-username
+            :username="clarification.receiver"
+          ></omegaup-user-username>
+          {{ ')' }}
+        </template>
+        <omegaup-user-username
+          v-else
+          :username="clarification.author"
+          :classname="clarification.author_classname"
+        ></omegaup-user-username>
       </span>
       <span class="font-weight-bold">{{ T.clarificationTime }}</span>
       {{ time.formatDateTime(clarification.time) }}
@@ -113,8 +128,13 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
+import user_Username from '../user/Username.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-user-username': user_Username,
+  },
+})
 export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
   @Prop({ default: false }) isAdmin!: boolean;
@@ -180,6 +200,7 @@ export default class ArenaClarification extends Vue {
     const response: types.Clarification = {
       clarification_id: this.clarification.clarification_id,
       author: this.clarification.author,
+      author_classname: this.clarification.author_classname,
       answer: this.responseText,
       public: this.isPublic,
       message: this.message,

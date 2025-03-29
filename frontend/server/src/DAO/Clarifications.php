@@ -9,7 +9,7 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Clarifications}.
  *
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, author_classname: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
@@ -61,6 +61,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             INNER JOIN
                 Identities i ON i.identity_id = cl.author_id
             LEFT JOIN
+                Users u ON u.main_identity_id = i.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = u.user_id
+            LEFT JOIN
                 Identities r ON r.identity_id = cl.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = cl.problem_id
@@ -94,6 +98,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 ps.assignment_alias AS assignment_alias,
                 p.alias AS problem_alias,
                 i.username AS author,
+                IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
                 r.username AS receiver,
                 cl.message,
                 cl.answer,
@@ -101,7 +106,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 cl.public
         ';
 
-        $query = $sql . $sqlFrom;
+        $query = $sql . $sqlFrom . $sqlOrderBy;
         $countQuery = $sqlCount . $sqlFrom;
 
         $sqlLimit = '';
@@ -111,9 +116,9 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $rowcount;
         }
 
-        $query .= $sqlOrderBy . $sqlLimit;
+        $query .= $sqlLimit;
 
-        /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, assignment_alias: string, author: string, author_classname: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $params
@@ -163,6 +168,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 c.clarification_id,
                 p.alias AS problem_alias,
                 i.username AS author,
+                IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
                 r.username AS receiver,
                 c.message,
                 c.answer,
@@ -172,6 +178,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 Clarifications c
             INNER JOIN
                 Identities i ON i.identity_id = c.author_id
+            LEFT JOIN
+                Users u ON u.main_identity_id = i.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = u.user_id
             LEFT JOIN
                 Identities r ON r.identity_id = c.receiver_id
             INNER JOIN
@@ -207,7 +217,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $rowcount;
         }
 
-        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, author: string, author_classname: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -232,6 +242,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                     p.alias AS problem_alias,
                     con.alias AS contest_alias,
                     i.username AS author,
+                    IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
                     r.username `receiver`,
                     c.message,
                     c.answer,
@@ -242,6 +253,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 INNER JOIN
                     Identities i ON i.identity_id = c.author_id
                 LEFT JOIN
+                    Users u ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = u.user_id
+                LEFT JOIN
                     Identities r ON r.identity_id = c.receiver_id
             ';
         } else {
@@ -250,13 +265,23 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                     c.clarification_id,
                     p.alias AS problem_alias,
                     con.alias AS contest_alias,
-                    "" AS author,
-                    CAST(NULL AS CHAR) AS receiver,
+                    i.username AS author,
+                    IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
+                    r.username `receiver`,
                     c.message,
                     c.answer,
                     c.`time`,
                     c.public
-                FROM Clarifications c
+                FROM
+                    Clarifications c
+                INNER JOIN
+                    Identities i ON i.identity_id = c.author_id
+                LEFT JOIN
+                    Users u ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = u.user_id
+                LEFT JOIN
+                    Identities r ON r.identity_id = c.receiver_id
             ';
         }
         $sql .= '
@@ -282,7 +307,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         }
 
         $result = [];
-        /** @var array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp} $row */
+        /** @var array{answer: null|string, author: string, author_classname: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
