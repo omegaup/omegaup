@@ -704,6 +704,7 @@ const translations: { [key: string]: string; } = {
   feedbackSuccessfullyUpdated: "The feedback has been successfully updated.",
   feedbackTitle: "Submission feedback",
   firstSumbissionWithIdentity: "Note that you are trying to send a submission with an identity account",
+  fontSize: "Font-Size",
   forSelectedItems: "For selected items",
   forbiddenInVirtualContest: "Forbidden in virtual contest",
   frontPageDevelopers: "Developers",
