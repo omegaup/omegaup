@@ -19,7 +19,7 @@ export class ProfilePage {
     cy.get('[data-nav-profile]').click();
     cy.get('a[href="/profile/#edit-preferences"]').click();
     cy.get('[data-preference-language]').select(preferredLanguage);
-    cy.get('[data-preference-save-button]').click();
+    cy.get('[data-preference-save-button]').click({ force: true });
   }
   updatePreferredProgrammingLanguage(preferredLanguage: string): void {
     cy.get('[data-nav-user]').click();
