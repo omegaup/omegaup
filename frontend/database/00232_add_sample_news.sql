@@ -1,5 +1,5 @@
--- Creating the News table with JSON support for multilingual text
-CREATE TABLE `News` (
+-- Creating the Carousel_Items table with JSON support for multilingual text
+CREATE TABLE `Carousel_Items` (
     `news_id` INT AUTO_INCREMENT PRIMARY KEY,
     `title` JSON NOT NULL,
     `excerpt` JSON NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE `News` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla para almacenar noticias en la plataforma';
 
 -- Inserting initial news entries with multilingual support
-INSERT INTO `News` (title, excerpt, image_url, link, button_title, expiration_date, status, user_id)
+INSERT INTO `Carousel_Items` (title, excerpt, image_url, link, button_title, expiration_date, status, user_id)
 VALUES
   (
     '{"en": "Improve your programming skills", "es": "Mejora tus habilidades de programación", "pt": "Melhore suas habilidades de programação"}',
