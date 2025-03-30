@@ -2347,6 +2347,14 @@ export namespace types {
       );
     }
 
+    export function UserDocsPayload(
+      elementId: string = 'payload',
+    ): types.UserDocsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3106,6 +3114,7 @@ export namespace types {
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
     shouldShowModalToLoginWithRegisteredIdentity: boolean;
+    userBasicInformation: types.UserBasicInformation;
   }
 
   export interface ContestList {
@@ -3993,7 +4002,7 @@ export namespace types {
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
-    solutionStatus?: string;
+    solutionStatus: string;
     solvers: types.BestSolvers[];
     totalRuns?: number;
     user: types.UserInfoForProblem;
@@ -4815,6 +4824,12 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserBasicInformation {
+    country?: string;
+    school?: number;
+    state?: string;
+  }
+
   export interface UserDependent {
     classname: string;
     name?: string;
@@ -4835,6 +4850,15 @@ export namespace types {
     systemRoles: string[];
     username: string;
     verified: boolean;
+  }
+
+  export interface UserDocsPayload {
+    docs: { [key: string]: types.UserDocument[] };
+  }
+
+  export interface UserDocument {
+    name: string;
+    url: string;
   }
 
   export interface UserInfoForProblem {

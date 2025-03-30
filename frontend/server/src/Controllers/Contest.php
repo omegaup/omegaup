@@ -30,7 +30,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
+ * @psalm-type UserBasicInformation=array{country: null|string, state: null|string, school: null|int}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool, userBasicInformation: UserBasicInformation}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
@@ -991,10 +992,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
-        $result['templateProperties']['payload']['needsBasicInformation'] = false;
-        $result['templateProperties']['payload']['requestsUserInformation'] = 'no';
+
         if (is_null($r->identity)) {
-            // No session, show the intro if public, so that they can login.
             return $result;
         }
 
@@ -1003,13 +1002,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requestsUserInformation' => $requestsUserInformation,
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($contest->problemset_id);
 
-        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
-        $result['templateProperties']['payload']['needsBasicInformation'] =
-            $needsBasicInformation &&
-            (
-                !$r->identity->country_id || !$r->identity->state_id ||
-                is_null($r->identity->current_identity_school_id)
+        $userBasicInformation = [
+            'country' => $r->identity->country_id,
+            'state' => $r->identity->state_id,
+            'school' => $r->identity->current_identity_school_id,
+        ];
+
+        $needsBasicInformation = $needsBasicInformation && (
+            is_null($userBasicInformation['country']) ||
+            is_null($userBasicInformation['state']) ||
+            is_null($userBasicInformation['school'])
         );
+
+        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
+        $result['templateProperties']['payload']['needsBasicInformation'] = $needsBasicInformation;
+        $result['templateProperties']['payload']['userBasicInformation'] = $userBasicInformation;
 
         // Privacy Statement Information
         $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
@@ -2368,6 +2375,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
+            'languages' => $originalContest->languages, // Cloned contests start with the same languages
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
