@@ -704,6 +704,7 @@ const translations: { [key: string]: string; } = {
   feedbackSuccessfullyUpdated: "La retroalimentaci\u00f3n se actualiz\u00f3 correctamente.",
   feedbackTitle: "Retroalimentaci\u00f3n sobre el env\u00edo",
   firstSumbissionWithIdentity: "Ten en cuenta que est\u00e1s intentando enviar una soluci\u00f3n con una cuenta de identidad",
+  fontSize: "Tama\u00f1o de fuente",
   forSelectedItems: "Para los items seleccionados",
   forbiddenInVirtualContest: "Prohibido en concurso virtual",
   frontPageDevelopers: "Desarrolladores",
