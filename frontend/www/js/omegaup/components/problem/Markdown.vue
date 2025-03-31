@@ -7,7 +7,6 @@ import { Vue, Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../../markdown';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
-import createApp from 'vue';
 import LibinteractiveDownload from './templates/LibinteractiveDownload.vue';
 import OutputOnlyDownload from './templates/OutputOnlyDownload.vue';
 
@@ -41,7 +40,7 @@ export default class Markdown extends Vue {
     @Prop({ default: false }) preview!: boolean;
     @Prop({ default: false }) fullWidth!: boolean;
 
-    private vueInstances: ReturnType<typeof createApp>[] = [];
+    private vueInstances: Vue[] = [];
 
     markdownConverter = new markdown.Converter({ preview: this.preview });
 
@@ -175,16 +174,21 @@ export default class Markdown extends Vue {
             const mountPoint = document.createElement('div');
             template.replaceWith(mountPoint);
 
-            const app = createApp(templateComponents[name]);
-            app.mount(mountPoint);
+            const app = new Vue({
+                render: h => h(templateComponents[name]),
+            });
+            app.$mount(mountPoint);
 
             this.vueInstances.push(app);
         }
     }
 
-    beforeUnmount(): void {
+    beforeDestroy() {
         for (const app of this.vueInstances) {
-            app.unmount();
+            app.$destroy();
+            if (app.$el && app.$el.parentNode) {
+                app.$el.parentNode.removeChild(app.$el);
+            }
         }
         this.vueInstances = [];
     }
