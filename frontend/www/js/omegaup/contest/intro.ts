@@ -16,6 +16,7 @@ OmegaUp.on('ready', () => {
   if (payload.contest.finish_time) {
     payload.contest.finish_time = time.remoteDate(payload.contest.finish_time);
   }
+
   new Vue({
     el: '#main-container',
     components: {
@@ -31,6 +32,7 @@ OmegaUp.on('ready', () => {
           contest: payload.contest,
           isLoggedIn: headerPayload.isLoggedIn,
           statement: payload.privacyStatement,
+          userBasicInformation: payload.userBasicInformation,
         },
         on: {
           'open-contest': (request: types.ContestAdminDetails): void => {
