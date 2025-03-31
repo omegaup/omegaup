@@ -1,14 +1,10 @@
 <template>
-    <div class="libinteractive-download panel panel-default">
-        <div class="panel-heading">
-            {{ T.wordsLibinteractiveDownload }}
-        </div>
-        <div class="panel-body">
-            <a :href="zipUrl" class="btn btn-primary">
-                {{ T.wordsDownload }}
-            </a>
-        </div>
+  <div class="libinteractive-download panel panel-default">
+    <div class="panel-heading">Output Only Files</div>
+    <div class="panel-body">
+      <a :href="zipUrl" class="btn btn-primary"> Download </a>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -17,10 +13,10 @@ import T from '../../../lang';
 
 @Component
 export default class LibinteractiveDownload extends Vue {
-    get zipUrl(): string {
-        return '/problem/libinteractive/files.zip';
-    }
+  get zipUrl(): string {
+    return '/problem/libinteractive/files.zip';
+  }
 
-    T = T;
+  T = T;
 }
 </script>

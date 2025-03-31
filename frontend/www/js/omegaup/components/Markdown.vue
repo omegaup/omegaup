@@ -1,13 +1,16 @@
 <template>
-  <div ref="root" data-markdown-statement :html="html" :class="{ 'full-width': fullWidth }"></div>
+  <div
+    ref="root"
+    data-markdown-statement
+    :html="html"
+    :class="{ 'full-width': fullWidth }"
+  ></div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import * as markdown from '../markdown';
-import * as ui from '../ui';
 
-import T from '../lang';
 
 declare global {
   interface Window {
@@ -117,14 +120,14 @@ export default class Markdown extends Vue {
     line-height: 125%;
   }
 
-  &>pre>button {
+  & > pre > button {
     margin-right: -16px;
     margin-top: -16px;
     padding: 6px;
     font-size: 90%;
   }
 
-  td>button.clipboard {
+  td > button.clipboard {
     float: right;
     border-color: var(--markdown-button-clipboard-border-color);
     margin-left: 0.5em;
@@ -147,7 +150,7 @@ export default class Markdown extends Vue {
       color: var(--markdown-details-summary-font-color);
     }
 
-    &[open]>summary {
+    &[open] > summary {
       margin-bottom: 24px;
     }
   }
@@ -196,7 +199,7 @@ export default class Markdown extends Vue {
       max-width: 800px;
       overflow-x: auto;
 
-      &>button {
+      & > button {
         margin-left: 2em;
         padding: 3px;
         font-size: 80%;
