@@ -12,7 +12,7 @@
 
 After forking the omegaUp repository, the `main` branch in your repository should always be kept up to date with the `main` branch of the omegaUp repository, which contains the latest changes approved by the review team. For this reason, you should avoid committing directly to `main`. Instead, create a separate branch for each change you plan to submit via a Pull Request.
 
-Once you have [set up your development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Set-Up-Your-Development-Environment-(English)) follow these steps:
+Once you have [set up your development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Set-Up-Your-Development-Environment-(English).md) follow these steps:
 
 # Setting Up the omegaUp Fork and Remotes
 
@@ -107,7 +107,7 @@ ln -sf ~/.mysql.docker.cnf .my.cnf
 
 # Starting a New Change
 
-We invite you to follow our [Coding Guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines-(English-version)) for contributing to our project. By adhering to them, your changes will be easier to review and integrate into production.
+We invite you to follow our [Coding Guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines-(English-version).md) for contributing to our project. By adhering to them, your changes will be easier to review and integrate into production.
 
 **Before making any modifications** run the following commands to create a new branch that is synchronized with `omegaup`:
 
@@ -233,6 +233,6 @@ Again you will notice that everything related to `newfeaturename` has already re
 * Has your PR been merged? Wait for the weekend deployment to see your changes in production.
 
 You might be interested in the following topics:
-* [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines-(English-version)).
-* [Useful development commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development).
-* [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp).
+* [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines-(English-version).md).
+* [Useful development commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md).
+* [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md).
