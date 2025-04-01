@@ -50,25 +50,18 @@ export default class UpdatedDatePicker extends Vue {
   @Prop({ default: null }) max!: Date | null;
   @Prop({ default: 'en' }) locale!: string;
 
-  private stringValue: string = '';
+  private stringValue: string | null = null;
 
   get minDateStr() {
-    return this.min ? time.formatDateLocal(this.min) : '';
+    return this.min ? time.formatDateLocal(this.min) : null;
   }
 
   get maxDateStr() {
-    return this.max ? time.formatDateLocal(this.max) : '';
+    return this.max ? time.formatDateLocal(this.max) : null;
   }
 
   mounted() {
     this.updateStringValue();
-  }
-
-  @Watch('value', { immediate: true })
-  onValueChanged(newValue: Date) {
-    if (newValue && time.formatDateLocal(newValue) !== this.stringValue) {
-      this.stringValue = time.formatDateLocal(newValue);
-    }
   }
 
   updateStringValue() {
@@ -79,18 +72,27 @@ export default class UpdatedDatePicker extends Vue {
     }
   }
 
+  @Watch('value', { immediate: true })
+  onValueChanged(newValue: Date) {
+    if (newValue && time.formatDateLocal(newValue) !== this.stringValue) {
+      this.stringValue = time.formatDateLocal(newValue);
+    }
+  }
+
   onInputChange() {
+    if (!this.stringValue) {
+      return;
+    }
+
     const parsedDate = time.parseDateLocal(this.stringValue);
     if (parsedDate) {
       this.$emit('input', parsedDate);
     }
   }
 
-  onDateSelected(newDate: Date) {
-    if (newDate) {
-      this.$emit('input', newDate);
-      this.stringValue = time.formatDateLocal(newDate);
-    }
+  onDateSelected(newDate: string) {
+    this.$emit('input', time.parseDateLocal(newDate));
   }
+
 }
 </script>
