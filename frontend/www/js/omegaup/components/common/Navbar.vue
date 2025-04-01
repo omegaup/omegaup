@@ -576,6 +576,15 @@ nav.navbar {
   width: 100%;
 }
 
+.username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 20vw;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 @media (min-width: 992px) {
   .fullwidth-mobile-fit-lg {
     width: fit-content;
