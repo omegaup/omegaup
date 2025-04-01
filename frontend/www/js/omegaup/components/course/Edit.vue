@@ -101,7 +101,7 @@
           @emit-cancel="onCancel"
           @submit="onSubmitEditCourse"
           @update-search-result-schools="
-          (query) => $emit('update-search-result-schools', query)
+            (query) => $emit('update-search-result-schools', query)
           "
         ></omegaup-course-form>
       </div>
@@ -121,9 +121,9 @@
           @emit-add-problems="(assignment) => onAddProblems(assignment)"
           @emit-delete="(assignment) => $emit('delete-assignment', assignment)"
           @emit-sort-content="
-          (courseAlias, contentAliases) =>
+            (courseAlias, contentAliases) =>
               $emit('sort-content', courseAlias, contentAliases)
-              "
+          "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
           ref="assignment-details"
@@ -146,18 +146,18 @@
           @emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
-            "
+          "
           @emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
-            "
+          "
           @remove-problem="
-          (assignment, problem) =>  
+            (assignment, problem) =>
               $emit('remove-problem', assignment, problem)
-            "
+          "
           @sort-problems="
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
-            "
+          "
           @cancel="onResetAssignmentForm"
           @add-assignment="(params) => $emit('add-assignment', params)"
           @update-assignment="(params) => $emit('update-assignment', params)"
@@ -188,7 +188,7 @@
           :course-alias="data.course.alias"
           :show-in-public-courses-list="data.course.recommended"
           @update-admission-mode="
-          (request) => $emit('update-admission-mode', request)
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-course-admision-mode>
       </div>
@@ -205,13 +205,13 @@
           :identity-requests="data.identityRequests"
           :search-result-users="searchResultUsers"
           @emit-add-student="
-          (participants) => $emit('add-student', participants)
+            (participants) => $emit('add-student', participants)
           "
           @emit-remove-student="(student) => $emit('remove-student', student)"
           @accept-request="(request) => $emit('accept-request', request)"
           @deny-request="(request) => $emit('deny-request', request)"
           @update-search-result-users="
-          (query) => $emit('update-search-result-users', query)
+            (query) => $emit('update-search-result-users', query)
           "
         ></omegaup-course-add-students>
       </div>
@@ -228,7 +228,7 @@
             @add-admin="(username) => $emit('add-admin', username)"
             @remove-admin="(username) => $emit('remove-admin', username)"
             @update-search-result-users="
-            (query) => $emit('update-search-result-users', query)
+              (query) => $emit('update-search-result-users', query)
             "
           ></omegaup-common-admins>
         </div>
@@ -237,13 +237,13 @@
             :group-admins="data.groupsAdmins"
             :search-result-groups="searchResultGroups"
             @add-group-admin="
-            (groupAlias) => $emit('add-group-admin', groupAlias)
+              (groupAlias) => $emit('add-group-admin', groupAlias)
             "
             @remove-group-admin="
-            (groupAlias) => $emit('remove-group-admin', groupAlias)
+              (groupAlias) => $emit('remove-group-admin', groupAlias)
             "
             @update-search-result-groups="
-            (query) => $emit('update-search-result-groups', query)
+              (query) => $emit('update-search-result-groups', query)
             "
           ></omegaup-common-groupadmins>
         </div>
@@ -252,13 +252,13 @@
             :teaching-assistants="data.teachingAssistants"
             :search-result-users="searchResultUsers"
             @add-teaching-assistant="
-            (username) => $emit('add-teaching-assistant', username)
+              (username) => $emit('add-teaching-assistant', username)
             "
             @remove-teaching-assistant="
-            (username) => $emit('remove-teaching-assistant', username)
+              (username) => $emit('remove-teaching-assistant', username)
             "
             @update-search-result-users="
-            (query) => $emit('update-search-result-users', query)
+              (query) => $emit('update-search-result-users', query)
             "
           ></omegaup-common-teaching-assistants>
         </div>
@@ -267,14 +267,14 @@
             :group-teaching-assistants="data.groupsTeachingAssistants"
             :search-result-groups="searchResultGroups"
             @add-group-teaching-assistant="
-            (groupAlias) => $emit('add-group-teaching-assistant', groupAlias)
+              (groupAlias) => $emit('add-group-teaching-assistant', groupAlias)
             "
             @remove-group-teaching-assistant="
-            (groupAlias) =>
+              (groupAlias) =>
                 $emit('remove-group-teaching-assistant', groupAlias)
-                "
+              "
             @update-search-result-groups="
-            (query) => $emit('update-search-result-groups', query)
+              (query) => $emit('update-search-result-groups', query)
             "
           ></omegaup-common-group-teaching-assistants>
         </div>
@@ -288,9 +288,9 @@
               :initial-alias="data.course.alias"
               :initial-name="data.course.name"
               @clone="
-              (alias, name, startTime) =>
+                (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
-                  "
+              "
             ></omegaup-course-clone>
             <omegaup-course-generate-link-clone
               v-if="data.course.admission_mode !== admissionMode.Public"
@@ -305,7 +305,7 @@
         <omegaup-common-archive
           :already-archived="alreadyArchived"
           :archive-button-description="
-          alreadyArchived ? T.wordsUnarchiveCourse : T.wordsArchiveCourse
+            alreadyArchived ? T.wordsUnarchiveCourse : T.wordsArchiveCourse
           "
           :archive-confirm-text="T.courseArchiveConfirmText"
           :archive-header-title="T.wordsArchiveCourse"
@@ -394,11 +394,12 @@ export default class CourseEdit extends Vue {
   @Prop() searchResultGroupsTeachingAssistants!: types.ListItem[];
   @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop() readOnly!: boolean;
-  
+
   T = T;
   showTab = this.initialTab;
   admissionMode = AdmissionMode.Private;
   alreadyArchived = this.data.course.archived;
+  
   invalidParameterName: string = '';
   statusMessage: string = '';
   statusSuccess: boolean = true;
