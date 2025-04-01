@@ -23,7 +23,7 @@
         @input="onDateSelected"
       />
     </b-input-group-append>
-    
+
   </b-input-group>
 </template>
 
@@ -31,10 +31,10 @@
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 import T from '../lang';
 import * as time from '../time';
-import { BFormDatepicker, BFormInput, BInputGroup } from 'bootstrap-vue';
+import { BFormDatepicker, BFormInput, BInputGroup, BInputGroupAppend } from 'bootstrap-vue';
 
 @Component({
-  components: { BFormDatepicker, BFormInput, BInputGroup },
+  components: { BFormDatepicker, BFormInput, BInputGroup, BInputGroupAppend },
 })
 export default class UpdatedDatePicker extends Vue {
   T = T;
