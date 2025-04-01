@@ -20,6 +20,7 @@
         button-only
         right
         :disabled="!enabled"
+        :locale="locale"
         @input="onDateSelected"
       />
     </b-input-group-append>
@@ -46,6 +47,7 @@ export default class UpdatedDatePicker extends Vue {
   @Prop({ default: false }) isInvalid!: boolean;
   @Prop({ default: null }) min!: Date | null;
   @Prop({ default: null }) max!: Date | null;
+  @Prop({ default: 'en' }) locale!: string;
 
   private stringValue: string = '';
 
