@@ -11,9 +11,10 @@
         </small>
       </h1>
       <p>
-        <a href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-escribir-problemas-para-Omegaup.md">{{
-          T.navHelp
-        }}</a>
+        <a
+          href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-escribir-problemas-para-Omegaup.md"
+          >{{ T.navHelp }}</a
+        >
       </p>
     </div>
     <ul class="nav nav-pills edit-problem-tabs my-3">
