@@ -1,5 +1,5 @@
 <template>
-  <b-input-group >
+  <b-input-group>
     <!-- Editable Text Input -->
     <b-form-input
       v-model="stringValue"
@@ -12,15 +12,18 @@
     />
     
     <!-- Calendar Input -->
-    <b-form-datepicker
-      v-model="stringValue"
-      :min="minDateStr"
-      :max="maxDateStr"
-      button-only
-      right
-      :disabled="!enabled"
-      @input="onDateSelected"
-    />
+    <b-input-group-append>
+      <b-form-datepicker
+        v-model="stringValue"
+        :min="minDateStr"
+        :max="maxDateStr"
+        button-only
+        right
+        :disabled="!enabled"
+        @input="onDateSelected"
+      />
+    </b-input-group-append>
+    
   </b-input-group>
 </template>
 
