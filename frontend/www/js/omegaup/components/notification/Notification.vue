@@ -18,18 +18,33 @@
       @click="handleClick"
     >
       <img class="d-block" width="50" :src="iconUrl" />
-      <template v-if="notificationMarkdown">
-        <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
-      </template>
-      <div v-else-if="url">
-        <a :href="url">
+      <div class="d-flex flex-column ms-2 flex-grow-1">
+        <template v-if="notificationMarkdown">
+          <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
+        </template>
+        <div v-else-if="url">
+          <a :href="url">
+            {{ text }}
+          </a>
+        </div>
+        <div v-else>
           {{ text }}
-        </a>
-      </div>
-      <div v-else>
-        {{ text }}
+        </div>
+        <button
+          v-if="notification.contents.type === 'badge'"
+          class="btn btn-outline-primary btn-sm mt-2 align-self-start"
+          @click.stop="openShareModal"
+        >
+          {{ T.shareYourBadge }}
+        </button>
       </div>
     </div>
+    <!-- Share badges modal -->
+    <omegaup-share-badges
+      v-if="showShareModal && notification.contents.type === 'badge'"
+      :badge-name="notification.contents.badge"
+      @close="showShareModal = false"
+    ></omegaup-share-badges>
   </div>
 </template>
 
@@ -41,14 +56,22 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_ShareBadges from './ShareBadges.vue';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-share-badges': omegaup_ShareBadges,
   },
 })
 export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
+  T = T;
+  showShareModal = false;
+
+  openShareModal(): void {
+    this.showShareModal = true;
+  }
 
   get iconUrl(): string {
     if (this.notification.contents.body) {
