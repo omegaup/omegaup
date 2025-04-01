@@ -2260,8 +2260,9 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         // Generate heatmap data (last 365 days)
-        $today = new \DateTime();
-        $oneYearAgo = (new \DateTime())->sub(new \DateInterval('P1Y'));
+        $currentTimeStamp = \OmegaUp\Time::get();
+        $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
+        $oneYearAgo = (clone $today)->sub(new \DateInterval('P1Y'));
 
         // Initialize all dates with zero count
         $heatmapData = [];
@@ -2274,7 +2275,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Fill in actual run counts for AC submissions
         foreach ($runs as $run) {
-            if ($run['verdict'] === 'AC' && !is_null($run['date'])) {
+            if (!is_null($run['date'])) {
                 $runDate = new \DateTime($run['date']);
                 if ($runDate >= $oneYearAgo && $runDate <= $today) {
                     $heatmapData[$run['date']] += $run['runs'];

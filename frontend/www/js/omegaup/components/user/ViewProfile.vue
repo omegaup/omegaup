@@ -206,6 +206,11 @@
                 <div class="chart-section-heatmap">
                   <omegaup-user-heatmap
                     :username="profile.username"
+                    :heatmap-data="heatmapData"
+                    :available-years="availableYears"
+                    @year-changed="
+                      (year) => $emit('heatmap-year-changed', year)
+                    "
                   ></omegaup-user-heatmap>
                 </div>
               </div>
@@ -277,6 +282,11 @@ export default class ViewProfile extends Vue {
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
+  @Prop({ default: () => [] }) heatmapData!: Array<{
+    date: string;
+    count: number;
+  }>;
+  @Prop({ default: () => [] }) availableYears!: number[];
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )

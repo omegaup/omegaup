@@ -5,7 +5,7 @@
         <select
           v-model="selectedYear"
           class="form-control"
-          @change="updateHeatmap"
+          @change="onYearChange"
         >
           <option v-for="year in availableYears" :key="year" :value="year">
             {{ year }}
@@ -18,13 +18,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { Chart } from 'highcharts-vue';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as Highcharts from 'highcharts/highstock';
 import HighchartsHeatmap from 'highcharts/modules/heatmap';
 import T from '../../lang';
 import * as ui from '../../ui';
-import { apiCall } from '../../api';
+import { getHeatmapChartOptions } from './heatmap_utils';
 
 HighchartsHeatmap(Highcharts);
 
@@ -33,99 +32,102 @@ interface HeatmapDataPoint {
   count: number;
 }
 
-interface UserProfileInfo {
-  created?: string;
-}
+// Define color variables
+export const COLORS = {
+  emptyCell: 'var(--user-heatmap-empty-cell-color)',
+  lowActivity: 'var(--user-heatmap-low-activity-color)',
+  mediumActivity: 'var(--user-heatmap-medium-activity-color)',
+  highActivity: 'var(--user-heatmap-high-activity-color)',
+  background: 'var(--user-heatmap-background-color)',
+  wrapper: 'var(--user-heatmap-wrapper-background-color)',
+};
 
-interface UserStatsResponse {
-  heatmap?: HeatmapDataPoint[];
-}
-
-@Component({
-  components: {
-    highcharts: Chart,
-  },
-})
+@Component({})
 export default class UserHeatmap extends Vue {
   @Prop() username!: string;
+  @Prop({ default: () => [] }) heatmapData!: HeatmapDataPoint[];
+  @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: false }) isLoading!: boolean;
 
   chart: Highcharts.Chart | null = null;
-  heatmapData: HeatmapDataPoint[] = [];
-  isLoading = true;
   selectedYear: number = new Date().getFullYear();
-  availableYears: number[] = [];
   T = T;
   ui = ui;
+  COLORS = COLORS;
 
-  // Define $refs type
-  $refs!: {
-    heatmapContainer: HTMLElement;
-  };
+  @Ref('heatmapContainer') readonly heatmapContainer!: HTMLElement;
 
-  created(): void {
-    if (!this.T) {
-      this.T = T;
-    }
-  }
-
-  async mounted(): Promise<void> {
-    this.isLoading = true;
-    try {
-      const response = await apiCall<{ username: string }, UserStatsResponse>(
-        '/api/user/stats/',
-      )({ username: this.username });
-
-      this.heatmapData = response.heatmap || [];
-
-      const profileResponse = await apiCall<
-        { username: string },
-        UserProfileInfo
-      >('/api/user/profile/')({ username: this.username });
-
-      const currentYear = new Date().getFullYear();
-      const years = new Set<number>();
-
-      if (profileResponse.created) {
-        const creationYear = new Date(profileResponse.created).getFullYear();
-
-        for (let year = creationYear; year <= currentYear; year++) {
-          years.add(year);
-        }
-      } else {
-        years.add(currentYear);
-      }
-
-      this.availableYears = Array.from(years).sort((a, b) => b - a);
-
-      if (this.availableYears.length > 0) {
+  mounted(): void {
+    this.$nextTick(() => {
+      if (this.availableYears && this.availableYears.length > 0) {
         this.selectedYear = this.availableYears[0];
       }
 
+      if (this.heatmapData && this.heatmapData.length > 0) {
+        this.renderHeatmap();
+      }
+    });
+  }
+
+  @Watch('availableYears', { immediate: true, deep: true })
+  onAvailableYearsChange(newValue: number[]): void {
+    if (!newValue || !newValue.length) return;
+
+    this.selectedYear = newValue[0];
+
+    this.$nextTick(() => {
+      if (this.heatmapData && this.heatmapData.length > 0) {
+        this.renderHeatmap();
+      }
+    });
+  }
+
+  @Watch('heatmapData', { immediate: true, deep: true })
+  onHeatmapDataChange(newValue: HeatmapDataPoint[]): void {
+    if (!newValue || !newValue.length) return;
+
+    this.$nextTick(() => {
       this.renderHeatmap();
-    } catch (error) {
-      console.error('Failed to load heatmap data', error);
-    } finally {
-      this.isLoading = false;
+    });
+  }
+
+  @Watch('isLoading')
+  onLoadingChange(newValue: boolean): void {
+    if (!newValue && this.heatmapData && this.heatmapData.length > 0) {
+      this.$nextTick(() => {
+        this.renderHeatmap();
+      });
     }
   }
 
-  updateHeatmap(): void {
-    this.renderHeatmap();
+  onYearChange(): void {
+    this.$emit('year-changed', this.selectedYear);
   }
 
   renderHeatmap(): void {
-    if (!this.$refs.heatmapContainer) return;
+    if (!this.heatmapContainer) {
+      return;
+    }
 
     const startDate = new Date(this.selectedYear, 0, 1);
     const firstDayOffset = startDate.getDay();
 
-    const dateMap = new Map();
-    this.heatmapData.forEach((item) => {
-      const date = new Date(item.date);
-      if (date.getFullYear() === this.selectedYear) {
-        dateMap.set(item.date, item.count);
-      }
-    });
+    const dateMap = new Map<string, number>();
+    if (this.heatmapData) {
+      this.heatmapData.forEach((item) => {
+        if (!item.date) return;
+
+        const dateObj = new Date(item.date);
+        const year = dateObj.getUTCFullYear();
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getUTCDate()).padStart(2, '0');
+        const normalizedDate = `${year}-${month}-${day}`;
+
+        if (year === this.selectedYear) {
+          dateMap.set(normalizedDate, item.count);
+        }
+      });
+    }
 
     const formattedData: Array<[number, number, number]> = [];
     const now = new Date();
@@ -140,7 +142,11 @@ export default class UserHeatmap extends Vue {
 
     for (let i = 0; i < totalDays; i++) {
       const currentDate = new Date(this.selectedYear, 0, i + 1);
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+
       const weekNumber = Math.floor((i + firstDayOffset) / 7);
       const dayOfWeek = currentDate.getDay();
 
@@ -161,134 +167,24 @@ export default class UserHeatmap extends Vue {
     const chartWidth = (totalWeeks + 1) * cellWidth;
     const chartHeight = 7 * cellHeight + 15;
 
-    const options: Highcharts.Options = {
-      chart: {
-        renderTo: this.$refs.heatmapContainer,
-        type: 'heatmap',
-        height: chartHeight,
-        width: chartWidth,
-        spacing: [0, 0, 10, 0],
-        margin: [0, 0, 15, 0],
-        backgroundColor: 'transparent',
-      },
-      title: {
-        text: '',
-      },
-      subtitle: {
-        text: '',
-      },
-      xAxis: {
-        min: 0,
-        max: totalWeeks,
-        labels: {
-          enabled: true,
-          formatter: function () {
-            const weekFirstDay = new Date(startDate);
-            weekFirstDay.setDate(
-              weekFirstDay.getDate() + (this.value as number) * 7,
-            );
+    const options = getHeatmapChartOptions({
+      heatmapContainer: this.heatmapContainer,
+      formattedData,
+      startDate,
+      firstDayOffset,
+      totalWeeks,
+      boxWidth,
+      boxHeight,
+      boxPadding,
+      chartWidth,
+      chartHeight,
+      colors: this.COLORS,
+    });
 
-            if (weekFirstDay.getDate() <= 7) {
-              return weekFirstDay.toLocaleString('default', {
-                month: 'short',
-              });
-            }
-            return '';
-          },
-          style: {
-            fontSize: '9px',
-            fontWeight: 'bold',
-          },
-          y: 7,
-          align: 'left',
-        },
-        lineWidth: 0,
-        tickWidth: 0,
-        tickPositioner: function () {
-          const positions = [];
-          for (let month = 0; month < 12; month++) {
-            const monthFirstDay = new Date(startDate.getFullYear(), month, 1);
-            const dayOfYear = Math.floor(
-              (monthFirstDay.getTime() - startDate.getTime()) /
-                (24 * 60 * 60 * 1000),
-            );
-            const weekNumber = Math.floor((dayOfYear + firstDayOffset) / 7);
-            positions.push(weekNumber);
-          }
-          return positions;
-        },
-      },
-      yAxis: {
-        min: 0,
-        max: 6,
-        labels: {
-          enabled: false,
-        },
-        lineWidth: 0,
-        tickWidth: 0,
-      },
-      colorAxis: {
-        dataClasses: [
-          { from: -1, to: 0, color: '#dddddd' },
-          { from: 1, to: 4, color: '#739DE3' },
-          { from: 5, to: 9, color: '#5588DD' },
-          { from: 10, to: 1000, color: '#4670B5' },
-        ],
-        labels: {
-          enabled: false,
-        },
-      },
-      tooltip: {
-        formatter: function () {
-          const date = new Date(startDate);
-          const dayOffset =
-            (this.point.x as number) * 7 +
-            (this.point.y as number) -
-            firstDayOffset;
-          date.setDate(date.getDate() + dayOffset);
+    if (this.chart) {
+      this.chart.destroy();
+    }
 
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const formattedDate = `${year}-${month}-${day}`;
-
-          const value = this.point.value as number;
-          if (value > 0) {
-            return `<b>${formattedDate}</b><br>Total submissions: <b>${value}</b>`;
-          }
-          return `<b>${formattedDate}</b>`;
-        },
-      },
-      legend: {
-        enabled: false,
-      },
-      credits: {
-        enabled: false,
-      },
-      series: [
-        {
-          name: 'Submissions',
-          borderWidth: 0.1,
-          borderColor: '#ffffff',
-          data: formattedData,
-          dataLabels: {
-            enabled: false,
-          },
-          type: 'heatmap' as const,
-          pointWidth: boxWidth,
-          pointHeight: boxHeight,
-          pointPadding: boxPadding / 2,
-          states: {
-            hover: {
-              brightness: 0.1,
-              borderColor: '#ffffff',
-            },
-          },
-        } as Highcharts.SeriesHeatmapOptions,
-      ],
-    };
-
-    // Create chart with properly typed options
     this.chart = new Highcharts.Chart(options);
   }
 
@@ -312,7 +208,7 @@ export default class UserHeatmap extends Vue {
 .user-heatmap-wrapper {
   position: relative;
   width: 100%;
-  background-color: white;
+  background-color: var(--user-heatmap-wrapper-background-color);
   border-radius: 6px;
 }
 

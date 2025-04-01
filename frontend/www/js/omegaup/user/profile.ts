@@ -9,11 +9,26 @@ import mainStore from '../mainStore';
 import user_Profile from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
+// Define minimum interfaces needed for heatmap data
+interface HeatmapDataPoint {
+  date: string;
+  count: number;
+}
+
+// Use type declaration merging to add the methods to Vue
+declare module 'vue/types/vue' {
+  interface Vue {
+    loadInitialHeatmapData(username: string): void;
+    loadHeatmapDataForYear(username: string, year: number): void;
+  }
+}
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substring(1).split('#');
   const searchResultSchools: types.SchoolListItem[] = [];
+  const currentYear = new Date().getFullYear();
 
   if (payload.profile.school && payload.profile.school_id) {
     searchResultSchools.push({
@@ -52,7 +67,97 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
+        heatmapData: [] as HeatmapDataPoint[],
+        availableYears: [currentYear] as number[],
+        isLoading: true,
       };
+    },
+    mounted: function () {
+      if (this.profile.username) {
+        this.loadInitialHeatmapData(this.profile.username);
+      }
+    },
+    methods: {
+      loadInitialHeatmapData: function (username: string): void {
+        this.isLoading = true;
+
+        api.User.stats({ username })
+          .then((response) => {
+            const processedData: HeatmapDataPoint[] = [];
+            if (response.runs && response.runs.length > 0) {
+              for (const run of response.runs) {
+                if (run.date) {
+                  processedData.push({
+                    date: run.date,
+                    count: run.runs,
+                  });
+                }
+              }
+            }
+
+            this.heatmapData = processedData;
+
+            if (response.runs && response.runs.length > 0) {
+              const sortedRuns = [...response.runs].sort((a, b) => {
+                if (!a.date) return 1;
+                if (!b.date) return -1;
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
+              });
+
+              if (sortedRuns[0].date) {
+                const firstSubmissionYear = new Date(
+                  sortedRuns[0].date,
+                ).getFullYear();
+
+                const years: number[] = [];
+                const currentYear = new Date().getFullYear();
+
+                for (
+                  let year = firstSubmissionYear;
+                  year <= currentYear;
+                  year++
+                ) {
+                  years.push(year);
+                }
+
+                years.sort((a, b) => b - a);
+                this.availableYears = years;
+              }
+            }
+
+            this.isLoading = false;
+          })
+          .catch((error) => {
+            ui.apiError(error);
+            this.isLoading = false;
+          });
+      },
+      loadHeatmapDataForYear: function (username: string, year: number): void {
+        this.isLoading = true;
+
+        api.User.stats({ username, year: year.toString() })
+          .then((response) => {
+            const processedData: HeatmapDataPoint[] = [];
+            if (response.runs && response.runs.length > 0) {
+              for (const run of response.runs) {
+                if (run.date) {
+                  processedData.push({
+                    date: run.date,
+                    count: run.runs,
+                  });
+                }
+              }
+            }
+
+            this.heatmapData = processedData;
+
+            this.isLoading = false;
+          })
+          .catch((error) => {
+            ui.apiError(error);
+            this.isLoading = false;
+          });
+      },
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -73,6 +178,9 @@ OmegaUp.on('ready', () => {
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
+          heatmapData: this.heatmapData,
+          availableYears: this.availableYears,
+          isLoading: this.isLoading,
         },
         on: {
           'update-user-basic-information': (
@@ -235,6 +343,10 @@ OmegaUp.on('ready', () => {
                 ui.success(T.apiTokenSuccessfullyRevoked);
               })
               .catch(ui.apiError);
+          },
+          'heatmap-year-changed': (year: number) => {
+            if (!this.profile.username) return;
+            this.loadHeatmapDataForYear(this.profile.username, year);
           },
         },
       });
