@@ -262,7 +262,7 @@
                       >
                       <a
                         class="dropdown-item"
-                        href="/arena/?filter=participating"
+                        href="/arena/?page=1&tab_name=current&sort_order=none&filter=signedup"
                         data-nav-user-contests
                         >{{ T.navContestsEnrolled }}</a
                       >
