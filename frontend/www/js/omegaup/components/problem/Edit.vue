@@ -11,7 +11,7 @@
         </small>
       </h1>
       <p>
-        <a href="/docs/C%C3%B3mo-escribir-problemas-para-Omegaup.md">{{
+        <a href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-escribir-problemas-para-Omegaup.md">{{
           T.navHelp
         }}</a>
       </p>

@@ -1,5 +1,5 @@
 # Prerrequisitos
-* Instalar la máquina virtual como se describe en [Cómo empezar a desarrollar](/docs/C%C3%B3mo-empezar-a-desarrollar.md)
+* Instalar la máquina virtual como se describe en [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-empezar-a-desarrollar.md)
 * Supongamos que la máquina virtual quedó instalada en `c:\documentos\omegaup\vm`
 
 # Software

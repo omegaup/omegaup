@@ -1,5 +1,3 @@
-[También disponible en Español](/docs/C%C3%B3mo-actualizar-y-configurar-tu-copia-local-de-omegaup-antes-de-hacer-cambios.md)
-
 You only have to execute this once to configure `upstream` and that you can download the changes:
 
 `git remote add upstream https://github.com/omegaup/omegaup.git`
