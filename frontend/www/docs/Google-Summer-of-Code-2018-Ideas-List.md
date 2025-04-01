@@ -1,4 +1,4 @@
-### Interested in applying to GSoC 2019? checkout our [2019 Ideas List](/docs/Google-Summer-of-Code-2019-Ideas-List.md) ###
+### Interested in applying to GSoC 2019? checkout our [2019 Ideas List](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2019-Ideas-List.md) ###
 
 ## Table of Contents ##
 * [Project Ideas List](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List#ideas-list.md)
