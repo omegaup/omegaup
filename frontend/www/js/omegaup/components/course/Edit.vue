@@ -101,7 +101,7 @@
           @emit-cancel="onCancel"
           @submit="onSubmitEditCourse"
           @update-search-result-schools="
-            (query) => $emit('update-search-result-schools', query)
+          (query) => $emit('update-search-result-schools', query)
           "
         ></omegaup-course-form>
       </div>
@@ -121,9 +121,9 @@
           @emit-add-problems="(assignment) => onAddProblems(assignment)"
           @emit-delete="(assignment) => $emit('delete-assignment', assignment)"
           @emit-sort-content="
-              (courseAlias, contentAliases) =>
+          (courseAlias, contentAliases) =>
               $emit('sort-content', courseAlias, contentAliases)
-          "
+              "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
           ref="assignment-details"
@@ -146,18 +146,18 @@
           @emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
-          "
+            "
           @emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
-          "
+            "
           @remove-problem="
           (assignment, problem) =>  
               $emit('remove-problem', assignment, problem)
-          "
+            "
           @sort-problems="
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
-          "
+            "
           @cancel="onResetAssignmentForm"
           @add-assignment="(params) => $emit('add-assignment', params)"
           @update-assignment="(params) => $emit('update-assignment', params)"
