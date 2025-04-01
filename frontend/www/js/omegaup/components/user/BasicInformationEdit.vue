@@ -65,6 +65,7 @@
         v-model="birthDate"
         :required="false"
         :max="new Date()"
+        :locale="profile.locale"
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">
