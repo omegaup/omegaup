@@ -151,6 +151,14 @@
   --arena-reset-border-color: #ced4da;
   --arena-reset-text-color: #6c757d;
 
+  // USER HEATMAP
+  --user-heatmap-empty-cell-color: #dddddd;
+  --user-heatmap-low-activity-color: #739de3;
+  --user-heatmap-medium-activity-color: #5588dd;
+  --user-heatmap-high-activity-color: #4670b5;
+  --user-heatmap-background-color: transparent;
+  --user-heatmap-wrapper-background-color: #ffffff;
+
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
   --finder-wizard-modal-container-background-color: #eee;

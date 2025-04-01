@@ -196,11 +196,23 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
-                <omegaup-user-charts
-                  v-if="charts"
-                  :data="charts"
-                  :username="profile.username"
-                ></omegaup-user-charts>
+                <div class="chart-section">
+                  <omegaup-user-charts
+                    v-if="charts"
+                    :data="charts"
+                    :username="profile.username"
+                  ></omegaup-user-charts>
+                </div>
+                <div class="chart-section-heatmap">
+                  <omegaup-user-heatmap
+                    :username="profile.username"
+                    :heatmap-data="heatmapData"
+                    :available-years="availableYears"
+                    @year-changed="
+                      (year) => $emit('heatmap-year-changed', year)
+                    "
+                  ></omegaup-user-heatmap>
+                </div>
               </div>
             </div>
           </div>
@@ -217,6 +229,7 @@ import country_Flag from '../CountryFlag.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Chartsv2.vue';
+import user_Heatmap from './UserHeatmap.vue';
 import user_MainInfo from './MainInfo.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
@@ -255,6 +268,7 @@ function getInitialSelectedTab(
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
+    'omegaup-user-heatmap': user_Heatmap,
     'omegaup-user-maininfo': user_MainInfo,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
@@ -268,6 +282,11 @@ export default class ViewProfile extends Vue {
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
+  @Prop({ default: () => [] }) heatmapData!: Array<{
+    date: string;
+    count: number;
+  }>;
+  @Prop({ default: () => [] }) availableYears!: number[];
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -352,5 +371,24 @@ export default class ViewProfile extends Vue {
 <style lang="scss">
 a:hover {
   cursor: pointer;
+}
+
+.chart-section {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.chart-section-heatmap {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 0px;
+  margin-top: 15px;
+}
+
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
 }
 </style>
