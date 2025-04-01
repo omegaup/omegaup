@@ -1,6 +1,6 @@
 # Índice de ligas útiles
 ## Coding
-- 📝 [Coding guidelines](/docs/Coding-guidelines.md) ([English](/docs/Coding-guidelines-(English-version.md)))
+- 📝 [Coding guidelines](https://github.com/omegaup/omegaup/wiki/Coding-guidelines)
 
 - :100: [Comando útiles para el desarrollo](/docs/Comandos-%C3%BAtiles-para-el-desarrollo.md)
 

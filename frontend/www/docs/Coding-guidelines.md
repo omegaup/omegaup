@@ -1,17 +1,17 @@
 # General
 
-* Muchas de las cosas expresadas en las guías de estilo se validan en GitHub al momento de correr las pruebas.
-  - Siempre que se pueda, se debería automatizar este proceso para evitar regresiones y facilitar la labor de la revisión de código.
-* Todo el código debe declarar los tipos de datos en las interfaces (parámetros de funciones y el tipo de datos que regresan).
-  - También se prefiere que los arreglos / mapas adentro de las funciones tengan anotaciones de tipos para facilitar su comprensión.
-  - En el frontend usamos [TypeScript](https://www.typescriptlang.org/), en PHP usamos [Psalm](https://psalm.dev/) y en Python usamos [mypy](http://mypy-lang.org/).
-* Todo el código (y los comentarios) se escriben en inglés.
-* Cambios en funcionalidad o funcionalidad nueva deben ser acompañados por sus respectivos tests nuevos/modificados.
-* Se evita el uso de `null` y `undefined` siempre que sea posible. Especialmente en los parámetros de funciones.
-  - `null` se debe usar únicamente cuando hay algo que un usuario no proveyó.
-  - `undefined` se debe usar únicamente en la declaración de parámetros opcionales en funciones de TypeScript.
-  - Se debe evitar declarar tipos que puedan ser simultáneamente `null` y `undefined`.
-  - Si hay varios parámetros o campos que pueden ser `null`/`undefined`, todos deberían poder serlo independientemente: si hay subconjuntos de parámetros/campos que se deben pasar juntos, es mejor crear un tipo intermedio que los agrupe. Por ejemplo,
+* Many of the things expressed in the coding guidelines are validated on GitHub by linters and integration tests.
+  - Whenever possible, this process should be automated to avoid regressions and facilitate the code review work.
+* All code must declare data types in the interfaces (in function parameters and the type of data they return).
+  - It is also preferred that arrays/maps inside functions have type annotations to make them easier to understand.
+  - In the frontend we use [TypeScript](https://www.typescriptlang.org/), in PHP we use [Psalm](https://psalm.dev/) and in Python we use [mypy](http://mypy -lang.org/).
+* All code (and comments) are written in English.
+* Changes in functionalities or new functionalities must be accompanied by their respective new/modified tests.
+* Avoid using `null` and `undefined` wherever possible. Especially in function parameters.
+  - `null` should only be used when there is something a user did not provide.
+  - `undefined` should only be used in the declaration of optional parameters in TypeScript functions.
+  - Avoid declaring types that can be `null` and `undefined` at the same time.
+  - If there are several parameters or fields that can be `null`/`undefined`, they should all be able to be null independently: if there are subsets of parameters/fields that must be passed together, it is better to create an intermediate type that groups them together. For example,
     ```php
     function MyFunc(
         \OmegaUp\DAO\Problems $problem,
@@ -20,7 +20,7 @@
         int|null $validatorTimeout = null,
     ): void {
     ```
-    En esta función, `$validatorLanguage` y `$validatorTimeout` se _deben_ especificar si `$customValidator` es `true`, y se deben _no_ especificar en caso contrario. Entonces es mejor crear otro tipo que los agrupe:
+   In this function, `$validatorLanguage` and `$validatorTimeout` must _be_ specified if `$customValidator` is `true`, and must _not_ be specified otherwise. So it's better to create another type that groups them:
     ```php
     /**
      * @psalm-type ValidatorOptions=array{language: string, timeout: int}
@@ -34,92 +34,99 @@
         array? $customValidatorOptions = null,
     ): void {
     ```
-    - Cada parámetro `undefined`/`null` duplica el número de posibles combinaciones recibibles para una función, y esto crece exponencialmente. Hay que intentar limitar esto a < 10.
-* Se deben evitar funciones que cambien su comportamiento significativamente dependiendo de banderas / condicionales. Se prefiere que se declaren múltiples funciones y que se llame la función apropiada.
-* Siempre que sea posible, hay que usar el [Guard Clause Pattern](https://refactoring.com/catalog/replaceNestedConditionalWithGuardClauses.html).
-* No debe haber código no-usado. Se prefiere eliminar código que no se usa a comentarlo. Al final de cuentas, siempre se puede recuperar usando la historia de git.
-* Se prefiere el uso de [camelCase](https://en.wikipedia.org/wiki/Camel_case) para nombres de funciones/variables/clases. Excepciones donde se usa [snake_case](https://en.wikipedia.org/wiki/Snake_case):
-  - columnas en MySQL
-  - variables y parámetros en Python
-  - parámetros del API
-* Se prefiere evitar el uso de abreviaturas en el código (tanto en nombres de variables como en comentarios). No siempre las abreviaturas son completamente obvias para todas las personas.
-* Se prefiere minimizar la distancia entre donde se declaran las variables y la primera vez que se usan, para minimizar la cantidad de código no-relevante que hay que leer para saber qué contiene una variable.
-* Los comentarios deberían usarse para explicar partes complicadas o no-intuitivas del código. No es necesario agregar comentarios para describir lo que hace el código y se prefiere que mejor expliquen _el por qué_.
+   - Each possible `undefined`/`null` parameter doubles the number of combinations a function can receive, and this grows exponentially. Try to limit this to < 10.
+* Functions that change their behavior significantly depending on flags/conditionals should be avoided. It is preferred that multiple functions be declared and the appropriate function be called.
+* Whenever possible, use the [Guard Clause Pattern](https://refactoring.com/catalog/replaceNestedConditionalWithGuardClauses.html).
+* There must not be any unused code. Removing unused code is preferred to commenting it out. At the end of the day, it can always be retrieved using the git history.
+* Is preferred the use of [camelCase](https://en.wikipedia.org/wiki/Camel_case)  for function/variable/class names. Exceptions where [snake_case](https://en.wikipedia.org/wiki/Snake_case) is used are:
+   - Columns in MySQL
+   - Variables and parameters in Python
+   - API parameters  
+* It is preferred to avoid the use of abbreviations in the code (both in variable names and in comments). Abbreviations are not completely obvious to everyone.
+* It is preferred to minimize the distance between where variables are declared and the first time they are used. Because, we want to minimize the amount of non-relevant code that has to be read to know what a variable contains.
+* Comments should be used to explain complex or non-intuitive parts of the code. It is unnecessary to add comments to describe what the code does and it is preferred to explain _why things are done the way they are done_.
 
-# Formato
+# Format
 
-* Le delegamos el trabajo de decidir cómo darle el formato al código a herramientas automatizadas. Usamos [yapf](https://github.com/google/yapf) para Python, [prettier.io](https://prettier.io/) para TypeScript/Vue y [phpcbf](https://github.com/squizlabs/PHP_CodeSniffer) para PHP. Puedes validar que se está cumpliendo con el estilo llamando `./stuff/lint.sh validate`.
-  - Se usan 2/4 espacios (depende del tipo de archivo), no tabs.
-  - El fin-de-linea debe ser estilo Unix (`\n`), no estilo Windows (`\r\n`).
-  - La llave va en la misma línea que el statement anterior.
+* We delegate the job of deciding how to style the code to the automated tools. We use:
+  - [yapf](https://github.com/google/yapf) for Python.
+  - [prettier.io](https://prettier.io/) for TypeScript/Vue.
+  - [phpcbf](https://github.com/squizlabs/PHP_CodeSniffer) for PHP.
+  
+  You can validate the style by calling `./stuff/lint.sh validate`.
+* More styling guidelines:
+  - 2/4 spaces are used (depends on the type of file), not tabs.
+  - The end-of-line must be Unix-style (`\n`), not Windows-style (`\r\n`).
+  - Opening brackets goes in the same line as the last statement.
     ```php
-    if (condicion) {
-        bloque;
-    }
+        if (condition) {
+            stuff;
+        }
     ```
-  - Un espacio entre los keywords y el paréntesis para: `if`, `else`, `while`, `switch`, `catch`, `function`.
-  - Las llamadas a funciones no tienen espacio antes del paréntesis.
-  - No se dejan espacios adentro del paréntesis.
-  - Un espacio después de cada coma, pero sin espacio antes.
-  - Todos los operadores binarios deben tener un espacio antes y uno después.
-  - No debe haber más de una línea en blanco seguida.
-* No deben haber comentarios vacíos.
-* No se deben usar comentarios de bloque `/* ... */`, solo de línea `// ...`.
-
+  - Include a space between the keywords and parentheses for: `if`, `else`, `while`, `switch`, `catch`, `function`.
+  - Function calls do not have a space before the parentheses.
+  - No spaces are left inside the parentheses.
+  - A space after each comma, but no space before it.
+  - All binary operators must have a space before and one after.
+  - There should not be more than one blank line in a row.
+* There should not be empty comments.
+* No `/* ... */` block comments should be used, only `// ...` line comments.
+ 
 # PHP
 
-* Los tests se deben correr antes de hacer commit y todos deben pasar 100%, sin excepción.
-* Se debe evitar funciones que requieran O(n) consultas a la base de datos (esto incluye operaciones con los DAOs). En vez, se deberían crear consultas manualmente para que hagan toda la funcionalidad en un sólo viaje redondo.
-* Con excepción de las funciones que implementan el API, ninguna función puede recibir un parámetro de tipo `\OmegaUp\Request`. Todas las funciones de API deben validar los parámetros, extraerlos a variables con los tipos correctos y llamar a las funciones con estas variables en vez del `\OmegaUp\Request` original.
-* Todas las funciones deben estar comentadas con el estilo:
-  ```php
-  /**
-   * set
-   *  
-   * Si el cache está prendido, guarda value en key con el timeout dado
-   *      
-   * @param string $value
-   * @param int $timeout   
-   * @return boolean
-   */
-  public function set($value, $timeout) { ...
-  ```
-* Se deben usar excepciones para reportar condiciones erróneas. El uso de funciones que regresen true/false es permitido cuando son valores esperados.
-* Todas las APIs deben reportar sus resultados en forma de arreglos asociativos.
-* Usar [RAII](http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) cuando sea conveniente, principalmente en la administración de recursos (archivos, etc...)
+* Tests must be run before committing and all must pass 100%, no exceptions.
+* Changes in functionality must be accompanied by their respective new / modified tests.
+* Functions that require O(n) queries to the database (this includes operations with DAOs) should be avoided. Instead, queries should be created manually so that they do all the functionality in a single round trip.
+* With the exception of functions that implement the API, none function can receive a parameter of type `\OmegaUp\Request`. All API functions must validate parameters, extract them to variables with the correct types, and call functions with these variables instead of the original `\OmegaUp\Request` .
+* All functions must be commented with the style:
+   ```php
+   /**
+    * set
+    *
+    * If cache is on, save value in key with given timeout
+    *
+    * @param string $value
+    * @param int $timeout
+    * @return boolean
+    */
+   public function set($value, $timeout) { ...
+   ```
+* Exceptions must be used to report erroneous conditions. The use of functions that return true/false is allowed when they are expected values.
+* All APIs must report their results in the form of associative arrays.
+* Use [RAII](http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) when convenient, mainly when managing resources (files, etc...)
 
 # Vue
 
-* Se debe evitar crear componentes que cambien su comportamiento significativamente dependiendo de banderas / condicionales. Se prefiere que el comportamiento distinto se abstraiga usando [`slot`s](https://vuejs.org/v2/guide/components-slots.html) para que el componente que lo llame pueda personalizarlo. Si hay varios componentes que van a usar este comportamiento distinto, se puede crear _otro_ componente que tenga el `slot` apropiado.
-* Como toda la interfaz se debe poder mostrar en varios idiomas, no se deben escribir textos directamente y en vez se deben usar cadenas de traducción.
-* Se debe evitar concatenar cadenas de traducción, porque distintos idiomas pueden usar distintos órdenes para las palabras. Se prefiere crear una cadena de traducción con parámetros reemplazables y usar la función `ui.formatString`:
+* Avoid creating components that change their behavior significantly depending on flags/conditionals. It is preferred that the distinct behavior be abstracted using [`slot`s](https://vuejs.org/v2/guide/components-slots.html) so that it can be customized by the calling component. If there are multiple components that are going to use this different behavior, you can create _another_ component that has the appropriate `slot`.
+* As the entire interface must be able to be displayed in several languages, texts should not be written directly and translation strings should be used instead.
+* Avoid concatenating translation strings, because different languages may use different word orders. It is preferred to create a translation string with replaceable parameters and use the `ui.formatString` function:
   ```typescript
-  <!-- Ejemplo malo:
+  <!-- Bad example:
   contestRanking = "Contest ranking: "
   -->
   <div>{{ T.contestRanking }} {{ user.rank }} {{ user.username }} {{ user.name }} {{ user.score }}</div>
 
-  <!-- Ejemplo mejor:
+  <!-- Better example:
   contestRanking = "Contest ranking: %(rank) %(username) %(name) %(score)"
   -->
   <div>{{ ui.formatString(T.contestRanking, { rank: user.rank, user: user.username, name: user.name, score: user.score }) }}</div>
   ```
-* Se debe evitar asignar colores en formato hexadecimal o `rgb(...)`. En vez de esto, los colores deberían declararse como variables para que no se rompa el modo oscuro.
-* Se debe evitar el uso de [lifecycle hooks](https://v3.vuejs.org/api/options-lifecycle-hooks.html) _a menos_ que haya algo en el componente que interactúe directamente con el DOM.
-  - También se debe evitar la interacción directa con el DOM.
-* Se prefiere el uso de [propiedades computadas y watchers](https://vuejs.org/v2/guide/computed.html) en vez de manipular variables programáticamente.
-* Se recomienda agregar **storybook** stories para cada componente nuevo, y en caso de modificar un componente existente agregar o actualizar las stories relacionadas al mismo. [Ver más](/docs/Coding-Guidelines-%E2%80%90-Storybook.md)
+* Avoid assigning colors in hexadecimal or `rgb(...)` format. Instead, the colors should be declared as variables so that dark mode doesn't break.
+* Avoid using [lifecycle hooks](https://v3.vuejs.org/api/options-lifecycle-hooks.html) _unless_ there is something in the component that interacts directly with the DOM.
+   - Direct interaction with the DOM should also be avoided.
+* Using [computed properties and watchers](https://vuejs.org/v2/guide/computed.html) is preferred over manipulating variables programmatically.
+* It's recommended to add **Storybook** stories for each new component, and if modifying an existing component, add or update the related stories. [See more](https://github.com/omegaup/omegaup/wiki/Coding-Guidelines-%E2%80%90-Storybook)
 
 # TypeScript
 
-* Cuando una función tenga más de 2-3 parámetros y _sobre todo_ si esos parámetros son del mismo tipo y definitivamente si tiene varios parámetros opcionales, se prefiere cambiar los parámetros por un objeto. Ejemplo:
+* When a function has more than 2-3 parameters and _especially_ if those parameters are of the same type and definitely if it has several optional parameters, it is preferred to change the parameters to an object. Example:
   ```typescript
-  // Ejemplo malo:
+  // Bad example:
   function updateProblem(problem: Problem, previousVersion: string, currentVersion: string, points?: int): void {
     // ...
   }
 
-  // Ejemplo mejor:
+  // Better example:
   function updateProblem({
     problem,
     previousVersion,
@@ -134,22 +141,22 @@
     // ...
   }
   ```
-* Se prefiere el uso de camelCase para nombres de funciones/variables/clases.
-* Se debe evitar el uso de [Type Assertions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions). Únicamente se permite en los siguientes casos:
-  - Cuando se está interactuando con el DOM (`document.querySelector` y sus amigos).
-  - Para declarar que una literal vacía (`null`, `{}`, `[]`) es de cierto tipo ejemplo: `null as null | string`, `[] as []types.Foo`.
-  - En las pruebas, para declarar `params` en el constructor de Vue.
-* jQuery ha sido deprecado y ya no se puede usar en ningún lugar.
+* Use of camelCase for function/variable/class names is preferred
+* The use of [Type Assertions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions) should be avoided. It is only allowed in the following cases:
+  - When you are interacting with the DOM (`document.querySelector` and its friends).
+  - To declare that an empty literal (`null`, `{}`, `[]`) is of a certain type example: `null as null | string`, `[] as []types.Foo`.
+  - In testing, to declare `params` in the Vue constructor.
+* `jQuery` has been deprecated and can no longer be used anywhere.
 
 # Python
 
-* Cuando una función tenga más de 2-3 parámetros y _sobre todo_ si esos parámetros son del mismo tipo y definitivamente si tiene varios parámetros opcionales, se prefiere cambiar los parámetros para que se deban recibir por nombre. Ejemplo:
+* When a function has more than 2-3 parameters and _especially_ if those parameters are of the same type and definitely if it has several optional parameters, it is preferred to change the parameters so that they should be received by name. Example:
   ```python
-  # Ejemplo malo:
+  # Bad example:
   def updateProblem(problem: Problem, previousVersion: str, currentVersion: str, points: Optional[int] = None) -> None:
     # ...
 
-  # Ejemplo mejor:
+  # Better example:
   def updateProblem(
     *,
     problem: Problem,
@@ -159,20 +166,20 @@
   ) -> None:
     # ...
   ```
-* Se prefiere el uso de snake_case para nombres de funciones y variables, y CamelCase para clases.
-* Hay que evitar el uso de `from module import function`. Se prefiere siempre importar módulos y llamar los miembros de los módulos con el nombre del módulo. El módulo `typing` es la única excepción a esta regla.
-  ```python
-  # Ejemplo malo:
-  from typing import Optional
+* It is preferred to use `snake_case` for function and variable names, and `CamelCase` for classes.
+* Avoid using `from module import function`. It is always preferred to import modules and call their members using the module name. The `typing` module is the only exception to this rule.
+```python
+# Bad example:
+from typing import Optional
 
-  from module import function
-  # ...
-  function()
+from module import function
+# ...
+function()
 
-  # Ejemplo mejor:
-  from typing import Optional
+# Better example:
+from typing import Optional
 
-  import module
-  # ...
-  module.function()
-  ```
+import module
+# ...
+module.function()
+```
