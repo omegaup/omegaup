@@ -21,6 +21,7 @@
         right
         :disabled="!enabled"
         :locale="locale"
+        :label-help="''"
         @input="onDateSelected"
       />
     </b-input-group-append>
