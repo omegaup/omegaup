@@ -1,5 +1,5 @@
 <template>
-  <b-input-group size="16">
+  <b-input-group >
     <!-- Editable Text Input -->
     <b-form-input
       v-model="stringValue"
