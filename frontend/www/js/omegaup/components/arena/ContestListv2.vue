@@ -173,7 +173,11 @@
           @click="currentTab = ContestTab.Current"
         >
           <template v-if="loading || refreshing">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+            <div
+              v-for="index in 3"
+              :key="`current-${index}`"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
@@ -225,7 +229,11 @@
           @click="currentTab = ContestTab.Future"
         >
           <template v-if="loading || refreshing">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+            <div
+              v-for="index in 3"
+              :key="`future-${index}`"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
@@ -280,7 +288,11 @@
           @click="currentTab = ContestTab.Past"
         >
           <template v-if="loading || refreshing">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
+            <div
+              v-for="index in 3"
+              :key="`past-${index}`"
+              class="card contest-card mb-3"
+            >
               <div class="line"></div>
             </div>
           </template>
@@ -451,11 +463,11 @@ export default class ArenaContestList extends Vue {
     this.refreshing = true; // Set refreshing to true when searching
     this.fetchPage(params, urlObj);
   }
-  
+
   onReset() {
     this.currentQuery = '';
   }
-  
+
   fetchInitialContests() {
     this.refreshing = true; // Set refreshing to true when fetching initial contests
     const urlObj = new URL(window.location.href);
@@ -474,24 +486,16 @@ export default class ArenaContestList extends Vue {
       this.contests = {
         current: [],
         future: [],
-        past: []
-      } as types.ContestList;
+        past: [],
+      };
     }
     this.currentPage = 1;
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
-  
+
   mounted() {
     window.addEventListener('scroll', this.handleScroll);
-    // Initialize contests if they don't exist
-    if (!this.contests) {
-      this.contests = {
-        current: [],
-        future: [],
-        past: []
-      } as types.ContestList;
-    }
     this.fetchInitialContests();
   }
 
@@ -513,7 +517,7 @@ export default class ArenaContestList extends Vue {
       this.loadMoreContests();
     }
   }
-  
+
   async loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore) return;
 
@@ -540,10 +544,10 @@ export default class ArenaContestList extends Vue {
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
-    // Set a timeout to turn off refreshing if it takes too long
+    // Turn off refreshing after a short delay to allow parent component to respond
     setTimeout(() => {
       this.refreshing = false;
-    }, 3000);
+    }, 1000);
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -560,55 +564,46 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
   filterBySignedUp() {
     this.currentFilter = ContestFilter.SignedUp;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
-  
+
   filterByRecommended() {
     this.currentFilter = ContestFilter.OnlyRecommended;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
-  
+
   filterByAll() {
     this.currentFilter = ContestFilter.All;
-    this.refreshing = true;
     this.fetchInitialContests();
   }
 
@@ -616,16 +611,16 @@ export default class ArenaContestList extends Vue {
     if (!this.contests) {
       return [];
     }
-    
+
     switch (this.currentTab) {
       case ContestTab.Current:
-        return this.contests.current || [];
+        return this.contests.current;
       case ContestTab.Past:
-        return this.contests.past || [];
+        return this.contests.past;
       case ContestTab.Future:
-        return this.contests.future || [];
+        return this.contests.future;
       default:
-        return this.contests.current || [];
+        return this.contests.current;
     }
   }
 
@@ -634,7 +629,7 @@ export default class ArenaContestList extends Vue {
     if (!this.contestList) return true;
     return this.contestList.length === 0;
   }
-  
+
   @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
     if (typeof oldValue === 'undefined') return;
@@ -719,35 +714,49 @@ export default class ArenaContestList extends Vue {
 
 .line {
   height: 100%;
-  background: var(--arena-submissions-list-skeletonloader-final-background-color);
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
   border-radius: 8px;
   animation: loading 1.5s infinite;
 }
 
 @keyframes loading {
   0% {
-    background: var(--arena-submissions-list-skeletonloader-initial-background-color);
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
 
   50% {
-    background: var(--arena-submissions-list-skeletonloader-final-background-color);
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
   }
 
   100% {
-    background: var(--arena-submissions-list-skeletonloader-initial-background-color);
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
   }
 }
 
 .sidebar {
-  >>>.contest-list-nav {
-    background-color: var(--arena-contest-list-sidebar-tab-list-background-color);
+  >>> .contest-list-nav {
+    background-color: var(
+      --arena-contest-list-sidebar-tab-list-background-color
+    );
 
     .active-title-link {
-      background-color: var(--arena-contest-list-sidebar-tab-list-link-background-color--active) !important;
+      background-color: var(
+        --arena-contest-list-sidebar-tab-list-link-background-color--active
+      ) !important;
     }
 
     .title-link {
-      color: var(--arena-contest-list-sidebar-tab-list-link-font-color) !important;
+      color: var(
+        --arena-contest-list-sidebar-tab-list-link-font-color
+      ) !important;
     }
   }
 }
