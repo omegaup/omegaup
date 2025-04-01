@@ -2265,9 +2265,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
 
         // If year parameter is provided, set date range to that year
-        $yearParam = $r->ensureOptionalString('year');
-        if (!is_null($yearParam)) {
-            $year = intval($yearParam);
+        $year = $r->ensureOptionalInt('year');
+        if (!is_null($year)) {
             $startDate = new \DateTime("{$year}-01-01");
             $endDate = new \DateTime("{$year}-12-31");
 
