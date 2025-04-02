@@ -766,7 +766,6 @@ const translations: { [key: string]: string; } = {
   homepageCompeteSectionTitle: "Compita",
   homepageCreateSectionDescription: "Organize seu concurso com problemas dispon\u00edveis na plataforma ou crie seus pr\u00f3prios problemas",
   homepageCreateSectionTitle: "Crie",
-  homepageSponsorsSectionTitle: "Obrigado ao nosso Patrocinador",
   homepageTeachSectionDescription: "Acompanhe o progresso do seu aluno atrav\u00e9s de tarefas e testes que s\u00e3o avaliados automaticamente",
   homepageTeachSectionTitle: "Ensine",
   homepageTrainSectionDescription: "Resolva problemas e melhore suas habilidades",

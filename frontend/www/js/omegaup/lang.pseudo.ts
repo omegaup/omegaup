@@ -766,7 +766,6 @@ const translations: { [key: string]: string; } = {
   homepageCompeteSectionTitle: "(C0mp373)",
   homepageCreateSectionDescription: "(Organiz3 y0ur c0n7357 wi7h pr0b13m5 7ha7 ar3 avai1ab13 0n 7h3 p1a7f0rm 0r cr3a73 y0ur 0wn pr0b13m5)",
   homepageCreateSectionTitle: "(Cr3a73)",
-  homepageSponsorsSectionTitle: "(Thank5 70 0ur Sp0n50r)",
   homepageTeachSectionDescription: "(Track y0ur 57ud3n7'5 pr0gr355 7hr0ugh a55ignm3n75 and 73575 7ha7 ar3 au70ma7ica11y a553553d)",
   homepageTeachSectionTitle: "(T3ach)",
   homepageTrainSectionDescription: "(S01v3 pr0b13m5 and impr0v3 y0ur 5ki115)",
