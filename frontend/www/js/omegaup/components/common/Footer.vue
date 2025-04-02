@@ -65,22 +65,6 @@
           </ul>
         </div>
         <div
-          class="footer-list-section footer-sponsors w-50 mb-4 mb-lg-0 mx-auto"
-        >
-          <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
-          <ul>
-            <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
-                <img
-                  class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
-                />
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div
           class="footer-list-section footer-organization d-inline-block w-50 mb-4"
         >
           <h4 class="column-title">{{ T.frontPageFooterOrganization }}</h4>
@@ -245,9 +229,6 @@ export default class Footer extends Vue {
         &.footer-site {
           order: -1;
         }
-        &.footer-sponsors {
-          order: -2;
-        }
       }
 
       ul {
@@ -271,9 +252,7 @@ export default class Footer extends Vue {
         }
       }
 
-      img.sponsor-logo {
-        width: 120px;
-      }
+     
     }
   }
 
