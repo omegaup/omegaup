@@ -145,7 +145,6 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
-import homepage_Sponsors from './Sponsors.vue';
 import homepage_Cookie from './CookieConsent.vue';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expire: -1 });
