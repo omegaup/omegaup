@@ -5,7 +5,7 @@
 /**
  * Description of ClarificationController
  *
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: string, author_classname: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, receiver_classname?: string, time: \OmegaUp\Timestamp}
  */
 class Clarification extends \OmegaUp\Controllers\Controller {
     /** @var null|\OmegaUp\Broadcaster */
@@ -25,7 +25,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification for a contest or an assignment of a course
      *
-     * @return Clarification
+     * @return array{answer: null|string, author: string, author_classname: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, receiver_classname: string, time: \OmegaUp\Timestamp}
      *
      * @omegaup-request-param string|null $contest_alias
      * @omegaup-request-param string|null $course_alias
@@ -207,12 +207,20 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         return [
             'answer' => $clarification->answer,
             'author' => $r->identity->username,
+            'author_classname' => \OmegaUp\DAO\UserRank::getByPK(
+                $r->identity->user_id
+            )?->classname ?? 'user-rank-unranked',
             'clarification_id' => intval($clarification->clarification_id),
             'contest_alias' => null,
             'message' => strval($clarification->message),
             'problem_alias' => strval($problem->alias),
             'public' => $clarification->public,
             'receiver' => $receiver ? $receiver->username : null,
+            'receiver_classname' => $receiver && $receiver->user_id ?
+                (\OmegaUp\DAO\UserRank::getByPK(
+                    $receiver->user_id
+                )?->classname ?? 'user-rank-unranked') :
+                'user-rank-unranked',
             'time' => $clarification->time,
         ];
     }

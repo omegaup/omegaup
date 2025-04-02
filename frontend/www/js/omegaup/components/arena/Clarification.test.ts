@@ -9,12 +9,14 @@ describe('Clarification.vue', () => {
   const clarification = {
     answer: null,
     author: 'omegaUp',
+    author_classname: 'user-rank-unranked',
     clarification_id: 1,
     message: 'Clarificación de prueba 1',
     assignment_alias: 'Tarea de prueba',
     problem_alias: 'Problema de prueba',
     public: false,
     receiver: null,
+    receiver_classname: null,
     time: new Date(),
   };
 
@@ -33,7 +35,13 @@ describe('Clarification.vue', () => {
   it('Should handle contest clarification on behalf', async () => {
     const wrapper = shallowMount(arena_Clarification, {
       propsData: {
-        clarification: { ...clarification, ...{ receiver: 'user' } },
+        clarification: { 
+          ...clarification, 
+          ...{ 
+            receiver: 'user',
+            receiver_classname: 'user-rank-beginner',
+          },
+        },
         isAdmin: true,
       },
     });
