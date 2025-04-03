@@ -1225,6 +1225,23 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * Returns the time of the next execution to the current problem
+     */
+    final public static function nextExecutionTimestamp(
+        ?\OmegaUp\Timestamp $lastExecutionTime = null
+    ): \OmegaUp\Timestamp {
+        $executionGap = \OmegaUp\Controllers\Run::$defaultExecutionGap;
+
+        if (is_null($lastExecutionTime)) {
+            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+        }
+
+        return new \OmegaUp\Timestamp(
+            $lastExecutionTime->time + $executionGap
+        );
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function searchWithRunIdGreaterThan(
