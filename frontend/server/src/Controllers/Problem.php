@@ -3884,7 +3884,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $search_type
-     */
+     */ 
     public static function apiListForTypeahead(\OmegaUp\Request $r) {
         // Authenticate request
         try {
@@ -3923,7 +3923,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{results: list<ProblemListItem>, total: int}
      *
-     * @omegaup-request-param null|string $authors
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
@@ -4830,6 +4829,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
@@ -4838,7 +4838,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param null|string $authors
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
@@ -6043,7 +6042,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{templateProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
-     * @omegaup-request-param null|string $authors
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
@@ -6053,7 +6051,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param bool|null $only_karel
-     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
@@ -6289,7 +6286,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{templateProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
-     * @omegaup-request-param null|string $authors
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param ''|'all'|'en'|'es'|'pt'|null $language
@@ -6300,7 +6296,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $only_karel
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
-     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param 'all'|'onlyQualityProblems'|null $quality
      * @omegaup-request-param null|string $query
