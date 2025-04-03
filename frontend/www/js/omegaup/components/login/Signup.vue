@@ -268,7 +268,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
-import * as ui from '../../ui'; // +++ ADD import for ui +++
+import * as ui from '../../ui';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
