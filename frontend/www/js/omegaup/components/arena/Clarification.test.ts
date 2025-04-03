@@ -46,12 +46,11 @@ describe('Clarification.vue', () => {
       },
     });
 
-    expect(wrapper.find('span[data-author]').text()).toContain(
-      ui.formatString(T.clarificationsOnBehalf, {
-        author: 'omegaUp',
-        receiver: 'user',
-      }),
-    );
+    const formattedString = ui.formatString(T.clarificationsOnBehalf, {
+      author: 'omegaUp',
+      receiver: 'user',
+    });
+    expect(wrapper.find('span[data-author]').text()).toContain(formattedString);
   });
 
   it('Should handle course clarification', async () => {

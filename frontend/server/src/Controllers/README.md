@@ -3052,6 +3052,7 @@ List of public and user's private problems
 
 | Name                    | Type                                                                                                                               | Description |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `authors`               | `null\|string`                                                                                                                     |             |
 | `difficulty`            | `null\|string`                                                                                                                     |             |
 | `difficulty_range`      | `null\|string`                                                                                                                     |             |
 | `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |
