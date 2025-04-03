@@ -19,11 +19,10 @@
       <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
       <omegaup-markdown
         v-show="allowedSolutionsToSee !== null"
-        :markdown="
-          ui.formatString(T.solutionViewsLeft, {
-            available: allowedSolutionsToSee,
-            total: 5,
-          }),
+        :markdown="ui.formatString(T.solutionViewsLeft, {
+        available: allowedSolutionsToSee,
+        total: 5,
+      }),
         "
       ></omegaup-markdown>
 
@@ -73,7 +72,7 @@ library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Markdown from './Markdown.vue';
 
 @Component({
   components: {

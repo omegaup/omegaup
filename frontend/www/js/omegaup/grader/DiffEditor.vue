@@ -7,6 +7,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
 import * as monaco from 'monaco-editor';
+(window as any).monaco = monaco;
 
 @Component
 export default class DiffEditor extends Vue {
@@ -56,11 +57,14 @@ export default class DiffEditor extends Vue {
     );
 
     // both sides are either editable or not at the same time
-    this._editor = monaco.editor.createDiffEditor(this.$el as HTMLElement, {
-      theme: this.theme,
-      originalEditable: !this.readOnly,
-      readOnly: this.readOnly,
-    });
+    this._editor = monaco.editor.createDiffEditor(
+      this.$refs.container as HTMLElement,
+      {
+        theme: this.theme,
+        originalEditable: !this.readOnly,
+        readOnly: this.readOnly,
+      },
+    );
 
     this._editor.setModel({
       original: this._originalModel,
