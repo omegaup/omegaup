@@ -4941,50 +4941,70 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Utility function to make GitHub API requests.
+     */
+    private static function makeGitHubApiRequest(
+        string $url,
+        string $method = 'GET',
+        array $headers = []
+    ): array {
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array_merge([
+            'Accept: application/vnd.github+json',
+            'User-Agent: OmegaUp'
+        ], $headers));
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpCode !== 200) {
+            throw new \OmegaUp\Exceptions\ApiException(
+                'GitHub API request failed',   // Message
+                'HTTP/1.1 500 Internal Server Error',  // Header
+                $httpCode  // Code
+            );
+        }
+
+        return json_decode($response, true);
+    }
+
+    /**
+     * Get the list of documents from GitHub.
      * @return array{entrypoint: string, templateProperties: array{payload: UserDocsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getDocsForTypeScript(\OmegaUp\Request $r) {
-        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
-        $dir = strval(OMEGAUP_ROOT);
-        /** @var list<string> */
-        $files = array_diff(scandir("{$dir}/www/docs/"), ['.', '..']);
+        $url = 'https://api.github.com/repos/iqbalcodes6602/omegaup/contents/frontend/www/docs';
+        $response = self::makeGitHubApiRequest($url);
 
         $docs = [
             'pdf' => [],
             'dir' => [],
         ];
 
-        foreach ($files as $file) {
-            if (is_file("$dir/www/docs/$file")) {
-                $name = preg_replace('/\.[^.]+$/', '', $file);
-                $name = str_replace('-', ' ', $name);
-                $name = ucwords($name);
-                if (preg_match('/\.pdf$/', $file)) {
-                    $docs['pdf'][] = [
-                        'name' => $name,
-                        'url' => "/docs/{$file}",
-                    ];
-                }
+        foreach ($response as $file) {
+            $name = preg_replace('/\.[^.]+$/', '', $file['name']);
+            $name = str_replace('-', ' ', $name);
+            $name = ucwords($name);
+
+            if (preg_match('/\.pdf$/', $file['name'])) {
+                $docs['pdf'][] = [
+                    'name' => $name,
+                    'url' => $file['html_url'],
+                ];
             } else {
                 $docs['dir'][] = [
-                    'name' => $file,
-                    'url' => "/docs/{$file}",
+                    'name' => $name,
+                    'url' => $file['html_url'],
                 ];
             }
         }
-        // Adding three more directories ignored by git
-        $docs['dir'][] = [
-            'name' => 'C++',
-            'url' => '/docs/cpp/en/',
-        ];
-        $docs['dir'][] = [
-            'name' => 'Java',
-            'url' => '/docs/java/en/',
-        ];
-        $docs['dir'][] = [
-            'name' => 'Pascal',
-            'url' => '/docs/pas/en/',
-        ];
+
+        $docs['dir'][] = ['name' => 'C++', 'url' => '/docs/cpp/en/'];
+        $docs['dir'][] = ['name' => 'Java', 'url' => '/docs/java/en/'];
+        $docs['dir'][] = ['name' => 'Pascal', 'url' => '/docs/pas/en/'];
 
         return [
             'templateProperties' => [
@@ -4994,6 +5014,180 @@ class User extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'common_docs',
         ];
     }
+
+    /**
+     * Upload a file to the GitHub repository.
+     *
+     * @omegaup-request-param string $filename
+     * @omegaup-request-param string $content
+     *
+     * @return array{status: string, message: string}
+     */
+    public static function apiUploadFile(\OmegaUp\Request $r): array {
+        $fileName = $r->ensureString('filename');
+        // $content = base64_encode($r->ensureString('content'));
+        $url = "https://api.github.com/repos/iqbalcodes6602/omegaup/contents/frontend/www/docs/{$fileName}";
+
+        $data = json_encode([
+            'message' => 'Upload file via API',
+            'content' => $r->ensureString('content')
+        ]);
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Authorization: token ' . GITUB_TOKEN,
+            'Content-Type: application/json',
+            'Accept: application/vnd.github+json',
+            'User-Agent: OmegaUp'
+        ]);
+
+        curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpCode !== 201) {
+            throw new \OmegaUp\Exceptions\ApiException(
+                'GitHub API request failed',
+                'HTTP/1.1 500 Internal Server Error',
+                $httpCode
+            );
+        }
+
+        return ['status' => 'ok', 'message' => 'File uploaded successfully'];
+    }
+
+    // /**
+    //  * Delete a file from the GitHub repository.
+    //  *
+    //  * @omegaup-request-param string $filename
+    //  *
+    //  * @return array{status: string, message: string}
+    //  */
+    // public static function apiDeleteFile(\OmegaUp\Request $r): array {
+    //     $fileName = $r->ensureString('filename');
+    //     $url = "https://api.github.com/repos/iqbalcodes6602/omegaup/contents/frontend/www/docs/{$fileName}";
+
+    //     $data = json_encode([
+    //         'message' => 'Delete file via API'
+    //     ]);
+
+    //     $curl = curl_init($url);
+    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    //     curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    //     curl_setopt($curl, CURLOPT_HTTPHEADER, [
+    //         'Authorization: token ' . GITUB_TOKEN,
+    //         'Content-Type: application/json',
+    //         'Accept: application/vnd.github+json',
+    //         'User-Agent: OmegaUp'
+    //     ]);
+
+    //     curl_exec($curl);
+    //     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    //     curl_close($curl);
+
+    //     if ($httpCode !== 200) {
+    //         throw new \OmegaUp\Exceptions\ApiException(
+    //             'GitHub API request failed',
+    //             'HTTP/1.1 500 Internal Server Error',
+    //             $httpCode
+    //         );
+    //     }
+
+    //     return ['status' => 'ok', 'message' => 'File deleted successfully'];
+    // }
+
+
+
+    /**
+     * Delete a file from the GitHub repository.
+     *
+     * @omegaup-request-param string $filename
+     *
+     * @return array{status: string, message: string}
+     */
+    public static function apiDeleteFile(\OmegaUp\Request $r): array {
+        $fileName = $r->ensureString('filename');
+        $url = "https://api.github.com/repos/iqbalcodes6602/omegaup/contents/frontend/www/docs/{$fileName}";
+
+        // Step 1: Get the SHA of the file to delete
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Authorization: token ' . GITUB_TOKEN,
+            'Accept: application/vnd.github+json',
+            'User-Agent: OmegaUp'
+        ]);
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($curl);
+        curl_close($curl);
+
+        if ($httpCode !== 200) {
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'Failed to retrieve file SHA from GitHub. HTTP code: ' . $httpCode . 
+                ' - Error: ' . ($curlError ?: 'No error message') . 
+                ' - Response: ' . $response
+            );
+        }
+
+        // Parse the response to extract the SHA
+        $responseData = json_decode($response, true);
+        if (!isset($responseData['sha'])) {
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'Unable to find file SHA for deletion. GitHub response: ' . $response
+            );
+        }
+        $fileSha = $responseData['sha'];
+
+        // Step 2: Prepare the delete request with the file SHA
+        $data = json_encode([
+            'message' => 'Delete file via API',
+            'sha' => $fileSha
+        ]);
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            'Authorization: token ' . GITUB_TOKEN,
+            'Content-Type: application/json',
+            'Accept: application/vnd.github+json',
+            'User-Agent: OmegaUp'
+        ]);
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($curl);
+        curl_close($curl);
+
+        if ($httpCode !== 200) {
+            // Check if the cURL request itself failed
+            if ($httpCode === 0) {
+                throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    'GitHub API request failed: ' . ($curlError ?: 'Unknown error')
+                );
+            }
+
+            // Include the GitHub API response body
+            $responseData = json_decode($response, true);
+            $errorMessage = 'GitHub API request failed with HTTP code: ' . $httpCode;
+            if (is_array($responseData) && isset($responseData['message'])) {
+                $errorMessage .= ' - ' . $responseData['message'];
+            }
+
+            throw new \OmegaUp\Exceptions\InternalServerErrorException($errorMessage);
+        }
+
+        return ['status' => 'ok', 'message' => 'File deleted successfully'];
+    }
+
+
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();

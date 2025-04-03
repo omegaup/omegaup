@@ -1955,6 +1955,10 @@ export const User = {
     messages.UserDeleteConfirmRequest,
     messages.UserDeleteConfirmResponse
   >('/api/user/deleteConfirm/'),
+  deleteFile: apiCall<
+    messages.UserDeleteFileRequest,
+    messages.UserDeleteFileResponse
+  >('/api/user/deleteFile/'),
   deleteRequest: apiCall<
     messages.UserDeleteRequestRequest,
     messages.UserDeleteRequestResponse
@@ -2080,6 +2084,10 @@ export const User = {
     messages.UserUpdateMainEmailRequest,
     messages.UserUpdateMainEmailResponse
   >('/api/user/updateMainEmail/'),
+  uploadFile: apiCall<
+    messages.UserUploadFileRequest,
+    messages.UserUploadFileResponse
+  >('/api/user/uploadFile/'),
   validateFilter: apiCall<
     messages.UserValidateFilterRequest,
     messages.UserValidateFilterResponse
