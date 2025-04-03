@@ -1,4 +1,3 @@
-// frontend/www/js/omegaup/urlHelper.ts
 import linksConfig from '../../../templates/blog-links-config.json';
 
 export type BlogLinkKey = keyof typeof linksConfig;
