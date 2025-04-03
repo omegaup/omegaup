@@ -87,7 +87,7 @@ CREATE TABLE `Auth_Tokens` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Carousel_Items` (
-  `news_id` int NOT NULL AUTO_INCREMENT,
+  `corousel_item_id` int NOT NULL AUTO_INCREMENT,
   `title` json NOT NULL,
   `excerpt` json NOT NULL,
   `image_url` varchar(255) DEFAULT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `Carousel_Items` (
   `user_id` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`news_id`),
+  PRIMARY KEY (`corousel_item_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `Carousel_Items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar noticias en la plataforma';
