@@ -28,16 +28,21 @@
       <span data-author>
         <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
         <template v-if="clarification.receiver">
-          <span v-html="formatStringWithUsernames(T.clarificationsOnBehalf, {
-            author: {
-              username: clarification.author,
-              classname: clarification.author_classname
-            },
-            receiver: {
-              username: clarification.receiver,
-              classname: clarification.receiver_classname || 'user-rank-unranked'
-            }
-          })"></span>
+          <span
+            v-html="
+              formatStringWithUsernames(T.clarificationsOnBehalf, {
+                author: {
+                  username: clarification.author,
+                  classname: clarification.author_classname,
+                },
+                receiver: {
+                  username: clarification.receiver,
+                  classname:
+                    clarification.receiver_classname || 'user-rank-unranked',
+                },
+              })
+            "
+          ></span>
         </template>
         <template v-else>
           <omegaup-user-username
@@ -178,7 +183,7 @@ export default class ArenaClarification extends Vue {
     params: {
       author: { username: string; classname: string };
       receiver: { username: string; classname: string };
-    }
+    },
   ): string {
     const authorSpan = `<span class="${params.author.classname} font-weight-bold">${params.author.username}</span>`;
     const receiverSpan = `<span class="${params.receiver.classname} font-weight-bold">${params.receiver.username}</span>`;
@@ -224,12 +229,12 @@ export default class ArenaClarification extends Vue {
       problem_alias: this.clarification.problem_alias,
       time: new Date(),
     };
-    
+
     if (this.clarification.receiver && this.clarification.receiver_classname) {
       response.receiver = this.clarification.receiver;
       response.receiver_classname = this.clarification.receiver_classname;
     }
-    
+
     this.showUpdateAnswer = false;
     this.$emit('clarification-response', response);
   }

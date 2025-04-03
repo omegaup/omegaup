@@ -35,9 +35,9 @@ describe('Clarification.vue', () => {
   it('Should handle contest clarification on behalf', async () => {
     const wrapper = shallowMount(arena_Clarification, {
       propsData: {
-        clarification: { 
-          ...clarification, 
-          ...{ 
+        clarification: {
+          ...clarification,
+          ...{
             receiver: 'user',
             receiver_classname: 'user-rank-beginner',
           },
