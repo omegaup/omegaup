@@ -3884,7 +3884,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param string $search_type
-     */ 
+     */
     public static function apiListForTypeahead(\OmegaUp\Request $r) {
         // Authenticate request
         try {
