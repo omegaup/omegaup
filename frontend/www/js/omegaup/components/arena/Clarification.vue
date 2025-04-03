@@ -28,21 +28,21 @@
       <span data-author>
         <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
         <template v-if="clarification.receiver">
-          <span
-            v-html="
-              formatStringWithUsernames(T.clarificationsOnBehalf, {
-                author: {
-                  username: clarification.author,
-                  classname: clarification.author_classname,
-                },
-                receiver: {
-                  username: clarification.receiver,
-                  classname:
-                    clarification.receiver_classname || 'user-rank-unranked',
-                },
-              })
-            "
-          ></span>
+          <span>
+            <span
+              :class="clarification.author_classname"
+              class="font-weight-bold"
+            >
+              {{ clarification.author }}
+            </span>
+            {{ T.clarificationsOnBehalf }}
+            <span
+              :class="clarification.receiver_classname || 'user-rank-unranked'"
+              class="font-weight-bold"
+            >
+              {{ clarification.receiver }}
+            </span>
+          </span>
         </template>
         <template v-else>
           <omegaup-user-username

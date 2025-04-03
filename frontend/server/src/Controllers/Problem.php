@@ -3784,14 +3784,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $require_all_tags
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param null|string $authors
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         $sortOrder = $r->ensureOptionalEnum(
@@ -4829,6 +4833,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $min_visibility
      * @omegaup-request-param int|null $offset
      * @omegaup-request-param bool|null $only_karel
+     * @omegaup-request-param bool|null $only_quality_seal
      * @omegaup-request-param ''|'accepted'|'creation_date'|'difficulty'|'points'|'problem_id'|'quality'|'ratio'|'score'|'submissions'|'title'|null $order_by
      * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
@@ -4837,6 +4842,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param null|string $authors
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r

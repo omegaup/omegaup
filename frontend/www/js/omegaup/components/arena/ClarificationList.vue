@@ -33,6 +33,7 @@
                 :users="users"
                 :problem-alias="problemAlias"
                 :username="username"
+                :current-user-class-name="currentUserClassName"
                 @new-clarification="
                   (contestClarification) =>
                     $emit('new-clarification', contestClarification)
@@ -151,6 +152,7 @@ export default class ArenaClarificationList extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() problemAlias!: null | string;
   @Prop() username!: null | string;
+  @Prop({ default: 'user-rank-unranked' }) currentUserClassName!: string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: false }) allowFilterByAssignment!: boolean;
   @Prop() pageSize!: number;
