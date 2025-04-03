@@ -13,10 +13,12 @@
               highCount: page * length,
             })
       }}
+
       <a :href="SchoolRankingFeatureGuideURL">
         <font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}
       </a>
+
     </h5>
     <table class="table mb-0">
       <thead>

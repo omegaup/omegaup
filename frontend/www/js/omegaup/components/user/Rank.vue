@@ -11,6 +11,7 @@
               highCount: page * length,
             })
       }}
+
       <a :href="UserRankingFeatureGuideURL"
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
