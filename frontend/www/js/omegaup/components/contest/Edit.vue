@@ -154,6 +154,8 @@
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
           :problems="problems"
+          :is-system-admin-or-support="details.isSystemAdminOrSupport"
+          :initial-recommended="details.recommended"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "

@@ -357,6 +357,23 @@
             </p>
           </div>
         </div>
+        <div class="row" v-if="isSystemAdminOrSupport">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestFilterByRecommended }}</label>
+            <div class="checkbox form-check">
+              <input
+                v-model="recommended"
+                data-recommended
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label"> {{ T.wordsEnable }}</label>
+            </div>
+            <p class="help-block">
+              {{ T.arenaPageRecommendedContestsText }}
+            </p>
+          </div>
+        </div>
         <div class="form-group">
           <button class="btn btn-primary introjs-schedule" type="submit">
             {{
@@ -425,6 +442,8 @@ export default class NewForm extends Vue {
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
   @Prop({ default: true }) hasVisitedSection!: boolean;
+  @Prop({ default: false }) isSystemAdminOrSupport!: boolean;
+  @Prop({ default: false }) initialRecommended!: boolean;
 
   T = T;
   ScoreMode = ScoreMode;
@@ -451,6 +470,7 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
+  recommended = this.initialRecommended;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -608,6 +628,7 @@ export default class NewForm extends Vue {
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
+      recommended: this.recommended,
     };
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
