@@ -717,7 +717,6 @@ const translations: { [key: string]: string; } = {
   frontPageFooterOrganization: "Organizaci\u00f3n",
   frontPageFooterPrivacyPolicy: "Pol\u00edticas de privacidad",
   frontPageFooterSite: "Sitio",
-  frontPageFooterSponsors: "Patrocinador",
   frontPageFooterTeam: "Equipo",
   frontPageNextContests: "Pr\u00f3ximos concursos",
   generalError: "Oops. Ocurri\u00f3 un error interno. Por favor int\u00e9ntalo nuevamente.",
