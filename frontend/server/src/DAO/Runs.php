@@ -1200,7 +1200,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the time of the next submission to the current problem
+     * Returns the time of the next submission to the current problem.
+     * The calculation logic for the next submission time is delegated to
+     * `getTimeGap`.
      */
     final public static function nextSubmissionTimestamp(
         ?\OmegaUp\DAO\VO\Contests $contest = null,
@@ -1214,31 +1216,36 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 intval($contest->submissions_gap)
             );
         }
-
-        if (is_null($lastSubmissionTime)) {
-            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
-        }
-
-        return new \OmegaUp\Timestamp(
-            $lastSubmissionTime->time + $submissionGap
-        );
+        return self::getTimeGap($submissionGap, $lastSubmissionTime);
     }
 
     /**
-     * Returns the time of the next execution to the current problem
+     * Returns the time of the next execution to the current problem.
+     * The calculation logic for the next execution time is delegated to
+     * `getTimeGap`.
      */
     final public static function nextExecutionTimestamp(
         ?\OmegaUp\Timestamp $lastExecutionTime = null
     ): \OmegaUp\Timestamp {
-        $executionGap = \OmegaUp\Controllers\Run::$defaultExecutionGap;
+        return self::getTimeGap(
+            \OmegaUp\Controllers\Run::$defaultExecutionGap,
+            $lastExecutionTime
+        );
+    }
 
-        if (is_null($lastExecutionTime)) {
+    /**
+     * Calculates the timestamp for the next activity based on a specified
+     * time gap.
+     */
+    public static function getTimeGap(
+        int $initialGap,
+        ?\OmegaUp\Timestamp $lastActivityTime = null
+    ): \OmegaUp\Timestamp {
+        if (is_null($lastActivityTime)) {
             return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
-        return new \OmegaUp\Timestamp(
-            $lastExecutionTime->time + $executionGap
-        );
+        return new \OmegaUp\Timestamp($lastActivityTime->time + $initialGap);
     }
 
     /**
