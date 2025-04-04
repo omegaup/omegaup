@@ -192,6 +192,7 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/execute/`](#apirunexecute)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -3910,6 +3911,18 @@ Disqualify one or more submissions based on the received parameters:
 | Name   | Type                                    |
 | ------ | --------------------------------------- |
 | `runs` | `{ guid: string; username: string; }[]` |
+
+## `/api/run/execute/`
+
+### Description
+
+Get the next execution timestamp
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
 
 ## `/api/run/getSubmissionFeedback/`
 

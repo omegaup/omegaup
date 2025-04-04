@@ -187,6 +187,8 @@
               :preferred-language="preferredLanguage"
               :last-run="lastRun"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
+              :next-execution-timestamp="nextExecutionTimestamp || new Date()"
+              @execute-run="() => $emit('execute-run')"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -475,6 +477,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
+  @Prop() nextExecutionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
