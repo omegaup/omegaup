@@ -1,5 +1,5 @@
 <template>
-  <span class="pr-1">
+  <span v-if="country && country !== ''" class="pr-1">
     <img height="11" :src="flagUrl" :title="country" width="16" />
   </span>
 </template>
@@ -12,7 +12,7 @@ export default class CountryFlag extends Vue {
   @Prop() country!: string;
 
   get flagUrl(): string {
-    if (this.country == null) return '';
+    if (!this.country || this.country === '') return '';
     return `/media/flags/${this.country.toLowerCase()}.png`;
   }
 }
