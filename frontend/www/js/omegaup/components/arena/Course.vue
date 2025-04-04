@@ -292,6 +292,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop({ default: false }) showRanking!: boolean;
@@ -316,6 +317,7 @@ export default class ArenaCourse extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentExecutionTimestamp = this.nextExecutionTimestamp;
   now = new Date();
   INF = '∞';
 
@@ -455,6 +457,7 @@ export default class ArenaCourse extends Vue {
     }
     this.currentNextSubmissionTimestamp =
       newValue.nextSubmissionTimestamp ?? null;
+    this.currentExecutionTimestamp = newValue.nextExecutionTimestamp ?? null;
   }
 
   @Watch('runDetailsData')
