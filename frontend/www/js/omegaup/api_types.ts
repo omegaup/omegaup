@@ -168,6 +168,13 @@ export namespace types {
               x.creation_date,
             );
             if (
+              typeof x.nextExecutionTimestamp !== 'undefined' &&
+              x.nextExecutionTimestamp !== null
+            )
+              x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextExecutionTimestamp,
+              );
+            if (
               typeof x.nextSubmissionTimestamp !== 'undefined' &&
               x.nextSubmissionTimestamp !== null
             )
@@ -928,6 +935,12 @@ export namespace types {
                   x.creation_date = ((x: number) => new Date(x * 1000))(
                     x.creation_date,
                   );
+                  if (
+                    typeof x.nextExecutionTimestamp !== 'undefined' &&
+                    x.nextExecutionTimestamp !== null
+                  )
+                    x.nextExecutionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextExecutionTimestamp);
                   if (
                     typeof x.nextSubmissionTimestamp !== 'undefined' &&
                     x.nextSubmissionTimestamp !== null
@@ -1799,6 +1812,13 @@ export namespace types {
           })(x.clarifications);
         x.problem = ((x) => {
           if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
+          if (
             typeof x.nextSubmissionTimestamp !== 'undefined' &&
             x.nextSubmissionTimestamp !== null
           )
@@ -1934,6 +1954,13 @@ export namespace types {
           x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
+          if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
           if (
             typeof x.nextSubmissionTimestamp !== 'undefined' &&
             x.nextSubmissionTimestamp !== null
@@ -3967,6 +3994,7 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
     nextSubmissionTimestamp?: Date;
     nominationStatus: types.NominationStatus;
     order: string;
@@ -4094,6 +4122,7 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
     nextSubmissionTimestamp?: Date;
     points: number;
     preferred_language?: string;
@@ -5730,6 +5759,9 @@ export namespace messages {
   export type RunDisqualifyResponse = {
     runs: { guid?: string; username?: string }[];
   };
+  export type RunExecuteRequest = { [key: string]: any };
+  export type _RunExecuteServerResponse = any;
+  export type RunExecuteResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -6533,6 +6565,9 @@ export namespace controllers {
     disqualify: (
       params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
+    execute: (
+      params?: messages.RunExecuteRequest,
+    ) => Promise<messages.RunExecuteResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
