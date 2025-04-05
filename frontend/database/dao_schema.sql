@@ -154,7 +154,6 @@ CREATE TABLE `Coder_Of_The_Month` (
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
   KEY `rank_time_category` (`category`,`ranking`,`time`),
-  KEY `time_category` (`category`,`time`),
   CONSTRAINT `fk_coms_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_cotmi_identity_id` FOREIGN KEY (`selected_by`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_cotmu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
@@ -973,7 +972,6 @@ CREATE TABLE `Schools` (
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
-  KEY `idx_schools_name` (`name`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
@@ -1075,7 +1073,6 @@ CREATE TABLE `Submissions` (
   KEY `fk_s_current_run_id` (`current_run_id`),
   KEY `school_id` (`school_id`),
   KEY `school_id_problem_id` (`school_id`,`problem_id`),
-  KEY `verdict_type_time` (`verdict`,`type`,`time`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1232,7 +1229,6 @@ CREATE TABLE `Users` (
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
   KEY `fk_parent_email_id` (`parent_email_id`),
-  KEY `verification_id` (`verification_id`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
@@ -1247,7 +1243,6 @@ CREATE TABLE `Users_Badges` (
   `assignation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_badge_id`),
   KEY `user_id` (`user_id`),
-  KEY `user_badge` (`badge_alias`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Badges de Usuario';
 /*!40101 SET character_set_client = @saved_cs_client */;
