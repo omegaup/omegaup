@@ -2274,11 +2274,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Generates heatmap data for user activity visualization.
-     * 
-     * @param array $runs The runs data from the database
+     *
+     * @param list<array{date: null|string, runs: int, verdict: string}> $runs The runs data from the database
      * @param \DateTime $today The current date
      * @param int|null $year Optional year to filter data
-     * 
+     *
      * @return list<array{date: string, count: int}> An array of date-count pairs representing user activity
      */
     private static function generateHeatmapData(
@@ -2324,7 +2324,10 @@ class User extends \OmegaUp\Controllers\Controller {
         /** @var list<array{date: string, count: int}> $heatmapResult */
         $heatmapResult = [];
         foreach ($heatmapData as $date => $count) {
-            $heatmapResult[] = ['date' => $date, 'count' => $count];
+            $heatmapResult[] = [
+                'date' => strval($date),
+                'count' => intval($count)
+            ];
         }
 
         return $heatmapResult;

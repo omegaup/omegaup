@@ -5947,7 +5947,7 @@ export namespace messages {
   export type UserStatsRequest = { [key: string]: any };
   export type UserStatsResponse = {
     heatmap: { count: number; date: string }[];
-    runs: types.UserProfileStats[];
+    runs: { date?: string; runs: number; verdict: string }[];
   };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {

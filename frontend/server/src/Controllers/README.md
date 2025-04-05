@@ -5039,10 +5039,10 @@ Get stats
 
 ### Returns
 
-| Name      | Type                                 |
-| --------- | ------------------------------------ |
-| `heatmap` | `{ count: number; date: string; }[]` |
-| `runs`    | `types.UserProfileStats[]`           |
+| Name      | Type                                                 |
+| --------- | ---------------------------------------------------- |
+| `heatmap` | `{ count: number; date: string; }[]`                 |
+| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
 
 ## `/api/user/statusVerified/`
 
