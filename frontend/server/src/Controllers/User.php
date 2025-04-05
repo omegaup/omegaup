@@ -2232,7 +2232,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-    * @return array{runs: list<UserProfileStats>, heatmap: list<array{date: string, count: int}>}
+     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>, heatmap: list<array{date: string, count: int}>}
      *
      * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $year
@@ -2274,12 +2274,12 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Generates heatmap data for user activity visualization.
-     *
+     * 
      * @param array $runs The runs data from the database
      * @param \DateTime $today The current date
      * @param int|null $year Optional year to filter data
-     *
-     * @return array An array of date-count pairs representing user activity
+     * 
+     * @return list<array{date: string, count: int}> An array of date-count pairs representing user activity
      */
     private static function generateHeatmapData(
         array $runs,
@@ -2321,6 +2321,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         // Format for frontend
+        /** @var list<array{date: string, count: int}> $heatmapResult */
         $heatmapResult = [];
         foreach ($heatmapData as $date => $count) {
             $heatmapResult[] = ['date' => $date, 'count' => $count];
