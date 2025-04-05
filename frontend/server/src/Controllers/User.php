@@ -2260,12 +2260,33 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        // Set date range based on year parameter if provided
         $currentTimeStamp = \OmegaUp\Time::get();
         $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
-
-        // If year parameter is provided, set date range to that year
         $year = $r->ensureOptionalInt('year');
+
+        $heatmapResult = self::generateHeatmapData($runs, $today, $year);
+
+        return [
+            'runs' => $runs,
+            'heatmap' => $heatmapResult,
+        ];
+    }
+
+    /**
+     * Generates heatmap data for user activity visualization.
+     *
+     * @param array $runs The runs data from the database
+     * @param \DateTime $today The current date
+     * @param int|null $year Optional year to filter data
+     *
+     * @return array An array of date-count pairs representing user activity
+     */
+    private static function generateHeatmapData(
+        array $runs,
+        \DateTime $today,
+        ?int $year
+    ): array {
+        // Set date range based on year parameter if provided
         if (!is_null($year)) {
             $startDate = new \DateTime("{$year}-01-01");
             $endDate = new \DateTime("{$year}-12-31");
@@ -2305,10 +2326,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $heatmapResult[] = ['date' => $date, 'count' => $count];
         }
 
-        return [
-            'runs' => $runs,
-            'heatmap' => $heatmapResult,
-        ];
+        return $heatmapResult;
     }
 
     /**
