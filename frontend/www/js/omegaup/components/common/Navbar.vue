@@ -262,8 +262,8 @@
                       >
                       <a
                         class="dropdown-item"
-                        href="/arena/?filter=participating"
-                        data-nav-user-contests
+                        href="/arena/?page=1&tab_name=current&sort_order=none&filter=signedup"
+                        data-nav-user-contests-enrolled
                         >{{ T.navContestsEnrolled }}</a
                       >
                       <a
@@ -574,6 +574,15 @@ nav.navbar {
 
 .fullwidth-mobile-fit-lg {
   width: 100%;
+}
+
+.username {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 20vw;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 @media (min-width: 992px) {
