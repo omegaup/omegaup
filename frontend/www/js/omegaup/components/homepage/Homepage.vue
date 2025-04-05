@@ -124,17 +124,6 @@
         :image-src="'/media/homepage/courses_section.svg'"
         :image-to-right="true"
       ></omegaup-section>
-      <omegaup-sponsors
-        :title="T.homepageSponsorsSectionTitle"
-        :logos="[
-          {
-            class: 'img-fluid',
-            src: '/media/homepage/replit_logo.png',
-            alt: 'replitLogo',
-            href: 'https://replit.com/',
-          },
-        ]"
-      ></omegaup-sponsors>
     </div>
     <omegaup-cookie-accept-decline
       @cookie-clicked-accept="cookieClickedAccept"
@@ -156,7 +145,6 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
-import homepage_Sponsors from './Sponsors.vue';
 import homepage_Cookie from './CookieConsent.vue';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expire: -1 });
@@ -170,7 +158,6 @@ Vue.use(VueCookies, { expire: -1 });
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
-    'omegaup-sponsors': homepage_Sponsors,
     'omegaup-cookie-accept-decline': homepage_Cookie,
   },
 })
