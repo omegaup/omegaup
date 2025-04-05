@@ -234,9 +234,7 @@
               :existing-options="searchResultTeamsGroups"
               :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
-              @update-existing-options="
-                (query) => $emit('update-search-result-teams-groups', query)
-              "
+              @update-existing-options="updateTeamsGroups"
             >
             </omegaup-common-typeahead>
             <input
@@ -357,10 +355,10 @@
             </p>
           </div>
         </div>
-        <div class="row" v-if="isSystemAdminOrSupport">
+        <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestFilterByRecommended }}</label>
-            <div class="checkbox form-check">
+            <div v-if="canSetRecommended" class="checkbox form-check">
               <input
                 v-model="recommended"
                 data-recommended
@@ -370,7 +368,7 @@
               <label class="form-check-label"> {{ T.wordsEnable }}</label>
             </div>
             <p class="help-block">
-              {{ T.arenaPageRecommendedContestsText }}
+              {{ canSetRecommended ? T.arenaPageRecommendedContestsTextAdmin : T.arenaPageRecommendedContestsTextNonAdmin }}
             </p>
           </div>
         </div>
@@ -442,7 +440,7 @@ export default class NewForm extends Vue {
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
   @Prop({ default: true }) hasVisitedSection!: boolean;
-  @Prop({ default: false }) isSystemAdminOrSupport!: boolean;
+  @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
   T = T;
@@ -678,6 +676,10 @@ export default class NewForm extends Vue {
 
   onSelect(language: string) {
     this.languages.push(language);
+  }
+
+  updateTeamsGroups(query: string) {
+    this.$emit('update-search-result-teams-groups', query);
   }
 }
 </script>

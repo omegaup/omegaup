@@ -17,7 +17,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       invalidParameterName: null as null | string,
       searchResultTeamsGroups: [] as types.ListItem[],
-      isSystemAdminOrSupport: payload.isSystemAdminOrSupport,
+      canSetRecommended: payload.canSetRecommended,
     }),
     render: function (createElement) {
       return createElement('omegaup-contest-new', {
@@ -30,7 +30,7 @@ OmegaUp.on('ready', () => {
           invalidParameterName: this.invalidParameterName,
           searchResultTeamsGroups: this.searchResultTeamsGroups,
           hasVisitedSection: payload.hasVisitedSection,
-          isSystemAdminOrSupport: this.isSystemAdminOrSupport,
+          canSetRecommended: this.canSetRecommended,
         },
         on: {
           'create-contest': ({

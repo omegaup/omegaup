@@ -1379,8 +1379,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
                     ),
-                    'isSystemAdminOrSupport' => \OmegaUp\Authorization::isSystemAdmin($r->identity) || 
-                        \OmegaUp\Authorization::isSupportTeamMember($r->identity),
+                    'canSetRecommended' => \OmegaUp\Authorization::isSupportTeamMember($r->identity),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestNew'
@@ -1914,6 +1913,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'title',
                     'window_length',
                     'check_plagiarism',
+            //'recommended', // Removed from auto-update as it's handled manually
                 ]);
 
                 $result['original_contest_alias'] = null;
@@ -2142,8 +2142,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
         $result['recommended'] = $contest->recommended;
-        $result['isSystemAdminOrSupport'] = \OmegaUp\Authorization::isSystemAdmin($adminIdentity) || 
-            \OmegaUp\Authorization::isSupportTeamMember($adminIdentity);
+        $result['canSetRecommended'] = \OmegaUp\Authorization::isSupportTeamMember($adminIdentity);
         return $result;
     }
 
@@ -2678,15 +2677,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         
         // Handle recommended flag - only available for admins and support team
-        $recommended = false;
-        if ($r->ensureOptionalBool('recommended') ?? false) {
+        $recommendedValue = false;
+        $recommended = $r->ensureOptionalBool('recommended');
+        if (!is_null($recommended)) {
             if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) && 
                 !\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'userNotAllowed'
                 );
             }
-            $recommended = true;
+            $recommendedValue = $recommended;
         }
         
         $contest = new \OmegaUp\DAO\VO\Contests([
@@ -2709,7 +2709,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
             'check_plagiarism' => $checkPlagiarism ? true : false,
-            'recommended' => $recommended,
+            'recommended' => $recommendedValue,
         ]);
 
         self::createContest(
@@ -4879,14 +4879,20 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $updateRequests = false;
         
         // Handle recommended flag - only available for admins and support team
-        if ($r->ensureOptionalBool('recommended') !== null) {
+        $recommendedValue = false;
+        $recommended = $r->ensureOptionalBool('recommended');
+        if (!is_null($recommended)) {
             if (!\OmegaUp\Authorization::isSystemAdmin($r->identity) && 
                 !\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'userNotAllowed'
                 );
             }
+            $recommendedValue = $recommended;
         }
+        
+        // Set the recommended value on the contest object
+        $contest->recommended = $recommendedValue;
         
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
@@ -4955,7 +4961,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'admission_mode',
             'check_plagiarism',
-            'recommended',
+            //'recommended', // Removed from auto-update as it's handled manually
         ];
         self::updateValueProperties($r, $contest, $valueProperties);
 

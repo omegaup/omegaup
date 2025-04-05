@@ -3019,7 +3019,7 @@ export namespace types {
     title: string;
     window_length?: number;
     recommended?: boolean;
-    isSystemAdminOrSupport?: boolean;
+    canSetRecommended?: boolean;
   }
 
   export interface ContestCertificatesAdminDetails {
@@ -3169,7 +3169,7 @@ export namespace types {
 
   export interface ContestNewPayload {
     hasVisitedSection?: boolean;
-    isSystemAdminOrSupport?: boolean;
+    canSetRecommended?: boolean;
     languages: { [key: string]: string };
   }
 
