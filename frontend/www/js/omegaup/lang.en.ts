@@ -73,6 +73,8 @@ const translations: { [key: string]: string; } = {
   arenaCourseAssignmentWillBeginIn: "This content will begin in %(time)",
   arenaCourseProblemTitle: "%(letter). %(title)",
   arenaPageRecommendedContestsText: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
+  arenaPageRecommendedContestsTextAdmin: "Enable this option if you want your contest to appear in the Recommended Contests list.",
+  arenaPageRecommendedContestsTextNonAdmin: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
   arenaPageTitle: "omegaUp Arena",
   arenaPracticeEndtime: "End time",
   arenaPracticeScoreboardCutoff: "Scoreboard cutoff time",

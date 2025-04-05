@@ -3045,6 +3045,8 @@ export namespace types {
     submissions_gap: number;
     title: string;
     window_length?: number;
+    recommended?: boolean;
+    canSetRecommended?: boolean;
   }
 
   export interface ContestCertificatesAdminDetails {
@@ -3089,6 +3091,7 @@ export namespace types {
     submissions_gap: number;
     title: string;
     window_length?: number;
+    recommended?: boolean;
   }
 
   export interface ContestDetailsPayload {
@@ -3193,6 +3196,7 @@ export namespace types {
 
   export interface ContestNewPayload {
     hasVisitedSection?: boolean;
+    canSetRecommended?: boolean;
     languages: { [key: string]: string };
   }
 
