@@ -609,12 +609,12 @@ nav.navbar {
     text-align: center;
     position: relative;
     max-height: 85vh;
-    overflow-y: auto; 
-    
+    overflow-y: auto;
+
     .navbar-nav {
       align-items: center;
       width: 100%;
-      
+
       .nav-item {
         display: flex;
         justify-content: center;
@@ -628,7 +628,7 @@ nav.navbar {
       width: 100%;
       text-align: center;
       padding: 0.5rem 0;
-      
+
       .dropdown-item {
         text-align: center;
         padding: 0.5rem 1rem;
