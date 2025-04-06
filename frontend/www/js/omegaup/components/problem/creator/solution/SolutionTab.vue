@@ -3,7 +3,11 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-6">
-          <div ref="markdownButtonBar" class="wmd-button-bar"></div>
+          <div
+            ref="markdownButtonBar"
+            class="wmd-button-bar"
+            data-solution-markdown-toolbar
+          ></div>
           <textarea
             ref="markdownInput"
             v-model="currentSolutionMarkdown"
@@ -45,7 +49,13 @@ import * as markdown from '../../../../markdown';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
+import VueCookies from 'vue-cookies';
+
 import omegaup_Markdown from '../../../Markdown.vue';
+
+Vue.use(VueCookies, { expire: -1 });
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -62,6 +72,7 @@ export default class SolutionTab extends Vue {
 
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
+  @Prop() activeTabIndex!: number;
 
   T = T;
   ui = ui;
@@ -81,6 +92,15 @@ export default class SolutionTab extends Vue {
     this.currentSolutionMarkdown = this.currentSolutionMarkdownProp;
   }
 
+  @Watch('activeTabIndex')
+  onActiveTabIndexChanged(newIndex: number) {
+    if (newIndex === 3) {
+      this.$nextTick(() => {
+        this.startIntroGuide();
+      });
+    }
+  }
+
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
       panels: {
@@ -95,6 +115,49 @@ export default class SolutionTab extends Vue {
   updateMarkdown() {
     this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
     this.$emit('show-update-success-message');
+  }
+
+  startIntroGuide() {
+    if (!this.$cookies.get('has-visited-solution-tab')) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title: T.problemCreatorSolutionTabIntroToolbarTitle,
+              intro: T.problemCreatorSolutionTabIntroToolbarIntro,
+              element: document.querySelector(
+                '[data-solution-markdown-toolbar]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroEditorTitle,
+              intro: T.problemCreatorSolutionTabIntroEditorIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-editor-markdown]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroPreviewTitle,
+              intro: T.problemCreatorSolutionTabIntroPreviewIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-previewer-markdown]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroSaveTitle,
+              intro: T.problemCreatorSolutionTabIntroSaveIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-save-markdown]',
+              ) as Element,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-solution-tab', true, -1);
+    }
   }
 }
 </script>

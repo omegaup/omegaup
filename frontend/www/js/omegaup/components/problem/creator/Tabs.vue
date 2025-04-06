@@ -1,7 +1,7 @@
 <template>
-  <b-tabs small>
+  <b-tabs v-model="activeTabIndex" small>
     <b-tab>
-      <template #title>
+      <template #title @click="activeTabIndex = 0">
         <BIconPencil class="mr-1" />
         <span name="writing" data-problem-creator-tab="statement">
           {{ T.problemCreatorStatement }}</span
@@ -9,13 +9,14 @@
       </template>
       <omegaup-problem-creator-statement-tab
         :current-markdown-prop="currentMarkdownProp"
+        :active-tab-index="activeTabIndex"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
       />
     </b-tab>
     <b-tab>
-      <template #title>
+      <template #title @click="activeTabIndex = 1">
         <BIconFileCode class="mr-1" />
         <span name="code" data-problem-creator-tab="code">
           {{ T.problemCreatorCode }}</span
@@ -24,6 +25,7 @@
       <omegaup-problem-creator-code-tab
         :code-prop="codeProp"
         :extension-prop="extensionProp"
+        :active-tab-index="activeTabIndex"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -37,6 +39,7 @@
         >
       </template>
       <omegaup-problem-creator-cases-tab
+        :active-tab-index="activeTabIndex"
         @download-zip-file="
           (zipObject) => $emit('download-zip-file', zipObject)
         "
@@ -54,6 +57,7 @@
       </template>
       <omegaup-problem-creator-solution-tab
         :current-solution-markdown-prop="currentSolutionMarkdownProp"
+        :active-tab-index="activeTabIndex"
         @show-update-success-message="
           () => $emit('show-update-success-message')
         "
@@ -63,28 +67,40 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import problemCreator_CasesTab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
 import problemCreator_CodeTab from './code/CodeTab.vue';
 import problemCreator_SolutionTab from './solution/SolutionTab.vue';
 import T from '../../../lang';
+
 @Component({
   components: {
     'omegaup-problem-creator-statement-tab': problemCreator_StatementTab,
     'omegaup-problem-creator-code-tab': problemCreator_CodeTab,
-    'omegaup-problem-creator-solution-tab': problemCreator_SolutionTab,
     'omegaup-problem-creator-cases-tab': problemCreator_CasesTab,
+    'omegaup-problem-creator-solution-tab': problemCreator_SolutionTab,
   },
 })
 export default class Tabs extends Vue {
   T = T;
+
+  activeTabIndex = 0;
+
+  @Watch('activeTabIndex')
+  onActiveTabIndexChange(newValue: number) {
+    console.log('activeTabIndex', newValue);
+  }
+
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
+
   @Prop({ default: T.problemCreatorEmpty })
   currentMarkdownProp!: string;
+
   @Prop({ default: T.problemCreatorEmpty })
   codeProp!: string;
+
   @Prop({ default: T.problemCreatorEmpty })
   extensionProp!: string;
 }
