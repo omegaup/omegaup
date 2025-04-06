@@ -134,6 +134,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      problemDetails?.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -148,6 +155,7 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       runDetailsData: runDetails,
     }),
     render: function (createElement) {
@@ -174,6 +182,7 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
         },
         on: {

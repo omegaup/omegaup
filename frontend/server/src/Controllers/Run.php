@@ -24,6 +24,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
     /** @var int */
     public static $defaultSubmissionGap = 60; // seconds.
+    /** @var int */
+    public static $defaultExecutionGap = 30; // initial default execution gap.
 
     public const VERDICTS = [
         'AC',
@@ -360,6 +362,21 @@ class Run extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'problemset' => $problemset,
             'problemsetContainer' => $problemsetContainer,
+        ];
+    }
+
+    /**
+     * Get the next execution timestamp
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecute(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
         ];
     }
 
