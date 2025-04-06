@@ -508,6 +508,143 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test the heatmap data with year filtering
+     */
+    public function testStatsWithYearFilter() {
+        // Create a test user and problem
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $login = self::login($identity);
+
+        // Save original time
+        $originalTime = \OmegaUp\Time::get();
+
+        // Create runs with specific dates for different years
+        // First, create a run in 2021
+        $time2021 = strtotime('2021-06-15');
+        {
+            // Set time to 2021
+            \OmegaUp\Time::setTimeForTesting($time2021);
+
+            // Create and grade a run
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
+
+            // Update the run time to ensure it's in 2021
+            \OmegaUp\Test\Factories\Run::updateRunTime(
+                $run['response']['guid'],
+                new \OmegaUp\Timestamp($time2021)
+            );
+        }
+
+        // Create runs in 2022
+        $time2022 = strtotime('2022-04-20');
+        {
+            // Set time to 2022
+            \OmegaUp\Time::setTimeForTesting($time2022);
+
+            // Create and grade the run
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
+
+            // Update the run time
+            \OmegaUp\Test\Factories\Run::updateRunTime(
+                $run['response']['guid'],
+                new \OmegaUp\Timestamp($time2022)
+            );
+        }
+
+        // Create another run in 2022 to verify multiple runs are counted correctly
+        $time2022_2 = strtotime('2022-08-10');
+        {
+            \OmegaUp\Time::setTimeForTesting($time2022_2);
+
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
+
+            \OmegaUp\Test\Factories\Run::updateRunTime(
+                $run['response']['guid'],
+                new \OmegaUp\Timestamp($time2022_2)
+            );
+        }
+
+        // Reset time to original
+        \OmegaUp\Time::setTimeForTesting($originalTime);
+
+        // Test with year filter for 2021
+        $response2021 = \OmegaUp\Controllers\User::apiStats(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'year' => '2021',
+        ]));
+
+        // Check filtering for 2021
+        $found2021InFiltered = false;
+        $found2022InFiltered = false;
+        foreach ($response2021['heatmap'] as $entry) {
+            if (strpos($entry['date'], '2021') === 0 && $entry['count'] > 0) {
+                $found2021InFiltered = true;
+            }
+            if (strpos($entry['date'], '2022') === 0 && $entry['count'] > 0) {
+                $found2022InFiltered = true;
+            }
+        }
+        $this->assertTrue(
+            $found2021InFiltered,
+            'Year 2021 filtered heatmap should contain entries from 2021'
+        );
+        $this->assertFalse(
+            $found2022InFiltered,
+            'Year 2021 filtered heatmap should not contain entries from 2022'
+        );
+
+        // Test with year filter for 2022
+        $response2022 = \OmegaUp\Controllers\User::apiStats(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'year' => '2022',
+        ]));
+
+        // Check filtering for 2022
+        $found2021In2022Filtered = false;
+        $found2022In2022Filtered = false;
+        $count2022 = 0;
+        foreach ($response2022['heatmap'] as $entry) {
+            if (strpos($entry['date'], '2021') === 0 && $entry['count'] > 0) {
+                $found2021In2022Filtered = true;
+            }
+            if (strpos($entry['date'], '2022') === 0 && $entry['count'] > 0) {
+                $found2022In2022Filtered = true;
+                $count2022 += $entry['count'];
+            }
+        }
+        $this->assertFalse(
+            $found2021In2022Filtered,
+            'Year 2022 filtered heatmap should not contain entries from 2021'
+        );
+        $this->assertTrue(
+            $found2022In2022Filtered,
+            'Year 2022 filtered heatmap should contain entries from 2022'
+        );
+        $this->assertEquals(
+            2,
+            $count2022,
+            'Should count exactly 2 submissions in 2022'
+        );
+    }
+
+    /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
      * @return list<array{0: string, 1: string}>
