@@ -47,7 +47,7 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret>
+                <b-dropdown ref="dropdownOrderBy" no-caret data-dropdown-order>
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
@@ -121,7 +121,12 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
+                <b-dropdown
+                  ref="dropdownFilterBy"
+                  class="mr-0"
+                  no-caret
+                  data-dropdown-filter
+                >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
