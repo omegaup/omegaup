@@ -357,7 +357,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-6">
-            <label>{{ T.contestFilterByRecommended }}</label>
+            <label>{{ T.contestNewFormRecommended }}</label>
             <div v-if="canSetRecommended" class="checkbox form-check">
               <input
                 v-model="recommended"
@@ -368,7 +368,7 @@
               <label class="form-check-label"> {{ T.wordsEnable }}</label>
             </div>
             <p class="help-block">
-              {{ canSetRecommended ? T.arenaPageRecommendedContestsTextAdmin : T.arenaPageRecommendedContestsTextNonAdmin }}
+              {{ canSetRecommended ? T.contestNewFormRecommendedTextAdmin : T.contestNewFormRecommendedTextNonAdmin }}
             </p>
           </div>
         </div>

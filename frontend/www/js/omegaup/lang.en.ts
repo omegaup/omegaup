@@ -2091,6 +2091,9 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   zipPrepare: "Prepare zip file",
+  contestNewFormRecommended: "Recommended Contest",
+  contestNewFormRecommendedTextAdmin: "Mark this contest as recommended to highlight it in the contest list. Only system admins and support team members can set this flag.",
+  contestNewFormRecommendedTextNonAdmin: "Recommended contests are highlighted in the contest list. Only system admins and support team members can set this flag.",
 };
 
 export {translations as default};

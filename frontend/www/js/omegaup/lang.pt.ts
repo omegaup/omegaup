@@ -2091,6 +2091,9 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
   zipPrepare: "Preparar arquivo zip",
+  contestNewFormRecommended: "Concurso Recomendado",
+  contestNewFormRecommendedTextAdmin: "Marque este concurso como recomendado para destacá-lo na lista de concursos. Apenas administradores do sistema e membros da equipe de suporte podem definir esta marca.",
+  contestNewFormRecommendedTextNonAdmin: "Os concursos recomendados são destacados na lista de concursos. Apenas administradores do sistema e membros da equipe de suporte podem definir esta marca.",
 };
 
 export {translations as default};
