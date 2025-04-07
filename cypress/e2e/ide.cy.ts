@@ -175,13 +175,13 @@ describe('Test IDE', () => {
       .first()
       .should('be.visible')
       .type(caseOutput);
-    cy.get(`li[title="diff"]`).should('be.visible').click();
+    
+    cy.get('li[title="diff"]').should('be.visible').click();
 
-    cy.get('.editor.original .view-line span span') // lhs is the original text
+    cy.get('.editor.original .view-line span span', { timeout: 10000 })
+      .should('have.length.greaterThan', 0)
       .then(($spans) => {
-        const concatText = Array.from($spans, (span) => span.innerText).join(
-          '\n',
-        );
+        const concatText = Array.from($spans, (span) => span.innerText).join('\n');
         expect(concatText).to.equal(caseOutput);
       });
     cy.logout();

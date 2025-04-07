@@ -212,7 +212,9 @@ describe('Problem creator Test', () => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
           .invoke('text')
           .then((text) => {
-            expect(text.trim().toLowerCase()).to.contain(lineCase.text.toLowerCase());
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
           });
       });
     });
@@ -237,7 +239,9 @@ describe('Problem creator Test', () => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
           .invoke('text')
           .then((text) => {
-            expect(text.trim().toLowerCase()).to.contain(lineCase.text.toLowerCase());
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
           });
       });
     });
@@ -256,7 +260,9 @@ describe('Problem creator Test', () => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
           .invoke('text')
           .then((text) => {
-            expect(text.trim().toLowerCase()).to.contain(lineCase.text.toLowerCase());
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
           });
       });
     });
