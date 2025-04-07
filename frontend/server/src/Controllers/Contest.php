@@ -2677,9 +2677,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
         
         // Handle recommended flag - only available for admins and support team
-        $recommended = $r->ensureOptionalBool('recommended');
         if (
-            !is_null($recommended) &&
+            !is_null($r->ensureOptionalBool('recommended')) &&
             !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
         ) {
@@ -2708,7 +2707,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
             'check_plagiarism' => $checkPlagiarism ? true : false,
-            'recommended' => $recommended,
+            'recommended' => $r->ensureOptionalBool('recommended'),
         ]);
 
         self::createContest(
@@ -2810,8 +2809,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (!empty($r['window_length'])) {
             $r->ensureOptionalInt(
                 'window_length',
-                lowerBound: 0,
-                upperBound: intval(floor($contestLength / 60)),
+                0,
+                intval(floor($contestLength / 60)),
                 required: false
             );
         }
@@ -4878,9 +4877,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $updateRequests = false;
         
         // Handle recommended flag - only available for admins and support team
-        $recommended = $r->ensureOptionalBool('recommended');
         if (
-            !is_null($recommended) &&
+            !is_null($r->ensureOptionalBool('recommended')) &&
             !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
             !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
         ) {
@@ -4890,7 +4888,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         
         // Set the recommended value on the contest object
-        $contest->recommended = $recommended;
+        $contest->recommended = $r->ensureOptionalBool('recommended');
         
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
@@ -5368,6 +5366,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: ScoreboardMergePayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param null|string $contest_alias
      */
     public static function getScoreboardMergeDetailsForTypeScript(
         \OmegaUp\Request $r

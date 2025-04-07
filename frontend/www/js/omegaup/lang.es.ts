@@ -2092,8 +2092,8 @@ const translations: { [key: string]: string; } = {
   wordsYes: "S\u00ed",
   zipPrepare: "Preparar archivo zip",
   contestNewFormRecommended: "Concurso Recomendado",
-  contestNewFormRecommendedTextAdmin: "Marcar este concurso como recomendado para destacarlo en la lista de concursos. Solo los administradores del sistema y miembros del equipo de soporte pueden establecer esta marca.",
-  contestNewFormRecommendedTextNonAdmin: "Los concursos recomendados se destacan en la lista de concursos. Solo los administradores del sistema y miembros del equipo de soporte pueden establecer esta marca.",
+  contestNewFormRecommendedTextAdmin: "Habilita esta opción si deseas que tu concurso aparezca en la lista de Concursos Recomendados.",
+  contestNewFormRecommendedTextNonAdmin: "Para mostrar tu concurso en la lista de Concursos Recomendados, contacta a soporte@omegaup.com.",
 };
 
 export {translations as default};
