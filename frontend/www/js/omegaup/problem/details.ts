@@ -60,6 +60,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (payload.problem.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      payload.problem.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -79,6 +86,7 @@ OmegaUp.on('ready', async () => {
           !payload.nominationStatus?.solved),
       guid,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
@@ -111,6 +119,7 @@ OmegaUp.on('ready', async () => {
           isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           createdGuid: this.createdGuid,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
@@ -452,6 +461,21 @@ OmegaUp.on('ready', async () => {
                 classname: commonPayload.userClassname,
                 problemAlias: payload.problem.alias,
               });
+            })
+            .catch((run) => {
+              submitRunFailed({
+                error: run.error,
+                errorname: run.errorname,
+                run,
+              });
+            });
+          break;
+        case 'executeRun':
+          api.Run.execute()
+            .then(time.remoteTimeAdapter)
+            .then((response) => {
+              problemDetailsView.nextExecutionTimestamp =
+                response.nextExecutionTimestamp;
             })
             .catch((run) => {
               submitRunFailed({
