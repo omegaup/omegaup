@@ -2810,8 +2810,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalInt(
                 'window_length',
                 0,
-                intval(floor($contestLength / 60)),
-                required: false
+                lowerBound: 0,
+                upperBound: intval(floor($contestLength / 60)),
             );
         }
 
