@@ -185,7 +185,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Markdown from '../problem//Markdown.vue';
 import user_Username from '../user/Username.vue';
 
 import T from '../../lang';
