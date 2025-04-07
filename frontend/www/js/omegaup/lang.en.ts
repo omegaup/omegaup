@@ -73,8 +73,6 @@ const translations: { [key: string]: string; } = {
   arenaCourseAssignmentWillBeginIn: "This content will begin in %(time)",
   arenaCourseProblemTitle: "%(letter). %(title)",
   arenaPageRecommendedContestsText: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
-  arenaPageRecommendedContestsTextAdmin: "Enable this option if you want your contest to appear in the Recommended Contests list.",
-  arenaPageRecommendedContestsTextNonAdmin: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
   arenaPageTitle: "omegaUp Arena",
   arenaPracticeEndtime: "End time",
   arenaPracticeScoreboardCutoff: "Scoreboard cutoff time",
@@ -395,6 +393,9 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyTypeDesc: "Indicates how the submission penalty is calculated: minutes since the beginning of the contest, minutes since the problem was opened, or program execution time (milliseconds).",
   contestNewFormPointDecrementFactor: "Score Decrement Factor",
   contestNewFormPointDecrementFactorDesc: "A number between 0 and 1, inclusive. If the number is different from 0, the score awarded for a correct submission will decay as time passes, according to the following formula: (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), where PT is the penalty of the submission in minutes and TT the total length of the contest in minutes.",
+  contestNewFormRecommended: "Recommended Contest",
+  contestNewFormRecommendedTextAdmin: "Enable this option if you want your contest to appear in the Recommended Contests list.",
+  contestNewFormRecommendedTextNonAdmin: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
   contestNewFormScheduleContest: "Schedule contest",
   contestNewFormScheduleVirtualContest: "Schedule virtual contest",
   contestNewFormScoreMode: "Score mode",
@@ -2091,9 +2092,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   zipPrepare: "Prepare zip file",
-  contestNewFormRecommended: "Recommended Contest",
-  contestNewFormRecommendedTextAdmin: "Enable this option if you want your contest to appear in the Recommended Contests list.",
-  contestNewFormRecommendedTextNonAdmin: "To show your contest in the Recommended Contests list, contact soporte@omegaup.com.",
 };
 
 export {translations as default};

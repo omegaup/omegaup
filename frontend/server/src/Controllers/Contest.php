@@ -1379,7 +1379,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
                     ),
-                    'canSetRecommended' => \OmegaUp\Authorization::isSupportTeamMember($r->identity),
+                    'canSetRecommended' => \OmegaUp\Authorization::isSupportTeamMember(
+                        $r->identity
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestNew'
@@ -2141,7 +2143,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
         $result['recommended'] = $contest->recommended;
-        $result['canSetRecommended'] = \OmegaUp\Authorization::isSupportTeamMember($adminIdentity);
+        $result['canSetRecommended'] = \OmegaUp\Authorization::isSupportTeamMember(
+            $adminIdentity
+        );
         return $result;
     }
 
@@ -2674,18 +2678,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ['partial','all_or_nothing','max_per_group'],
         );
         $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
-        
+
         // Handle recommended flag - only available for admins and support team
         $recommendedValue = $r->ensureOptionalBool('recommended');
-        if (
-            !is_null($recommendedValue) &&
-            !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-        
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2706,8 +2701,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'show_scoreboard_after' => $r['show_scoreboard_after'] ?? true,
             'contest_for_teams' => $forTeams,
             'check_plagiarism' => $checkPlagiarism ? true : false,
-            'recommended' => $recommendedValue,
         ]);
+
+        if (
+            !is_null($recommendedValue) &&
+            \OmegaUp\Authorization::isSupportTeamMember($r->identity)
+        ) {
+            $contest->recommended = $recommendedValue;
+        }
 
         self::createContest(
             $problemset,
@@ -2740,7 +2741,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
@@ -2964,7 +2964,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
@@ -3003,7 +3002,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
@@ -4813,6 +4811,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
@@ -4874,21 +4873,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $updateProblemset = true;
         $updateRequests = false;
-        
+
         // Handle recommended flag - only available for admins and support team
         $recommendedValue = $r->ensureOptionalBool('recommended');
         if (
             !is_null($recommendedValue) &&
-            !\OmegaUp\Authorization::isSupportTeamMember($r->identity)
+            \OmegaUp\Authorization::isSupportTeamMember($r->identity)
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
+            $contest->recommended = $recommendedValue;
         }
-        
-        // Set the recommended value on the contest object
-        $contest->recommended = $recommendedValue;
-        
+
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             \OmegaUp\Validators::validateOptionalInEnum(

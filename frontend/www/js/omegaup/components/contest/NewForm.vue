@@ -368,7 +368,11 @@
               <label class="form-check-label"> {{ T.wordsEnable }}</label>
             </div>
             <p class="help-block">
-              {{ canSetRecommended ? T.contestNewFormRecommendedTextAdmin : T.contestNewFormRecommendedTextNonAdmin }}
+              {{
+                canSetRecommended
+                  ? T.contestNewFormRecommendedTextAdmin
+                  : T.contestNewFormRecommendedTextNonAdmin
+              }}
             </p>
           </div>
         </div>

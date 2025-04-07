@@ -73,8 +73,6 @@ const translations: { [key: string]: string; } = {
   arenaCourseAssignmentWillBeginIn: "Este contenido iniciar\u00e1 en %(time)",
   arenaCourseProblemTitle: "%(letter). %(title)",
   arenaPageRecommendedContestsText: "Para mostrar tu concurso en la lista de Concursos Recomendados, contacta a soporte@omegaup.com.",
-  arenaPageRecommendedContestsTextAdmin: "Habilita esta opción si deseas que tu concurso aparezca en la lista de Concursos Recomendados.",
-  arenaPageRecommendedContestsTextNonAdmin: "Para mostrar tu concurso en la lista de Concursos Recomendados, contacta a soporte@omegaup.com.",
   arenaPageTitle: "omegaUp Arena",
   arenaPracticeEndtime: "Hora de fin",
   arenaPracticeScoreboardCutoff: "Fin de actualizaci\u00f3n del scoreboard",
@@ -395,6 +393,9 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyTypeDesc: "Indica c\u00f3mo se calcula la penalizaci\u00f3n por env\u00edo: tiempo desde que inicia el concurso, tiempo desde que se abre el problema, o tiempo de ejecuci\u00f3n del programa.",
   contestNewFormPointDecrementFactor: "Factor de decremento de puntos",
   contestNewFormPointDecrementFactorDesc: "Un n\u00famero entre 0 y 1 inclusive. Si este n\u00famero es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estar\u00e1 dado por (1 - points_decay_factor) + points_decay_factor * TT^2 / (10 * PT^2 + TT^2), donde PT es el penalty en minutos del env\u00edo y TT el tiempo total del concurso, en minutos.",
+  contestNewFormRecommended: "Concurso recomendado",
+  contestNewFormRecommendedTextAdmin: "Habilita esta opci\u00f3n si deseas que tu concurso aparezca en la lista de Concursos Recomendados.",
+  contestNewFormRecommendedTextNonAdmin: "Para mostrar tu concurso en la lista de Concursos Recomendados, contacta a soporte@omegaup.com.",
   contestNewFormScheduleContest: "Agendar concurso",
   contestNewFormScheduleVirtualContest: "Agendar concurso virtual",
   contestNewFormScoreMode: "Modo de puntaje",
@@ -2091,9 +2092,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
   zipPrepare: "Preparar archivo zip",
-  contestNewFormRecommended: "Concurso Recomendado",
-  contestNewFormRecommendedTextAdmin: "Habilita esta opción si deseas que tu concurso aparezca en la lista de Concursos Recomendados.",
-  contestNewFormRecommendedTextNonAdmin: "Para mostrar tu concurso en la lista de Concursos Recomendados, contacta a soporte@omegaup.com.",
 };
 
 export {translations as default};

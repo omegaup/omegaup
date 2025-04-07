@@ -73,8 +73,6 @@ const translations: { [key: string]: string; } = {
   arenaCourseAssignmentWillBeginIn: "Este conte\u00fado inciar\u00e1 em %(time)",
   arenaCourseProblemTitle: "%(letter). %(title)",
   arenaPageRecommendedContestsText: "Para mostrar seus concursos na lista de Concursos Recomendados, entre em contato soporte@omegaup.com.",
-  arenaPageRecommendedContestsTextAdmin: "Habilite esta opção se você quiser que seu concurso apareça na lista de Concursos Recomendados.",
-  arenaPageRecommendedContestsTextNonAdmin: "Para mostrar seus concursos na lista de Concursos Recomendados, entre em contato soporte@omegaup.com.",
   arenaPageTitle: "omegaUp Arena",
   arenaPracticeEndtime: "Tempo Final",
   arenaPracticeScoreboardCutoff: "Tempo de corte do painel de avalia\u00e7\u00e3o",
@@ -395,6 +393,9 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyTypeDesc: "Ele indica como penalidade frete \u00e9 calculado: tempo desde que a concurso come\u00e7ou, o tempo j\u00e1 que o problema \u00e9 aberto, ou tempo de execu\u00e7\u00e3o do programa.",
   contestNewFormPointDecrementFactor: "Fator de decrescimiento de pontua\u00e7\u00e3o",
   contestNewFormPointDecrementFactorDesc: "Un n\u00famero entre 0 e 1 inclusive. Si este n\u00famero \u00e9 deferente de zero, a pontua\u00e7\u00e3o que se obtem ao resolver corretamente um problema descresce conforme passa o tiempo. O valor da pontua\u00e7\u00e3o estar\u00e1 dado por (1 - points_decay_factor) + points_decay_factor * TT ^ 2 / (10 * PT ^ 2 + TT ^ 2), onde PT \u00e9 a penalidade em minutos do env\u00edo e TT o tempo total do concurso, en minutos.",
+  contestNewFormRecommended: "Concurso recomendado",
+  contestNewFormRecommendedTextAdmin: "Ative esta op\u00e7\u00e3o se voc\u00ea deseja que seu concurso apare\u00e7a na lista de Concursos Recomendados.",
+  contestNewFormRecommendedTextNonAdmin: "Para mostrar seu concurso na lista de Concursos Recomendados, entre em contato com soporte@omegaup.com.",
   contestNewFormScheduleContest: "Agendar concurso",
   contestNewFormScheduleVirtualContest: "Agendar concurso virtual",
   contestNewFormScoreMode: "Modo de pontua\u00e7\u00e3o",
@@ -2091,9 +2092,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
   zipPrepare: "Preparar arquivo zip",
-  contestNewFormRecommended: "Concurso Recomendado",
-  contestNewFormRecommendedTextAdmin: "Habilite esta opção se você quiser que seu concurso apareça na lista de Concursos Recomendados.",
-  contestNewFormRecommendedTextNonAdmin: "Para mostrar seus concursos na lista de Concursos Recomendados, entre em contato soporte@omegaup.com.",
 };
 
 export {translations as default};
