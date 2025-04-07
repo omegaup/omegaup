@@ -72,7 +72,7 @@ OmegaUp.on('ready', () => {
     }
     if (urlParams.get('filter')) {
       const filterParam = urlParams.get('filter');
-      if (filterParam === 'participating') {
+      if (filterParam === 'signedup') {
         filter = ContestFilter.SignedUp;
       } else if (filterParam === 'recommended') {
         filter = ContestFilter.OnlyRecommended;
