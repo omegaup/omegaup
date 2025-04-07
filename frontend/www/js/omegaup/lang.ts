@@ -3,7 +3,7 @@ import * as lang_es from './lang.es';
 import * as lang_pt from './lang.pt';
 import * as lang_pseudo from './lang.pseudo';
 
-const T = (function() {
+const T = (function () {
   const head =
     (document && document.querySelector && document.querySelector('head')) ||
     null;
