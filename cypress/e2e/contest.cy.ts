@@ -324,9 +324,7 @@ describe('Contest Test', () => {
         const newContestAlias = contestOptions.contestAlias + '/practice';
         contestOptions.contestAlias = newContestAlias;
         // Wait for the practice mode page to fully load before creating runs
-        cy.waitUntil(() => 
-          cy.url().should('include', newContestAlias)
-        );
+        cy.waitUntil(() => cy.url().should('include', newContestAlias));
         // Add additional wait for the page to be fully interactive
         cy.wait(1000);
         cy.createRunsInsideContest(contestOptions);
