@@ -128,11 +128,10 @@
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
           {
-            class: 'img-fluid',
+            class: 'img-fluid mx-auto d-block my-4',
             src: '/media/homepage/airbnb_logo.svg',
             alt: 'airbnbLogo',
-            href: 'https://airbnb.com/',
-            style: 'width: 280px; height: auto; display: block; margin: 20px auto;'
+            href: 'https://airbnb.com/'
           },
         ]"
       ></omegaup-sponsors>
