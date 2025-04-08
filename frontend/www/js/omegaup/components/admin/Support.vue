@@ -4,7 +4,9 @@
       <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
         <span v-if="username != null">- {{ username }} ({{ email }})</span>
-        <span v-if="contestAlias != null && contestTitle != null">- {{ contestTitle }} ({{ contestAlias }})</span>
+        <span v-if="contestAlias != null && contestTitle != null"
+          >- {{ contestTitle }} ({{ contestAlias }})</span
+        >
       </div>
     </div>
     <div class="card-body">
@@ -85,14 +87,13 @@
           <div class="col-md-12">
             <h4>{{ T.supportOptions }}</h4>
             <div class="form-check">
-              <input
-                v-model="isContestRecommended"
-                class="form-check-input"
-                type="checkbox"
-                id="recommendedCheckbox"
-                @change="onToggleRecommended"
-              />
-              <label class="form-check-label" for="recommendedCheckbox">
+              <label class="form-check-label">
+                <input
+                  v-model="isContestRecommended"
+                  class="form-check-input"
+                  type="checkbox"
+                  @change="onToggleRecommended"
+                />
                 {{ T.supportSetAsRecommended }}
               </label>
             </div>

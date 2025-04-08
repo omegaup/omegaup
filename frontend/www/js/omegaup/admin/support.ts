@@ -130,7 +130,7 @@ OmegaUp.on('ready', () => {
             adminSupport.contestFound = false;
             adminSupport.contestTitle = null;
             adminSupport.isContestRecommended = false;
-            
+
             api.Contest.details({ contest_alias: contestAlias })
               .then((data) => {
                 adminSupport.contestAlias = contestAlias;
@@ -149,7 +149,7 @@ OmegaUp.on('ready', () => {
                 ui.success(
                   isNowRecommended
                     ? T.supportContestSetAsRecommended
-                    : T.supportContestRemovedFromRecommended
+                    : T.supportContestRemovedFromRecommended,
                 );
               })
               .catch(ui.apiError);
