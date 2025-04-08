@@ -13,6 +13,12 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [CarouselItems](#carouselitems)
+  - [`/api/carouselItems/create/`](#apicarouselitemscreate)
+  - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
+  - [`/api/carouselItems/list/`](#apicarouselitemslist)
+  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
+  - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
@@ -490,6 +496,95 @@ Returns a list of badges owned by a certain user
 | Name     | Type            |
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
+
+# CarouselItems
+
+CarouselItemController
+
+## `/api/carouselItems/create/`
+
+### Description
+
+Create a new Carousel Item
+
+### Parameters
+
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `buttonTitle`     | `string`       |             |
+| `excerpt`         | `string`       |             |
+| `image_url`       | `string`       |             |
+| `link`            | `string`       |             |
+| `status`          | `bool`         |             |
+| `title`           | `string`       |             |
+| `expiration_date` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/delete/`
+
+### Description
+
+Delete a Carousel Item
+
+### Parameters
+
+| Name               | Type  | Description |
+| ------------------ | ----- | ----------- |
+| `carousel_item_id` | `int` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/list/`
+
+### Description
+
+List all Carousel Items (admin only)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/listActive/`
+
+### Description
+
+List all status Carousel Items (homepage)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/update/`
+
+### Description
+
+Update a Carousel Item
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `buttonTitle`      | `string`       |             |
+| `carousel_item_id` | `int`          |             |
+| `excerpt`          | `string`       |             |
+| `image_url`        | `string`       |             |
+| `link`             | `string`       |             |
+| `status`           | `bool`         |             |
+| `title`            | `string`       |             |
+| `expiration_date`  | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Certificate
 

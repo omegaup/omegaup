@@ -8,7 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CarouselItem=array{carousel_item_id: int, title: string,excerpt: string,image_url: string,link: string,button_title: string,expiration_date: \OmegaUp\Timestamp|null,status: bool}
  * @psalm-type CarouselItemListPayload=array{carouselItems: list<CarouselItem>}
  */
-class CarouselItem extends \OmegaUp\Controllers\Controller {
+class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new Carousel Item
      *
@@ -52,9 +52,13 @@ class CarouselItem extends \OmegaUp\Controllers\Controller {
         self::validateAdmin($r);
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
-        $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK($carouselItemId);
+        $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
+            $carouselItemId
+        );
         if (is_null($carouselItem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('carouselItemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'carouselItemNotFound'
+            );
         }
 
         \OmegaUp\DAO\Base\CarouselItems::delete($carouselItem);
@@ -83,7 +87,9 @@ class CarouselItem extends \OmegaUp\Controllers\Controller {
             $r->ensureInt('carousel_item_id')
         );
         if (is_null($carouselItem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('carouselItemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'carouselItemNotFound'
+            );
         }
 
         $carouselItem->title = $r->ensureString('title');
@@ -91,7 +97,9 @@ class CarouselItem extends \OmegaUp\Controllers\Controller {
         $carouselItem->image_url = $r->ensureString('image_url');
         $carouselItem->link = $r->ensureString('link');
         $carouselItem->button_title = $r->ensureString('buttonTitle');
-        $carouselItem->expiration_date = $r->ensureOptionalString('expiration_date');
+        $carouselItem->expiration_date = $r->ensureOptionalString(
+            'expiration_date'
+        );
         $carouselItem->status = $r->ensureBool('status');
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
@@ -132,7 +140,6 @@ class CarouselItem extends \OmegaUp\Controllers\Controller {
             'carouselItems' => array_values($activeItems),
         ];
     }
-
 
     /**
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
