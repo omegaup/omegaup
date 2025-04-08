@@ -1656,7 +1656,11 @@ submitFeedbackPlaceholder = "Insira seus comentários (opcional)"
 submitFeedbackRequireConfirmation = "Enviar comentários"
 submitFeedbackSubmit = "Enviar"
 supportAssignUserRoles = "Atribuir funções"
+supportContestSetAsRecommended = "O concurso foi definido como recomendado"
 supportNewSearch = "Nova pesquisa"
+supportOptions = "Opções"
+supportSetAsRecommended = "Definir como recomendado"
+supportTypeContestAlias = "Digite o alias do concurso"
 supportTypeEmailOrUsername = "Digite o e-mail ou nome de usuário"
 systemInMaintainance = "O sistema de Coder do Mês está em manutenção.\n\nVoltaremos em breve."
 tagAdded = "Tag adicionado com sucesso!"
@@ -2087,8 +2091,4 @@ wordsWallTimeInSeconds = "Tempo-real (Seg)"
 wordsWarningProblem = "Mantener com um aviso"
 wordsYes = "Sim"
 zipPrepare = "Preparar arquivo zip"
-supportTypeContestAlias: "Digite o alias do concurso",
-supportOptions: "Opções",
-supportSetAsRecommended: "Definir como recomendado",
-supportContestSetAsRecommended: "O concurso foi definido como recomendado",
-supportContestRemovedFromRecommended: "O concurso foi removido dos recomendados",
+supportContestRemovedFromRecommended = "O concurso foi removido dos recomendados"
