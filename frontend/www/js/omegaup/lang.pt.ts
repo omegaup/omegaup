@@ -2089,11 +2089,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
   zipPrepare: "Preparar arquivo zip",
-  supportTypeContestAlias: "Digite o alias do concurso",
-  supportOptions: "Opções",
-  supportSetAsRecommended: "Definir como recomendado",
-  supportContestSetAsRecommended: "O concurso foi definido como recomendado",
-  supportContestRemovedFromRecommended: "O concurso foi removido dos recomendados",
 };
 
 export {translations as default};
