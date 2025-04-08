@@ -1,9 +1,9 @@
 <template>
   <div class="row p-4 text-center justify-content-around align-items-center">
     <h3 class="col-12 mb-3 display-4">{{ title }}</h3>
-    <div v-for="logo in logos" :key="logo.href" class="p-3 mt-2 mt-md-0">
+    <div v-for="logo in logos" :key="logo.href" class="p-3 mt-2 mt-md-0 sponsor-logo-container">
       <a :href="logo.href" target="_blank">
-        <img :class="logo.class" :src="logo.src" :alt="logo.alt" />
+        <img :class="logo.class" :src="logo.src" :alt="logo.alt" :style="logo.style || ''" />
       </a>
     </div>
   </div>
@@ -20,6 +20,7 @@ export default class Sponsors extends Vue {
     alt: string;
     href: string;
     class: string;
+    style?: string;
   }[];
 }
 </script>
@@ -34,7 +35,13 @@ h3.display-4 {
   margin-top: 1.88em;
 }
 img.img-fluid {
-  max-width: 200px;
-  margin: -0.2rem !important;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.sponsor-logo-container {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -129,9 +129,10 @@
         :logos="[
           {
             class: 'img-fluid',
-            src: '/media/homepage/replit_logo.png',
-            alt: 'replitLogo',
-            href: 'https://replit.com/',
+            src: '/media/homepage/airbnb_logo.svg',
+            alt: 'airbnbLogo',
+            href: 'https://airbnb.com/',
+            style: 'width: 280px; height: auto; display: block; margin: 20px auto;'
           },
         ]"
       ></omegaup-sponsors>
