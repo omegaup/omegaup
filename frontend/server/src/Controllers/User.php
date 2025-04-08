@@ -5059,49 +5059,6 @@ class User extends \OmegaUp\Controllers\Controller {
         return ['status' => 'ok', 'message' => 'File uploaded successfully'];
     }
 
-    // /**
-    //  * Delete a file from the GitHub repository.
-    //  *
-    //  * @omegaup-request-param string $filename
-    //  *
-    //  * @return array{status: string, message: string}
-    //  */
-    // public static function apiDeleteFile(\OmegaUp\Request $r): array {
-    //     $fileName = $r->ensureString('filename');
-    //     $url = "https://api.github.com/repos/iqbalcodes6602/omegaup/contents/frontend/www/docs/{$fileName}";
-
-    //     $data = json_encode([
-    //         'message' => 'Delete file via API'
-    //     ]);
-
-    //     $curl = curl_init($url);
-    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
-    //     curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-    //     curl_setopt($curl, CURLOPT_HTTPHEADER, [
-    //         'Authorization: token ' . GITUB_TOKEN,
-    //         'Content-Type: application/json',
-    //         'Accept: application/vnd.github+json',
-    //         'User-Agent: OmegaUp'
-    //     ]);
-
-    //     curl_exec($curl);
-    //     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    //     curl_close($curl);
-
-    //     if ($httpCode !== 200) {
-    //         throw new \OmegaUp\Exceptions\ApiException(
-    //             'GitHub API request failed',
-    //             'HTTP/1.1 500 Internal Server Error',
-    //             $httpCode
-    //         );
-    //     }
-
-    //     return ['status' => 'ok', 'message' => 'File deleted successfully'];
-    // }
-
-
-
     /**
      * Delete a file from the GitHub repository.
      *
@@ -5129,8 +5086,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if ($httpCode !== 200) {
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                'Failed to retrieve file SHA from GitHub. HTTP code: ' . $httpCode . 
-                ' - Error: ' . ($curlError ?: 'No error message') . 
+                'Failed to retrieve file SHA from GitHub. HTTP code: ' . $httpCode .
+                ' - Error: ' . ($curlError ?: 'No error message') .
                 ' - Response: ' . $response
             );
         }
@@ -5152,7 +5109,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Authorization: token ' . GITUB_TOKEN,
@@ -5181,13 +5138,13 @@ class User extends \OmegaUp\Controllers\Controller {
                 $errorMessage .= ' - ' . $responseData['message'];
             }
 
-            throw new \OmegaUp\Exceptions\InternalServerErrorException($errorMessage);
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                $errorMessage
+            );
         }
 
         return ['status' => 'ok', 'message' => 'File deleted successfully'];
     }
-
-
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();

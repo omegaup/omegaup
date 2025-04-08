@@ -444,7 +444,7 @@
               "
               @click="openCollapsedIfRequired()"
             >
-              {{ buttonText }} test 99
+              {{ buttonText }}
             </button>
           </div>
         </div>
