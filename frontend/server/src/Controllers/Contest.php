@@ -1901,6 +1901,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'penalty_type',
                     'points_decay_factor',
                     'problemset_id',
+                    'recommended',
                     'rerun_id',
                     'scoreboard',
                     'scoreboard_url',
