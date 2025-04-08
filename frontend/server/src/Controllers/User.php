@@ -2230,11 +2230,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param null|string $username
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<UserProfileStats>}
+     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>, heatmap: list<array{date: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     * @omegaup-request-param null|string $year
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2255,11 +2256,81 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $runs = \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+            $identity->identity_id
+        );
+
+        $currentTimeStamp = \OmegaUp\Time::get();
+        $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
+        $year = $r->ensureOptionalInt('year');
+
+        $heatmapResult = self::generateHeatmapData($runs, $today, $year);
+
         return [
-            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                $identity->identity_id
-            ),
+            'runs' => $runs,
+            'heatmap' => $heatmapResult,
         ];
+    }
+
+    /**
+     * Generates heatmap data for user activity visualization.
+     *
+     * @param list<array{date: null|string, runs: int, verdict: string}> $runs The runs data from the database
+     * @param \DateTime $today The current date
+     * @param int|null $year Optional year to filter data
+     *
+     * @return list<array{date: string, count: int}> An array of date-count pairs representing user activity
+     */
+    private static function generateHeatmapData(
+        array $runs,
+        \DateTime $today,
+        ?int $year
+    ): array {
+        // Set date range based on year parameter if provided
+        if (!is_null($year)) {
+            $startDate = new \DateTime("{$year}-01-01");
+            $endDate = new \DateTime("{$year}-12-31");
+
+            // If the year is the current year, use today as the end date
+            if ($year === intval($today->format('Y'))) {
+                $endDate = $today;
+            }
+        } else {
+            // Otherwise use the default last 365 days
+            $startDate = (clone $today)->sub(new \DateInterval('P1Y'));
+            $endDate = $today;
+        }
+
+        // Initialize all dates with zero count
+        $heatmapData = [];
+        $currentDate = clone $startDate;
+        while ($currentDate <= $endDate) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $heatmapData[$dateStr] = 0;
+            $currentDate->add(new \DateInterval('P1D'));
+        }
+
+        // Fill in actual run counts for submissions
+        foreach ($runs as $run) {
+            if (!is_null($run['date'])) {
+                $runDate = new \DateTime($run['date']);
+                if ($runDate >= $startDate && $runDate <= $endDate) {
+                    $heatmapData[$run['date']] += $run['runs'];
+                }
+            }
+        }
+
+        // Format for frontend
+        /** @var list<array{date: string, count: int}> $heatmapResult */
+        $heatmapResult = [];
+        foreach ($heatmapData as $date => $count) {
+            $heatmapResult[] = [
+                'date' => strval($date),
+                'count' => intval($count)
+            ];
+        }
+
+        return $heatmapResult;
     }
 
     /**
