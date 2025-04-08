@@ -1,5 +1,5 @@
 WITH DailySubmissions AS (
-    SELECT 
+    SELECT
         i.user_id,
         DATE(r.time) AS submission_date
     FROM Runs AS r
@@ -8,17 +8,17 @@ WITH DailySubmissions AS (
     GROUP BY i.user_id, DATE(r.time)
 ),
 ConsecutiveStreaks AS (
-    SELECT 
+    SELECT
         ds.user_id,
         ds.submission_date,
-        DENSE_RANK() OVER (PARTITION BY ds.user_id ORDER BY ds.submission_date) AS rank
+        DENSE_RANK() OVER (PARTITION BY ds.user_id ORDER BY ds.submission_date) AS d_rank
     FROM DailySubmissions ds
 ),
 GroupedStreaks AS (
-    SELECT 
+    SELECT
         user_id,
         submission_date,
-        submission_date - INTERVAL rank DAY AS streak_group
+        submission_date - INTERVAL d_rank DAY AS streak_group
     FROM ConsecutiveStreaks
 )
 SELECT DISTINCT user_id
