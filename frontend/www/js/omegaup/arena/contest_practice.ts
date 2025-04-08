@@ -62,6 +62,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      problemDetails?.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
@@ -74,6 +81,7 @@ OmegaUp.on('ready', async () => {
       guid,
       problemAlias,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -95,6 +103,7 @@ OmegaUp.on('ready', async () => {
           problemAlias: this.problemAlias,
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
