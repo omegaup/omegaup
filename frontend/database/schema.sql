@@ -86,6 +86,25 @@ CREATE TABLE `Auth_Tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Carousel_Items` (
+  `corousel_item_id` int NOT NULL AUTO_INCREMENT,
+  `title` json NOT NULL,
+  `excerpt` json NOT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `button_title` json DEFAULT NULL,
+  `expiration_date` datetime DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `user_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`corousel_item_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `Carousel_Items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar noticias en la plataforma';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Certificates` (
   `certificate_id` int NOT NULL AUTO_INCREMENT,
   `identity_id` int NOT NULL,
@@ -973,6 +992,7 @@ CREATE TABLE `Schools` (
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
+  KEY `idx_schools_name` (`name`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';

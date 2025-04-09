@@ -13,7 +13,8 @@
               highCount: page * length,
             })
       }}
-      <a href="https://blog.omegaup.com/ranking-de-escuelas-en-omegaup/"
+      <a
+        href="https://blog.omegaup.com/features/ranking-de-escuelas-en-omegaup/"
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
