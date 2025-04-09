@@ -44,7 +44,7 @@ import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
 import * as ui from '../../../../ui';
 
-import omegaup_Markdown from '../../../Markdown.vue';
+import omegaup_Markdown from '../../../problem/Markdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,

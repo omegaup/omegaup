@@ -213,8 +213,12 @@
             "
             @new-submission="onNewSubmission"
           >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
+            <template #title>
+              <div></div>
+            </template>
+            <template #runs>
+              <div></div>
+            </template>
           </omegaup-arena-runs>
           <omegaup-arena-runs-for-courses
             v-else
@@ -237,8 +241,12 @@
             "
             @new-submission="onNewSubmission"
           >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
+            <template #title>
+              <div></div>
+            </template>
+            <template #runs>
+              <div></div>
+            </template>
           </omegaup-arena-runs-for-courses>
         </template>
         <omegaup-problem-feedback
@@ -286,8 +294,12 @@
             (request) => $emit('update-search-result-users', request)
           "
         >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
+          <template #title>
+            <div></div>
+          </template>
+          <template #runs>
+            <div></div>
+          </template>
         </omegaup-arena-runs>
         <omegaup-arena-runs-for-courses
           v-else
@@ -318,8 +330,12 @@
             (request) => $emit('update-search-result-users', request)
           "
         >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
+          <template #title>
+            <div></div>
+          </template>
+          <template #runs>
+            <div></div>
+          </template>
         </omegaup-arena-runs-for-courses>
         <omegaup-overlay
           v-if="user.loggedIn"
@@ -345,7 +361,9 @@
           :is-admin="true"
           @clarification-response="onClarificationResponse"
         >
-          <template #new-clarification><div></div></template>
+          <template #new-clarification>
+            <div></div>
+          </template>
         </omegaup-arena-clarification-list>
       </div>
       <div
@@ -385,7 +403,7 @@ import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Markdown from './Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
 

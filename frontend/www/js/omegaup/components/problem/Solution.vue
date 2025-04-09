@@ -27,7 +27,6 @@
           }),
         "
       ></omegaup-markdown>
-
       <div class="text-center mt-5">
         <button
           v-if="status === 'unlocked'"
@@ -74,7 +73,7 @@ library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Markdown from './Markdown.vue';
 
 @Component({
   components: {

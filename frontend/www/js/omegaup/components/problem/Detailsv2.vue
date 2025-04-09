@@ -96,8 +96,12 @@
                 })
             "
           >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
+            <template #title>
+              <div></div>
+            </template>
+            <template #runs>
+              <div></div>
+            </template>
           </omegaup-arena-runs-v2>
         </template>
       </b-tab>
@@ -113,8 +117,12 @@
           :show-user="true"
           :problemset-problems="[]"
         >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
+          <template #title>
+            <div></div>
+          </template>
+          <template #runs>
+            <div></div>
+          </template>
         </omegaup-arena-runs>
       </b-tab>
       <b-tab :title="T.wordsClarifications">a</b-tab>
@@ -134,7 +142,7 @@ import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_Runsv2 from '../arena/Runsv2.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Markdown from './Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import user_Username from '../user/Username.vue';
 
