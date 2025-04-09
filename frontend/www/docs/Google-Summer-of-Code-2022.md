@@ -192,7 +192,7 @@ At this step we hope you are familiar with our development environment and code 
 We will only consider candidates that completed all 3 phases of the application.
 
 # Communications
-## If you have questions about the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Quiero-desarrollar-en-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
+## If you have questions about the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
 
 **Our main communication medium with GSoC candidates is our [Discord channel](https://discord.gg/aj8r5M5W). We invited you to join!**
 

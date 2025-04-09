@@ -571,7 +571,7 @@ export default class ProblemForm extends Vue {
   }
 
   get howToWriteProblemLink(): string {
-    return 'https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-escribir-problemas-para-Omegaup.md';
+    return 'https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Cómo-escribir-problemas-para-omegaUp.md';
   }
 
   get buttonText(): string {
