@@ -95,15 +95,15 @@ These are the directories that we are actively using in the development:
 * [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Smarty templates used to generate the HTML that is displayed to users. Also here are the internationalization files for English, Spanish and Portuguese.
 * [frontend/www](https://github.com/omegaup/omegaup/tree/master/frontend/www): The complete contents of the Internet page.
 
-For more details, see [here](https://github.com/omegaup/omegaup/wiki/Frontend).
+For more details, see [here](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Frontend.md).
 
 ## How To Update Your Copy of omegaUp
 
-Before you start making changes to the code, you should update the code to its latest version, that can be done by following [these steps](https://github.com/omegaup/omegaup/wiki/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes).
+Before you start making changes to the code, you should update the code to its latest version, that can be done by following [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md).
 
 ## How To Make Changes To The Code
 
-When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/wiki/How-to-Make-a-Pull-Request-(English)).
+When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md).
 
 ## The Web App Is Not Showing My Changes!
 

@@ -30,7 +30,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
+ * @psalm-type UserBasicInformation=array{country: null|string, state: null|string, school: null|int}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool, userBasicInformation: UserBasicInformation}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
@@ -71,7 +72,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  * @psalm-type RunDetailsV2=array{admin: bool, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, judged_by?: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type RunWithDetails=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, details: null|RunDetailsV2, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestPrintDetailsPayload=array{contestTitle: string, problems: array<int, null|ProblemDetails>}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
@@ -991,10 +992,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
-        $result['templateProperties']['payload']['needsBasicInformation'] = false;
-        $result['templateProperties']['payload']['requestsUserInformation'] = 'no';
+
         if (is_null($r->identity)) {
-            // No session, show the intro if public, so that they can login.
             return $result;
         }
 
@@ -1003,13 +1002,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requestsUserInformation' => $requestsUserInformation,
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($contest->problemset_id);
 
-        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
-        $result['templateProperties']['payload']['needsBasicInformation'] =
-            $needsBasicInformation &&
-            (
-                !$r->identity->country_id || !$r->identity->state_id ||
-                is_null($r->identity->current_identity_school_id)
+        $userBasicInformation = [
+            'country' => $r->identity->country_id,
+            'state' => $r->identity->state_id,
+            'school' => $r->identity->current_identity_school_id,
+        ];
+
+        $needsBasicInformation = $needsBasicInformation && (
+            is_null($userBasicInformation['country']) ||
+            is_null($userBasicInformation['state']) ||
+            is_null($userBasicInformation['school'])
         );
+
+        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
+        $result['templateProperties']['payload']['needsBasicInformation'] = $needsBasicInformation;
+        $result['templateProperties']['payload']['userBasicInformation'] = $userBasicInformation;
 
         // Privacy Statement Information
         $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
@@ -2368,6 +2375,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
+            'languages' => $originalContest->languages, // Cloned contests start with the same languages
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();

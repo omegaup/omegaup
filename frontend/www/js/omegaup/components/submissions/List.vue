@@ -198,12 +198,28 @@ table.submissions-table > tbody > tr > td {
 }
 
 .verdict-CE {
-  background: --arena-submissions-list-verdict-ce-background-color;
+  background: var(--arena-submissions-list-verdict-ce-background-color);
 }
 
 .verdict-JE,
 .verdict-VE {
   background: var(--arena-submissions-list-verdict-je-ve-background-color);
+}
+
+.verdict-PA {
+  background: var(--arena-runs-table-status-pa-background-color);
+}
+
+.verdict-OLE {
+  background: var(--arena-runs-table-status-ole-background-color);
+}
+
+.verdict-RTE {
+  background: var(--arena-runs-table-status-rte-background-color);
+}
+
+.verdict-RFE {
+  background: var(--arena-runs-table-status-rfe-background-color);
 }
 
 .school-text {
