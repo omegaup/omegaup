@@ -39,6 +39,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -60,6 +61,7 @@ export default class ShareBadges extends Vue {
   @Prop() badgeName!: string;
 
   T = T;
+  ui = ui;
 
   get badgeImageUrl(): string {
     return `/media/dist/badges/${this.badgeName}.svg`;
@@ -97,27 +99,52 @@ export default class ShareBadges extends Vue {
     window.open(facebookShareUrl, '_blank', 'noopener,noreferrer');
   }
 
-  copyImageToClipboard(): void {
-    const canvas = document.createElement('canvas');
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = this.badgeImageUrl;
+  async copyImageToClipboard(): Promise<void> {
+    try {
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = this.badgeImageUrl;
 
-    img.onload = () => {
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const clipboardData: Record<string, Promise<Blob>> = {};
-            clipboardData[blob.type] = Promise.resolve(blob);
-            navigator.clipboard.write([new ClipboardItem(clipboardData)]);
-          }
-        });
+      if (!ctx) {
+        throw new Error('Could not get canvas context');
       }
-    };
+
+      ctx.drawImage(img, 0, 0);
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve);
+      });
+
+      if (!blob) {
+        throw new Error('Could not create blob from canvas');
+      }
+
+      const clipboardData: Record<string, Blob> = {
+        [blob.type]: blob,
+      };
+
+      if ('ClipboardItem' in window) {
+        const ClipboardItemConstructor = (window as any).ClipboardItem as {
+          new (data: Record<string, Blob>): any;
+        };
+        await navigator.clipboard.write([
+          new ClipboardItemConstructor(clipboardData),
+        ]);
+        ui.success(T.badgeImageCopiedToClipboard);
+      }
+    } catch (error) {
+      // Show instruction for manual copying on error
+      ui.warning(T.badgeImageManualCopyInstructions);
+    }
   }
 }
 </script>

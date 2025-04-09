@@ -111,6 +111,8 @@ const translations: { [key: string]: string; } = {
   authorRankUnranked: "(Unrank3d au7h0r)",
   badgeAssignationTimeMessage: "(Da73 y0u g07 7hi5 badg3)",
   badgeFirstAssignationMessage: "(Th3 fir57 7im3 7hi5 badg3 wa5 a55ign3d)",
+  badgeImageCopiedToClipboard: "(Badg3 imag3 c0pi3d 70 c1ipb0ard)",
+  badgeImageManualCopyInstructions: "(Y0ur br0w53r d035n'7 5upp0r7 dir3c7 imag3 c0pying. P13a53 righ7-c1ick 0n 7h3 imag3 and 5313c7 'C0py imag3')",
   badgeNotAssignedMessage: "(Y0u hav3 n07 g07 7hi5 badg3 y37)",
   badgeNotExist: "(Th3 pr0vid3d badg3 d035n'7 3xi57.)",
   badgeOwnersMessage: "(C0d3r5 wh0 hav3 r3c3iv3d 7hi5 badg3)",

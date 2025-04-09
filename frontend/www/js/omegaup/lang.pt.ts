@@ -111,6 +111,8 @@ const translations: { [key: string]: string; } = {
   authorRankUnranked: "Autor n\u00e3o classificado",
   badgeAssignationTimeMessage: "Data que voc\u00ea recebeu este crach\u00e1",
   badgeFirstAssignationMessage: "A primeira vez que este crach\u00e1 foi atribu\u00eddo",
+  badgeImageCopiedToClipboard: "Imagem do distintivo copiada para a \u00e1rea de transfer\u00eancia",
+  badgeImageManualCopyInstructions: "Seu navegador n\u00e3o suporta c\u00f3pia direta de imagem. Por favor, clique com o bot\u00e3o direito na imagem e selecione 'Copiar imagem'",
   badgeNotAssignedMessage: "Voc\u00ea ainda n\u00e3o tem este crach\u00e1",
   badgeNotExist: "O crach\u00e1 n\u00e3o existe.",
   badgeOwnersMessage: "Coders que receberam este crach\u00e1",

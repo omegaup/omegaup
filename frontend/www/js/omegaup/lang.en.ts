@@ -111,6 +111,8 @@ const translations: { [key: string]: string; } = {
   authorRankUnranked: "Unranked author",
   badgeAssignationTimeMessage: "Date you got this badge",
   badgeFirstAssignationMessage: "The first time this badge was assigned",
+  badgeImageCopiedToClipboard: "Badge image copied to clipboard",
+  badgeImageManualCopyInstructions: "Your browser doesn't support direct image copying. Please right-click on the image and select 'Copy image'",
   badgeNotAssignedMessage: "You have not got this badge yet",
   badgeNotExist: "The provided badge doesn't exist.",
   badgeOwnersMessage: "Coders who have received this badge",

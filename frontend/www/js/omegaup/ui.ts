@@ -115,6 +115,7 @@ export function displayStatus({
     .removeClass('alert-success alert-info alert-warning alert-danger')
     .addClass(type)
     .addClass('animating')
+    .css('z-index', '1060')
     .attr('data-counter', statusCounter + 1)
     .slideDown({
       complete: () => {

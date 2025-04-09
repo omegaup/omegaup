@@ -111,6 +111,8 @@ const translations: { [key: string]: string; } = {
   authorRankUnranked: "Autor no clasificado",
   badgeAssignationTimeMessage: "Fecha en que conseguiste esta insignia",
   badgeFirstAssignationMessage: "La primera vez que esta insignia fue asignada",
+  badgeImageCopiedToClipboard: "\u00a1Imagen de la insignia copiada al portapapeles",
+  badgeImageManualCopyInstructions: "Tu navegador no admite la copia directa de im\u00e1genes. Por favor, haz clic derecho en la imagen y selecciona 'Copiar imagen'",
   badgeNotAssignedMessage: "A\u00fan no has conseguido esta insignia",
   badgeNotExist: "La insignia no existe.",
   badgeOwnersMessage: "Coders que han recibido esta insignia",
