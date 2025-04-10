@@ -70,7 +70,10 @@
           <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-4">
-              <a href="https://news.airbnb.com/2025-community-fund/" target="_blank">
+              <a
+                href="https://news.airbnb.com/2025-community-fund/"
+                target="_blank"
+              >
                 <img
                   class="sponsor-logo"
                   src="/media/homepage/airbnb_logo.svg"
