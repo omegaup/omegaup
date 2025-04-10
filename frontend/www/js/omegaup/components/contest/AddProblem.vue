@@ -27,7 +27,7 @@
               <omegaup-common-typeahead
                 class="w-75"
                 :existing-options="searchResultProblems"
-                :activation-threshold="2"
+                :activation-threshold="1"
                 :value.sync="alias"
                 @update-existing-options="
                   (query) =>
