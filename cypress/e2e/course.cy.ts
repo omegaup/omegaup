@@ -5,6 +5,7 @@ import {
   LoginOptions,
   ProblemOptions,
   RunOptions,
+  LinkTestCase,
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
@@ -555,5 +556,34 @@ describe('Course Test', () => {
     cy.visit(courseUrl);
     cy.waitUntil(() => cy.url().should('include', courseUrl));
     cy.get('button[name=start-course-submit]').click();
+  });
+});
+
+const testCases: LinkTestCase[] = [
+  {
+    url: '/',
+    links: [
+      'https://blog.omegaup.com',
+      'https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/',
+      'https://blog.omegaup.com/policies/privacy-policy/',
+    ],
+  },
+];
+
+describe('External Blog Link Validation On Home Page ', () => {
+  testCases.forEach((testCase) => {
+    it(`should find and validate external blog links on page: ${testCase.url}`, () => {
+      cy.visit(testCase.url);
+
+      testCase.links.forEach((linkUrl) => {
+        cy.get(`a[href="${linkUrl}"]`).should('exist');
+        cy.request({
+          url: linkUrl,
+          failOnStatusCode: false,
+        }).then((response) => {
+          expect(response.status).to.be.lessThan(400);
+        });
+      });
+    });
   });
 });

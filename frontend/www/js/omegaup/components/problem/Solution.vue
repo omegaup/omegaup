@@ -2,8 +2,7 @@
   <div class="card">
     <div class="row p-3">
       <div class="col-12 text-right">
-        <a
-          href="https://blog.omegaup.com/features/soluciones-de-problemas-en-omegaup/"
+        <a :href="SolutionViewFeatureGuideURL"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a
         >
@@ -69,7 +68,7 @@ import {
   faUnlock,
   faQuestionCircle,
 } from '@fortawesome/free-solid-svg-icons';
-
+import { getBlogUrl } from '../../urlHelper';
 library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
@@ -90,6 +89,9 @@ export default class ProblemSolution extends Vue {
   T = T;
   ui = ui;
 
+  get SolutionViewFeatureGuideURL(): string {
+    return getBlogUrl('SolutionViewFeatureGuideURL');
+  }
   get showSolution(): boolean {
     return this.status === 'unlocked' && this.solution !== null;
   }
