@@ -177,8 +177,17 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`current-${index}`"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -220,8 +229,17 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`current-${index}`"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -266,8 +284,17 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="contestListEmpty">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`current-${index}`"
+              class="card contest-card mb-3"
+            >
+              <div class="line"></div>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
           <template v-else>
             <omegaup-contest-card
@@ -496,6 +523,10 @@ export default class ArenaContestList extends Vue {
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
+    // Turn off refreshing after a short delay to allow parent component to respond
+    setTimeout(() => {
+      this.refreshing = false;
+    }, 1000);
   }
 
   finishContestDate(contest: types.ContestListItem): string {
