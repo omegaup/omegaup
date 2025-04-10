@@ -2,6 +2,8 @@
 
  namespace OmegaUp\Controllers;
 
+use OmegaUp\DAO\VO\Schools; // Ensure this is imported
+
 /**
  * SchoolController
  *
@@ -12,7 +14,8 @@
  * @psalm-type SchoolProblemsSolved=array{month: int, problems_solved: int, year: int}
  * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
  * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null, monthly_solved_problems: list<SchoolProblemsSolved>, school_users: list<SchoolUser>, coders_of_the_month: list<SchoolCoderOfTheMonth>}
- * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool, pagerItems: list<PageItem>}
+ * @psalm-type SchoolRankPayload=array{availableFilters: array{country?: null|string, state?: null|string}, filter: string, isLogged: bool, page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool, pagerItems: list<PageItem>, profileComplete: bool}
+ * @psalm-type SchoolRankLoggedOutPayload=array{isLogged: bool, page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool, pagerItems: list<PageItem>}
  * @psalm-type SchoolOfTheMonthPayload=array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}, schoolsOfPreviousMonth: list<array{country_id: string, name: string, ranking: int, school_id: int}>, schoolsOfPreviousMonths: list<array{country_id: string, name: string, school_id: int, time: string}>}
  */
 class School extends \OmegaUp\Controllers\Controller {
@@ -266,8 +269,9 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{templateProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array<string, mixed>, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
+     * @omegaup-request-param null|string $filter
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
@@ -275,32 +279,178 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            [
+                \OmegaUp\DAO\Enum\RankFilter::NONE,
+                \OmegaUp\DAO\Enum\RankFilter::COUNTRY,
+                \OmegaUp\DAO\Enum\RankFilter::STATE,
+            ]
+        );
+
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $currentFilter = $filter ?? \OmegaUp\DAO\Enum\RankFilter::NONE;
 
+        $params = [];
+        if ($currentFilter !== \OmegaUp\DAO\Enum\RankFilter::NONE) {
+            $params['filter'] = $currentFilter;
+        }
+
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $r->identity = null;
+        }
+
+        if (is_null($r->identity)) {
+            return array_merge(
+                self::getSchoolRankToLoggedOutUser(
+                    offset: $page,
+                    rowCount: $length,
+                ),
+                [
+                    'inContest' => false,
+                    'navbarSection' => 'schools',
+                ]
+            );
+        }
+
+        return array_merge(
+            self::getSchoolRankToLoggedInUser(
+                offset: $page,
+                rowCount: $length,
+                loggedIdentity: $r->identity,
+                filteredBy: $currentFilter,
+            ),
+            [
+                'inContest' => false,
+                'navbarSection' => 'schools',
+            ]
+        );
+    }
+
+    /**
+     * Gets the details for historical rank of schools with pagination
+     * for logged out users
+     *
+     * @return array{templateProperties: array{payload: SchoolRankLoggedOutPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getSchoolRankToLoggedOutUser(
+        int $offset,
+        int $rowCount
+    ): array {
         $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
-            "{$page}-{$length}",
-            fn () => \OmegaUp\DAO\Schools::getRank($page, $length),
+            "{$offset}-{$rowCount}",
+            fn () => \OmegaUp\DAO\Schools::getRank($offset, $rowCount),
             3600 // 1 hour
         );
 
         return [
             'templateProperties' => [
                 'payload' => [
-                    'page' => $page,
-                    'length' => $length,
+                    'page' => $offset,
+                    'length' => $rowCount,
                     'showHeader' => false,
                     'rank' => $schoolRank['rank'],
                     'totalRows' => $schoolRank['totalRows'],
                     'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
                         $schoolRank['totalRows'],
-                        $length,
-                        $page,
+                        $rowCount,
+                        $offset,
                         '/rank/schools/',
                         5,
                         []
                     ),
+                    'isLogged' => false,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSchoolsRank'
+                )
+            ],
+            'entrypoint' => 'schools_rank',
+        ];
+    }
+
+    /**
+     * Gets the details for historical rank of schools with pagination
+     * for logged in users
+     *
+     * @return array{templateProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getSchoolRankToLoggedInUser(
+        int $offset,
+        int $rowCount,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity,
+        string $filteredBy,
+    ): array {
+        $availableFilters = [];
+
+        $profileComplete = !is_null(
+            $loggedIdentity->country_id
+        ) && !is_null(
+            $loggedIdentity->state_id
+        );
+
+        if (!is_null($loggedIdentity->country_id)) {
+            $availableFilters['country'] =
+                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
+                    'wordsFilterByCountry'
+                );
+        }
+        if (!is_null($loggedIdentity->state_id)) {
+            $availableFilters['state'] =
+                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
+                    'wordsFilterByState'
+                );
+        }
+
+        $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_RANK,
+            "{$filteredBy}-{$offset}-{$rowCount}",
+            fn () => \OmegaUp\DAO\Schools::getFilteredRank(
+                $offset,
+                $rowCount,
+                $filteredBy,
+                $availableFilters
+            ),
+            3600 // 1 hour
+        );
+
+        // Map the rank field to the expected structure
+        $rank = array_map(
+            fn (\OmegaUp\DAO\VO\Schools $school) => [
+                'country_id' => $school->country_id,
+                'name' => $school->name ?? '',
+                'ranking' => $school->ranking,
+                'school_id' => $school->school_id ?? 0,
+                'score' => $school->score,
+            ],
+            $schoolRank['rank']
+        );
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'page' => $offset,
+                    'length' => $rowCount,
+                    'showHeader' => true,
+                    'rank' => $rank,
+                    'totalRows' => $schoolRank['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $schoolRank['totalRows'],
+                        $rowCount,
+                        $offset,
+                        '/rank/schools/',
+                        5,
+                        []
+                    ),
+                    'isLogged' => true,
+                    'availableFilters' => $availableFilters,
+                    'filter' => $filteredBy,
+                    'profileComplete' => $profileComplete
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleSchoolsRank'

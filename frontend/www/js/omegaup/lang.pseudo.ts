@@ -853,6 +853,7 @@ const translations: { [key: string]: string; } = {
   modalConsentCookiesAccept: "(Acc3p7 a11 c00ki35)",
   modalConsentCookiesDecline: "(Acc3p7 0n1y 3553n7ia1 c00ki35)",
   modalConsentCookiesDescription: "(W3 u53 c00ki35 70 3n5ur3 y0u g37 7h3 b357 3xp3ri3nc3 0n 0ur w3b5i73.)",
+  mustLoginToFilterSchools: "(Y0u mu57 10gin 70 fi173r 5ch0015 in 7h3 ranking.)",
   mustLoginToFilterUsers: "(Y0u mu57 10gin 70 fi173r c0d3r5 in 7h3 ranking.)",
   mustLoginToJoinContest: "(Y0u mu57 10gin 70 j0in 7hi5 c0n7357)",
   mustRegisterToJoinContest: "(Y0u mu57 r3gi573r 70 j0in 7hi5 c0n7357.)",

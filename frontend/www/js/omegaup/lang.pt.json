@@ -852,6 +852,7 @@
 	"modalConsentCookiesAccept": "Aceite todos os cookies",
 	"modalConsentCookiesDecline": "Aceite apenas cookies essenciais",
 	"modalConsentCookiesDescription": "Usamos cookies para garantir que voc\u00ea tenha a melhor experi\u00eancia em nosso site.",
+	"mustLoginToFilterSchools": "Voc\u00ea deve entrar para filtrar escolas no ranking.",
 	"mustLoginToFilterUsers": "Voc\u00ea deve entrar para filtrar coders no ranking.",
 	"mustLoginToJoinContest": "Voc\u00ea deve entrar na sua conta para se inscrever num concurso",
 	"mustRegisterToJoinContest": "voc\u00ea deve se registrar para entrar concurso",
