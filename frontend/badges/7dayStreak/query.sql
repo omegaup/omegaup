@@ -1,11 +1,12 @@
 WITH DailySubmissions AS (
     SELECT
-        i.user_id,
+        u.user_id,
         DATE(r.time) AS submission_date
     FROM Runs AS r
     JOIN Submissions AS s ON r.submission_id = s.submission_id
     JOIN Identities AS i ON s.identity_id = i.identity_id
-    GROUP BY i.user_id, DATE(r.time)
+    JOIN Users AS u ON i.user_id = u.user_id
+    GROUP BY u.user_id, DATE(r.time)
 ),
 ConsecutiveStreaks AS (
     SELECT
