@@ -12,7 +12,7 @@
 - :mag: [How to get help](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md)  
 
 ## Development Environment  
-- :computer: [How to start developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Set-Up-Your-Development-Environment-(English).md)  
+- :computer: [How to start developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md)
 
 - ⬇️ [Virtual machine installation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Virtual-machine-installation.md)  
 
