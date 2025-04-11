@@ -18,7 +18,7 @@
 ## Technologies  
 - :shipit: [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md)  
 
-- :chart_with_upwards_trend: [Monitoring tools](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Monitoring-tools.md)  
+- :chart_with_upwards_trend: [Monitoring tools](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Monitoring-Tools.md)  
 
 - 🔗 [Configure nginx](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Configure-nginx.md)  
 
