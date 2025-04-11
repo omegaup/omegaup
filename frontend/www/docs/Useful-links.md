@@ -6,7 +6,6 @@
 
 - :beginner: [How to update and configure your local omegaup copy before making changes](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md)  
 
-- 🆚 [How to develop using VSCode Remote](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-develop-using-VSCode-Remote.md)  
 
 - 🔧 [Migration from Smarty to TS-Vue-BS4](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Guidelines-to-Follow-Migrating-from-Smarty-to-TypeScript-Vue-Bootstrap.md)  
 
