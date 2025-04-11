@@ -52,6 +52,7 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
+        aclList: [] as any,
       };
     },
     render: function (createElement) {
@@ -73,6 +74,7 @@ OmegaUp.on('ready', () => {
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
+          aclList: this.aclList,
         },
         on: {
           'update-user-basic-information': (
@@ -233,6 +235,13 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 refreshApiTokensList();
                 ui.success(T.apiTokenSuccessfullyRevoked);
+              })
+              .catch(ui.apiError);
+          },
+          'fetch-acl-list': () => {
+            api.ACL.userOwnedAclReport()
+              .then((data) => {
+                this.aclList = data;
               })
               .catch(ui.apiError);
           },

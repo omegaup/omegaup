@@ -1801,6 +1801,7 @@ const translations: { [key: string]: string; } = {
   userRoles: "Roles",
   userVerified: "A conta foi verificada",
   userVerify: "Verificar a conta",
+  userViewAclList: "Minha ACL",
   username: "Nome da conta",
   usernameInUse: "Este nome de conta j\u00e1 foi utilizado.",
   usernameOrPassIsWrong: "O nome da conta ou a senha est\u00e3o incorretos. Por favor verifique suas credenciais.",
