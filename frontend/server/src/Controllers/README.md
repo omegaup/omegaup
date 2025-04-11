@@ -5035,12 +5035,14 @@ Get stats
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `username` | `null\|string` |             |
+| `year`     | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                       |
-| ------ | -------------------------- |
-| `runs` | `types.UserProfileStats[]` |
+| Name      | Type                                                 |
+| --------- | ---------------------------------------------------- |
+| `heatmap` | `{ count: number; date: string; }[]`                 |
+| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
 
 ## `/api/user/statusVerified/`
 
