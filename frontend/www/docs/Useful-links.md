@@ -14,7 +14,6 @@
 ## Development Environment  
 - :computer: [How to start developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md)
 
-- ⬇️ [Virtual machine installation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Virtual-machine-installation.md)  
 
 ## Technologies  
 - :shipit: [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md)  
