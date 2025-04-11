@@ -2636,6 +2636,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $recommended
+
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -5359,8 +5361,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: ScoreboardMergePayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param null|string $contest_alias
      */
     public static function getScoreboardMergeDetailsForTypeScript(
         \OmegaUp\Request $r
