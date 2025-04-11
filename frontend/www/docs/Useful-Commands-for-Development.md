@@ -41,7 +41,7 @@ npx cypress open
 - Install `npm`
 - Install `libasound2`
 
-\* For more detailed information, visit https://github.com/omegaup/omegaup/wiki/How-to-use-Cypress-in-omegaUp
+\* For more detailed information, visit [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md)
 
 **Execution Location:** Outside the Docker container.  
 
