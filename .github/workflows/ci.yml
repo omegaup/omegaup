@@ -284,6 +284,13 @@ jobs:
         run: |
           docker compose pull
 
+      - name: Clean up existing Docker volumes
+        run: |
+          # Ensure any existing containers and volumes are removed
+          docker compose down -v || true
+          # Make sure any orphaned volumes are cleaned up
+          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+
       - name: Start the Docker containers
         run: |
           docker compose up --no-build --detach
@@ -418,6 +425,13 @@ jobs:
       - name: Download the Docker containers
         run: |
           docker compose pull
+
+      - name: Clean up existing Docker volumes
+        run: |
+          # Ensure any existing containers and volumes are removed
+          docker compose down -v || true
+          # Make sure any orphaned volumes are cleaned up
+          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
 
       - name: Start the Docker containers
         run: |
