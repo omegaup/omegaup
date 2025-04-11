@@ -2,7 +2,7 @@
 ## Coding  
 - 📝 [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines.md)  
 
-- :100: [Useful commands for development](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-commands-for-development.md)  
+- :100: [Useful commands for development](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md)  
 
 - :beginner: [How to update and configure your local omegaup copy before making changes](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md)  
 
