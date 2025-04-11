@@ -25,4 +25,4 @@
 ## Features on omegaup.com  
 - :trophy: [Guide for badge implementation (Spanish version)](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Guía-para-la-Implementación-de-Insignias-en-omegaUp.md)  
 
-- :inbox_tray: [How to add notifications to the DB](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-add-notifications-to-DB.md)
+- :inbox_tray: [How to add notifications to the DB (Spanish version)](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Cómo-agregar-nuevas-notificaciones.md)
