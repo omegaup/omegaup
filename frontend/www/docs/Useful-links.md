@@ -23,6 +23,6 @@
 - 🔗 [Configure nginx](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Configure-nginx.md)  
 
 ## Features on omegaup.com  
-- :trophy: [Guide for badge implementation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Guide-for-badge-implementation.md)  
+- :trophy: [Guide for badge implementation (Spanish version)](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Guía-para-la-Implementación-de-Insignias-en-omegaUp.md)  
 
 - :inbox_tray: [How to add notifications to the DB](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-add-notifications-to-DB.md)
