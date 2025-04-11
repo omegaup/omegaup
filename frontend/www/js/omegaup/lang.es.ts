@@ -1658,6 +1658,7 @@ const translations: { [key: string]: string; } = {
   submitFeedbackRequireConfirmation: "Enviar comentarios",
   submitFeedbackSubmit: "Enviar",
   supportAssignUserRoles: "Asignar roles",
+  supportContestRemovedFromRecommended: "El concurso ha sido eliminado de recomendados",
   supportContestSetAsRecommended: "El concurso ha sido marcado como recomendado",
   supportNewSearch: "Nueva b\u00fasqueda",
   supportOptions: "Opciones",
