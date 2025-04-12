@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * CarouselItemController
  *
- * @psalm-type CarouselItem=array{carousel_item_id: int, title: string,excerpt: string,image_url: string,link: string,button_title: string,expiration_date: \OmegaUp\Timestamp|null,status: bool}
+ * @psalm-type CarouselItem=array{ carousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, status: bool}
  * @psalm-type CarouselItemListPayload=array{carouselItems: list<CarouselItem>}
  */
 class CarouselItems extends \OmegaUp\Controllers\Controller {
@@ -24,15 +24,19 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $r->ensureIdentity();
         self::validateAdmin($r);
 
+        $expiration = $r->ensureOptionalString('expiration_date');
         $carouselItem = new \OmegaUp\DAO\VO\CarouselItems([
             'title' => $r->ensureString('title'),
             'excerpt' => $r->ensureString('excerpt'),
             'image_url' => $r->ensureString('image_url'),
             'link' => $r->ensureString('link'),
             'button_title' => $r->ensureString('buttonTitle'),
-            'expiration_date' => $r->ensureOptionalString('expiration_date'),
+            'expiration_date' => is_null($expiration)
+                ? null
+                : new \OmegaUp\Timestamp(strtotime($expiration)),
             'status' => $r->ensureBool('status'),
         ]);
 
@@ -49,6 +53,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $r->ensureIdentity();
         self::validateAdmin($r);
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
@@ -81,6 +86,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $r->ensureIdentity();
         self::validateAdmin($r);
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
@@ -97,9 +103,12 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $carouselItem->image_url = $r->ensureString('image_url');
         $carouselItem->link = $r->ensureString('link');
         $carouselItem->button_title = $r->ensureString('buttonTitle');
-        $carouselItem->expiration_date = $r->ensureOptionalString(
-            'expiration_date'
-        );
+
+        $expiration = $r->ensureOptionalString('expiration_date');
+        $carouselItem->expiration_date = is_null($expiration)
+            ? null
+            : new \OmegaUp\Timestamp(strtotime($expiration));
+
         $carouselItem->status = $r->ensureBool('status');
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
@@ -113,10 +122,23 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        $r->ensureIdentity();
         self::validateAdmin($r);
 
         return [
-            'carouselItems' => \OmegaUp\DAO\Base\CarouselItems::getAll(),
+            'carouselItems' => array_map(
+                fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
+                    'carousel_item_id' => $item->carousel_item_id,
+                    'title' => $item->title,
+                    'excerpt' => $item->excerpt,
+                    'image_url' => $item->image_url,
+                    'link' => $item->link,
+                    'button_title' => $item->button_title,
+                    'expiration_date' => $item->expiration_date,
+                    'status' => $item->status,
+                ],
+                \OmegaUp\DAO\Base\CarouselItems::getAll()
+            ),
         ];
     }
 
@@ -137,7 +159,19 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         });
 
         return [
-            'carouselItems' => array_values($activeItems),
+            'carouselItems' => array_map(
+                fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
+                    'carousel_item_id' => $item->carousel_item_id,
+                    'title' => $item->title,
+                    'excerpt' => $item->excerpt,
+                    'image_url' => $item->image_url,
+                    'link' => $item->link,
+                    'button_title' => $item->button_title,
+                    'expiration_date' => $item->expiration_date,
+                    'status' => $item->status,
+                ],
+                array_values($activeItems)
+            ),
         ];
     }
 
@@ -145,6 +179,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function validateAdmin(\OmegaUp\Request $r): void {
+        $r->ensureIdentity();
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
