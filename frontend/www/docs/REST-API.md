@@ -17,7 +17,7 @@ URL completo sería `https://omegaup.com/api/time/get/`.
 Muchas de las llamadas no requieren ningún privilegio especial (e incluso se
 pueden hacer simplemente visitando el URL en un navegador), pero otras
 únicamente están disponibles a usuarios que hayan iniciado sesión. Para hacer
-esto, debes llamar [user/login](https://github.com/omegaup/omegaup/wiki/User-API#post-userlogin).
+esto, debes llamar [user/login](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API#post-userlogin.md).
 Todas las llamadas subsecuentes que necesiten autenticación debes realizarlas
 agregando un cookie llamado `ouat` (omegaUp Auth Token), con el contenido de
 `auth_token` de `user/login`. Toma en cuenta que para evitar trampa, solo

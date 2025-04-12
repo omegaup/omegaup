@@ -219,7 +219,7 @@ If you are interested spending this summer collaborating with us, first of all, 
  - Join our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2019') and greet fellow candidates and omegaUp volunteers.
 
 # Communications
-## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-%28English%29) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) to effectively getting your question answered.
+## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
 
 Communication with our organization and fellow candidates is carried through our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2019'). We encourage you to join it :)
 
@@ -236,7 +236,7 @@ Communication with our organization and fellow candidates is carried through our
 
 We ask that you complete phase one before you start working with our codebase.
 
- - Follow these [instructions](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-%28English%29) to set up your development environment.
+ - Follow these [instructions](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) to set up your development environment.
  - Find yourself an interesting bug to solve from our [issue tracker](https://github.com/omegaup/omegaup/issues), or reach out to the [slack channel](https://omegaup-slack.herokuapp.com/) asking for one and we will be happy to find a good fit for you. Most of the conversations in the issue tracker are in Spanish, but feel free to switch the conversation to English on any issue. Alternatively, you can go and find bugs on omegaup.com    yourself, then report them in our issue tracker, and then fix them.
  - Implement your fix and submit is for review. Once it's merged you can move onto the third phase.
 
@@ -253,7 +253,7 @@ At this step we hope you are familiar with our development environment and code 
 We will only consider candidates that finished all 3 phases of the application.
 
 # Frequently Asked Questions #
-* **The development environment installation script is throwing me an error.** Please follow our [Getting Help page](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) to effectively getting your issue resolved.
+* **The development environment installation script is throwing me an error.** Please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your issue resolved.
 * **Am I expected to speak Spanish?** Of course not. We try our best to be as inclusive as possible to non-Spanish volunteers. Please feel free to use English throughout our communication channels and in your code. We have also found Google Translate to do a decent job in translating the Spanish contents of our github page, we advise you to use it to navigate our issue tracker, wiki, etc.
 * **How many spots will your organization have for GSoC 2019?** We will ask for 3 students this year, but there is no guarantee yet, we will know for sure until around mid April 2019.
 * **How do you choose your students?** We will review each application that we receive and will choose our candidates based on three things:
