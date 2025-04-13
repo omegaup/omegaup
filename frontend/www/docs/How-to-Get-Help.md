@@ -1,11 +1,11 @@
 We know that you will have a lot of questions about how things work at omegaUp, technical and otherwise.
 This is a guide on how to get better answers.
 
-Whenever you get stuck installing the [development evironment](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) or reading through the [codebase](https://github.com/omegaup/omegaup) or wondering about how the GSoC application process works at omegaUp, please follow these steps to get your question answered:
+Whenever you get stuck installing the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) or reading through the [codebase](https://github.com/omegaup/omegaup) or wondering about how the GSoC application process works at omegaUp, please follow these steps to get your question answered:
 
 ### 1. Do a quick search for your question
 The following resources are super powerful when looking for answers:
-* Our [GSoC page](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2019-Ideas-List) answers many questions about how the application process works, specially in the [FAQ section](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2019-Ideas-List#frequently-asked-questions).
+* Our [GSoC page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2019-Ideas-List.md) answers many questions about how the application process works, specially in the [FAQ section](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2019-Ideas-List.md#frequently-asked-questions).
 * Message history in our #dev_training channel in [Discord Server](https://discord.com/invite/K3JFd9d3wk). Discord has a search feature where you can look up some keywords for question. It is very likely that a candidate has already asked your question either this year or on a past year.
 * [google.com](https://www.google.com/) is your friend. If your question is let's say related to Git, Docker, php or something not specific to omegaUp, most likely you can find your answer through google.
 
@@ -17,7 +17,7 @@ The following resources are super powerful when looking for answers:
 
 If you want to learn more about good practices for asking question, we recommend reading [this article](https://www.mikeash.com/getting_answers.html).
 
-It is also important to **help your peers** with their questions. We do [take this into account when picking our candidates](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2019-Ideas-List#frequently-asked-questions). We ask that you regularly read questions posted by other candidates on slack and try to help them out if you are familiar with the things they are asking about.
+It is also important to **help your peers** with their questions. We do [take this into account when picking our candidates](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2019-Ideas-List.md#frequently-asked-questions). We ask that you regularly read questions posted by other candidates on slack and try to help them out if you are familiar with the things they are asking about.
  
 ### We ask that you avoid doing the following things:
 * Do not send direct messages asking for help. Please post them in the general channel so that other people can see your question and/or the answers.
