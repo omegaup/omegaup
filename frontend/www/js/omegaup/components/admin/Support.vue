@@ -4,7 +4,7 @@
       <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
         <span v-if="username != null">- {{ username }} ({{ email }})</span>
-        <span v-if="contestAlias != null && contestTitle != null"
+        <span v-else-if="contestAlias != null"
           >- {{ contestTitle }} ({{ contestAlias }})</span
         >
       </div>
@@ -51,7 +51,7 @@
           <form class="form w-100" @submit.prevent="onSearchContest">
             <div class="input-group">
               <input
-                v-model="contestAlias"
+                v-model="currentContestAlias"
                 class="form-control"
                 name="contest_alias"
                 type="text"
@@ -89,7 +89,7 @@
             <div class="form-check">
               <label class="form-check-label">
                 <input
-                  v-model="isContestRecommended"
+                  v-model="currentIsContestRecommended"
                   class="form-check-input"
                   type="checkbox"
                   @change="onToggleRecommended"
@@ -237,7 +237,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -281,6 +281,9 @@ export default class AdminSupport extends Vue {
   @Prop() contestTitle!: string;
   @Prop() contestFound!: boolean;
   @Prop() isContestRecommended!: boolean;
+
+  currentContestAlias = this.contestAlias;
+  currentIsContestRecommended = this.isContestRecommended;
 
   T = T;
   ui = ui;
@@ -335,18 +338,28 @@ export default class AdminSupport extends Vue {
 
   @Emit('search-contest')
   onSearchContest(): null | string {
-    if (this.contestAlias == null) return null;
-    return this.contestAlias;
+    if (this.currentContestAlias == null) return null;
+    return this.currentContestAlias;
   }
 
   @Emit('toggle-recommended')
   onToggleRecommended(): boolean {
-    return this.isContestRecommended;
+    return this.currentIsContestRecommended;
   }
 
   @Emit('reset-contest')
   onResetContest(): void {
     // The actual reset will be handled in support.ts
+  }
+
+  @Watch('isContestRecommended')
+  onContestRecommendedChange(newValue: boolean) {
+    this.currentIsContestRecommended = newValue;
+  }
+
+  @Watch('contestAlias')
+  onContestAliasChange(newValue: string) {
+    this.currentContestAlias = newValue;
   }
 }
 </script>

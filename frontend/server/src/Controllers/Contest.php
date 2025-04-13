@@ -5964,6 +5964,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest->recommended = $r->ensureBool('value');
         \OmegaUp\DAO\Contests::update($contest);
 
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $contestAlias
+        );
+
         return ['status' => 'ok'];
     }
 

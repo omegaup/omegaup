@@ -136,7 +136,7 @@ OmegaUp.on('ready', () => {
                 adminSupport.contestAlias = contestAlias;
                 adminSupport.contestTitle = data.title;
                 adminSupport.contestFound = true;
-                adminSupport.isContestRecommended = !!data.recommended;
+                adminSupport.isContestRecommended = data.recommended;
               })
               .catch(ui.apiError);
           },
