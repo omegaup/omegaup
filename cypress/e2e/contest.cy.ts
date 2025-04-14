@@ -323,10 +323,13 @@ describe('Contest Test', () => {
       .then(() => {
         const newContestAlias = contestOptions.contestAlias + '/practice';
         contestOptions.contestAlias = newContestAlias;
+<<<<<<< HEAD
         // Wait for the practice mode page to fully load before creating runs
         cy.waitUntil(() => cy.url().should('include', newContestAlias));
         // Add additional wait for the page to be fully interactive
         cy.wait(1000);
+=======
+>>>>>>> d99df7660 (added the test files back)
         cy.createRunsInsideContest(contestOptions);
       });
     cy.get('a[href="#ranking"]').click();

@@ -175,11 +175,17 @@ describe('Test IDE', () => {
       .first()
       .should('be.visible')
       .type(caseOutput);
+<<<<<<< HEAD
 
     cy.get('li[title="diff"]').should('be.visible').click();
 
     cy.get('.editor.original .view-line span span', { timeout: 10000 })
       .should('have.length.greaterThan', 0)
+=======
+    cy.get(`li[title="diff"]`).should('be.visible').click();
+
+    cy.get('.editor.original .view-line span span') // lhs is the original text
+>>>>>>> d99df7660 (added the test files back)
       .then(($spans) => {
         const concatText = Array.from($spans, (span) => span.innerText).join(
           '\n',

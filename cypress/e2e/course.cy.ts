@@ -5,7 +5,10 @@ import {
   LoginOptions,
   ProblemOptions,
   RunOptions,
+<<<<<<< HEAD
   LinkTestCase,
+=======
+>>>>>>> d99df7660 (added the test files back)
 } from '../support/types';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
@@ -558,6 +561,7 @@ describe('Course Test', () => {
     cy.get('button[name=start-course-submit]').click();
   });
 });
+<<<<<<< HEAD
 
 const testCases: LinkTestCase[] = [
   {
@@ -587,3 +591,5 @@ describe('External Blog Link Validation On Home Page ', () => {
     });
   });
 });
+=======
+>>>>>>> d99df7660 (added the test files back)
