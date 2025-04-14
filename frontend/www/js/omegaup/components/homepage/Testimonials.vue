@@ -14,7 +14,9 @@
                 >
                   <div class="d-flex flex-row align-items-center">
                     <div class="d-flex flex-column ml-2">
-                      <span class="font-weight-normal">{{ testimonial.author.name }}</span>
+                      <span class="font-weight-normal">{{
+                        testimonial.author.name
+                      }}</span>
                       <span>{{ testimonial.author.title[T.locale] }}</span>
                     </div>
                   </div>
@@ -29,8 +31,8 @@
           <div class="p-3 testimonials-margin">
             <div
               v-for="(testimonial, index) in testimonials"
-              :key="'details-' + index"
               v-show="activeIndex === index"
+              :key="'details-' + index"
               class="card-body"
             >
               <h4>Testimonial</h4>
@@ -52,11 +54,11 @@ import testimonialsConfig from '../../testimonials.config';
 export default class Testimonials extends Vue {
   T = T;
 
-  testimonials = testimonialsConfig.map(testimonial => ({
+  testimonials = testimonialsConfig.map((testimonial) => ({
     text: testimonial.text,
     author: {
-      ...testimonial.author
-    }
+      ...testimonial.author,
+    },
   }));
 
   activeIndex = 0;
