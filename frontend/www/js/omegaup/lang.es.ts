@@ -179,6 +179,7 @@ const translations: { [key: string]: string; } = {
   cannotEditUngroupedGroup: "No es posible editar un grupo sin agrupar",
   cannotRemoveProblem: "No puedes eliminar problemas porque no eres el director del concurso.",
   cannotRemoveProblemWithSubmissions: "No puedes eliminar un problema que ya tiene env\u00edos",
+  carouselItemNotFound: "Elemento del carrusel no encontrado",
   caseAlreadyExists: "Ya existe un caso de prueba con ese nombre",
   caseEditTitle: "Editar caso",
   caseModalBack: "Atr\u00e1s",

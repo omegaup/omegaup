@@ -24,7 +24,6 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        $r->ensureIdentity();
         self::validateAdmin($r);
 
         $expiration = $r->ensureOptionalString('expiration_date');
@@ -53,7 +52,6 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        $r->ensureIdentity();
         self::validateAdmin($r);
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
@@ -86,7 +84,6 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        $r->ensureIdentity();
         self::validateAdmin($r);
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
@@ -109,7 +106,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             ? null
             : new \OmegaUp\Timestamp(strtotime($expiration));
 
-        $carouselItem->status = $r->ensureBool('status');
+        $carouselItem->status = $r['status'] ? 'true' : 'false';
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];
@@ -122,20 +119,19 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        $r->ensureIdentity();
         self::validateAdmin($r);
 
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->carousel_item_id,
-                    'title' => $item->title,
-                    'excerpt' => $item->excerpt,
-                    'image_url' => $item->image_url,
-                    'link' => $item->link,
-                    'button_title' => $item->button_title,
+                    'carousel_item_id' => $item->corousel_item_id ?? 0,
+                    'title' => $item->title ?? '',
+                    'excerpt' => $item->excerpt ?? '',
+                    'image_url' => $item->image_url ?? '',
+                    'link' => $item->link ?? '',
+                    'button_title' => $item->button_title ?? '',
                     'expiration_date' => $item->expiration_date,
-                    'status' => $item->status,
+                    'status' => boolval($item->status)
                 ],
                 \OmegaUp\DAO\Base\CarouselItems::getAll()
             ),
@@ -153,7 +149,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
 
         $activeItems = array_filter($allItems, function ($item) use ($now) {
             /** @var \OmegaUp\DAO\VO\CarouselItems $item */
-            return $item->status && (
+            return boolval($item->status) && (
                 is_null($item->expiration_date) || $item->expiration_date >= $now
             );
         });
@@ -161,14 +157,14 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->carousel_item_id,
-                    'title' => $item->title,
-                    'excerpt' => $item->excerpt,
-                    'image_url' => $item->image_url,
-                    'link' => $item->link,
-                    'button_title' => $item->button_title,
+                    'carousel_item_id' => $item->corousel_item_id ?? 0,
+                    'title' => $item->title ?? '',
+                    'excerpt' => $item->excerpt ?? '',
+                    'image_url' => $item->image_url ?? '',
+                    'link' => $item->link ?? '',
+                    'button_title' => $item->button_title ?? '',
                     'expiration_date' => $item->expiration_date,
-                    'status' => $item->status,
+                    'status' => boolval($item->status)
                 ],
                 array_values($activeItems)
             ),
