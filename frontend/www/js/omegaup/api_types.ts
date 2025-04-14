@@ -5048,9 +5048,9 @@ export namespace messages {
       type: string;
       users: {
         role_description: string;
-        role_id?: number;
+        role_id: number;
         role_name: string;
-        user_id?: number;
+        user_id: number;
         username: string;
       }[];
     }[];
