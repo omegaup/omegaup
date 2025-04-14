@@ -20,7 +20,7 @@ https://omegaup.com/api/time/get/
 
 Some API endpoints are public and require no authentication—you can even access them by visiting the URL in a browser. However, certain endpoints are protected and require the user to be logged in.
 
-To authenticate, use the [`user/login`](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API#post-userlogin.md) endpoint. Upon successful login, you will receive an `auth_token`. You must include this token in a cookie named `ouat` (omegaUp Auth Token) for all subsequent authenticated requests.
+To authenticate, use the [`user/login`](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API.md#post-userlogin) endpoint. Upon successful login, you will receive an `auth_token`. You must include this token in a cookie named `ouat` (omegaUp Auth Token) for all subsequent authenticated requests.
 
 **Important:** omegaUp supports only one active session at a time. Logging in programmatically will invalidate your browser session, and vice versa.
 
