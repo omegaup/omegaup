@@ -26,11 +26,11 @@ To authenticate, use the [`user/login`](https://github.com/omegaup/omegaup/blob/
 
 ## API Categories
 
-- [Contests](Contests API)
-- [Problems](Problems API)
-- [Runs](Runs API)
-- [Users](User API)
-- [Clarifications](Clarifications API)
+- [Contests API](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Contests-API.md)
+- [Problems API](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Problems-API.md)
+- [Runs API](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Runs-API.md)
+- [User API](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API.md)
+- [Clarifications API](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Clarifications-API.md)
 
 ## Example: Get Server Time
 
