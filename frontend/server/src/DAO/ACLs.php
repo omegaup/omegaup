@@ -10,10 +10,11 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ACLs extends \OmegaUp\DAO\Base\ACLs {
-     /**
-     * Get all ACLs owned by a user along with their type and alias.
+    /**
+     * Get all ACLs owned by a user along with their type, alias, and an empty users array.
      *
-     * @return list<array{acl_id: int, type: string, alias: string}>
+     * @param int $userId The user ID whose ACLs are being fetched.
+     * @return list<array{acl_id: int, type: string, alias: string, users: list<array>}>
      */
     public static function getUserOwnedAclTypesWithAliases(int $userId): array {
         $sql = '
@@ -45,6 +46,7 @@ class ACLs extends \OmegaUp\DAO\Base\ACLs {
             'acl_id' => intval($row['acl_id']),
             'type' => $row['type'],
             'alias' => $row['alias'],
+            'users' => [],
         ], $rows);
     }
 }
