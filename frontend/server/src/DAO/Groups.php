@@ -80,22 +80,6 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
         return new \OmegaUp\DAO\VO\Groups($rs);
     }
 
-    final public static function getByAclId(int $aclId): ?\OmegaUp\DAO\VO\Groups {
-        $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Groups::FIELD_NAMES,
-            'g'
-        ) . ' FROM `Groups_` AS `g` WHERE `g`.`acl_id` = ? LIMIT 1;';
-
-        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$aclId]);
-
-        if (empty($rs)) {
-            return null;
-        }
-
-        return new \OmegaUp\DAO\VO\Groups($rs);
-    }
-
     /**
      * Returns all groups that a user can manage.
      * @param int $userId

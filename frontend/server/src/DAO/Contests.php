@@ -63,25 +63,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return new \OmegaUp\DAO\VO\Contests($rs);
     }
 
-    final public static function getByAclId(int $aclId): ?\OmegaUp\DAO\VO\Contests {
-        $sql = 'SELECT ' .
-            join(
-                ', ',
-                array_keys(
-                    \OmegaUp\DAO\VO\Contests::FIELD_NAMES
-                )
-            ) . ' ' .
-            'FROM Contests WHERE acl_id = ? LIMIT 1;';
-
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, check_plagiarism: bool, contest_for_teams: bool|null, contest_id: int, default_show_all_contestants_in_scoreboard: bool|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, plagiarism_threshold: bool, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$aclId]);
-        if (empty($rs)) {
-            return null;
-        }
-
-        return new \OmegaUp\DAO\VO\Contests($rs);
-    }
-
     /**
      * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, last_updated: \OmegaUp\Timestamp, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, default_show_all_contestants_in_scoreboard: bool, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
      */

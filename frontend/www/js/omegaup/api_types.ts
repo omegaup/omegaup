@@ -5042,13 +5042,13 @@ export namespace messages {
   // ACL
   export type ACLUserOwnedAclReportRequest = { [key: string]: any };
   export type ACLUserOwnedAclReportResponse = {
-    acls: { acl_id: number; alias?: string; type: string }[];
+    acls: { acl_id: number; alias: string; type: string }[];
     roles: {
-      acl_id: number;
+      acl_id?: number;
       role_description: string;
-      role_id: number;
+      role_id?: number;
       role_name: string;
-      user_id: number;
+      user_id?: number;
       username: string;
     }[];
   };

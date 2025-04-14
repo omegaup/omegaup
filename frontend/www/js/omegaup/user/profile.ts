@@ -54,6 +54,13 @@ OmegaUp.on('ready', () => {
         searchResultSchools: searchResultSchools,
       };
     },
+    mounted() {
+      api.ACL.userOwnedAclReport()
+        .then((data) => {
+          console.log(data);
+        })
+        .catch(ui.apiError);
+    },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
