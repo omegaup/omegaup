@@ -10,37 +10,41 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ACLs extends \OmegaUp\DAO\Base\ACLs {
-    /**
-     * Returns the type and alias of each ACL in a single query.
+     /**
+     * Get all ACLs owned by a user along with their type and alias.
      *
-     * @return array<int, array{type: string, alias: string}>
+     * @return list<array{acl_id: int, type: string, alias: string}>
      */
-    public static function getAclTypesWithAliases(): array {
+    public static function getUserOwnedAclTypesWithAliases(int $userId): array {
         $sql = '
-            SELECT acl_id, alias, "contest" AS type FROM Contests
+            SELECT a.acl_id, c.alias, "contest" AS type
+            FROM ACLs a
+            INNER JOIN Contests c ON c.acl_id = a.acl_id
+            WHERE a.owner_id = ?
             UNION
-            SELECT acl_id, alias, "course" AS type FROM Courses
+            SELECT a.acl_id, c.alias, "course" AS type
+            FROM ACLs a
+            INNER JOIN Courses c ON c.acl_id = a.acl_id
+            WHERE a.owner_id = ?
             UNION
-            SELECT acl_id, alias, "problem" AS type FROM Problems
+            SELECT a.acl_id, p.alias, "problem" AS type
+            FROM ACLs a
+            INNER JOIN Problems p ON p.acl_id = a.acl_id
+            WHERE a.owner_id = ?
             UNION
-            SELECT acl_id, alias, "group" AS type FROM Groups_';
+            SELECT a.acl_id, g.alias, "group" AS type
+            FROM ACLs a
+            INNER JOIN Groups_ g ON g.acl_id = a.acl_id
+            WHERE a.owner_id = ?
+        ';
+        $params = [$userId, $userId, $userId, $userId];
 
-        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
-        $aclTypes = [];
-        foreach ($rows as $row) {
-            if (
-                isset($row['alias'], $row['type'], $row['acl_id']) &&
-                is_string($row['alias']) &&
-                is_string($row['type'])
-            ) {
-                $aclTypes[intval($row['acl_id'])] = [
-                    'type' => $row['type'],
-                    'alias' => $row['alias'],
-                ];
-            }
-        }
-
-        return $aclTypes;
+        return array_map(fn($row) => [
+            'acl_id' => intval($row['acl_id']),
+            'type' => $row['type'],
+            'alias' => $row['alias'],
+        ], $rows);
     }
 }
