@@ -345,11 +345,9 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         $sql = "SELECT * FROM User_Roles WHERE acl_id IN ($placeholders)";
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aclIds);
 
-        // Manually map the rows to UserRoles objects
         $userRoles = [];
         foreach ($rows as $row) {
             $userRole = new \OmegaUp\DAO\VO\UserRoles();
-            // Assuming you need to populate UserRoles from $row, adjust as necessary
             $userRole->acl_id = $row['acl_id'];
             $userRole->user_id = $row['user_id'];
             $userRole->role_id = $row['role_id'];
