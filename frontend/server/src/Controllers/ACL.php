@@ -90,7 +90,15 @@ class ACL extends \OmegaUp\Controllers\Controller {
         // Build role map (role_id => [name, description])
         $roleMap = [];
         foreach (\OmegaUp\DAO\Roles::getAll() as $role) {
-            if ($role->role_id === null || $role->name === null || $role->description === null) {
+            if (
+                is_null(
+                    $role->role_id
+                ) || is_null(
+                    $role->name
+                ) || is_null(
+                    $role->description
+                )
+            ) {
                 continue;
             }
             $roleMap[$role->role_id] = [
@@ -106,7 +114,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
                 $userRoles,
                 'user_id'
             ),
-            fn($id) => $id !== null
+            fn($id) => !is_null($id) // Changed !== null to !is_null()
         );
         /** @var list<int> $userIds */
         $userIds = array_map('intval', array_values(array_unique($userIds)));
@@ -115,9 +123,9 @@ class ACL extends \OmegaUp\Controllers\Controller {
 
         foreach ($userRoles as $userRole) {
             if (
-                $userRole->acl_id === null ||
-                $userRole->user_id === null ||
-                $userRole->role_id === null
+                is_null($userRole->acl_id) ||  // Changed === null to is_null()
+                is_null($userRole->user_id) || // Changed === null to is_null()
+                is_null($userRole->role_id)   // Changed === null to is_null()
             ) {
                 continue;
             }
@@ -129,7 +137,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
 
             $aclMap[$aclId]['users'][] = [
                 'user_id' => $userRole->user_id,
-                'username' => $usernames[$userRole->user_id] ?? 'unknown',
+                'username' => $usernames[$userRole->user_id],
                 'role_id' => $userRole->role_id,
                 'role_name' => $roleMap[$userRole->role_id]['name'] ?? 'Unknown',
                 'role_description' => $roleMap[$userRole->role_id]['description'] ?? 'Unknown',
