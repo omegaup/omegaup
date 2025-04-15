@@ -1901,6 +1901,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'penalty_type',
                     'points_decay_factor',
                     'problemset_id',
+                    'recommended',
                     'rerun_id',
                     'scoreboard',
                     'scoreboard_url',
@@ -5962,6 +5963,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest->recommended = $r->ensureBool('value');
         \OmegaUp\DAO\Contests::update($contest);
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $contestAlias
+        );
 
         return ['status' => 'ok'];
     }
