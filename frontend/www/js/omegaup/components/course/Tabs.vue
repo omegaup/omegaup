@@ -356,4 +356,18 @@ export default class CourseTabs extends Vue {
     max-width: calc(50% - 25px);
   }
 }
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .row.m-0.mt-4 {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .row.m-0.mt-4 > div {
+    width: calc(50% - 25px);
+    flex: 0 0 calc(50% - 25px);
+    max-width: calc(50% - 25px);
+  }
+}
 </style>
