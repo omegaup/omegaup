@@ -1,10 +1,10 @@
-_UX_ será lo que nuestros concursantes vean durante la mayoría del tiempo, pues es la cara de _Arena_. Sus responsabilidades son:
+_UX_ will be what our contestants see most of the time, as it is the face of _Arena_. Its responsibilities are:
 
-* Mostrar el ambiente del concurso.
-* Desplegar, enviar y revisar el envío de problemas.
-* Mostrar clarificaciones.
-* Manejar el envío de problemas.
-* Desplegar un mini y un macro scoreboard (quizá hasta una grafiquita fresa!).
-* Desplegar standings.
+* Display the contest environment.
+* Show, submit, and review problem submissions.
+* Display clarifications.
+* Handle problem submissions.
+* Display both a mini and a macro scoreboard (maybe even a fancy little graph!).
+* Display standings.
 
-Una decisión de diseño es que UX estará escrito 100% en HTML/JavaScript, para que se pueda usar tanto con _Arena_ como con _Frontend_ para V1.
+A design decision is that UX will be written 100% in HTML/JavaScript, so it can be used with both _Arena_ and _Frontend_ for V1.
