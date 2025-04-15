@@ -167,6 +167,7 @@ export class EventsSocket {
             startTime: this.startTime,
             finishTime: this.finishTime,
             scoreMode: this.scoreMode,
+            currentTime: new Date(scoreboard.time),
           });
         })
         .catch(ui.ignoreError);
@@ -187,6 +188,13 @@ export class EventsSocket {
     rankingStore.commit('updateMiniRankingUsers', users);
     rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
+    // Create a consistent time reference for timestamp calculations
+    const now = new Date();
+    const finishTimestamp = Math.min(
+      this.finishTime?.getTime() || Infinity,
+      now.getTime(),
+    );
+
     api.Problemset.scoreboardEvents({
       problemset_id: this.problemsetId,
       token: this.scoreboardToken,
@@ -195,7 +203,7 @@ export class EventsSocket {
         this.calculateRankingEvents({
           events: response.events,
           startTimestamp: this.startTime.getTime(),
-          finishTimestamp: Date.now(),
+          finishTimestamp,
           currentRanking,
         }),
       )
@@ -233,7 +241,7 @@ export class EventsSocket {
         series,
         navigatorData,
         startTimestamp: this.startTime.getTime(),
-        finishTimestamp: Date.now(),
+        finishTimestamp,
         maxPoints,
       });
       rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
@@ -327,6 +335,13 @@ export class EventsSocket {
           scoreMode: this.scoreMode,
         });
 
+        // Create a consistent time reference
+        const now = new Date();
+        const finishTimestamp = Math.min(
+          this.finishTime?.getTime() || Infinity,
+          now.getTime(),
+        );
+
         api.Problemset.scoreboardEvents({
           problemset_id: this.problemsetId,
           token: this.scoreboardToken,
@@ -335,6 +350,8 @@ export class EventsSocket {
             onRankingEvents({
               events: response.events,
               currentRanking,
+              startTimestamp: this.startTime.getTime(),
+              finishTimestamp,
             }),
           )
           .catch(ui.ignoreError);
@@ -376,6 +393,13 @@ export class EventsSocket {
               scoreMode: this.scoreMode,
             });
 
+            // Create a consistent time reference for the interval
+            const now = new Date();
+            const finishTimestamp = Math.min(
+              this.finishTime?.getTime() || Infinity,
+              now.getTime(),
+            );
+
             api.Problemset.scoreboardEvents({
               problemset_id: this.problemsetId,
               token: this.scoreboardToken,
@@ -384,6 +408,8 @@ export class EventsSocket {
                 onRankingEvents({
                   events: response.events,
                   currentRanking,
+                  startTimestamp: this.startTime.getTime(),
+                  finishTimestamp,
                 }),
               )
               .catch(ui.ignoreError);

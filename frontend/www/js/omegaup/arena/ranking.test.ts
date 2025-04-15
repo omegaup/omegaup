@@ -167,10 +167,14 @@ describe('ranking', () => {
 
   describe('mergeRankings', () => {
     it('Should merge original ranking with current scoreboard', () => {
+      const now = Date.now();
+
+      // Pass currentTime to ensure consistent time-based calculations
       const { mergedScoreboard, originalContestEvents } = mergeRankings({
         scoreboard,
         originalScoreboardEvents,
         navbarProblems,
+        currentTime: new Date(now),
       });
       expect(originalContestEvents).toEqual([
         {
@@ -257,7 +261,9 @@ describe('ranking', () => {
       const localVue = createLocalVue();
       localVue.use(Vuex);
       const store = new Vuex.Store(rankingStoreConfig);
+      const now = Date.now();
 
+      // Pass currentTime to ensure consistent time-based calculations
       onVirtualRankingChanged({
         scoreboard,
         scoreboardEvents: originalScoreboardEvents,
@@ -266,6 +272,7 @@ describe('ranking', () => {
         finishTime: new Date(1),
         currentUsername: 'omegaUp',
         scoreMode: ScoreMode.Partial,
+        currentTime: new Date(now),
       });
 
       expect(store.state.ranking).toEqual([
@@ -338,7 +345,10 @@ describe('ranking', () => {
           penalty: 0,
         },
       ]);
-      expect(store.state.rankingChartOptions.series).toBeTruthy();
+      expect(store.state.rankingChartOptions).toBeTruthy();
+      expect(
+        (store.state.rankingChartOptions as Highcharts.Options).series,
+      ).toBeTruthy();
     });
   });
 
@@ -400,12 +410,15 @@ describe('ranking', () => {
         navbarProblems: navbarProblems,
         scoreMode: ScoreMode.Partial,
       });
+
+      // Use consistent timestamp references
+      const testNow = now;
       const params = {
         events: scoreboardEvents,
         currentRanking,
         maxPoints,
-        startTimestamp: Date.now() - 10000,
-        finishTimestamp: Date.now() + 10000,
+        startTimestamp: testNow - 10000,
+        finishTimestamp: testNow + 10000,
       };
       const { series, navigatorData } = onRankingEvents(params);
       expect(navigatorData).toEqual([
@@ -424,8 +437,10 @@ describe('ranking', () => {
     });
 
     it('Should get ranking chart options object', () => {
-      const startTimestamp = Date.now() - 10000;
-      const finishTimestamp = Date.now() + 10000;
+      // Use consistent timestamp references
+      const testNow = now;
+      const startTimestamp = testNow - 10000;
+      const finishTimestamp = testNow + 10000;
       const { currentRanking, maxPoints } = onRankingChanged({
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,

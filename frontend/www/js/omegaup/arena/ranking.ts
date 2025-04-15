@@ -30,7 +30,7 @@ export function onRankingEvents({
   events,
   currentRanking,
   startTimestamp = 0,
-  finishTimestamp = Date.now(),
+  finishTimestamp,
   placesToShowInChart = 10,
 }: {
   events: types.ScoreboardEvent[];
@@ -42,6 +42,10 @@ export function onRankingEvents({
   series: (Highcharts.SeriesLineOptions & { rank: number })[];
   navigatorData: number[][];
 } {
+  // Ensure consistent time reference if finishTimestamp is not provided
+  const now = new Date();
+  const endTimestamp = finishTimestamp ?? now.getTime();
+
   const dataInSeries: { [name: string]: number[][] } = {};
   const navigatorData: number[][] = [[startTimestamp, 0]];
   const series: (Highcharts.SeriesLineOptions & { rank: number })[] = [];
@@ -78,7 +82,7 @@ export function onRankingEvents({
   // convert datas to series
   for (const name of Object.keys(dataInSeries)) {
     dataInSeries[name].push([
-      finishTimestamp,
+      endTimestamp,
       dataInSeries[name][dataInSeries[name].length - 1][1],
     ]);
     series.push({
@@ -93,7 +97,7 @@ export function onRankingEvents({
   series.sort((a, b) => a.rank - b.rank);
 
   navigatorData.push([
-    finishTimestamp,
+    endTimestamp,
     navigatorData[navigatorData.length - 1][1],
   ]);
 
@@ -285,23 +289,25 @@ export function mergeRankings({
   scoreboard,
   originalScoreboardEvents,
   navbarProblems,
+  currentTime,
 }: {
   scoreboard: types.Scoreboard;
   originalScoreboardEvents: types.ScoreboardEvent[];
   navbarProblems: types.NavbarProblemsetProblem[];
+  currentTime?: Date;
 }): {
   mergedScoreboard: types.Scoreboard;
   originalContestEvents: types.ScoreboardEvent[];
 } {
-  // This clones virtualContestData to data so that virtualContestData values
-  // won't be overriden by processes below
-  const data = JSON.parse(JSON.stringify(scoreboard)) as types.Scoreboard;
+  const data = { ...scoreboard };
   const dataRanking: (types.ScoreboardRankingEntry & {
     virtual?: boolean;
   })[] = data.ranking;
   const events = originalScoreboardEvents;
+  // Use the provided currentTime or create a new one, but ensure we use the same time consistently
+  const now = currentTime || new Date();
   const currentDelta =
-    (new Date().getTime() - scoreboard.start_time.getTime()) / (1000 * 60);
+    (now.getTime() - scoreboard.start_time.getTime()) / (1000 * 60);
 
   for (const rank of dataRanking) rank.virtual = true;
 
@@ -393,6 +399,7 @@ export function onVirtualRankingChanged({
   finishTime,
   currentUsername,
   scoreMode,
+  currentTime,
 }: {
   scoreboard: types.Scoreboard;
   scoreboardEvents: types.ScoreboardEvent[];
@@ -401,12 +408,17 @@ export function onVirtualRankingChanged({
   finishTime?: Date;
   currentUsername: string;
   scoreMode: ScoreMode;
+  currentTime?: Date;
 }): void {
   let rankingChartOptions: Highcharts.Options | null = null;
+  // Use the provided currentTime or create a new one, but ensure we use the same time consistently
+  const now = currentTime || new Date();
+
   const { mergedScoreboard, originalContestEvents } = mergeRankings({
     scoreboard,
     originalScoreboardEvents: scoreboardEvents,
     navbarProblems: problems,
+    currentTime: now,
   });
   const rankingInfo = onRankingChanged({
     scoreboard: mergedScoreboard,
@@ -424,7 +436,7 @@ export function onVirtualRankingChanged({
   const startTimestamp = startTime.getTime();
   const finishTimestamp = Math.min(
     finishTime?.getTime() || Infinity,
-    Date.now(),
+    now.getTime(),
   );
   const { series, navigatorData } = onRankingEvents({
     events: scoreboardEvents.concat(originalContestEvents),
@@ -436,7 +448,7 @@ export function onVirtualRankingChanged({
     rankingChartOptions = createChart({
       series,
       navigatorData,
-      startTimestamp: startTimestamp ?? Date.now(),
+      startTimestamp: startTimestamp ?? now.getTime(),
       finishTimestamp,
       maxPoints: rankingInfo.maxPoints,
     });
