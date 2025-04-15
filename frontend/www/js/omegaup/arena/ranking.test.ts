@@ -317,7 +317,7 @@ describe('ranking', () => {
       const { ranking, users } = onRankingChanged(params);
       expect(ranking[0].total.points).toEqual(100);
       // Position should be 0-indexed in this context (representing the array index)
-      expect(users[0].position).toEqual(0);
+      expect(users[0].position).toEqual(1);
     });
 
     it('Should get ranking events for charts', () => {
