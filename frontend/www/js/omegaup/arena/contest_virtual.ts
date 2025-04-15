@@ -90,6 +90,7 @@ OmegaUp.on('ready', async () => {
               finishTime: contest.finish_time,
               currentUsername,
               scoreMode: getScoreModeEnum(contest.score_mode),
+              currentTime: new Date(),
             });
           })
           .catch(ui.apiError);
@@ -115,6 +116,7 @@ OmegaUp.on('ready', async () => {
       finishTime: payload.contest.finish_time,
       currentUsername: commonPayload.currentUsername,
       scoreMode: getScoreModeEnum(payload.contest.score_mode),
+      currentTime: new Date(),
     });
     virtualContestRefreshInterval = setInterval(() => {
       loadVirtualRanking({

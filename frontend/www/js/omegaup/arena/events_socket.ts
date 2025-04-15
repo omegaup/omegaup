@@ -167,7 +167,7 @@ export class EventsSocket {
             startTime: this.startTime,
             finishTime: this.finishTime,
             scoreMode: this.scoreMode,
-            currentTime: new Date(scoreboard.time),
+            currentTime: new Date(),
           });
         })
         .catch(ui.ignoreError);
