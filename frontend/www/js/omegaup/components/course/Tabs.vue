@@ -25,7 +25,7 @@
     </ul>
     <div class="tab-content">
       <div class="row m-0 mt-4">
-        <div class="col-md-6 col-lg-3 p-0 ml-4">
+        <div class="col-md-4 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
             class="form-control introjs-search"
@@ -35,22 +35,18 @@
         </div>
         <div
           v-if="currentSelectedTab === Tab.Public"
-          class="col-md-6 col-lg-3 p-0 ml-4"
+          class="col-md-4 col-lg-3 p-0 ml-3"
         >
-          <div class="form-group">
-            <label>
-              <select v-model="levelFilter" class="ml-2 form-control">
-                <option value="all">{{ T.wordsAll }}</option>
-                <option value="introductory">
-                  {{ T.courseLevelIntroductory }}
-                </option>
-                <option value="intermediate">
-                  {{ T.courseLevelIntermediate }}
-                </option>
-                <option value="advanced">{{ T.courseLevelAdvanced }}</option>
-              </select>
-            </label>
-          </div>
+          <select v-model="levelFilter" class="form-control">
+            <option :value="Level.All">{{ T.wordsAll }}</option>
+            <option :value="Level.Introductory">
+              {{ T.courseLevelIntroductory }}
+            </option>
+            <option :value="Level.Intermediate">
+              {{ T.courseLevelIntermediate }}
+            </option>
+            <option :value="Level.Advanced">{{ T.courseLevelAdvanced }}</option>
+          </select>
         </div>
       </div>
       <div
@@ -152,6 +148,13 @@ export enum Tab {
   Finished = 'finished',
 }
 
+export enum Level {
+  All = 'all',
+  Introductory = 'introductory',
+  Intermediate = 'intermediate',
+  Advanced = 'advanced',
+}
+
 @Component({
   components: {
     'omegaup-course-card-public': course_CardPublic,
@@ -173,9 +176,10 @@ export default class CourseTabs extends Vue {
   T = T;
   ui = ui;
   Tab = Tab;
+  Level = Level;
   currentSelectedTab = this.selectedTab;
   searchText = '';
-  levelFilter = 'all';
+  levelFilter = Level.All;
 
   mounted() {
     const title = T.joinCourseInteractiveGuideTitle;
@@ -259,7 +263,7 @@ export default class CourseTabs extends Vue {
             );
 
           const matchesLevel =
-            this.levelFilter === 'all' || course.level === this.levelFilter;
+            this.levelFilter === Level.All || course.level === this.levelFilter;
 
           return matchesText && matchesLevel;
         });
@@ -339,20 +343,17 @@ export default class CourseTabs extends Vue {
   .custom-card {
     padding: 1.25rem 2rem !important;
   }
-  .form-control {
-    margin-left: 0 !important;
-    margin-top: 0.5rem;
+
+  .row.m-0.mt-4 {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
   }
-}
 
-.form-group label {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  font-weight: bold;
-}
-
-.form-group select {
-  min-width: 120px;
+  .row.m-0.mt-4 > div {
+    width: calc(50% - 25px);
+    flex: 0 0 calc(50% - 25px);
+    max-width: calc(50% - 25px);
+  }
 }
 </style>
