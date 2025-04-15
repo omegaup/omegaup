@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Racha de 7 días",
+      "description": "Otorgado a personas que han mantenido una racha de 7 días consecutivos."
+    },
+    "en": {
+      "name": "7-day streak",
+      "description": "User has maintained a streak of 7 consecutive days."
+    },
+    "pt": {
+      "name": "Sequência de 7 dias",
+      "description": "Concedido a pessoas que mantiveram uma sequência de 7 dias consecutivos."
+    }
+  }
+  
