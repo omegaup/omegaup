@@ -17,17 +17,17 @@ If you're new to omegaUp, we recommend:
 
 The first step is setting up the development environment. We use Docker for this, and the main operating systems used are Windows and Ubuntu. It can run on macOS, but additional configurations are needed.  
 
-- [Development Environment Installation](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)).  
+- [Development Environment Installation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Set-Up-Your-Development-Environment-(English).md).  
 
 ## Architecture (Overview)  
 
 Below is a high-level overview of omegaUp components _(temporary codenames are used)_:  
 
  
-- **[Frontend](https://github.com/omegaup/omegaup/wiki/Frontend)**: A collection of controllers (in the MVC model) that manage site interactions, including problem and contest administration, user management, rankings, solved and pending problems, the scoreboard, and more. _Frontend_ communicates with _Backend_ to compile and run programs. Written in PHP+MySQL.  
+- **[Frontend](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Frontend.md)**: A collection of controllers (in the MVC model) that manage site interactions, including problem and contest administration, user management, rankings, solved and pending problems, the scoreboard, and more. _Frontend_ communicates with _Backend_ to compile and run programs. Written in PHP+MySQL.  
 - **Backend**: The evaluation subsystem, written in Go.  
-  - **[Grader](https://github.com/omegaup/omegaup/wiki/Grader)**: Responsible for maintaining the submission queue, sending them to one or more _Runners_, receiving responses, and determining a verdict.  
-  - **[Runner](https://github.com/omegaup/omegaup/wiki/Runner)**: A decentralized, asynchronous system for compiling and executing programs. Other systems communicate with _Runner_ through a RESTful API. It knows how to compile, execute, and pass input to user-submitted programs and verify their correctness. It is essentially a distributed and user-friendly frontend for _Minijail_.  
+  - **[Grader](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Grader.md)**: Responsible for maintaining the submission queue, sending them to one or more _Runners_, receiving responses, and determining a verdict.  
+  - **[Runner](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Runner.md)**: A decentralized, asynchronous system for compiling and executing programs. Other systems communicate with _Runner_ through a RESTful API. It knows how to compile, execute, and pass input to user-submitted programs and verify their correctness. It is essentially a distributed and user-friendly frontend for _Minijail_.  
   - **Minijail**: A fork of the Linux sandbox used in Chrome OS. It can execute code in C, C++, Perl, Python, Ruby, Java, and Karel. Written in C.  
 
 For more details, you can refer to two papers published in the IOI journal:  
@@ -59,8 +59,8 @@ These are the main directories actively used in development:
 
 ### You may find these useful:  
 
-- [Coding Guidelines](https://github.com/omegaup/omegaup/wiki/Coding-guidelines-(English-version)).  
-- [Useful Development Commands](https://github.com/omegaup/omegaup/wiki/Useful-Commands-for-Development).  
+- [Coding Guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines-(English-version).md).  
+- [Useful Development Commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md).  
 
 ## Design Decisions  
 
@@ -75,6 +75,6 @@ These are the main directories actively used in development:
 
 | Topic | Description |  
 | ---------------------------- | ------------------------------------------------------------ |  
-| [How to Start Developing](https://github.com/omegaup/omegaup/wiki/How-to-Make-a-Pull-Request-(English)) | Git configuration and how to submit a PR. |  
-| [Architecture](https://github.com/omegaup/omegaup/wiki/Architecture-(English)) | Software architecture of omegaUp.com. |  
-| [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment-(English)) | How and when deployments occur. |  
+| [How to Start Developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md) | Git configuration and how to submit a PR. |  
+| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md) | Software architecture of omegaUp.com. |  
+| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md) | How and when deployments occur. |  
