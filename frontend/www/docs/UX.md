@@ -1,31 +1,31 @@
 _UX_ will be what our contestants see most of the time, as it is the face of _Arena_. Its responsibilities are:
 
----
+
 
 ### • Display the contest environment
 
 ![Contest Environment](https://github.com/user-attachments/assets/663cf488-ff15-4112-bf7d-5149ad983765)
 
 
----
+
 
 ### • Show, submit, and review problem submissions
 
 ![Review of submissions](https://github.com/user-attachments/assets/87c12e4e-bb41-41bb-931f-8ac4338ff7bf)
 
----
+
 
 ### • Display clarifications  
 
 ![clarifications](https://github.com/user-attachments/assets/186e0aa3-f645-425a-ab98-351d82df6e8a)
 
----
+
 
 ### • Handle problem submissions
 
 ![Previous submissions of a problem](https://github.com/user-attachments/assets/b1a56c84-1ef1-42ca-a5e9-31fa4d69dc81)
 
----
+
 
 ### • Display both a mini scoreboard and a scoreboard (maybe even a fancy little graph!)  
 i) view of mini scoreboard:
@@ -44,7 +44,7 @@ iii) view of graph:
 ![image](https://github.com/user-attachments/assets/215607d1-512b-4d62-8389-7bc468f8c6b9)
 
 
----
+
 
 ### • Display standings
 
