@@ -28,6 +28,21 @@ _UX_ will be what our contestants see most of the time, as it is the face of _Ar
 ---
 
 ### • Display both a mini scoreboard and a scoreboard (maybe even a fancy little graph!)  
+i) view of mini scoreboard:
+
+
+![mini scoreboard](https://github.com/user-attachments/assets/d555926e-bdb1-4cde-a48f-89785b568245)
+
+ii) view of scoreboard:
+
+
+![scoreboard](https://github.com/user-attachments/assets/e260ee20-77b1-4466-b9c1-c6ac6d49f636)
+
+iii) view of graph:
+
+
+![image](https://github.com/user-attachments/assets/215607d1-512b-4d62-8389-7bc468f8c6b9)
+
 
 ---
 
