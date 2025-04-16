@@ -60,7 +60,7 @@ def explain_queries(
     '''Run explain command on queries'''
     cursor = connection.cursor()
     query_count = 0
-    max_inefficient = 0
+    # max_inefficient = 0
     for query in queries:
         query_text = query[0]
         try:
@@ -69,7 +69,7 @@ def explain_queries(
 
             # Get the index of the interest columns
             column_names = [i[0] for i in cursor.description]  # type: ignore
-            possible_keys_index = column_names.index('possible_keys')
+            # possible_keys_index = column_names.index('possible_keys')
             type_row_index = column_names.index('type')
             table_row_index = column_names.index('table')
             extra_row_index = column_names.index('Extra')
@@ -110,9 +110,9 @@ def explain_queries(
                 query_count += 1
                 print(inefficient_count, " inefficient tables scan")
                 print(query_text, "\n\n")
-            #if inefficient_count == 1:
-                #print(query_text, "\n\n")
-            #if inefficient_count > 2:
+            # if inefficient_count == 1:
+                # print(query_text, "\n\n")
+            # if inefficient_count > 2:
             #    max_inefficient += 1
             #    print(query_text, "\n\n")
 
