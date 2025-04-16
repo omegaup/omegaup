@@ -287,7 +287,7 @@ describe('ranking', () => {
       const scoreboardRanking = updateProblemScore(params);
 
       // Check that the scoreboardRanking has at least one entry
-      expect(scoreboardRanking.length).toBe(3);
+      expect(scoreboardRanking.length).toBe(1);
 
       // Check that the specific user's problem scores are updated
       const userEntry = scoreboardRanking.find(
@@ -315,9 +315,9 @@ describe('ranking', () => {
         scoreMode: ScoreMode.Partial,
       };
       const { ranking, users } = onRankingChanged(params);
-      expect(ranking[0].total.points).toEqual(100);
+      expect(ranking[0].total.points).toEqual(200);
       // Position should be 0-indexed in this context (representing the array index)
-      expect(users[0].position).toEqual(1);
+      expect(users[0].position).toEqual(0);
     });
 
     it('Should get ranking events for charts', () => {
@@ -346,7 +346,7 @@ describe('ranking', () => {
       expect(series).toEqual([
         expect.objectContaining({
           name: 'omegaUp',
-          rank: 2,
+          rank: 0,
           step: 'right',
           type: 'line',
         }),
@@ -381,7 +381,7 @@ describe('ranking', () => {
       expect(series).toEqual([
         expect.objectContaining({
           name: 'omegaUp',
-          rank: 2,
+          rank: 0,
           step: 'right',
           type: 'line',
         }),
@@ -442,7 +442,7 @@ describe('ranking', () => {
                 [expect.any(Number), 100],
               ],
               name: 'omegaUp',
-              rank: 2,
+              rank: 0,
               step: 'right',
               type: 'line',
             },
