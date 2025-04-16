@@ -120,10 +120,10 @@ def explain_queries(
             print(f"Failed to explain query: {query_text}")
             print(f"Error: {e}")
     print(query_count, " inefficient queries found")
-    #print(max_inefficient, " max inefficient queries")
+    # print(max_inefficient, " max inefficient queries")
     if query_count > 0:
         pytest.skip(f'{query_count} need fix')
-    #assert False
+    # assert False
 
 
 # Main function to handle the logic
