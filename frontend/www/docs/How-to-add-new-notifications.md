@@ -23,4 +23,4 @@ The notification indicates that it is of type badge and the `badge` field works 
 
 From the `Notifications.vue` component, this is supported through: https://github.com/omegaup/omegaup/blob/master/frontend/www/js/omegaup/components/notification/Notification.vue#L58, and the various styles that are applied.
 
-If you have any questions, it's better to post them in the #depto_tecnico channel on our Slack :)
+If you have any questions, it's better to post them in the #ingenieria channel on our Slack :)
