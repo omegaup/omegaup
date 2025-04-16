@@ -299,7 +299,7 @@ export function mergeRankings({
   mergedScoreboard: types.Scoreboard;
   originalContestEvents: types.ScoreboardEvent[];
 } {
-  const data = { ...scoreboard };
+  const data = JSON.parse(JSON.stringify(scoreboard)) as types.Scoreboard;
   const dataRanking: (types.ScoreboardRankingEntry & {
     virtual?: boolean;
   })[] = data.ranking;

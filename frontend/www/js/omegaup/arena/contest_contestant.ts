@@ -89,7 +89,7 @@ OmegaUp.on('ready', async () => {
     const startTimestamp = payload.contest.start_time.getTime();
     const finishTimestamp = Math.min(
       payload.contest.finish_time?.getTime() || Infinity,
-      new Date().getTime(), // Use consistent time reference
+      Date.now(),
     );
     const { series, navigatorData } = onRankingEvents({
       events: payload.scoreboardEvents,
