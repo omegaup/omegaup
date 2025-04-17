@@ -104,8 +104,7 @@ export default class CasesTab extends Vue {
           ],
         });
 
-        intro.onbeforechange((targetElement) => {
-          console.log('onbeforechange', targetElement.attributes);
+        intro.onbeforechange(() => {
           var currentStep = intro.currentStep();
           if (currentStep === 1) {
             this.openAddWindow();

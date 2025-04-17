@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import problemCreator_CasesTab from './cases/CasesTab.vue';
 import problemCreator_StatementTab from './statement/StatementTab.vue';
 import problemCreator_CodeTab from './code/CodeTab.vue';
@@ -86,11 +86,6 @@ export default class Tabs extends Vue {
   T = T;
 
   activeTabIndex = 0;
-
-  @Watch('activeTabIndex')
-  onActiveTabIndexChange(newValue: number) {
-    console.log('activeTabIndex', newValue);
-  }
 
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
