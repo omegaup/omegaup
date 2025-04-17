@@ -38,14 +38,15 @@ class ACLs extends \OmegaUp\DAO\Base\ACLs {
             INNER JOIN Groups_ g ON g.acl_id = a.acl_id
             WHERE a.owner_id = ?
         ';
-        $params = [$userId, $userId, $userId, $userId];
+        $params = array_fill(0, 4, $userId);
 
+        /** @var list<array{acl_id: int, alias: string, type: string}> */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         return array_map(fn($row) => [
-            'acl_id' => intval($row['acl_id']),
-            'type' => strval($row['type']),
-            'alias' => strval($row['alias']),
+            'acl_id' => $row['acl_id'],
+            'type' => $row['type'],
+            'alias' => $row['alias'],
             'users' => [],
         ], $rows);
     }
