@@ -15,6 +15,10 @@ describe('Problem creator Test', () => {
     cy.visit('/');
     cy.login(loginOptions);
     profilePage.updatePreferredLanguage('es');
+    cy.setCookie('has-visited-problem-creator', true.toString());
+    cy.setCookie('has-visited-cases-tab', true.toString());
+    cy.setCookie('has-visited-code-tab', true.toString());
+    cy.setCookie('has-visited-solution-tab', true.toString());
     cy.logout();
   });
 
