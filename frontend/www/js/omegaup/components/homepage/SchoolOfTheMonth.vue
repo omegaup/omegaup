@@ -4,10 +4,7 @@
       <h5 class="m-0 mr-1">
         {{ T.schoolOfTheMonth }}
       </h5>
-      <a
-        class="card-header-help"
-        href="https://blog.omegaup.com/el-nuevo-ranking-de-escuelas-de-omegaup/"
-      >
+      <a class="card-header-help" :href="NewSchoolofTheMonthFeatureURL">
         <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
     </div>
@@ -43,6 +40,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import CountryFlag from '../CountryFlag.vue';
 import T from '../../lang';
+import { getBlogUrl } from '../../urlHelper';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -59,6 +57,10 @@ export default class SchoolOfTheMonth extends Vue {
   @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
 
   T = T;
+
+  get NewSchoolofTheMonthFeatureURL(): string {
+    return getBlogUrl('NewSchoolofTheMonthFeatureURL');
+  }
 }
 </script>
 
