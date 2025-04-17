@@ -48,7 +48,7 @@ Vue.use(VueCookies, { expire: -1 });
   },
 })
 export default class CasesTab extends Vue {
-  @Prop() activeTabIndex!: number;
+  @Prop() activeTabIndex!: TabIndex;
 
   shouldShowAddWindow = false;
   shouldShowCaseEditWindow = false;
@@ -72,7 +72,7 @@ export default class CasesTab extends Vue {
   }
 
   @Watch('activeTabIndex')
-  onActiveTabIndexChanged(newIndex: number) {
+  onActiveTabIndexChanged(newIndex: TabIndex) {
     if (newIndex === TabIndex.TestCases) {
       this.startIntroGuide();
     }

@@ -73,7 +73,7 @@ export default class SolutionTab extends Vue {
 
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
-  @Prop() activeTabIndex!: number;
+  @Prop() activeTabIndex!: TabIndex;
 
   T = T;
   ui = ui;
@@ -94,7 +94,7 @@ export default class SolutionTab extends Vue {
   }
 
   @Watch('activeTabIndex')
-  onActiveTabIndexChanged(newIndex: number) {
+  onActiveTabIndexChanged(newIndex: TabIndex) {
     if (newIndex === TabIndex.Solution) {
       this.$nextTick(() => {
         this.startIntroGuide();

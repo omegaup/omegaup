@@ -88,7 +88,7 @@ Vue.use(VueCookies, { expire: -1 });
 export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
-  @Prop() activeTabIndex!: number;
+  @Prop() activeTabIndex!: TabIndex;
 
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
@@ -133,7 +133,7 @@ export default class CodeTab extends Vue {
   }
 
   @Watch('activeTabIndex')
-  onActiveTabIndexChanged(newIndex: number) {
+  onActiveTabIndexChanged(newIndex: TabIndex) {
     if (newIndex === TabIndex.Code) {
       this.startIntroGuide();
     }
