@@ -94,7 +94,6 @@ export enum TabIndex {
 })
 export default class Tabs extends Vue {
   T = T;
-
   activeTabIndex = TabIndex.Statement;
 
   @Prop({ default: T.problemCreatorEmpty })
