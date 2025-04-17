@@ -1,6 +1,6 @@
 -- Creating the Carousel_Items table with JSON support for multilingual text
 CREATE TABLE `Carousel_Items` (
-    `corousel_item_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `carousel_item_id` INT AUTO_INCREMENT PRIMARY KEY,
     `title` JSON NOT NULL,
     `excerpt` JSON NOT NULL,
     `image_url` VARCHAR(255) NULL,

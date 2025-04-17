@@ -24,7 +24,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r);
+        self::validateAdmin($r->identity);
 
         $expiration = $r->ensureOptionalString('expiration_date');
         $carouselItem = new \OmegaUp\DAO\VO\CarouselItems([
@@ -52,7 +52,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r);
+        self::validateAdmin($r->identity);
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
@@ -84,7 +84,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r);
+        self::validateAdmin($r->identity);
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $r->ensureInt('carousel_item_id')
@@ -119,12 +119,12 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r);
+        self::validateAdmin($r->identity);
 
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->corousel_item_id ?? 0,
+                    'carousel_item_id' => $item->carousel_item_id ?? 0,
                     'title' => $item->title ?? '',
                     'excerpt' => $item->excerpt ?? '',
                     'image_url' => $item->image_url ?? '',
@@ -157,7 +157,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'carousel_item_id' => $item->corousel_item_id ?? 0,
+                    'carousel_item_id' => $item->carousel_item_id ?? 0,
                     'title' => $item->title ?? '',
                     'excerpt' => $item->excerpt ?? '',
                     'image_url' => $item->image_url ?? '',
@@ -174,9 +174,8 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateAdmin(\OmegaUp\Request $r): void {
-        $r->ensureIdentity();
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+    private static function validateAdmin(\OmegaUp\DAO\VO\Identities $identity): void {
+        if (!\OmegaUp\Authorization::isSystemAdmin($identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
     }
