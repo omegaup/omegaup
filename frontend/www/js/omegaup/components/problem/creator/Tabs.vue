@@ -100,7 +100,6 @@ export default class Tabs extends Vue {
   currentSolutionMarkdownProp!: string;
   @Prop({ default: T.problemCreatorEmpty })
   currentMarkdownProp!: string;
-
   @Prop({ default: T.problemCreatorEmpty })
   codeProp!: string;
 
