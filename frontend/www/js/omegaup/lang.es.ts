@@ -1005,7 +1005,7 @@ const translations: { [key: string]: string; } = {
   originalContestHasNotEnded: "El concurso original a\u00fan no ha terminado",
   outputOnly: "S\u00f3lo salida",
   outputOnlyDownloadInput: "Descargar .zip con los casos de entrada",
-  outputOnlyFiles: "Sólo archivos de salida",
+  outputOnlyFiles: "S\u00f3lo archivos de salida",
   over13yearsOld: "Tengo m\u00e1s de 13 a\u00f1os.",
   parameterDateTooLarge: "La fecha excede el l\u00edmite superior de %(upper_bound!timestamp)",
   parameterDateTooSmall: "La fecha es menor al l\u00edmite inferior de %(lower_bound!timestamp)",
@@ -2095,4 +2095,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export { translations as default };
+export {translations as default};
