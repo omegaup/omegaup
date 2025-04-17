@@ -34,7 +34,7 @@ declare global {
 }
 
 @Component
-export default class Markdown extends Vue {
+export default class ProblemMarkdown extends Vue {
   @Prop() markdown!: string;
   @Ref() root!: HTMLElement;
   @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
