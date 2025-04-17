@@ -614,27 +614,4 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             [$identity->identity_id]
         );
     }
-
-    /**
-     * Gets usernames for a list of user IDs.
-     *
-     * @param list<int> $userIds
-     * @return array<int, string> user_id => username
-     */
-    public static function getUsernamesByUserIds(array $userIds): array {
-        if (empty($userIds)) {
-            return [];
-        }
-
-        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
-        $sql = "SELECT user_id, username FROM Identities WHERE user_id IN ($placeholders)";
-        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $userIds);
-
-        $usernames = [];
-        foreach ($rows as $row) {
-            $usernames[intval($row['user_id'])] = $row['username'];
-        }
-
-        return $usernames;
-    }
 }

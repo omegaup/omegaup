@@ -119,28 +119,18 @@ class ACL extends \OmegaUp\Controllers\Controller {
         /** @var list<int> $userIds */
         $userIds = array_map('intval', array_values(array_unique($userIds)));
 
-        $usernames = \OmegaUp\DAO\Identities::getUsernamesByUserIds($userIds);
-
         foreach ($userRoles as $userRole) {
-            if (
-                is_null($userRole->acl_id) ||  // Changed === null to is_null()
-                is_null($userRole->user_id) || // Changed === null to is_null()
-                is_null($userRole->role_id)   // Changed === null to is_null()
-            ) {
-                continue;
-            }
-
-            $aclId = $userRole->acl_id;
+            $aclId = $userRole['acl_id'];
             if (!isset($aclMap[$aclId])) {
                 continue;
             }
 
             $aclMap[$aclId]['users'][] = [
-                'user_id' => $userRole->user_id,
-                'username' => $usernames[$userRole->user_id],
-                'role_id' => $userRole->role_id,
-                'role_name' => $roleMap[$userRole->role_id]['name'] ?? 'Unknown',
-                'role_description' => $roleMap[$userRole->role_id]['description'] ?? 'Unknown',
+                'user_id' => $userRole['user_id'],
+                'username' => $userRole['username'],
+                'role_id' => $userRole['role_id'],
+                'role_name' => $roleMap[$userRole['role_id']]['name'],
+                'role_description' => $roleMap[$userRole['role_id']]['description'],
             ];
         }
 
