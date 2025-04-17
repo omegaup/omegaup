@@ -6,7 +6,7 @@ Implementing a badge is quite simple, just follow these steps:
 
 3. If the badge has a custom icon, the `SVG` file should be added to `badgeFolder`, named `icon.svg`.
 
-4. Create a file called `query.sql` in `badgeFolder`. This file must contain the `SQL (MySQL)` statement that SELECTs the `user_id`s of users who should receive the proposed badge. To follow this logic, it's necessary to understand the [omegaUp database schema](https://github.com/omegaup/omegaup/blob/master/frontend/database/schema.sql).
+4. Create a file called `query.sql` in `badgeFolder`. This file must contain the `SQL (MySQL)` statement that selects the `user_id`s of users who should receive the proposed badge. To follow this logic, it's necessary to understand the [omegaUp database schema](https://github.com/omegaup/omegaup/blob/master/frontend/database/schema.sql).
 
 5. Create the [`localizations.json`](https://github.com/omegaup/omegaup/blob/master/frontend/badges/legacyUser/localizations.json) file inside `badgeFolder`. This must contain the translations of the badge's name and description in Spanish (es), English (en), and Portuguese (pt). Remember that the maximum length for a badge name is **50 characters**.
 
