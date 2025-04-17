@@ -1,134 +1,132 @@
-En este texto te mostramos cómo generar/editar manualmente un archivo `.zip` para un problema de omegaUp. Este texto está dirigido a aquellos usuarios más experimentados o que requieren de funcionalidades más específicas (por ejemplo, problemas de Karel). Si eres un usuario que va comenzando a escribir problemas o que tiene necesidades más básicas te recomendamos utilizar el [Creador de Problemas](https://mau-md.github.io/Omegaup-CDP/#/) y ver [este tutorial](https://www.youtube.com/watch?v=cUUP9DqQ1Vg&list=PL43fZBs80z1OdkZqSZte3vXA-8VKyh_ZZ&index=2&t=329s) de como usarlo. 
+In this document, we show you how to manually generate/edit a `.zip` file for an omegaUp problem. This document is intended for more experienced users or those who require more specific functionalities (e.g., Karel problems). If you're just starting to write problems or have simpler needs, we recommend using the [Problem Creator](https://mau-md.github.io/Omegaup-CDP/#/) and watching this [tutorial](https://www.youtube.com/watch?v=cUUP9DqQ1Vg&list=PL43fZBs80z1OdkZqSZte3vXA-8VKyh_ZZ&index=2&t=329s) on how to use it.
 
-Si optaste por la opción manual que describiremos en este documento, también te recomendamos ver la [parte 1](https://www.youtube.com/watch?v=LfyRSsgrvNc) y [parte 2](https://www.youtube.com/watch?v=i2aqXXOW5ic) del tutorial de cómo crear problemas para omegaUp manualmente.
+If you chose the manual option described in this document, we also recommend watching [part 1](https://www.youtube.com/watch?v=LfyRSsgrvNc) and [part 2](https://www.youtube.com/watch?v=i2aqXXOW5ic) of the tutorial on how to manually create problems for omegaUp.
 
-# Configuración
+# Configuration
 
-Los problemas de omegaUp tiene algunas variables que se pueden configurar:
+omegaUp problems have several configurable variables:
 
-* Validador:
-    * **Token por token**: Lee todos los tokens (secuencias de hasta 4,194,304 caracteres imprimibles contiguos separados por espacios) del archivo de salida esperada y la salida del usuario y valida que ambas secuencias de tokens sean idénticas.
-    * **Token por token, ignorando mayúsculas y minúsculas**: Lee todos los tokens (secuencias de hasta 4,194,304 caracteres imprimibles contiguos separados por espacios) del archivo de salida esperada y la salida del usuario, convierte todos los tokens a minúsculas, y valida que ambas secuencias de tokens sean idénticas.
-    * **Tokens numéricos con tolerancia de 1e-9**: Lee todos los tokens numéricos (secuencias contiguas de números y separadores decimales) del archivo de salida esperada y la salida del usuario, interpreta todos los tokens como números, y valida que ambas secuencias de números tengan la misma longitud y que los números correspondientes en el archivo de salida esperada tengan un error absoluto O relativo de hasta 1e-9.
-    * **Interpretar salida estándar como puntaje**: Lee la salida estándar, la convierte a un número flotante, la restringe al intervalo cerrado [0.0, 1.0] y usa eso como puntuación final. Normalmente sólo se utiliza con problemas interactivos, para evitar trampas del concursante.
-    * **Validador personalizado (validator.$lang$)**: Permite proporcionar un programa que lee la salida estándar del concursante (y tanto la entrada estándar del caso como la salida esperada), e imprime un número flotante en el intervalo cerrado [0.0, 1.0]. Para ver cómo se debe escribir dicho programa, ver la sección de [validator.$lang$ (opcional)](#validatorlang-opcional).
-* Lenguajes:
-    * **C, C++, etc.**: Permite que el concursante proporcione el código fuente en uno de los lenguajes soportados para resolver el problema.
-    * **Karel**: Permite que el concursante proporcione el código fuente en Karel para resolver el problema.
-    * **Sólo salida**: Permite que el concursante proporcione un archivo .zip con las respuestas de todos los casos. Si se desea permitir que el concursante envíe un único caso de salida como texto en vez de un .zip, debe existir un sólo caso llamado `Main.in`/`Main.out`.
-    * **Sin envíos**: No permite que el concursante haga envíos. Esto se utiliza únicamente para mostrar contenido en un curso.
-* **Tiempo límite para el validador (ms)**: El número máximo de milisegundos (en tiempo real) que el evaluador esperará a que el validador emita un veredicto para cada caso antes de regresar `JE`.
-* **Tiempo límite (ms)**: El número máximo de milisegundos (en tiempo de CPU) que el sistema operativo permitirá que el proceso del concursante se ejecute para cada caso antes de terminarlo con `TLE`.
-* **Tiempo límite total (ms)**: El número máximo de milisegundos (en tiempo real) que el evaluador esperará a que el problema completo termine de ejecutar antes de terminarlo con `TLE`. Si algún caso no alcanzó a ejecutarse antes de este límite, no se evaluará. Para intentar tener cierta cantidad de consistencia, los casos se evaluarán en orden lexicográfico.
-* **Tiempo extra para libinteractive (ms)**: El número máximo de milisegundos (en tiempo real) que el evaluador esperará a que el programa del evaluador termine para cada caso antes de terminarlo con `TLE`.
-* **Límite de memoria (KiB)**: La cantidad máxima de memoria RAM (heap+stack) en [kibibytes](https://es.wikipedia.org/wiki/Kibibyte) que el sistema operativo permitirá que el programa del concursante utilice antes de terminarlo con `MLE`.
-* **Límite de salida (bytes)**: El número máximo de bytes que el programa del concursante puede escribir a salida o error estándar antes de terminarlo con `OLE`. Normalmente este límite se autodetecta con los archivos `.out`, obteniendo el tamaño más grande de ellos y sumándole 10KiB. Para problemas que necesitan un validador personalizado, este valor se debe proporcionar explícitamente.
-* **Límite de entrada (bytes)**: Longitud máxima (en bytes) del programa del concursante. Utilizado si se desea evitar que los concursantes utilicen una solución precalculada.
-* **Fuente**: Atribución u origen de la redacción del problema.
-* **Aparece en el listado público**: Si el problema se puede mostrar en el listado público y usar para concursos y cursos de terceros.
-* **Enviar clarificaciones por correo**: Si omegaUp puede enviar clarificaciones que hagan los usuarios acerca de este problema por correo al autor del problema.
-* **Tags**: Etiquetas de clasificación para este problema.
+* **Validator**:
+    * **Token by token**: Reads all tokens (sequences of up to 4,194,304 printable contiguous characters separated by spaces) from the expected output file and the user's output, and validates that both sequences are identical.
+    * **Token by token, ignoring case**: Same as above, but converts all tokens to lowercase before comparison.
+    * **Numeric tokens with 1e-9 tolerance**: Reads numeric tokens (contiguous sequences of numbers and decimal separators), interprets them as numbers, and checks that both sequences have the same length and their corresponding values differ by no more than 1e-9 absolute or relative error.
+    * **Interpret stdout as score**: Reads standard output, converts it to a float number, restricts it to the range [0.0, 1.0], and uses it as the final score. Mostly used for interactive problems to avoid cheating.
+    * **Custom validator (`validator.$lang$`)**: Allows a custom program that reads the contestant's stdout (and both the input and expected output files), and prints a float in [0.0, 1.0]. See the [validator.$lang$ (optional)](#validatorlang-optional) section for implementation.
 
-# Problemas de Lenguaje (C/C++/Java/Pascal)
+* **Languages**:
+    * **C, C++, etc.**: Contestants can submit source code in supported languages.
+    * **Karel**: Contestants can submit source code in Karel.
+    * **Output only**: Contestants submit a `.zip` file with answers for all cases. To allow single case submission as plain text, there must be only one case named `Main.in`/`Main.out`.
+    * **No submissions**: Contestants cannot submit. Used only for displaying content in courses.
 
-Para subir un problema a omegaup hay que guardar los contenidos en un archivo **.ZIP** (no `.rar`, `.tar.bz2`, `.7z`, `.zx`). El nombre del zip no es importante.
+* **Validator time limit (ms)**: Max real time in milliseconds the grader waits for the validator to return a verdict per case before returning `JE`.
+* **Time limit (ms)**: Max CPU time in milliseconds the contestant's program is allowed per case before it's killed with `TLE`.
+* **Total time limit (ms)**: Max real time the grader waits for the entire problem to execute before returning `TLE`. Cases are evaluated lexicographically.
+* **Extra time for libinteractive (ms)**: Max real time for the judge’s program per case before it’s terminated with `TLE`.
+* **Memory limit (KiB)**: Max RAM (heap+stack) in kibibytes the program can use before being terminated with `MLE`.
+* **Output limit (bytes)**: Max bytes a program can write to stdout/stderr before being terminated with `OLE`. This is auto-detected from `.out` file sizes plus 10KiB, unless a custom validator is used.
+* **Input limit (bytes)**: Max byte size of the contestant’s program. Use to avoid hardcoded/precomputed solutions.
+* **Source**: Attribution or origin of the problem.
+* **Public listing**: Whether the problem appears in public listings and is available for contests and courses.
+* **Send clarifications via email**: Whether omegaUp can email the problem author when users request clarifications.
+* **Tags**: Classification tags for the problem.
 
-El zip debe contener los siguientes elementos:
+# Language Problems (C/C++/Java/Pascal)
+
+To upload a problem to omegaUp, you need to save everything inside a **.ZIP** file (not `.rar`, `.tar.bz2`, `.7z`, `.zx`). The zip filename doesn't matter.
+
+The zip must contain the following elements:
 
 ### cases/
 
-* Esta carpeta debe contener todos los casos con extensiones .in y .out. El nombre de cada archivo no importa, pero los nombres deben estar correctamente pareados, por ejemplo: `1.in 1.out`, `hola.in hola.out`. 
+* This folder should contain all the test cases with `.in` and `.out` extensions. Filenames don’t matter, but names must be matched, e.g., `1.in 1.out`, `hello.in hello.out`.
 
-* **El uso del `.` (punto) para un nombre de caso está prohibido, a menos que desees usar casos agrupados:** 
+* **Do not use `.` in case names unless you're grouping cases:**
 
-* omegaUp soporta casos agrupados. Es decir, para obtener puntos hay que resolver todos los casos de un sólo grupo. Este tipo de evaluación es útil cuando el conjunto de respuestas posibles para un problema es muy pequeño. Para agrupar, simplemente hay que separar el nombre del grupo con un `.` del nombre del caso. No hay límite en el número de grupos. 
-Por ejemplo `grupo1.caso1.in grupo1.caso1.out grupo1.caso2.in grupo1.caso2.out` es un sólo grupo con 2 casos.
-Los grupos pueden tener diferentes números de casos.
+* omegaUp supports grouped cases, meaning you must solve all cases in a group to earn points. Useful when possible outputs are limited. To group, separate the group and case name with a `.`. Example: `group1.case1.in group1.case1.out`, `group1.case2.in group1.case2.out`.
 
-* No hay límite en el número de casos, sin embargo recomendamos mantener el tamaño total de los casos por debajo de los 100MB. 
+* No limit on the number of cases, but recommended total case size is under 100MB.
 
-Ten en cuenta que entre más casos, mayor tiempo se tomará en evaluar el problema para cada envío y puede causar una mala experiencia en el concurso debido al tiempo de espera en la cola para evaluar, en particular si una solución en la cola da `TLE`.
+* More cases means longer grading time per submission and may delay contests, especially if a solution causes `TLE`.
 
 ### statements/
 
-* Debe contener la redacción del problema en formato markdown (el mismo formato que usa Wikipedia). El archivo se debe llamar `es.markdown`. Para previsualizar el formato puedes usar [https://omegaup.com/redaccion.php] (https://omegaup.com/redaccion.php) para ayudarse a previsualizar. 
+* Must contain the problem statement in Markdown format (`es.markdown`). Use [https://omegaup.com/redaccion.php](https://omegaup.com/redaccion.php) to preview formatting.
 
-* Soportamos LaTeX completamente. Puedes encontrar ejemplos de cómo usar LaTeX aquí [ http://www.thestudentroom.co.uk/wiki/LaTex] ( http://www.thestudentroom.co.uk/wiki/LaTex).
+* Full LaTeX support. Examples at [http://www.thestudentroom.co.uk/wiki/LaTex](http://www.thestudentroom.co.uk/wiki/LaTex).
 
-* Para dar una mejor experiencia a los concursantes, por favor asegúrate de que la previsualización se ve como deseas, incluyendo la tabla de casos de entrada y salida.
+* For a better contestant experience, make sure the preview looks good, including input/output tables.
 
-* Igualmente, encierra los nombres de variables en tu redacción así: `$n$`, `$x$`, etc... para que resalten de la redacción y sea fácil de localizar para los concursantes al momento del concurso, además de que evita confusiones. Para usar subíndices:  `$x_i$`
+* Wrap variable names like `$n$`, `$x$` to highlight them. Use `$x_i$` for subscripts.
 
 ### solutions/
-*  Es similar a **statements/**. Debe contener la redacción de la solución del problema en formato markdown. El archivo se debe llamar `es.markdown`, y en caso de tener traducciones `en.markdown` y `pt.markdown`.
-* Tenemos ejemplos de archivos de problemas [aquí](https://github.com/omegaup/omegaup/tree/master/frontend/tests/resources) . En especial https://github.com/omegaup/omegaup/blob/master/frontend/tests/resources/testproblem.zip tiene un ejemplo con soluciones.
 
-### interactive/ (opcional)
+* Similar to **statements/**. Contains the problem solution in markdown format. Must be named `es.markdown`, with optional translations: `en.markdown`, `pt.markdown`.
 
-* Los problemas interactivos deben hacerse utilizando [libinteractive](https://omegaup.com/libinteractive/). Pueden encontrar más información en esa página.
+* Examples of problem files can be found [here](https://github.com/omegaup/omegaup/tree/master/frontend/tests/resources), especially [testproblem.zip](https://github.com/omegaup/omegaup/blob/master/frontend/tests/resources/testproblem.zip) which contains solutions.
 
-* Para referencia de cómo debe estar estructurado un problema interactivo, pueden usar [Cave de la IOI 2013](https://omegaup.com/resources/cave.zip) como ejemplo.
+### interactive/ (optional)
 
-### validator.$lang$ (opcional)
+* Interactive problems must be created using [libinteractive](https://omegaup.com/libinteractive/). See that page for more info.
 
-* Si tu problema necesita un validador personalizado, incluye un archivo llamado `validator.$lang$` en la raíz del zip, donde `$lang$` es uno de `c`, `cpp`, `java`, `p` (Pascal), `py`. Solo necesitas un validador, y es independiente del lenguaje del concursante.
+* For a reference structure, use [Cave from IOI 2013](https://omegaup.com/resources/cave.zip).
 
-* Dentro del validador, puedes abrir un archivo llamado `data.in`, que es el mismo archivo de entrada que se le dio al programa del concursante. En la entrada del validador (que puedes leer normal usando `scanf` o `cin`), se encuentra la salida del concursante. Es similar a como si se ejecutara `./concursante < data.in | ./validador nombredelcaso` en una consola, donde `nombredelcaso` es el nombre del `.in` del caso actual, pero sin la extensión.
+### validator.$lang$ (optional)
 
-* Adicionalmente puedes abrir un archivo llamado `data.out`, que contiene el `.out` asociado al `.in` actual.
+* If a custom validator is needed, include a file `validator.$lang$` in the root of the zip, where `$lang$` is one of `c`, `cpp`, `java`, `p` (Pascal), or `py`. Only one validator is needed and it’s language-independent from the contestant's submission.
 
-* El código del validador **debe** escribir un número de punto flotante entre 0 y 1 a salida estándar, que indica el porcentaje del caso que el concursante tuvo bien. Si no escribes nada, resultará en un JE. Si escribes un valor menor que 0, el puntaje será 0, mientras que si escribes un valor mayor a 1, el puntaje será 1.
+* In the validator, you can open `data.in` (same as the input given to the contestant). The validator receives the contestant’s output via standard input.
 
-* Los validadores también corren en el sandbox, igual que los programas de los concursantes. Si llega a haber algún error con el código del validador (WA, RFE, RTE, etc.), el envío se juecea como JE.
+* It’s equivalent to running: `./contestant < data.in | ./validator casebasename`, where `casebasename` is the `.in` filename without extension.
 
-* Aunque uses validador, debes proporcionar archivos .out (no se van a utilizar, puedes mandar archivos vacíos).
+* You may also open `data.out`, which is the expected output for the current case.
 
-Para validar [sumas](https://omegaup.com/arena/problem/sumas), podrías usar el siguiente código en C++17:
+* The validator **must** output a float between 0 and 1 to stdout indicating the percentage correctness. If nothing is printed, it results in `JE`. Less than 0 becomes 0; more than 1 becomes 1.
 
-```c++
+* Validators also run in the same sandbox as contestant programs.
+
+Validating [sumas](https://omegaup.com/arena/problem/sumas), You can use the following code in C++17:
+
+```cpp
 #include <iostream>
 #include <fstream>
 
 int main() {
-  // lee "data.in" para obtener la entrada original.
+  // Reads "data.in" to get the original input.
   int64_t a, b;
   {
-    std::ifstream entrada_original("data.in", std::ifstream::in);
-    entrada_original >> a >> b;
+    std::ifstream input("data.in", std::ifstream::in);
+    input >> a >> b;
   }
-  // puedes guardar cualquier cosa que te ayude a evaluar
-  // en "data.out".
-  int64_t suma;
+  // You can save anything that helps you evaluate in "data.out".
+  int64_t expected_sum;
   {
-    std::ifstream salida_original("data.out", std::ifstream::in);
-    salida_original >> suma;
+    std::ifstream output("data.out", std::ifstream::in);
+    output >> expected_sum;
   }
 
-  // lee entrada estándar para obtener la salida del concursante.
-  int64_t suma_concursante;
-  if (!(std::cin >> suma_concursante)) {
-    // cualquier cosa que imprimas a cerr se ignora, pero es útil
-    // para depurar.
-    std::cerr << "Error leyendo la salida del concursante\n";
+  // Reads standard input to get the contestant's output.
+  int64_t contestant_sum;
+  if (!(std::cin >> contestant_sum)) {
+    std::cerr << "Error reading contestant output\n";
     std::cout << 0.0 << '\n';
     return 0;
   }
 
-  // determina si la respuesta es incorrecta.
-  if (suma != suma_concursante && suma != a + b) {
-    std::cerr << "Salida incorrecta\n";
+  // Determines if the answer is incorrect.
+  if (expected_sum != contestant_sum && expected_sum != a + b) {
+    std::cerr << "Incorrect output\n";
     std::cout << 0.0 << '\n';
     return 0;
   }
 
-  // Si la ejecución llega hasta aquí, la salida del concursante
-  // es correcta.
+  // If execution reaches here, the contestant's output is correct.
   std::cout << 1.0 << '\n';
   return 0;
 }
 ```
 
-o Python 3:
+Or in Python 3:
 
 ```python
 #!/usr/bin/python3
@@ -138,31 +136,28 @@ import logging
 import sys
 
 def _main():
-  # lee "data.in" para obtener la entrada original.
+  # Read "data.in" to get the original input.
   with open('data.in', 'r') as f:
     a, b = [int(x) for x in f.read().strip().split()]
-  # puedes guardar cualquier cosa que te ayude a evaluar la
-  # en "data.out".
+  
+  # Read "data.out" to get the expected result.
   with open('data.out', 'r') as f:
-    suma = int(f.read().strip())
+    expected_sum = int(f.read().strip())
 
   score = 0
   try:
-    # Lee la salida del concursante
-    suma_concursante = int(input().strip())
+    # Read the contestant's output
+    contestant_sum = int(input().strip())
 
-    # Determina si la salida es incorrecta
-    if suma_concursante not in (suma, a + b):
-      # Cualquier cosa que imprimas a sys.stderr se ignora, pero es útil
-      # para depurar.
-      print('Salida incorrecta', file=sys.stderr)
+    # Check if the output is incorrect
+    if contestant_sum not in (expected_sum, a + b):
+      print('Incorrect output', file=sys.stderr)
       return
 
-    # Si la ejecución llega hasta aquí, la salida del concursante
-    # es correcta.
+    # If all checks passed, the output is correct
     score = 1
   except:
-    logging.exception('Error leyendo la salida del concursante')
+    logging.exception('Error reading contestant output')
   finally:
     print(score)
 
@@ -170,9 +165,9 @@ if __name__ == '__main__':
   _main()
 ```
 
-### `testplan` (opcional)
+### `testplan` (optional)
 
-* Por default, cada caso tiene un valor de 1/número-de-casos. Si deseas darle valores distintos a cada caso, crea un archivo llamado `testplan` (sin extensión) en la raíz del .zip. En este archivo, escribe una línea por caso. Cada línea debe tener el nombre del archivo que contiene el caso (sin la extensión) y los puntos para ese caso. Por ejemplo, para un problema con casos `cases/caso1.in`, `cases/grupo2.caso1.in`, `cases/grupo2.caso2.in`, el `testplan` sería:
+* By default, each case has a value of 1/number-of-cases. If you want to assign different values to each case, create a file named `testplan` (without extension) at the root of the .zip. In this file, write one line per case. Each line should contain the name of the file that holds the case (without the extension) and the points for that case. For example, for a problem with cases `cases/caso1.in`, `cases/grupo2.caso1.in`, `cases/grupo2.caso2.in`, the `testplan` would be:
 
     ```
     caso1 5
@@ -180,45 +175,46 @@ if __name__ == '__main__':
     grupo2.caso2 0
     ```
 
-Asegúrate que ningún archivo tenga espacios en el nombre.
+Make sure no file has spaces in its name.
 
-Si se desea asignar puntaje a un grupo (para no tener que dividirlo entre todos los casos del grupo), la convención es ponerle ese puntaje completo al primer caso del grupo y 0 a todos los demás casos de ese grupo.
+If you want to assign scores to a group (so you don't have to divide it among all the cases in the group), the convention is to assign the full score to the first case of the group and 0 to all the other cases in that group.
 
-## Imágenes
+## Images
+omegaUp already has native support for images :). To insert an image into your description, add the image file to your zip within the `statements/` folder and write in your `es.markdown`:
 
-omegaUp ya tiene soporte nativo para imágenes :). Para insertar una imagen en tu redacción,  agrega el archivo de la imagen a tu zip dentro de la carpeta `statements/` y escribe en tu `es.markdown`:
+`![Alt text](image.jpg)`
 
-`![Texto alternativo](imagen.jpg)`
+The supported formats are: jpg, gif, png. Be mindful of the image size, as it cannot be re-scaled in markdown. Try to keep the image width under 650 pixels.
 
-Los formatos soportados son: jpg, gif, png. Cuida el tamaño de tu imagen, no se puede re-escalar en el markdown. Trata de que la imagen no pase de los 650 pixeles de ancho.
-
-## Zips de ejemplo
-
-Aquí hay algunos zips de ejemplo que usamos en los tests de omegaUp:
+## Example Zips
+Here are some example zips we use in omegaUp tests:
 
 https://github.com/omegaup/omegaup/tree/master/frontend/tests/resources
 
-## Errores y bugs conocidos de omegaUp
+## Known Errors and Bugs in omegaUp
 
-* Es de suprema importancia que las carpetas `/cases` y `/statements` estén directamente en la raíz del .zip, sin carpetas intermedias. [Bug link] (https://github.com/omegaup/omegaup/issues/310)  Una forma de hacerlo en la consola de Linux/Mac es con el comando `zip -r miproblema.zip *` desde el directorio del problema.
-* omegaUp corre en Linux, así que sí hay diferencia entre mayúsculas y minúsculas. Si tu carpeta se llama `Cases`, no la va a encontrar, al igual que si tus archivos de entrada terminan en `.In`.
+* It is crucial that the `/cases` and `/statements` folders are directly at the root of the .zip, without intermediate folders. [Bug link] (https://github.com/omegaup/omegaup/issues/310) One way to do this in the Linux/Mac console is by using the command `zip -r miproblema.zip *` from the problem directory.
+* omegaUp runs on Linux, so there is a difference between uppercase and lowercase letters. If your folder is named `Cases`, it won't be found, just like if your input files end in `.In`.
 
-Cualquier duda, contacta a [joemmanuel](mailto:joemmanuel@gmail.com) y [lhchavez](mailto:lhchavez@lhchavez.com)
+If you have any questions, contact [joemmanuel](mailto:joemmanuel@gmail.com) and [lhchavez](mailto:lhchavez@lhchavez.com)
 
-# Problemas de Karel
-Primero intenta usar https://omegaup.com/karel.js/
+# Karel Problems
+First, try using https://omegaup.com/karel.js/
 
-Si ya tienes hechos los casos y te da flojera convertirlos con karel.js, estos puntos son para Windows. Antes que nada hay que tener instalado python 2.7 (http://www.python.org/download/releases/2.7.5/) y agregar al PATH (variable de entorno) la ruta de Python (que si le das next, next en la instalacion, la ruta por default es C:\Pyhton27) ...bueno teniendo python y que verifiques que desde la consola DOS, puedes hacer ejecutar pyhton con el comando "python" (sin comillas), pues ya puedes seguir con los puntos de abajo.
+If you've already created the cases and don't feel like converting them with karel.js, here are the steps for Windows. First, install Python 2.7 (http://www.python.org/download/releases/2.7.5/) and add Python's path to the PATH environment variable (the default path is C:\Python27 if you choose "next, next" during installation). Once Python is installed and you can verify that you can run "python" from the DOS console, proceed with the following steps:
 
-1. Tener estos archivos a la mano: https://docs.google.com/file/d/0B6Rb3__ksbxDRC1VSDV0amRYNmc/edit?usp=sharing . Son los exes de karel.exe (ejecutar una solucion con un mundo) y kcl.exe (compilador de soluciones), el script de python (karel_mdo_convert.py), y mi script (karel-to-omegaup.bat) que usa todo lo anterior.
-2. Tener en una carpeta los casos MDO y los KEC; para generarlos puedes usar el karel que hace casos, no se si lo tengas, pero lo puedes bajar de aqui: http://www.cimat.mx/~amor/Omi/Utilerias/KarelOMI.zip
-3. Teniendo eso, es necesario también tener la solución, yo programo en java, así que a mis soluciones les pongo extension .JS (esta extension es porque kcl.exe interpreta JS como un codigo hecho en karel-java), o si eres de pascal, agrega .PAS (para que kcl.exe interprete que es solucion en karel-pascal)
-4. Ahora sí, hay que tener en la misma carpeta los exes, el script de python y mi script.
-5. Mi script lo puedes ejecutar sin parametros, cuando entres te pedirá la ruta de la solucion (.JS o .PAS) y tambien te pedira la ruta de los casos (MDO y KEC) (esta esta ruta no es necesario agregar la ultima diagonal). También puedes correrlo de la consola con el comando: karel-to-omegaup.bat path-solucion path-casos . Si la ruta tiene espacios, utiliza comillas dobles para encerrar el path, por ejemplo:  
+1. Have these files ready: https://docs.google.com/file/d/0B6Rb3__ksbxDRC1VSDV0amRYNmc/edit?usp=sharing. These include karel.exe (to run a solution with a world), kcl.exe (solution compiler), the Python script (karel_mdo_convert.py), and my script (karel-to-omegaup.bat) that uses everything above.
+2. Place the MDO and KEC cases in a folder. To generate them, you can use the Karel case generator. I’m not sure if you have it, but you can download it here: http://www.cimat.mx/~amor/Omi/Utilerias/KarelOMI.zip
+3. With that in place, you also need the solution. I program in Java, so I give my solutions a .JS extension (because kcl.exe interprets JS as Karel-Java code), or if you're using Pascal, add .PAS (so kcl.exe interprets it as a Karel-Pascal solution).
+4. Now, place the executables, Python script, and my script in the same folder.
+5. You can run my script without parameters; it will ask for the solution path (.JS or .PAS) and the cases' path (MDO and KEC) (no need to add the trailing slash). You can also run it from the console with this command: karel-to-omegaup.bat path-solution path-cases. If the path has spaces, use double quotes around the path, like this:
 
         karel-to-omegaup.bat "karel vs chuzpa\solucion.js" "karel vs chuzpa\casos"
 
-6. Si todos los archivos están en su lugar, primero tratará de compilar la solucion.js (usando kcl.exe que genera un archivo .KX con el mismo nombre y en la misma ruta de la solucion), luego creará los mundos .IN usando los MDO (busca todos los archivos con extension MDO que se encuentren en la carpeta "path-casos" ). Un punto importante es que el script de python (karel_mdo_convert.py) necesita que el KEC exista, es decir si el MDO se llama caso1.MDO es necesario que exista caso1.KEC. Si eso esta bien, el script de python extrae la información de beepers, orientacion, y posicion, si esta informacion existe, se la agrega al archivo IN que genera.
-8. Una vez que se genera el archivo IN, mi script ejecuta karel.exe usando el archivo IN que acaba de generar y la solución compilada (con extension KX) como parametro y con ello te genera el archivo OUT para ese IN. Es necesario que la solucion este bien, ya que de esta depende que se genere bien el OUT.
-9. Mi script BAT, crea una carpeta "cases" dentro de la carpeta de que contenia los casos, y ahi se van guardando los IN y OUT para Karel.
-10. Listo ya tienes la carpeta cases con los IN y OUT, ya solo crea la carpeta statements con el es.markdown y que comprimas como cuando haces problemas de Lenguaje.
+6. If all files are in place, it will first try to compile the solution.js (using kcl.exe, which generates a .KX file with the same name and in the same location as the solution), then it will create the .IN worlds using the MDOs (it looks for all files with the MDO extension in the "path-cases" folder). An important point is that the Python script (karel_mdo_convert.py) requires the KEC to exist. That is, if the MDO is called caso1.MDO, there must be a corresponding caso1.KEC. If everything is correct, the Python script extracts information about beepers, orientation, and position, and adds it to the IN file it generates.
+
+8. Once the IN file is generated, my script runs karel.exe using the generated IN file and the compiled solution (with the KX extension) as parameters, creating the OUT file for that IN. It's essential that the solution is correct, as this affects how the OUT is generated.
+
+9. My BAT script creates a "cases" folder within the folder containing the cases, and that's where the IN and OUT files for Karel are stored.
+
+10. Now you have the "cases" folder with the IN and OUT files. Just create the "statements" folder with the es.markdown file, and compress everything as you would when creating Language problems.
