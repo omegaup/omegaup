@@ -10,7 +10,7 @@ Implementing a badge is quite simple, just follow these steps:
 
 5. Create the [`localizations.json`](https://github.com/omegaup/omegaup/blob/master/frontend/badges/legacyUser/localizations.json) file inside `badgeFolder`. This must contain the translations of the badge's name and description in Spanish (es), English (en), and Portuguese (pt). Remember that the maximum length for a badge name is **50 characters**.
 
-6. For the translations to be loaded from localizations.json into the corresponding files, you need to run the script: `./stuff/lint.sh`.
+6. To load the translations from `localizations.json` into the corresponding files, you need to run the script: `./stuff/lint.sh`.
 
 7. A `test.json` file must be created inside `badgeFolder`. This will specify through the `testType` field how the badge's unit tests will be executed:
 
