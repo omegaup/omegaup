@@ -2,7 +2,7 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "Coder under 13 years can not perform this action.",
   aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
-  acceptPrivacyPolicy: "I have read and accept the site's [Use and Privacy Policy](https://blog.omegaup.com/policies/privacy-policy/), as well as the [Code of Conduct](https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/).",
+  acceptPrivacyPolicy: "I have read and accept the site's [Use and Privacy Policy](%(PrivacyPolicyURL)), as well as the [Code of Conduct](%(CodeofConductPolicyURL)).",
   accountDeleteCancel: "Cancel",
   accountDeleteConfirmationMessage: "Are you sure you want to delete your account?",
   accountDeleteMessage: "Click the following button if you wish to delete your account and all your personal information from omegaUp. This operation will take place immediately after you confirm that you want to do it and it is not reversible.",

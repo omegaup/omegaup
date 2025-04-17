@@ -1,62 +1,72 @@
-# API de omegaUp
+# omegaUp API
 
-omegaUp está construido a partir de un API [REST](https://es.wikipedia.org/wiki/Representational_State_Transfer) que es posible
-invocar directamente. Todos los APIs están implementados mediante peticiones
-HTTP (ya sea GET o POST) y todos regresan un status HTTP apropiado y una
-respuesta en JSON. Como nos interesa mantener la privacidad de todos nuestros
-usuarios y evitar trampa, solo soportamos las llamadas al API a través de HTTPS
-y cualquier llamada hecha sobre HTTP inseguro va a fallar porque el servidor
-regresará un error HTTP 301 de redirección permanente.
+The omegaUp platform is built on a [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API that can be accessed directly. All endpoints use standard HTTP methods (`GET` or `POST`) and respond with appropriate HTTP status codes along with a JSON-formatted response.
 
-Todos los URL del API comienzan con `https://omegaup.com/api/` y el resto
-del path depende de cada función. La convención en la documentación es
-únicamente especificar lo que va _después_ de ese prefijo. Por ejemplo, el API
-para obtener el tiempo se menciona en este documento como `time/get`, pero el
-URL completo sería `https://omegaup.com/api/time/get/`.
+To ensure user privacy and prevent cheating, **only HTTPS** connections are allowed. Any requests made over plain HTTP will fail, returning an `HTTP 301 Permanent Redirect`.
 
-Muchas de las llamadas no requieren ningún privilegio especial (e incluso se
-pueden hacer simplemente visitando el URL en un navegador), pero otras
-únicamente están disponibles a usuarios que hayan iniciado sesión. Para hacer
-esto, debes llamar [user/login](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API#post-userlogin.md).
-Todas las llamadas subsecuentes que necesiten autenticación debes realizarlas
-agregando un cookie llamado `ouat` (omegaUp Auth Token), con el contenido de
-`auth_token` de `user/login`. Toma en cuenta que para evitar trampa, solo
-puedes tener una sesión activa al mismo tiempo, así que si inicias sesión
-programáticamente, perderás la sesión del navegador y viceversa.
+## Base URL
 
-# Categorías
+All API endpoints are prefixed with:
 
-* [Contests](Contests API)
-* [Problems](Problems API)
-* [Runs](Runs API)
-* [Users](User API)
-* [Clarifications](Clarifications API)
+https://omegaup.com/api/
 
-# Ejemplo
 
-El API para obtener la hora del servidor se puede invocar haciendo una llamada
-GET a `https://omegaup.com/api/time/get/`. Como no necesita ningún privilegio,
-la respuesta tendrá un status de `HTTP 200 OK` y su contenido será algo similar
-a esto, que debe ser interpretado como JSON: `{"time":1436577101,"status":"ok"}`.
+In this documentation, only the part of the URL **after** this prefix is shown. For example, the endpoint for retrieving the server time is referred to as `time/get`, but the complete URL is:
 
-## GET `time/get/`
+https://omegaup.com/api/time/get/
 
-### Descripción
 
-Obtiene el UNIX timestamp según lo reporta el reloj interno del servidor. Útil
-para sincronizar el reloj local que posiblemente esté incorrecto.
+## Authentication
 
-### Privilegios
+Some API endpoints are public and require no authentication—you can even access them by visiting the URL in a browser. However, certain endpoints are protected and require the user to be logged in.
 
-Ninguno requerido.
+To authenticate, use the [`user/login`](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/User-API.md) endpoint. Upon successful login, you will receive an `auth_token`. You must include this token in a cookie named `ouat` (omegaUp Auth Token) for all subsequent authenticated requests.
 
-### Parámetros
+**Important:** omegaUp supports only one active session at a time. Logging in programmatically will invalidate your browser session, and vice versa.
 
-Ninguno
+## API Categories
 
-### Regresa
+- [Contests API](./Contests-API.md)
+- [Problems API](./Problems-API.md)
+- [Runs API](./Runs-API.md)
+- [Users API](./Users-API.md)
+- [Clarifications API](./Clarifications-API.md)
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
-|`time`|int|UNIX timestamp del servidor|
+
+## Example: Get Server Time
+
+To retrieve the current time from the server, make a `GET` request to:
+
+https://omegaup.com/api/time/get/
+
+
+This is a public endpoint and does not require authentication. If successful, it will return:
+
+```json
+{
+  "time": 1436577101,
+  "status": "ok"
+}
+```
+
+### Endpoint: `GET time/get/`
+
+#### Description
+
+Returns the current UNIX timestamp according to the server's internal clock. This can be useful for synchronizing a potentially incorrect local clock.
+
+#### Required Permissions
+
+None
+
+#### Request Parameters
+
+None
+
+#### Response Format
+
+| Field   | Type   | Description                                      |
+|---------|--------|--------------------------------------------------|
+| status  | string | Will return `"ok"` if the request was successful |
+| time    | int    | UNIX timestamp representing the server time      |
+
