@@ -72,7 +72,7 @@ OmegaUp.on('ready', () => {
     }
     if (urlParams.get('filter')) {
       const filterParam = urlParams.get('filter');
-      if (filterParam === 'participating') {
+      if (filterParam === 'signedup') {
         filter = ContestFilter.SignedUp;
       } else if (filterParam === 'recommended') {
         filter = ContestFilter.OnlyRecommended;
@@ -118,7 +118,7 @@ OmegaUp.on('ready', () => {
           loading: contestStore.state.loading,
         },
         on: {
-          'fetch-page': ({
+          'fetch-page': async ({
             params,
             urlObj,
           }: {
@@ -133,7 +133,7 @@ OmegaUp.on('ready', () => {
               }
             }
             window.history.pushState({}, '', urlObj);
-            contestStore.dispatch('fetchContestList', {
+            await contestStore.dispatch('fetchContestList', {
               requestParams: params,
               name: params.tab_name,
             });
