@@ -776,7 +776,7 @@
 	"identityAlreadyInUse": "La identidad ya est\u00e1 siendo utilizada por otra cuenta.",
 	"identityInGroup": "La identidad ya est\u00e1 asociada al grupo.",
 	"incompatibleArgs": "Los par\u00e1metros problemset_id y contest_alias no se pueden utilizar al mismo tiempo",
-	"interactiveGuideDoneButton": "Hecho",
+	"interactiveGuideDoneButton": "Listo",
 	"interactiveGuideNextButton": "Siguiente",
 	"interactiveGuidePreviousButton": "Anterior",
 	"invalidLanguage": "Languaje inv\u00e1lido",
