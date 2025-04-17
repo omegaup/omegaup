@@ -73,11 +73,11 @@ library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
 
-import omegaup_Markdown from './Markdown.vue';
+import omegaup_problemMarkdown from './Markdown.vue';
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     FontAwesomeIcon,
   },
 })

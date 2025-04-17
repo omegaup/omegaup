@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import Markdown from '../../www/js/omegaup/components/problem/Markdown.vue';
+import Markdown from './Markdown.vue';
 
 describe('problem/Markdown.vue', () => {
   it('renders simple markdown with MathJax and template', async () => {

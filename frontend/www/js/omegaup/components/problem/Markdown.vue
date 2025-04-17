@@ -63,6 +63,8 @@ export default class Markdown extends Vue {
   mounted(): void {
     this.renderMathJax();
     this.injectTemplates();
+    // NOTE: When binding markdown input via <textarea>, use v-model.lazy to ensure
+    // changes from pagedown controls are reflected correctly
   }
 
   @Watch('markdown')

@@ -403,7 +403,7 @@ import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
-import omegaup_Markdown from './Markdown.vue';
+import omegaup_problemMarkdown from './Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
 
@@ -451,7 +451,7 @@ export enum PopupDisplayed {
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-solvers': arena_Solvers,
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
@@ -510,7 +510,8 @@ export default class ProblemDetails extends Vue {
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: true }) useNewVerdictTable!: boolean;
 
-  @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
+  @Ref('statement-markdown')
+  readonly statementMarkdown!: omegaup_problemMarkdown;
 
   PopupDisplayed = PopupDisplayed;
   T = T;

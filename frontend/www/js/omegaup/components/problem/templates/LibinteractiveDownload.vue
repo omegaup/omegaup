@@ -1,8 +1,8 @@
 <template>
   <div class="libinteractive-download panel panel-default">
-    <div class="panel-heading">Output Only Files</div>
+    <div class="panel-heading">{{ T.outputOnlyFiles }}</div>
     <div class="panel-body">
-      <a :href="zipUrl" class="btn btn-primary"> Download </a>
+      <a :href="zipUrl" class="btn btn-primary">{{ T.downloadZip }}</a>
     </div>
   </div>
 </template>
