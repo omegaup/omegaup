@@ -1585,7 +1585,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
 
             // Define file path inside ZIP: "problem_alias/username.language"
-            $zipPath = "{$alias}/{$username}.{$language}";
+            $zipPath = "{$alias}/{$username}-{$guid}.{$language}";
             $zip->addFromString($zipPath, $sourceCode);
         }
 
@@ -1607,7 +1607,6 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Retrieves the source code for a given run, ensuring the user has permission.
      *
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function getSourceCode(
@@ -1633,14 +1632,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            !\OmegaUp\Authorization::canViewSubmission(
-                $identity,
-                $submission
-            )
+            !\OmegaUp\Authorization::canViewSubmission($identity, $submission) ||
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
+            return null;
         }
 
         $details = self::getOptionalRunDetails(
