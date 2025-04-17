@@ -2,7 +2,7 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "Coder menor de 13 anos n\u00e3o pode realizar esta a\u00e7\u00e3o.",
   aboutToStart: "Voc\u00ea est\u00e1 prestes a iniciar o concurso. Seu tempo come\u00e7ar\u00e1 depois de clicar em Come\u00e7ar Concurso.",
-  acceptPrivacyPolicy: "Li e aceito a [Pol\u00edtica de Uso e Privacidade](https://blog.omegaup.com/policies/privacy-policy/) do site, bem como o [C\u00f3digo de Conduta](https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/).",
+  acceptPrivacyPolicy: "Li e aceito a [Pol\u00edtica de Uso e Privacidade](%(PrivacyPolicyURL)) do site, bem como o [C\u00f3digo de Conduta](%(CodeofConductPolicyURL)).",
   accountDeleteCancel: "Cancelar",
   accountDeleteConfirmationMessage: "Tem certeza de que deseja excluir sua conta?",
   accountDeleteMessage: "Clique no bot\u00e3o abaixo se desejar excluir sua conta e todas as suas informa\u00e7\u00f5es pessoais do omegaUp. Esta opera\u00e7\u00e3o ser\u00e1 realizada imediatamente assim que voc\u00ea confirmar que deseja realiz\u00e1-la e n\u00e3o \u00e9 revers\u00edvel.",
@@ -118,6 +118,8 @@ const translations: { [key: string]: string; } = {
   badge_100solvedProblems_name: "100 Problemas Resolvidos",
   badge_500score_description: "Concedido a pessoas que obtiveram pontua\u00e7\u00e3o igual ou superior a 500.",
   badge_500score_name: "Pontua\u00e7\u00e3o 500",
+  badge_7dayStreak_description: "Concedido a pessoas que mantiveram uma sequ\u00eancia de 7 dias consecutivos.",
+  badge_7dayStreak_name: "Sequ\u00eancia de 7 dias",
   badge_christmasProblem2021_description: "Concedido ao usu\u00e1rio que participou do concurso A Problem for Christmas 2021 apresentando problemas originais com temas natalinos.",
   badge_christmasProblem2021_name: "Problema de Natal 2021",
   badge_coderOfTheMonth_description: "Concedido a pessoas que foram nomeadas Coder do M\u00eas pelo menos uma vez.",
