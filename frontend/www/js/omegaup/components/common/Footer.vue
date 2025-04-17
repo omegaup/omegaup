@@ -69,12 +69,16 @@
         >
           <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
           <ul>
-            <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
+            <li class="mt-4">
+              <a
+                href="https://news.airbnb.com/2025-community-fund/"
+                target="_blank"
+              >
                 <img
                   class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
+                  src="/media/homepage/airbnb_logo.svg"
+                  alt="AirbnbLogo"
+                  width="100"
                 />
               </a>
             </li>
@@ -104,7 +108,7 @@
           <ul>
             <li class="mt-1">
               <a
-                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md"
                 target="_blank"
                 >{{ T.frontPageFooterHelpUs }}</a
               >
