@@ -26,7 +26,7 @@ Implementing a badge is quite simple, just follow these steps:
 
       - https://github.com/omegaup/omegaup/blob/master/frontend/badges/coderOfTheMonth/test.json
 
-   - `"testType": "phpunit"` Consists of creating a unit test with filename equal to `badge alias + "Test.php"`. This file should be saved in the [badges test folder](https://github.com/omegaup/omegaup/tree/master/frontend/tests/badges) and should follow the classic structure of unit tests already implemented in omegaUp, it can even make use of [factories](https://github.com/omegaup/omegaup/tree/master/frontend/tests/factories).
+   - `"testType": "phpunit"` Consists of creating a unit test with filename equal to `badge alias + "Test.php"`. This file should be saved in the [badges test folder](https://github.com/omegaup/omegaup/tree/master/frontend/tests/badges) and should follow the classic structure of unit tests already implemented in omegaUp, it can even make use of the available [factories](https://github.com/omegaup/omegaup/tree/master/frontend/tests/factories).
        
         Examples:
 
