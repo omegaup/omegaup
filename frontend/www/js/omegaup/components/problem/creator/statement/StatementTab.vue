@@ -60,7 +60,6 @@ export default class StatementTab extends Vue {
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
   @Prop({ default: T.problemCreatorEmpty }) currentMarkdownProp!: string;
-  @Prop() activeTabIndex!: number;
 
   T = T;
   ui = ui;
