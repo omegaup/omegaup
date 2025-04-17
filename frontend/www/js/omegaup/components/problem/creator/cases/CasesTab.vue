@@ -36,6 +36,7 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 import T from '../../../../lang';
+import { TabIndex } from '../Tabs.vue';
 
 Vue.use(VueCookies, { expire: -1 });
 
@@ -72,7 +73,7 @@ export default class CasesTab extends Vue {
 
   @Watch('activeTabIndex')
   onActiveTabIndexChanged(newIndex: number) {
-    if (newIndex === 2) {
+    if (newIndex === TabIndex.TestCases) {
       this.startIntroGuide();
     }
   }

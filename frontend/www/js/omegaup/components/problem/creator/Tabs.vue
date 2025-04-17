@@ -1,7 +1,7 @@
 <template>
   <b-tabs v-model="activeTabIndex" small>
     <b-tab>
-      <template #title @click="activeTabIndex = 0">
+      <template #title>
         <BIconPencil class="mr-1" />
         <span name="writing" data-problem-creator-tab="statement">
           {{ T.problemCreatorStatement }}</span
@@ -15,8 +15,9 @@
         "
       />
     </b-tab>
+
     <b-tab>
-      <template #title @click="activeTabIndex = 1">
+      <template #title>
         <BIconFileCode class="mr-1" />
         <span name="code" data-problem-creator-tab="code">
           {{ T.problemCreatorCode }}</span
@@ -31,6 +32,7 @@
         "
       />
     </b-tab>
+
     <b-tab>
       <template #title>
         <BIconCheckCircle class="mr-1" />
@@ -48,6 +50,7 @@
         "
       />
     </b-tab>
+
     <b-tab>
       <template #title>
         <BIconFileEarmarkCheck class="mr-1" />
@@ -74,6 +77,13 @@ import problemCreator_CodeTab from './code/CodeTab.vue';
 import problemCreator_SolutionTab from './solution/SolutionTab.vue';
 import T from '../../../lang';
 
+export enum TabIndex {
+  Statement = 0,
+  Code = 1,
+  TestCases = 2,
+  Solution = 3,
+}
+
 @Component({
   components: {
     'omegaup-problem-creator-statement-tab': problemCreator_StatementTab,
@@ -85,7 +95,7 @@ import T from '../../../lang';
 export default class Tabs extends Vue {
   T = T;
 
-  activeTabIndex = 0;
+  activeTabIndex = TabIndex.Statement;
 
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;

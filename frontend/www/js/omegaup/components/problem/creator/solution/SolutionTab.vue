@@ -54,6 +54,7 @@ import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 
 import omegaup_Markdown from '../../../Markdown.vue';
+import { TabIndex } from '../Tabs.vue';
 
 Vue.use(VueCookies, { expire: -1 });
 
@@ -94,7 +95,7 @@ export default class SolutionTab extends Vue {
 
   @Watch('activeTabIndex')
   onActiveTabIndexChanged(newIndex: number) {
-    if (newIndex === 3) {
+    if (newIndex === TabIndex.Solution) {
       this.$nextTick(() => {
         this.startIntroGuide();
       });
