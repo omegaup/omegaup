@@ -4,7 +4,7 @@ Sandbox is a *very* modified version of Moeval (the sandbox used in the IOI), wr
 2. Replace the called syscall (for example, replace setrlimit with getuid, which is very harmless) and then make the process believe there was an error when calling the syscall. This is used to pretend there's no network (all socket calls return -1).
 3. Kill the process if the syscall is VERY evil.
 
-Some of the modifications I made to Sandbox that aren't in Moeval are:
+Some of the modifications made to Sandbox that aren't in Moeval are:
 
 1. Support for syscall mangling
 2. Support for multiple threads.
