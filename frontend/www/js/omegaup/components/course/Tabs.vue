@@ -45,7 +45,9 @@
             <option :value="Level.Intermediate">
               {{ T.courseLevelIntermediateLevel }}
             </option>
-            <option :value="Level.Advanced">{{ T.courseLevelAdvancedLevel }}</option>
+            <option :value="Level.Advanced">
+              {{ T.courseLevelAdvancedLevel }}
+            </option>
           </select>
         </div>
       </div>
