@@ -97,8 +97,9 @@
           :all-languages="data.allLanguages"
           :search-result-schools="searchResultSchools"
           :read-only="readOnly"
+          :invalid-parameter-name="invalidParameterName"
           @emit-cancel="onCancel"
-          @submit="(request) => $emit('submit-edit-course', request)"
+          @submit="onSubmitEditCourse"
           @update-search-result-schools="
             (query) => $emit('update-search-result-schools', query)
           "
@@ -271,7 +272,7 @@
             @remove-group-teaching-assistant="
               (groupAlias) =>
                 $emit('remove-group-teaching-assistant', groupAlias)
-            "
+              "
             @update-search-result-groups="
               (query) => $emit('update-search-result-groups', query)
             "
@@ -385,7 +386,6 @@ const emptyAssignment: types.CourseAssignment = {
 export default class CourseEdit extends Vue {
   @Ref('assignment-details') readonly assignmentDetails!: Vue;
   @Prop() data!: types.CourseEditPayload;
-  @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultProblems!: types.ListItem[];
@@ -399,7 +399,11 @@ export default class CourseEdit extends Vue {
   showTab = this.initialTab;
   admissionMode = AdmissionMode.Private;
   alreadyArchived = this.data.course.archived;
-
+  
+  invalidParameterName: string = '';
+  statusMessage: string = '';
+  statusSuccess: boolean = true;
+  
   assignmentProblems = this.data.assignmentProblems;
   assignments = this.data.course.assignments;
   assignmentFormMode: omegaup.AssignmentFormMode =
@@ -409,6 +413,40 @@ export default class CourseEdit extends Vue {
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;
+  }
+
+  onSubmitEditCourse(request: any): void {
+    if (!request.school) {
+      this.invalidParameterName = 'school';
+      this.statusMessage = "No school selected.";
+      this.statusSuccess = false;
+
+      const statusEl = document.getElementById("status");
+      if (statusEl) {
+        statusEl.className = "alert mt-0 alert-danger";
+        const messageSpan = statusEl.querySelector(".message");
+        if (messageSpan) {
+          messageSpan.innerHTML = "No school selected.";
+        }
+        statusEl.style.display = "block";
+      }
+
+      const schoolInput = document.querySelector('.tags-input-wrapper-default.tags-input') as HTMLElement;
+        if (schoolInput) {
+          schoolInput.style.border = '1px solid #fe8b8b';
+          schoolInput.style.boxShadow = '0 0 0 0.2rem rgba(255, 0, 0, 0.25)'; 
+          (schoolInput as HTMLInputElement).focus();
+        }
+        return;
+
+    }
+
+    this.invalidParameterName = '';
+    const typeaheadWrapper = document.querySelector('.tags-input-wrapper-default.tags-input');
+    if (typeaheadWrapper) {
+      typeaheadWrapper.classList.remove('input-error');
+    }
+    this.$emit('submit-edit-course', request);
   }
 
   onNewAssignment(): void {
@@ -461,9 +499,9 @@ export default class CourseEdit extends Vue {
 
   @Watch('initialTab')
   onInitialTabChanged(newValue: string): void {
-    if (!availableTabs.includes(this.initialTab)) {
-      this.showTab = 'course';
-      return;
+    if (!availableTabs.includes(newValue)) {
+        this.showTab = 'course';
+        return;
     }
     this.showTab = newValue;
   }
