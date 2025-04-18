@@ -217,11 +217,11 @@ def update_author_rank(
             `i`.`country_id`,
             `i`.`state_id`,
             `isc`.`school_id`,
-            SUM(`p`.`quality`) AS `author_score`
+            SUM(`full_p`.`quality`) AS `author_score`
         FROM
-            `Problems` AS `p`
+            `Problems` AS `full_p`
         INNER JOIN
-            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+            `ACLs` AS `a` ON `a`.`acl_id` = `full_p`.`acl_id`
         INNER JOIN
             `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
         INNER JOIN
@@ -231,7 +231,7 @@ def update_author_rank(
         ON
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `p`.`quality` IS NOT NULL
+            `full_p`.`quality` IS NOT NULL
         GROUP BY
             `u`.`user_id`
         ORDER BY
