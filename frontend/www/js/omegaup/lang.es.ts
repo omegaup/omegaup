@@ -1668,7 +1668,6 @@ const translations: { [key: string]: string; } = {
   supportAssignUserRoles: "Asignar roles",
   supportNewSearch: "Nueva b\u00fasqueda",
   supportTypeEmailOrUsername: "Escribe correo electr\u00f3nico o nombre de usuario",
-  systemInMaintainance: "El sistema de Coder del Mes se encuentra en mantenimiento.\n\nVolveremos pronto.",
   tagAdded: "Tag agregado exitosamente.",
   tagNotFound: "Etiqueta no encontrada",
   tagPrefixRestricted: "El prefijo 'problemTag' no puede ser usado para las etiquetas agregadas manualmente.",

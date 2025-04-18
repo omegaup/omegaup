@@ -1668,7 +1668,6 @@ const translations: { [key: string]: string; } = {
   supportAssignUserRoles: "Assign roles",
   supportNewSearch: "New search",
   supportTypeEmailOrUsername: "Type email or username",
-  systemInMaintainance: "The Coder of the Month system is under maintenance.\n\nWe will be back soon.",
   tagAdded: "Tag successfully added!",
   tagNotFound: "Tag not found",
   tagPrefixRestricted: "The 'problemTag' prefix can't be used for tags added manually.",
