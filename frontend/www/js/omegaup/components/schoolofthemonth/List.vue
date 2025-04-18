@@ -46,7 +46,13 @@
         </a>
       </li>
     </ul>
-    <table class="table table-striped table-hover">
+    <div v-if="isDisabled" class="system-in-maintainance m-5 text-center">
+      <omegaup-markdown
+        :markdown="T.schoolOfTheMonthSystemInMaintainance"
+      ></omegaup-markdown>
+      <font-awesome-icon :icon="['fas', 'cogs']" />
+    </div>
+    <table v-else class="table table-striped table-hover">
       <thead>
         <tr>
           <th scope="col" class="text-center">{{ T.wordsCountryRegion }}</th>
@@ -108,10 +114,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
+import omegaup_Markdown from '../Markdown.vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCogs } from '@fortawesome/free-solid-svg-icons';
+library.add(faCogs);
 
 @Component({
   components: {
     'omegaup-country-flag': country_Flag,
+    'omegaup-markdown': omegaup_Markdown,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class SchoolOfTheMonthList extends Vue {
@@ -121,6 +134,7 @@ export default class SchoolOfTheMonthList extends Vue {
   @Prop() isMentor!: boolean;
   @Prop() canChooseSchool!: boolean;
   @Prop() schoolIsSelected!: boolean;
+  @Prop({ default: true }) isDisabled!: boolean;
 
   T = T;
   selectedTab = 'allSchoolsOfTheMonth';
@@ -160,5 +174,9 @@ export default class SchoolOfTheMonthList extends Vue {
 .ranking-width {
   max-width: 55rem;
   margin: 0 auto;
+}
+.system-in-maintainance {
+  font-size: 180%;
+  color: var(--general-in-maintainance-color);
 }
 </style>
