@@ -167,6 +167,7 @@ const translations: { [key: string]: string; } = {
   banningDeclinedByReviewer: "Proibi\u00e7\u00e3o negada pelo revisor.",
   banningProblemDueToReport: "Banido problema devido a um relat\u00f3rio de conta.",
   birthdayInTheFuture: "Voc\u00ea n\u00e3o tem idade suficiente para usar omegaUp",
+  bulkAction: "A\u00e7\u00e3o em Massa",
   bulkOperationError: "Ocorreu um erro ao executar a opera\u00e7\u00e3o",
   bulkUserAddError: "Ocorreu um erro ao adicionar contas. Os seguintes nomes ou emails n\u00e3o foram encontrados no omegaUp:<br><br><b>%(userEmail)</b>.<br><br>No entanto, todas as outras contas foram adicionadas corretamente.",
   bulkUserAddSuccess: "Contas adicionadas com sucesso!",
@@ -907,6 +908,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "Meu perfil",
   newPublicTagsNotAllowed: "N\u00e3o \u00e9 permitido adicionar novos tags p\u00fablicos",
   noCoders: "Nenhum programador.",
+  noRunsProvided: "Nenhuma execu\u00e7\u00e3o fornecida.",
   nominationsRangeHeader: "Relat\u00f3rios de problemas (de %(lowCount) a %(highCount))",
   notProblemLevelTag: "O tag enviado n\u00e3o \u00e9 um tag de n\u00edvel.",
   notificationContestClarificationRequest: "Uma nova clarifica\u00e7\u00e3o tem sido solicitada para o problema %(problemAlias) do concurso %(contestAlias), que voc\u00ea administra.",
@@ -2094,6 +2096,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tempo-real (Seg)",
   wordsWarningProblem: "Mantener com um aviso",
   wordsYes: "Sim",
+  zipCreationFailed: "Falha na cria\u00e7\u00e3o do arquivo zip.",
   zipPrepare: "Preparar arquivo zip",
 };
 
