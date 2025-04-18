@@ -38,14 +38,18 @@
           class="col-md-4 col-lg-3 p-0 ml-3"
         >
           <select v-model="levelFilter" class="form-control">
-            <option :value="Level.All">{{ T.wordsAll }}</option>
+            <option :value="Level.All">
+              {{ T.wordsAll }} {{ T.wordsLevel.toLowerCase() }}s
+            </option>
             <option :value="Level.Introductory">
-              {{ T.courseLevelIntroductory }}
+              {{ T.courseLevelIntroductory }} {{ T.wordsLevel.toLowerCase() }}
             </option>
             <option :value="Level.Intermediate">
-              {{ T.courseLevelIntermediate }}
+              {{ T.courseLevelIntermediate }} {{ T.wordsLevel.toLowerCase() }}
             </option>
-            <option :value="Level.Advanced">{{ T.courseLevelAdvanced }}</option>
+            <option :value="Level.Advanced">
+              {{ T.courseLevelAdvanced }} {{ T.wordsLevel.toLowerCase() }}
+            </option>
           </select>
         </div>
       </div>
