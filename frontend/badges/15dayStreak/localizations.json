@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Racha de 15 días",
+      "description": "Otorgado a personas que han mantenido una racha de 15 días consecutivos."
+    },
+    "en": {
+      "name": "15-day streak",
+      "description": "User has maintained a streak of 15 consecutive days."
+    },
+    "pt": {
+      "name": "Sequência de 15 dias",
+      "description": "Concedido a pessoas que mantiveram uma sequência de 15 dias consecutivos."
+    }
+  }
+  

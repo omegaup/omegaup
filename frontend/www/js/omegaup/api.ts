@@ -1684,6 +1684,16 @@ export const Run = {
     );
     return x;
   }),
+  executeForIDE: apiCall<
+    messages.RunExecuteForIDERequest,
+    messages._RunExecuteForIDEServerResponse,
+    messages.RunExecuteForIDEResponse
+  >('/api/run/executeForIDE/', (x) => {
+    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+      x.nextExecutionTimestamp,
+    );
+    return x;
+  }),
   getSubmissionFeedback: apiCall<
     messages.RunGetSubmissionFeedbackRequest,
     messages._RunGetSubmissionFeedbackServerResponse,
