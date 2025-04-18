@@ -533,7 +533,7 @@ Delete a Carousel Item
 
 | Name               | Type  | Description |
 | ------------------ | ----- | ----------- |
-| `carousel_item_id` | `int` |             |
+| `corousel_item_id` | `int` |             |
 
 ### Returns
 
@@ -574,7 +574,7 @@ Update a Carousel Item
 | Name               | Type           | Description |
 | ------------------ | -------------- | ----------- |
 | `buttonTitle`      | `string`       |             |
-| `carousel_item_id` | `int`          |             |
+| `corousel_item_id` | `int`          |             |
 | `excerpt`          | `string`       |             |
 | `image_url`        | `string`       |             |
 | `link`             | `string`       |             |

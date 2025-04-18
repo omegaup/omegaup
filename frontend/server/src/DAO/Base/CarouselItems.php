@@ -44,7 +44,7 @@ abstract class CarouselItems {
                 `updated_at` = ?
             WHERE
                 (
-                    `carousel_item_id` = ?
+                    `corousel_item_id` = ?
                 );';
         $params = [
             $Carousel_Items->title,
@@ -67,7 +67,7 @@ abstract class CarouselItems {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Carousel_Items->updated_at
             ),
-            intval($Carousel_Items->carousel_item_id),
+            intval($Carousel_Items->corousel_item_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -84,11 +84,11 @@ abstract class CarouselItems {
      * registro.
      */
     final public static function getByPK(
-        int $carousel_item_id
+        int $corousel_item_id
     ): ?\OmegaUp\DAO\VO\CarouselItems {
         $sql = '
             SELECT
-                `Carousel_Items`.`carousel_item_id`,
+                `Carousel_Items`.`corousel_item_id`,
                 `Carousel_Items`.`title`,
                 `Carousel_Items`.`excerpt`,
                 `Carousel_Items`.`image_url`,
@@ -103,10 +103,10 @@ abstract class CarouselItems {
                 `Carousel_Items`
             WHERE
                 (
-                    `carousel_item_id` = ?
+                    `corousel_item_id` = ?
                 )
             LIMIT 1;';
-        $params = [$carousel_item_id];
+        $params = [$corousel_item_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
@@ -126,7 +126,7 @@ abstract class CarouselItems {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        int $carousel_item_id
+        int $corousel_item_id
     ): bool {
         $sql = '
             SELECT
@@ -135,9 +135,9 @@ abstract class CarouselItems {
                 `Carousel_Items`
             WHERE
                 (
-                    `carousel_item_id` = ?
+                    `corousel_item_id` = ?
                 );';
-        $params = [$carousel_item_id];
+        $params = [$corousel_item_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
@@ -189,10 +189,10 @@ abstract class CarouselItems {
                 `Carousel_Items`
             WHERE
                 (
-                    `carousel_item_id` = ?
+                    `corousel_item_id` = ?
                 );';
         $params = [
-            $Carousel_Items->carousel_item_id
+            $Carousel_Items->corousel_item_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -239,7 +239,7 @@ abstract class CarouselItems {
         );
         $sql = "
             SELECT
-                `Carousel_Items`.`carousel_item_id`,
+                `Carousel_Items`.`corousel_item_id`,
                 `Carousel_Items`.`title`,
                 `Carousel_Items`.`excerpt`,
                 `Carousel_Items`.`image_url`,
@@ -343,7 +343,7 @@ abstract class CarouselItems {
         if ($affectedRows == 0) {
             return 0;
         }
-        $Carousel_Items->carousel_item_id = (
+        $Carousel_Items->corousel_item_id = (
             \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
         );
 

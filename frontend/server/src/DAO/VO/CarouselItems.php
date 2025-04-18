@@ -16,7 +16,7 @@ namespace OmegaUp\DAO\VO;
  */
 class CarouselItems extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
-        'carousel_item_id' => true,
+        'corousel_item_id' => true,
         'title' => true,
         'excerpt' => true,
         'image_url' => true,
@@ -39,9 +39,9 @@ class CarouselItems extends \OmegaUp\DAO\VO\VO {
                 'Unknown columns: ' . join(', ', array_keys($unknownColumns))
             );
         }
-        if (isset($data['carousel_item_id'])) {
-            $this->carousel_item_id = intval(
-                $data['carousel_item_id']
+        if (isset($data['corousel_item_id'])) {
+            $this->corousel_item_id = intval(
+                $data['corousel_item_id']
             );
         }
         if (isset($data['title'])) {
@@ -129,7 +129,7 @@ class CarouselItems extends \OmegaUp\DAO\VO\VO {
      *
      * @var int|null
      */
-    public $carousel_item_id = 0;
+    public $corousel_item_id = 0;
 
     /**
      * [Campo no documentado]
