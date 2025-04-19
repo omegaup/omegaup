@@ -185,7 +185,7 @@ export function getHeatmapChartOptions(
 }
 
 // Define minimum interfaces needed for heatmap data
-interface HeatmapDataPoint {
+export interface HeatmapDataPoint {
   date: string;
   count: number;
 }
@@ -240,64 +240,47 @@ OmegaUp.on('ready', () => {
         hasPassword: payload.extraProfileDetails?.hasPassword,
         selectedTab,
         searchResultSchools: searchResultSchools,
-        heatmapData: [] as HeatmapDataPoint[],
         availableYears: [currentYear] as number[],
         isLoading: true,
       };
     },
     mounted: function () {
       if (this.profile.username) {
-        this.loadInitialHeatmapData(this.profile.username);
+        this.loadInitialData(this.profile.username);
       }
     },
     methods: {
-      loadInitialHeatmapData: function (username: string): void {
+      /**
+       * Loads all profile data including stats for both charts
+       */
+      loadInitialData: function (username: string): void {
         this.isLoading = true;
 
         api.User.stats({ username })
           .then((response) => {
-            const processedData: HeatmapDataPoint[] = [];
-            if (response.runs && response.runs.length > 0) {
-              for (const run of response.runs) {
-                if (run.date) {
-                  processedData.push({
-                    date: run.date,
-                    count: run.runs,
-                  });
+            // Store runs data directly
+            if (this.data) {
+              if (!this.data.stats) {
+                this.data.stats = [];
+              }
+              this.data.stats = response.runs || [];
+            }
+
+            // Find all available years from runs data
+            const years = new Set<number>();
+            const currentYear = new Date().getFullYear();
+            years.add(currentYear);
+
+            for (const run of response.runs || []) {
+              if (run.date) {
+                const year = parseInt(run.date.split('-')[0], 10);
+                if (!isNaN(year)) {
+                  years.add(year);
                 }
               }
             }
 
-            this.heatmapData = processedData;
-
-            if (response.runs && response.runs.length > 0) {
-              const sortedRuns = [...response.runs].sort((a, b) => {
-                if (!a.date) return 1;
-                if (!b.date) return -1;
-                return new Date(a.date).getTime() - new Date(b.date).getTime();
-              });
-
-              if (sortedRuns[0].date) {
-                const firstSubmissionYear = new Date(
-                  sortedRuns[0].date,
-                ).getFullYear();
-
-                const years: number[] = [];
-                const currentYear = new Date().getFullYear();
-
-                for (
-                  let year = firstSubmissionYear;
-                  year <= currentYear;
-                  year++
-                ) {
-                  years.push(year);
-                }
-
-                years.sort((a, b) => b - a);
-                this.availableYears = years;
-              }
-            }
-
+            this.availableYears = [...years].sort((a, b) => b - a);
             this.isLoading = false;
           })
           .catch((error) => {
@@ -305,24 +288,22 @@ OmegaUp.on('ready', () => {
             this.isLoading = false;
           });
       },
+
+      /**
+       * Loads data for a specific year for both charts
+       */
       loadHeatmapDataForYear: function (username: string, year: number): void {
         this.isLoading = true;
 
         api.User.stats({ username, year: year.toString() })
           .then((response) => {
-            const processedData: HeatmapDataPoint[] = [];
-            if (response.runs && response.runs.length > 0) {
-              for (const run of response.runs) {
-                if (run.date) {
-                  processedData.push({
-                    date: run.date,
-                    count: run.runs,
-                  });
-                }
+            // Store runs data directly
+            if (this.data) {
+              if (!this.data.stats) {
+                this.data.stats = [];
               }
+              this.data.stats = response.runs || [];
             }
-
-            this.heatmapData = processedData;
 
             this.isLoading = false;
           })
@@ -351,7 +332,6 @@ OmegaUp.on('ready', () => {
           hasPassword: this.hasPassword,
           viewProfileSelectedTab,
           searchResultSchools: this.searchResultSchools,
-          heatmapData: this.heatmapData,
           availableYears: this.availableYears,
           isLoading: this.isLoading,
         },

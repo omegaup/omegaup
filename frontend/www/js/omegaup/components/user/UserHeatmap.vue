@@ -27,11 +27,6 @@ import { getHeatmapChartOptions } from '../../user/profile';
 
 HighchartsHeatmap(Highcharts);
 
-interface HeatmapDataPoint {
-  date: string;
-  count: number;
-}
-
 // Define color variables
 export const COLORS = {
   emptyCell: 'var(--user-heatmap-empty-cell-color)',
@@ -45,9 +40,9 @@ export const COLORS = {
 @Component({})
 export default class UserHeatmap extends Vue {
   @Prop() username!: string;
-  @Prop({ default: () => [] }) heatmapData!: HeatmapDataPoint[];
   @Prop({ default: () => [] }) availableYears!: number[];
   @Prop({ default: false }) isLoading!: boolean;
+  @Prop({ default: () => [] }) data!: any[];
 
   chart: Highcharts.Chart | null = null;
   selectedYear: number = new Date().getFullYear();
@@ -59,11 +54,11 @@ export default class UserHeatmap extends Vue {
 
   mounted(): void {
     this.$nextTick(() => {
-      if (this.availableYears && this.availableYears.length > 0) {
+      if (this.availableYears?.length) {
         this.selectedYear = this.availableYears[0];
       }
 
-      if (this.heatmapData && this.heatmapData.length > 0) {
+      if (this.data?.length) {
         this.renderHeatmap();
       }
     });
@@ -71,20 +66,20 @@ export default class UserHeatmap extends Vue {
 
   @Watch('availableYears', { immediate: true, deep: true })
   onAvailableYearsChange(newValue: number[]): void {
-    if (!newValue || !newValue.length) return;
+    if (!newValue?.length) return;
 
     this.selectedYear = newValue[0];
 
     this.$nextTick(() => {
-      if (this.heatmapData && this.heatmapData.length > 0) {
+      if (this.data && this.data.length > 0) {
         this.renderHeatmap();
       }
     });
   }
 
-  @Watch('heatmapData', { immediate: true, deep: true })
-  onHeatmapDataChange(newValue: HeatmapDataPoint[]): void {
-    if (!newValue || !newValue.length) return;
+  @Watch('data', { immediate: true, deep: true })
+  onDataChange(): void {
+    if (!this.data?.length) return;
 
     this.$nextTick(() => {
       this.renderHeatmap();
@@ -93,7 +88,7 @@ export default class UserHeatmap extends Vue {
 
   @Watch('isLoading')
   onLoadingChange(newValue: boolean): void {
-    if (!newValue && this.heatmapData && this.heatmapData.length > 0) {
+    if (!newValue && this.data?.length) {
       this.$nextTick(() => {
         this.renderHeatmap();
       });
@@ -109,24 +104,26 @@ export default class UserHeatmap extends Vue {
       return;
     }
 
+    // Use the same stats data that the bar chart uses
+    const stats = this.data;
+
     const startDate = new Date(this.selectedYear, 0, 1);
     const firstDayOffset = startDate.getDay();
 
+    // Create a map for faster lookups, using the same format as bar chart
     const dateMap = new Map<string, number>();
-    if (this.heatmapData) {
-      this.heatmapData.forEach((item) => {
-        if (!item.date) return;
 
-        const dateObj = new Date(item.date);
-        const year = dateObj.getUTCFullYear();
-        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(dateObj.getUTCDate()).padStart(2, '0');
-        const normalizedDate = `${year}-${month}-${day}`;
+    if (stats?.length) {
+      for (const run of stats) {
+        if (!run.date) continue;
 
-        if (year === this.selectedYear) {
-          dateMap.set(normalizedDate, item.count);
+        // Only include data for the selected year
+        if (run.date.startsWith(this.selectedYear.toString())) {
+          // Sum runs by date
+          const currentCount = dateMap.get(run.date) || 0;
+          dateMap.set(run.date, currentCount + run.runs);
         }
-      });
+      }
     }
 
     const formattedData: Array<[number, number, number]> = [];
@@ -142,6 +139,8 @@ export default class UserHeatmap extends Vue {
 
     for (let i = 0; i < totalDays; i++) {
       const currentDate = new Date(this.selectedYear, 0, i + 1);
+
+      // Format date for map lookup (YYYY-MM-DD)
       const year = currentDate.getFullYear();
       const month = String(currentDate.getMonth() + 1).padStart(2, '0');
       const day = String(currentDate.getDate()).padStart(2, '0');
