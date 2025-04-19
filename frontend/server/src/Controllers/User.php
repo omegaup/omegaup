@@ -2311,11 +2311,13 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         // Fill in actual run counts for submissions
+        $processedDates = [];
         foreach ($runs as $run) {
             if (!is_null($run['date'])) {
                 $runDate = new \DateTime($run['date']);
                 if ($runDate >= $startDate && $runDate <= $endDate) {
                     $heatmapData[$run['date']] += $run['runs'];
+                    $processedDates[] = $run['date'];
                 }
             }
         }
