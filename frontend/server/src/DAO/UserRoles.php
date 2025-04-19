@@ -356,16 +356,16 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
                 ur.acl_id IN ($placeholders)
         ";
 
+        /** @var list<array{acl_id: int, user_id: int, role_id: int, username: string}> */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aclIds);
 
-        /** @var list<array{acl_id: int, user_id: int, role_id: int, username: string}> */
         $result = [];
         foreach ($rows as $row) {
             $result[] = [
-                'acl_id' => intval($row['acl_id']),
-                'user_id' => intval($row['user_id']),
-                'role_id' => intval($row['role_id']),
-                'username' => strval($row['username']),
+                'acl_id' => $row['acl_id'],
+                'user_id' => $row['user_id'],
+                'role_id' => $row['role_id'],
+                'username' => $row['username'],
             ];
         }
 

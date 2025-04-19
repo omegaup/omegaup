@@ -14,7 +14,7 @@ class ACLs extends \OmegaUp\DAO\Base\ACLs {
      * Get all ACLs owned by a user along with their type, alias, and an empty users array.
      *
      * @param int $userId The user ID whose ACLs are being fetched.
-     * @return list<array{acl_id: int, type: string, alias: string, users: list<array<string, never>>}>
+     * @return list<array{acl_id: int, type: string, alias: string, users: list<array{user_id: int, username: string, role_id: int, role_name: string, role_description: string}>}>
      */
     public static function getUserOwnedAclTypesWithAliases(int $userId): array {
         $sql = '

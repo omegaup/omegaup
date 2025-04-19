@@ -114,10 +114,10 @@ class ACL extends \OmegaUp\Controllers\Controller {
                 $userRoles,
                 'user_id'
             ),
-            fn($id) => !is_null($id) // Changed !== null to !is_null()
+            fn($id) => !is_null($id)
         );
         /** @var list<int> $userIds */
-        $userIds = array_map('intval', array_values(array_unique($userIds)));
+        $userIds = array_values(array_unique($userIds));
 
         foreach ($userRoles as $userRole) {
             $aclId = $userRole['acl_id'];
