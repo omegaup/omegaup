@@ -97,6 +97,7 @@
         :users="users"
         :problem-alias="problems.length != 0 ? problems[0].alias : null"
         :username="contestAdmin && users.length != 0 ? users[0].username : null"
+        :current-user-class-name="currentUserClassName"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :show-new-clarification-popup="showNewClarificationPopup"
@@ -144,7 +145,7 @@ import { SubmissionRequest } from '../../arena/submissions';
   },
 })
 export default class ArenaContestPractice extends Vue {
-  @Prop() contest!: types.ContestPublicDetails;
+  @Prop() contest!: types.ContestDetails;
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
@@ -163,6 +164,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: 'user-rank-unranked' }) currentUserClassName!: string;
 
   T = T;
   ui = ui;
