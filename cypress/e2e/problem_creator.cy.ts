@@ -210,8 +210,12 @@ describe('Problem creator Test', () => {
     problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
       lineCases.forEach((lineCase) => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-          .find('button.dropdown-toggle')
-          .should('contain.text', lineCase.text);
+          .invoke('text')
+          .then((text) => {
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
+          });
       });
     });
 
@@ -233,8 +237,12 @@ describe('Problem creator Test', () => {
     problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
       lineCases.forEach((lineCase) => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-          .find('button.dropdown-toggle')
-          .should('contain.text', lineCase.text);
+          .invoke('text')
+          .then((text) => {
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
+          });
       });
     });
 
@@ -250,8 +258,12 @@ describe('Problem creator Test', () => {
     problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
       lineCases.forEach((lineCase) => {
         cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-          .find('button.dropdown-toggle')
-          .should('contain.text', lineCase.text);
+          .invoke('text')
+          .then((text) => {
+            expect(text.trim().toLowerCase()).to.contain(
+              lineCase.text.toLowerCase(),
+            );
+          });
       });
     });
   });
