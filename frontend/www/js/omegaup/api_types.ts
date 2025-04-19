@@ -5748,6 +5748,9 @@ export namespace messages {
   export type RunExecuteRequest = { [key: string]: any };
   export type _RunExecuteServerResponse = any;
   export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -6557,6 +6560,9 @@ export namespace controllers {
     execute: (
       params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
