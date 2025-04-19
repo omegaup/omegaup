@@ -193,7 +193,7 @@ export interface HeatmapDataPoint {
 // Use type declaration merging to add the methods to Vue
 declare module 'vue/types/vue' {
   interface Vue {
-    loadInitialHeatmapData(username: string): void;
+    loadInitialData(username: string): void;
     loadHeatmapDataForYear(username: string, year: number): void;
   }
 }
