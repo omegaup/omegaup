@@ -2902,7 +2902,7 @@ export namespace types {
 
   export interface CarouselItem {
     button_title: string;
-    corousel_item_id: number;
+    carousel_item_id: number;
     excerpt: string;
     expiration_date?: Date;
     image_url: string;

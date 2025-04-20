@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * CarouselItemController
  *
- * @psalm-type CarouselItem=array{ corousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, status: bool}
+ * @psalm-type CarouselItem=array{ carousel_item_id: int, title: string, excerpt: string, image_url: string, link: string, button_title: string, expiration_date: \OmegaUp\Timestamp|null, status: bool}
  * @psalm-type CarouselItemListPayload=array{carouselItems: list<CarouselItem>}
  */
 class CarouselItems extends \OmegaUp\Controllers\Controller {
@@ -46,7 +46,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Delete a Carousel Item
      *
-     * @omegaup-request-param int $corousel_item_id
+     * @omegaup-request-param int $carousel_item_id
      *
      * @return array{status: string}
      */
@@ -54,7 +54,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         self::validateAdmin($r->identity);
 
-        $carouselItemId = $r->ensureInt('corousel_item_id');
+        $carouselItemId = $r->ensureInt('carousel_item_id');
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $carouselItemId
         );
@@ -71,7 +71,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Carousel Item
      *
-     * @omegaup-request-param int $corousel_item_id
+     * @omegaup-request-param int $carousel_item_id
      * @omegaup-request-param string $title
      * @omegaup-request-param string $excerpt
      * @omegaup-request-param string $image_url
@@ -87,7 +87,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         self::validateAdmin($r->identity);
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
-            $r->ensureInt('corousel_item_id')
+            $r->ensureInt('carousel_item_id')
         );
         if (is_null($carouselItem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -124,7 +124,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'corousel_item_id' => $item->corousel_item_id ?? 0,
+                    'carousel_item_id' => $item->carousel_item_id ?? 0,
                     'title' => $item->title ?? '',
                     'excerpt' => $item->excerpt ?? '',
                     'image_url' => $item->image_url ?? '',
@@ -157,7 +157,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         return [
             'carouselItems' => array_map(
                 fn(\OmegaUp\DAO\VO\CarouselItems $item): array => [
-                    'corousel_item_id' => $item->corousel_item_id ?? 0,
+                    'carousel_item_id' => $item->carousel_item_id ?? 0,
                     'title' => $item->title ?? '',
                     'excerpt' => $item->excerpt ?? '',
                     'image_url' => $item->image_url ?? '',
