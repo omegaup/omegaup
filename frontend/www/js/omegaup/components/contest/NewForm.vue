@@ -606,6 +606,7 @@ export default class NewForm extends Vue {
       alias: this.alias,
       archived: false,
       available_languages: {},
+      canSetRecommended: false,
       director: '',
       opened: false,
       penalty_calc_policy: 'sum',
