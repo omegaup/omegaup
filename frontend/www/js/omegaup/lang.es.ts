@@ -458,6 +458,7 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "Este concurso iniciar\u00e1 en %(time)",
   contestsCreate: "Crear Concurso",
   contestsJoinScoreboards: "Unir Scoreboards",
+  countryNotSet: "Pa\u00eds no establecido",
   courseActionScoreboard: "Scoreboard",
   courseAddContent: "A\u00f1adir contenido",
   courseAddLecturesAdd: "Agregar lecturas",
