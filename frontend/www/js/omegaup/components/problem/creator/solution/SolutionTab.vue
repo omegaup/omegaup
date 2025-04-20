@@ -48,15 +48,13 @@ import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
-
+import { TabIndex } from '../Tabs.vue';
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
+Vue.use(VueCookies, { expire: -1 });
 
 import omegaup_Markdown from '../../../Markdown.vue';
-import { TabIndex } from '../Tabs.vue';
-
-Vue.use(VueCookies, { expire: -1 });
 
 const markdownConverter = new markdown.Converter({
   preview: true,
