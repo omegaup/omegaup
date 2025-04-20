@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Simple test for 7dayStreak Badge
+ * Simple test for easySolver Badge
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_EasySolverTest extends \OmegaUp\Test\BadgesTestCase {
