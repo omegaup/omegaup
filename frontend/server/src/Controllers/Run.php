@@ -366,7 +366,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get the next execution timestamp
+     * Get the next execution timestamp, no user session required, as the IDE
+     * runs independently.
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecuteForIDE(\OmegaUp\Request $r): array {
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
+     * Get the next execution timestamp for a specific problemset:
+     * - Contest
+     * - Virtual contest
+     * - Practice contest
+     * - Course
      *
      * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
      */
