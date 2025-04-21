@@ -4,14 +4,15 @@
 #  inefficient queries are determined by having an 'ALL' on the query type
 '''Looking for inefficient queries in the MySQL log.'''
 from typing import Any, Iterable, Tuple
+import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
-import re
 
 import pytest
 
 
-def normalize_query(query):
+def normalize_query(query: str) -> str:
+    '''eliminate numeric values and strings'''
     # Reemplaza números
     query = re.sub(r'\b\d+\b', '?', query)
     # Reemplaza strings entre comillas
@@ -120,7 +121,7 @@ def explain_queries(
                 print(query_text)
                 print(explain_result)
                 query_count += 1
-                print("===========================================================================================================================")
+                print("==================================================")
                 print(inefficient_count, " inefficient tables scan")
                 # print(query_text, "\n\n")
                 query_set.add(normalize_query(query_text))
@@ -137,8 +138,8 @@ def explain_queries(
     print(query_set)
     print(len(query_set))
     # print(max_inefficient, " max inefficient queries")
-    # if query_count > 0:
-        # pytest.skip(f'{query_count} need fix')
+    if query_count > 0:
+        pytest.skip(f'{query_count} need fix')
     assert False
 
 
