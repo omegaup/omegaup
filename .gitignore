@@ -44,6 +44,9 @@ frontend/tests/ui/results/
 .nyc_output/
 coverage.xml
 coverage/
+testmysql_1.txt
+testmysql.txt
+testResult.txt
 
 # Ignore runtime and test stuff
 test-env

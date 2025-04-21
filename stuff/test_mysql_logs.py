@@ -6,8 +6,17 @@
 from typing import Any, Iterable, Tuple
 import mysql.connector
 from mysql.connector import Error  # type: ignore
+import re
 
 import pytest
+
+
+def normalize_query(query):
+    # Reemplaza números
+    query = re.sub(r'\b\d+\b', '?', query)
+    # Reemplaza strings entre comillas
+    query = re.sub(r"'[^']*'", '?', query)
+    return query
 
 
 # Establish connection to MySQL
@@ -60,6 +69,7 @@ def explain_queries(
     '''Run explain command on queries'''
     cursor = connection.cursor()
     query_count = 0
+    query_set = set()
     # max_inefficient = 0
     for query in queries:
         query_text = query[0]
@@ -107,9 +117,13 @@ def explain_queries(
                 #      row[type_row_index],
                 #      row[possible_keys_index])
             if inefficient_count > 0:
+                print(query_text)
+                print(explain_result)
                 query_count += 1
+                print("===========================================================================================================================")
                 print(inefficient_count, " inefficient tables scan")
-                print(query_text, "\n\n")
+                # print(query_text, "\n\n")
+                query_set.add(normalize_query(query_text))
             # if inefficient_count == 1:
                 # print(query_text, "\n\n")
             # if inefficient_count > 2:
@@ -120,10 +134,12 @@ def explain_queries(
             print(f"Failed to explain query: {query_text}")
             print(f"Error: {e}")
     print(query_count, " inefficient queries found")
+    print(query_set)
+    print(len(query_set))
     # print(max_inefficient, " max inefficient queries")
-    if query_count > 0:
-        pytest.skip(f'{query_count} need fix')
-    # assert False
+    # if query_count > 0:
+        # pytest.skip(f'{query_count} need fix')
+    assert False
 
 
 # Main function to handle the logic
