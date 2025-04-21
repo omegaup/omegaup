@@ -2707,11 +2707,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'check_plagiarism' => $checkPlagiarism ? true : false,
         ]);
 
-        if (
-            !is_null($recommendedValue) &&
-            \OmegaUp\Authorization::isSupportTeamMember($r->identity)
-        ) {
-            $contest->recommended = $recommendedValue;
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
         }
 
         self::createContest(
@@ -4880,11 +4883,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Handle recommended flag - only available for admins and support team
         $recommendedValue = $r->ensureOptionalBool('recommended');
-        if (
-            !is_null($recommendedValue) &&
-            \OmegaUp\Authorization::isSupportTeamMember($r->identity)
-        ) {
-            $contest->recommended = $recommendedValue;
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
         }
 
         // Update contest DAO
