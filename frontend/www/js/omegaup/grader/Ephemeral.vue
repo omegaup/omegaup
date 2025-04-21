@@ -120,6 +120,8 @@
 </template>
 
 <script lang="ts">
+import * as monaco from 'monaco-editor';
+(window as any).monaco = monaco;
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
