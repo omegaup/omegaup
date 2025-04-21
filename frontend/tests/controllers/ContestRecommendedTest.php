@@ -90,7 +90,9 @@ class ContestRecommendedTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
 
         // Verify the contest was updated with recommended flag
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
         $this->assertTrue($contest->recommended);
     }
 
@@ -130,7 +132,9 @@ class ContestRecommendedTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Verify the contest was not updated
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
         $this->assertFalse($contest->recommended);
     }
 
@@ -166,7 +170,9 @@ class ContestRecommendedTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
 
         // Verify the contest was updated with recommended flag
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
         $this->assertTrue($contest->recommended);
 
         // Toggle recommended flag back to false
@@ -182,7 +188,9 @@ class ContestRecommendedTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
 
         // Verify the contest was updated with recommended flag
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestData['request']['alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
         $this->assertFalse($contest->recommended);
     }
-} 
+}
