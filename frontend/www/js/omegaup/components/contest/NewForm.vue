@@ -631,8 +631,13 @@ export default class NewForm extends Vue {
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
-      recommended: this.recommended,
     };
+
+    // Only include recommended field if user has permission
+    if (this.canSetRecommended) {
+      contest.recommended = this.recommended;
+    }
+
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
