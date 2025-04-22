@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-column h-100">
+  <div class="root d-flex flex-column h-100" :class="theme">
     <div class="summary">
       {{ summary }}
     </div>
@@ -38,9 +38,8 @@
             type="button"
             :class="{
               'in-group': group.explicit,
-              active: currentCase == item.name && theme == 'vs',
-              'vs-dark': currentCase == item.name && theme == 'vs-dark',
-            }"
+              active: currentCase == item.name
+              }"
             @click="selectCase(item.name)"
           >
             <div class="text-truncate">
@@ -271,8 +270,20 @@ input[type='number'].case-weight {
   padding-left: 15px;
 }
 
-.vs-dark {
-  background: var(--vs-dark-background-color);
+/* Dark theme styles */
+.vs-dark .summary {
+  color: var(--vs-dark-font-color);
+  background-color: var(--vs-dark-background-color);
+}
+
+.vs-dark .list-group-item-action:not(.active) {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+  opacity: 0.6;
+}
+
+.vs-dark .list-group-item-action.active {
+  background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
 }
 </style>

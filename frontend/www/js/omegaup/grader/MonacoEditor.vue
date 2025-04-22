@@ -1,6 +1,5 @@
 <template>
-  <div class="h-100 d-flex flex-column">
-    <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
+  <div :class="['h-100', 'd-flex', 'flex-column', theme]"> <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
       <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
       <select
         v-model="selectedFontSize"
@@ -172,5 +171,27 @@ export default class MonacoEditor extends Vue {
 
 .editor {
   border: 1px solid var(--moncao-editor-toolbar-label-border-color);
+}
+
+/* Dark theme styles */
+.vs-dark .editor-toolbar {
+  background: var(--vs-dark-background-color) ;
+  border-bottom: 1px solid var(--vs-dark-border-color);
+}
+
+.vs-dark .editor-toolbar label {
+  background: var(--vs-dark-label-background-color);
+  color: var(--vs-dark-font-color);
+  border: 1px solid var(--vs-dark-font-color-light);
+}
+
+.vs-dark .editor-toolbar select {
+  background-color: var(--vs-dark-select-background-color);
+  color: var(--vs-dark-font-color);
+  border: 1px solid var(--vs-dark-font-color-light);
+}
+
+.vs-dark .editor {
+  border: 1px solid var(--vs-dark-font-color-light);
 }
 </style>
