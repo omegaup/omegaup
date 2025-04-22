@@ -286,4 +286,8 @@ input[type='number'].case-weight {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
 }
+.vs-dark .input-group input.form-control {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
 </style>
