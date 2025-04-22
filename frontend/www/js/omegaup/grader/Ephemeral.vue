@@ -775,10 +775,10 @@ div {
     color: var(--vs-dark-font-color);
     border-bottom: 1px solid var(--vs-dark-background-color);
 
-  /* Target the language selector */
-  .form-control.form-control-sm[data-language-select] {
-    background-color: var(--vs-dark-background-color); 
-    color: var(--vs-dark-font-color); 
+    /* Target the language selector */
+    .form-control.form-control-sm[data-language-select] {
+      background-color: var(--vs-dark-background-color);
+      color: var(--vs-dark-font-color);
     }
   }
   &.vs {

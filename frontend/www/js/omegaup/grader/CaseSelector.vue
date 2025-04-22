@@ -38,8 +38,8 @@
             type="button"
             :class="{
               'in-group': group.explicit,
-              active: currentCase == item.name
-              }"
+              active: currentCase == item.name,
+            }"
             @click="selectCase(item.name)"
           >
             <div class="text-truncate">
