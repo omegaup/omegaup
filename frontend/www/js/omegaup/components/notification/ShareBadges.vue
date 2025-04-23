@@ -1,39 +1,46 @@
 <template>
-  <div class="share-badges-modal">
-    <div class="modal-content p-3">
-      <div class="d-flex justify-content-end align-items-center mb-3">
-        <button class="close" @click.prevent="$emit('close')">❌</button>
-      </div>
-
-      <div class="badge-image-container mb-3">
-        <div class="position-relative">
-          <img class="badge-image" :src="badgeImageUrl" :alt="badgeName" />
-          <button
-            class="btn btn-sm btn-outline-secondary copy-button"
-            :title="T.copyBadgeImage"
-            @click.stop="copyImageToClipboard"
-          >
-            <font-awesome-icon :icon="['fas', 'copy']" />
-          </button>
+  <b-modal
+    v-model="showModal"
+    :title="badgeName"
+    hide-footer
+    body-class="p-3"
+    static
+    lazy
+    centered
+    content-class="share-badge-modal-content"
+  >
+    <div class="badge-image-container mb-3">
+      <div class="position-relative">
+        <img class="badge-image" :src="badgeImageUrl" :alt="badgeName" />
+        <button
+          ref="copyButton"
+          class="btn btn-sm btn-outline-secondary copy-button"
+          :title="T.copyBadgeImage"
+          @click.stop="copyImageToClipboard"
+        >
+          <font-awesome-icon :icon="['fas', 'copy']" />
+        </button>
+        <div v-if="tooltipVisible" class="tooltip-message">
+          {{ tooltipMessage }}
         </div>
       </div>
-
-      <div class="share-options d-flex justify-content-center mb-3">
-        <button class="btn btn-outline-primary mx-2" @click="shareOnLinkedIn">
-          <font-awesome-icon :icon="['fab', 'linkedin']" class="me-1" />
-          LinkedIn
-        </button>
-        <button class="btn btn-outline-info mx-2" @click="shareOnTwitter">
-          <font-awesome-icon :icon="['fab', 'twitter']" class="me-1" />
-          Twitter
-        </button>
-        <button class="btn btn-outline-primary mx-2" @click="shareOnFacebook">
-          <font-awesome-icon :icon="['fab', 'facebook-f']" class="me-1" />
-          Facebook
-        </button>
-      </div>
     </div>
-  </div>
+
+    <div class="share-options d-flex justify-content-center mb-3">
+      <button class="btn btn-outline-primary mx-2" @click="shareOnLinkedIn">
+        <font-awesome-icon :icon="['fab', 'linkedin']" class="me-1" />
+        {{ T.socialMediaLinkedIn }}
+      </button>
+      <button class="btn btn-outline-info mx-2" @click="shareOnTwitter">
+        <font-awesome-icon :icon="['fab', 'twitter']" class="me-1" />
+        {{ T.socialMediaTwitter }}
+      </button>
+      <button class="btn btn-outline-primary mx-2" @click="shareOnFacebook">
+        <font-awesome-icon :icon="['fab', 'facebook-f']" class="me-1" />
+        {{ T.socialMediaFacebook }}
+      </button>
+    </div>
+  </b-modal>
 </template>
 
 <script lang="ts">
@@ -59,16 +66,30 @@ library.add(faCopy, faLinkedin, faFacebookF, faTwitter);
 })
 export default class ShareBadges extends Vue {
   @Prop() badgeName!: string;
+  @Prop({ default: false }) value!: boolean;
+
+  tooltipVisible = false;
+  tooltipMessage = '';
 
   T = T;
   ui = ui;
+
+  get showModal(): boolean {
+    return this.value;
+  }
+
+  set showModal(value: boolean) {
+    this.$emit('input', value);
+  }
 
   get badgeImageUrl(): string {
     return `/media/dist/badges/${this.badgeName}.svg`;
   }
 
   get shareText(): string {
-    return `I'm excited to share that I've earned the ${this.badgeName} badge on omegaUp!`;
+    return ui.formatString(T.badgeShareText, {
+      badgeName: this.badgeName,
+    });
   }
 
   get shareUrl(): string {
@@ -76,7 +97,9 @@ export default class ShareBadges extends Vue {
   }
 
   shareOnLinkedIn(): void {
-    const text = `${this.shareText}\n\nYou can check it here: ${this.shareUrl}`;
+    const text = `${this.shareText}\n\n${ui.formatString(T.shareBadgeLink, {
+      url: this.shareUrl,
+    })}`;
     const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?text=${encodeURIComponent(
       text,
     )}`;
@@ -84,7 +107,9 @@ export default class ShareBadges extends Vue {
   }
 
   shareOnTwitter(): void {
-    const text = `${this.shareText}\n\nYou can check it here: ${this.shareUrl}`;
+    const text = `${this.shareText}\n\n${ui.formatString(T.shareBadgeLink, {
+      url: this.shareUrl,
+    })}`;
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text,
     )}`;
@@ -99,78 +124,25 @@ export default class ShareBadges extends Vue {
     window.open(facebookShareUrl, '_blank', 'noopener,noreferrer');
   }
 
-  async copyImageToClipboard(): Promise<void> {
-    try {
-      const canvas = document.createElement('canvas');
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = this.badgeImageUrl;
+  showTooltip(message: string): void {
+    this.tooltipMessage = message;
+    this.tooltipVisible = true;
 
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-      });
+    // Auto-hide the tooltip after 3 seconds
+    setTimeout(() => {
+      this.tooltipVisible = false;
+    }, 3000);
+  }
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        throw new Error('Could not get canvas context');
-      }
-
-      ctx.drawImage(img, 0, 0);
-
-      const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob(resolve);
-      });
-
-      if (!blob) {
-        throw new Error('Could not create blob from canvas');
-      }
-
-      const clipboardData: Record<string, Blob> = {
-        [blob.type]: blob,
-      };
-
-      if ('ClipboardItem' in window) {
-        const ClipboardItemConstructor = (window as any).ClipboardItem as {
-          new (data: Record<string, Blob>): any;
-        };
-        await navigator.clipboard.write([
-          new ClipboardItemConstructor(clipboardData),
-        ]);
-        ui.success(T.badgeImageCopiedToClipboard);
-      }
-    } catch (error) {
-      // Show instruction for manual copying on error
-      ui.warning(T.badgeImageManualCopyInstructions);
-    }
+  copyImageToClipboard(): void {
+    // Emit an event to the parent component to handle the copy operation
+    this.$emit('copy-badge-image', this.badgeName);
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-.share-badges-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background-color: var(--white);
-  border-radius: 0.3rem;
-  width: 90%;
-  max-width: 500px;
-}
 
 .badge-image-container {
   display: flex;
@@ -196,10 +168,21 @@ export default class ShareBadges extends Vue {
   }
 }
 
-.close {
-  font-size: inherit;
-  background: none;
-  border: none;
-  cursor: pointer;
+.share-badge-modal-content {
+  margin-top: 4rem;
+}
+
+.tooltip-message {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  animation: fade-in-out 3s ease-in-out;
 }
 </style>

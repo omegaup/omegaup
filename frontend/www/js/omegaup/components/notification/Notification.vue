@@ -33,7 +33,7 @@
         <button
           v-if="notification.contents.type === 'badge'"
           class="btn btn-outline-primary btn-sm mt-2 align-self-start"
-          @click.stop="openShareModal"
+          @click.stop="showShareModal = true"
         >
           {{ T.shareYourBadge }}
         </button>
@@ -41,9 +41,11 @@
     </div>
     <!-- Share badges modal -->
     <omegaup-share-badges
-      v-if="showShareModal && notification.contents.type === 'badge'"
+      v-if="notification.contents.type === 'badge'"
+      ref="shareBadges"
+      v-model="showShareModal"
       :badge-name="notification.contents.badge"
-      @close="showShareModal = false"
+      @copy-badge-image="handleCopyBadgeImage"
     ></omegaup-share-badges>
   </div>
 </template>
@@ -68,10 +70,6 @@ export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
   T = T;
   showShareModal = false;
-
-  openShareModal(): void {
-    this.showShareModal = true;
-  }
 
   get iconUrl(): string {
     if (this.notification.contents.body) {
@@ -146,6 +144,58 @@ export default class Notification extends Vue {
   handleClick(): void {
     if (this.url) {
       this.$emit('remove', this.notification, this.url);
+    }
+  }
+
+  async handleCopyBadgeImage(badgeName: string): Promise<void> {
+    try {
+      const badgeImageUrl = `/media/dist/badges/${badgeName}.svg`;
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = badgeImageUrl;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('Could not get canvas context');
+      }
+
+      ctx.drawImage(img, 0, 0);
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve);
+      });
+
+      if (!blob) {
+        throw new Error('Could not create blob from canvas');
+      }
+
+      const clipboardData: Record<string, Blob> = {
+        [blob.type]: blob,
+      };
+
+      if ('ClipboardItem' in window) {
+        const ClipboardItemConstructor = (window as any).ClipboardItem as {
+          new (data: Record<string, Blob>): any;
+        };
+        await navigator.clipboard.write([
+          new ClipboardItemConstructor(clipboardData),
+        ]);
+        (this.$refs.shareBadges as any).showTooltip(
+          T.badgeImageCopiedToClipboard,
+        );
+      }
+    } catch (error) {
+      (this.$refs.shareBadges as any).showTooltip(
+        T.badgeImageManualCopyInstructions,
+      );
     }
   }
 }
