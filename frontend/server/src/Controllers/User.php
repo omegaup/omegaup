@@ -5022,6 +5022,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $docs = [
             'pdf' => [],
+            'md' => [],
             'dir' => [],
         ];
 
@@ -5032,6 +5033,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 $name = ucwords($name);
                 if (preg_match('/\.pdf$/', $file)) {
                     $docs['pdf'][] = [
+                        'name' => $name,
+                        'url' => "/docs/{$file}",
+                    ];
+                } elseif (preg_match('/\.md$/', $file)) {
+                    $docs['md'][] = [
                         'name' => $name,
                         'url' => "/docs/{$file}",
                     ];
