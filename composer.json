@@ -18,7 +18,7 @@
     "phpunit/phpunit": "^9",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
     "sirbrillig/phpcs-variable-analysis": "^2.11",
-    "codedungeon/phpunit-result-printer": "^0.32.0"
+    "diablomedia/phpunit-pretty-printer": "^5.0"
   },
   "scripts": {
     "test": "./stuff/mysql_types.sh"

@@ -13,7 +13,8 @@ class UserDocsTest extends \OmegaUp\Test\ControllerTestCase {
         )['templateProperties']['payload']['docs'];
 
         $this->assertNotEmpty($pdfFiles);
-        $this->assertNotEmpty($mdFiles);
+        // This array is empty until PR #7989 is approved and merged
+        $this->assertEmpty($mdFiles);
         $this->assertNotEmpty($directories);
     }
 }
