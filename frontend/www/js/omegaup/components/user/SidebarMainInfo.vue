@@ -104,12 +104,12 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
+  { key: 'view-acl-list', title: T.userViewAclList, visible: true },
   { key: 'manage-api-tokens', title: T.profileManageApiTokens, visible: true },
   { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
   { key: 'delete-account', title: T.userEditDeleteAccount, visible: true },
-  { key: 'view-acl-list', title: T.userViewAclList, visible: true },
 ];
 
 @Component({

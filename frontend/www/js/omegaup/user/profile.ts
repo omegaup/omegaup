@@ -190,6 +190,19 @@ export interface HeatmapDataPoint {
   count: number;
 }
 
+export interface Acl {
+  acl_id: number;
+  alias: string;
+  type: string;
+  users: {
+    role_description: string;
+    role_id: number;
+    role_name: string;
+    user_id: number;
+    username: string;
+  }[];
+}
+
 // Use type declaration merging to add the methods to Vue
 declare module 'vue/types/vue' {
   interface Vue {
@@ -242,7 +255,7 @@ OmegaUp.on('ready', () => {
         searchResultSchools: searchResultSchools,
         availableYears: [currentYear] as number[],
         isLoading: true,
-        aclList: [] as any,
+        aclList: [] as Acl[],
       };
     },
     mounted: function () {
@@ -504,7 +517,7 @@ OmegaUp.on('ready', () => {
           'fetch-acl-list': () => {
             api.ACL.userOwnedAclReport()
               .then((data) => {
-                this.aclList = data;
+                this.aclList = data.acls;
               })
               .catch(ui.apiError);
           },

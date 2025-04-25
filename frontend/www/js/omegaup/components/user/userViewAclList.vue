@@ -1,16 +1,11 @@
 <template>
   <div class="acl-container">
-    <!-- Sidebar: List of ACLs Owned by the User -->
+    <!-- Sidebar: List of ACLs -->
     <div class="sidebar">
-      <ul>
-        <li
-          v-for="acl in allAcls"
-          :key="acl.acl_id"
-          :class="{ active: selectedAcl === acl.acl_id }"
-          @click="selectAcl(acl.acl_id)"
-        >
+      <ul v-if="aclList.length">
+        <li v-for="acl in aclList" :key="acl.acl_id" @click="selectAcl(acl)">
           <span class="acl-alias">
-            {{ getAclAlias(acl.acl_id) }} ({{ getUserCount(acl.acl_id) }})
+            {{ getAclAlias(acl) }} ({{ acl.users.length }})
           </span>
         </li>
       </ul>
@@ -19,25 +14,20 @@
     <!-- Main Content: Users in the Selected ACL -->
     <div class="main-content">
       <h3 v-if="selectedAcl" style="text-align: center">
-        {{ T.viewAclListUsersForAcl }} {{ getAclAlias(selectedAcl) }} ({{
-          getAclType(selectedAcl)
-        }})
+        {{ getAclAlias(selectedAcl) }} ({{ selectedAcl.type }})
       </h3>
-      <ul v-if="selectedAclUsers.length">
-        <li v-for="user in selectedAclUsers" :key="user.user_id">
+      <ul v-if="selectedAcl && selectedAcl.users.length">
+        <li v-for="user in selectedAcl.users" :key="user.user_id">
           <strong>
-            <omegaup-username
-              :username="user.username"
-              :linkify="true"
-            ></omegaup-username>
+            <omegaup-username :username="user.username" :linkify="true" />
           </strong>
           - {{ user.role_name }}
-          <span v-if="user.role_description"
-            >({{ user.role_description }})</span
-          >
+          <span v-if="user.role_description">
+            ({{ user.role_description }})
+          </span>
         </li>
       </ul>
-      <p v-else>{{ T.viewAclListSelectAnAcl }}</p>
+      <p v-else>{{ T.viewAclListNoUsers }}</p>
     </div>
   </div>
 </template>
@@ -46,68 +36,34 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
+import { Acl } from '../../user/profile';
+
 @Component({
   components: {
     'omegaup-username': user_Username,
   },
 })
 export default class UserManageAclList extends Vue {
-  @Prop() aclList!: {
-    acls: {
-      acl_id: number;
-      type: string;
-      alias: string | null;
-    }[];
-    roles: {
-      acl_id: number;
-      user_id: number;
-      username: string;
-      role_id: number;
-      role_name: string;
-      role_description: string;
-    }[];
-  };
+  @Prop() aclList!: Acl[];
   T = T;
-  selectedAcl: number | null = null;
+
+  selectedAcl: Acl | null = null;
+
   mounted() {
     this.$emit('fetch-acl-list', {});
-    // Auto-select the first ACL if available
     setTimeout(() => {
-      if (this.allAcls.length > 0) {
-        this.selectedAcl = this.allAcls[0].acl_id;
+      if (this.aclList?.length > 0) {
+        this.selectedAcl = this.aclList[0];
       }
     }, 1000);
   }
-  // Show all ACLs instead of just owned ones
-  get allAcls() {
-    return this.aclList?.acls || [];
+
+  selectAcl(acl: Acl) {
+    this.selectedAcl = acl;
   }
-  // Get users in the selected ACL
-  get selectedAclUsers() {
-    if (!this.selectedAcl) return [];
-    return this.aclList?.roles?.filter(
-      (role) => role.acl_id === this.selectedAcl,
-    );
-  }
-  // Select an ACL when clicked
-  selectAcl(aclId: number) {
-    this.selectedAcl = aclId;
-  }
-  // Get ACL alias or default to "ACL <id>"
-  getAclAlias(aclId: number) {
-    const acl = this.aclList.acls.find((a) => a.acl_id === aclId);
-    return acl ? acl.alias || `ACL ${acl.acl_id}` : `ACL ${aclId}`;
-  }
-  // Get ACL alias or default to "ACL <id>"
-  getAclType(aclId: number) {
-    const acl = this.aclList.acls.find((a) => a.acl_id === aclId);
-    return acl ? acl.type || `ACL ${acl.type}` : `ACL ${acl.type}`;
-  }
-  // Get number of users in an ACL
-  getUserCount(aclId: number) {
-    return (
-      this.aclList?.roles?.filter((role) => role.acl_id === aclId).length || 0
-    );
+
+  getAclAlias(acl: Acl) {
+    return acl.alias || `ACL ${acl.acl_id}`;
   }
 }
 </script>
@@ -119,7 +75,6 @@ export default class UserManageAclList extends Vue {
   max-height: 600px;
 }
 
-/* Sidebar Styling */
 .sidebar {
   width: 250px;
   background: #f8f9fa;
@@ -148,7 +103,6 @@ export default class UserManageAclList extends Vue {
   color: white;
 }
 
-/* Main Content */
 .main-content {
   flex-grow: 1;
   padding: 1rem;
