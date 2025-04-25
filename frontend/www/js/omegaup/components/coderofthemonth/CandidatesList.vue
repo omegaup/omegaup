@@ -1,6 +1,8 @@
 <template>
   <div v-if="isDisabled" class="system-in-maintainance m-5 text-center">
-    <omegaup-markdown :markdown="T.systemInMaintainance"></omegaup-markdown>
+    <omegaup-markdown
+      :markdown="T.coderOfTheMonthSystemInMaintainance"
+    ></omegaup-markdown>
     <font-awesome-icon :icon="['fas', 'cogs']" />
   </div>
   <table v-else class="table table-striped table-hover table-responsive-sm">

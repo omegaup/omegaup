@@ -22,6 +22,11 @@
             :profile-badges="profileBadges"
             :visitor-badges="visitorBadges"
             :selected-tab.sync="currentViewProfileSelectedTab"
+            :heatmap-data="heatmapData"
+            :available-years="availableYears"
+            @heatmap-year-changed="
+              (year) => $emit('heatmap-year-changed', year)
+            "
           ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
@@ -148,6 +153,11 @@ export default class Profile extends Vue {
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
   @Prop({ default: [] }) aclList!: [];
+  @Prop({ default: () => [] }) heatmapData!: Array<{
+    date: string;
+    count: number;
+  }>;
+  @Prop({ default: () => [] }) availableYears!: number[];
 
   T = T;
   ui = ui;
