@@ -152,12 +152,12 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
-  @Prop({ default: [] }) aclList!: [];
   @Prop({ default: () => [] }) heatmapData!: Array<{
     date: string;
     count: number;
   }>;
   @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: [] }) aclList!: [];
 
   T = T;
   ui = ui;
