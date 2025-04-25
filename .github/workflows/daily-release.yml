@@ -3,14 +3,13 @@ name: daily-release
 # Run every day at 3:00 UTC. This translates to 20:00 PT.
 # TODO(#1624): Make this daily once we have better coverage of the frontend.
 on:
-  repository_dispatch:
-    types: daily-release
+  repository_dispatch: {}
   schedule:
     - cron: '0 3 * * 0'
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2

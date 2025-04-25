@@ -2,14 +2,13 @@ name: weekly-release
 
 # Run every Monday at 3:00 UTC. This translates to Sunday 20:00 PT.
 on:
-  repository_dispatch:
-    types: weekly-release
+  repository_dispatch: {}
   schedule:
     - cron: '0 3 * * 1'
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v2
