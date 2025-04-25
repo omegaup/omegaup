@@ -1995,7 +1995,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $result['admin'] = false;
                 $result['opened'] = false;
                 $result['has_submissions'] = $hasSubmissions;
-                $result['recommended'] = boolval($contest->recommended);
                 return $result;
             },
             APC_USER_CACHE_CONTEST_INFO_TIMEOUT
