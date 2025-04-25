@@ -275,14 +275,13 @@
 
 ### Description
 
-Returns all ACLs owned by the current user and the roles assigned within those ACLs.
+Returns all ACLs owned by the current user along with assigned roles for each.
 
 ### Returns
 
-| Name    | Type                                                                                                                     |
-| ------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `acls`  | `{ acl_id: number; alias: string; type: string; }[]`                                                                     |
-| `roles` | `{ acl_id: number; role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]` |
+| Name   | Type                                                                                                                                                                |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `acls` | `{ acl_id: number; alias: string; type: string; users: { role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]; }[]` |
 
 # Admin
 

@@ -1860,6 +1860,8 @@ const translations: { [key: string]: string; } = {
   verificationEmailSuccessfully: "Your email address has been verified.",
   verificationIdInvalid: "The provided verification information is not valid.",
   verificationParentalTokenGoToMyDependents: "Go to my dependents",
+  viewAclListSelectAnAcl: "Please select an ACL from the sidebar",
+  viewAclListUsersForAcl: "Users for ACL",
   virtualContest: "Virtual contest",
   virtualContestSuffix: "%(title) [virtual]",
   virtualSuffix: "%(username) [virtual]",

@@ -64,116 +64,76 @@ class ACL extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns all ACLs owned by the current user and the roles assigned within those ACLs.
+     * Returns all ACLs owned by the current user along with assigned roles for each.
      *
      * @param \OmegaUp\Request $r The request object containing user session information.
      * @throws \OmegaUp\Exceptions\NotFoundException If the user is not found.
-     * @return array{acls: list<array{acl_id: int, type: string, alias: ?string}>, roles: list<array{acl_id: int, user_id: int, username: string, role_id: int, role_name: string, role_description: string}>}
+     * @return array{acls: list<array{acl_id: int, type: string, alias: string, users: list<array{user_id: int, username: string, role_id: int, role_name: string, role_description: string}>}>}
      */
     public static function apiUserOwnedAclReport(\OmegaUp\Request $r): array {
-        // Ensure user is authenticated
         $r->ensureMainUserIdentity();
 
-        /** @var null|\OmegaUp\DAO\VO\Identities $user */
-        $user = $r->identity;
-        if (!$user || is_null($user->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
-        $userId = $user->identity_id;
+        $userId = $r->user->user_id;
 
-        // Step 1: Fetch all ACLs owned by the user
-        $allACLs = \OmegaUp\DAO\ACLs::getAll();
-        $userACLs = [];
-        foreach ($allACLs as $acl) {
-            if (
-                !isset(
-                    $acl->acl_id,
-                    $acl->owner_id
-                ) || $acl->owner_id !== $userId
-            ) {
-                continue;
-            }
-            $aclData = self::getAclType($acl->acl_id);
-            $userACLs[$acl->acl_id] = [
-                'acl_id' => $acl->acl_id,
-                'type' => $aclData['type'],
-                'alias' => $aclData['alias'] ?? null,
-            ];
+        // Get ACLs owned by the user with alias, type, and users initialized
+        $ownedAcls = \OmegaUp\DAO\ACLs::getUserOwnedAclTypesWithAliases(
+            $userId
+        );
+
+        if (empty($ownedAcls)) {
+            return ['acls' => []];
         }
 
-        if (empty($userACLs)) {
-            return ['acls' => [], 'roles' => []];
-        }
+        $aclMap = array_column($ownedAcls, null, 'acl_id');
+        $aclIds = array_keys($aclMap);
 
-        // Step 2: Fetch role descriptions
-        $roles = \OmegaUp\DAO\Roles::getAll();
+        // Build role map (role_id => [name, description])
         $roleMap = [];
-        foreach ($roles as $role) {
-            if (isset($role->role_id, $role->name, $role->description)) {
-                $roleMap[$role->role_id] = [
-                    'name' => $role->name,
-                    'description' => $role->description,
-                ];
-            }
-        }
-
-        // Step 3: Fetch all UserRoles related to these ACLs
-        $allUserRoles = \OmegaUp\DAO\UserRoles::getAll();
-        $aclRoles = [];
-        foreach ($allUserRoles as $userRole) {
+        foreach (\OmegaUp\DAO\Roles::getAll() as $role) {
             if (
-                !isset(
-                    $userRole->acl_id,
-                    $userRole->user_id,
-                    $userRole->role_id
-                ) || !isset(
-                    $userACLs[$userRole->acl_id]
+                is_null(
+                    $role->role_id
+                ) || is_null(
+                    $role->name
+                ) || is_null(
+                    $role->description
                 )
             ) {
                 continue;
             }
-
-            // Get user identity
-            $identity = \OmegaUp\DAO\Identities::findByUserId(
-                $userRole->user_id
-            );
-            $username = $identity->username ?? 'unknown';
-
-            // Get role name & description
-            $roleData = $roleMap[$userRole->role_id] ?? ['name' => 'Unknown', 'description' => 'Unknown role'];
-
-            $aclRoles[] = [
-                'acl_id' => $userRole->acl_id,
-                'user_id' => $userRole->user_id,
-                'username' => $username,
-                'role_id' => $userRole->role_id,
-                'role_name' => $roleData['name'],
-                'role_description' => $roleData['description'],
+            $roleMap[$role->role_id] = [
+                'name' => $role->name,
+                'description' => $role->description,
             ];
         }
 
-        return [
-            'acls' => array_values($userACLs),
-            'roles' => $aclRoles,
-        ];
-    }
+        // Get all user roles for these ACLs
+        $userRoles = \OmegaUp\DAO\UserRoles::getByAclIds($aclIds);
+        $userIds = array_filter(
+            array_column(
+                $userRoles,
+                'user_id'
+            ),
+            fn($id) => !is_null($id)
+        );
+        /** @var list<int> $userIds */
+        $userIds = array_values(array_unique($userIds));
 
-    /**
-     * Determines the type and alias of an ACL.
-     *
-     * @param int $aclId The ACL ID.
-     * @return array{type: string, alias: ?string}
-     */
-    private static function getAclType(int $aclId): array {
-        if ($contest = \OmegaUp\DAO\Contests::getByAclId($aclId)) {
-            return ['type' => 'contest', 'alias' => $contest->alias ?? null];
-        } elseif ($course = \OmegaUp\DAO\Courses::getByAclId($aclId)) {
-            return ['type' => 'course', 'alias' => $course->alias ?? null];
-        } elseif ($problem = \OmegaUp\DAO\Problems::getByAclId($aclId)) {
-            return ['type' => 'problem', 'alias' => $problem->alias ?? null];
-        } elseif ($group = \OmegaUp\DAO\Groups::getByAclId($aclId)) {
-            return ['type' => 'group', 'alias' => $group->alias ?? null];
+        foreach ($userRoles as $userRole) {
+            $aclId = $userRole['acl_id'];
+            if (!isset($aclMap[$aclId])) {
+                continue;
+            }
+
+            $aclMap[$aclId]['users'][] = [
+                'user_id' => $userRole['user_id'],
+                'username' => $userRole['username'],
+                'role_id' => $userRole['role_id'],
+                'role_name' => $roleMap[$userRole['role_id']]['name'],
+                'role_description' => $roleMap[$userRole['role_id']]['description'],
+            ];
         }
-        return ['type' => 'unknown', 'alias' => null];
+
+        return ['acls' => array_values($aclMap)];
     }
 }
