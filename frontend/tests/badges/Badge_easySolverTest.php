@@ -22,7 +22,9 @@ class Badge_EasySolverTest extends \OmegaUp\Test\BadgesTestCase {
             foreach (range(0, 1) as $_) {
                 $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
                 // Set the problem's difficulty manually
-                $problem = \OmegaUp\DAO\Problems::getByPK($problemData['problem']->problem_id);
+                $problem = \OmegaUp\DAO\Problems::getByPK(
+                    $problemData['problem']->problem_id
+                );
                 $problem->difficulty = 1.0; // Set it to easy
                 \OmegaUp\DAO\Problems::update($problem);
 
