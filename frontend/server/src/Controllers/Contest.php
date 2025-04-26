@@ -2072,9 +2072,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        // When user is admin or user joins contest in practice mode, saving
+        // When user is admin, support team member, or user joins contest in practice mode, saving
         // first access time is not necessary
-        if ($isPracticeMode || $contestAdmin) {
+        if (
+            $isPracticeMode || $contestAdmin || \OmegaUp\Authorization::isSupportTeamMember(
+                $identity
+            )
+        ) {
             return $result;
         }
 
