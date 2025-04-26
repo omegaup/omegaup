@@ -5748,6 +5748,9 @@ export namespace messages {
   export type RunExecuteRequest = { [key: string]: any };
   export type _RunExecuteServerResponse = any;
   export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5945,7 +5948,10 @@ export namespace messages {
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
-  export type UserStatsResponse = { runs: types.UserProfileStats[] };
+  export type UserStatsResponse = {
+    heatmap: { count: number; date: string }[];
+    runs: { date?: string; runs: number; verdict: string }[];
+  };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
     username: string;
@@ -6554,6 +6560,9 @@ export namespace controllers {
     execute: (
       params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;

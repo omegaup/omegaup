@@ -193,6 +193,7 @@
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/execute/`](#apirunexecute)
+  - [`/api/run/executeForIDE/`](#apirunexecuteforide)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -3916,7 +3917,25 @@ Disqualify one or more submissions based on the received parameters:
 
 ### Description
 
-Get the next execution timestamp
+Get the next execution timestamp for a specific problemset:
+
+- Contest
+- Virtual contest
+- Practice contest
+- Course
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
+
+## `/api/run/executeForIDE/`
+
+### Description
+
+Get the next execution timestamp, no user session required, as the IDE
+runs independently.
 
 ### Returns
 
@@ -5035,12 +5054,14 @@ Get stats
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `username` | `null\|string` |             |
+| `year`     | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                       |
-| ------ | -------------------------- |
-| `runs` | `types.UserProfileStats[]` |
+| Name      | Type                                                 |
+| --------- | ---------------------------------------------------- |
+| `heatmap` | `{ count: number; date: string; }[]`                 |
+| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
 
 ## `/api/user/statusVerified/`
 

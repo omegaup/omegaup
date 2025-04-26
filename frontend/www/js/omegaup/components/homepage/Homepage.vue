@@ -128,10 +128,10 @@
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
           {
-            class: 'img-fluid',
-            src: '/media/homepage/replit_logo.png',
-            alt: 'replitLogo',
-            href: 'https://replit.com/',
+            class: 'img-fluid mx-auto d-block my-4',
+            src: '/media/homepage/airbnb_logo.svg',
+            alt: 'airbnbLogo',
+            href: 'https://news.airbnb.com/2025-community-fund/',
           },
         ]"
       ></omegaup-sponsors>
