@@ -122,6 +122,7 @@ class ProblemParams {
         }
         $this->author = $author;
         $this->authorUser = $authorUser;
+        
     }
 }
 
