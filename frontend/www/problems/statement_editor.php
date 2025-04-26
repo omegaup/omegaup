@@ -10,6 +10,7 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
                 'omegaupTitleStatementEditor',
             ),
             'payload' => [],
+            'fullWidth' => true,
         ],
         'entrypoint' => 'problem_statement',
     ]
