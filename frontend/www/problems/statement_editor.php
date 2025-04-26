@@ -13,4 +13,4 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
         ],
         'entrypoint' => 'problem_statement',
     ]
-); 
+);
