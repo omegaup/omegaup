@@ -62,7 +62,8 @@ QualifiedUsers AS (
 
 SELECT DISTINCT user_id
 FROM(
-  SELECT user_id,
+  SELECT
+  user_id,
   'MEDIUM' AS badge
   FROM
     QualifiedUsers

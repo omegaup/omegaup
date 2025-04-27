@@ -62,8 +62,9 @@ QualifiedUsers AS (
 
 SELECT DISTINCT user_id
 FROM(
-  SELECT user_id,
-  'EASY' AS badge
+  SELECT
+    user_id,
+    'EASY' AS badge
   FROM
     QualifiedUsers
 )
