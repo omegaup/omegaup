@@ -60,11 +60,7 @@ QualifiedUsers AS (
     AND problems_solved >= 10
 )
 
-SELECT DISTINCT user_id
-FROM(
-  SELECT
-  user_id,
-  'MEDIUM' AS badge
-  FROM
-    QualifiedUsers
-)
+SELECT
+  user_id
+FROM
+  QualifiedUsers;
