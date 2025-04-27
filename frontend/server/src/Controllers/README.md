@@ -843,6 +843,7 @@ Creates a new contest
 | `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`       | `float\|null`                                              |             |
 | `problems`                  | `null\|string`                                             |             |
+| `recommended`               | `bool\|null`                                               |             |
 | `requests_user_information` | `bool\|null`                                               |             |
 | `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                | `float\|null`                                              |             |
@@ -1424,6 +1425,7 @@ Update a Contest
 | `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`                        | `float\|null`                                              |             |
 | `problems`                                   | `null\|string`                                             |             |
+| `recommended`                                | `bool\|null`                                               |             |
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
