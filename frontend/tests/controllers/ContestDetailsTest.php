@@ -1215,20 +1215,21 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $supportTeamMember] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Assert the log is empty
-        $this->assertSame(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+        $this->assertEmpty(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
             $supportTeamMember->identity_id
-        )));
+        ));
 
         // Prepare our request
         $login = self::login($supportTeamMember);
-        $r = new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $login->auth_token,
-        ]);
 
         // Call api directly (without explicitly joining the contest)
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
 
         $this->assertContestDetails($contestData, $problems, $response);
 
@@ -1240,9 +1241,9 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($problemsetIdentity);
 
         // Assert the log is not empty (should still log access)
-        $this->assertSame(1, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+        $this->assertCount(1, \OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
             $contestData['contest']->problemset_id,
             $supportTeamMember->identity_id
-        )));
+        ));
     }
 }
