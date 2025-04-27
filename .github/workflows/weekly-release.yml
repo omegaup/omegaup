@@ -2,7 +2,8 @@ name: weekly-release
 
 # Run every Monday at 3:00 UTC. This translates to Sunday 20:00 PT.
 on:
-  repository_dispatch: {}
+  repository_dispatch:
+    types: weekly-release
   schedule:
     - cron: '0 3 * * 1'
 

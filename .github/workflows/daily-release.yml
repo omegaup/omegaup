@@ -3,7 +3,8 @@ name: daily-release
 # Run every day at 3:00 UTC. This translates to 20:00 PT.
 # TODO(#1624): Make this daily once we have better coverage of the frontend.
 on:
-  repository_dispatch: {}
+  repository_dispatch:
+    types: daily-release
   schedule:
     - cron: '0 3 * * 0'
 
