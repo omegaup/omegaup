@@ -1,11 +1,10 @@
 <template>
-  <div class="root d-flex flex-row h-100">
+  <div class="root d-flex flex-row h-100" :class="theme">
     <div class="filenames">
       <div class="list-group">
         <button
           v-if="!zip"
           class="text-truncate list-group-item list-group-item-action disabled"
-          :class="theme"
           type="button"
         >
           <em>{{ T.wordsEmpty }}</em>
@@ -17,8 +16,7 @@
           class="text-truncate list-group-item list-group-item-action"
           type="button"
           :class="{
-            active: active === name && theme === 'vs',
-            'vs-dark': active === name && theme === 'vs-dark',
+            active: active === name,
           }"
           :title="name"
           @click="select(item)"
@@ -93,5 +91,35 @@ textarea {
 .vs-dark {
   background: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
+}
+.vs-dark .filenames {
+  background-color: var(--vs-dark-background-color);
+}
+
+.vs-dark .list-group-item {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+  border-color: #555;
+}
+
+.vs-dark .list-group-item-action {
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item-action:hover,
+.vs-dark .list-group-item-action:focus {
+  background-color: #3a3a3a;
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item-action.active {
+  background-color: #484848;
+  border-color: #666;
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item.disabled {
+  background-color: #333;
+  color: #888;
 }
 </style>

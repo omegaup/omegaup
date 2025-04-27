@@ -276,18 +276,57 @@ input[type='number'].case-weight {
   background-color: var(--vs-dark-background-color);
 }
 
-.vs-dark .list-group-item-action:not(.active) {
+.vs-dark .list-group-item {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  opacity: 0.6;
+  border-color: #555;
+}
+
+.vs-dark .list-group-item-action {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item-action:hover,
+.vs-dark .list-group-item-action:focus {
+  background-color: #3a3a3a;
+  color: var(--vs-dark-font-color);
 }
 
 .vs-dark .list-group-item-action.active {
-  background-color: var(--vs-dark-background-color);
+  background-color: #484848;
+  border-color: #666;
+}
+
+.vs-dark .list-group-item-secondary {
+  background-color: #2d2d2d;
   color: var(--vs-dark-font-color);
 }
+
+.vs-dark .close {
+  color: #aaa;
+}
+
+.vs-dark .close:hover {
+  color: #fff;
+}
+
 .vs-dark .input-group input.form-control {
   background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+  border-color: #555;
+}
+
+.vs-dark .btn-secondary {
+  background-color: #444;
+  border-color: #666;
+}
+
+.vs-dark .btn-secondary:hover {
+  background-color: #555;
+}
+
+.vs-dark .verdict {
   color: var(--vs-dark-font-color);
 }
 </style>

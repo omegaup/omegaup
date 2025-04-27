@@ -177,22 +177,19 @@ export default class MonacoEditor extends Vue {
 /* Dark theme styles */
 .vs-dark .editor-toolbar {
   background: var(--vs-dark-background-color);
-  border-bottom: 1px solid var(--vs-dark-border-color);
 }
 
 .vs-dark .editor-toolbar label {
-  background: var(--vs-dark-label-background-color);
+  background: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  border: 1px solid var(--vs-dark-font-color-light);
 }
 
 .vs-dark .editor-toolbar select {
-  background-color: var(--vs-dark-select-background-color);
+  background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  border: 1px solid var(--vs-dark-font-color-light);
 }
 
 .vs-dark .editor {
-  border: 1px solid var(--vs-dark-font-color-light);
+  border: 1px solid var(--vs-dark-font-color);
 }
 </style>
