@@ -8,7 +8,28 @@ To achieve this, these notifications must first be loaded into the `Notification
 }
 ```
 
-The `type` field will tell the `Notification.vue` component what format the notification should have (with image, without image, image on the right, without date, etc). It's important to know that this format will only work if the appropriate styles are created/adjusted in the mentioned Vue component.
+The `type` field will tell the `Notification.vue` component what format the notification should have. Currently supported notification types are:
+
+- `badge`: Used for badge achievements, requires a `badge` field with the badge name
+- `demotion`: Used for user status changes (e.g. banned status), requires a `status` and `message` field
+- `general_notification`: Used for general purpose notifications, requires a `message` and optional `url` field 
+- System notifications using the `body` field structure:
+  ```json
+  {
+    "type": "notification-type",
+    "body": {
+      "localizationString": "translationKey",
+      "localizationParams": {
+        "param1": "value1",
+        "param2": "value2"
+      },
+      "url": "/path/to/resource",
+      "iconUrl": "/media/icon.png"
+    }
+  }
+  ```
+
+Each notification type may require different payload fields and will render with specific styles in the [`Notification.vue`](frontend/www/js/omegaup/components/notification/Notification.vue) component.
 
 The `any_field` can have any name you want, it works as a "payload", carrying the relevant information for the notification to be properly displayed.
 
