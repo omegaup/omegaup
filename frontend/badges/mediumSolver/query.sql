@@ -64,6 +64,6 @@ SELECT DISTINCT user_id
 FROM(
   SELECT user_id,
   'MEDIUM' AS badge
-  FROM 
+  FROM
     QualifiedUsers
 )
