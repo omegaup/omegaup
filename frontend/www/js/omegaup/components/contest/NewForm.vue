@@ -234,9 +234,7 @@
               :existing-options="searchResultTeamsGroups"
               :options="searchResultTeamsGroups"
               :value.sync="currentTeamsGroupAlias"
-              @update-existing-options="
-                (query) => $emit('update-search-result-teams-groups', query)
-              "
+              @update-existing-options="updateTeamsGroups"
             >
             </omegaup-common-typeahead>
             <input
@@ -357,6 +355,27 @@
             </p>
           </div>
         </div>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormRecommended }}</label>
+            <div v-if="canSetRecommended" class="checkbox form-check">
+              <input
+                v-model="recommended"
+                data-recommended
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label"> {{ T.wordsEnable }}</label>
+            </div>
+            <p class="help-block">
+              {{
+                canSetRecommended
+                  ? T.contestNewFormRecommendedTextAdmin
+                  : T.contestNewFormRecommendedTextNonAdmin
+              }}
+            </p>
+          </div>
+        </div>
         <div class="form-group">
           <button class="btn btn-primary introjs-schedule" type="submit">
             {{
@@ -425,6 +444,8 @@ export default class NewForm extends Vue {
   @Prop({ default: false }) contestForTeams!: boolean;
   @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
   @Prop({ default: true }) hasVisitedSection!: boolean;
+  @Prop({ default: false }) canSetRecommended!: boolean;
+  @Prop({ default: false }) initialRecommended!: boolean;
 
   T = T;
   ScoreMode = ScoreMode;
@@ -451,6 +472,7 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
+  recommended = this.initialRecommended;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -584,6 +606,7 @@ export default class NewForm extends Vue {
       alias: this.alias,
       archived: false,
       available_languages: {},
+      canSetRecommended: false,
       director: '',
       opened: false,
       penalty_calc_policy: 'sum',
@@ -609,6 +632,12 @@ export default class NewForm extends Vue {
       requests_user_information: this.requestsUserInformation,
       contest_for_teams: this.currentContestForTeams,
     };
+
+    // Only include recommended field if user has permission
+    if (this.canSetRecommended) {
+      contest.recommended = this.recommended;
+    }
+
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
@@ -657,6 +686,10 @@ export default class NewForm extends Vue {
 
   onSelect(language: string) {
     this.languages.push(language);
+  }
+
+  updateTeamsGroups(query: string) {
+    this.$emit('update-search-result-teams-groups', query);
   }
 }
 </script>
