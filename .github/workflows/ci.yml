@@ -160,7 +160,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
   javascript:
@@ -395,14 +395,14 @@ jobs:
         if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-screenshots-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
         if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-videos-${{ github.run_attempt }}
           path: cypress/videos
 
   python:

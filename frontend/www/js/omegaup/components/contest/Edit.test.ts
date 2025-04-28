@@ -12,6 +12,8 @@ describe('Edit.vue', () => {
     alias: 'test',
     archived: false,
     available_languages: { py2: 'py2' },
+    canSetRecommended: false,
+    recommended: false,
     contest_for_teams: false,
     default_show_all_contestants_in_scoreboard: false,
     description: 'contest test',
