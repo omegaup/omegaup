@@ -1197,4 +1197,53 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $aliases = array_map(fn ($problem) => $problem['alias'], $problems);
         $this->assertSame($aliases, $expectedAliases);
     }
+
+    /**
+     * Check that support team members can access contest details without
+     * recording first access time
+     */
+    public function testSupportTeamMemberCanAccessContest() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get some problems into the contest
+        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
+
+        // Create a support team member
+        ['identity' => $supportTeamMember] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        // Assert the log is empty
+        $this->assertEmpty(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+            $contestData['contest']->problemset_id,
+            $supportTeamMember->identity_id
+        ));
+
+        // Prepare our request
+        $login = self::login($supportTeamMember);
+
+        // Call api directly (without explicitly joining the contest)
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertContestDetails($contestData, $problems, $response);
+
+        // Assert that a problemset identity was NOT created for the support team member
+        $problemsetIdentity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
+            $contestData['contest']->problemset_id,
+            $supportTeamMember->identity_id
+        );
+        $this->assertNull($problemsetIdentity);
+
+        // Assert the log is not empty (should still log access)
+        $this->assertCount(1, \OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
+            $contestData['contest']->problemset_id,
+            $supportTeamMember->identity_id
+        ));
+    }
 }
