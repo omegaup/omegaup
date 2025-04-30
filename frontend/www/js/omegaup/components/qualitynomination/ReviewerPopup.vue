@@ -11,21 +11,41 @@
               <label class="control-label">
                 {{ T.reviewerNominationQuality }}
               </label>
-              <br />
               <omegaup-radio-switch
                 :value.sync="qualitySeal"
                 :selected-value="qualitySeal"
               ></omegaup-radio-switch>
             </div>
+            <div class="form-group w-100">
+              <label class="control-label w-100">
+                {{ T.reviewerNominationCategory }}
+              </label>
+              <ul class="tag-select">
+                <li
+                  v-for="problemTopic in sortedProblemTags"
+                  :key="problemTopic.value"
+                  class="tag-select"
+                >
+                  <label class="tag-label"
+                    ><input
+                      v-model="selectedProblemLevel"
+                      type="radio"
+                      :value="problemTopic.value"
+                    />
+                    {{ problemTopic.text }}</label
+                  >
+                </li>
+              </ul>
+            </div>
             <div class="form-group w-100" data-other-tag-input>
+              <label>{{ T.wordsPublicTags }}</label>
               <vue-typeahead-bootstrap
                 :data="publicTags"
                 :serializer="publicTagsSerializer"
-                :placeholder="T.collecionOtherTags"
+                :placeholder="T.publicTagsPlaceholder"
                 @hit="addOtherTag"
               >
               </vue-typeahead-bootstrap>
-              <br />
               <div class="card-body table-responsive w-100">
                 <table class="table table-striped w-100">
                   <thead>
@@ -37,7 +57,14 @@
                     </th>
                   </thead>
                   <tbody>
-                    <tr v-for="tag in publicTagsList" :key="tag">
+                    <tr
+                      v-for="tag in uniqueTags"
+                      :key="tag"
+                      class="border"
+                      :class="{
+                        'border-primary': exclusiveReviewedTags.includes(tag),
+                      }"
+                    >
                       <td data-tag-name>{{ getName(tag) }}</td>
                       <td class="text-center">
                         <button
@@ -123,6 +150,7 @@ export default class ReviewerPopup extends Vue {
   })
   possibleTags!: string[];
   @Prop({ default: () => [] }) publicTags!: string[];
+  @Prop({ default: () => [] }) reviewedPublicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
@@ -132,7 +160,9 @@ export default class ReviewerPopup extends Vue {
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = true;
-  publicTagsList = this.selectedPublicTags ?? [];
+  publicTagsList = Array.from(this.selectedPublicTags);
+  currentReviewedTags = this.reviewedPublicTags;
+  selectedProblemLevel = this.problemLevel;
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags
@@ -149,9 +179,22 @@ export default class ReviewerPopup extends Vue {
       });
   }
 
+  get uniqueTags() {
+    return [...new Set([...this.publicTagsList, ...this.reviewedPublicTags])];
+  }
+
+  get exclusiveReviewedTags(): string[] {
+    return this.reviewedPublicTags.filter(
+      (tag) => !this.selectedPublicTags.includes(tag),
+    );
+  }
+
   addOtherTag(tag: string): void {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
+    }
+    if (!this.reviewedPublicTags.includes(tag)) {
+      this.reviewedPublicTags = [...this.reviewedPublicTags, tag];
     }
   }
 
@@ -166,9 +209,18 @@ export default class ReviewerPopup extends Vue {
     return T[alias];
   }
 
-  removeTag(name: string) {
-    let pos = this.publicTagsList.indexOf(name);
-    this.publicTagsList.splice(pos, 1);
+  removeTag(name: string): void {
+    const publicTagIndex = this.publicTagsList.indexOf(name);
+    if (publicTagIndex !== -1) {
+      this.publicTagsList.splice(publicTagIndex, 1);
+    }
+
+    const reviewedTagIndex = this.reviewedPublicTags.indexOf(name);
+    if (reviewedTagIndex !== -1) {
+      this.reviewedPublicTags = this.reviewedPublicTags.filter(
+        (tag) => tag !== name,
+      );
+    }
   }
 
   onHide(): void {
@@ -177,8 +229,9 @@ export default class ReviewerPopup extends Vue {
 
   onSubmit(): void {
     this.$emit('rate-problem-as-reviewer', {
-      tags: this.publicTagsList,
-      qualitySeal: this.qualitySeal,
+      tags: this.uniqueTags,
+      level: this.selectedProblemLevel,
+      quality_seal: this.qualitySeal,
     });
     this.currentView = AvailableViews.Thanks;
     setTimeout(() => this.onHide(), 2000);
@@ -189,9 +242,9 @@ export default class ReviewerPopup extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 ul.tag-select {
-  height: 225px;
   overflow: auto;
   border: 1px solid var(--quality-nomination-tag-select-border-color);
+  border-radius: 0.25rem;
   background: var(--quality-nomination-tag-select-background-color);
   list-style-type: none;
 }
@@ -200,5 +253,10 @@ ul.tag-select {
   width: -webkit-fill-available;
   margin-bottom: 0;
   padding-bottom: 0.5rem;
+}
+
+.reviewed {
+  background-color: #f9e79f;
+  font-weight: bold;
 }
 </style>

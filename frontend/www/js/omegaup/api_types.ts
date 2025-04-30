@@ -4031,6 +4031,7 @@ export namespace types {
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedPublicTags?: string[];
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];

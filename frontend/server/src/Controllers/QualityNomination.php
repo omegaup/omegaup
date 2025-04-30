@@ -276,7 +276,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-
+        $qualityNomination = null;
         if ($nominationType === 'suggestion') {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
@@ -487,16 +487,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (
-                !isset($contents['quality_seal']) ||
-                (
-                    $contents['quality_seal'] &&
-                    !isset($contents['tag'])
-                )
-            ) {
+            if (!isset($contents['quality_seal'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'contents'
+                    'quality_seal'
                 );
             }
             if (
@@ -505,25 +499,20 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'contents'
+                    'level'
                 );
             }
 
-            if (
-                isset($contents['tags'])
-            ) {
+            if (isset($contents['tags'])) {
                 if (!is_array($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'parameterInvalid',
                         'contents'
                     );
                 }
-                /** @var mixed $tag */
+                /** @var list<string> $tag */
                 foreach ($contents['tags'] as &$tag) {
-                    if (
-                        !is_string($tag) ||
-                        !in_array($tag, self::ALLOWED_PUBLIC_TAGS)
-                    ) {
+                    if (!in_array($tag, self::ALLOWED_PUBLIC_TAGS)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'contents'
@@ -532,16 +521,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            if (
-                \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                    $identity,
-                    $problem
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                    'qualityNominationReviewerHasAlreadySentNominationForProblem'
-                );
-            }
+            $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
+                $identity,
+                $problem
+            );
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
@@ -551,7 +534,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'contents' => json_encode($contents),
             'status' => 'open',
         ]);
-        \OmegaUp\DAO\QualityNominations::create($nomination);
+
+        if ($nominationType === 'quality_tag' && is_null($qualityNomination)) {
+            \OmegaUp\DAO\QualityNominations::create($nomination);
+        } else {
+            $nomination->qualitynomination_id = $qualityNomination[
+                'qualitynomination_id'
+            ];
+            \OmegaUp\DAO\QualityNominations::update($nomination);
+        }
 
         if ($nomination->nomination == 'promotion') {
             $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
@@ -655,11 +646,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        $contents = $r->ensureString('contents');
         /**
          * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
          */
-        $contents = json_decode($r['contents'], associative: true);
+        $contents = json_decode($contents, associative: true);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',

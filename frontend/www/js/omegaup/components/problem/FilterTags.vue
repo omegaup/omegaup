@@ -16,7 +16,7 @@
         <vue-typeahead-bootstrap
           :data="publicQualityTagNames"
           :serializer="publicQualityTagsSerializer"
-          :placeholder="T.collecionOtherTags"
+          :placeholder="T.collectionOtherTags"
           @hit="addOtherTag"
         >
         </vue-typeahead-bootstrap>
