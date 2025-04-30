@@ -279,7 +279,7 @@ input[type='number'].case-weight {
 .vs-dark .list-group-item {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  border-color: #555;
+  border-color: var(--vs-dark-border-color-medium);
 }
 
 .vs-dark .list-group-item-action {
@@ -289,41 +289,45 @@ input[type='number'].case-weight {
 
 .vs-dark .list-group-item-action:hover,
 .vs-dark .list-group-item-action:focus {
-  background-color: #3a3a3a;
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--hover
+  );
   color: var(--vs-dark-font-color);
 }
 
 .vs-dark .list-group-item-action.active {
-  background-color: #484848;
-  border-color: #666;
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--active
+  );
+  border-color: var(--vs-dark-border-color-strong);
 }
 
 .vs-dark .list-group-item-secondary {
-  background-color: #2d2d2d;
+  background-color: var(--vs-dark-list-group-item-secondary-background-color);
   color: var(--vs-dark-font-color);
 }
 
 .vs-dark .close {
-  color: #aaa;
+  color: var(--vs-dark-close-color);
 }
 
 .vs-dark .close:hover {
-  color: #fff;
+  color: var(--vs-dark-close-color--hover);
 }
 
 .vs-dark .input-group input.form-control {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  border-color: #555;
+  border-color: var(--vs-dark-border-color-medium);
 }
 
 .vs-dark .btn-secondary {
-  background-color: #444;
-  border-color: #666;
+  background-color: var(--vs-dark-btn-secondary-background-color);
+  border-color: var(--vs-dark-border-color-strong);
 }
 
 .vs-dark .btn-secondary:hover {
-  background-color: #555;
+  background-color: var(--vs-dark-btn-secondary-background-color--hover);
 }
 
 .vs-dark .verdict {

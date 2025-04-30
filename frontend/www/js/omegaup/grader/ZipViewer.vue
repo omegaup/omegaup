@@ -99,7 +99,7 @@ textarea {
 .vs-dark .list-group-item {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
-  border-color: #555;
+  border-color: var(--vs-dark-border-color-medium);
 }
 
 .vs-dark .list-group-item-action {
@@ -108,18 +108,22 @@ textarea {
 
 .vs-dark .list-group-item-action:hover,
 .vs-dark .list-group-item-action:focus {
-  background-color: #3a3a3a;
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--hover
+  );
   color: var(--vs-dark-font-color);
 }
 
 .vs-dark .list-group-item-action.active {
-  background-color: #484848;
-  border-color: #666;
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--active
+  );
+  border-color: var(--vs-dark-border-color-strong);
   color: var(--vs-dark-font-color);
 }
 
 .vs-dark .list-group-item.disabled {
-  background-color: #333;
-  color: #888;
+  background-color: var(--vs-dark-list-group-item-disabled-background-color);
+  color: var(--vs-dark-list-group-item-disabled-color);
 }
 </style>

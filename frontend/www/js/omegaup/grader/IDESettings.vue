@@ -263,7 +263,7 @@ form {
     }
 
     .form-control:focus {
-      border-color: #007bff;
+      border-color: var(--vs-dark-selected-form-border-color);
       box-shadow: 0 0 0 3px rgba($omegaup-blue, 0.4);
       background-color: var(--vs-dark-background-color);
       color: var(--vs-dark-font-color);
