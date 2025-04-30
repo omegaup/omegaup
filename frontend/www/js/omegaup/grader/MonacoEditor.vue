@@ -155,15 +155,15 @@ export default class MonacoEditor extends Vue {
 @import '../../../sass/main.scss';
 
 .editor-toolbar {
-  background: var(--moncao-editor-toolbar-background-color);
-  border-bottom: 1px solid var(--moncao-editor-toolbar-border-bottom-color);
+  background: var(--monaco-editor-toolbar-background-color);
+  border-bottom: 1px solid var(--monaco-editor-toolbar-border-bottom-color);
 }
 
 .editor-toolbar label {
   font-size: 12px;
-  background: var(--moncao-editor-toolbar-label-background-color);
-  color: var(--moncao-editor-toolbar-label-color);
-  border: 1px solid var(--moncao-editor-toolbar-label-border-color);
+  background: var(--monaco-editor-toolbar-label-background-color);
+  color: var(--monaco-editor-toolbar-label-color);
+  border: 1px solid var(--monaco-editor-toolbar-label-border-color);
 }
 
 .editor-toolbar select {
@@ -171,7 +171,7 @@ export default class MonacoEditor extends Vue {
 }
 
 .editor {
-  border: 1px solid var(--moncao-editor-toolbar-label-border-color);
+  border: 1px solid var(--monaco-editor-toolbar-label-border-color);
 }
 
 /* Dark theme styles */
