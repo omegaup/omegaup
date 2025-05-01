@@ -5,13 +5,11 @@
 '''Looking for inefficient queries in the MySQL log.'''
 from typing import Any, Iterable, Tuple
 import re
+import warnings
+# import logging
 import mysql.connector
 from mysql.connector import Error  # type: ignore
-
-import pytest
-import warnings
-import logging
-
+# import pytest
 
 
 def normalize_query(query: str) -> str:
