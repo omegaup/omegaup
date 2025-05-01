@@ -160,8 +160,8 @@ export default class ReviewerPopup extends Vue {
   @Prop() reviewedProblemLevel!: null | string;
   @Prop() reviewedQualitySeal!: boolean;
   @Prop({ default: () => [] }) reviewedPublicTags!: string[];
-  @Prop() selectedPublicTags!: string[];
-  @Prop() selectedPrivateTags!: string[];
+  @Prop({ default: () => [] }) selectedPublicTags!: string[];
+  @Prop({ default: () => [] }) selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
 
@@ -190,7 +190,7 @@ export default class ReviewerPopup extends Vue {
       });
   }
 
-  get uniqueTags() {
+  get uniqueTags(): string[] {
     return [...new Set([...this.publicTagsList, ...this.reviewedPublicTags])];
   }
 
@@ -264,10 +264,5 @@ ul.tag-select {
   width: -webkit-fill-available;
   margin-bottom: 0;
   padding-bottom: 0.5rem;
-}
-
-.reviewed {
-  background-color: #f9e79f;
-  font-weight: bold;
 }
 </style>
