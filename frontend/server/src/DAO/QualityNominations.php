@@ -130,7 +130,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     /**
      * Returns the quality nomination ID and contents for a problem and reviewer.
      *
-     * @return array{contents: string, quality_nomination_id: int}|null
+     * @return array{contents: string, qualitynomination_id: int}|null
      */
     public static function getQualityNominationContentsForProblemAndReviewer(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -150,7 +150,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 qn.problem_id = ?
             LIMIT 1";
 
-        /** @var array{contents: string, quality_nomination_id: int}|null */
+        /** @var array{contents: string, qualitynomination_id: int}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identity->identity_id, $problem->problem_id]

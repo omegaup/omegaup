@@ -2795,7 +2795,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($loggedIdentity?->identity_id)) {
+        if (
+            !is_null(
+                $loggedIdentity
+            ) && !is_null(
+                $loggedIdentity->identity_id
+            )
+        ) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
                 $problem->problem_id,
@@ -4698,13 +4704,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $problem
             );
-            /**
-             * @var null|array{tags?: list<string>, quality_seal?: bool, level?: string} $contents
-             */
-            $contents = json_decode(
-                $qualityNomination['contents'],
-                associative: true
-            );
+            $contents = [];
+            if (!is_null($qualityNomination)) {
+                /**
+                 * @var null|array{tags?: list<string>, quality_seal?: bool, level?: string} $contents
+                 */
+                $contents = json_decode(
+                    $qualityNomination['contents'],
+                    associative: true
+                );
+            }
             $response['templateProperties']['payload'] = array_merge(
                 $response['templateProperties']['payload'],
                 [

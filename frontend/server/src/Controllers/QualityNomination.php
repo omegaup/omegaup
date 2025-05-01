@@ -535,13 +535,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'status' => 'open',
         ]);
 
-        if ($nominationType === 'quality_tag' && is_null($qualityNomination)) {
-            \OmegaUp\DAO\QualityNominations::create($nomination);
-        } else {
-            $nomination->qualitynomination_id = $qualityNomination[
-                'qualitynomination_id'
-            ];
+        if ($nominationType === 'quality_tag' && !is_null($qualityNomination)) {
+            $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
             \OmegaUp\DAO\QualityNominations::update($nomination);
+        } else {
+            \OmegaUp\DAO\QualityNominations::create($nomination);
         }
 
         if ($nomination->nomination == 'promotion') {
@@ -693,7 +691,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $r->ensureMainUserIdentity();
-        self::validateMemberOfReviewerGroup($r);
+        self::validateMemberOfReviewerGroup($r->identity);
 
         $status = $r->ensureEnum(
             'status',
@@ -947,15 +945,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ?int $nominator,
         ?int $assignee
     ): array {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $pageSize = is_null(
-            $r['page_size']
-        ) ? self::PAGE_SIZE : intval(
-            $r['page_size']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? self::PAGE_SIZE;
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -979,9 +970,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return void
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateMemberOfReviewerGroup(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
-        if (!\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
+    private static function validateMemberOfReviewerGroup(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -1007,35 +999,27 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
+     *
      * @omegaup-request-param 'author_username'|'nominator_username'|'problem_alias'|null $column
      * @omegaup-request-param int $offset
      * @omegaup-request-param null|string $query
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
-     *
-     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
+     * @omegaup-request-param 'all'|'banned'|'open'|'resolved'|'warning'|null $status
      */
     public static function apiList(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
+        $offset = $r->ensureOptionalInt('offset') ?? 1;
+        $rowCount = $r->ensureOptionalInt('rowcount') ?? self::PAGE_SIZE;
+        $status = $r->ensureOptionalEnum(
             'status',
-            ['all','open','resolved','banned','warning']
-        );
-        $status = $r['status'] ?? 'all';
-        self::validateMemberOfReviewerGroup($r);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null(
-            $r['rowcount']
-        ) ? self::PAGE_SIZE : intval(
-            $r['rowcount']
-        );
+            ['all','open','resolved','banned','warning'],
+            required: false
+        ) ?? 'all';
+        self::validateMemberOfReviewerGroup($r->identity);
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
         \OmegaUp\Validators::validateValidSubset(
@@ -1092,7 +1076,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $r->ensureMainUserIdentity();
-        self::validateMemberOfReviewerGroup($r);
+        self::validateMemberOfReviewerGroup($r->identity);
 
         return self::getListImpl(
             $r,
@@ -1113,15 +1097,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null(
-            $r['rowcount']
-        ) ? self::PAGE_SIZE : intval(
-            $r['rowcount']
-        );
+        $offset = $r->ensureOptionalInt('offset') ?? 1;
+        $rowCount = $r->ensureOptionalInt('rowcount') ?? self::PAGE_SIZE;
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -1295,16 +1272,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-        self::validateMemberOfReviewerGroup($r);
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null(
-            $r['length']
-        ) ? self::PAGE_SIZE : intval(
-            $r['length']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
+        self::validateMemberOfReviewerGroup($r->identity);
 
         return [
             'templateProperties' => [
@@ -1334,15 +1304,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null(
-            $r['length']
-        ) ? self::PAGE_SIZE : intval(
-            $r['length']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
 
         return [
             'templateProperties' => [
