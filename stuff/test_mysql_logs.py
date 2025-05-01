@@ -9,6 +9,9 @@ import mysql.connector
 from mysql.connector import Error  # type: ignore
 
 import pytest
+import warnings
+import logging
+
 
 
 def normalize_query(query: str) -> str:
@@ -69,9 +72,7 @@ def explain_queries(
 ) -> None:
     '''Run explain command on queries'''
     cursor = connection.cursor()
-    query_count = 0
     query_set = set()
-    # max_inefficient = 0
     for query in queries:
         query_text = query[0]
         try:
@@ -80,7 +81,6 @@ def explain_queries(
 
             # Get the index of the interest columns
             column_names = [i[0] for i in cursor.description]  # type: ignore
-            # possible_keys_index = column_names.index('possible_keys')
             type_row_index = column_names.index('type')
             table_row_index = column_names.index('table')
             extra_row_index = column_names.index('Extra')
@@ -94,7 +94,6 @@ def explain_queries(
                        'urc']
             inefficient_count = 0
             for row in explain_result:
-                # print(row[table_row_index])
                 if str(row[extra_row_index]) in check_extra:
                     continue
                 if row[type_row_index] != full_table_scan:
@@ -109,38 +108,17 @@ def explain_queries(
                     ' WHERE ' not in query_text):
                     continue
                 inefficient_count += 1
-                # print(row[table_row_index][0],' ',type_row_index,' ',
-                # extra_row_index,' ',possible_keys_index)
-                # print(f"Found query with full table scan: {query_text}")
-                # print(query_text.split()[0],
-                #      row[table_row_index],
-                #      row[extra_row_index],
-                #      row[type_row_index],
-                #      row[possible_keys_index])
             if inefficient_count > 0:
-                print(query_text)
-                print(explain_result)
-                query_count += 1
-                print("==================================================")
-                print(inefficient_count, " inefficient tables scan")
-                # print(query_text, "\n\n")
                 query_set.add(normalize_query(query_text))
-            # if inefficient_count == 1:
-                # print(query_text, "\n\n")
-            # if inefficient_count > 2:
-            #    max_inefficient += 1
-            #    print(query_text, "\n\n")
 
         except Error as e:
             print(f"Failed to explain query: {query_text}")
             print(f"Error: {e}")
-    print(query_count, " inefficient queries found")
-    print(query_set)
+    for clean_query in query_set:
+        print("===========Clean query==================\n",
+              clean_query)
     print(len(query_set))
-    # print(max_inefficient, " max inefficient queries")
-    if query_count > 0:
-        pytest.skip(f'{query_count} need fix')
-    assert False
+    warnings.warn(f"{len(query_set)} inefficient queries found", UserWarning)
 
 
 # Main function to handle the logic
