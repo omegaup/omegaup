@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();

@@ -20,7 +20,14 @@
               <label class="control-label w-100">
                 {{ T.reviewerNominationCategory }}
               </label>
-              <ul class="tag-select">
+              <ul
+                class="tag-select border"
+                :class="{
+                  'border-primary':
+                    reviewedProblemLevel &&
+                    reviewedProblemLevel !== problemLevel,
+                }"
+              >
                 <li
                   v-for="problemTopic in sortedProblemTags"
                   :key="problemTopic.value"
@@ -150,6 +157,8 @@ export default class ReviewerPopup extends Vue {
   })
   possibleTags!: string[];
   @Prop({ default: () => [] }) publicTags!: string[];
+  @Prop() reviewedProblemLevel!: null | string;
+  @Prop() reviewedQualitySeal!: boolean;
   @Prop({ default: () => [] }) reviewedPublicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
@@ -159,10 +168,12 @@ export default class ReviewerPopup extends Vue {
   AvailableViews = AvailableViews;
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
-  qualitySeal = true;
+  qualitySeal = this.reviewedQualitySeal;
   publicTagsList = Array.from(this.selectedPublicTags);
   currentReviewedTags = this.reviewedPublicTags;
-  selectedProblemLevel = this.problemLevel;
+  selectedProblemLevel = this.reviewedProblemLevel
+    ? this.reviewedProblemLevel
+    : this.problemLevel;
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags

@@ -84,6 +84,8 @@ OmegaUp.on('ready', async () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
+      reviewedProblemLevel: payload.reviewedProblemLevel,
+      reviewedQualitySeal: payload.reviewedQualitySeal,
       reviewedPublicTags: payload.reviewedPublicTags,
       guid,
       nextSubmissionTimestamp,
@@ -113,6 +115,8 @@ OmegaUp.on('ready', async () => {
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
           publicTags: payload.publicTags,
+          reviewedProblemLevel: this.reviewedProblemLevel,
+          reviewedQualitySeal: this.reviewedQualitySeal,
           reviewedPublicTags: this.reviewedPublicTags,
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
@@ -227,6 +231,11 @@ OmegaUp.on('ready', async () => {
             })
               .then(() => {
                 this.reviewedPublicTags = tags;
+                this.reviewedProblemLevel = level;
+                this.reviewedQualitySeal = quality_seal;
+                if (this.nominationStatus) {
+                  this.nominationStatus.alreadyReviewed = true;
+                }
               })
               .catch(ui.apiError);
           },
