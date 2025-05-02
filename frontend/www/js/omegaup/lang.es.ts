@@ -178,6 +178,7 @@ const translations: { [key: string]: string; } = {
   cannotAddProb: "No puedes agregar problemas porque no eres el director del concurso.",
   cannotRemoveProblem: "No puedes eliminar problemas porque no eres el director del concurso.",
   cannotRemoveProblemWithSubmissions: "No puedes eliminar un problema que ya tiene env\u00edos",
+  carouselItemNotFound: "Elemento del carrusel no encontrado",
   caseEditTitle: "Editar caso",
   caseModalBack: "Atr\u00e1s",
   caseModalSave: "Guardar",

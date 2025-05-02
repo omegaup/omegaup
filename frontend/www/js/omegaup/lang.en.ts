@@ -178,6 +178,7 @@ const translations: { [key: string]: string; } = {
   cannotAddProb: "Cannot add problem. You are not a contest admin.",
   cannotRemoveProblem: "Cannot remove the problem. You are not a contest admin.",
   cannotRemoveProblemWithSubmissions: "You cannot remove a problem that already has submissions",
+  carouselItemNotFound: "Carousel item not found",
   caseEditTitle: "Edit case",
   caseModalBack: "Back",
   caseModalSave: "Save",
