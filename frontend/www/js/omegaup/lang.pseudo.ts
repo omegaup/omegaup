@@ -1521,6 +1521,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationRateProblem: "(Ra73 pr0b13m)",
   qualityNominationRateProblemDesc: "(If y0u wan7 70 ra73 7h3 pr0b13m 1a73r, c1ick 0n \"Ra73 pr0b13m\" 1ink)",
   qualityNominationResolutionSuccess: "(Qua1i7y n0mina7i0n 5ucc355fu11y r3501v3d.)",
+  qualityNominationReviewerHasAlreadySentNominationForProblem: "(R3vi3w3r ha5 a1r3ady 53n7 n0mina7i0n f0r pr0b13m)",
   qualityNominationShowAll: "(A150 5h0w r3501v3d n0mina7i0n5)",
   qualityNominationType: "(Typ3)",
   rankRangeHeader: "(C0d3r5 wi7h 7h3 m057 p0in75 (%(lowCount) 70 %(highCount)))",

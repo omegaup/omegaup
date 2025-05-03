@@ -1520,6 +1520,7 @@
 	"qualityNominationRateProblem": "Calificar el problema",
 	"qualityNominationRateProblemDesc": "Si quieres calificar el problema m\u00e1s tarde, haz clic en el enlace: \"Calificar el problema\"",
 	"qualityNominationResolutionSuccess": "Nominaci\u00f3n resuelta exitosamente.",
+	"qualityNominationReviewerHasAlreadySentNominationForProblem": "Ya se ha enviado una nominaci\u00f3n para este problema",
 	"qualityNominationShowAll": "Tambi\u00e9n mostrar nominaciones resueltas",
 	"qualityNominationType": "Tipo",
 	"rankRangeHeader": "Coders con mayor puntaje (%(lowCount) a %(highCount))",

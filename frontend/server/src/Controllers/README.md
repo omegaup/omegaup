@@ -3693,7 +3693,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
+| `status`   | `mixed`                                                          |             |
 
 ### Returns
 

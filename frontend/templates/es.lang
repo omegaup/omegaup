@@ -1519,6 +1519,7 @@ qualityNominationProblemHasWarning = "Este problema tiene una advertencia. No pu
 qualityNominationRateProblem = "Calificar el problema"
 qualityNominationRateProblemDesc = "Si quieres calificar el problema más tarde, haz clic en el enlace: \"Calificar el problema\""
 qualityNominationResolutionSuccess = "Nominación resuelta exitosamente."
+qualityNominationReviewerHasAlreadySentNominationForProblem = "Ya se ha enviado una nominación para este problema"
 qualityNominationShowAll = "También mostrar nominaciones resueltas"
 qualityNominationType = "Tipo"
 rankRangeHeader = "Coders con mayor puntaje (%(lowCount) a %(highCount))"

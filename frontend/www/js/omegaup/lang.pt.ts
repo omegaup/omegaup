@@ -1521,6 +1521,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationRateProblem: "Avaliar o problema",
   qualityNominationRateProblemDesc: "Se voc\u00ea quiser avaliar o problema mais tarde, clique no link \"Avaliar o problema\"",
   qualityNominationResolutionSuccess: "Nomea\u00e7\u00e3o resolvido com sucesso.",
+  qualityNominationReviewerHasAlreadySentNominationForProblem: "Uma nomea\u00e7\u00e3o j\u00e1 foi enviada para este problema",
   qualityNominationShowAll: "Mostre tamb\u00e9m as Nomea\u00e7\u00f5es resolvidas",
   qualityNominationType: "Tipo",
   rankRangeHeader: "Coders com maior score obtido (%(lowCount) a %(highCount))",
