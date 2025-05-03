@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Racha de 30 días",
+      "description": "Otorgado a personas que han mantenido una racha de 30 días consecutivos."
+    },
+    "en": {
+      "name": "30-day streak",
+      "description": "User has maintained a streak of 30 consecutive days."
+    },
+    "pt": {
+      "name": "Sequência de 30 dias",
+      "description": "Concedido a pessoas que mantiveram uma sequência de 30 dias consecutivos."
+    }
+  }
+  

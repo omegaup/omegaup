@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SVG por defecto para los Badges
+  Este archivo servirá como referencia para personalizar badges a criterio de los contribuidores.
+  Este archivo puede ser modificado usando una herramienta de diseño (Adobe Illustrator, Potoshop,
+  Inkscape, etc), o también se puede modificar directamente desde el código (cosas simples como
+  el cambio de colores).
+  Las restricciones que todo Badge SVG deberá respetar:
+  - Ancho (width)  = Alto (height) = 600px (SIEMPRE).
+  - Tamaño de archivo de 15KB como máximo.
+-->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg2"
+   x="0px"
+   y="0px"
+   viewBox="0 0 600 600"
+   style="enable-background:new 0 0 600 600;"
+   xml:space="preserve"
+   height="600px"
+   width="600px"
+   sodipodi:docname="100+accepted.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"><metadata
+   id="metadata3821"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs3819" />
+
+<style
+   type="text/css"
+   id="style3787">
+  <!--
+    Estos colores pueden ser personalizados a gusto del contribuidor en caso
+    desee configurar el ícono a partir del código.
+    Simplemente se reemplazan (o agregan) los colores con las clases que se encuentran a continuación
+    y se asignan las clases correspondientes en el los trazos.
+  -->
+  .st0{fill:#FFFFFF;} <!-- Color de fondo de la parte superior del badge -->
+  .st1{fill:#5588DD;} <!-- Color para "Up" y fondo de la parte inferior del badge -->
+  .st2{fill:#111111;} <!-- Color de "omega" -->
+  <!-- Colores para el ícono de la laptop -->
+  .st3{fill:#BBBBBB;}
+  .st4{fill:#888888;}
+</style>
+
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   id="base"
+   inkscape:current-layer="g3816"
+   inkscape:cx="-3705.1417"
+   inkscape:cy="88.331562"
+   inkscape:document-units="px"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="1405"
+   inkscape:window-maximized="1"
+   inkscape:window-width="2560"
+   inkscape:window-x="2560"
+   inkscape:window-y="0"
+   inkscape:zoom="0.18145833"
+   pagecolor="#ffffff"
+   showgrid="false"
+   inkscape:snap-text-baseline="false"
+   showguides="true"
+   inkscape:guide-bbox="true">
+<sodipodi:guide
+   position="300.1,564.7"
+   orientation="1,0"
+   id="guide4705"
+   inkscape:locked="false" /></sodipodi:namedview>
+
+<g
+   id="g3816">
+  <g
+   id="g3792">
+    <path
+   d="M548.8,100.5c-0.2-7.9-5.9-14.8-13.8-15.9c-37-5.1-73.6-13.9-109.4-27.1C390,44.4,350.5,26.2,308,2.2       c-5.4-3-10.5-3.1-15.9,0c-42.2,24-81.4,42.2-117.3,55.3c-35.8,13.1-72.3,22-109.1,27.1c-7.9,1.1-13.5,7.9-14.4,15.9       c-3.5,150.8,29.5,274.2,98.8,370.2c37.7,52.3,85,94.7,142,127c4.4,3.2,11.3,3,16.5,0c56.6-32.9,103.8-75,141.4-127       C519.4,374.8,552.2,251.3,548.8,100.5z"
+   id="path3790" />
+  </g>
+
+  <!-- Badge -->
+  <path
+   class="st0"
+   d="M516.2,114.9c-34.7-5.6-69.4-15-103.8-27.6s-71.7-30-112.3-52c-40.6,22-78.2,39.4-112.6,52     S118.7,109.4,84,114.9c-0.5,54.1,4.1,104.3,13.6,150.8h405.1C512.1,219.3,516.7,169.1,516.2,114.9z"
+   id="path3794" /> <!-- Parte superior -->
+  <path
+   class="st1"
+   d="M97.6,265.7c14.6,71.2,40.9,133.3,79,186.5c32.5,45.3,73.8,82.9,123.5,113.2c49.7-30.3,90.8-68,123.5-113.2     c38.1-52.7,64.5-114.9,79.1-186.5H97.6z"
+   id="path3796"
+   style="fill:#ccff66;fill-opacity:1" /> <!-- Parte inferior -->
+
+  <!-- Logo de omegaUp -->
+  <g
+   id="layer1_2_"
+   transform="translate(-1.5300006,-318.74925)"
+   inkscape:groupmode="layer"
+   inkscape:label="Layer 1">
+    <path
+   id="path3717_6_"
+   class="st2"
+   d="M144.3,537.1c15.6,0,22.6-14.8,22.6-26.8c0-11.9-7-26.8-22.6-26.8s-22.6,14.8-22.6,26.8       C121.6,522.3,128.6,537.1,144.3,537.1 M144.3,496.1c4.8,0,7.7,5.4,7.7,14.3c0,8.8-2.9,14.4-7.7,14.4s-7.7-5.5-7.7-14.4       C136.5,501.4,139.4,496.1,144.3,496.1" />
+    <path
+   id="path3719_6_"
+   class="st2"
+   d="M224.1,535.6H239v-36.7c0-8.2-3.8-15.2-16.7-15.2c-5,0-12.9,5.2-12.9,5.2s-2.9-5.2-11.8-5.2       c-3.7,0-9.1,3.1-11.8,5.2v-3.8h-14.9v50.5h14.9v-35.5c2-1.4,4.1-4.1,9.3-4.1c1.6,0,2.5,0.8,2.5,4.2v35.4h14.9v-36.3       c0,0,4-3.4,9.1-3.4c2,0,2.6,1.3,2.6,4L224.1,535.6" />
+    <path
+   id="path3721_6_"
+   class="st2"
+   d="M287,511.7c0-2.8-0.1-5.5-0.2-8.2c-0.3-10.8-9.2-19.9-20.1-19.9       c-14.3,0-24.1,11.8-24.1,25.6c0,13.8,6.4,28,22.2,28c6.3,0,14.1-3.4,19-7.5l-4.3-9.3c-3.8,2.8-9.6,4.4-14.2,4.4       c-5.9,0-7.8-6.8-7.8-11.5c0-0.5,0-1.1,0.1-1.6L287,511.7 M273,502.2h-14.3c0.4-3.6,3.1-8.7,7.3-8.7       C270.6,493.5,272.9,498.2,273,502.2" />
+    <path
+   id="path3723_6_"
+   class="st2"
+   d="M327.7,494.7l4.8,1.2v-10.8h-12.7c-2.9-1.1-6-1.5-8.8-1.5c-12,0-20.3,7.6-20.3,19.1       c0,4.8,3.6,11.5,8.6,14c-2.6,1.4-6.9,4.4-6.9,8c0,3.3,3,6.1,5.8,6.9c-3.8,1.3-8.8,5.6-8.8,10c0,11.1,11.1,14.3,19.6,14.3       c11.3,0,24.3-6.6,24.3-19.7c0-8.4-6.7-11.4-14.3-11.4h-3.3c-2.1,0-8.4,0.4-8.4-1.7c0-3.1,5.9-3.4,8-3.8c8-1.5,14.5-7.5,14.5-16.4       C329.8,498.3,327.7,494.7,327.7,494.7 M313.8,535.3c2,0,5.7-0.3,5.7,1.7c0,4.5-4.6,7.6-10,7.6c-3.4,0-5.7-1-5.7-4.4       c0-2.2,4.5-4.9,4.5-4.9L313.8,535.3 M310.5,494.9c4,0,4.9,4,4.9,7.3c0,2.8-0.8,6.9-4.7,6.9c-4.4,0-5.1-3.7-5.1-7.4       C305.5,498.4,306.5,494.9,310.5,494.9" />
+    <path
+   id="path3725_6_"
+   class="st2"
+   d="M378.3,535l-2.3-7c-0.4,0.2-0.9,0.4-1.4,0.4c-1.2,0-1.2-1.7-1.2-2.7v-26.9       c0-10.7-8.2-15.2-18-15.2c-6.8,0-14.3,3.6-19.1,8.2l5.2,8.4c3.7-2.9,7.7-4.7,12.5-4.7c2.4,0,5.6,1.3,5.6,4.1v2.2l-22.6,9.1       c-1.7,3.2-3.7,7.3-3.7,10.9c0,10.3,5.7,15.3,15.7,15.3c5.1,0,10.7-3.1,12.6-8.1c0.6,4.6,3.6,8.1,9,8.1       C373.1,537.1,375.8,536.2,378.3,535 M359.7,511.6v2.8c0,5.4-2.7,10.8-8.6,10.8c-2.1,0-4-1.4-4-3.6c0-1.6,0.4-3.6,0.9-5.1       L359.7,511.6" />
+    <path
+   id="path3727_6_"
+   class="st1"
+   d="M431.2,509.7v-39h-15.3v39c0,9.9-2.4,14.2-7.9,14.2s-7.9-4.3-7.9-14.2v-39h-15.3v39       c0,13,5.5,27.4,23.3,27.4S431.2,522.7,431.2,509.7" />
+    <path
+   id="path3729_6_"
+   class="st1"
+   d="M460.2,537.1c17.8,0,21.4-17,21.4-28.5c0-10.7-5.9-25-19.2-25c-5.6,0-10.7,5.2-10.7,5.2       l0.1-3.7h-15v68.4h15v-20.1C451.8,533.5,455.4,537.1,460.2,537.1 M459.8,496c6.5,0,6.6,9,6.6,13.5c0,4.4,0.2,15.6-6.6,15.6       c-7.4,0-8-8.1-8-13.9v-11C454.1,498.2,455.6,496,459.8,496" />
+  </g>
+
+  <!-- Ícono de laptop -->
+
+<rect
+   style="fill:#ccff66;fill-opacity:1;stroke:none;stroke-width:0.73151922;stroke-opacity:1;paint-order:stroke markers fill"
+   id="rect4638"
+   width="231.75345"
+   height="52.553749"
+   x="181.50175"
+   y="379.8075" /><text
+   xml:space="preserve"
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:44.2754631px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.10686529;stroke-opacity:1;"
+   x="185.81902"
+   y="422.18573"
+   id="text4711"><tspan
+     sodipodi:role="line"
+     x="185.81902"
+     y="422.18573"
+     id="tspan4709"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:44.2754631px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:1.10686529;stroke:none;stroke-opacity:1;"><tspan
+       x="185.81902"
+       y="422.18573"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:44.2754631px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.10686529;stroke-opacity:1;"
+       id="tspan4707">Day Streak</tspan></tspan></text>
+
+<text
+   xml:space="preserve"
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:66.66666667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1;"
+   x="299.4502"
+   y="348.35132"
+   id="text4703"><tspan
+     sodipodi:role="line"
+     id="tspan4536">7</tspan></text>
+
+</g>
+</svg>
