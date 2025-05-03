@@ -1304,7 +1304,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-         $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
         self::validateMemberOfReviewerGroup($r);
 
