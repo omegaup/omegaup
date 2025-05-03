@@ -331,4 +331,44 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
 
         return $groups;
     }
+
+    /**
+     * @param list<int> $aclIds
+     * @return list<array{acl_id: int, user_id: int, role_id: int, username: string}>
+     */
+    public static function getByAclIds(array $aclIds): array {
+        if (empty($aclIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($aclIds), '?'));
+        $sql = "
+            SELECT
+                ur.acl_id,
+                ur.user_id,
+                ur.role_id,
+                i.username
+            FROM
+                User_Roles ur
+            INNER JOIN
+                Identities i ON ur.user_id = i.user_id
+            WHERE
+                ur.acl_id IN ($placeholders)
+        ";
+
+        /** @var list<array{acl_id: int, user_id: int, role_id: int, username: string}> */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aclIds);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = [
+                'acl_id' => $row['acl_id'],
+                'user_id' => $row['user_id'],
+                'role_id' => $row['role_id'],
+                'username' => $row['username'],
+            ];
+        }
+
+        return $result;
+    }
 }
