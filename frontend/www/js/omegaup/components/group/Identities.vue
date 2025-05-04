@@ -53,7 +53,13 @@
                 <td class="password" data-identity-password>
                   {{ identity.password }}
                 </td>
-                <td>{{ identity.country_id }}</td>
+                <td>
+                  {{
+                    identity.country_id === 'xx'
+                      ? T.countryNotSet
+                      : identity.country_id
+                  }}
+                </td>
                 <td>{{ identity.state_id }}</td>
                 <td>{{ identity.gender }}</td>
                 <td>{{ identity.school_name }}</td>

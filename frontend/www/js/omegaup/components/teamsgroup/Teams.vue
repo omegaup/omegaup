@@ -24,7 +24,9 @@
             ></omegaup-user-username>
           </td>
           <td data-group-team-name>{{ identity.name }}</td>
-          <td>{{ identity.country }}</td>
+          <td>
+            {{ identity.country === 'xx' ? T.countryNotSet : identity.country }}
+          </td>
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>
           <td>
