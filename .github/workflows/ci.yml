@@ -161,7 +161,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
   javascript:
@@ -285,6 +285,13 @@ jobs:
         run: |
           docker compose pull
 
+      - name: Clean up existing Docker volumes
+        run: |
+          # Ensure any existing containers and volumes are removed
+          docker compose down -v || true
+          # Make sure any orphaned volumes are cleaned up
+          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+
       - name: Start the Docker containers
         run: |
           docker compose up --no-build --detach
@@ -389,14 +396,14 @@ jobs:
         if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-screenshots-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
         if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-videos-${{ github.run_attempt }}
           path: cypress/videos
 
   python:
@@ -419,6 +426,13 @@ jobs:
       - name: Download the Docker containers
         run: |
           docker compose pull
+
+      - name: Clean up existing Docker volumes
+        run: |
+          # Ensure any existing containers and volumes are removed
+          docker compose down -v || true
+          # Make sure any orphaned volumes are cleaned up
+          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
 
       - name: Start the Docker containers
         run: |

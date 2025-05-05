@@ -8,6 +8,11 @@ export interface Identities {
   passwords: string;
 }
 
+export interface LinkTestCase {
+  url: string;
+  links: string[];
+}
+
 export interface GroupOptions {
   groupTitle: string;
   groupDescription: string;

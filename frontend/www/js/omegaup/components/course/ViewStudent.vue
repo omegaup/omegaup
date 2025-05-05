@@ -185,7 +185,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from '../problem//Markdown.vue';
 import user_Username from '../user/Username.vue';
 
 import T from '../../lang';
@@ -194,7 +194,7 @@ import * as time from '../../time';
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     'omegaup-user-username': user_Username,
   },
 })
