@@ -240,6 +240,7 @@
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
   - [`/api/user/deleteConfirm/`](#apiuserdeleteconfirm)
+  - [`/api/user/deleteFile/`](#apiuserdeletefile)
   - [`/api/user/deleteRequest/`](#apiuserdeleterequest)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
@@ -264,6 +265,7 @@
   - [`/api/user/update/`](#apiuserupdate)
   - [`/api/user/updateBasicInfo/`](#apiuserupdatebasicinfo)
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
+  - [`/api/user/uploadFile/`](#apiuseruploadfile)
   - [`/api/user/validateFilter/`](#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](#apiuserverifyemail)
 
@@ -4709,6 +4711,24 @@ There is a limit of 5 API tokens that each user can have.
 
 _Nothing_
 
+## `/api/user/deleteFile/`
+
+### Description
+
+Delete a file from the GitHub repository.
+
+### Parameters
+
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `filename` | `string` |             |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `message` | `string` |
+
 ## `/api/user/deleteRequest/`
 
 ### Description
@@ -5150,6 +5170,25 @@ Updates the main email of the current user
 ### Returns
 
 _Nothing_
+
+## `/api/user/uploadFile/`
+
+### Description
+
+Upload a file to the GitHub repository.
+
+### Parameters
+
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `content`  | `string` |             |
+| `filename` | `string` |             |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `message` | `string` |
 
 ## `/api/user/validateFilter/`
 
