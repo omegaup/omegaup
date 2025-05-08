@@ -107,7 +107,7 @@ def explain_queries(
                     ' WHERE ' not in query_text):
                     continue
                 inefficient_count += 1
-                diagnostic = (diagnostic +' '+
+                diagnostic = (diagnostic + ' ' +
                               str(row[type_row_index]) + ' ' +
                               str(row[table_row_index]) + ' ' +
                               str(row[extra_row_index]) + '\n')
@@ -126,8 +126,9 @@ def explain_queries(
     if len(query_set) > 0:
         for clean_query in query_set:
             warnings.warn(f"\n\n==inefficient query found==\n{clean_query}\n",
-                           UserWarning)
-        warnings.warn(f"{len(query_set)} inefficient queries found", UserWarning)
+                          UserWarning)
+        warnings.warn(f"{len(query_set)} inefficient queries found",
+                      UserWarning)
 
 
 # Main function to handle the logic
