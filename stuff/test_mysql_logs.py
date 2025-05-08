@@ -91,6 +91,7 @@ def explain_queries(
                        'Tags',
                        'urc']
             inefficient_count = 0
+            diagnostic = ' '
             for row in explain_result:
                 if str(row[extra_row_index]) in check_extra:
                     continue
@@ -106,17 +107,27 @@ def explain_queries(
                     ' WHERE ' not in query_text):
                     continue
                 inefficient_count += 1
+                diagnostic = (diagnostic +' '+
+                              str(row[type_row_index]) + ' ' +
+                              str(row[table_row_index]) + ' ' +
+                              str(row[extra_row_index]) + '\n')
             if inefficient_count > 0:
-                query_set.add(normalize_query(query_text))
+                query_set.add(normalize_query(query_text +
+                                              '\n\ndetected problems:\n' +
+                                              diagnostic))
 
         except Error as e:
             print(f"Failed to explain query: {query_text}")
             print(f"Error: {e}")
     for clean_query in query_set:
-        print("===========Clean query==================\n",
+        print("=======================Clean query=======================\n",
               clean_query)
     print(len(query_set))
-    warnings.warn(f"{len(query_set)} inefficient queries found", UserWarning)
+    if len(query_set) > 0:
+        for clean_query in query_set:
+            warnings.warn(f"\n\n==inefficient query found==\n{clean_query}\n",
+                           UserWarning)
+        warnings.warn(f"{len(query_set)} inefficient queries found", UserWarning)
 
 
 # Main function to handle the logic
