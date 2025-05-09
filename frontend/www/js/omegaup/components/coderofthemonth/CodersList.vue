@@ -17,7 +17,7 @@
     <tbody>
       <tr v-for="(coder, index) in coders" :key="index" class="coder-row">
         <td class="text-center">
-          <img :src="coder.gravatar_32" class="coder-profile-image" />
+          <img :src="coder.gravatar_100" class="coder-profile-image rounded-circle" />
         </td>
         <td class="text-center align-middle">
           <omegaup-user-username
@@ -66,12 +66,12 @@ export default class CoderOfTheMonthList extends Vue {
 }
 
 .coder-row:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--coder-row-hover-bg);
   transform: translateX(5px);
 }
 
 .coder-date {
-  color: #666;
+  color: var(--coder-date-color);
   font-size: 0.9em;
 }
 
@@ -82,12 +82,12 @@ export default class CoderOfTheMonthList extends Vue {
 
 .table th {
   border-top: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--table-header-color);
   font-weight: 500;
 }
 
 .table td {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--table-border-color);
 }
 
 /* Coder of the Month section styles */
@@ -97,33 +97,30 @@ export default class CoderOfTheMonthList extends Vue {
   overflow: hidden;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--coder-section-shadow);
 }
 
 .coder-of-month-section:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--coder-section-hover-shadow);
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
 
 /* Profile image styles */
 .coder-profile-image {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
   margin: 0 auto 15px;
   display: block;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid var(--profile-image-border);
   transition: border-color 0.3s ease;
 }
 
 .coder-of-month-section:hover .coder-profile-image {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--profile-image-hover-border);
 }
 
 /* Text styles */
 .coder-name {
-  color: white;
+  color: var(--coder-name-color);
   font-size: 1.2em;
   font-weight: bold;
   text-align: center;
