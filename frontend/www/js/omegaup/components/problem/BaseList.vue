@@ -152,7 +152,7 @@
                 :icon="['fas', 'eye-slash']"
               />
               <a
-                v-for="tag in problem.tags"
+                          v-for="tag in problem.tags"
                 :key="tag.name"
                 :class="`badge custom-badge custom-badge-${
                   tag.source.includes('quality') ? 'owner' : tag.source
@@ -162,12 +162,7 @@
                     : ''
                 } m-1 p-2`"
                 :href="hrefForProblemTag(selectedTags, tag.name)"
-                >{{
-                  Object.prototype.hasOwnProperty.call(T, tag.name)
-                    ? T[tag.name]
-                    : tag.name
-                }}</a
-              >
+                >{{ getTranslatedTag(tag.name) }}</a>
             </td>
             <td
               v-if="problem.quality !== null"
@@ -303,6 +298,24 @@ export default class BaseList extends Vue {
   get UserRankingFeatureGuideURL(): string {
     return getBlogUrl('UserRankingFeatureGuideURL');
   }
+  getTranslatedTag(tag: string): string {
+  if (Object.prototype.hasOwnProperty.call(T, tag)) {
+    return T[tag];
+  }
+  if (tag.startsWith('problemTopic')) {
+    const topicName = tag.replace('problemTopic', '');
+
+    if (topicName === 'InputOutput') {
+      return T.problemTopicInputOutput || 'Input/Output';
+    }
+    if (topicName === 'BinarySearch') {
+      return T.problemTopicBinarySearch || 'Binary Search';
+    }
+
+    return topicName.replace(/([A-Z])/g, ' $1').trim();
+  }
+  return tag;
+}
 }
 </script>
 
