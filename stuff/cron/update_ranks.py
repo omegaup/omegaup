@@ -118,7 +118,7 @@ def update_user_rank(
             `i`.`name`,
             `i`.`country_id`,
             `i`.`state_id`,
-            `isc`.`school_id`,
+            `full_isc`.`school_id`,
             `i`.`identity_id`,
             `i`.`user_id`,
             COUNT(`p`.`problem_id`) AS `problems_solved_count`,
@@ -142,18 +142,19 @@ def update_user_rank(
                 `iu`.user_id, `s`.`problem_id`
         ) AS up
         INNER JOIN
-            `Users` AS `u` ON `u`.`user_id` = `up`.`user_id`
+            `Users` AS `full_u` ON `full_u`.`user_id` = `up`.`user_id`
         INNER JOIN
             `Problems` AS `p`
         ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = u.`main_identity_id`
+            `Identities` AS `i`
+                ON `i`.`identity_id` = `full_u`.`main_identity_id`
         LEFT JOIN
-            `Identities_Schools` AS `isc`
+            `Identities_Schools` AS `full_isc`
         ON
-            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
+            `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `u`.`is_private` = 0
+            `full_u`.`is_private` = 0
             AND NOT EXISTS (
                 SELECT
                     `pf`.`problem_id`, `pf`.`user_id`
@@ -161,7 +162,7 @@ def update_user_rank(
                     `Problems_Forfeited` AS `pf`
                 WHERE
                     `pf`.`problem_id` = `p`.`problem_id` AND
-                    `pf`.`user_id` = `u`.`user_id`
+                    `pf`.`user_id` = `full_u`.`user_id`
             )
             AND NOT EXISTS (
                 SELECT
@@ -170,7 +171,7 @@ def update_user_rank(
                     `ACLs` AS `a`
                 WHERE
                     `a`.`acl_id` = `p`.`acl_id` AND
-                    `a`.`owner_id` = `u`.`user_id`
+                    `a`.`owner_id` = `full_u`.`user_id`
             )
         GROUP BY
             `identity_id`
@@ -217,11 +218,11 @@ def update_author_rank(
             `i`.`country_id`,
             `i`.`state_id`,
             `isc`.`school_id`,
-            SUM(`p`.`quality`) AS `author_score`
+            SUM(`full_p`.`quality`) AS `author_score`
         FROM
-            `Problems` AS `p`
+            `Problems` AS `full_p`
         INNER JOIN
-            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+            `ACLs` AS `a` ON `a`.`acl_id` = `full_p`.`acl_id`
         INNER JOIN
             `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
         INNER JOIN
@@ -231,7 +232,7 @@ def update_author_rank(
         ON
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `p`.`quality` IS NOT NULL
+            `full_p`.`quality` IS NOT NULL
         GROUP BY
             `u`.`user_id`
         ORDER BY
