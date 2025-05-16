@@ -309,7 +309,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     c.recommended = ? AND
                     c.archived = ?;';
 
-        /** @var list<array{alias: null|string, alreadyStarted: int, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
+        /** @var list<array{alias: string, alreadyStarted: int, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -320,15 +320,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ]
         );
 
-        $results = [];
-        foreach ($rs as &$row) {
-            if (is_null($row['alias']) || is_null($row['name'])) {
-                continue;
-            }
+        return array_map(function ($row) {
             $row['alreadyStarted'] = boolval($row['alreadyStarted']);
-            $results[] = $row;
-        }
-        return $results;
+            return $row;
+        }, $rs);
     }
 
     /**
