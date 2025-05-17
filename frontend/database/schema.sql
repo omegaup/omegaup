@@ -63,6 +63,7 @@ CREATE TABLE `Assignments` (
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_finish_time_assignment` (`finish_time`,`assignment_id`),
   CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
   CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
@@ -822,8 +823,8 @@ CREATE TABLE `Problemsets` (
   UNIQUE KEY `problemset_id` (`problemset_id`,`contest_id`,`assignment_id`,`interview_id`),
   KEY `acl_id` (`acl_id`),
   KEY `contest_id` (`contest_id`),
-  KEY `assignment_id` (`assignment_id`),
   KEY `interview_id` (`interview_id`),
+  KEY `idx_assignment_id_problemset_id_acl_id` (`assignment_id`,`problemset_id`,`acl_id`),
   CONSTRAINT `fk_psa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `Problemsets_ibfk_1` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `Problemsets_ibfk_2` FOREIGN KEY (`assignment_id`) REFERENCES `Assignments` (`assignment_id`),
