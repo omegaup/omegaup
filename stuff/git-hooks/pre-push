@@ -58,7 +58,7 @@ if [ $GIT_PUSH -eq 1 ]; then
 	fi
 fi
 
-if ! which docker compose >/dev/null; then
+if ! command -v docker compose &> /dev/null; then
 	echo -e "\033[0;31mERROR\033[0m: \`docker compose\` not found. Please run \`git push\` outside the container."
 	exit 1
 fi
