@@ -25,6 +25,10 @@ OmegaUp.on('ready', () => {
         birthDate: null as null | Date,
         roles: [] as Array<string>,
         email: null as null | string,
+        contestAlias: null as null | string,
+        contestTitle: null as null | string,
+        contestFound: false,
+        isContestRecommended: false,
       };
     },
     render: function (createElement) {
@@ -38,6 +42,10 @@ OmegaUp.on('ready', () => {
           roleNamesWithDescription: payload.roleNamesWithDescription,
           roles: this.roles,
           email: this.email,
+          contestAlias: this.contestAlias,
+          contestTitle: this.contestTitle,
+          contestFound: this.contestFound,
+          isContestRecommended: this.isContestRecommended,
         },
         on: {
           'search-username-or-email': (usernameOrEmail: string): void => {
@@ -117,6 +125,40 @@ OmegaUp.on('ready', () => {
                 })
                 .catch(ui.apiError);
             }
+          },
+          'search-contest': (contestAlias: string): void => {
+            adminSupport.contestFound = false;
+            adminSupport.contestTitle = null;
+            adminSupport.isContestRecommended = false;
+
+            api.Contest.details({ contest_alias: contestAlias })
+              .then((data) => {
+                adminSupport.contestAlias = contestAlias;
+                adminSupport.contestTitle = data.title;
+                adminSupport.contestFound = true;
+                adminSupport.isContestRecommended = data.recommended;
+              })
+              .catch(ui.apiError);
+          },
+          'toggle-recommended': (isNowRecommended: boolean): void => {
+            api.Contest.setRecommended({
+              contest_alias: adminSupport.contestAlias,
+              value: isNowRecommended,
+            })
+              .then(() => {
+                ui.success(
+                  isNowRecommended
+                    ? T.supportContestSetAsRecommended
+                    : T.supportContestRemovedFromRecommended,
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'reset-contest': () => {
+            adminSupport.contestAlias = null;
+            adminSupport.contestTitle = null;
+            adminSupport.contestFound = false;
+            adminSupport.isContestRecommended = false;
           },
         },
       });
