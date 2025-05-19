@@ -90,6 +90,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 Schools s
             WHERE
                 s.score != 0
+        ';
+
+        $sqlOrder = '
             ORDER BY
                 s.`ranking` IS NULL, s.`ranking` ASC
         ';
@@ -116,7 +119,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         /** @var list<array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlFrom . $sqlLimit,
+            $sql . $sqlFrom . $sqlOrder . $sqlLimit,
             [
                 max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,
