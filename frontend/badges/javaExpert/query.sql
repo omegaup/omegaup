@@ -14,7 +14,7 @@ WHERE
     `r`.`verdict` = "AC" AND
     `s`.`type` = "normal" AND
     `p`.`visibility` >= 2 AND
-    `s`.`language`='java'
+    `s`.`language`= 'java'
 GROUP BY
     `u`.`user_id`
 HAVING
