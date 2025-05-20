@@ -4,4 +4,4 @@ ALTER TABLE `Courses`
 
 -- Add index to the Assignments table
 ALTER TABLE `Assignments`
-    ADD KEY `idx_course_assignment_type` (`course_id`, `assignment_type`);
+    ADD KEY `idx_assignment_type` (`assignment_type`);

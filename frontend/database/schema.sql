@@ -63,7 +63,7 @@ CREATE TABLE `Assignments` (
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
-  KEY `idx_course_assignment_type` (`course_id`,`assignment_type`),
+  KEY `idx_assignment_type` (`assignment_type`),
   CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
   CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
