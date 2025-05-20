@@ -4252,7 +4252,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             'female'
                         )['coderinfo']
                     ],
-                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'schoolOfTheMonthData' => null,
                     'userRank' => self::getTopCodersOfTheMonth(
                         $rowCount
                     ),
