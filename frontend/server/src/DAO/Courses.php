@@ -1517,16 +1517,22 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 NULL AS clone_token_payload,
                 NULL AS name
             FROM
-                Problemset_Access_Log pal
+                Problemset_Access_Log pal FORCE INDEX(problemset_id)
             INNER JOIN
-                Identities i ON i.identity_id = pal.identity_id
+                Identities i
+            ON
+                i.identity_id = pal.identity_id
             LEFT JOIN
-                User_Rank ur ON ur.user_id = i.user_id
+                User_Rank ur
+            ON
+                ur.user_id = i.user_id
             INNER JOIN
-                Assignments a ON a.problemset_id = pal.problemset_id
+                Assignments a FORCE INDEX(fk_ap_problemset_id)
+            ON
+                a.problemset_id = pal.problemset_id
             WHERE
                 a.course_id = ?
-        ) UNION (
+        ) UNION ALL (
             SELECT
                 i.username,
                 p.alias,
@@ -1551,7 +1557,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Assignments a ON a.problemset_id = sl.problemset_id
             WHERE
                 a.course_id = ?
-        ) UNION (
+        ) UNION ALL (
             SELECT
                 i.username,
                 c.alias,
@@ -1574,8 +1580,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Courses c ON c.course_id = ccl.new_course_id
             WHERE
                 ccl.course_id = ?
-        ) ORDER BY
-            time DESC';
+        )';
+
+        $sqlOrder = ' ORDER BY time DESC';
 
         $sqlCount = "
             SELECT
@@ -1593,7 +1600,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlLimit,
+            $sql . $sqlOrder . $sqlLimit,
             [
                 $course->course_id,
                 $course->course_id,
