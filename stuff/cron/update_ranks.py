@@ -735,6 +735,7 @@ def update_schools_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
+    update_school_of_the_month: bool,
 ) -> None:
     '''Updates all the information and ranks related to schools'''
     logging.info('Updating schools stats...')
@@ -753,13 +754,16 @@ def update_schools_stats(
             logging.exception('Failed to update school ranking')
             raise
 
-        try:
-            update_school_of_the_month_candidates(cur, cur_readonly, date)
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to school of the month')
-            raise
+        if update_school_of_the_month:
+            try:
+                update_school_of_the_month_candidates(cur, cur_readonly, date)
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to school of the month')
+                raise
+        else:
+            logging.info('Skipping updating School of the Month')
         logging.info('Schools stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all schools stats')
@@ -780,6 +784,8 @@ def main() -> None:
                         type=int,
                         default=100,
                         help='The number of candidates to save in the DB')
+    parser.add_argument('--update-school-of-the-month', action='store_true',
+                        help='Update the School of the month')
     args: argparse.Namespace = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -793,7 +799,8 @@ def main() -> None:
                                buffered=True, dictionary=True) as cur_readonly:
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
             update_users_stats(cur, cur_readonly, dbconn.conn, args)
-            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
+            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
+                                 args.update_school_of_the_month)
     finally:
         dbconn.conn.close()
         logging.info('Done')

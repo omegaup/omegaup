@@ -3014,6 +3014,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    canSetRecommended: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
@@ -3032,6 +3033,7 @@ export namespace types {
     points_decay_factor: number;
     problems?: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended?: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3076,6 +3078,7 @@ export namespace types {
     points_decay_factor: number;
     problems: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3192,6 +3195,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    canSetRecommended?: boolean;
     hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
@@ -4027,6 +4031,9 @@ export namespace types {
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
@@ -5748,6 +5755,9 @@ export namespace messages {
   export type RunExecuteRequest = { [key: string]: any };
   export type _RunExecuteServerResponse = any;
   export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -6557,6 +6567,9 @@ export namespace controllers {
     execute: (
       params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
