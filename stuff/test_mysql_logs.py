@@ -91,7 +91,7 @@ def explain_queries(
                        'Tags',
                        'urc']
             inefficient_count = 0
-            diagnostic = ' '
+            diagnostic = ''
             for row in explain_result:
                 if str(row[extra_row_index]) in check_extra:
                     continue
