@@ -520,6 +520,9 @@ jobs:
           sudo mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
           sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
 
+      - name: Inspect volume contents
+        run: ls -l /var/lib/docker/volumes/omegaup_omegaupdata/_data/
+
       - name: Bootstrap environment
         run: |
           # Create directory to prevent --purge from failing.
