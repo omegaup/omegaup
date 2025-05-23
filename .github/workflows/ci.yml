@@ -433,20 +433,6 @@ jobs:
           # Make sure any orphaned volumes are cleaned up
           docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
 
-      - name: Debug existing volumes
-        run: docker volume ls
-
-      - name: Ensure problems.git doesn't exist
-        run: |
-          sudo rm -rf /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git || true
-          sudo mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
-
-      - name: Reset Git submodules
-        run: |
-          git submodule deinit -f --all
-          git submodule update --init --recursive
-
       - name: Start the Docker containers
         run: |
           docker compose up --no-build --detach
@@ -514,14 +500,6 @@ jobs:
             python3 -m venv /opt/omegaup/stuff/venv && \
             python3 -m pip install wheel && \
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-
-      - name: Ensure problems.git exists before bootstrap
-        run: |
-          sudo mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
-
-      - name: Inspect volume contents
-        run: sudo ls -l /var/lib/docker/volumes/omegaup_omegaupdata/_data/
 
       - name: Bootstrap environment
         run: |
