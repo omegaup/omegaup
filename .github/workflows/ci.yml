@@ -518,7 +518,7 @@ jobs:
       - name: Ensure problems.git exists before bootstrap
         run: |
           sudo mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omega
+          sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
 
       - name: Bootstrap environment
         run: |
