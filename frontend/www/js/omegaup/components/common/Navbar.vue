@@ -329,7 +329,10 @@
                     href="#"
                     data-logout-button
                     @click.prevent="logoutModalVisible = true"
-                  ></a>
+                  >
+                    <font-awesome-icon :icon="['fas', 'power-off']" />
+                    {{ T.omegaupTitleLogout }}
+                  </a>
                   <omegaup-common-grader-status
                     v-show="isAdmin"
                     :status="errorMessage !== null ? 'down' : 'ok'"
