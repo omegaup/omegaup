@@ -439,7 +439,8 @@ jobs:
       - name: Ensure problems.git doesn't exist
         run: |
           sudo rm -rf /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git || true
-          mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
+          sudo mkdir -p /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
+          sudo chown "$(id -u)":"$(id -g)" /var/lib/docker/volumes/omegaup_omegaupdata/_data/problems.git
 
       - name: Reset Git submodules
         run: |
