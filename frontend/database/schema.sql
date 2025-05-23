@@ -993,6 +993,7 @@ CREATE TABLE `Schools` (
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
   KEY `idx_schools_name` (`name`),
+  KEY `idx_schools_score` (`score`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
