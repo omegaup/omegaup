@@ -133,33 +133,36 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     /**
      * Gets a random sample (of up to size $n) of group members.
      *
-     * @return \OmegaUp\DAO\VO\Identities[] $identities
+     * @return list<\OmegaUp\DAO\VO\Identities> $identities
      */
     final public static function sampleMembers(
         \OmegaUp\DAO\VO\Groups $group,
-        int $n
+        int $membersCount
     ): array {
-        $sql = '
-            SELECT
-                i.*
-            FROM
-                Groups_Identities gi
-            INNER JOIN
-                Identities i ON i.identity_id = gi.identity_id
-            WHERE
-                gi.group_id = ?
-            ORDER BY
-                RAND()
-            LIMIT
-                0, ?;';
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Identities::FIELD_NAMES,
+            'i'
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Identities i ON i.identity_id = gi.identity_id
+                WHERE
+                    gi.group_id = ?
+                ORDER BY
+                    RAND()
+                LIMIT
+                    0, ?;";
 
-        /** @var \OmegaUp\DAO\VO\Identities[] */
+        /** @var list<\OmegaUp\DAO\VO\Identities> */
         $identities = [];
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [$group->group_id, $n]
+                [$group->group_id, $membersCount]
             ) as $row
         ) {
             $identities[] = new \OmegaUp\DAO\VO\Identities($row);
