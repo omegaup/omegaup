@@ -139,7 +139,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            $identity->identity_id,
+            identityId: $identity->identity_id,
         );
         $this->assertCount(2, $submissions);
         $this->assertSame(
@@ -173,7 +173,7 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $submissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-            $identity->identity_id,
+            identityId: $identity->identity_id,
         );
         $this->assertEmpty($submissions);
     }
