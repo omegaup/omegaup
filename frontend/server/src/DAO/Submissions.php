@@ -233,10 +233,11 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * @return list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
-        int $identityId = null,
+        ?int $identityId = null,
         ?int $page = 1,
-        int $rowsPerPage = 100,
+        ?int $rowsPerPage = 100,
     ): array {
+        $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';
         } else {
@@ -275,7 +276,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= 24 * 3600
+                s.`time` >= ?
                 AND s.status = 'ready'
                 AND u.is_private = 0
                 AND p.visibility >= ?
@@ -288,9 +289,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     OR c.finish_time < s.time
                 )
         ";
-        $params = [
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-        ];
+        $params = [$limitDate, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC];
 
         if (!is_null($identityId)) {
             $sql .= '
