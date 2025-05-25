@@ -10,7 +10,7 @@
           ></div>
           <textarea
             ref="markdownInput"
-            v-model="currentSolutionMarkdown"
+            v-model.lazy="currentSolutionMarkdown"
             data-problem-creator-solution-editor-markdown
             class="wmd-input"
           ></textarea>
@@ -54,7 +54,7 @@ import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expire: -1 });
 
-import omegaup_Markdown from '../../../Markdown.vue';
+import omegaup_problemMarkdown from '../../Markdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -62,7 +62,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
   },
 })
 export default class SolutionTab extends Vue {
