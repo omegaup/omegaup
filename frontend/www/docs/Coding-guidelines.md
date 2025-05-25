@@ -115,7 +115,17 @@
 * Avoid using [lifecycle hooks](https://v3.vuejs.org/api/options-lifecycle-hooks.html) _unless_ there is something in the component that interacts directly with the DOM.
    - Direct interaction with the DOM should also be avoided.
 * Using [computed properties and watchers](https://vuejs.org/v2/guide/computed.html) is preferred over manipulating variables programmatically.
-* It's recommended to add **Storybook** stories for each new component, and if modifying an existing component, add or update the related stories. [See more](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-Guidelines-%E2%80%90-Storybook.md)
+* It's recommended to add **Storybook** stories for each new component, and if modifying an existing component, add or update the related stories. [See more](https://github.com/omegaup/omegaup/wiki/Coding-Guidelines-%E2%80%90-Storybook)
+* **Development Tip**: If you encounter TypeScript errors related to HTML elements in Vue templates, you might be tempted to add JSX IntrinsicElements declarations. While this can be done by adding the following to a `.d.ts` file:
+  ```typescript
+  declare namespace JSX {
+    interface IntrinsicElements {
+      [elem: string]: any;
+    }
+  }
+  ```
+  This is not recommended as it could mask real errors and make debugging harder. Instead, try to properly type your components and templates to avoid these errors in the first place.
+
 
 # TypeScript
 
