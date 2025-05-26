@@ -55,6 +55,7 @@
       </b-button>
       <b-button
         variant="warning"
+        data-create-new-problem-button
         size="sm"
         @click="newProblemConfirmationModal = !newProblemConfirmationModal"
       >
