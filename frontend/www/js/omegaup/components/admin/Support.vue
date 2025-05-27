@@ -4,6 +4,9 @@
       <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
         <span v-if="username != null">- {{ username }} ({{ email }})</span>
+        <span v-else-if="contestAlias != null"
+          >- {{ contestTitle }} ({{ contestAlias }})</span
+        >
       </div>
     </div>
     <div class="card-body">
@@ -43,6 +46,60 @@
           </button>
         </div>
       </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <form class="form w-100" @submit.prevent="onSearchContest">
+            <div class="input-group">
+              <input
+                v-model="currentContestAlias"
+                class="form-control"
+                name="contest_alias"
+                type="text"
+                required="required"
+                :disabled="contestFound"
+                :placeholder="T.supportTypeContestAlias"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="submit"
+                  :disabled="contestFound"
+                >
+                  {{ T.wordsSearch }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-6 text-right">
+          <button
+            v-if="contestFound"
+            class="btn btn-secondary"
+            type="reset"
+            @click.prevent="onResetContest"
+          >
+            {{ T.supportNewSearch }}
+          </button>
+        </div>
+      </div>
+      <template v-if="contestFound">
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <h4>{{ T.supportOptions }}</h4>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input
+                  v-model="currentIsContestRecommended"
+                  class="form-check-input"
+                  type="checkbox"
+                  @change="onToggleRecommended"
+                />
+                {{ T.supportSetAsRecommended }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </template>
       <template v-if="username != null">
         <div class="row mb-3">
           <div class="col-md">
@@ -180,7 +237,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -219,6 +276,14 @@ export default class AdminSupport extends Vue {
   @Prop() birthDate!: null | Date;
   @Prop() roles!: string[];
   @Prop() roleNamesWithDescription!: types.UserRole[];
+
+  @Prop() contestAlias!: string;
+  @Prop() contestTitle!: string;
+  @Prop() contestFound!: boolean;
+  @Prop() isContestRecommended!: boolean;
+
+  currentContestAlias = this.contestAlias;
+  currentIsContestRecommended = this.isContestRecommended;
 
   T = T;
   ui = ui;
@@ -269,6 +334,32 @@ export default class AdminSupport extends Vue {
       value: role,
       selected: (ev.target as HTMLInputElement).checked,
     };
+  }
+
+  @Emit('search-contest')
+  onSearchContest(): null | string {
+    if (this.currentContestAlias == null) return null;
+    return this.currentContestAlias;
+  }
+
+  @Emit('toggle-recommended')
+  onToggleRecommended(): boolean {
+    return this.currentIsContestRecommended;
+  }
+
+  @Emit('reset-contest')
+  onResetContest(): void {
+    // The actual reset will be handled in support.ts
+  }
+
+  @Watch('isContestRecommended')
+  onContestRecommendedChange(newValue: boolean) {
+    this.currentIsContestRecommended = newValue;
+  }
+
+  @Watch('contestAlias')
+  onContestAliasChange(newValue: string) {
+    this.currentContestAlias = newValue;
   }
 }
 </script>
