@@ -1096,6 +1096,7 @@ CREATE TABLE `Submissions` (
   KEY `school_id` (`school_id`),
   KEY `school_id_problem_id` (`school_id`,`problem_id`),
   KEY `verdict_type_time` (`verdict`,`type`,`time`),
+  KEY `idx_time_status` (`time`,`status`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1254,6 +1255,7 @@ CREATE TABLE `Users` (
   KEY `fk_main_identity_id` (`main_identity_id`),
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
+  KEY `idx_is_private` (`is_private`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
