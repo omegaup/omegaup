@@ -562,8 +562,7 @@ def handle_input() -> None:
     parser.add_argument(
         "--submission_id_mode",
         action="store_true",
-        help="If set, the script will process feedbacks for a single "
-             "submission"
+        help="Yes if you want to process a single submission."
     )
     parser.add_argument(
         "--submission_id",
