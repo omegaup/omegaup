@@ -27,7 +27,7 @@ ASSIGNMENT_ALIAS = None
 TA_FEEDBACK_INDICATOR = None
 SKIP_CONFIRM = False
 SUBMISSION_ID_MODE = False
-SUBMISSION_ID = None  
+SUBMISSION_ID = None
 STUDENT_NAME = None
 
 BASE_URL = "https://omegaup.com"
@@ -160,23 +160,24 @@ def extract_show_run_ids() -> list[tuple[str, str]]:
         usernames from the course
     """
     if SUBMISSION_ID_MODE:
-        return [(SUBMISSION_ID, STUDENT_NAME)]
-    else:
-        runs = get_contents_from_url(
-            get_runs_from_course_endpoint,
-            {"course_alias": COURSE_ALIAS, "assignment_alias": ASSIGNMENT_ALIAS},
-        )["runs"]
+        if isinstance(SUBMISSION_ID, str) and isinstance(STUDENT_NAME, str):
+            return [(SUBMISSION_ID, STUDENT_NAME)]
 
-        current_time = int(time.time())
-        a_month_ago = current_time - (30 * 24 * 60 * 60)
+    runs = get_contents_from_url(
+        get_runs_from_course_endpoint,
+        {"course_alias": COURSE_ALIAS, "assignment_alias": ASSIGNMENT_ALIAS},
+    )["runs"]
 
-        run_ids_and_usernames = [
-            (item["guid"], item["username"])
-            for item in runs
-            if item["time"] >= a_month_ago
-        ]
+    current_time = int(time.time())
+    a_month_ago = current_time - (30 * 24 * 60 * 60)
 
-        return run_ids_and_usernames
+    run_ids_and_usernames = [
+        (item["guid"], item["username"])
+        for item in runs
+        if item["time"] >= a_month_ago
+    ]
+
+    return run_ids_and_usernames
 
 
 def extract_feedback_thread(run_alias: str) -> list[list[dict[str, Any]]]:
@@ -551,7 +552,8 @@ def handle_input() -> None:
     global USERNAME, PASSWORD  # pylint: disable=W0603
     global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
     global KEY, TA_FEEDBACK_INDICATOR, SKIP_CONFIRM  # pylint: disable=W0603
-    global SUBMISSION_ID_MODE, SUBMISSION_ID, STUDENT_NAME  # pylint: disable=W0603
+    global SUBMISSION_ID_MODE, SUBMISSION_ID  # pylint: disable=W0603
+    global STUDENT_NAME  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
@@ -560,9 +562,11 @@ def handle_input() -> None:
     parser.add_argument(
         "--submission_id_mode",
         action="store_true",
-        help="If set, the script will process feedbacks for a single submission"
+        help="If set, the script will process feedbacks for a single "
+             "submission"
     )
-    parser.add_argument("--submission_id",
+    parser.add_argument(
+        "--submission_id",
         type=str,
         help="Submission ID to process feedbacks for"
     )
@@ -599,9 +603,13 @@ def handle_input() -> None:
 
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
-    SUBMISSION_ID_MODE = args.submission_id_mode or input("Enter your submission id mode: ")
+    SUBMISSION_ID_MODE = (args.submission_id_mode == "Yes") or input(
+        "Are you working in submission id mode: "
+    ) == "Yes"
     if SUBMISSION_ID_MODE:
-        SUBMISSION_ID = args.submission_id or input("Enter the submission id: ")
+        SUBMISSION_ID = args.submission_id or input(
+            "Enter the submission id: "
+        )
         STUDENT_NAME = args.student_name or input("Enter the student name: ")
     else:
         COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
