@@ -38,7 +38,7 @@
           :key="country.country_id"
           :value="country.country_id"
         >
-          {{ country.name }}
+          {{ country.country_id === 'xx' ? T.countryNotSet : country.name }}
         </option>
       </select>
     </div>
