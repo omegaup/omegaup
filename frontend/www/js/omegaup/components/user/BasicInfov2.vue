@@ -40,7 +40,9 @@
             <strong>{{ T.profileCountry }}</strong>
           </div>
           <div class="col-sm-9 field-data" data-user-country>
-            <strong>{{ profile.country }}</strong>
+            <strong>{{
+              profile.country === 'xx' ? T.countryNotSet : profile.country
+            }}</strong>
           </div>
         </div>
 
