@@ -12,7 +12,8 @@
       </h1>
       <p>
         <a
-          href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Cómo-escribir-problemas-para-omegaUp.md"
+          href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md"
+          target="_blank"
           >{{ T.navHelp }}</a
         >
       </p>
