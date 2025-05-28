@@ -1127,6 +1127,7 @@ CREATE TABLE `Team_Groups` (
   PRIMARY KEY (`team_group_id`),
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_create_time` (`create_time`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
