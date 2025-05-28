@@ -1490,7 +1490,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 pal.problemset_id = ?
-        ) UNION (
+        ) UNION ALL (
             SELECT
                 i.username,
                 p.alias,
@@ -1513,8 +1513,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problems p ON p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
-        ) ORDER BY
-            time DESC';
+        )';
+
+        $sqlOrder = ' ORDER BY time DESC';
 
         $sqlCount = "
             SELECT
@@ -1532,7 +1533,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlLimit,
+            $sql . $sqlOrder . $sqlLimit,
             [
                 $contest->problemset_id,
                 $contest->problemset_id,
