@@ -23,7 +23,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
  * @psalm-type UserDependentsPayload=array{dependents:list<UserDependent>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
- * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string, problems_solved: int|null, score: float|null}>
+ * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, gravatar_100: string, date: string, classname: string, problems_solved: int|null, score: float|null}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: CoderOfTheMonthList, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
  * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
@@ -4755,11 +4755,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($coders as $coder) {
             $hashEmail = md5($coder['email'] ?? '');
-            $avatar = "https://secure.gravatar.com/avatar/{$hashEmail}?s=32";
+            $avatar_32 = "https://secure.gravatar.com/avatar/{$hashEmail}?s=32";
+            $avatar_100 = "https://secure.gravatar.com/avatar/{$hashEmail}?s=100";
             $response[] = [
                 'username' => $coder['username'],
                 'country_id' => $coder['country_id'],
-                'gravatar_32' => $avatar,
+                'gravatar_32' => $avatar_32,
+                'gravatar_100' => $avatar_100,
                 'date' => $coder['time'],
                 'classname' => $coder['classname'],
                 'problems_solved' => $coder['problems_solved'] ?? null,
