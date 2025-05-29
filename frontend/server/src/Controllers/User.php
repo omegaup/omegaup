@@ -4759,6 +4759,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $response[] = [
                 'username' => $coder['username'],
                 'country_id' => $coder['country_id'],
+                'gravatar_32' => "https://secure.gravatar.com/avatar/{$hashEmail}?s=32",
                 'gravatar_100' => $avatar,
                 'date' => $coder['time'],
                 'classname' => $coder['classname'],
