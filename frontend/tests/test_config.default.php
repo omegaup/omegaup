@@ -63,6 +63,7 @@ try_define(
 );
 try_define('TEMPLATES_PATH', OMEGAUP_TEST_ROOT . '/templates/');
 try_define('INPUTS_PATH', OMEGAUP_TEST_ROOT . '/probleminput/');
+try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 
 # #########################
 # CACHE CONFIG
