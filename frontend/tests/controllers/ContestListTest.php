@@ -866,13 +866,14 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             ['ends', [2, 3, 1, 4], false],
             ['duration', [3, 2, 4, 1], true],
             ['organizer', [4, 1, 2, 3], false],
-            ['signedup', [3, 1, 2, 4], true],
+            ['signedup', [1, 3, 4, 2], true],
         ];
     }
 
     /**
      * @param string $sortOrder
      * @param list<int> $expectedOrder
+     * @param bool $expectedParticipating
      *
      * @dataProvider sortOrderProvider
      */
