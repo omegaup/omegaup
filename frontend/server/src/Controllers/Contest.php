@@ -1822,6 +1822,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ) ?? false
             );
 
+            \OmegaUp\DAO\Contests::updateContestantsCount(
+                $response['contest']
+            );
+
             // Insert into PrivacyStatement_Consent_Log whether request
             // user info is optional or required
             if ($requestsUserInformation !== 'no') {
@@ -3552,6 +3556,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $r->user
                 );
             }
+
+            \OmegaUp\DAO\Contests::updateContestantsCount($contest);
+
             // End transaction
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
@@ -3632,10 +3639,31 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        \OmegaUp\DAO\ProblemsetIdentities::delete(new \OmegaUp\DAO\VO\ProblemsetIdentities([
-            'problemset_id' => $contest->problemset_id,
-            'identity_id' => $identity->identity_id,
-        ]));
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\ProblemsetIdentities::delete(
+                new \OmegaUp\DAO\VO\ProblemsetIdentities([
+                    'problemset_id' => $contest->problemset_id,
+                    'identity_id' => $identity->identity_id,
+                ])
+            );
+
+            \OmegaUp\DAO\Contests::updateContestantsCount($contest);
+
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            strval($contest->contest_id)
+        );
 
         return ['status' => 'ok'];
     }
@@ -3767,12 +3795,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'groupsCanNotBeAddedInContestForTeams'
             );
         }
-        \OmegaUp\DAO\GroupRoles::create(
-            new \OmegaUp\DAO\VO\GroupRoles([
-                'acl_id' => $problemset->acl_id,
-                'group_id' => $group->group_id,
-                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
-            ])
+
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\GroupRoles::create(
+                new \OmegaUp\DAO\VO\GroupRoles([
+                    'acl_id' => $problemset->acl_id,
+                    'group_id' => $group->group_id,
+                    'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+                ])
+            );
+
+            \OmegaUp\DAO\Contests::updateContestantsCount($contest);
+
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            strval($contest->contest_id)
         );
 
         return ['status' => 'ok'];
@@ -3818,12 +3866,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-        \OmegaUp\DAO\GroupRoles::delete(
-            new \OmegaUp\DAO\VO\GroupRoles([
-                'acl_id' => $problemset->acl_id,
-                'group_id' => $group->group_id,
-                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
-            ])
+
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\GroupRoles::delete(
+                new \OmegaUp\DAO\VO\GroupRoles([
+                    'acl_id' => $problemset->acl_id,
+                    'group_id' => $group->group_id,
+                    'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+                ])
+            );
+
+            \OmegaUp\DAO\Contests::updateContestantsCount($contest);
+
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
+            strval($contest->contest_id)
         );
 
         return ['status' => 'ok'];
