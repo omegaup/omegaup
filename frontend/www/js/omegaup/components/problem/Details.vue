@@ -350,15 +350,17 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'solution' }"
       >
-        <omegaup-problem-solution
+        <omegaup-problem-solution-tabs
+          v-if="selectedTab === 'solution'"
           :status="solutionStatus"
           :allowed-solutions-to-see="allowedSolutionsToSee"
           :solution="solution"
+          :selected-tab="selectedTab"
           @get-solution="$emit('get-solution')"
           @get-allowed-solutions="$emit('get-allowed-solutions')"
           @unlock-solution="$emit('unlock-solution')"
         >
-        </omegaup-problem-solution>
+        </omegaup-problem-solution-tabs>
       </div>
     </div>
   </div>
@@ -386,6 +388,7 @@ import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
+import problem_solution_tabs from './SolutionTabs.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -439,6 +442,7 @@ export enum PopupDisplayed {
     'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
+    'omegaup-problem-solution-tabs': problem_solution_tabs,
   },
 })
 export default class ProblemDetails extends Vue {

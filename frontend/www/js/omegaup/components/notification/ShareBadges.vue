@@ -9,34 +9,49 @@
     centered
     content-class="share-badge-modal-content"
   >
-    <div class="badge-image-container mb-3">
-      <div class="position-relative">
-        <img class="badge-image" :src="badgeImageUrl" :alt="badgeName" />
+    <div class="text-center mb-4">
+      <div class="position-relative d-inline-block">
+        <img
+          class="img-fluid mx-auto"
+          style="max-width: 150px; max-height: 150px"
+          :src="badgeImageUrl"
+          :alt="badgeName"
+        />
         <button
           ref="copyButton"
-          class="btn btn-sm btn-outline-secondary copy-button"
+          class="btn btn-sm btn-outline-secondary position-absolute"
+          style="top: 5px; right: -35px"
           :title="T.copyBadgeImage"
           @click.stop="copyImageToClipboard"
         >
           <font-awesome-icon :icon="['fas', 'copy']" />
         </button>
-        <div v-if="tooltipVisible" class="tooltip-message">
+        <div
+          v-if="tooltipVisible"
+          class="position-absolute bg-dark text-white px-3 py-2 rounded small"
+          style="
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+          "
+        >
           {{ tooltipMessage }}
         </div>
       </div>
     </div>
 
-    <div class="share-options d-flex justify-content-center mb-3">
+    <div class="d-flex justify-content-center mb-3">
       <button class="btn btn-outline-primary mx-2" @click="shareOnLinkedIn">
-        <font-awesome-icon :icon="['fab', 'linkedin']" class="me-1" />
+        <font-awesome-icon :icon="['fab', 'linkedin']" class="mr-1" />
         {{ T.socialMediaLinkedIn }}
       </button>
       <button class="btn btn-outline-info mx-2" @click="shareOnTwitter">
-        <font-awesome-icon :icon="['fab', 'twitter']" class="me-1" />
+        <font-awesome-icon :icon="['fab', 'twitter']" class="mr-1" />
         {{ T.socialMediaTwitter }}
       </button>
       <button class="btn btn-outline-primary mx-2" @click="shareOnFacebook">
-        <font-awesome-icon :icon="['fab', 'facebook-f']" class="me-1" />
+        <font-awesome-icon :icon="['fab', 'facebook-f']" class="mr-1" />
         {{ T.socialMediaFacebook }}
       </button>
     </div>
@@ -97,9 +112,10 @@ export default class ShareBadges extends Vue {
   }
 
   shareOnLinkedIn(): void {
-    const text = `${this.shareText}\n\n${ui.formatString(T.shareBadgeLink, {
+    const text = ui.formatString(T.shareBadgeLink, {
+      text: this.shareText,
       url: this.shareUrl,
-    })}`;
+    });
     const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?text=${encodeURIComponent(
       text,
     )}`;
@@ -107,9 +123,10 @@ export default class ShareBadges extends Vue {
   }
 
   shareOnTwitter(): void {
-    const text = `${this.shareText}\n\n${ui.formatString(T.shareBadgeLink, {
+    const text = ui.formatString(T.shareBadgeLink, {
+      text: this.shareText,
       url: this.shareUrl,
-    })}`;
+    });
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text,
     )}`;
@@ -140,49 +157,3 @@ export default class ShareBadges extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.badge-image-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.badge-image {
-  max-width: 150px;
-  max-height: 150px;
-}
-
-.copy-button {
-  position: absolute;
-  top: 5px;
-  right: -35px;
-  padding: 0.2rem 0.5rem;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
-.share-badge-modal-content {
-  margin-top: 4rem;
-}
-
-.tooltip-message {
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  animation: fade-in-out 3s ease-in-out;
-}
-</style>

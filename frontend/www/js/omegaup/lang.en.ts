@@ -1611,7 +1611,7 @@ const translations: { [key: string]: string; } = {
   settingsTimeLimit: "Time Limit",
   settingsTolerance: "Tolerance",
   settingsValidator: "Validator",
-  shareBadgeLink: "You can check it here: %(url)",
+  shareBadgeLink: "%(text)\n\nYou can check it here: %(url)",
   shareYourBadge: "Share your badge",
   showDefaultAllContestantsInScoreboard: "Show all contestants on the scoreboard by default.",
   showLinks: "Links",
