@@ -119,7 +119,6 @@
               T.navViewLatestSubmissions
             }}</a>
             <form
-              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
               class="collapse-submenu"
             >
               <div class="btn-group d-flex">
