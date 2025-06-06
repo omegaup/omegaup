@@ -118,9 +118,7 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
-            <form
-              class="collapse-submenu"
-            >
+            <form class="collapse-submenu">
               <div class="btn-group d-flex">
                 <span class="dropdown-item">
                   {{ T.myproblemsListCreateProblem }}
