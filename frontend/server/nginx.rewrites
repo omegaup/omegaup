@@ -11,6 +11,11 @@ location /preguntas/ {
 		rewrite ^/preguntas/(.+)$ /preguntas/?qa-rewrite=$1&$query_string last;
 	}
 }
+#rekarel
+location /rekarel/ {
+    alias /opt/omegaup/frontend/www/rekarel/webapp/;
+    index index.html;
+}
 rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;

@@ -74,6 +74,7 @@
 				"frontend/www/docs/.*",
 				"frontend/www/grader/.*",
 				"frontend/www/karel.js/.*",
+				"frontend/www/rekarel/.*",
 				"frontend/www/libinteractive/.*",
 				"frontend/www/preguntas/.*",
 				"frontend/www/third_party/.*"
