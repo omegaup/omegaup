@@ -15,6 +15,7 @@
             <directory name="frontend/server/libs/third_party" />
             <directory name="frontend/www/docs" />
             <directory name="frontend/www/karel.js" />
+            <directory name="frontend/www/rekarel" />
             <directory name="frontend/www/phpminiadmin" />
             <directory name="frontend/www/preguntas" />
             <directory name="frontend/www/third_party" />
