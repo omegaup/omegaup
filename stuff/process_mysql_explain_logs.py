@@ -3,13 +3,12 @@
 #  queries that might cause trouble in highly demanding conditions,
 #  inefficient queries are determined by having an 'ALL' on the query type
 '''Looking for inefficient queries in the MySQL log.'''
+import logging
+import sys
 from typing import Any, Iterable, Tuple
 import re
-import warnings
-# import logging
 import mysql.connector
 from mysql.connector import Error  # type: ignore
-# import pytest
 
 
 def normalize_query(query: str) -> str:
@@ -35,9 +34,9 @@ def create_connection(
             database=db_name,
             port=13306
         )
-        print("Connection to MySQL DB successful")
+        logging.warning("Connection to MySQL DB successful")
     except Error as e:
-        print(f"The error '{e}' occurred")
+        logging.error("The error '%s' occurred", e)
     return connection
 
 
@@ -67,8 +66,9 @@ def get_queries_from_general_log(
 def explain_queries(
     connection: mysql.connector.MySQLConnection,
     queries: Iterable[Tuple[Any, ...]]
-) -> None:
+) -> bool:
     '''Run explain command on queries'''
+    success = True
     cursor = connection.cursor()
     query_set = set()
     for query in queries:
@@ -117,22 +117,19 @@ def explain_queries(
                                               diagnostic))
 
         except Error as e:
-            print(f"Failed to explain query: {query_text}")
-            print(f"Error: {e}")
+            logging.error("Failed to explain query: %s", query_text)
+            logging.error("Error: %s", e)
     for clean_query in query_set:
-        print("=======================Clean query=======================\n",
-              clean_query)
-    print(len(query_set))
+        logging.warning(clean_query)
+    logging.warning(len(query_set))
     if len(query_set) > 0:
-        for clean_query in query_set:
-            warnings.warn(f"\n\n==inefficient query found==\n{clean_query}\n",
-                          UserWarning)
-        warnings.warn(f"{len(query_set)} inefficient queries found",
-                      UserWarning)
+        success = False
+        logging.warning('inefficient queries found')
+    return success
 
 
 # Main function to handle the logic
-def test_main() -> None:
+def _main() -> None:
     '''Main function to handle the logic'''
     # Use your credentials
     connection = create_connection(host_name="mysql",
@@ -142,9 +139,12 @@ def test_main() -> None:
     if connection:
         queries = get_queries_from_general_log(connection)
         if queries:
-            explain_queries(connection, queries)
+            if not explain_queries(connection, queries):
+                sys.exit(1)
         else:
-            print("No queries found in the general log")
+            logging.warning("No queries found in the general log")
         connection.close()
 
-#
+
+if __name__ == '__main__':
+    _main()
