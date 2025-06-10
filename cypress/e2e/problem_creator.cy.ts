@@ -158,7 +158,7 @@ describe('Problem Creator Tests', () => {
     it(`Should add and edit layouts ${
       isAuthenticated ? 'with' : 'without'
     } login`, () => {
-      if (isAuthenticated) {
+      // if (isAuthenticated) {
         problemCreatorPage.visit();
         cy.get('[data-problem-creator-tab="cases"]').click();
 
@@ -287,7 +287,7 @@ describe('Problem Creator Tests', () => {
               });
           });
         });
-      }
+      // }
     });
   };
 
