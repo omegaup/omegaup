@@ -159,134 +159,132 @@ describe('Problem Creator Tests', () => {
       isAuthenticated ? 'with' : 'without'
     } login`, () => {
       // if (isAuthenticated) {
-        problemCreatorPage.visit();
-        cy.get('[data-problem-creator-tab="cases"]').click();
+      problemCreatorPage.visit();
+      cy.get('[data-problem-creator-tab="cases"]').click();
 
-        cy.get('[data-add-window]').click();
-        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
-        cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
-        cy.get('[data-problem-creator-add-panel-submit]').click();
+      cy.get('[data-add-window]').click();
+      cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+      cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
+      cy.get('[data-problem-creator-add-panel-submit]').click();
 
-        cy.get('[data-sidebar-groups="ungrouped"]').click();
-        cy.get('[data-sidebar-cases-ungrouped]').first().click();
+      cy.get('[data-sidebar-groups="ungrouped"]').click();
+      cy.get('[data-sidebar-cases-ungrouped]').first().click();
 
-        const caseTypes = [
-          {
-            type: 'multiline',
-            text: isAuthenticated
-              ? T.problemCreatorLineMultiline
-              : 'multilines',
-          },
-          {
-            type: 'array',
-            text: isAuthenticated ? T.problemCreatorLineArray : 'array',
-          },
-          {
-            type: 'matrix',
-            text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
-          },
-          {
-            type: 'line',
-            text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
-          },
-        ];
+      const caseTypes = [
+        {
+          type: 'multiline',
+          text: isAuthenticated ? T.problemCreatorLineMultiline : 'multilines',
+        },
+        {
+          type: 'array',
+          text: isAuthenticated ? T.problemCreatorLineArray : 'array',
+        },
+        {
+          type: 'matrix',
+          text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
+        },
+        {
+          type: 'line',
+          text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
+        },
+      ];
 
-        caseTypes.forEach(() => {
-          cy.get('[data-edit-case-add-line]').click();
+      caseTypes.forEach(() => {
+        cy.get('[data-edit-case-add-line]').click();
+      });
+
+      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+        lineCases.forEach((lineCase) => {
+          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`).click();
+          cy.get(
+            `[data-array-modal-dropdown-kind="${lineCase.id}-${lineCase.type}"]`,
+          ).click();
+          problemCreatorPage.fillInformationForCaseType(lineCase);
         });
+      });
 
-        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-          lineCases.forEach((lineCase) => {
-            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`).click();
-            cy.get(
-              `[data-array-modal-dropdown-kind="${lineCase.id}-${lineCase.type}"]`,
-            ).click();
-            problemCreatorPage.fillInformationForCaseType(lineCase);
-          });
+      cy.get('[data-toggle-layout-sidebar]').click();
+      cy.get('[data-add-layout-from-selected-case]').click();
+      cy.get('[data-close-layout-sidebar]').click();
+
+      cy.get('[data-add-window]').click();
+      cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+      cy.get('[data-problem-creator-case-input="name"]').type('Hello case 2');
+      cy.get('[data-problem-creator-add-panel-submit]').click();
+
+      cy.get('[data-toggle-layout-sidebar]').click();
+      openLayoutDropdownAndClick('[data-layout-dropdown-enforce-to-all]');
+
+      cy.get('[data-toggle-layout-sidebar]').click();
+      cy.get('[data-sidebar-cases-ungrouped]').last().click();
+
+      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+        lineCases.forEach((lineCase) => {
+          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+            .invoke('text')
+            .then((text) => {
+              expect(text.toLowerCase()).to.include(
+                lineCase.text.toLowerCase(),
+              );
+            });
         });
+      });
 
-        cy.get('[data-toggle-layout-sidebar]').click();
-        cy.get('[data-add-layout-from-selected-case]').click();
-        cy.get('[data-close-layout-sidebar]').click();
+      cy.get('[data-toggle-layout-sidebar]').click();
+      openLayoutDropdownAndClick('[data-layout-dropdown-copy]');
 
-        cy.get('[data-add-window]').click();
-        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
-        cy.get('[data-problem-creator-case-input="name"]').type('Hello case 2');
-        cy.get('[data-problem-creator-add-panel-submit]').click();
+      cy.get('[data-layout-dropdown]').eq(1).click();
+      cy.get('[data-line-info-dropdown]').eq(4).click();
+      cy.get('[data-line-info-dropdown-item="array"]').eq(4).click();
 
-        cy.get('[data-toggle-layout-sidebar]').click();
-        openLayoutDropdownAndClick('[data-layout-dropdown-enforce-to-all]');
+      cy.get('button.dropdown-toggle-split').eq(3).click();
+      cy.get('[data-layout-dropdown-enforce-to-selected]').eq(1).click();
 
-        cy.get('[data-toggle-layout-sidebar]').click();
-        cy.get('[data-sidebar-cases-ungrouped]').last().click();
-
-        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-          lineCases.forEach((lineCase) => {
-            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-              .invoke('text')
-              .then((text) => {
-                expect(text.toLowerCase()).to.include(
-                  lineCase.text.toLowerCase(),
-                );
-              });
-          });
+      cy.get('[data-sidebar-cases-ungrouped]').first().click();
+      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+        lineCases.forEach((lineCase) => {
+          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+            .invoke('text')
+            .then((text) => {
+              expect(text.toLowerCase()).to.include(
+                lineCase.text.toLowerCase(),
+              );
+            });
         });
+      });
 
-        cy.get('[data-toggle-layout-sidebar]').click();
-        openLayoutDropdownAndClick('[data-layout-dropdown-copy]');
+      cy.get('[data-sidebar-cases-ungrouped]').last().click();
 
-        cy.get('[data-layout-dropdown]').eq(1).click();
-        cy.get('[data-line-info-dropdown]').eq(4).click();
-        cy.get('[data-line-info-dropdown-item="array"]').eq(4).click();
+      const caseTypesUpdated = [
+        {
+          type: 'multiline',
+          text: isAuthenticated ? T.problemCreatorLineArray : 'multilines',
+        },
+        {
+          type: 'array',
+          text: isAuthenticated ? T.problemCreatorLineArray : 'array',
+        },
+        {
+          type: 'matrix',
+          text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
+        },
+        {
+          type: 'line',
+          text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
+        },
+      ];
 
-        cy.get('button.dropdown-toggle-split').eq(3).click();
-        cy.get('[data-layout-dropdown-enforce-to-selected]').eq(1).click();
-
-        cy.get('[data-sidebar-cases-ungrouped]').first().click();
-        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-          lineCases.forEach((lineCase) => {
-            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-              .invoke('text')
-              .then((text) => {
-                expect(text.toLowerCase()).to.include(
-                  lineCase.text.toLowerCase(),
-                );
-              });
-          });
+      problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
+        lineCases.forEach((lineCase) => {
+          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+            .invoke('text')
+            .then((text) => {
+              expect(text.toLowerCase()).to.include(
+                lineCase.text.toLowerCase(),
+              );
+            });
         });
-
-        cy.get('[data-sidebar-cases-ungrouped]').last().click();
-
-        const caseTypesUpdated = [
-          {
-            type: 'multiline',
-            text: isAuthenticated ? T.problemCreatorLineArray : 'multilines',
-          },
-          {
-            type: 'array',
-            text: isAuthenticated ? T.problemCreatorLineArray : 'array',
-          },
-          {
-            type: 'matrix',
-            text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
-          },
-          {
-            type: 'line',
-            text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
-          },
-        ];
-
-        problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
-          lineCases.forEach((lineCase) => {
-            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-              .invoke('text')
-              .then((text) => {
-                expect(text.toLowerCase()).to.include(
-                  lineCase.text.toLowerCase(),
-                );
-              });
-          });
-        });
+      });
       // }
     });
   };
