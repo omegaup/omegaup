@@ -401,25 +401,24 @@ def aggregate_reviewers_feedback_for_problem(
         cur.execute("""SELECT qn.`contents`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'quality_tag'
-                       AND qn.`problem_id` = %s
-                       LIMIT 1;""",
+                       AND qn.`problem_id` = %s;""",
                     (problem_id,))
 
         total_votes = 0
         seal_positive_votes = 0
         level_tag_votes: DefaultDict[str, int] = collections.defaultdict(int)
         topic_tag_votes: Set[str] = set()
-        for row in cur.fetchone():
+        for row in cur.fetchall():
             try:
-                contents = json.loads(row)
+                contents = json.loads(row[0])
             except json.JSONDecodeError:  # pylint: disable=no-member
                 logging.exception('Failed to parse contents')
                 continue
             total_votes += 1
-            if contents['quality_seal'] is True:
+            if contents['quality_seal']:
                 seal_positive_votes += 1
-            if 'level' in contents and not contents['level'] is None:
-                level_tag_votes[contents['level']] += 1
+            if 'tag' in contents and not contents['tag'] is None:
+                level_tag_votes[contents['tag']] += 1
             if 'tags' in contents:
                 # Take the union of voted topic tags
                 topic_tag_votes.update(contents['tags'])
@@ -436,26 +435,13 @@ def aggregate_reviewers_feedback_for_problem(
             (seal_positive_votes > (total_votes / 2), problem_id))
 
         # Delete old level and topic tags for problem and add the new ones
-        if level_tag_votes:
-            most_voted_level = max(level_tag_votes,
-                                   key=lambda x: level_tag_votes.get(x, 0))
-            final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
-                              {(problem_id, most_voted_level)})
-            if most_voted_level is not None:
-                cur.execute("""DELETE FROM
-                                    `Problems_Tags`
-                                WHERE
-                                    `problem_id` = %s
-                                AND `tag_id` IN (
-                                    SELECT `tag_id`
-                                    FROM `Tags`
-                                    WHERE `name` LIKE CONCAT(
-                                        'problemLevel', '%')
-                                );""",
-                            (problem_id,))
-        else:
-            logging.warning('No level tags found for problem %d', problem_id)
-            final_tags = list({(problem_id, tag) for tag in topic_tag_votes})
+        most_voted_level = max(level_tag_votes,
+                               key=lambda x: level_tag_votes.get(x, 0),
+                               default=None)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes})
+        # Avoid adding None as a tag
+        if most_voted_level is not None:
+            final_tags.append((problem_id, most_voted_level))
 
         cur.execute("""DELETE FROM
                                `Problems_Tags`
