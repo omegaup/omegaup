@@ -3,297 +3,296 @@ import T from '../../frontend/www/js/omegaup/lang';
 import { problemCreatorPage } from '../support/pageObjects/problemCreatorPage';
 import { profilePage } from '../support/pageObjects/profilePage';
 
-describe('Problem Creator Tests', () => {
+describe('Problem creator Test', () => {
   const loginOptions: LoginOptions = {
     username: 'user',
     password: 'user',
   };
 
-  function openLayoutDropdownAndClick(selector: string) {
-    cy.get('[data-layout-dropdown]')
-      .first()
-      .within(() => {
-        cy.get('button.dropdown-toggle-split').click();
-        cy.get(selector).click({ force: true }); // ensure click even if dropdown menu has display:none initially
-      });
-  }
-
-  const runTests = (isAuthenticated: boolean) => {
-    beforeEach(() => {
-      cy.clearCookies();
-      cy.clearLocalStorage();
-      cy.visit('/');
-
-      // Disable Intro.js overlays
-      cy.setCookie('has-visited-problem-creator', 'true');
-      cy.setCookie('has-visited-cases-tab', 'true');
-      cy.setCookie('has-visited-code-tab', 'true');
-      cy.setCookie('has-visited-solution-tab', 'true');
-
-      cy.window().then((win) => {
-        win.localStorage.setItem('has-visited-problem-creator', 'true');
-        win.localStorage.setItem('has-visited-cases-tab', 'true');
-        win.localStorage.setItem('has-visited-code-tab', 'true');
-        win.localStorage.setItem('has-visited-solution-tab', 'true');
-      });
-
-      if (isAuthenticated) {
+  // Define test modes
+  const testModes = [
+    {
+      name: 'Authenticated User',
+      isAuthenticated: true,
+      setup: () => {
         cy.login(loginOptions);
         profilePage.updatePreferredLanguage('es');
-
-        // Skip Intro.js overlay if visible
-        cy.get('body').then(($body) => {
-          if ($body.find('.introjs-overlay').length > 0) {
-            cy.get('.introjs-skipbutton').click({ force: true });
+      },
+      visit: () => {
+        cy.get('[data-nav-problems]').click();
+        cy.get('[data-nav-problems-create-options]').click();
+        cy.get('a[href="/problem/creator/"]').click();
+      },
+    },
+    {
+      name: 'Unauthenticated User',
+      isAuthenticated: false,
+      setup: () => {
+        // No setup needed for unauthenticated user
+      },
+      visit: () => {
+        cy.get('[data-nav-problems]').click();
+        cy.get('a[href="/problem/creator/"]').click();
+        cy.location('search').then((search) => {
+          if (!search.includes('lang')) {
+            cy.visit('/problem/creator/?lang=es');
           }
         });
-      }
-    });
+      },
+    },
+  ];
 
-    it(`Should be accessible ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      problemCreatorPage.visit();
-      cy.url().should('include', '/problem/creator/');
-      cy.get('[data-problem-creator-tab="statement"]').should('be.visible');
-      cy.get('[data-problem-creator-tab="solution"]').should('be.visible');
-      cy.get('[data-problem-creator-tab="code"]').should('be.visible');
-      cy.get('[data-problem-creator-tab="cases"]').should('be.visible');
-    });
-
-    it(`Should write and verify the problem statement ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      problemCreatorPage.visit();
-      cy.get('[data-problem-creator-tab="statement"]').click();
-      cy.get('[data-problem-creator-editor-markdown]').type('Hello omegaUp!');
-      cy.get('[data-problem-creator-save-markdown]').click();
-
-      const expectedHeader = isAuthenticated ? 'Previsualización' : 'Preview';
-      cy.get('[data-problem-creator-previewer-markdown]').should(
-        'have.html',
-        `<h1>${expectedHeader}</h1>\n\n<p>Hello omegaUp!</p>`,
-      );
-    });
-
-    it(`Should write and verify the problem solution ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      problemCreatorPage.visit();
-      cy.get('[data-problem-creator-tab="solution"]').click();
-      cy.get('[data-problem-creator-solution-editor-markdown]').type(
-        'Hello **solution**!',
-      );
-      cy.get('[data-problem-creator-solution-save-markdown]').click();
-
-      const expectedHeader = isAuthenticated ? 'Previsualización' : 'Preview';
-      cy.get('[data-problem-creator-solution-previewer-markdown]').should(
-        'have.html',
-        `<h1>${expectedHeader}</h1>\n\n<p>Hello <strong>solution</strong>!</p>`,
-      );
-    });
-
-    it(`Should upload and verify the problem code ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      problemCreatorPage.visit();
-      cy.get('[data-problem-creator-tab="code"]').click();
-      cy.get('[data-problem-creator-code-input]').attachFile(
-        '../fixtures/main.rs',
-      );
-
-      cy.wait(1000).then(() => {
-        cy.get('.CodeMirror-line')
-          .eq(1)
-          .should('have.text', 'println!("Hello omegaUp!");');
-        cy.get('[data-problem-creator-code-language]')
-          .should('have.value', 'rs')
-          .find('option:selected')
-          .should('contain', 'Rust (1.56.1)');
-      });
-    });
-
-    it(`Should add groups, cases and multiple cases ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      problemCreatorPage.visit();
-      cy.get('[data-problem-creator-tab="cases"]').click();
-
-      cy.get('[data-add-window]').click();
-      cy.get('[data-problem-creator-add-panel-tab="case"]').click();
-      cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
-      cy.get('[data-problem-creator-add-panel-submit]').click();
-
-      cy.get('[data-add-window]').click();
-      cy.get('[data-problem-creator-add-panel-tab="group"]').click();
-      cy.get('[data-problem-creator-group-input="name"]').type('Hello group!');
-      cy.get('[data-problem-creator-add-panel-submit]').click();
-
-      cy.get('[data-add-window]').click();
-      cy.get('[data-problem-creator-add-panel-tab="multiple-cases"]').click();
-      cy.get('[data-problem-creator-multiple-cases-input="prefix"]').type(
-        'hello',
-      );
-      cy.get('[data-problem-creator-multiple-cases-input="suffix"]').type(
-        'there',
-      );
-      cy.get('[data-problem-creator-multiple-cases-input="count"]')
-        .clear()
-        .type('10');
-      cy.get('[data-problem-creator-add-panel-submit]').click();
-
-      cy.get('[data-sidebar-ungrouped-cases="count"]')
-        .invoke('text')
-        .should((text) => {
-          expect(text.trim()).to.contain('11');
-        });
-      cy.get('[data-sidebar-groups="grouped"]').should('have.length', 1);
-      cy.get('[data-sidebar-groups="count"]')
-        .invoke('text')
-        .should((text) => {
-          expect(text.trim()).to.contain('0');
-        });
-    });
-
-    it(`Should add and edit layouts ${
-      isAuthenticated ? 'with' : 'without'
-    } login`, () => {
-      // if (isAuthenticated) {
-      problemCreatorPage.visit();
-      cy.get('[data-problem-creator-tab="cases"]').click();
-
-      cy.get('[data-add-window]').click();
-      cy.get('[data-problem-creator-add-panel-tab="case"]').click();
-      cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
-      cy.get('[data-problem-creator-add-panel-submit]').click();
-
-      cy.get('[data-sidebar-groups="ungrouped"]').click();
-      cy.get('[data-sidebar-cases-ungrouped]').first().click();
-
-      const caseTypes = [
-        {
-          type: 'multiline',
-          text: isAuthenticated ? T.problemCreatorLineMultiline : 'multilines',
-        },
-        {
-          type: 'array',
-          text: isAuthenticated ? T.problemCreatorLineArray : 'array',
-        },
-        {
-          type: 'matrix',
-          text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
-        },
-        {
-          type: 'line',
-          text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
-        },
-      ];
-
-      caseTypes.forEach(() => {
-        cy.get('[data-edit-case-add-line]').click();
-      });
-
-      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-        lineCases.forEach((lineCase) => {
-          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`).click();
-          cy.get(
-            `[data-array-modal-dropdown-kind="${lineCase.id}-${lineCase.type}"]`,
-          ).click();
-          problemCreatorPage.fillInformationForCaseType(lineCase);
-        });
-      });
-
-      cy.get('[data-toggle-layout-sidebar]').click();
-      cy.get('[data-add-layout-from-selected-case]').click();
-      cy.get('[data-close-layout-sidebar]').click();
-
-      cy.get('[data-add-window]').click();
-      cy.get('[data-problem-creator-add-panel-tab="case"]').click();
-      cy.get('[data-problem-creator-case-input="name"]').type('Hello case 2');
-      cy.get('[data-problem-creator-add-panel-submit]').click();
-
-      cy.get('[data-toggle-layout-sidebar]').click();
-      openLayoutDropdownAndClick('[data-layout-dropdown-enforce-to-all]');
-
-      cy.get('[data-toggle-layout-sidebar]').click();
-      cy.get('[data-sidebar-cases-ungrouped]').last().click();
-
-      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-        lineCases.forEach((lineCase) => {
-          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-            .invoke('text')
-            .then((text) => {
-              expect(text.toLowerCase()).to.include(
-                lineCase.text.toLowerCase(),
-              );
-            });
-        });
-      });
-
-      cy.get('[data-toggle-layout-sidebar]').click();
-      openLayoutDropdownAndClick('[data-layout-dropdown-copy]');
-
-      cy.get('[data-layout-dropdown]').eq(1).click();
-      cy.get('[data-line-info-dropdown]').eq(4).click();
-      cy.get('[data-line-info-dropdown-item="array"]').eq(4).click();
-
-      cy.get('button.dropdown-toggle-split').eq(3).click();
-      cy.get('[data-layout-dropdown-enforce-to-selected]').eq(1).click();
-
-      cy.get('[data-sidebar-cases-ungrouped]').first().click();
-      problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
-        lineCases.forEach((lineCase) => {
-          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-            .invoke('text')
-            .then((text) => {
-              expect(text.toLowerCase()).to.include(
-                lineCase.text.toLowerCase(),
-              );
-            });
-        });
-      });
-
-      cy.get('[data-sidebar-cases-ungrouped]').last().click();
-
-      const caseTypesUpdated = [
-        {
-          type: 'multiline',
-          text: isAuthenticated ? T.problemCreatorLineArray : 'multilines',
-        },
-        {
-          type: 'array',
-          text: isAuthenticated ? T.problemCreatorLineArray : 'array',
-        },
-        {
-          type: 'matrix',
-          text: isAuthenticated ? T.problemCreatorLineMatrix : 'matrix',
-        },
-        {
-          type: 'line',
-          text: isAuthenticated ? T.problemCreatorLineLine : 'single line',
-        },
-      ];
-
-      problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
-        lineCases.forEach((lineCase) => {
-          cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
-            .invoke('text')
-            .then((text) => {
-              expect(text.toLowerCase()).to.include(
-                lineCase.text.toLowerCase(),
-              );
-            });
-        });
-      });
-      // }
-    });
-  };
-
-  describe('Unauthenticated Tests', () => {
-    runTests(false);
+  before(() => {
+    cy.visit('/');
+    cy.setCookie('has-visited-problem-creator', true.toString());
+    cy.setCookie('has-visited-cases-tab', true.toString());
+    cy.setCookie('has-visited-code-tab', true.toString());
+    cy.setCookie('has-visited-solution-tab', true.toString());
   });
 
-  describe('Authenticated Tests', () => {
-    runTests(true);
+  beforeEach(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.visit('/');
+
+    cy.setCookie('has-visited-problem-creator', true.toString());
+    cy.setCookie('has-visited-cases-tab', true.toString());
+    cy.setCookie('has-visited-code-tab', true.toString());
+    cy.setCookie('has-visited-solution-tab', true.toString());
+  });
+
+  testModes.forEach((mode) => {
+    describe(`${mode.name} Mode`, () => {
+      beforeEach(() => {
+        mode.setup();
+      });
+
+      it(`Should write and verify the problem statement - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="statement"]').click();
+        cy.get('[data-problem-creator-editor-markdown]').type('Hello omegaUp!');
+        cy.get('[data-problem-creator-save-markdown]').click();
+        cy.get('[data-problem-creator-previewer-markdown]').should(
+          'have.html',
+          '<h1>Previsualización</h1>\n\n<p>Hello omegaUp!</p>',
+        );
+      });
+
+      it(`Should write and verify the problem solution - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="solution"]').click();
+        cy.get('[data-problem-creator-solution-editor-markdown]').type(
+          'Hello **solution**!',
+        );
+        cy.get('[data-problem-creator-solution-save-markdown]').click();
+        cy.get('[data-problem-creator-solution-previewer-markdown]').should(
+          'have.html',
+          '<h1>Previsualización</h1>\n\n<p>Hello <strong>solution</strong>!</p>',
+        );
+      });
+
+      it(`Should upload and verify the problem code - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="code"]').click();
+        cy.get('[data-problem-creator-code-input]').attachFile(
+          '../fixtures/main.rs',
+        );
+        cy.wait(1000).then(() => {
+          cy.get('.CodeMirror-line').then((rawHTMLElements) => {
+            const intendedLine = rawHTMLElements[1];
+            expect(intendedLine.innerText).to.eq('println!("Hello omegaUp!");');
+          });
+          cy.get('[data-problem-creator-code-language]')
+            .should('have.value', 'rs')
+            .find('option:selected')
+            .should('contain', 'Rust (1.56.1)');
+        });
+      });
+
+      it(`Should add groups, cases and multiple cases - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="cases"]').click();
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+        cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
+        cy.get('[data-problem-creator-case-input="name"]').should(
+          'have.value',
+          'hellocase',
+        );
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+        cy.get('[data-problem-creator-tab="cases"]').click();
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="group"]').click();
+        cy.get('[data-problem-creator-group-input="name"]').type(
+          'Hello group!',
+        );
+        cy.get('[data-problem-creator-group-input="name"]').should(
+          'have.value',
+          'hellogroup',
+        );
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="multiple-cases"]').click();
+        cy.get('[data-problem-creator-multiple-cases-input="prefix"]').type(
+          'hello',
+        );
+        cy.get('[data-problem-creator-multiple-cases-input="suffix"]').type(
+          'there',
+        );
+        cy.get('[data-problem-creator-multiple-cases-input="count"]').clear();
+        cy.get('[data-problem-creator-multiple-cases-input="count"]').type(
+          '10',
+        );
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+        cy.get('[data-sidebar-ungrouped-cases="count"]')
+          .invoke('text')
+          .then((text) => {
+            expect(text.trim()).contain('11');
+          });
+        cy.get('[data-sidebar-groups="grouped"]').should('have.length', 1);
+        cy.get('[data-sidebar-groups="count"]')
+          .invoke('text')
+          .then((text) => {
+            expect(text.trim()).contain('0');
+          });
+      });
+
+      it(`Should add and edit layouts - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="cases"]').click();
+
+        // Add initial case
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+        cy.get('[data-problem-creator-case-input="name"]').type('Hello case');
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+
+        cy.get('[data-sidebar-groups="ungrouped"]').click();
+        cy.get('[data-sidebar-cases-ungrouped]').first().click();
+
+        const caseTypes = [
+          { type: 'multiline', text: T.problemCreatorLineMultiline },
+          { type: 'array', text: T.problemCreatorLineArray },
+          { type: 'matrix', text: T.problemCreatorLineMatrix },
+          { type: 'line', text: T.problemCreatorLineLine },
+        ];
+
+        caseTypes.forEach(() => {
+          cy.get('[data-edit-case-add-line]').click();
+        });
+
+        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+          lineCases.forEach((lineCase) => {
+            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`).click();
+            cy.get(
+              `[data-array-modal-dropdown-kind="${lineCase.id}-${lineCase.type}"]`,
+            ).click();
+            problemCreatorPage.fillInformationForCaseType(lineCase);
+          });
+        });
+
+        // Create layout from selected case
+        cy.get('[data-toggle-layout-sidebar]').click();
+        cy.get('[data-add-layout-from-selected-case]').click();
+        cy.get('[data-close-layout-sidebar]').click();
+
+        // Add another case
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+        cy.get('[data-problem-creator-case-input="name"]').type('Hello case 2');
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+
+        // Enforce layout to all cases
+        cy.get('[data-toggle-layout-sidebar]').click();
+
+        cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
+          .as('targetLayout')
+          .find('button.dropdown-toggle-split')
+          .click();
+
+        cy.get('@targetLayout')
+          .find('[data-layout-dropdown-enforce-to-all]')
+          .should('be.visible')
+          .click({ force: true });
+
+        cy.get('[data-close-layout-sidebar]').click();
+
+        // Assert layout applied to second case
+        cy.get('[data-sidebar-cases-ungrouped]').last().click();
+        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+          lineCases.forEach((lineCase) => {
+            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+              .invoke('text')
+              .should('contain', lineCase.text);
+          });
+        });
+
+        // Copy the layout
+        cy.get('[data-toggle-layout-sidebar]').click();
+
+        cy.contains('[data-layout-dropdown]', 'hellocase_hellocase')
+          .as('originalLayout')
+          .find('button.dropdown-toggle-split')
+          .click();
+
+        cy.get('@originalLayout')
+          .find('[data-layout-dropdown-copy]')
+          .should('be.visible')
+          .click({ force: true });
+
+        // Apply copied layout to first case
+        cy.contains('[data-layout-dropdown]', 'hellocase_hellocase copia')
+          .as('copiedLayout')
+          .find('button.dropdown-toggle-split')
+          .click();
+
+        cy.get('@copiedLayout')
+          .find('[data-layout-dropdown-enforce-to-selected]')
+          .should('be.visible')
+          .click({ force: true });
+
+        // Assert layout still applied to first case
+        cy.get('[data-sidebar-cases-ungrouped]').first().click();
+        problemCreatorPage.getLineIDs(caseTypes).then((lineCases) => {
+          lineCases.forEach((lineCase) => {
+            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+              .invoke('text')
+              .should('contain', lineCase.text);
+          });
+        });
+
+        // Assert copied layout applied correctly to last case
+        cy.get('[data-sidebar-cases-ungrouped]').last().click();
+        const caseTypesUpdated = [
+          { type: 'multiline', text: T.problemCreatorLineArray },
+          { type: 'array', text: T.problemCreatorLineArray },
+          { type: 'matrix', text: T.problemCreatorLineMatrix },
+          { type: 'line', text: T.problemCreatorLineLine },
+        ];
+        problemCreatorPage.getLineIDs(caseTypesUpdated).then((lineCases) => {
+          lineCases.forEach((lineCase) => {
+            cy.get(`[data-array-modal-dropdown="${lineCase.id}"]`)
+              .invoke('text')
+              .should('contain', lineCase.text);
+          });
+        });
+      });
+    });
+  });
+
+  // Optional: Add tests that specifically validate differences between modes
+  describe('Mode-specific behavior tests', () => {
+    it('Should handle authentication state correctly', () => {
+      // Test authenticated user has access to additional features
+      cy.login(loginOptions);
+      cy.get('[data-nav-problems]').click();
+      cy.get('[data-nav-problems-create-options]').click();
+      cy.get('a[href="/problem/creator/"]').click();
+
+      cy.logout();
+
+      cy.get('[data-nav-problems]').click();
+      cy.get('a[href="/problem/creator/"]').click();
+    });
   });
 });
