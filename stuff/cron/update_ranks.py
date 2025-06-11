@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence
+from typing import Any, Iterable, List, Mapping, NamedTuple, Sequence
 
 import mysql.connector
 import mysql.connector.cursor
@@ -432,6 +432,7 @@ def update_school_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
+    update_school_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to school of the current month'''
 
@@ -468,6 +469,7 @@ def update_school_of_the_month_candidates(
         '''
         SELECT
             `s`.`school_id`,
+            `s`.`name`,
             IFNULL(
                 SUM(
                     ROUND(
@@ -527,24 +529,54 @@ def update_school_of_the_month_candidates(
         ''', (first_day_of_current_month, first_day_of_next_month,
               first_day_of_next_month))
 
-    for index, row in enumerate(cur_readonly.fetchall()):
-        cur.execute(
-            '''
-                    INSERT INTO
-                        `School_Of_The_Month` (
-                            `school_id`,
-                            `time`,
-                            `ranking`,
-                            `score`
-                        )
-                    VALUES (
-                        %s,
-                        %s,
-                        %s,
-                        %s
-                    );
-                    ''', (row['school_id'], first_day_of_next_month, index + 1,
-                          row['score']))
+    candidates = cur_readonly.fetchall()
+    if not candidates:
+        logging.info('No eligible schools found.')
+        return
+
+    if update_school_of_the_month:
+        for index, row in enumerate(candidates):
+            cur.execute(
+                '''
+                        INSERT INTO
+                            `School_Of_The_Month` (
+                                `school_id`,
+                                `time`,
+                                `ranking`,
+                                `score`
+                            )
+                        VALUES (
+                            %s,
+                            %s,
+                            %s,
+                            %s
+                        );
+                        ''', (row['school_id'], first_day_of_next_month,
+                              index + 1, row['score']))
+    else:
+        debug_school_of_the_month_candidates(first_day_of_next_month,
+                                             candidates)
+
+
+def debug_school_of_the_month_candidates(
+    first_day_of_next_month: datetime.date,
+    candidates: Iterable[Mapping[str, Any]],
+) -> None:
+    '''Log school of the month candidates'''
+
+    log_entries = []
+    for ranking, candidate in enumerate(candidates, start=1):
+        log_entry = {
+            "school_id": candidate['school_id'],
+            "name": candidate['name'],
+            "time": first_day_of_next_month.isoformat(),
+            "ranking": ranking,
+            "score": candidate['score'],
+        }
+        log_entries.append(log_entry)
+
+    log_message = json.dumps(log_entries, indent=4)
+    logging.info(log_message)
 
 
 def compute_points_for_user(
@@ -754,16 +786,14 @@ def update_schools_stats(
             logging.exception('Failed to update school ranking')
             raise
 
-        if update_school_of_the_month:
-            try:
-                update_school_of_the_month_candidates(cur, cur_readonly, date)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to school of the month')
-                raise
-        else:
-            logging.info('Skipping updating School of the Month')
+        try:
+            update_school_of_the_month_candidates(cur, cur_readonly, date,
+                                                  update_school_of_the_month)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to school of the month')
+            raise
         logging.info('Schools stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all schools stats')
