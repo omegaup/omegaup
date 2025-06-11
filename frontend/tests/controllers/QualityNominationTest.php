@@ -1,5 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
@@ -695,6 +694,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'something else',
             $emailSender->listEmails[0]['body']
         );
+
+        unset($scopedSender);
     }
 
     /**
@@ -768,6 +769,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'something else',
             $emailSender->listEmails[0]['body']
         );
+
+        unset($scopedSender);
     }
 
     /**
@@ -2744,5 +2747,64 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 );
             }
         }
+    }
+
+    /**
+     * Test that if a quality nomination from a reviewer does not include a
+     * level tag, the cronjob does not fail and simply ignores that nomination.
+     */
+    public function testNominationSkippedIfMissingLevelTag() {
+        // Create two problems
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $karelProblemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        // Reviewer nominates both problems for quality review, the first one
+        // has a level tag, the second one does not.
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $karelProblemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+
+        // Run the cronjob to process nominations
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        // Check that the first problem has the selected level tag and the
+        // second one has the default tag level, and the application does not
+        // crash
+        [
+            'results' => $problems,
+            'total' => $total,
+        ] = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+            ])
+        );
+        $this->assertSame($total, 2);
+        $this->assertSame(
+            $problems[0]['tags'][0]['name'],
+            'problemLevelBasicKarel'
+        );
+        $this->assertSame(
+            $problems[1]['tags'][0]['name'],
+            'problemLevelBasicIntroductionToProgramming'
+        );
     }
 }

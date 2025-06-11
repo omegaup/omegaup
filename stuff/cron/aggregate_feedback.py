@@ -436,9 +436,12 @@ def aggregate_reviewers_feedback_for_problem(
 
         # Delete old level and topic tags for problem and add the new ones
         most_voted_level = max(level_tag_votes,
-                               key=lambda x: level_tag_votes.get(x, 0))
-        final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
-                          {(problem_id, most_voted_level)})
+                               key=lambda x: level_tag_votes.get(x, 0),
+                               default=None)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes})
+        # Avoid adding None as a tag
+        if most_voted_level is not None:
+            final_tags.append((problem_id, most_voted_level))
 
         cur.execute("""DELETE FROM
                                `Problems_Tags`
