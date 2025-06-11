@@ -93,6 +93,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     const ADMISSION_MODE_PRIVATE = 'private';
     const ADMISSION_MODE_REGISTRATION = 'registration';
 
+    // Assignment type constants
+    const ASSIGNMENT_TYPE_HOMEWORK = 'homework';
+    const ASSIGNMENT_TYPE_LESSON = 'lesson';
+    const ASSIGNMENT_TYPE_TEST = 'test';
+
     // Course level constants
     const COURSE_LEVEL_INTRODUCTORY = 'introductory';
     const COURSE_LEVEL_INTERMEDIATE = 'intermediate';
