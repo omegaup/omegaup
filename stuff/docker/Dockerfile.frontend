@@ -43,6 +43,9 @@ WORKDIR /opt/omegaup
 ARG BRANCH=release
 ENV BRANCH=$BRANCH
 RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+WORKDIR /opt/omegaup/frontend/www/rekarel
+RUN npm install && npx gulp
+WORKDIR /opt/omegaup
 RUN yarn install && yarn build
 RUN composer install --no-dev --classmap-authoritative
 RUN printf "<?php\n\
