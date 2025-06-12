@@ -19,25 +19,15 @@ describe('Problem creator Test', () => {
         profilePage.updatePreferredLanguage('es');
       },
       visit: () => {
-        cy.get('[data-nav-problems]').click();
-        cy.get('[data-nav-problems-create-options]').click();
-        cy.get('a[href="/problem/creator/"]').click();
+        problemCreatorPage.visit();
       },
     },
     {
       name: 'Unauthenticated User',
       isAuthenticated: false,
-      setup: () => {
-        // No setup needed for unauthenticated user
-      },
+      setup: () => {},
       visit: () => {
-        cy.get('[data-nav-problems]').click();
-        cy.get('a[href="/problem/creator/"]').click();
-        cy.location('search').then((search) => {
-          if (!search.includes('lang')) {
-            cy.visit('/problem/creator/?lang=es');
-          }
-        });
+        problemCreatorPage.visit('es');
       },
     },
   ];
@@ -277,22 +267,6 @@ describe('Problem creator Test', () => {
           });
         });
       });
-    });
-  });
-
-  // Optional: Add tests that specifically validate differences between modes
-  describe('Mode-specific behavior tests', () => {
-    it('Should handle authentication state correctly', () => {
-      // Test authenticated user has access to additional features
-      cy.login(loginOptions);
-      cy.get('[data-nav-problems]').click();
-      cy.get('[data-nav-problems-create-options]').click();
-      cy.get('a[href="/problem/creator/"]').click();
-
-      cy.logout();
-
-      cy.get('[data-nav-problems]').click();
-      cy.get('a[href="/problem/creator/"]').click();
     });
   });
 });

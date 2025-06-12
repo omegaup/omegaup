@@ -34,7 +34,9 @@ export class ProblemCreatorPage {
 
   visit(lang?: string): void {
     cy.get('[data-nav-problems]').click();
-    cy.get('[data-nav-problems-create-options]').click();
+    if (!lang) {
+      cy.get('[data-nav-problems-create-options]').click();
+    }
     cy.get('a[href="/problem/creator/"]').click();
 
     // Check if we're on the correct page
