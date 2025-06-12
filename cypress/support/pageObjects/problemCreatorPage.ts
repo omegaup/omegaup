@@ -32,10 +32,25 @@ export class ProblemCreatorPage {
     cy.get('button[class="btn btn-success"]').eq(0).click();
   }
 
-  visit(): void {
+  visit(lang?: string): void {
     cy.get('[data-nav-problems]').click();
-    cy.get('[data-nav-problems-create-options]').click();
+    if (!lang) {
+      cy.get('[data-nav-problems-create-options]').click();
+    }
     cy.get('a[href="/problem/creator/"]').click();
+
+    // Check if we're on the correct page
+    cy.location('pathname', { timeout: 10000 }).should(
+      'eq',
+      '/problem/creator/',
+    );
+
+    // If a language is specified and not already in URL, add it
+    cy.location('search').then((search) => {
+      if (!search.includes('lang') && lang) {
+        cy.visit(`/problem/creator/?lang=${lang}`);
+      }
+    });
   }
 }
 
