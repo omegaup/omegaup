@@ -2719,7 +2719,7 @@ export namespace types {
     director: string;
     finishTime?: Date;
     name: string;
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetCourseProblem[];
     problemsetId: number;
     startTime: Date;
   }
@@ -3031,7 +3031,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems?: types.ProblemsetProblem[];
+    problems?: types.ProblemsetContestProblem[];
     problemset_id: number;
     recommended?: boolean;
     requests_user_information: string;
@@ -3076,7 +3076,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetContestProblem[];
     problemset_id: number;
     recommended: boolean;
     requests_user_information: string;
@@ -3427,7 +3427,7 @@ export namespace types {
   export interface CourseEditPayload {
     admins: types.CourseAdmin[];
     allLanguages: { [key: string]: string };
-    assignmentProblems: types.ProblemsetProblem[];
+    assignmentProblems: types.ProblemsetCourseProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
     groupsTeachingAssistants: types.CourseGroupAdmin[];
@@ -4307,6 +4307,51 @@ export namespace types {
       username: string;
     }[];
     window_length?: number;
+  }
+
+  export interface ProblemsetContestProblem {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    has_submissions: boolean;
+    input_limit: number;
+    is_extra_problem: boolean;
+    languages: string;
+    letter?: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
+  export interface ProblemsetCourseProblem {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    has_submissions: boolean;
+    input_limit: number;
+    is_extra_problem: boolean;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    quality_payload: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
   }
 
   export interface ProblemsetProblem {
@@ -5344,7 +5389,7 @@ export namespace messages {
     director: string;
     finish_time?: Date;
     name: string;
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetCourseProblem[];
     problemset_id: number;
     start_time: Date;
   };
