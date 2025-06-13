@@ -13,9 +13,9 @@ from mysql.connector import Error  # type: ignore
 
 def normalize_query(query: str) -> str:
     '''eliminate numeric values and strings'''
-    # Reemplaza números
+    # replace numbers
     query = re.sub(r'\b\d+\b', '?', query)
-    # Reemplaza strings entre comillas
+    # replace strings
     query = re.sub(r"'[^']*'", '?', query)
     return query
 
@@ -115,16 +115,15 @@ def explain_queries(
                 query_set.add(normalize_query(query_text +
                                               '\n\ndetected problems:\n' +
                                               diagnostic))
-
         except Error as e:
             logging.error("Failed to explain query: %s", query_text)
             logging.error("Error: %s", e)
-    for clean_query in query_set:
-        logging.warning(clean_query)
-    logging.warning(len(query_set))
+            success = False
     if len(query_set) > 0:
         success = False
-        logging.warning('inefficient queries found')
+        for clean_query in query_set:
+            logging.warning(clean_query)
+        logging.warning('%d inefficient queries found', len(query_set))
     return success
 
 
@@ -143,6 +142,7 @@ def _main() -> None:
                 sys.exit(1)
         else:
             logging.warning("No queries found in the general log")
+            sys.exit(1)
         connection.close()
 
 
