@@ -87,7 +87,7 @@ CREATE TABLE `Auth_Tokens` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Carousel_Items` (
-  `corousel_item_id` int NOT NULL AUTO_INCREMENT,
+  `carousel_item_id` int NOT NULL AUTO_INCREMENT,
   `title` json NOT NULL,
   `excerpt` json NOT NULL,
   `image_url` varchar(255) DEFAULT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE `Carousel_Items` (
   `user_id` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`corousel_item_id`),
+  PRIMARY KEY (`carousel_item_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `Carousel_Items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar noticias en la plataforma';
@@ -993,6 +993,7 @@ CREATE TABLE `Schools` (
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
   KEY `idx_schools_name` (`name`),
+  KEY `idx_schools_score` (`score`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
@@ -1095,6 +1096,7 @@ CREATE TABLE `Submissions` (
   KEY `school_id` (`school_id`),
   KEY `school_id_problem_id` (`school_id`,`problem_id`),
   KEY `verdict_type_time` (`verdict`,`type`,`time`),
+  KEY `idx_time_status` (`time`,`status`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1252,6 +1254,7 @@ CREATE TABLE `Users` (
   KEY `fk_main_identity_id` (`main_identity_id`),
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
+  KEY `idx_is_private` (`is_private`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
