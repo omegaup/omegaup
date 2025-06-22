@@ -7,14 +7,17 @@ Handles multi-language editorial generation using OpenAI GPT-4.
 import logging
 from typing import Any, Dict, Optional
 
-from openai import OpenAI
+from openai import OpenAI  # type: ignore
 
 # Import from absolute path instead of relative import
 try:
     from ai_editorial_generator import EditorialGeneratorConfig
 except ImportError:
     # Fallback for when running as module
-    from .ai_editorial_generator import EditorialGeneratorConfig
+    # pylint: disable=relative-beyond-top-level
+    from .ai_editorial_generator import (  # type: ignore[import,no-redef]
+        EditorialGeneratorConfig
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +69,15 @@ class EditorialGenerator:
 
             return editorials
 
-        except Exception as e:
+        except (AttributeError, KeyError, IndexError) as e:
             logger.error(
                 "Failed to generate multi-language editorials: %s", str(e)
+            )
+            return None
+        except OSError as e:
+            logger.error(
+                "Network error generating multi-language editorials: %s",
+                str(e)
             )
             return None
 
@@ -117,11 +126,16 @@ class EditorialGenerator:
             )
 
             editorial = response.choices[0].message.content.strip()
-            logger.info("Generated English editorial (%d chars)", len(editorial))
-            return editorial
+            logger.info("Generated English editorial (%d chars)",
+                        len(editorial))
+            return str(editorial)  # type: ignore
 
-        except Exception as e:
+        except (AttributeError, KeyError, IndexError) as e:
             logger.error("Failed to generate English editorial: %s", str(e))
+            return None
+        except OSError as e:
+            logger.error("Network error generating English editorial: %s",
+                         str(e))
             return None
 
     def _create_editorial_prompt(
@@ -213,10 +227,10 @@ Provide a complete editorial in markdown format WITHOUT any code."""
                 logger.info(
                     "Successfully parsed Spanish and Portuguese translations"
                 )
-                logger.info("  Spanish: %d characters", len(translations['es']))
-                logger.info(
-                    "  Portuguese: %d characters", len(translations['pt'])
-                )
+                logger.info("  Spanish: %d characters",
+                            len(translations['es']))
+                logger.info("  Portuguese: %d characters",
+                            len(translations['pt']))
                 return translations
 
             logger.error(
@@ -225,8 +239,11 @@ Provide a complete editorial in markdown format WITHOUT any code."""
             )
             return None
 
-        except Exception as e:
+        except (AttributeError, KeyError, IndexError) as e:
             logger.error("Failed to translate editorial: %s", str(e))
+            return None
+        except OSError as e:
+            logger.error("Network error translating editorial: %s", str(e))
             return None
 
     def _create_translation_prompt(self, english_editorial: str) -> str:
@@ -304,7 +321,7 @@ Requirements:
             logger.error("Empty translation content")
             return None
 
-        except Exception as e:
+        except (AttributeError, ValueError, TypeError) as e:
             logger.error("Error parsing translation response: %s", str(e))
             return None
 
@@ -335,4 +352,4 @@ Requirements:
         for lang_code, content in editorials.items():
             final_editorials[lang_code] = disclaimers[lang_code] + content
 
-        return final_editorials 
+        return final_editorials

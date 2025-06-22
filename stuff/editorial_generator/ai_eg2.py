@@ -377,8 +377,11 @@ Generate the editorial:"""
         except (AttributeError, KeyError, IndexError) as e:
             logger.error("Failed to generate editorial: %s", str(e))
             return None
-        except (OSError, Exception) as e:
+        except OSError as e:
             logger.error("Network/API error generating editorial: %s", str(e))
+            return None
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error generating editorial: %s", str(e))
             return None
 
     def _generate_solution_from_editorial(
@@ -451,8 +454,11 @@ Provide only the complete C++ source code without explanations:"""
         except (AttributeError, KeyError, IndexError) as e:
             logger.error("Failed to generate solution code: %s", str(e))
             return None
-        except (OSError, Exception) as e:
+        except OSError as e:
             logger.error("Network/API error generating solution: %s", str(e))
+            return None
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error generating solution: %s", str(e))
             return None
 
     def _clean_solution_code(self, code: str) -> str:
@@ -508,9 +514,16 @@ Provide only the complete C++ source code without explanations:"""
             self.stats.increment('solution_verification_failed')
             return False, None
 
-        except (AttributeError, KeyError, ValueError, OSError, Exception) as e:
-            error_type = "Network error" if isinstance(e, OSError) else "Error"
-            logger.error("%s during verification: %s", error_type, str(e))
+        except (AttributeError, KeyError, ValueError) as e:
+            logger.error("Error during verification: %s", str(e))
+            self.stats.increment('solution_verification_failed')
+            return False, None
+        except OSError as e:
+            logger.error("Network error during verification: %s", str(e))
+            self.stats.increment('solution_verification_failed')
+            return False, None
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error during verification: %s", str(e))
             self.stats.increment('solution_verification_failed')
             return False, None
 
@@ -573,8 +586,11 @@ Provide only the complete C++ source code without explanations:"""
         except (AttributeError, KeyError, ValueError) as e:
             logger.error("Failed to submit and check solution: %s", str(e))
             return False
-        except (OSError, Exception) as e:
+        except OSError as e:
             logger.error("Network error submitting solution: %s", str(e))
+            return False
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error submitting solution: %s", str(e))
             return False
 
     def _generate_editorial_with_feedback(
@@ -664,8 +680,11 @@ Requirements:
         except (AttributeError, KeyError, IndexError) as e:
             logger.error("Failed to translate editorial: %s", str(e))
             return None
-        except (OSError, Exception) as e:
+        except OSError as e:
             logger.error("Network/API error translating editorial: %s", str(e))
+            return None
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error translating editorial: %s", str(e))
             return None
 
     def _parse_translation_response(
@@ -752,8 +771,14 @@ Requirements:
 
             return successful_uploads > 0
 
-        except (AttributeError, KeyError, OSError, Exception) as e:
+        except (AttributeError, KeyError) as e:
             logger.error("Failed to upload editorials: %s", str(e))
+            return False
+        except OSError as e:
+            logger.error("Network error uploading editorials: %s", str(e))
+            return False
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("Unexpected error uploading editorials: %s", str(e))
             return False
 
     def _log_editorial(self, editorial: str) -> None:
@@ -847,7 +872,14 @@ Requirements:
                                  problem_alias,
                                  result.get('error', 'Unknown error'))
 
-            except (AttributeError, KeyError, ValueError, OSError, Exception) as e:
+            except (AttributeError, KeyError, ValueError) as e:
+                logger.error("Error processing %s: %s", problem_alias, str(e))
+                self.stats.increment('problems_failed')
+            except OSError as e:
+                logger.error("Network error processing %s: %s",
+                             problem_alias, str(e))
+                self.stats.increment('problems_failed')
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error("Unexpected error processing %s: %s",
                              problem_alias, str(e))
                 self.stats.increment('problems_failed')
@@ -934,8 +966,11 @@ def main() -> int:
     except KeyboardInterrupt:
         logger.info("\nInterrupted by user")
         return 0
-    except (AttributeError, KeyError, ValueError, OSError, Exception) as e:
-        logger.error("Unexpected error: %s", str(e))
+    except (  # pylint: disable=broad-except
+        AttributeError, KeyError, ValueError, OSError, Exception
+    ) as e:
+        error_type = "Network error" if isinstance(e, OSError) else "Error"
+        logger.error("%s: %s", error_type, str(e))
         return 1
 
 
