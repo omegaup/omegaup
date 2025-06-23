@@ -17,3 +17,6 @@
 [submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/
+[submodule "frontend/www/rekarel"]
+	path = frontend/www/rekarel
+	url = https://github.com/kishtarn555/ReKarel
