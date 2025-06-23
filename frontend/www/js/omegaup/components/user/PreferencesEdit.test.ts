@@ -139,14 +139,6 @@ describe('PreferencesEdit.vue', () => {
     },
     {
       objectiveLearningTeaching: 'learning',
-      objectiveScholarCompetitive: 'competitive',
-      valueCompetitive: true,
-      valueLearning: true,
-      valueScholar: false,
-      valueTeaching: false,
-    },
-    {
-      objectiveLearningTeaching: 'learning',
       objectiveScholarCompetitive: 'scholarAndcompetitive',
       valueCompetitive: true,
       valueLearning: true,
