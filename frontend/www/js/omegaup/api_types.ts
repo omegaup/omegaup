@@ -5901,6 +5901,8 @@ export namespace messages {
   export type UserCreateAPITokenResponse = { token: string };
   export type UserDeleteConfirmRequest = { [key: string]: any };
   export type UserDeleteConfirmResponse = {};
+  export type UserDeleteFileRequest = { [key: string]: any };
+  export type UserDeleteFileResponse = { message: string };
   export type UserDeleteRequestRequest = { [key: string]: any };
   export type UserDeleteRequestResponse = { token: string };
   export type UserExtraInformationRequest = { [key: string]: any };
@@ -5970,6 +5972,8 @@ export namespace messages {
   export type UserUpdateBasicInfoResponse = {};
   export type UserUpdateMainEmailRequest = { [key: string]: any };
   export type UserUpdateMainEmailResponse = {};
+  export type UserUploadFileRequest = { [key: string]: any };
+  export type UserUploadFileResponse = { message: string };
   export type UserValidateFilterRequest = { [key: string]: any };
   export type UserValidateFilterResponse = {
     admin: boolean;
@@ -6708,6 +6712,9 @@ export namespace controllers {
     deleteConfirm: (
       params?: messages.UserDeleteConfirmRequest,
     ) => Promise<messages.UserDeleteConfirmResponse>;
+    deleteFile: (
+      params?: messages.UserDeleteFileRequest,
+    ) => Promise<messages.UserDeleteFileResponse>;
     deleteRequest: (
       params?: messages.UserDeleteRequestRequest,
     ) => Promise<messages.UserDeleteRequestResponse>;
@@ -6780,6 +6787,9 @@ export namespace controllers {
     updateMainEmail: (
       params?: messages.UserUpdateMainEmailRequest,
     ) => Promise<messages.UserUpdateMainEmailResponse>;
+    uploadFile: (
+      params?: messages.UserUploadFileRequest,
+    ) => Promise<messages.UserUploadFileResponse>;
     validateFilter: (
       params?: messages.UserValidateFilterRequest,
     ) => Promise<messages.UserValidateFilterResponse>;
