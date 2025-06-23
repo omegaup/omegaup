@@ -602,9 +602,9 @@ def handle_input() -> None:
 
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
-    SUBMISSION_ID_MODE = (args.submission_id_mode == "Yes") or input(
+    SUBMISSION_ID_MODE = (args.submission_id_mode == "true") or input(
         "Are you working in submission id mode: "
-    ) == "Yes"
+    ) == "true"
     if SUBMISSION_ID_MODE:
         SUBMISSION_ID = args.submission_id or input(
             "Enter the submission id: "
