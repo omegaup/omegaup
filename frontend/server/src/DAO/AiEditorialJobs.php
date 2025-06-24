@@ -54,7 +54,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     ): void {
         $job = self::getByPK($jobId);
         if (is_null($job)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('jobNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         $job->status = $status;
@@ -77,7 +77,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     ): void {
         $job = self::getByPK($jobId);
         if (is_null($job)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('jobNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         if (!is_null($mdEn)) {

@@ -27,7 +27,7 @@ abstract class AiEditorialJobs {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function save(\OmegaUp\DAO\VO\AiEditorialJobs $AI_Editorial_Jobs): int {
-        if (is_null(self::getByPK($AI_Editorial_Jobs->job_id))) {
+        if (is_null($AI_Editorial_Jobs->job_id) || is_null(self::getByPK($AI_Editorial_Jobs->job_id))) {
             return AiEditorialJobs::create($AI_Editorial_Jobs);
         }
         return AiEditorialJobs::update($AI_Editorial_Jobs);
@@ -122,13 +122,6 @@ abstract class AiEditorialJobs {
      * filas afectadas.
      */
     final public static function create(\OmegaUp\DAO\VO\AiEditorialJobs $AI_Editorial_Jobs): int {
-        if (is_null($AI_Editorial_Jobs->created_at)) {
-            $AI_Editorial_Jobs->created_at = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                \OmegaUp\MySQLConnection::getInstance()->GetOne(
-                    'SELECT NOW();'
-                )
-            );
-        }
         $sql = '
             INSERT INTO `AI_Editorial_Jobs` (
                 `job_id`,
@@ -222,12 +215,10 @@ abstract class AiEditorialJobs {
             $clauses[] = '`AI_Editorial_Jobs`.`attempts` = ?';
             $params[] = $AI_Editorial_Jobs->attempts;
         }
-        if (!is_null($AI_Editorial_Jobs->created_at)) {
-            $clauses[] = '`AI_Editorial_Jobs`.`created_at` = ?';
-            $params[] = \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $AI_Editorial_Jobs->created_at
-            );
-        }
+        $clauses[] = '`AI_Editorial_Jobs`.`created_at` = ?';
+        $params[] = \OmegaUp\DAO\DAO::toMySQLTimestamp(
+            $AI_Editorial_Jobs->created_at
+        );
         if (!is_null($AI_Editorial_Jobs->md_en)) {
             $clauses[] = '`AI_Editorial_Jobs`.`md_en` = ?';
             $params[] = $AI_Editorial_Jobs->md_en;
@@ -244,11 +235,7 @@ abstract class AiEditorialJobs {
             $clauses[] = '`AI_Editorial_Jobs`.`validation_verdict` = ?';
             $params[] = $AI_Editorial_Jobs->validation_verdict;
         }
-        if (empty($clauses)) {
-            $whereClause = '';
-        } else {
-            $whereClause = 'WHERE ' . implode(' AND ', $clauses);
-        }
+        $whereClause = 'WHERE ' . implode(' AND ', $clauses);
         $sql = "
             SELECT
                 `AI_Editorial_Jobs`.`job_id`,

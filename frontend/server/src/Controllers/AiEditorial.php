@@ -28,7 +28,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * @return array{status: string, job_id?: string}
      */
     public static function apiGenerate(\OmegaUp\Request $r): array {
-        $identity = self::authenticateRequest($r);
+        $r->ensureIdentity();
         $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -40,25 +40,33 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         // Check if user has admin permissions for this problem
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
 
         // Rate limiting: Check user's recent job count
+        if (is_null($r->identity->user_id)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
         $recentJobs = \OmegaUp\DAO\AiEditorialJobs::countRecentJobsByUser(
-            $identity->user_id,
+            $r->identity->user_id,
             1 // 1 hour
         );
 
         if ($recentJobs >= self::MAX_JOBS_PER_HOUR) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'rateLimitExceeded'
+                'parameterInvalid'
             );
         }
 
         // Problem cooldown: Check if there's a recent job for this problem
+        if (is_null($problem->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $lastJob = \OmegaUp\DAO\AiEditorialJobs::getLastJobForProblem(
             $problem->problem_id
         );
@@ -67,7 +75,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $cooldownEnd = $lastJob->created_at->time + (self::COOLDOWN_MINUTES * 60);
             if (time() < $cooldownEnd) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'problemCooldownActive'
+                    'parameterInvalid'
                 );
             }
         }
@@ -75,7 +83,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         // Create the job
         $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
             $problem->problem_id,
-            $identity->user_id
+            $r->identity->user_id
         );
 
         return [
@@ -92,22 +100,25 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * @return array{status: string, job?: AiEditorialJobDetails}
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
-        $identity = self::authenticateRequest($r);
+        $r->ensureIdentity();
         $jobId = $r->ensureString('job_id');
 
         $job = \OmegaUp\DAO\AiEditorialJobs::getJobByUuid($jobId);
         if (is_null($job)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('jobNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         // Get problem to check permissions
+        if (is_null($job->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Check if user has admin permissions for this problem
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -116,11 +127,11 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'job' => [
-                'job_id' => $job->job_id,
-                'status' => $job->status,
+                'job_id' => strval($job->job_id),
+                'status' => strval($job->status),
                 'error_message' => $job->error_message,
                 'created_at' => $job->created_at,
-                'problem_alias' => $problem->alias,
+                'problem_alias' => strval($problem->alias),
                 'md_en' => $job->md_en,
                 'md_es' => $job->md_es,
                 'md_pt' => $job->md_pt,
@@ -132,36 +143,39 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
      * Review and approve/reject an AI editorial
      *
      * @omegaup-request-param string $job_id
-     * @omegaup-request-param string $action (approve|reject)
+     * @omegaup-request-param string $action
      * @omegaup-request-param null|string $language
      *
      * @return array{status: string}
      */
     public static function apiReview(\OmegaUp\Request $r): array {
-        $identity = self::authenticateRequest($r);
+        $r->ensureIdentity();
         $jobId = $r->ensureString('job_id');
         $action = $r->ensureString('action');
         $language = $r->ensureOptionalString('language');
 
         if (!in_array($action, ['approve', 'reject'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'invalidParameter'
+                'parameterInvalid'
             );
         }
 
         $job = \OmegaUp\DAO\AiEditorialJobs::getJobByUuid($jobId);
         if (is_null($job)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('jobNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         // Get problem to check permissions
+        if (is_null($job->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Check if user has admin permissions for this problem
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -170,7 +184,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         // Check if job is in completed status
         if ($job->status !== self::STATUS_COMPLETED) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'jobNotCompleted'
+                'parameterInvalid'
             );
         }
 
@@ -195,21 +209,8 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
 
             if (!is_null($solutionMarkdown)) {
-                // Create a new Request for the Problem::apiUpdateSolution call
-                $solutionRequest = new \OmegaUp\Request([
-                    'problem_alias' => $problem->alias,
-                    'solution' => $solutionMarkdown,
-                    'message' => 'AI-generated editorial approved and published',
-                    'lang' => $language ?? 'en',
-                ]);
-
-                // Set the identity for the request
-                $solutionRequest->identity = $identity;
-
-                // Call the existing Problem API to update the solution
-                \OmegaUp\Controllers\Problem::apiUpdateSolution(
-                    $solutionRequest
-                );
+                // Publish the editorial by calling a helper method
+                self::publishEditorial($r->identity, $problem, $solutionMarkdown, $language);
             }
         } else {
             // Reject the job
@@ -220,5 +221,34 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Helper method to publish AI editorial to problem solution
+     *
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param string $solutionMarkdown
+     * @param null|string $language
+     */
+    private static function publishEditorial(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $solutionMarkdown,
+        ?string $language
+    ): void {
+        // Create a new Request for the Problem::apiUpdateSolution call
+        $solutionRequest = new \OmegaUp\Request([
+            'problem_alias' => $problem->alias,
+            'solution' => $solutionMarkdown,
+            'message' => 'AI-generated editorial approved and published',
+            'lang' => $language ?? 'en',
+        ]);
+
+        // Set the identity for the request
+        $solutionRequest->identity = $identity;
+
+        // Call the existing Problem API to update the solution
+        \OmegaUp\Controllers\Problem::apiUpdateSolution($solutionRequest);
     }
 }
