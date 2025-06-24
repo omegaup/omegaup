@@ -334,7 +334,7 @@ CREATE TABLE `Courses` (
   KEY `fk_ca_acl_id` (`acl_id`),
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
-  KEY `idx_admission_mode_recommended_archived` (`admission_mode`,`recommended`,`archived`),
+  KEY `idx_admission_mode_recommended_archived` (`archived`,`admission_mode`,`recommended`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
