@@ -104,7 +104,7 @@ const carouselConfig: {
     },
     description: {
       en:
-        'Join omegaUp\'s Discord server and hang out with your community, get help and learn about new projects.',
+        "Join omegaUp's Discord server and hang out with your community, get help and learn about new projects.",
       es:
         'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
       pt:
