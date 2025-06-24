@@ -27,7 +27,15 @@ abstract class AiEditorialJobs {
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function save(\OmegaUp\DAO\VO\AiEditorialJobs $AI_Editorial_Jobs): int {
-        if (is_null($AI_Editorial_Jobs->job_id) || is_null(self::getByPK($AI_Editorial_Jobs->job_id))) {
+        if (
+            is_null(
+                $AI_Editorial_Jobs->job_id
+            ) || is_null(
+                self::getByPK(
+                    $AI_Editorial_Jobs->job_id
+                )
+            )
+        ) {
             return AiEditorialJobs::create($AI_Editorial_Jobs);
         }
         return AiEditorialJobs::update($AI_Editorial_Jobs);

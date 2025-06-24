@@ -324,7 +324,7 @@ Review and approve/reject an AI editorial
 
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
-| `action`   | `string`       | (approve    | reject) |
+| `action`   | `string`       |             |
 | `job_id`   | `string`       |             |
 | `language` | `null\|string` |             |
 

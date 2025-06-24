@@ -210,7 +210,12 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             if (!is_null($solutionMarkdown)) {
                 // Publish the editorial by calling a helper method
-                self::publishEditorial($r->identity, $problem, $solutionMarkdown, $language);
+                self::publishEditorial(
+                    $r->identity,
+                    $problem,
+                    $solutionMarkdown,
+                    $language
+                );
             }
         } else {
             // Reject the job
