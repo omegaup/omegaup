@@ -1491,7 +1491,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
-        $sql = '(
+        $sql = 'WITH course_assignments AS (
+                    SELECT assignment_id, problemset_id
+                    FROM Assignments
+                    WHERE course_id = ?
+                )
+                (
             SELECT
                 i.username,
                 NULL AS alias,
@@ -1505,14 +1510,18 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
-                Identities i ON i.identity_id = pal.identity_id
-            LEFT JOIN
-                User_Rank ur ON ur.user_id = i.user_id
+                course_assignments a
+            ON
+                a.problemset_id = pal.problemset_id
             INNER JOIN
-                Assignments a ON a.problemset_id = pal.problemset_id
-            WHERE
-                a.course_id = ?
-        ) UNION (
+                Identities i
+            ON
+                i.identity_id = pal.identity_id
+            LEFT JOIN
+                User_Rank ur
+            ON
+                ur.user_id = i.user_id
+        ) UNION ALL (
             SELECT
                 i.username,
                 p.alias,
@@ -1526,18 +1535,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             FROM
                 Submission_Log sl
             INNER JOIN
+                course_assignments a ON a.problemset_id = sl.problemset_id
+            INNER JOIN
                 Identities i ON i.identity_id = sl.identity_id
-            LEFT JOIN
-                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
                 Submissions s ON s.submission_id = sl.submission_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
-            INNER JOIN
-                Assignments a ON a.problemset_id = sl.problemset_id
-            WHERE
-                a.course_id = ?
-        ) UNION (
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
+        ) UNION ALL (
             SELECT
                 i.username,
                 c.alias,
@@ -1560,8 +1567,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Courses c ON c.course_id = ccl.new_course_id
             WHERE
                 ccl.course_id = ?
-        ) ORDER BY
-            time DESC';
+        )';
+
+        $sqlOrder = ' ORDER BY time DESC';
 
         $sqlCount = "
             SELECT
@@ -1574,14 +1582,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sqlCount,
-            [$course->course_id, $course->course_id, $course->course_id]
+            [$course->course_id, $course->course_id]
         );
 
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlLimit,
+            $sql . $sqlOrder . $sqlLimit,
             [
-                $course->course_id,
                 $course->course_id,
                 $course->course_id,
                 max(0, $page - 1) * $rowsPerPage,

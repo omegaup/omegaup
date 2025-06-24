@@ -69,6 +69,9 @@ COPY ./usr/bin/* /usr/bin/
 RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/developer-environment.sh
 COPY ./my.cnf /home/ubuntu/.my.cnf
 
+COPY ./entrypoint.dev.sh /entrypoint.dev.sh
+RUN chmod +x /entrypoint.dev.sh
+
 RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
@@ -78,6 +81,8 @@ EXPOSE 8001
 ENV CI=false
 ENV VIRTUAL_ENV=/opt/omegaup/stuff/venv
 ENV PATH=/opt/omegaup/stuff/venv/bin:$PATH
+
+ENTRYPOINT ["/entrypoint.dev.sh"]
 
 CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:13306", "--", \
      "/bin/bash", "-c", \
