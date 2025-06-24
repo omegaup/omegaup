@@ -630,16 +630,6 @@ jobs:
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
-      - name: Install yarn dependencies
-        run: yarn install
-
-      - name: Build webpack resources
-        run: yarn build
-
-      - name: Wait for dependencies
-        run: |
-          wait-for-it -t 30 grader:21680
-
       - name: Run pytest
         run: |
           pytest stuff/teaching_assistant/ -s
