@@ -4,7 +4,7 @@ CREATE TABLE `AI_Editorial_Jobs` (
     `problem_id` int NOT NULL COMMENT 'Identificador del problema',
     `user_id` int NOT NULL COMMENT 'Usuario que solicitó la generación',
     `status` enum('queued','processing','completed','failed','approved','rejected') NOT NULL DEFAULT 'queued' COMMENT 'Estado actual del trabajo',
-    `error_message` text NULL COMMENT 'Mensaje de error en caso de fallo',
+    `error_message` text COMMENT 'Mensaje de error en caso de fallo',
     `attempts` int NOT NULL DEFAULT 0 COMMENT 'Número de intentos realizados',
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora de creación del trabajo',
     `md_en` mediumtext NULL COMMENT 'Editorial generado en inglés',

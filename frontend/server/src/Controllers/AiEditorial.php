@@ -73,21 +73,15 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         // Create the job
-        try {
-            $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
-                $problem->problem_id,
-                $identity->user_id
-            );
+        $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
+            $problem->problem_id,
+            $identity->user_id
+        );
 
-            return [
-                'status' => 'ok',
-                'job_id' => $jobId,
-            ];
-        } catch (\Exception $e) {
-            throw new \OmegaUp\Exceptions\InvalidDatabaseOperationException(
-                $e
-            );
-        }
+        return [
+            'status' => 'ok',
+            'job_id' => $jobId,
+        ];
     }
 
     /**
