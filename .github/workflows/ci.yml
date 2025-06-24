@@ -611,6 +611,8 @@ jobs:
           python3 -m pip install --user wheel
           python3 -m pip install --user \
             -r stuff/requirements.txt
+          python3 -m pip install --user \
+            -r stuff/teaching_assistant/requirements.txt
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
