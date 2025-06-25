@@ -134,6 +134,6 @@ def create_test_run():
     yield response.json()
 
 
-def test_ta(setup_accounts, create_test_problem, create_test_run):
+def test_teaching_assistant(setup_accounts, create_test_problem, create_test_run):
     """test the teaching assistant functionality"""
     assert 2 + 2 == 4, "This test should always pass"
