@@ -5046,6 +5046,23 @@ export namespace types {
 
 // API messages
 export namespace messages {
+  // ACL
+  export type ACLUserOwnedAclReportRequest = { [key: string]: any };
+  export type ACLUserOwnedAclReportResponse = {
+    acls: {
+      acl_id: number;
+      alias: string;
+      type: string;
+      users: {
+        role_description: string;
+        role_id: number;
+        role_name: string;
+        user_id: number;
+        username: string;
+      }[];
+    }[];
+  };
+
   // Admin
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
@@ -5984,6 +6001,12 @@ export namespace messages {
 
 // Controller interfaces
 export namespace controllers {
+  export interface ACL {
+    userOwnedAclReport: (
+      params?: messages.ACLUserOwnedAclReportRequest,
+    ) => Promise<messages.ACLUserOwnedAclReportResponse>;
+  }
+
   export interface Admin {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
