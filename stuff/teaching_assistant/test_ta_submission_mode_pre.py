@@ -7,6 +7,16 @@ import os
 BASE_URL = "http://localhost:8001"
 COOKIES = None
 
+TEACHER_USERNAME = "teacher"
+TEACHER_PASSWORD = "teacher123"
+STUDENT_USERNAME = "student"
+STUDENT_PASSWORD = "student123"
+
+PROBLEM_ALIAS = "sum"
+PROBLEM_TITLE = "Sum"
+TEST_PROBLEM_DIR = "stuff/teaching_assistant/test_problem_sum"
+TEST_PROBLEM_ZIP = f"{TEST_PROBLEM_DIR}.zip"
+
 def get_signup_endpoint(username: str, password: str) -> str:
     """endpoint for creating a teaching assistant user"""
     return (
@@ -30,19 +40,13 @@ def get_problem_details_endpoint(problem_alias: str) -> str:
 def setup_accounts():
     global COOKIES, BASE_URL
     """setup accounts for testing"""
-    username = "teacher"
-    password = "teacher123"
-    
-    signup_endpoint = get_signup_endpoint(username, password)
+    signup_endpoint = get_signup_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     url = f"{BASE_URL}/{signup_endpoint}"
 
     response = requests.get(url)
     response.raise_for_status()
 
-    username = "student"
-    password = "student123"
-
-    signup_endpoint = get_signup_endpoint(username, password)
+    signup_endpoint = get_signup_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     url = f"{BASE_URL}/{signup_endpoint}"
 
     response = requests.get(url)
@@ -54,30 +58,30 @@ def setup_accounts():
 def create_test_problem():
     """test creating a problem"""
     global COOKIES, BASE_URL
-    
-    login_endpoint = get_login_endpoint("teacher", "teacher123")
+
+    login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
-    
+
     response = requests.get(login_url)
     response.raise_for_status()
     COOKIES = response.cookies
 
-    with zipfile.ZipFile("stuff/teaching_assistant/test_problem_sum.zip", "w") as zipf:
-        for root, dirs, files in os.walk("stuff/teaching_assistant/test_problem_sum"):
+    with zipfile.ZipFile(TEST_PROBLEM_ZIP, "w") as zipf:
+        for root, dirs, files in os.walk(TEST_PROBLEM_DIR):
             for file in files:
                 file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, "stuff/teaching_assistant/test_problem_sum")
+                arcname = os.path.relpath(file_path, TEST_PROBLEM_DIR)
                 zipf.write(file_path, arcname)
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
-                arcname = os.path.relpath(dir_path, "stuff/teaching_assistant/test_problem_sum")
+                arcname = os.path.relpath(dir_path, TEST_PROBLEM_DIR)
                 zipf.write(dir_path, arcname + "/")
-    
+
     create_problem_url = f"{BASE_URL}/{get_create_problem_endpoint()}"
     data = {
         "visibility": "public",
-        "title": "Sum",
-        "problem_alias": "sum",
+        "title": PROBLEM_TITLE,
+        "problem_alias": PROBLEM_ALIAS,
         "validator": "token-numeric",
         "time_limit": 1000,
         "validator_time_limit": 0,
@@ -96,57 +100,56 @@ def create_test_problem():
     }
 
     files = {
-        "problem_contents": open("stuff/teaching_assistant/test_problem_sum.zip", "rb")
+        "problem_contents": open(TEST_PROBLEM_ZIP, "rb")
     }
 
     response = requests.post(create_problem_url, data=data, files=files, cookies=COOKIES)
     response.raise_for_status()
-    
+
     files["problem_contents"].close()
-    
-    if os.path.exists("stuff/teaching_assistant/test_problem_sum.zip"):
-        os.remove("stuff/teaching_assistant/test_problem_sum_sum.zip")
-    
+
+    if os.path.exists(TEST_PROBLEM_ZIP):
+        os.remove(TEST_PROBLEM_ZIP)
+
     assert response.status_code == 200
 
 @pytest.fixture
 def create_test_run():
     """test creating a run"""
     global COOKIES, BASE_URL
-    
-    login_endpoint = get_login_endpoint("student", "student123")
+
+    login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
-    
+
     response = requests.get(login_url)
     response.raise_for_status()
     student_cookies = response.cookies
-    
+
     run_data = {
         "language": "cpp17-gcc",
-        "problem_alias": "sum",
+        "problem_alias": PROBLEM_ALIAS,
         "source": "#include <iostream>\n\nint main() {\n    std::cin.tie(nullptr);\n    std::ios_base::sync_with_stdio(false);\n\n    int A, B;\n    std::cin >> A >> B;\n    std::cout << A - B << '\\n';\n}",
         "contest_alias": None,
         "problemset_id": None
     }
-    
+
     create_run_url = f"{BASE_URL}/{get_create_run_endpoint()}"
     response = requests.post(create_run_url, data=run_data, cookies=student_cookies)
     response.raise_for_status()
-    
+
     assert response.status_code == 200
-    
+
     yield response.json()
 
 
 def test_problem_and_run_setup(setup_accounts, create_test_problem, create_test_run):
     """test that the problem and run are created successfully"""
     global COOKIES, BASE_URL
-    
-    problem_alias = "sum"
-    problem_details_url = f"{BASE_URL}/{get_problem_details_endpoint(problem_alias)}"
-    
+
+    problem_details_url = f"{BASE_URL}/{get_problem_details_endpoint(PROBLEM_ALIAS)}"
+
     response = requests.get(problem_details_url, cookies=COOKIES)
     response.raise_for_status()
-    
+
     assert response.status_code == 200
-    assert response.json()["alias"] == problem_alias
+    assert response.json()["alias"] == PROBLEM_ALIAS
