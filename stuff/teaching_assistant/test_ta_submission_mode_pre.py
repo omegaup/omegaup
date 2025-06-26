@@ -62,15 +62,15 @@ def create_test_problem():
     response.raise_for_status()
     COOKIES = response.cookies
 
-    with zipfile.ZipFile("stuff/teaching_assistant/test_problem.zip", "w") as zipf:
-        for root, dirs, files in os.walk("stuff/teaching_assistant/test_problem"):
+    with zipfile.ZipFile("stuff/teaching_assistant/test_problem_sum.zip", "w") as zipf:
+        for root, dirs, files in os.walk("stuff/teaching_assistant/test_problem_sum"):
             for file in files:
                 file_path = os.path.join(root, file)
-                arcname = os.path.relpath(file_path, "stuff/teaching_assistant/test_problem")
+                arcname = os.path.relpath(file_path, "stuff/teaching_assistant/test_problem_sum")
                 zipf.write(file_path, arcname)
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
-                arcname = os.path.relpath(dir_path, "stuff/teaching_assistant/test_problem")
+                arcname = os.path.relpath(dir_path, "stuff/teaching_assistant/test_problem_sum")
                 zipf.write(dir_path, arcname + "/")
     
     create_problem_url = f"{BASE_URL}/{get_create_problem_endpoint()}"
@@ -96,7 +96,7 @@ def create_test_problem():
     }
 
     files = {
-        "problem_contents": open("stuff/teaching_assistant/test_problem.zip", "rb")
+        "problem_contents": open("stuff/teaching_assistant/test_problem_sum.zip", "rb")
     }
 
     response = requests.post(create_problem_url, data=data, files=files, cookies=COOKIES)
@@ -104,8 +104,8 @@ def create_test_problem():
     
     files["problem_contents"].close()
     
-    if os.path.exists("stuff/teaching_assistant/test_problem.zip"):
-        os.remove("stuff/teaching_assistant/test_problem.zip")
+    if os.path.exists("stuff/teaching_assistant/test_problem_sum.zip"):
+        os.remove("stuff/teaching_assistant/test_problem_sum_sum.zip")
     
     assert response.status_code == 200
 
