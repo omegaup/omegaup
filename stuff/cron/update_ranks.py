@@ -147,7 +147,7 @@ def update_user_rank(
             `Problems` AS `p`
         ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = `u`.`main_identity_id`
+            `Identities` AS `i` ON `i`.`identity_id` = u.`main_identity_id`
         LEFT JOIN
             `Identities_Schools` AS `isc`
         ON
