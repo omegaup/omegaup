@@ -543,7 +543,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         p.scoreboard_url,
                         p.scoreboard_url_admin,
-                        COALESCE(contestants, 0) AS contestants,
+                        COALESCE(pic.contestants, 0) AS contestants,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         1 AS participating,
                         ANY_VALUE(organizer.username) AS organizer";
@@ -808,7 +808,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $select = "{$cteCountContestants}
                 SELECT
                     $columns,
-                    COALESCE(contestants, 0) AS contestants,
+                    COALESCE(pic.contestants, 0) AS contestants,
                     ANY_VALUE(organizer.username) AS organizer,
                     TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                     (participating.identity_id IS NOT NULL) AS `participating`";
@@ -1029,7 +1029,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $select = "{$cteCountContestants}
                     SELECT
                         $columns,
-                        COALESCE(contestants, 0) AS contestants,
+                        COALESCE(pic.contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         BIT_OR(rc.participating) AS participating";
@@ -1135,7 +1135,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $select = "{$cteCountContestants}
                     SELECT
                         $columns,
-                        COALESCE(contestants, 0) AS contestants,
+                        COALESCE(pic.contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         FALSE AS `participating`
@@ -1230,7 +1230,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $select = "{$cteCountContestants}
                     SELECT
                         $columns,
-                        COALESCE(contestants, 0) AS contestants,
+                        COALESCE(pic.contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
                         TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
                         TRUE AS participating";
