@@ -24,7 +24,7 @@ def get_create_run_endpoint() -> str:
 
 def get_problem_details_endpoint(problem_alias: str) -> str:
     """endpoint for getting problem details"""
-    return f"api/problem/details/{problem_alias}/"
+    return f"api/problem/details?problem_alias={problem_alias}"
 
 @pytest.fixture
 def setup_accounts():
