@@ -12,6 +12,9 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
+    /** @var int Hours that define whether a job is considered recent */
+    const RECENT_JOB_HOURS = 1;
+
     /**
      * Creates a new AI editorial job
      *
@@ -29,19 +32,11 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             'user_id' => $userId,
             'status' => 'queued',
             'attempts' => 0,
+            'is_retriable' => true,
         ]);
 
         self::save($job);
         return $jobId;
-    }
-
-    /**
-     * Gets a job by its UUID
-     *
-     * @return \OmegaUp\DAO\VO\AiEditorialJobs|null
-     */
-    public static function getJobByUuid(string $jobId): ?\OmegaUp\DAO\VO\AiEditorialJobs {
-        return self::getByPK($jobId);
     }
 
     /**
@@ -105,7 +100,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
      */
     public static function countRecentJobsByUser(
         int $userId,
-        int $hours = 1
+        int $hours = self::RECENT_JOB_HOURS
     ): int {
         $sql = '
             SELECT COUNT(*)
