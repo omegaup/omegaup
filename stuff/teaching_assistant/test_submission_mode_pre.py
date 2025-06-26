@@ -22,6 +22,10 @@ def get_create_run_endpoint() -> str:
     """endpoint for creating a run"""
     return "api/run/create/"
 
+def get_problem_details_endpoint(problem_alias: str) -> str:
+    """endpoint for getting problem details"""
+    return f"api/problem/details/{problem_alias}/"
+
 @pytest.fixture
 def setup_accounts():
     global COOKIES, BASE_URL
@@ -134,6 +138,15 @@ def create_test_run():
     yield response.json()
 
 
-def test_teaching_assistant(setup_accounts, create_test_problem, create_test_run):
-    """test the teaching assistant functionality"""
-    assert 2 + 2 == 4, "This test should always pass"
+def test_problem_and_run_setup(setup_accounts, create_test_problem, create_test_run):
+    """test that the problem and run are created successfully"""
+    global COOKIES, BASE_URL
+    
+    problem_alias = "sum"
+    problem_details_url = f"{BASE_URL}/{get_problem_details_endpoint(problem_alias)}"
+    
+    response = requests.get(problem_details_url, cookies=COOKIES)
+    response.raise_for_status()
+    
+    assert response.status_code == 200
+    assert response.json()["alias"] == problem_alias
