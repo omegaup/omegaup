@@ -320,6 +320,8 @@ Generate AI editorial for a problem
 
 Review and approve/reject an AI editorial
 
+When approved, the editorial is published to gitserver
+
 ### Parameters
 
 | Name       | Type           | Description |

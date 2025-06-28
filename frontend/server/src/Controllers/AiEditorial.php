@@ -142,7 +142,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
     /**
      * Review and approve/reject an AI editorial
-     * 
+     *
      * When approved, the editorial is published to gitserver
      *
      * @omegaup-request-param string $job_id
