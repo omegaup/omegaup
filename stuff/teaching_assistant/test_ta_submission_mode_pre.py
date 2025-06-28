@@ -40,17 +40,20 @@ def get_problem_details_endpoint(problem_alias: str) -> str:
 def setup_accounts():
     global COOKIES, BASE_URL
     """setup accounts for testing"""
-    signup_endpoint = get_signup_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
-    url = f"{BASE_URL}/{signup_endpoint}"
+    try:
+        signup_endpoint = get_signup_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
+        url = f"{BASE_URL}/{signup_endpoint}"
 
-    response = requests.get(url)
-    response.raise_for_status()
+        response = requests.get(url)
+        response.raise_for_status()
 
-    signup_endpoint = get_signup_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
-    url = f"{BASE_URL}/{signup_endpoint}"
+        signup_endpoint = get_signup_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
+        url = f"{BASE_URL}/{signup_endpoint}"
 
-    response = requests.get(url)
-    response.raise_for_status()
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        pass
 
     yield
 

@@ -7,6 +7,7 @@ from test_ta_submission_mode_pre import (
     TEACHER_PASSWORD,
     STUDENT_USERNAME,
     STUDENT_PASSWORD,
+    setup_accounts,
 )
 import pytest
 import requests
@@ -297,7 +298,7 @@ def request_feedback(create_test_run):
     
     assert response.status_code == 200
 
-def test_problem_and_run_setup(create_test_course, create_test_assignment, get_assignment_details, create_test_problem, add_problem_to_course, add_student_to_course, create_test_run, request_feedback):
+def test_problem_and_run_setup(setup_accounts, create_test_course, create_test_assignment, get_assignment_details, create_test_problem, add_problem_to_course, add_student_to_course, create_test_run, request_feedback):
     """test that the problem and run are created successfully"""
     global COOKIES, BASE_URL
     
