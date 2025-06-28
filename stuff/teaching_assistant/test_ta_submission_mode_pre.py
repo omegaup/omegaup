@@ -3,6 +3,7 @@ import pytest
 import requests
 import zipfile
 import os
+import logging
 
 BASE_URL = "http://localhost:8001"
 COOKIES = None
@@ -52,10 +53,8 @@ def setup_accounts():
 
         response = requests.get(url)
         response.raise_for_status()
-    except requests.RequestException as e:
-        pass
-
-    yield
+    except requests.RequestException as _:
+        logging.error(f"Account might already exist, Proceeding with tests.")
 
 @pytest.fixture
 def create_test_problem():
