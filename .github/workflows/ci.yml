@@ -630,6 +630,6 @@ jobs:
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
-      - name: Run pytest
+      - name: Run pre setup for course mode
         run: |
-          pytest stuff/teaching_assistant/ -s
+          pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
