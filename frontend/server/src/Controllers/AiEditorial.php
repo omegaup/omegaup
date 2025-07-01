@@ -23,9 +23,10 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     /**
      * Generate AI editorial for a problem
      *
-     * @omegaup-request-param string $problem_alias
-     *
      * @return array{status: string, job_id?: string}
+     *
+     * @omegaup-request-param string $language
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiGenerate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -67,7 +68,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
         if ($recentJobs >= self::MAX_JOBS_PER_HOUR) {
             throw new \OmegaUp\Exceptions\RateLimitExceededException(
-                'rateLimitExceeded'
+                'apiTokenRateLimitExceeded'
             );
         }
 
@@ -83,7 +84,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $cooldownEnd = $lastJob->created_at->time + (self::COOLDOWN_MINUTES * 60);
             if (time() < $cooldownEnd) {
                 throw new \OmegaUp\Exceptions\RateLimitExceededException(
-                    'problemCooldownActive'
+                    'apiTokenRateLimitExceeded'
                 );
             }
         }

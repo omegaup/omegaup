@@ -89,7 +89,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown RateLimitExceededException');
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
-            $this->assertSame('rateLimitExceeded', $e->getMessage());
+            $this->assertSame('apiTokenRateLimitExceeded', $e->getMessage());
         }
 
         // Verify exactly 5 jobs were created
@@ -275,7 +275,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
                 'Should have thrown RateLimitExceededException for problem cooldown'
             );
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
-            $this->assertSame('problemCooldownActive', $e->getMessage());
+            $this->assertSame('apiTokenRateLimitExceeded', $e->getMessage());
         }
     }
 
