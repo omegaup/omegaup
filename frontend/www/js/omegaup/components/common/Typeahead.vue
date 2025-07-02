@@ -34,7 +34,7 @@ import { types } from '../../api_types';
 export default class Typeahead extends Vue {
   @Prop({ default: () => [] }) existingOptions!: types.ListItem[];
   @Prop({ default: () => [] }) options!: types.ListItem[];
-  @Prop({ default: 3 }) activationThreshold!: number;
+  @Prop({ default: 1 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
   @Prop({ default: null }) value!: null | types.ListItem;
   @Prop({ default: true }) onlyExistingTags!: boolean;
