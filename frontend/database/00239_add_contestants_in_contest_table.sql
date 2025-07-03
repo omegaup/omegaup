@@ -1,3 +1,6 @@
+-- Add index in Problemsets table for contest_id and problemset_id
+CREATE INDEX idx_pp_contest_problemset ON Problemsets (contest_id, problemset_id);
+
 -- Add column contestants into the Contests table
 ALTER TABLE `Contests`
   ADD COLUMN `contestants` INT NOT NULL DEFAULT 0,
