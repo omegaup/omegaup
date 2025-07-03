@@ -281,63 +281,49 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * @return list<CourseCardPublic>
      */
     public static function getPublicCoursesForTab(): array {
-        $sql = '
-            SELECT
-                c.alias,
-                c.name,
-                c.level,
-                s.name as school_name,
-                IFNULL(
-                    (
-                        SELECT
-                            COUNT(*)
-                        FROM
-                            Groups_Identities gi
-                        WHERE
-                            gi.group_id = c.group_id
-                    ),
-                    0
-                ) AS studentCount,
-                IFNULL(
-                    (
-                        SELECT
-                            COUNT(*)
-                        FROM
-                            Assignments a
-                        WHERE
-                            a.course_id = c.course_id AND
-                            a.assignment_type = ?
-                    ),
-                    0
-                ) AS lessonCount,
-                0 AS alreadyStarted
-            FROM
-                Courses c
-            LEFT JOIN
-                Schools s ON c.school_id = s.school_id
-            WHERE
-                c.admission_mode = ? AND
-                c.recommended = 1 AND
-                c.archived = 0;';
+        $sql = 'SELECT
+                    c.alias,
+                    c.name,
+                    c.level,
+                    s.name AS school_name,
+                    COALESCE(student_count.total, 0) AS studentCount,
+                    COALESCE(lesson_count.total, 0) AS lessonCount,
+                    0 AS alreadyStarted
+                FROM
+                    Courses c
+                LEFT JOIN
+                    Schools s ON c.school_id = s.school_id
+                LEFT JOIN (
+                    SELECT group_id, COUNT(*) AS total
+                    FROM Groups_Identities
+                    GROUP BY group_id
+                ) student_count ON student_count.group_id = c.group_id
+                LEFT JOIN (
+                    SELECT course_id, assignment_type, COUNT(*) AS total
+                    FROM Assignments
+                    WHERE assignment_type = ?
+                    GROUP BY course_id
+                ) lesson_count ON lesson_count.course_id = c.course_id
+                WHERE
+                    c.admission_mode = ? AND
+                    c.recommended = ? AND
+                    c.archived = ?;';
 
-        /** @var list<array{alias: null|string, alreadyStarted: int, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
+        /** @var list<array{alias: string, alreadyStarted: int, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
-                /*assignment_type=*/'lesson',
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+                \OmegaUp\Controllers\Course::ASSIGNMENT_TYPE_LESSON,
+                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+                /** recommended= */ 1,
+                /** archived= */ 0
             ]
         );
 
-        $results = [];
-        foreach ($rs as &$row) {
-            if (is_null($row['alias']) || is_null($row['name'])) {
-                continue;
-            }
+        return array_map(function ($row) {
             $row['alreadyStarted'] = boolval($row['alreadyStarted']);
-            $results[] = $row;
-        }
-        return $results;
+            return $row;
+        }, $rs);
     }
 
     /**
