@@ -32,6 +32,9 @@ ASSIGNMENT_ALIAS: str | None = None
 TA_FEEDBACK_INDICATOR: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
+SUBMISSION_ID_MODE = False
+SUBMISSION_ID = None
+STUDENT_NAME = None
 
 BASE_URL = "https://omegaup.com"
 COOKIES = None
@@ -162,6 +165,10 @@ def extract_show_run_ids() -> list[tuple[str, str]]:
         list: List of all the latest (at most 30 days old) run IDs and the
         usernames from the course
     """
+    if SUBMISSION_ID_MODE:
+        if isinstance(SUBMISSION_ID, str) and isinstance(STUDENT_NAME, str):
+            return [(SUBMISSION_ID, STUDENT_NAME)]
+
     runs = get_contents_from_url(
         get_runs_from_course_endpoint,
         {"course_alias": COURSE_ALIAS, "assignment_alias": ASSIGNMENT_ALIAS},
@@ -550,11 +557,28 @@ def handle_input() -> None:
     global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
     global KEY, TA_FEEDBACK_INDICATOR, SKIP_CONFIRM  # pylint: disable=W0603
     global LLM_PROVIDER  # pylint: disable=W0603
+    global SUBMISSION_ID_MODE, SUBMISSION_ID  # pylint: disable=W0603
+    global STUDENT_NAME  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
     parser.add_argument("--username", type=str, help="Your username")
     parser.add_argument("--password", type=str, help="Your password")
+    parser.add_argument(
+        "--submission_id_mode",
+        action="store_true",
+        help="Yes if you want to process a single submission."
+    )
+    parser.add_argument(
+        "--submission_id",
+        type=str,
+        help="Submission ID to process feedbacks for"
+    )
+    parser.add_argument(
+        "--student_name",
+        type=str,
+        help="Student name to process feedbacks for"
+    )
     parser.add_argument(
         "--course_alias",
         type=str,
@@ -590,10 +614,19 @@ def handle_input() -> None:
 
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
-    COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
-    ASSIGNMENT_ALIAS = (
-        args.assignment_alias or input("Enter the assignment alias: ")
-    )
+    SUBMISSION_ID_MODE = (args.submission_id_mode == "true") or input(
+        "Are you working in submission id mode: "
+    ) == "true"
+    if SUBMISSION_ID_MODE:
+        SUBMISSION_ID = args.submission_id or input(
+            "Enter the submission id: "
+        )
+        STUDENT_NAME = args.student_name or input("Enter the student name: ")
+    else:
+        COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
+        ASSIGNMENT_ALIAS = (
+            args.assignment_alias or input("Enter the assignment alias: ")
+        )
     LANGUAGE = args.language or input(
         'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
     )

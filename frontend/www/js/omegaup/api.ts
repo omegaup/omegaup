@@ -97,6 +97,29 @@ export const Admin = {
   >('/api/admin/platformReportStats/'),
 };
 
+export const AiEditorial = {
+  generate: apiCall<
+    messages.AiEditorialGenerateRequest,
+    messages.AiEditorialGenerateResponse
+  >('/api/aiEditorial/generate/'),
+  review: apiCall<
+    messages.AiEditorialReviewRequest,
+    messages.AiEditorialReviewResponse
+  >('/api/aiEditorial/review/'),
+  status: apiCall<
+    messages.AiEditorialStatusRequest,
+    messages._AiEditorialStatusServerResponse,
+    messages.AiEditorialStatusResponse
+  >('/api/aiEditorial/status/', (x) => {
+    if (typeof x.job !== 'undefined' && x.job !== null)
+      x.job = ((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      })(x.job);
+    return x;
+  }),
+};
+
 export const Authorization = {
   problem: apiCall<
     messages.AuthorizationProblemRequest,
