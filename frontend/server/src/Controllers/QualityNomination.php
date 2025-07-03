@@ -221,7 +221,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, tag?: mixed, quality_seal?: bool} $contents
+     * @param array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -324,7 +324,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
             // Tags must be strings.
             if (isset($contents['tags']) && is_array($contents['tags'])) {
-                /** @var mixed $tag */
+                /** @var string $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (
                         !is_string($tag) ||
@@ -367,7 +367,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Tags must be strings.
-            /** @var mixed $tag */
+            /** @var string $tag */
             foreach ($contents['tags'] as &$tag) {
                 if (
                     !is_string($tag) ||
@@ -393,7 +393,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             /**
              * Statements must be a dictionary of language => { 'markdown': string }.
              * @var string $language
-             * @var mixed $statement
+             * @var array{markdown: string} $statement
              */
             foreach ($contents['statements'] as $language => $statement) {
                 if (
@@ -646,7 +646,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         $contents = $r->ensureString('contents');
         /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+         * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
          */
         $contents = json_decode($contents, associative: true);
         if (!is_array($contents)) {
@@ -808,7 +808,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     ])
                 );
                 /**
-                * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+                * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
                 */
                 $contents = json_decode($nomination->contents ?? '{}', true);
                 $contents['rationale'] = $rationale;
@@ -1233,7 +1233,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */
