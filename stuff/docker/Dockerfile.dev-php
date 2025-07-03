@@ -46,9 +46,6 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-WORKDIR /opt/omegaup/frontend/www/rekarel
-RUN npm install && npx gulp
-
 RUN curl -sL https://getcomposer.org/download/2.2.4/composer.phar -o /usr/bin/composer && \
     chmod +x /usr/bin/composer
 
