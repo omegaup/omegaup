@@ -1,265 +1,263 @@
-**NOTA**: Esta documentación está desactualizada.
+**NOTE**: This documentation is outdated.
 
-Para una versión más reciente, visita el sguiente enlace: [apiContest](https://github.com/omegaup/omegaup/blob/master/frontend/server/src/Controllers/README.md#contest)
+For a more recent version, visit the following link: [apiContest](https://github.com/omegaup/omegaup/blob/master/frontend/server/src/Controllers/README.md#contest)
 
 ## GET `contests/`
 
-### Descripción
-Regresa los 10 concursos más recientes que el usuario loggeado puede ver. Usuarios no loggeados pueden consumir esta API
+### Description
+Returns the 10 most recent contests that the logged-in user can view. Non-logged-in users can consume this API.
 
-### Privilegios
-Ninguno requerido.
+### Privileges
+None required.
 
+### Parameters
+None
 
-### Parámetros
-Ninguno
+### Returns
+Returns an array with the following information for each contest:
 
-### Regresa
-Regresa un arreglo con la siguiente información para cada concurso:
-
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`alias`|string|Alias del concurso|
-|`contest_id`|int|Id del concurso|
-|`title`|string|Título del concurso|
-|`description`|string|Descripción del concurso|
-|`start_time`|int|Hora de inicio del concurso en formato UNIX timestamp|
-|`finish_time`|int|Hora del final del concurso en formato UNIX timestamp|
-|`public`|int|Si `0`, el concurso es privado. Si `1`, el concurso es público|
-|`director_id`|int|Id del usuario que es el director del concurso|
-|`window_length`|int| Si no es nulo, la duración del concurso será `window_length` en minutos y el cronómetro del concurso será particular para cada usuario en vez de general para todos. El cronómetro iniciará cuando el concursante entra por primera vez al concurso. `start_time` determinará entonces la hora a partir de la cual los usuarios pueden empezar a abrir el concurso. (estilo USACO). El default es `null`.|
-|`duration`|int|La duración del concurso, tomando en cuenta el valor de `window_length`|
+|`alias`|string|Contest alias|
+|`contest_id`|int|Contest ID|
+|`title`|string|Contest Title|
+|`description`|string|Contest Description|
+|`start_time`|int|Contest start time in UNIX timestamp format|
+|`finish_time`|int|Contest end time in UNIX timestamp format|
+|`public`|int|If `0`, the contest is private. If `1`, the contest is public|
+|`director_id`|int|ID of the user who is the contest director|
+|`window_length`|int| If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general to all. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can start opening the contest (USACO style). The default is `null`. |`duration`|int|The duration of the contest, taking into account the value of `window_length`|
 
-##  GET `contests/:contest_alias/`
+## GET `contests/:contest_alias/`
 
-### Descripción
-Regresa los detalles del concurso `:contest_alias`.
+### Description
+Returns the details of the contest `:contest_alias`.
 
-### Privilegios
-Si el concurso es privado, el usuario debe estar en la lista de concursantes privados del concurso. Si el concurso es público, cualquier usuario puede acceder a esta API.
+### Privileges
+If the contest is private, the user must be on the list of private contestants. If the contest is public, any user can access this API.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`title`|string|Título del concurso|
-|`description`|string|Descripción del concurso|
-|`alias`|string|Alias del concurso|
-|`start_time`|int|Hora de inicio del concurso en formato UNIX timestamp|
-|`finish_time`|int|Hora del final del concurso en formato UNIX timestamp|
-|`window_length`|int| Si no es nulo, la duración del concurso será `window_length` en minutos y el cronómetro del concurso será particular para cada usuario en vez de general para todos. El cronómetro iniciará cuando el concursante entra por primera vez al concurso. `start_time` determinará entonces la hora a partir de la cual los usuarios pueden empezar a abrir el concurso. (estilo USACO). El default es `null`.|
-|`scoreboard`|int|Entero entre `0` y `100` (inclusive) que determina el porcentaje del tiempo en que el scoreboard del concurso podrá ser visto por los concursantes. Cuando el porcentaje es excedido, el scoreboard que se regresa es la última versión que pudo ser pública. Los administradores siempre verán el scoreboard completo.|
-|`points_decay_factor`|double|Double entre `0` y `1` inclusive. Si este número es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estará dado por `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, donde `PT` es el penalty en minutos del envío y `TT` el tiempo total del concurso, en minutos.|
-|`partial_score`|int|Entero entre `0` y `1` |
-|`submissions_gap`|int| Número de segundos que el concursante necesita esperar para reenviar una solución.|
-|`feedback`|string|Opciones: `yes`, `no`, `partial`|
-|`penalty_time_start`|string|Determina cómo se calcula el penalty. Opciones: `contest`, `problem`, `none`. En caso de `contest`, el penalty para un envío se empieza a contar desde el inicio del concurso. `problem` indica que el penalty se toma en cuenta a partir de que se abre un problema. `none` indica que no habrá penalties en el concurso.|
-|`penalty_calc_policy`|string|Opciones: `sum`, `max`.  Default:|
-|`submission_deadline`|int|Tiempo restante en segundos para el final del concurso. Si `window_length` no es `NULL`, este valor puede ser diferente para cada concursante.|
-|`problems`|array|Arreglo que contiene información sobre los problemas del concurso ordenados conforme lo deseó el contest director. Ver la tabla `problems` para más detalles.|
+|`title`|string|Contest title|
+|`description`|string|Contest description|
+|`alias`|string|Contest alias|
+|`start_time`|int|Contest start time in UNIX timestamp format|
+|`finish_time`|int|Contest end time in UNIX timestamp format|
+|`window_length`|int| If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general to all. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can begin opening the contest (USACO style). The default is `null`.|
+|`scoreboard`|int|An integer between `0` and `100` (inclusive) that determines the percentage of time the contest scoreboard will be viewable by contestants. When the percentage is exceeded, the scoreboard returned is the last version that could have been made public. Administrators will always see the full scoreboard.|
+|`points_decay_factor`|double|Double between `0` and `1` inclusive. If this number is non-zero, the score obtained for correctly solving a problem decays over time. The score value is given by `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, where `PT` is the penalty in minutes for the submission and `TT` is the total contest time, in minutes. |
+|`partial_score`|int|Integer between `0` and `1` |
+|`submissions_gap`|int| Number of seconds the contestant must wait before resubmitting a solution. |
+|`feedback`|string|Options: `yes`, `no`, `partial` |
+|`penalty_time_start`|string|Determines how the penalty is calculated. Options: `contest`, `problem`, `none`. In the case of a `contest`, the penalty for a submission starts counting from the start of the contest. `problem` indicates that the penalty is taken into account from the moment a problem is opened. `none` indicates that there will be no penalties in the contest. |
+|`penalty_calc_policy`|string|Options: `sum`, `max`. Default:|
+|`submission_deadline`|int|Time remaining in seconds until the end of the contest. If `window_length` is not `NULL`, this value can be different for each contestant. |
+|`problems`|array|Array containing information about the contest problems ordered as desired by the contest director. See the `problems` table for more details. |
 
 #### `problems`
 
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`title`|string|Tìtulo del problema|
-|`alias`|string|Alias del problema|
-|`validator`|string|Tipo del validador del problema. Opciones: `remote`, `literal`, `token`, `token-caseless`, `token-numeric`|
-|`time_limit`|int|Tiempo límite en segundos para cada envío (TLE)|
-|`memory_limit`|int|Límite de memora en KB. (MLE)|
-|`submissions`|int|Número total de envíos a este problema en todo el sistema, no solamente en el concurso|
-|`accepted`|int|Número de soluciones que han resuelto el problema por completo en todo el sistema, no solamente en el concurso dado|
-|`difficulty`|string|Dificultad del problema calculada en base a las estadísticas del sistema|
+|`title`|string|Problem title|
+|`alias`|string|Issue alias|
+|`validator`|string|Type of the problem validator. Options: `remote`, `literal`, `token`, `token-caseless`, `token-numeric`|
+|`time_limit`|int|Time limit in seconds for each submission (TLE)|
+|`memory_limit`|int|Memory limit in KB (MLE)|
+|`submissions`|int|Total number of submissions to this problem system-wide, not just in the contest|
+|`accepted`|int|Number of solutions that fully solved the problem system-wide, not just in the given contest|
+|`difficulty`|string|Problem difficulty calculated based on system statistics|
 
+## POST `contests/create`
 
-##  POST `contests/create`
+### Description
+Creates a new contest. The contest leader will be the currently logged in user.
 
-### Descripción
-Crea un nuevo concurso. El director del concurso será el usuario que está actualmente loggeado.
+### Privileges
+Any logged in user.
 
-### Privilegios
-Cualquier usuario loggeado.
-
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
+### Parameters
+| Parameter | Type | Description | Optional? |
 | -------- |:-------------:| :-----|:-----|
-| `title` |string | Título del concurso |  |
-|`description` | string | Descripción corta del concurso |  | 
-| `alias` | string | Alias del concurso. Su uso principal es para construir las URLs del concurso (ver demás APIs). |   |
-| `start_time`| int | Hora de inicio del concurso en formato UNIX timestamp si `window_length` es nulo. | |
-| `finish_time` | int | Hora de final del concurso en formato UNIX timestamp si `window_length` es nulo. | |
-| `window_length` | int | Si no es nulo, la duración del concurso será `window_length` en minutos y el cronómetro del concurso será particular para cada usuario en vez de general para todos. El cronómetro iniciará cuando el concursante entra por primera vez al concurso. `start_time` determinará entonces la hora a partir de la cual los usuarios pueden empezar a abrir el concurso. (estilo USACO). El default es `null`. | Opcional |
-| `public` | int | Determina si el concurso es público o privado (`0` para privado, `1` para público) | |
-| `scoreboard` | int | Entero entre `0` y `100` (inclusive) que determina el porcentaje del tiempo en que el scoreboard del concurso podrá ser visto por los concursantes. Cuando el porcentaje es excedido, el scoreboard que se regresa es la última versión que pudo ser pública. Los administradores siempre verán el scoreboard completo. | |
-| `points_decay_factor` | double | Double entre `0` y `1` inclusive. Si este número es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estará dado por `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, donde `PT` es el penalty en minutos del envío y `TT` el tiempo total del concurso, en minutos.  | |
-| `partial_score` | int | Entero entre `0` y `1` | |
-| `submissions_gap` | int | Número de segundos que el concursante necesita esperar para reenviar una solución. | |
-| `feedback` | string | Opciones: `yes`, `no`, `partial` | |
-| `penalty_time_start` | string | Determina cómo se calcula el penalty. Opciones: `contest`, `problem`, `none`. En caso de `contest`, el penalty para un envío se empieza a contar desde el inicio del concurso. `problem` indica que el penalty se toma en cuenta a partir de que se abre un problema. `none` indica que no habrá penalties en el concurso. | |
-| `penalty_calc_policy` | string | Opciones: `sum`, `max`.  Default: | Opcional |
-| `private_users` | json_array[int] | Arreglo de `user_id` de participantes que pueden entrar a un concurso privado. | Opcional |
-| `problems` | array[string] | Arreglo de `problem_alias` con los alias de los problemas existentes que se usarán en el concurso. | Opcional |
-| `show_scoreboard_after` | int | Si `1`, el scoreboard final será mostrado inmediatamente al final del concurso. Si `0`, el scoreboard se quedará congelado desde el momento en que el parámetro `scoreboard` lo haya indicado, aún después del final del concurso. | Opcional |
+| `title` |string | Contest title | |
+|`description` | string | Short description of the contest | |
+| `alias` | string | Contest alias. Its main use is to build contest URLs (see other APIs). | |
+| `start_time`| int | Contest start time in UNIX timestamp format if `window_length` is null. | |
+| `finish_time` | int | Contest end time in UNIX timestamp format if `window_length` is null. | |
+| `window_length` | int | If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can begin opening the contest (USACO style). The default is `null`. | Optional |
+| `public` | int | Determines whether the contest is public or private (`0` for private, `1` for public) | |
+| `scoreboard` | int | Integer between `0` and `100` (inclusive) that determines the percentage of time the contest scoreboard will be viewable by contestants. When the percentage is exceeded, the scoreboard returned is the last version that could have been public. Administrators will always see the full scoreboard. | |
+| `points_decay_factor` | double | Double between `0` and `1` inclusive. If this number is non-zero, the score obtained for correctly solving a problem decays over time. The score value is given by `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, where `PT` is the penalty in minutes for the submission and `TT` is the total contest time, in minutes. | |
+| `partial_score` | int | Integer between `0` and `1` | |
+| `submissions_gap` | int | Number of seconds the contestant needs to wait before resubmitting a solution. | |
+| `feedback` | string | Options: `yes`, `no`, `partial` | |
+| `penalty_time_start` | string | Determines how the penalty is calculated. Options: `contest`, `problem`, `none`. In the case of `contest`, the penalty for a submission starts counting from the start of the contest. `problem` indicates that the penalty is taken into account from the moment a problem is opened. `none` indicates that there will be no penalties in the contest. | |
+| `penalty_calc_policy` | string | Options: `sum`, `max`. Default: | Optional |
+| `private_users` | json_array[int] | Array of `user_id` of participants who can enter a private contest. | Optional |
+| `problems` | array[string] | Array of `problem_alias` with the aliases of existing problems that will be used in the contest. | Optional |
+| `show_scoreboard_after` | int | If `1`, the final scoreboard will be shown immediately at the end of the contest. If `0`, the scoreboard will be frozen from the time specified by the `scoreboard` parameter, even after the end of the contest. | Optional |
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-| `status` | string | Si el request fue exitoso, regresa `ok`| 
+| `status` | string | If the request was successful, returns `ok` |
 
-##  POST `contests/:contest_alias/addProblem/`
+## POST `contests/:contest_alias/addProblem/`
 
-### Descripción
-Agrega un problema a un concurso. El problema debe haber sido previamente creado.
+### Description
+Adds a problem to a contest. The problem must have been previously created.
 
-### Privilegios
-Contest director o superior.
+### Privileges
+Contest director or higher.
 
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
+### Parameters
+| Parameter | Type | Description | Optional? |
 | -------- |:-------------:| :-----|:-----|
-|`problem_alias`|string|Alias del problema a agregar||
-|`points`|int|Valor de una solución completa a este problema. Lo usual es `100`, sin embargo, puede ser diferente para cada problema||
-|`order_in_contest`|int|Ìndice que sirve para ordenar los problemas con respecto a otros del mismo concurso|Opcional|
+|`problem_alias`|string|Alias ​​of the problem to add||
+|`points`|int|Value of a complete solution to this problem. Typically, it is `100`, however, it can be different for each problem||
+|`order_in_contest`|int|Index used to order problems relative to others in the same contest|Optional|
 
-### Regresa
-| Parámetro | Tipo | Descripción |
+### Returns
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-| `status` | string | Si el request fue exitoso, regresa `ok`| 
+| `status` | string | If the request was successful, returns `ok`|
 
-##  POST `contests/:contest_alias/addUser/`
+## POST `contests/:contest_alias/addUser/`
 
-### Descripción
-Agrega un usuario a un concurso privado. Si el concurso es privado y el usuario no está en esta lista, no podrá entrar al concurso.
+### Description
+Adds a user to a private contest. If the contest is private and the user is not on this list, they will not be able to enter the contest.
 
-### Privilegios
-Contest director o superior.
+### Privileges
+Contest director or higher.
 
-### Parámetros
+### Parameters
 
-| Parámetro | Tipo | Descripción  | Opcional? |
+| Parameter | Type | Description | Optional? |
 | -------- |:-------------:| :-----|:-----|
-|`user_id`|int|Id del usuario a agregar||
+|`user_id`|int|User ID to add||
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-| `status` | string | Si el request fue exitoso, regresa `ok`| 
+| `status` | string | If the request was successful, returns `ok` |
 
-##  GET `contests/:contest_alias/clarifications/`
+## GET `contests/:contest_alias/clarifications/`
 
-### Descripción
-Regresa las clarificaciones de un concurso. Si el usuario es concursante, regresará sólo las clarificaciones marcadas como públicas más sus propias clarificaciones privadas. Si el usuario es contest director o admin, regresará las clarificaciones privadas también.
+### Description
+Returns the clarifications for a contest. If the user is a contestant, only the clarifications marked as public plus their own
 
-### Privilegios
-Si el concurso es privado, el usuario debe estar en la lista de concursantes privados del concurso. Si el concurso es público, cualquier usuario puede acceder a esta API.
+Private clarifications. If the user is a contest director or admin, this API will also return private clarifications.
 
-### Parámetros
+### Privileges
+If the contest is private, the user must be on the contest's private contestant list. If the contest is public, any user can access this API.
 
-| Parámetro | Tipo | Descripción  | Opcional? |
+### Parameters
+
+| Parameter | Type | Description | Optional? |
 | -------- |:-------------:| :-----|:-----|
-|`offset`|int|Determina a partir de cuál elemento se procesará el request con respecto al total de elementos. Usado comuúmente para paginar (determina el inicio de la página)|Opcional|
-|`rowcount`|int|Determina cuántos elementos se regresan.|Opcional|
+|`offset`|int|Determines which element the request will be processed from, relative to the total number of elements. Commonly used for pagination (determines the start of the page). | Optional |
+|`rowcount`|int|Determines how many elements are returned. | Optional |
 
-
-### Regresa
-| Parámetro | Tipo | Descripción |
+### Returns
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`clarification_id`|int|Id de la clarificación|
-|`problem_alias`|string|Alias del problema al que corresponde la clarificación|
-|`message`|string|Texto de la clarificación|
-|`answer`|string|Respuesta a la clarificación|
-|`time`|int|Timestamp del último update a la clarificación|
-|`public`|int|`0` o `1` dependiendo si la clarificación es privada o pública|
+|`clarification_id`|int|Clarification ID|
+|`problem_alias`|string|Alias ​​of the problem the clarification corresponds to|
+|`message`|string|Text of the clarification|
+|`answer`|string|Response to the clarification|
+|`time`|int|Timestamp of the last update to the clarification|
+|`public`|int|`0` or `1` depending on whether the clarification is private or public|
 
-##  GET `contests/:contest_alias/scoreboard/`
+## GET `contests/:contest_alias/scoreboard/`
 
-### Descripción
-Regresa el scoreboard del concurso. Si el usuario es concursante, el scoreboard se congelará tal como lo dicte el parametro `scoreboard` en la creación del concurso (se puede modificar via Update). Si el usuario es administrador, siempre verá el scoreboard actualizado.
+### Description
+Returns the contest scoreboard. If the user is a contestant, the scoreboard will be frozen as dictated by the `scoreboard` parameter when creating the contest (can be modified via Update). If the user is an administrator, they will always see the updated scoreboard.
 
-### Privilegios
-Si el concurso es privado, el usuario debe estar en la lista de concursantes privados del concurso. Si el concurso es público, cualquier usuario puede acceder a esta API.
+### Privileges
+If the contest is private, the user must be on the contest's private contestant list. If the contest is public, any user can access this API.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
-| Parámetro | Tipo | Descripción |
+### Returns
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`ranking`|array|Array de detalles del scoreboard para cada usuario, ver tabla `ranking`|
+|`ranking`|array|Array of scoreboard details for each user, see `ranking` table|
 
 ### `ranking`
-La tabla ranking es un arreglo ordenado, con índices enteros, donde el índice 0 es el mejor concursante.
+The ranking table is an ordered array with integer indices, where index 0 is the best contestant.
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`username`|string|Username del concursante|
-|`total[points]`|int|Puntos totales del concursante|
-|`total[penalty]`|int|Penalty total del concursante|
-|`problems`|array|Arreglo con detalle del scoreboard por problema. Ver tabla `problems`|
+|`username`|string|Contestant's username|
+|`total[points]`|int|Contestant's total points|
+|`total[penalty]`|int|Contestant's total penalty|
+|`problems`|array|Array with scoreboard details by problem. See `problems` table |
 
 ### `problems`
-La tabla problems contiene información detallada de puntaje por problema por concursante. El índice del arreglo es un `string` que corresponde al `:problem_alias` del problema en cuestión. Para cada problema, la siguiente información es mostrada:
+The problems table contains detailed score information per problem per contestant. The array index is a string corresponding to the `:problem_alias` of the problem in question. For each problem, the following information is displayed:
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`points`|int|Puntos para el problema en particular|
-|`penalty`|int|Penalty total para el problema en particular|
-|`wrong_runs_count`|int|Total de envíos incorrectos para el problema en particular|
+|`points`|int|Points for the particular problem|
+|`penalty`|int|Total penalty for the particular problem|
+|`wrong_runs_count`|int|Total incorrect submissions for the particular problem|
 
-##  GET `contests/:contest_alias/users/`
+## GET `contests/:contest_alias/users/`
 
-### Descripción
-Regresa una lista con los usuarios que han entrado al concurso.
+### Description
+Returns a list of users who have entered the contest.
 
-### Privilegios
-Contest director o superior.
+### Privileges
+Contest director or higher.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-|`user_id`|int|Id del usuario|
-|`username`|string|Username del usuario|
+|`user_id`|int|User ID|
+|`username`|string|User username|
 
-##  POST `contests/:contest_alias/update`
+## POST `contests/:contest_alias/update`
 
-### Descripción
-Actualiza los contenidos de un concurso.
+### Description
+Updates the contents of a contest.
 
-### Privilegios
-Contest director o superior.
+### Privileges
+Contest director or higher.
 
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
+### Parameters
+| Parameter | Type | Description | Optional? |
 | -------- |:-------------:| :-----|:-----|
-| `title` |string | Título del concurso |Opcional|
-|`description` | string | Descripción corta del concurso | Opcional| 
-| `alias` | string | Alias del concurso. Su uso principal es para construir las URLs del concurso (ver demás APIs). | Opcional  |
-| `start_time`| int | Hora de inicio del concurso en formato UNIX timestamp si `window_length` es nulo. | Opcional|
-| `finish_time` | int | Hora de final del concurso en formato UNIX timestamp si `window_length` es nulo. |Opcional |
-| `window_length` | int | Si no es nulo, la duración del concurso será `window_length` en minutos y el cronómetro del concurso será particular para cada usuario en vez de general para todos. El cronómetro iniciará cuando el concursante entra por primera vez al concurso. `start_time` determinará entonces la hora a partir de la cual los usuarios pueden empezar a abrir el concurso. (estilo USACO). El default es `null`. | Opcional |
-| `public` | int | Determina si el concurso es público o privado (`0` para privado, `1` para público) | |
-| `scoreboard` | int | Entero entre `0` y `100` (inclusive) que determina el porcentaje del tiempo en que el scoreboard del concurso podrá ser visto por los concursantes. Cuando el porcentaje es excedido, el scoreboard que se regresa es la última versión que pudo ser pública. Los administradores siempre verán el scoreboard completo. |Opcional |
-| `points_decay_factor` | double | Double entre `0` y `1` inclusive. Si este número es distinto de cero, el puntaje que se obtiene al resolver correctamente un problema decae conforme pasa el tiempo. El valor del puntaje estará dado por `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, donde `PT` es el penalty en minutos del envío y `TT` el tiempo total del concurso, en minutos.  |Opcional |
-| `partial_score` | int | Entero entre `0` y `1` | Opcional|
-| `submissions_gap` | int | Número de segundos que el concursante necesita esperar para reenviar una solución. |Opcional |
-| `feedback` | string | Opciones: `yes`, `no`, `partial` |Opcional |
-| `penalty_time_start` | string | Determina cómo se calcula el penalty. Opciones: `contest`, `problem`, `none`. En caso de `contest`, el penalty para un envío se empieza a contar desde el inicio del concurso. `problem` indica que el penalty se toma en cuenta a partir de que se abre un problema. `none` indica que no habrá penalties en el concurso. |Opcional |
-| `penalty_calc_policy` | string | Opciones: `sum`, `max`.  Default: | Opcional |
-| `private_users` | json_array[int] | Arreglo de `user_id` de participantes que pueden entrar a un concurso privado. | Opcional |
-| `problems` | array[string] | Arreglo de `problem_alias` con los alias de los problemas existentes que se usarán en el concurso. | Opcional |
-| `show_scoreboard_after` | int | Si `1`, el scoreboard final será mostrado inmediatamente al final del concurso. Si `0`, el scoreboard se quedará congelado desde el momento en que el parámetro `scoreboard` lo haya indicado, aún después del final del concurso. | Opcional |
+| `title` |string | Contest title |Optional|
+|`description` | string | Short description of the contest | Optional|
+| `alias` | string | Contest alias. Its main use is to build contest URLs (see other APIs). | Optional |
+| `start_time`| int | Contest start time in UNIX timestamp format if `window_length` is null. | Optional |
+| `finish_time` | int | Contest end time in UNIX timestamp format if `window_length` is null. | Optional |
+| `window_length` | int | If not null, the contest duration will be `window_length` in minutes, and the contest timer will be specific to each user instead of general. The timer will start when the contestant first enters the contest. `start_time` will then determine the time at which users can start opening the contest (USACO style). The default is `null`. | Optional |
+| `public` | int | Determines whether the contest is public or private (`0` for private, `1` for public) | |
+| `scoreboard` | int | An integer between `0` and `100` (inclusive) that determines the percentage of time the contest scoreboard will be visible to contestants. When this percentage is exceeded, the scoreboard returned is the last version that could have been made public. Administrators will always see the full scoreboard. |Optional |
+| `points_decay_factor` | double | A double between `0` and `1` inclusive. If this number is non-zero, the score obtained for correctly solving a problem decays over time. The score valuewill be given by `(1 - points_decay_factor)` `+ points_decay_factor * TT^2` `/ (10 * PT^2 + TT^2)`, where `PT` is the penalty in minutes of the submission and `TT` is the total contest time, in minutes. |Optional |
+| `partial_score` | int | Integer between `0` and `1` | Optional|
+| `submissions_gap` | int | Number of seconds the contestant needs to wait before resubmitting a solution. |Optional |
+| `feedback` | string | Options: `yes`, `no`, `partial` |Optional |
+| `penalty_time_start` | string | Determines how the penalty is calculated. Options: `contest`, `problem`, `none`. In the case of a `contest`, the penalty for a submission starts counting from the start of the contest. `problem` indicates that the penalty is taken into account from the moment a problem is opened. `none` indicates that there will be no penalties in the contest. |Optional|
+| `penalty_calc_policy` | string | Options: `sum`, `max`. Default: | Optional|
+| `private_users` | json_array[int] | Array of `user_id` of participants who can enter a private contest. | Optional|
+| `problems` | array[string] | Array of `problem_alias` with the aliases of existing problems that will be used in the contest. | Optional|
+| `show_scoreboard_after` | int | If `1`, the final scoreboard will be shown immediately after the end of the contest. If `0`, the scoreboard will remain frozen from the time specified by the `scoreboard` parameter, even after the end of the contest. | Optional |
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción |
+| Parameter | Type | Description |
 | -------- |:-------------:| :-----|
-| `status` | string | Si el request fue exitoso, regresa `ok`| 
+| `status` | string | If the request was successful, returns `ok` |
