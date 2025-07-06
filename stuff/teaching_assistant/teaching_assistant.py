@@ -622,11 +622,10 @@ def handle_input() -> None:
             "Enter the submission id: "
         )
         STUDENT_NAME = args.student_name or input("Enter the student name: ")
-    else:
-        COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
-        ASSIGNMENT_ALIAS = (
-            args.assignment_alias or input("Enter the assignment alias: ")
-        )
+    COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
+    ASSIGNMENT_ALIAS = (
+        args.assignment_alias or input("Enter the assignment alias: ")
+    )
     LANGUAGE = args.language or input(
         'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
     )
