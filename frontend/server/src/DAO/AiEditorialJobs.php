@@ -135,7 +135,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             LIMIT 1
         ';
 
-        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
+        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: bool, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemId]
@@ -167,7 +167,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             LIMIT ?
         ';
 
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: bool, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$userId, $limit]
@@ -197,7 +197,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             ORDER BY created_at DESC
         ';
 
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: bool, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemId]
