@@ -37,7 +37,7 @@ SUBMISSION_ID = None
 STUDENT_NAME = None
 
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "https://omegaup.com"
 COOKIES = None
 CLIENT: LLMWrapper | None = None
 
