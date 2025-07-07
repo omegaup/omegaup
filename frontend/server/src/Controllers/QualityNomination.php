@@ -221,7 +221,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
+     * @param array $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -290,6 +290,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'contents'
                     );
                 }
+                /** @psalm-assert int $contents['difficulty'] */
                 $atLeastOneFieldIsPresent = true;
             }
             if (isset($contents['tags'])) {
@@ -314,6 +315,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'contents'
                     );
                 }
+                /** @psalm-assert int $contents['quality'] */
                 $atLeastOneFieldIsPresent = true;
             }
             if (!$atLeastOneFieldIsPresent) {
@@ -323,8 +325,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Tags must be strings.
-            if (isset($contents['tags']) && is_array($contents['tags'])) {
-                /** @var string $tag */
+            if (isset($contents['tags'])) {
+                /** @psalm-assert array $contents['tags'] */
                 foreach ($contents['tags'] as &$tag) {
                     if (
                         !is_string($tag) ||
@@ -336,6 +338,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         );
                     }
                 }
+                /** @psalm-assert list<string> $contents['tags'] */
 
                 $duplicatedTags = self::getDuplicatedTags($contents['tags']);
 
@@ -366,8 +369,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
+            /** @psalm-assert array $contents['statements'] */
+            /** @psalm-assert string $contents['source'] */
+            /** @psalm-assert array $contents['tags'] */
+            
             // Tags must be strings.
-            /** @var string $tag */
             foreach ($contents['tags'] as &$tag) {
                 if (
                     !is_string($tag) ||
@@ -379,6 +385,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
+            /** @psalm-assert list<string> $contents['tags'] */
 
             $duplicatedTags = self::getDuplicatedTags($contents['tags']);
 
@@ -392,8 +399,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
             /**
              * Statements must be a dictionary of language => { 'markdown': string }.
-             * @var string $language
-             * @var array{markdown: string} $statement
              */
             foreach ($contents['statements'] as $language => $statement) {
                 if (
@@ -409,6 +414,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
+            /** @psalm-assert array<string, array{markdown: string}> $contents['statements'] */
         } elseif ($nominationType === 'demotion') {
             if (
                 !isset($contents['reason']) ||
@@ -443,6 +449,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'contents'
                     );
                 }
+                /** @psalm-assert string $contents['original'] */
                 $original = \OmegaUp\DAO\Problems::getByAlias(
                     $contents['original']
                 );
@@ -510,7 +517,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'contents'
                     );
                 }
-                /** @var list<string> $tag */
+                /** @psalm-assert array $contents['tags'] */
                 foreach ($contents['tags'] as &$tag) {
                     if (!in_array($tag, self::ALLOWED_PUBLIC_TAGS)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -519,6 +526,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         );
                     }
                 }
+                /** @psalm-assert list<string> $contents['tags'] */
             }
 
             $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
@@ -645,9 +653,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contents = $r->ensureString('contents');
-        /**
-         * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
-         */
         $contents = json_decode($contents, associative: true);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -807,9 +812,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'rationale' => $rationale
                     ])
                 );
-                /**
-                * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: string, quality_seal?: bool, level?: string, rationale?: string} $contents
-                */
                 $contents = json_decode($nomination->contents ?? '{}', true);
                 $contents['rationale'] = $rationale;
                 $nomination->contents = json_encode($contents);
