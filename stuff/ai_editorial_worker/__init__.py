@@ -1,1 +1,1 @@
-# AI Editorial Worker Package 
+# AI Editorial Worker Package
