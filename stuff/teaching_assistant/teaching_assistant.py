@@ -657,7 +657,7 @@ def handle_input() -> None:
     COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
     ASSIGNMENT_ALIAS = args.assignment_alias or input(
         "Enter the assignment alias (leave empty to process all assignments): "
-    ) or None
+    )
     LANGUAGE = args.language or input(
         'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
     )
