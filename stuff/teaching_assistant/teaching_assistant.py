@@ -193,11 +193,14 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
     a_month_ago = current_time - (30 * 24 * 60 * 60)
 
     run_ids_and_usernames = []
-    
+
     for assignment_alias in assignments_to_process:
         runs = get_contents_from_url(
             get_runs_from_course_endpoint,
-            {"course_alias": COURSE_ALIAS, "assignment_alias": assignment_alias},
+            {
+                "course_alias": COURSE_ALIAS,
+                "assignment_alias": assignment_alias
+            },
         )["runs"]
 
         assignment_runs = [
@@ -573,7 +576,9 @@ def process_feedbacks() -> None:
         for index, (run_id, user_name, assignment_alias) in enumerate(
             tqdm(run_ids_and_usernames)
         ):
-            process_single_run(index, run_id, user_name, assignment_alias, total_runs)
+            process_single_run(
+                index, run_id, user_name, assignment_alias, total_runs
+            )
 
 
 def handle_input() -> None:
