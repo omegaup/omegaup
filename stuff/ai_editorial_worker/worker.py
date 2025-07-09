@@ -13,9 +13,9 @@ import time
 from typing import Dict, Any
 
 # Import our components
-from redis_client import RedisJobClient
-from config_manager import ConfigManager
-from editorial_generator import EditorialGenerator
+from redis_client import RedisJobClient  # type: ignore
+from config_manager import ConfigManager  # type: ignore
+from editorial_generator import EditorialGenerator  # type: ignore
 
 
 class EditorialWorker:
@@ -25,14 +25,14 @@ class EditorialWorker:
         """Initialize worker with configuration and components."""
         self.worker_id = args.worker_id
         self.args = args
-        
+
         # Initialize configuration manager
         self.config_manager = ConfigManager()
-        
+
         # Get configurations
         self.redis_config = self.config_manager.get_redis_config(args)
         self.openai_config = self.config_manager.get_openai_config(args)
-        
+
         # Initialize components
         self.setup_logging()
         self.setup_components()
@@ -46,17 +46,17 @@ class EditorialWorker:
         try:
             # Initialize Redis client
             self.redis_client = RedisJobClient(self.redis_config)
-            
+
             # Initialize editorial generator with 'gpt' provider for OpenAI
             self.editorial_generator = EditorialGenerator(
                 provider='gpt',
                 api_key=self.openai_config['api_key'],
                 config_manager=self.config_manager
             )
-            
+
             logging.info('All components initialized successfully')
-            
-        except Exception as e:
+
+        except Exception as e:  # pylint: disable=broad-except
             logging.error('Component setup error: %s', e)
             raise
 
@@ -70,7 +70,7 @@ class EditorialWorker:
             except KeyboardInterrupt:
                 logging.info('Worker interrupted by user')
                 break
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logging.exception('Worker error: %s', e)
                 time.sleep(5)  # Brief pause before retry
 
@@ -88,7 +88,7 @@ class EditorialWorker:
             try:
                 job = self.redis_client.parse_job_data(job_json)
                 self.handle_editorial_job(job)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logging.exception('Error processing job: %s', e)
 
     def handle_editorial_job(self, job: Dict[str, Any]) -> None:
@@ -132,9 +132,10 @@ class EditorialWorker:
                     'failed_at': time.time(),
                     'worker_id': self.worker_id
                 })
-                logging.error('Failed to generate editorial for job %s', job_id)
+                logging.error(
+                    'Failed to generate editorial for job %s', job_id)
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logging.exception('Unexpected error processing job %s', job_id)
             self.redis_client.set_job_status(job_id, {
                 'status': 'failed',
@@ -160,7 +161,7 @@ def main() -> None:
 
     # Initialize config manager for argument setup
     config_manager = ConfigManager()
-    
+
     # Add configuration arguments
     config_manager.configure_openai_parser(parser)
     config_manager.configure_redis_parser(parser)
@@ -180,7 +181,7 @@ def main() -> None:
 
     except KeyboardInterrupt:
         logging.info('Interrupted by user')
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logging.exception('Fatal error: %s', e)
         sys.exit(1)
 
