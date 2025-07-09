@@ -2,34 +2,43 @@
 This script adds a teaching assistant to the omegaup platform.
 """
 
-import json
-import time
 import argparse
-from getpass import getpass
-import urllib.parse
+import json
 import logging
+import os
+import sys
+import time
+import urllib.parse
+from getpass import getpass
 from typing import Callable, Any
+
 import requests
 from tqdm import tqdm  # type: ignore
 from tqdm.contrib.logging import logging_redirect_tqdm  # type: ignore
-from openai import OpenAI  # type: ignore
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from llm_wrapper import LLMWrapper
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 LOG = logging.getLogger(__name__)
 
-KEY = None
-USERNAME = None
-PASSWORD = None
-LANGUAGE = None
-COURSE_ALIAS = None
-ASSIGNMENT_ALIAS = None
-TA_FEEDBACK_INDICATOR = None
+KEY: str | None = None
+USERNAME: str | None = None
+PASSWORD: str | None = None
+LANGUAGE: str | None = None
+COURSE_ALIAS: str | None = None
+ASSIGNMENT_ALIAS: str | None = None
+TA_FEEDBACK_INDICATOR: str | None = None
 SKIP_CONFIRM = False
+LLM_PROVIDER: str | None = None
+SUBMISSION_ID_MODE = False
+SUBMISSION_ID = None
+STUDENT_NAME = None
 
 BASE_URL = "https://omegaup.com"
 COOKIES = None
-CLIENT = None
+CLIENT: LLMWrapper | None = None
 
 
 def get_login_endpoint(username: str, password: str) -> str:
@@ -156,6 +165,10 @@ def extract_show_run_ids() -> list[tuple[str, str]]:
         list: List of all the latest (at most 30 days old) run IDs and the
         usernames from the course
     """
+    if SUBMISSION_ID_MODE:
+        if isinstance(SUBMISSION_ID, str) and isinstance(STUDENT_NAME, str):
+            return [(SUBMISSION_ID, STUDENT_NAME)]
+
     runs = get_contents_from_url(
         get_runs_from_course_endpoint,
         {"course_alias": COURSE_ALIAS, "assignment_alias": ASSIGNMENT_ALIAS},
@@ -269,13 +282,10 @@ def query_llm(
 
     prompt = get_prompt(query_content=query_content)
 
-    response = CLIENT.chat.completions.create(  # type: ignore[attr-defined]
-        model="gpt-4o",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=temperature,
-        max_tokens=500,
-    )
-    response_text = response.choices[0].message.content
+    if CLIENT is None:
+        raise ValueError("CLIENT is not initialized")
+
+    response_text = CLIENT.generate_response(prompt, temperature)
 
     if not is_initial_feedback and len(response_text) > 1000:
         LOG.warning(
@@ -286,15 +296,7 @@ def query_llm(
             f"within 1000 characters? {response_text}"
         )
 
-        response = (
-            CLIENT.chat.completions.create(  # type: ignore[attr-defined]
-                model="gpt-4o",
-                messages=[{"role": "user", "content": concise_request}],
-                temperature=temperature,
-                max_tokens=500,
-            )
-        )
-        response_text = response.choices[0].message.content
+        response_text = CLIENT.generate_response(concise_request, temperature)
 
     return response_text
 
@@ -457,6 +459,15 @@ def handle_feedbacks(  # pylint: disable=R0913
                 oracle_feedback = query_llm(
                     conjured_query,
                 )
+                oracle_feedback = oracle_feedback.strip()
+                if oracle_feedback.startswith("```json"):
+                    oracle_feedback = oracle_feedback.removeprefix(
+                        "```json"
+                    ).strip()
+                if oracle_feedback.endswith("```"):
+                    oracle_feedback = oracle_feedback.removesuffix(
+                        "```"
+                    ).strip()
                 oracle_feedback = json.loads(oracle_feedback)
                 process_initial_feedback(
                     oracle_feedback,
@@ -545,11 +556,29 @@ def handle_input() -> None:
     global USERNAME, PASSWORD  # pylint: disable=W0603
     global COURSE_ALIAS, ASSIGNMENT_ALIAS, LANGUAGE  # pylint: disable=W0603
     global KEY, TA_FEEDBACK_INDICATOR, SKIP_CONFIRM  # pylint: disable=W0603
+    global LLM_PROVIDER  # pylint: disable=W0603
+    global SUBMISSION_ID_MODE, SUBMISSION_ID  # pylint: disable=W0603
+    global STUDENT_NAME  # pylint: disable=W0603
     parser = argparse.ArgumentParser(
         description="Process feedbacks from students"
     )
     parser.add_argument("--username", type=str, help="Your username")
     parser.add_argument("--password", type=str, help="Your password")
+    parser.add_argument(
+        "--submission_id_mode",
+        action="store_true",
+        help="Yes if you want to process a single submission."
+    )
+    parser.add_argument(
+        "--submission_id",
+        type=str,
+        help="Submission ID to process feedbacks for"
+    )
+    parser.add_argument(
+        "--student_name",
+        type=str,
+        help="Student name to process feedbacks for"
+    )
     parser.add_argument(
         "--course_alias",
         type=str,
@@ -568,7 +597,14 @@ def handle_input() -> None:
         type=str,
         help="Indicates that it's a TA feedback"
     )
-    parser.add_argument("--key", type=str, help="API key for OpenAI")
+    parser.add_argument("--key", type=str, help="API key for the LLM provider")
+    parser.add_argument(
+        "--llm",
+        type=str,
+        default="deepseek",
+        choices=["claude", "gpt", "deepseek", "gemini"],
+        help="LLM provider to use (default: deepseek)"
+    )
     parser.add_argument(
         "--skip-confirm",
         action="store_true",
@@ -578,6 +614,14 @@ def handle_input() -> None:
 
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
+    SUBMISSION_ID_MODE = (args.submission_id_mode == "true") or input(
+        "Are you working in submission id mode: "
+    ) == "true"
+    if SUBMISSION_ID_MODE:
+        SUBMISSION_ID = args.submission_id or input(
+            "Enter the submission id: "
+        )
+        STUDENT_NAME = args.student_name or input("Enter the student name: ")
     COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
     ASSIGNMENT_ALIAS = (
         args.assignment_alias or input("Enter the assignment alias: ")
@@ -590,7 +634,9 @@ def handle_input() -> None:
         " added to the feedback. \n(Default: Ese mensaje fue generado por un"
         " modelo de inteligencia artificial.)\nPlease enter the string: "
     ) or "Ese mensaje fue generado por un modelo de inteligencia artificial."
-    KEY = args.key or getpass("Enter your OpenAI API key: ")
+    LLM_PROVIDER = args.llm
+    provider_name = LLM_PROVIDER.upper() if LLM_PROVIDER else "LLM"
+    KEY = args.key or getpass(f"Enter your {provider_name} API key: ")
     SKIP_CONFIRM = args.skip_confirm
 
 
@@ -602,7 +648,10 @@ def main() -> None:
 
     handle_input()
 
-    CLIENT = OpenAI(api_key=KEY)
+    if LLM_PROVIDER is None or KEY is None:
+        raise ValueError("LLM_PROVIDER and KEY must be set")
+
+    CLIENT = LLMWrapper(LLM_PROVIDER, KEY)
 
     process_feedbacks()
 
