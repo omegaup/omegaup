@@ -82,4 +82,3 @@ ENV PATH=/opt/omegaup/stuff/venv/bin:$PATH
 CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:13306", "--", \
      "/bin/bash", "-c", \
      "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; exec /usr/bin/supervisord"]
-     
