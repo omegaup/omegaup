@@ -45,21 +45,20 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 LOG = logging.getLogger(__name__)
 
+TA_FEEDBACK_INDICATOR: str | None = None
 KEY: str | None = None
 USERNAME: str | None = None
 PASSWORD: str | None = None
 LANGUAGE: str | None = None
 COURSE_ALIAS: str | None = None
 ASSIGNMENT_ALIAS: str | None = None
-TA_FEEDBACK_INDICATOR: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
 SUBMISSION_ID_MODE = False
 SUBMISSION_ID = None
 STUDENT_NAME = None
 
-
-BASE_URL = "http://localhost:8001"
+BASE_URL = "https://omegaup.com"
 COOKIES = None
 CLIENT: LLMWrapper | None = None
 
@@ -221,8 +220,11 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
     # pylint: disable=R1702
     """
     Extracts show-run IDs, usernames, and assignment aliases from the course.
+    Extracts show-run IDs, usernames, and assignment aliases from the course.
 
     Returns:
+        list: List of tuples containing (run_id, username, assignment_alias)
+              for all the latest (at most 30 days old) runs from the course
         list: List of tuples containing (run_id, username, assignment_alias)
               for all the latest (at most 30 days old) runs from the course
     """
