@@ -637,4 +637,4 @@ jobs:
       - name: Run the teaching assistant for course mode
         run: |
           cd stuff/teaching_assistant
-          python teaching_assistant.py --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias qwerty --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias qwerty1 --llm gemini --key "${{ secrets.GEMINI_API_KEY }} --test_mode"
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm gemini --key "${{ secrets.GEMINI_API_KEY }}"

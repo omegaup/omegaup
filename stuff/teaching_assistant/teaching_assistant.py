@@ -601,6 +601,9 @@ def handle_input() -> None:
         action="store_true",
         help="Run in local server."
     )
+    if args.test_mode:
+        global BASE_URL  # pylint: disable=W0603
+        BASE_URL = "http://localhost:8001"
     parser.add_argument(
         "--submission_id_mode",
         type=str,
@@ -648,11 +651,6 @@ def handle_input() -> None:
         help="Skip confirmation prompts"
     )
     args = parser.parse_args()
-
-    if args.test_mode:
-        global BASE_URL  # pylint: disable=W0603
-        BASE_URL = "http://localhost:8001"
-
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
     SUBMISSION_ID_MODE = args.submission_id_mode
