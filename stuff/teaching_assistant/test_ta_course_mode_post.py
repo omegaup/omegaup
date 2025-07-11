@@ -18,7 +18,6 @@ import pytest
 import logging
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 @pytest.fixture
 def get_runs():
@@ -58,7 +57,7 @@ def test_verify_feedback(get_runs):
     response.raise_for_status()
 
     feedbacks = response.json()
-    logger.info(f"Feedbacks: {feedbacks}")
+    logging.info(f"Feedbacks: {feedbacks}")
     assert len(feedbacks) > 1, "Feedback is empty."
     
 

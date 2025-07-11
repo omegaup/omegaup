@@ -641,4 +641,4 @@ jobs:
 
       - name: Run post check for course mode
         run: |
-          pytest stuff/teaching_assistant/test_ta_course_mode_post.py -s
+          pytest stuff/teaching_assistant/test_ta_course_mode_post.py --log-cli-level=INFO -s
