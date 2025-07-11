@@ -7,6 +7,8 @@ from test_ta_submission_mode_pre import (
     TEACHER_PASSWORD,
     STUDENT_USERNAME,
     STUDENT_PASSWORD,
+    BASE_URL,
+    COOKIES,
     setup_accounts,
 )
 import pytest
@@ -14,9 +16,6 @@ import requests
 import time
 import zipfile
 import os
-
-BASE_URL = "http://localhost:8001"
-COOKIES = None
 
 COURSE_NAME = "Course"
 COURSE_ALIAS = "course"
