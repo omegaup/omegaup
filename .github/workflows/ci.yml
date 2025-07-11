@@ -633,3 +633,8 @@ jobs:
       - name: Run pre setup for course mode
         run: |
           pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
+
+      - name: Run the teaching assistant for course mode
+        run: |
+          cd stuff/teaching_assistant
+          python teaching_assistant.py --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias qwerty --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias qwerty1 --llm gemini --key "${{ secrets.GEMINI_API_KEY }} --test_mode"

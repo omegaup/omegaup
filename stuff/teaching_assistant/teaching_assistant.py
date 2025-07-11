@@ -32,7 +32,7 @@ ASSIGNMENT_ALIAS: str | None = None
 TA_FEEDBACK_INDICATOR: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
-SUBMISSION_ID_MODE = False
+SUBMISSION_ID_MODE: str | None = None
 SUBMISSION_ID = None
 STUDENT_NAME = None
 
@@ -597,9 +597,14 @@ def handle_input() -> None:
     parser.add_argument("--username", type=str, help="Your username")
     parser.add_argument("--password", type=str, help="Your password")
     parser.add_argument(
-        "--submission_id_mode",
+        "--test_mode",
         action="store_true",
-        help="Yes if you want to process a single submission."
+        help="Run in local server."
+    )
+    parser.add_argument(
+        "--submission_id_mode",
+        type=str,
+        help="true if you want to process a single submission."
     )
     parser.add_argument(
         "--submission_id",
@@ -644,12 +649,18 @@ def handle_input() -> None:
     )
     args = parser.parse_args()
 
+    if args.test_mode:
+        global BASE_URL  # pylint: disable=W0603
+        BASE_URL = "http://localhost:8001"
+
     USERNAME = args.username or input("Enter your username: ")
     PASSWORD = args.password or getpass("Enter your password: ")
-    SUBMISSION_ID_MODE = (args.submission_id_mode == "true") or input(
-        "Are you working in submission id mode: "
-    ) == "true"
-    if SUBMISSION_ID_MODE:
+    SUBMISSION_ID_MODE = args.submission_id_mode
+    if SUBMISSION_ID_MODE not in ["true", "false"]:
+        SUBMISSION_ID_MODE = input(
+            "Are you working in submission id mode: "
+        )
+    if SUBMISSION_ID_MODE == "true":
         SUBMISSION_ID = args.submission_id or input(
             "Enter the submission id: "
         )
