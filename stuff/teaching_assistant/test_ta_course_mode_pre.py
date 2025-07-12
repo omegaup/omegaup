@@ -1,5 +1,14 @@
+"""Test module for teaching assistant course mode pre functionality."""
+import os
+import time
+import zipfile
+from typing import Any
+
+import pytest
+import requests
+
 from teaching_assistant import get_login_endpoint
-from test_ta_submission_mode_pre import (
+from test_ta_submission_mode_pre import (  # pylint: disable=W0611
     get_create_problem_endpoint,
     get_create_run_endpoint,
     get_problem_details_endpoint,
@@ -8,61 +17,64 @@ from test_ta_submission_mode_pre import (
     STUDENT_USERNAME,
     STUDENT_PASSWORD,
     BASE_URL,
-    COOKIES,
     setup_accounts,
 )
-import pytest
-import requests
-import time
-import zipfile
-import os
 
-COURSE_NAME = "Course"
-COURSE_ALIAS = "course"
+COOKIES = None
+
+COURSE_NAME = "Course100"
+COURSE_ALIAS = "course100"
 COURSE_DESCRIPTION = "A course for testing."
 
-ASSIGNMENT_NAME = "Assignment"
-ASSIGNMENT_ALIAS = "assignment"
+ASSIGNMENT_NAME = "Assignment100"
+ASSIGNMENT_ALIAS = "assignment100"
 ASSIGNMENT_DESCRIPTION = "An assignment for testing."
 
-PROBLEM_ALIAS = "subtract"
-PROBLEM_TITLE = "Subtract"
+PROBLEM_ALIAS = "subtract100"
+PROBLEM_TITLE = "Subtract100"
 TEST_PROBLEM_DIR = "stuff/teaching_assistant/test_problem_subtract"
 TEST_PROBLEM_ZIP = f"{TEST_PROBLEM_DIR}.zip"
+
 
 def get_create_course_endpoint() -> str:
     """endpoint for creating a problem"""
     return "api/course/create/"
 
+
 def get_create_assignment_endpoint() -> str:
     """endpoint for creating an assignment"""
     return "api/course/createAssignment/"
+
 
 def get_add_problem_to_course_endpoint() -> str:
     """endpoint for adding a problem to a course"""
     return "api/course/addProblem/"
 
+
 def get_add_student_to_course_endpoint() -> str:
     """endpoint for adding a student to a course"""
     return "api/course/addStudent/"
+
 
 def get_request_feedback_endpoint() -> str:
     """endpoint for requesting feedback"""
     return "api/course/requestFeedback/"
 
+
 def get_assignment_details_endpoint() -> str:
     """endpoint for getting assignment details"""
-    return f"api/course/assignmentDetails/"
+    return "api/course/assignmentDetails/"
+
 
 @pytest.fixture
-def create_test_course():
+def create_test_course() -> None:
     """test creating a course"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
-    
-    response = requests.get(login_url)
+
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -81,19 +93,21 @@ def create_test_course():
         "languages": "py2,py3"
     }
 
-    response = requests.post(create_course_url, data=data, cookies=COOKIES)
+    response = requests.post(create_course_url, data=data, cookies=COOKIES,
+                             timeout=30)
     response.raise_for_status()
     assert response.status_code == 200
 
+
 @pytest.fixture
-def create_test_assignment():
+def create_test_assignment() -> None:
     """test creating an assignment in a course"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -112,19 +126,21 @@ def create_test_assignment():
         "publish_time_delay": 0
     }
 
-    response = requests.post(create_assignment_url, data=data, cookies=COOKIES)
+    response = requests.post(create_assignment_url, data=data, cookies=COOKIES,
+                             timeout=30)
     response.raise_for_status()
     assert response.status_code == 200
 
+
 @pytest.fixture
-def get_assignment_details():
+def get_assignment_details() -> Any:
     """test getting assignment details"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -134,24 +150,26 @@ def get_assignment_details():
         "assignment": ASSIGNMENT_ALIAS
     }
 
-    response = requests.get(assignment_details_url, params=params, cookies=COOKIES)
+    response = requests.get(assignment_details_url, params=params,
+                            cookies=COOKIES, timeout=30)
     response.raise_for_status()
-    
+
     problemset_id = response.json().get("problemset_id")
     assert problemset_id is not None
 
     assert response.status_code == 200
     yield problemset_id
 
+
 @pytest.fixture
-def create_test_problem():
+def create_test_problem() -> None:
     """test creating a problem"""
-    global COOKIES, BASE_URL
-    
+    global COOKIES  # pylint: disable=W0603
+
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
-    
-    response = requests.get(login_url)
+
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -161,11 +179,11 @@ def create_test_problem():
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, TEST_PROBLEM_DIR)
                 zipf.write(file_path, arcname)
-            for dir in dirs:
-                dir_path = os.path.join(root, dir)
+            for directory in dirs:
+                dir_path = os.path.join(root, directory)
                 arcname = os.path.relpath(dir_path, TEST_PROBLEM_DIR)
                 zipf.write(dir_path, arcname + "/")
-    
+
     create_problem_url = f"{BASE_URL}/{get_create_problem_endpoint()}"
     data = {
         "visibility": "public",
@@ -182,35 +200,44 @@ def create_test_problem():
         "source": "omegaUp classics",
         "show_diff": "examples",
         "allow_user_add_tags": "true",
-        "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,cs,pas,hs,lua,go,rs,js",
+        "languages": ("c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,"
+                      "cpp17-clang,cpp20-gcc,cpp20-clang,java,kt,py2,py3,rb,"
+                      "cs,pas,hs,lua,go,rs,js"),
         "email_clarifications": 1,
         "problem_level": "problemLevelBasicIntroductionToProgramming",
-        "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+        "selected_tags": ("[{\"tagname\":\"problemTagBinarySearchTree\","
+                          "\"public\":true}]")
     }
 
-    files = {
-        "problem_contents": open(TEST_PROBLEM_ZIP, "rb")
-    }
+    with open(TEST_PROBLEM_ZIP, "rb") as problem_file:
+        zip_files: Any = {
+            "problem_contents": problem_file
+        }
 
-    response = requests.post(create_problem_url, data=data, files=files, cookies=COOKIES)
-    response.raise_for_status()
-    
-    files["problem_contents"].close()
-    
+        response = requests.post(
+            create_problem_url,
+            data=data,
+            files=zip_files,
+            cookies=COOKIES,
+            timeout=30
+        )
+        response.raise_for_status()
+
     if os.path.exists(TEST_PROBLEM_ZIP):
         os.remove(TEST_PROBLEM_ZIP)
-    
+
     assert response.status_code == 200
 
+
 @pytest.fixture
-def add_problem_to_course():
+def add_problem_to_course() -> None:
     """Fixture to add a problem to a course assignment"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -221,19 +248,21 @@ def add_problem_to_course():
         "problem_alias": PROBLEM_ALIAS
     }
 
-    response = requests.post(add_problem_url, data=data, cookies=COOKIES)
+    response = requests.post(add_problem_url, data=data, cookies=COOKIES,
+                             timeout=30)
     response.raise_for_status()
     assert response.status_code == 200
 
+
 @pytest.fixture
-def add_student_to_course():
+def add_student_to_course() -> None:
     """Fixture to add a student to a course"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -245,66 +274,93 @@ def add_student_to_course():
         "accept_teacher": "true"
     }
 
-    response = requests.post(add_student_url, data=data, cookies=COOKIES)
+    response = requests.post(add_student_url, data=data, cookies=COOKIES,
+                             timeout=30)
     response.raise_for_status()
     assert response.status_code == 200
 
+
 @pytest.fixture
-def create_test_run(get_assignment_details):
+def create_test_run(
+    get_assignment_details: Any  # pylint: disable=W0621, W0613
+) -> Any:
     """test creating a run"""
-    global COOKIES, BASE_URL
-    
+
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
-    
-    response = requests.get(login_url)
+
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     student_cookies = response.cookies
-    
+
     run_data = {
         "language": "py2",
         "problem_alias": PROBLEM_ALIAS,
-        "source": "#include <iostream>\n\nint main() {\n    std::cin.tie(nullptr);\n    std::ios_base::sync_with_stdio(false);\n\n    int A, B;\n    std::cin >> A >> B;\n    std::cout << A - B << '\\n';\n}",
+        "source": ("#include <iostream>\n\nint main() {\n"
+                   "    std::cin.tie(nullptr);\n"
+                   "    std::ios_base::sync_with_stdio(false);\n\n"
+                   "    int A, B;\n    std::cin >> A >> B;\n"
+                   "    std::cout << A - B << '\\n';\n}"),
         "problemset_id": get_assignment_details
     }
-    
+
     create_run_url = f"{BASE_URL}/{get_create_run_endpoint()}"
-    response = requests.post(create_run_url, data=run_data, cookies=student_cookies)
+    response = requests.post(create_run_url, data=run_data,
+                             cookies=student_cookies, timeout=30)
     response.raise_for_status()
-    
+
     assert response.status_code == 200
     guid = response.json()['guid']
     yield guid
 
+
 @pytest.fixture
-def request_feedback(create_test_run):
+def request_feedback(
+    create_test_run: Any  # pylint: disable=W0621, W0613
+) -> None:
     """Fixture to request feedback for a problem"""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     guid = create_test_run
 
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
-    request_feedback_url = f"{BASE_URL}/{get_request_feedback_endpoint()}?course_alias={COURSE_ALIAS}&assignment_alias={ASSIGNMENT_ALIAS}&guid={guid}"
+    request_feedback_url = (f"{BASE_URL}/{get_request_feedback_endpoint()}"
+                            f"?course_alias={COURSE_ALIAS}"
+                            f"&assignment_alias={ASSIGNMENT_ALIAS}"
+                            f"&guid={guid}")
 
-    response = requests.post(request_feedback_url, cookies=COOKIES)
+    response = requests.post(request_feedback_url, cookies=COOKIES, timeout=30)
     response.raise_for_status()
-    
+
     assert response.status_code == 200
 
-def test_problem_and_run_setup(setup_accounts, create_test_course, create_test_assignment, get_assignment_details, create_test_problem, add_problem_to_course, add_student_to_course, create_test_run, request_feedback):
+
+def test_problem_and_run_setup(  # pylint: disable=R0913
+    setup_accounts: Any,  # pylint: disable=W0621, W0613
+    create_test_course: Any,  # pylint: disable=W0621, W0613
+    create_test_assignment: Any,  # pylint: disable=W0621, W0613
+    get_assignment_details: Any,  # pylint: disable=W0621, W0613
+    create_test_problem: Any,  # pylint: disable=W0621, W0613
+    add_problem_to_course: Any,  # pylint: disable=W0621, W0613
+    add_student_to_course: Any,  # pylint: disable=W0621, W0613
+    create_test_run: Any,  # pylint: disable=W0621, W0613
+    request_feedback: Any  # pylint: disable=W0621, W0613
+) -> None:
     """test that the problem and run are created successfully"""
-    global COOKIES, BASE_URL
-    
-    problem_details_url = f"{BASE_URL}/{get_problem_details_endpoint(PROBLEM_ALIAS)}"
-    
-    response = requests.get(problem_details_url, cookies=COOKIES)
+
+    problem_details_url = (
+        f"{BASE_URL}/"
+        f"{get_problem_details_endpoint(PROBLEM_ALIAS)}"
+    )
+
+    response = requests.get(problem_details_url, cookies=COOKIES, timeout=30)
     response.raise_for_status()
-    
+
     assert response.status_code == 200
     assert response.json()["alias"] == PROBLEM_ALIAS

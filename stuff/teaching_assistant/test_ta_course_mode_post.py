@@ -1,3 +1,10 @@
+"""Test module for teaching assistant course mode post functionality."""
+import logging
+from typing import Any
+
+import pytest
+import requests
+
 from teaching_assistant import (
     get_login_endpoint,
     get_runs_submission_feedback_endpoint,
@@ -13,21 +20,19 @@ from test_ta_course_mode_pre import (
     COURSE_ALIAS,
     ASSIGNMENT_ALIAS,
 )
-import requests
-import pytest
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
+
 @pytest.fixture
-def get_runs():
+def get_runs() -> Any:
     """Get the guid of the first run for the course and assignment."""
-    global COOKIES, BASE_URL
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url)
+    response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -37,13 +42,15 @@ def get_runs():
     )
 
     runs_url = f"{BASE_URL}/{runs_endpoint}"
-    runs = requests.get(runs_url, cookies=COOKIES).json()["runs"]
+    runs = requests.get(runs_url, cookies=COOKIES, timeout=30).json()["runs"]
 
     yield runs
 
-def test_verify_feedback(get_runs):
+
+def test_verify_feedback(
+    get_runs: Any  # pylint: disable=W0621, W0613
+) -> None:
     """Test to verify that the feedback was posted."""
-    global COOKIES, BASE_URL
 
     runs = get_runs
 
@@ -53,16 +60,9 @@ def test_verify_feedback(get_runs):
     feedback_endpoint = get_runs_submission_feedback_endpoint(run_guid)
     feedback_url = f"{BASE_URL}/{feedback_endpoint}"
 
-    response = requests.get(feedback_url, cookies=COOKIES)
+    response = requests.get(feedback_url, cookies=COOKIES, timeout=30)
     response.raise_for_status()
 
     feedbacks = response.json()
-    logging.info(f"Feedbacks: {feedbacks}")
+    logging.info("Feedbacks: %s", feedbacks)
     assert len(feedbacks) > 1, "Feedback is empty."
-    
-
-    
-
-
-
-    
