@@ -22,16 +22,16 @@ from test_ta_submission_mode_pre import (  # pylint: disable=W0611
 
 COOKIES = None
 
-COURSE_NAME = "Course100"
-COURSE_ALIAS = "course100"
+COURSE_NAME = "Course"
+COURSE_ALIAS = "course"
 COURSE_DESCRIPTION = "A course for testing."
 
-ASSIGNMENT_NAME = "Assignment100"
-ASSIGNMENT_ALIAS = "assignment100"
+ASSIGNMENT_NAME = "Assignment"
+ASSIGNMENT_ALIAS = "assignment"
 ASSIGNMENT_DESCRIPTION = "An assignment for testing."
 
-PROBLEM_ALIAS = "subtract100"
-PROBLEM_TITLE = "Subtract100"
+PROBLEM_ALIAS = "subtract"
+PROBLEM_TITLE = "Subtract"
 TEST_PROBLEM_DIR = "stuff/teaching_assistant/test_problem_subtract"
 TEST_PROBLEM_ZIP = f"{TEST_PROBLEM_DIR}.zip"
 
