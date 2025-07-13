@@ -639,7 +639,7 @@ def handle_input() -> None:
         "--llm",
         type=str,
         default="deepseek",
-        choices=["claude", "gpt", "deepseek", "gemini"],
+        choices=["claude", "gpt", "deepseek", "gemini", "omegaup"],
         help="LLM provider to use (default: deepseek)"
     )
     parser.add_argument(
