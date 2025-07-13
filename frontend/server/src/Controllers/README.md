@@ -306,6 +306,7 @@ Generate AI editorial for a problem
 
 | Name            | Type     | Description |
 | --------------- | -------- | ----------- |
+| `language`      | `string` |             |
 | `problem_alias` | `string` |             |
 
 ### Returns
