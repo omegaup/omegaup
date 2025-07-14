@@ -107,16 +107,20 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     /**
      * Queue job to Redis for Python worker (following cronjob pattern)
      */
-    private static function queueJobToRedis(string $jobId, string $problemAlias, int $userId): void {
+    private static function queueJobToRedis(
+        string $jobId,
+        string $problemAlias,
+        int $userId
+    ): void {
         try {
             // Use environment variables like existing cronjobs
             $redisHost = $_ENV['REDIS_HOST'] ?? 'redis';
             $redisPort = intval($_ENV['REDIS_PORT'] ?? '6379');
             $redisPassword = $_ENV['REDIS_PASSWORD'] ?? null;
-            
+
             $redis = new \Redis();
             $redis->connect($redisHost, $redisPort);
-            
+
             if ($redisPassword) {
                 $redis->auth($redisPassword);
             }
@@ -130,12 +134,13 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Queue to high priority queue for user-initiated jobs
             $redis->lpush('editorial_jobs_user', json_encode($job));
-            
+
             $redis->close();
-            
         } catch (\Exception $e) {
             // Log error but don't fail the API call
-            error_log("Failed to queue Redis job {$jobId}: " . $e->getMessage());
+            error_log(
+                "Failed to queue Redis job {$jobId}: " . $e->getMessage()
+            );
         }
     }
 

@@ -14,16 +14,16 @@ class RedisJobClient:
     """Handles Redis operations for editorial job management."""
 
     def __init__(self, redis_config: Optional[Dict[str, Any]] = None):
-        """Initialize Redis client with configuration or environment variables."""
+        """Initialize Redis client with config or environment variables."""
         if redis_config is None:
-            # Use environment variables 
+            # Use environment variables
             redis_config = {
                 'host': os.getenv('REDIS_HOST', 'redis'),
                 'port': int(os.getenv('REDIS_PORT', '6379')),
                 'password': os.getenv('REDIS_PASS'),  # Match omegaUp pattern
                 'timeout': 30  # Fixed timeout, not configurable
             }
-        
+
         self.config = redis_config
         self.client: Optional[redis.Redis[str]] = None
         self.setup_connection()
@@ -76,17 +76,27 @@ class RedisJobClient:
             logging.error('Redis polling error: %s', e)
             raise
 
-    def get_next_job(self, queues: List[str], timeout: int = 30) -> Optional[Dict[str, Any]]:
-        """Get next job from priority queues (first queue = highest priority)."""
+    def get_next_job(
+        self,
+        queues: List[str],
+        timeout: int = 30
+    ) -> Optional[Dict[str, Any]]:
+        """Get next job from priority queues (first queue = highest
+        priority)."""
         if not self.client:
             raise RuntimeError("Redis client not initialized")
 
         try:
             # Block and wait for jobs from multiple queues (priority order)
             result = self.client.brpop(queues, timeout=timeout)
-            if result and len(result) == 2:
-                queue_name, job_data = str(result[0]), str(result[1])
-                logging.debug(f'Got job from queue {queue_name}: {job_data}')
+            if result and len(result) == 2:  # type: ignore
+                # Redis brpop returns (queue_name, data) tuple
+                queue_name, job_data = (
+                    str(result[0]), str(result[1]))  # type: ignore[misc,index]
+                logging.debug(
+                    'Got job from queue %s: %s',
+                    queue_name,
+                    job_data)
                 return self.parse_job_data(job_data)
             return None
 
@@ -102,7 +112,8 @@ class RedisJobClient:
         try:
             job_json = json.dumps(job_data)
             self.client.lpush(queue_name, job_json)
-            logging.info(f'Queued job {job_data.get("job_id", "unknown")} to {queue_name}')
+            job_id = job_data.get("job_id", "unknown")
+            logging.info('Queued job %s to %s', job_id, queue_name)
 
         except redis.RedisError as e:
             logging.error('Redis job queuing error: %s', e)
