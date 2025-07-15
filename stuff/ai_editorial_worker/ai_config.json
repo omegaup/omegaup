@@ -1,15 +1,36 @@
 {
-  "openai": {
-    "model": "gpt-4",
-    "max_tokens": 2000,
+  "llm": {
+    "provider": "gpt",
+    "model_configs": {
+      "gpt": {
+        "model": "gpt-4o",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "deepseek": {
+        "model": "deepseek-chat",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "claude": {
+        "model": "claude-sonnet-4-20250514",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "gemini": {
+        "model": "gemini-2.0-flash-001",
+        "max_tokens": 2500,
     "temperature": 0.3,
-    "top_p": 1.0,
-    "frequency_penalty": 0.0,
-    "presence_penalty": 0.0,
-    "timeout": 60
+        "timeout": 90
+      }
+    }
   },
-  "system_message": "You are an expert competitive programming assistant who generates clear, educational editorials without any code.",
   "prompts": {
-    "editorial_file": "prompts/editorial.txt"
+    "editorial_generation": "prompts/editorial_generation.txt",
+    "solution_generation": "prompts/solution_generation.txt",
+    "translation": "prompts/translation.txt"
   }
 }
