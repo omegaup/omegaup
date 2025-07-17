@@ -10,7 +10,7 @@ from teaching_assistant import (
     get_runs_submission_feedback_endpoint,
     get_runs_from_course_endpoint
 )
-from test_ta_submission_mode_pre import (
+from stuff.teaching_assistant.test_ta_submission_mode import (
     TEACHER_USERNAME,
     TEACHER_PASSWORD,
     BASE_URL,

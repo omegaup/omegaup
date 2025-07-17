@@ -8,7 +8,7 @@ import pytest
 import requests
 
 from teaching_assistant import get_login_endpoint
-from test_ta_submission_mode_pre import (  # pylint: disable=W0611
+from stuff.teaching_assistant.test_ta_submission_mode import (  # pylint: disable=W0611
     get_create_problem_endpoint,
     get_create_run_endpoint,
     get_problem_details_endpoint,
@@ -17,18 +17,16 @@ from test_ta_submission_mode_pre import (  # pylint: disable=W0611
     STUDENT_USERNAME,
     STUDENT_PASSWORD,
     BASE_URL,
+    COURSE_NAME,
+    COURSE_ALIAS,
+    COURSE_DESCRIPTION,
+    ASSIGNMENT_NAME,
+    ASSIGNMENT_ALIAS,
+    ASSIGNMENT_DESCRIPTION,
     setup_accounts,
 )
 
 COOKIES = None
-
-COURSE_NAME = "Course"
-COURSE_ALIAS = "course"
-COURSE_DESCRIPTION = "A course for testing."
-
-ASSIGNMENT_NAME = "Assignment"
-ASSIGNMENT_ALIAS = "assignment"
-ASSIGNMENT_DESCRIPTION = "An assignment for testing."
 
 PROBLEM_ALIAS = "subtract"
 PROBLEM_TITLE = "Subtract"
