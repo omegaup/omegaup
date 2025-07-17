@@ -8,7 +8,7 @@ import pytest
 import requests
 
 from teaching_assistant import get_login_endpoint
-from stuff.teaching_assistant.test_ta_submission_mode import (  # pylint: disable=W0611
+from teaching_assistant.test_ta_submission_mode import (  # pylint: disable=W0611
     get_create_problem_endpoint,
     get_create_run_endpoint,
     get_problem_details_endpoint,
