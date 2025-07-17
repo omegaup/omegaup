@@ -16,7 +16,7 @@ from test_ta_submission_mode import (
     BASE_URL,
     COOKIES,
 )
-from test_ta_course_mode_pre import (
+from test_ta_submission_mode import (
     COURSE_ALIAS,
     ASSIGNMENT_ALIAS,
 )

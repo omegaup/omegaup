@@ -83,8 +83,12 @@ class LLMWrapper:
                 response_text = chat_completion.choices[0].message.content
 
             elif self.provider == 'omegaup':
-                # Dummy oracle for testing - always returns the same JSON response
-                response_text = '{"general advices": "This is dummy oracle", "1": "The oracle call worked."}'
+                # Dummy oracle for testing
+                # always returns the same JSON response
+                response_text = (
+                    '{"general advices": "This is dummy oracle", '
+                    '"1": "The oracle call worked."}'
+                )
 
             else:
                 raise ValueError(

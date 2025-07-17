@@ -1,10 +1,11 @@
 """Test module for teaching assistant submission mode pre functionality."""
 import logging
+from typing import Any
+import subprocess
 import pytest
 import requests
 
 from teaching_assistant import get_login_endpoint
-import subprocess
 
 from teaching_assistant import (
     get_runs_from_course_endpoint,
@@ -74,9 +75,9 @@ def setup_accounts() -> None:
 
 
 @pytest.fixture
-def extract_submission_id():
+def extract_submission_id() -> Any:
     """Fixture to extract only the submission from the course"""
-    global COOKIES
+    global COOKIES  # pylint: disable=W0603
 
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
@@ -84,7 +85,7 @@ def extract_submission_id():
     response = requests.get(login_url, timeout=30)
     response.raise_for_status()
     COOKIES = response.cookies
-    
+
     runs_endpoint = get_runs_from_course_endpoint(
         course_alias=COURSE_ALIAS,
         assignment_alias=ASSIGNMENT_ALIAS
@@ -100,10 +101,13 @@ def extract_submission_id():
     guid = runs[0]['guid']
     yield guid
 
+
 @pytest.fixture
-def extract_feedback_id(extract_submission_id):
+def extract_feedback_id(
+    extract_submission_id: Any  # pylint: disable=W0621, W0613
+) -> Any:
     """Fixture to extract only the feedback from the submission"""
-    global COOKIES
+    global COOKIES  # pylint: disable=W0603
 
     guid = extract_submission_id
 
@@ -118,8 +122,12 @@ def extract_feedback_id(extract_submission_id):
         run_alias=guid
     )
     submission_feedback_url = f"{BASE_URL}/{submission_feedback_endpoint}"
-    
-    response = requests.get(submission_feedback_url, timeout=30, cookies=COOKIES)
+
+    response = requests.get(
+        submission_feedback_url,
+        timeout=30,
+        cookies=COOKIES
+    )
     response.raise_for_status()
 
     feedbacks = response.json()
@@ -129,8 +137,14 @@ def extract_feedback_id(extract_submission_id):
     feedback_id = feedbacks[1]['submission_feedback_id']
     yield feedback_id
 
+
 @pytest.fixture
-def add_student_feedback(extract_submission_id, extract_feedback_id):
+def add_student_feedback(
+    extract_submission_id: Any,  # pylint: disable=W0621, W0613
+    extract_feedback_id: Any  # pylint: disable=W0621, W0613
+) -> Any:
+    """Fixture to add student feedback to the submission"""
+    global COOKIES  # pylint: disable=W0603
     guid = extract_submission_id
     feedback_id = extract_feedback_id
 
@@ -146,17 +160,24 @@ def add_student_feedback(extract_submission_id, extract_feedback_id):
         course_alias=COURSE_ALIAS,
         assignment_alias=ASSIGNMENT_ALIAS,
         feedback="May you check again?",
-        line_number="1",
+        line_number=1,
         submission_feedback_id=feedback_id
     )
     submission_feedback_url = f"{BASE_URL}/{submission_feedback_endpoint}"
 
-    response = requests.get(submission_feedback_url, timeout=30, cookies=COOKIES)
+    response = requests.get(
+        submission_feedback_url,
+        timeout=30,
+        cookies=COOKIES
+    )
     response.raise_for_status()
     yield guid
 
+
 @pytest.fixture
-def run_teaching_assistant(add_student_feedback):
+def run_teaching_assistant(
+    add_student_feedback: Any  # pylint: disable=W0621, W0613
+) -> None:
     """Fixture to run the teaching assistant"""
     guid = add_student_feedback
     command = [
@@ -189,19 +210,20 @@ def run_teaching_assistant(add_student_feedback):
         logging.info("STDERR: %s", result.stderr)
         logging.info("Return code: %s", result.returncode)
     except subprocess.CalledProcessError as e:
-        logging.error(f"Teaching assistant subprocess failed: {e}")
+        logging.error("Teaching assistant subprocess failed: %s", e)
         logging.error("STDOUT: %s", e.stdout)
         logging.error("STDERR: %s", e.stderr)
     except subprocess.TimeoutExpired:
         logging.error("Teaching assistant subprocess timed out.")
 
+
 def test_teaching_assistant_submission_mode(
-    setup_accounts,
-    extract_submission_id,
-    add_student_feedback,
-    run_teaching_assistant
-):
-    global COOKIES
+    extract_submission_id: Any,  # pylint: disable=W0621, W0613
+    add_student_feedback: Any,  # pylint: disable=W0621, W0613
+    run_teaching_assistant: Any  # pylint: disable=W0621, W0613
+) -> None:
+    """Test the teaching assistant submission mode functionality."""
+    global COOKIES  # pylint: disable=W0603
 
     guid = extract_submission_id
 
@@ -217,7 +239,11 @@ def test_teaching_assistant_submission_mode(
     )
     submission_feedback_url = f"{BASE_URL}/{submission_feedback_endpoint}"
 
-    response = requests.get(submission_feedback_url, timeout=30, cookies=COOKIES)
+    response = requests.get(
+        submission_feedback_url,
+        timeout=30,
+        cookies=COOKIES
+    )
     response.raise_for_status()
 
     feedbacks = response.json()
@@ -227,4 +253,3 @@ def test_teaching_assistant_submission_mode(
     feedback_thread = feedbacks[1]['feedback_thread']
     assert feedback_thread is not None, "Feedback thread should not be None"
     assert len(feedback_thread) == 2
-    
