@@ -13,11 +13,11 @@ from teaching_assistant import (
 )
 
 COURSE_NAME = "Course"
-COURSE_ALIAS = "qwerty"
+COURSE_ALIAS = "course"
 COURSE_DESCRIPTION = "A course for testing."
 
 ASSIGNMENT_NAME = "Assignment"
-ASSIGNMENT_ALIAS = "qwerty1"
+ASSIGNMENT_ALIAS = "assignment"
 ASSIGNMENT_DESCRIPTION = "An assignment for testing."
 
 BASE_URL = "http://localhost:8001"
