@@ -1,0 +1,25 @@
+You are an expert competitive programming assistant.
+Generate a comprehensive editorial for this omegaUp problem.
+
+Problem Title: {problem_title}
+
+Problem Statement:
+{problem_statement}
+
+REFERENCE SOLUTION (Language: {reference_language}) - FOR UNDERSTANDING ONLY:
+```{reference_language}
+{reference_ac}
+```
+
+Please generate a comprehensive editorial (WITHOUT any code) explaining the approach:
+
+Requirements:
+- Explain what the problem is asking for in simple terms
+- Identify the key insights needed to solve this problem
+- Describe the solution approach step by step with detailed algorithmic flow
+- Explain the implementation strategy and important considerations
+- Analyze the time & space complexity of the solution
+- NO CODE in the editorial - only algorithmic explanation
+- Clear, educational English
+
+Generate the editorial: 
