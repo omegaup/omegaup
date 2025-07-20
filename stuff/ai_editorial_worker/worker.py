@@ -33,6 +33,10 @@ class EditorialWorker:
         self.redis_config = self.config_manager.get_redis_config(args)
         self.openai_config = self.config_manager.get_openai_config(args)
 
+        # Initialize component attributes with proper types
+        self.redis_client: RedisJobClient
+        self.editorial_generator: EditorialGenerator
+
         # Initialize components
         self.setup_logging()
         self.setup_components()
@@ -133,7 +137,8 @@ class EditorialWorker:
                     'worker_id': self.worker_id
                 })
                 logging.error(
-                    'Failed to generate editorial for job %s', job_id)
+                    'Failed to generate editorial for job %s', job_id
+                )
 
         except Exception as e:  # pylint: disable=broad-except
             logging.exception('Unexpected error processing job %s', job_id)
