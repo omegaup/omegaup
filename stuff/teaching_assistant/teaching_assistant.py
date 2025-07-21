@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 This script adds a teaching assistant to the omegaup platform.
 """
@@ -19,23 +20,43 @@ from tqdm.contrib.logging import logging_redirect_tqdm  # type: ignore
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from llm_wrapper import LLMWrapper
 
+
+class TeachingAssistantError(Exception):
+    """Base exception for teaching assistant errors"""
+
+
+class APIError(TeachingAssistantError):
+    """Exception for API-related errors"""
+
+
+class LLMError(TeachingAssistantError):
+    """Exception for LLM-related errors"""
+
+
+class ConfigurationError(TeachingAssistantError):
+    """Exception for configuration errors"""
+
+
+class DataError(TeachingAssistantError):
+    """Exception for data processing errors"""
+
+
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 LOG = logging.getLogger(__name__)
 
+TA_FEEDBACK_INDICATOR: str | None = None
 KEY: str | None = None
 USERNAME: str | None = None
 PASSWORD: str | None = None
 LANGUAGE: str | None = None
 COURSE_ALIAS: str | None = None
 ASSIGNMENT_ALIAS: str | None = None
-TA_FEEDBACK_INDICATOR: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
 SUBMISSION_ID_MODE = False
 SUBMISSION_ID = None
 STUDENT_NAME = None
-
 
 BASE_URL = "https://omegaup.com"
 COOKIES = None
@@ -130,7 +151,7 @@ def get_course_assignments_endpoint(course_alias: str) -> str:
     return f"api/course/listAssignments?course_alias={course_alias}"
 
 
-def get_contents_from_url(
+def get_contents_from_url(  # pylint: disable=R0912
     get_endpoint_fn: Callable[..., str],
     args: dict[str, Any] | None = None
 ) -> Any:
@@ -139,111 +160,195 @@ def get_contents_from_url(
 
     if args is None:
         args = {}
-    endpoint = get_endpoint_fn(**args)
-    url = f"{BASE_URL}/{endpoint}"
-
-    if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
-        COOKIES = None
 
     try:
+        endpoint = get_endpoint_fn(**args)
+        url = f"{BASE_URL}/{endpoint}"
+
+        if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
+            COOKIES = None
+
         if COOKIES is None:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies
         else:
-            response = requests.get(url, COOKIES, timeout=10)
+            response = requests.get(url, cookies=COOKIES, timeout=10)
             response.raise_for_status()
-        data = response.json()
+
+        try:
+            data = response.json()
+        except json.JSONDecodeError as e:
+            LOG.error("Failed to decode JSON response from %s: %s", url, e)
+            LOG.error("Response content: %s", response.text[:500])
+            raise APIError(f"Invalid JSON response from {url}") from e
+
         return data
+    except requests.exceptions.Timeout as e:
+        LOG.error("Request timeout for %s: %s", url, e)
+        raise APIError(f"Request timeout for {url}") from e
+    except requests.exceptions.ConnectionError as e:
+        LOG.error("Connection error for %s: %s", url, e)
+        raise APIError(
+            f"Connection error for {url}. "
+            "Please check if the server is running."
+        ) from e
+    except requests.exceptions.HTTPError as e:
+        LOG.error("HTTP error for %s: %s", url, e)
+        if e.response.status_code == 401:
+            raise APIError(
+                "Authentication failed. Please check your credentials."
+            ) from e
+        if e.response.status_code == 403:
+            raise APIError(
+                "Access denied. Please check your permissions."
+            ) from e
+        if e.response.status_code == 404:
+            raise APIError(f"Resource not found: {url}") from e
+        raise APIError(
+            f"HTTP error {e.response.status_code} for {url}"
+        ) from e
     except requests.exceptions.RequestException as e:
-        LOG.error("An error occurred during the request: %s", e)
-        raise
-    except json.JSONDecodeError as e:
-        LOG.error("JSON decoding failed: %s", e)
-        raise
+        LOG.error("Request error for %s: %s", url, e)
+        raise APIError(f"Request failed for {url}") from e
+    except Exception as e:
+        LOG.error("Unexpected error in get_contents_from_url: %s", e)
+        raise APIError("Unexpected error during API request") from e
 
 
 def extract_show_run_ids() -> list[tuple[str, str, str]]:
+    # pylint: disable=R1702
     """
+    Extracts show-run IDs, usernames, and assignment aliases from the course.
     Extracts show-run IDs, usernames, and assignment aliases from the course.
 
     Returns:
         list: List of tuples containing (run_id, username, assignment_alias)
               for all the latest (at most 30 days old) runs from the course
+        list: List of tuples containing (run_id, username, assignment_alias)
+              for all the latest (at most 30 days old) runs from the course
     """
-    if SUBMISSION_ID_MODE:
-        if isinstance(SUBMISSION_ID, str) and isinstance(STUDENT_NAME, str):
-            # In submission ID mode, we still need assignment alias
-            return [(SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS)]
+    try:
+        if SUBMISSION_ID_MODE:
+            if (isinstance(SUBMISSION_ID, str) and
+                    isinstance(STUDENT_NAME, str)):
+                return [(SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS)]
 
-    # Get all assignments if no specific assignment alias is provided
-    assignments_to_process = []
-    if ASSIGNMENT_ALIAS:
-        assignments_to_process = [ASSIGNMENT_ALIAS]
-    else:
-        assignments = get_contents_from_url(
-            get_course_assignments_endpoint,
-            {"course_alias": COURSE_ALIAS}
-        )
-        assignments_to_process = [
-            assignment["alias"] for assignment in assignments["assignments"]
-        ]
+        assignments_to_process = []
+        if ASSIGNMENT_ALIAS:
+            assignments_to_process = [ASSIGNMENT_ALIAS]
+        else:
+            assignments_data = get_contents_from_url(
+                get_course_assignments_endpoint,
+                {"course_alias": COURSE_ALIAS}
+            )
+            if "assignments" not in assignments_data:
+                raise KeyError("No assignments found in course response")
+            assignments_to_process = [
+                assignment["alias"]
+                for assignment in assignments_data["assignments"]
+            ]
 
-    current_time = int(time.time())
-    a_month_ago = current_time - (30 * 24 * 60 * 60)
+        current_time = int(time.time())
+        a_month_ago = current_time - (30 * 24 * 60 * 60)
 
-    run_ids_and_usernames = []
+        run_ids_and_usernames = []
 
-    for assignment_alias in assignments_to_process:
-        runs = get_contents_from_url(
-            get_runs_from_course_endpoint,
-            {
-                "course_alias": COURSE_ALIAS,
-                "assignment_alias": assignment_alias
-            },
-        )["runs"]
+        for assignment_alias in assignments_to_process:
+            runs_data = get_contents_from_url(
+                get_runs_from_course_endpoint,
+                {
+                    "course_alias": COURSE_ALIAS,
+                    "assignment_alias": assignment_alias
+                },
+            )
 
-        assignment_runs = [
-            (item["guid"], item["username"], assignment_alias)
-            for item in runs
-            if item["time"] >= a_month_ago
-        ]
-        run_ids_and_usernames.extend(assignment_runs)
+            if "runs" not in runs_data:
+                LOG.warning(
+                    "No runs found for assignment %s", assignment_alias
+                )
+                continue
 
-    return run_ids_and_usernames
+            runs = runs_data["runs"]
+
+            assignment_runs = [
+                (item["guid"], item["username"], assignment_alias)
+                for item in runs
+                if "time" in item and "guid" in item and "username" in item
+                and item["time"] >= a_month_ago
+            ]
+            run_ids_and_usernames.extend(assignment_runs)
+
+        return run_ids_and_usernames
+    except KeyError as e:
+        LOG.error("Missing required data in API response: %s", e)
+        raise DataError(
+            "Invalid API response format when extracting run IDs."
+        ) from e
+    except (APIError, LLMError) as e:
+        LOG.error("Critical error extracting run IDs: %s", e)
+        raise
+    except Exception as e:
+        LOG.error("Error extracting run IDs: %s", e)
+        raise DataError("Failed to extract run IDs from course.") from e
 
 
 def extract_feedback_thread(run_alias: str) -> list[list[dict[str, Any]]]:
+    # pylint: disable=R1702
     """
     Extracts feedback thread from a run.
 
     Returns:
     list: List of feedback threads
     """
-    submission_feedback_requests = get_contents_from_url(
-        get_runs_submission_feedback_endpoint, {"run_alias": run_alias}
-    )
+    try:
+        submission_feedback_requests = get_contents_from_url(
+            get_runs_submission_feedback_endpoint, {"run_alias": run_alias}
+        )
 
-    conversations = []
-    for feedback_request in submission_feedback_requests:
-        conversation = []
-        conversation.append({
-            "line_number": feedback_request["range_bytes_start"]
-        })
-        conversation.append({
-            "feedback_id": feedback_request["submission_feedback_id"]
-        })
-        conversation.append({
-            feedback_request["author"]: feedback_request["feedback"]
-        })
+        conversations = []
+        for feedback_request in submission_feedback_requests:
+            try:
+                conversation = []
+                conversation.append({
+                    "line_number": feedback_request.get("range_bytes_start")
+                })
+                conversation.append({
+                    "feedback_id":
+                        feedback_request.get("submission_feedback_id")
+                })
 
-        if "feedback_thread" in feedback_request:
-            for feedback in feedback_request["feedback_thread"]:
-                conversation.append({feedback["author"]: feedback["text"]})
+                author = feedback_request.get("author")
+                feedback_text = feedback_request.get("feedback")
+                if author and feedback_text:
+                    conversation.append({author: feedback_text})
 
-        conversations.append(conversation)
+                if "feedback_thread" in feedback_request:
+                    for feedback in feedback_request["feedback_thread"]:
+                        thread_author = feedback.get("author")
+                        thread_text = feedback.get("text")
+                        if thread_author and thread_text:
+                            conversation.append({thread_author: thread_text})
 
-    return conversations
+                conversations.append(conversation)
+            except (KeyError, TypeError) as e:
+                LOG.warning("Skipping malformed feedback request: %s", e)
+                continue
+
+        return conversations
+    except (APIError, LLMError) as e:
+        LOG.error(
+            "Critical error extracting feedback thread for run %s: %s",
+            run_alias, e
+        )
+        raise
+    except Exception as e:
+        LOG.error(
+            "Error extracting feedback thread for run %s: %s", run_alias, e
+        )
+        raise DataError(
+            f"Failed to extract feedback thread for run {run_alias}."
+        ) from e
 
 
 def conjure_query(  # pylint: disable=R0913
@@ -288,11 +393,29 @@ def conjure_query(  # pylint: disable=R0913
 
 def get_prompt(query_content: str) -> str:
     """Get the prompt from the .\teaching_assistant_prompt.txt file"""
-    with open(
-        "./teaching_assistant_prompt.txt", "r", encoding='utf-8'
-    ) as file:
-        prompt = file.read()
-    return prompt.format(LANGUAGE=LANGUAGE, query_content=query_content)
+    try:
+        with open(
+            "./teaching_assistant_prompt.txt", "r", encoding='utf-8'
+        ) as file:
+            prompt = file.read()
+        return prompt.format(LANGUAGE=LANGUAGE, query_content=query_content)
+    except FileNotFoundError as e:
+        LOG.error("Prompt file not found: %s", e)
+        raise ConfigurationError(
+            "Teaching assistant prompt file not found. "
+            "Please ensure 'teaching_assistant_prompt.txt' exists "
+            "in the current directory."
+        ) from e
+    except IOError as e:
+        LOG.error("Error reading prompt file: %s", e)
+        raise ConfigurationError(
+            "Failed to read teaching assistant prompt file."
+        ) from e
+    except Exception as e:
+        LOG.error("Unexpected error formatting prompt: %s", e)
+        raise ConfigurationError(
+            "Failed to format teaching assistant prompt."
+        ) from e
 
 
 def query_llm(
@@ -306,26 +429,33 @@ def query_llm(
     Returns:
     string: Response from the LLM
     """
+    try:
+        prompt = get_prompt(query_content=query_content)
 
-    prompt = get_prompt(query_content=query_content)
+        if CLIENT is None:
+            raise LLMError("CLIENT is not initialized")
 
-    if CLIENT is None:
-        raise ValueError("CLIENT is not initialized")
+        response_text = CLIENT.generate_response(prompt, temperature)
 
-    response_text = CLIENT.generate_response(prompt, temperature)
+        if not is_initial_feedback and len(response_text) > 1000:
+            LOG.warning(
+                "The response is too long. Trying to make it concise."
+            )
+            concise_request = (
+                "Can you make the following response concise and try to "
+                "limit it within 1000 characters? " + response_text
+            )
 
-    if not is_initial_feedback and len(response_text) > 1000:
-        LOG.warning(
-            "The response is too long. Trying to make it concise."
-        )
-        concise_request = (
-            f"Can you make the following response concise and try to limit it "
-            f"within 1000 characters? {response_text}"
-        )
+            response_text = CLIENT.generate_response(
+                concise_request, temperature
+            )
 
-        response_text = CLIENT.generate_response(concise_request, temperature)
-
-    return response_text
+        return response_text
+    except LLMError:
+        raise
+    except Exception as e:
+        LOG.error("Error querying LLM: %s", e)
+        raise LLMError("Failed to get response from LLM.") from e
 
 
 def process_initial_feedback(
@@ -343,30 +473,51 @@ def process_initial_feedback(
     """
     if ta_feedback is None:
         return
-    for line, feedback in ta_feedback.items():
-        targeted_line = "0" if line == "general advices" else line
-        feedback_list = (
-            '[{"lineNumber": ' + targeted_line + ', "feedback": "'
-            + (str(TA_FEEDBACK_INDICATOR) + " " + feedback)[:1000] + '"}]'
-        )
-        if not SKIP_CONFIRM:
-            print("It is an initial feedback.")
-            print(f"The response is:\n {feedback_list}")
-            user_response = input(
-                "Do you want to post this response? (yes/no): "
-            ).strip().lower()
-            print_horizontal_line()
-            if user_response != "yes":
-                return
-        get_contents_from_url(
-            set_submission_feedback_list_endpoint,
-            {
-                "run_alias": show_run_id,
-                "course_alias": course_alias,
-                "assignment_alias": assignment_alias,
-                "feedback_list": feedback_list,
-            },
-        )
+
+    try:
+        for line, feedback in ta_feedback.items():
+            try:
+                targeted_line = "0" if line == "general advices" else line
+                feedback_text = (
+                    str(TA_FEEDBACK_INDICATOR) + " " + feedback
+                )[:1000]
+                feedback_list = (
+                    '[{"lineNumber": ' + targeted_line + ', "feedback": "'
+                    + feedback_text + '"}]'
+                )
+                if not SKIP_CONFIRM:
+                    print("It is an initial feedback.")
+                    print(f"The response is:\n {feedback_list}")
+                    user_response = input(
+                        "Do you want to post this response? (yes/no): "
+                    ).strip().lower()
+                    print_horizontal_line()
+                    if user_response != "yes":
+                        return
+                get_contents_from_url(
+                    set_submission_feedback_list_endpoint,
+                    {
+                        "run_alias": show_run_id,
+                        "course_alias": course_alias,
+                        "assignment_alias": assignment_alias,
+                        "feedback_list": feedback_list,
+                    },
+                )
+            except (KeyError, TypeError) as e:
+                LOG.warning("Skipping malformed feedback item: %s", e)
+                continue
+            except KeyboardInterrupt:
+                LOG.info("User interrupted feedback processing")
+                raise
+            except requests.exceptions.RequestException as e:
+                LOG.error("Error posting feedback: %s", e)
+                continue
+    except (LLMError, APIError) as e:
+        LOG.error("Critical error processing initial feedback: %s", e)
+        raise
+    except Exception as e:
+        LOG.error("Error processing initial feedback: %s", e)
+        raise DataError("Failed to process initial feedback.") from e
 
 
 def print_horizontal_line() -> None:
@@ -379,7 +530,7 @@ def print_horizontal_double_line() -> None:
     print("=" * 80)
 
 
-def handle_feedbacks(  # pylint: disable=R0913
+def handle_feedbacks(  # pylint: disable=R0913,R0912,R0915
         user_name: str,
         index: int,
         total_runs: int,
@@ -402,114 +553,176 @@ def handle_feedbacks(  # pylint: disable=R0913
 
     is_initial_feedback = len(feedbacks) == 1
 
-    for feedback in feedbacks:
-        if user_name not in feedback[-1]:
-            continue
-        line_number = feedback[0]["line_number"]
-        feedback_id = feedback[1]["feedback_id"]
-        conjured_query = conjure_query(
-            problem_content,
-            problem_solution,
-            source_content,
-            str(feedback[2:]),
-            user_name,
-            line_number,
-            line_number is not None,
-        )
-        if line_number is not None:
-            if not SKIP_CONFIRM:
-                print_horizontal_double_line()
-                print(f"The question is:\n {problem_content}")
-                print_horizontal_line()
-                print(f"The solution is:\n {source_content}")
-                print_horizontal_line()
-            oracle_feedback = query_llm(
-                conjured_query, is_initial_feedback=False
-            )
-            if len(oracle_feedback) >= 1000:
-                LOG.error(
-                    "The response is still too long. "
-                    "Trimming it to the first 1000 characters."
-                )
-            if not SKIP_CONFIRM:
-                print(
-                    f"The last question asked was:\n {feedback[-1]}"
-                )
-                print_horizontal_line()
-                print(
-                    "The response is:\n "
-                    + str(TA_FEEDBACK_INDICATOR)
-                    + " "
-                    + oracle_feedback[:1000]
-                )
-                print_horizontal_line()
+    for feedback in feedbacks:  # pylint: disable=R1702
+        try:
+            if user_name not in feedback[-1]:
+                continue
 
-                user_response = input(
-                    "Do you want to post this response? (yes/no): "
-                ).strip().lower()
-                print_horizontal_line()
-                if user_response != "yes":
-                    continue
-            get_contents_from_url(
-                set_submission_feedback_endpoint,
-                {
-                    "run_alias": run_id,
-                    "course_alias": COURSE_ALIAS,
-                    "assignment_alias": assignment_alias,
-                    "feedback": urllib.parse.quote(
-                        (
-                            str(TA_FEEDBACK_INDICATOR)
-                            +
-                            " "
-                            +
-                            oracle_feedback
-                        )[:1000]
-                    ),
-                    "line_number": line_number,
-                    "submission_feedback_id": feedback_id,
-                }
-            )
-            LOG.info(
-                "Request %s out of %s from user %s on %s: DONE",
-                index + 1,
-                total_runs,
+            try:
+                line_number = feedback[0].get("line_number")
+                feedback_id = feedback[1].get("feedback_id")
+            except (IndexError, KeyError, TypeError) as e:
+                LOG.warning("Malformed feedback structure, skipping: %s", e)
+                continue
+
+            conjured_query = conjure_query(
+                problem_content,
+                problem_solution,
+                source_content,
+                str(feedback[2:]),
                 user_name,
-                problem_alias,
+                line_number if line_number is not None else 0,
+                line_number is not None,
             )
-        else:
-            if is_initial_feedback:
-                if not SKIP_CONFIRM:
-                    print_horizontal_double_line()
-                    print(f"The question is:\n {problem_content}")
-                    print_horizontal_line()
-                    print(f"The solution is:\n {source_content}")
-                    print_horizontal_line()
-                oracle_feedback = query_llm(
-                    conjured_query,
-                )
-                oracle_feedback = oracle_feedback.strip()
-                if oracle_feedback.startswith("```json"):
-                    oracle_feedback = oracle_feedback.removeprefix(
-                        "```json"
-                    ).strip()
-                if oracle_feedback.endswith("```"):
-                    oracle_feedback = oracle_feedback.removesuffix(
-                        "```"
-                    ).strip()
-                oracle_feedback = json.loads(oracle_feedback)
-                process_initial_feedback(
-                    oracle_feedback,
-                    run_id,
-                    COURSE_ALIAS,
-                    assignment_alias
-                )
-                LOG.info(
-                    "Request %s out of %s from user %s on %s: DONE",
-                    index + 1,
-                    total_runs,
-                    user_name,
-                    problem_alias,
-                )
+
+            if line_number is not None:
+                try:
+                    if not SKIP_CONFIRM:
+                        print_horizontal_double_line()
+                        print(f"The question is:\n {problem_content}")
+                        print_horizontal_line()
+                        print(f"The solution is:\n {source_content}")
+                        print_horizontal_line()
+                    oracle_feedback = query_llm(
+                        conjured_query, is_initial_feedback=False
+                    )
+                    if len(oracle_feedback) >= 1000:
+                        LOG.error(
+                            "The response is still too long. "
+                            "Trimming it to the first 1000 characters."
+                        )
+                    if not SKIP_CONFIRM:
+                        print(
+                            f"The last question asked was:\n {feedback[-1]}"
+                        )
+                        print_horizontal_line()
+                        print(
+                            "The response is:\n "
+                            + str(TA_FEEDBACK_INDICATOR)
+                            + " "
+                            + oracle_feedback[:1000]
+                        )
+                        print_horizontal_line()
+
+                        user_response = input(
+                            "Do you want to post this response? (yes/no): "
+                        ).strip().lower()
+                        print_horizontal_line()
+                        if user_response != "yes":
+                            continue
+                    get_contents_from_url(
+                        set_submission_feedback_endpoint,
+                        {
+                            "run_alias": run_id,
+                            "course_alias": COURSE_ALIAS,
+                            "assignment_alias": assignment_alias,
+                            "feedback": urllib.parse.quote(
+                                (
+                                    str(TA_FEEDBACK_INDICATOR)
+                                    +
+                                    " "
+                                    +
+                                    oracle_feedback
+                                )[:1000]
+                            ),
+                            "line_number": line_number,
+                            "submission_feedback_id": feedback_id,
+                        }
+                    )
+                    LOG.info(
+                        "Request %s out of %s from user %s on %s: DONE",
+                        index + 1,
+                        total_runs,
+                        user_name,
+                        problem_alias,
+                    )
+                except KeyboardInterrupt:
+                    LOG.info("User interrupted feedback processing")
+                    raise
+                except LLMError as e:
+                    LOG.error("LLM error processing feedback with "
+                              "line number: %s", e)
+                    raise
+                except APIError as e:
+                    LOG.error("API error processing feedback with "
+                              "line number: %s", e)
+                    raise
+                except Exception as e:  # pylint: disable=broad-except
+                    LOG.error("Error processing feedback with "
+                              "line number: %s", e)
+                    continue
+            else:
+                if is_initial_feedback:
+                    try:
+                        if not SKIP_CONFIRM:
+                            print_horizontal_double_line()
+                            print(f"The question is:\n {problem_content}")
+                            print_horizontal_line()
+                            print(f"The solution is:\n {source_content}")
+                            print_horizontal_line()
+                        oracle_feedback = query_llm(
+                            conjured_query,
+                        )
+                        oracle_feedback = oracle_feedback.strip()
+                        if oracle_feedback.startswith("```json"):
+                            oracle_feedback = oracle_feedback.removeprefix(
+                                "```json"
+                            ).strip()
+                        if oracle_feedback.endswith("```"):
+                            oracle_feedback = oracle_feedback.removesuffix(
+                                "```"
+                            ).strip()
+
+                        try:
+                            oracle_feedback = json.loads(oracle_feedback)
+                        except json.JSONDecodeError as e:
+                            LOG.error("Failed to parse JSON response "
+                                      "from LLM: %s", e)
+                            LOG.error("Raw response: %s", oracle_feedback)
+                            continue
+
+                        process_initial_feedback(
+                            oracle_feedback,
+                            run_id,
+                            COURSE_ALIAS,
+                            assignment_alias
+                        )
+                        LOG.info(
+                            "Request %s out of %s from user %s on %s: DONE",
+                            index + 1,
+                            total_runs,
+                            user_name,
+                            problem_alias,
+                        )
+                    except KeyboardInterrupt:
+                        LOG.info("User interrupted feedback processing")
+                        raise
+                    except LLMError as e:
+                        LOG.error("LLM error processing initial "
+                                  "feedback: %s", e)
+                        raise
+                    except APIError as e:
+                        LOG.error("API error processing initial "
+                                  "feedback: %s", e)
+                        raise
+                    except Exception as e:  # pylint: disable=broad-except
+                        LOG.error("Error processing initial feedback: %s", e)
+                        continue
+        except KeyboardInterrupt:
+            LOG.info("User interrupted feedback processing")
+            raise
+        except LLMError as e:
+            LOG.error("LLM error processing feedback for user %s: %s",
+                      user_name, e)
+            raise
+        except APIError as e:
+            LOG.error("API error processing feedback for user %s: %s",
+                      user_name, e)
+            raise
+        except Exception as e:  # pylint: disable=broad-except
+            LOG.error("Error processing feedback for user %s: %s",
+                      user_name, e)
+            continue
 
 
 def process_single_run(
@@ -525,39 +738,75 @@ def process_single_run(
     Returns:
     None
     """
-    run_details = get_contents_from_url(
-        get_runs_endpoint, {"run_alias": run_id}
-    )
-
-    problem_alias = run_details["alias"]
-
-    source_content = run_details["source"]
-
-    problem_content = get_contents_from_url(
-        get_problem_details_endpoint, {"problem_alias": problem_alias}
-    )["statement"]["markdown"]
-
     try:
-        problem_solution = get_contents_from_url(
-            get_problem_solution_endpoint, {"problem_alias": problem_alias}
-        )["solution"]["markdown"]
-    except requests.exceptions.HTTPError:
-        problem_solution = ""
+        run_details = get_contents_from_url(
+            get_runs_endpoint, {"run_alias": run_id}
+        )
 
-    feedbacks = extract_feedback_thread(run_id)
+        if "alias" not in run_details:
+            LOG.error("No problem alias found in run details for run %s",
+                      run_id)
+            return
+        if "source" not in run_details:
+            LOG.error("No source code found in run details for run %s", run_id)
+            return
 
-    handle_feedbacks(
-        username,
-        index,
-        total_runs,
-        run_id,
-        assignment_alias,
-        problem_alias,
-        source_content,
-        problem_content,
-        problem_solution,
-        feedbacks
-    )
+        problem_alias = run_details["alias"]
+        source_content = run_details["source"]
+
+        problem_details = get_contents_from_url(
+            get_problem_details_endpoint, {"problem_alias": problem_alias}
+        )
+
+        if ("statement" not in problem_details or
+                "markdown" not in problem_details["statement"]):
+            LOG.error("No problem statement found for problem %s",
+                      problem_alias)
+            return
+
+        problem_content = problem_details["statement"]["markdown"]
+
+        try:
+            problem_solution_data = get_contents_from_url(
+                get_problem_solution_endpoint, {"problem_alias": problem_alias}
+            )
+            if ("solution" in problem_solution_data and
+                    "markdown" in problem_solution_data["solution"]):
+                problem_solution = (
+                    problem_solution_data["solution"]["markdown"]
+                )
+            else:
+                problem_solution = ""
+        except requests.exceptions.HTTPError:
+            problem_solution = ""
+        except Exception as e:  # pylint: disable=broad-except
+            LOG.warning("Error fetching problem solution for %s: %s",
+                        problem_alias, e)
+            problem_solution = ""
+
+        feedbacks = extract_feedback_thread(run_id)
+
+        handle_feedbacks(
+            username,
+            index,
+            total_runs,
+            run_id,
+            assignment_alias,
+            problem_alias,
+            source_content,
+            problem_content,
+            problem_solution,
+            feedbacks
+        )
+    except KeyError as e:
+        LOG.error("Missing required data in run details for %s: %s", run_id, e)
+        raise DataError(f"Invalid run details format for run {run_id}.") from e
+    except (LLMError, APIError) as e:
+        LOG.error("Critical error processing run %s: %s", run_id, e)
+        raise
+    except Exception as e:
+        LOG.error("Error processing run %s: %s", run_id, e)
+        raise DataError(f"Failed to process run {run_id}.") from e
 
 
 def process_feedbacks() -> None:
@@ -567,21 +816,75 @@ def process_feedbacks() -> None:
     Returns:
     None
     """
-    get_contents_from_url(
-        get_login_endpoint, {"username": USERNAME, "password": PASSWORD}
-    )
-    run_ids_and_usernames = extract_show_run_ids()
-    total_runs = len(run_ids_and_usernames)
-    with logging_redirect_tqdm():
-        for index, (run_id, user_name, assignment_alias) in enumerate(
-            tqdm(run_ids_and_usernames)
-        ):
-            process_single_run(
-                index, run_id, user_name, assignment_alias, total_runs
-            )
+    try:
+        login_response = get_contents_from_url(
+            get_login_endpoint, {"username": USERNAME, "password": PASSWORD}
+        )
+        if login_response.get("status") != "ok":
+            raise APIError("Login failed. Please check your credentials.")
+
+        run_ids_and_usernames = extract_show_run_ids()
+        if not run_ids_and_usernames:
+            LOG.warning("No runs found to process")
+            return
+
+        total_runs = len(run_ids_and_usernames)
+        LOG.info("Processing %d runs", total_runs)
+
+        successful_runs = 0
+        failed_runs = 0
+
+        with logging_redirect_tqdm():
+            for index, (run_id, user_name, assignment_alias) in enumerate(
+                tqdm(run_ids_and_usernames)
+            ):
+                try:
+                    process_single_run(
+                        index, run_id, user_name, assignment_alias, total_runs
+                    )
+                    successful_runs += 1
+                except KeyboardInterrupt:
+                    LOG.info("User interrupted processing")
+                    raise
+                except (LLMError, APIError) as e:
+                    LOG.error("Critical error processing run %s for "
+                              "user %s: %s", run_id, user_name, e)
+                    failed_runs += 1
+                    if isinstance(e, LLMError):
+                        LOG.error("LLM connection issues detected. "
+                                  "Stopping processing.")
+                        raise
+                    if (isinstance(e, APIError) and
+                            "Authentication failed" in str(e)):
+                        LOG.error("Authentication failed. "
+                                  "Stopping processing.")
+                        raise
+                    continue
+                except Exception as e:  # pylint: disable=broad-except
+                    LOG.error("Error processing run %s for user %s: %s",
+                              run_id, user_name, e)
+                    failed_runs += 1
+                    continue
+
+        LOG.info("Processing completed: %d successful, %d failed out of "
+                 "%d total runs", successful_runs, failed_runs, total_runs)
+
+        if failed_runs > 0:
+            raise DataError(f"Processing completed with {failed_runs} "
+                            f"failed runs out of {total_runs} total")
+    except KeyboardInterrupt:
+        LOG.info("Processing interrupted by user")
+        raise
+    except (LLMError, APIError, DataError) as e:
+        LOG.error("Critical error processing feedbacks: %s", e)
+        raise
+    except Exception as e:
+        LOG.error("Unexpected error processing feedbacks: %s", e)
+        raise DataError("Failed to process feedbacks due to "
+                        "unexpected error.") from e
 
 
-def handle_input() -> None:
+def handle_input() -> None:  # pylint: disable=R0915
     """
     Handles input from the user
     """
@@ -591,85 +894,121 @@ def handle_input() -> None:
     global LLM_PROVIDER  # pylint: disable=W0603
     global SUBMISSION_ID_MODE, SUBMISSION_ID  # pylint: disable=W0603
     global STUDENT_NAME  # pylint: disable=W0603
-    parser = argparse.ArgumentParser(
-        description="Process feedbacks from students"
-    )
-    parser.add_argument("--username", type=str, help="Your username")
-    parser.add_argument("--password", type=str, help="Your password")
-    parser.add_argument(
-        "--submission_id_mode",
-        action="store_true",
-        help="Yes if you want to process a single submission."
-    )
-    parser.add_argument(
-        "--submission_id",
-        type=str,
-        help="Submission ID to process feedbacks for"
-    )
-    parser.add_argument(
-        "--student_name",
-        type=str,
-        help="Student name to process feedbacks for"
-    )
-    parser.add_argument(
-        "--course_alias",
-        type=str,
-        help="Course alias to process feedbacks for"
-    )
-    parser.add_argument(
-        "--assignment_alias",
-        type=str,
-        help="Assignment alias to process feedbacks for"
-    )
-    parser.add_argument(
-        "--language", type=str, help="Language to use for feedbacks"
-    )
-    parser.add_argument(
-        "--ta_feedback_indicator",
-        type=str,
-        help="Indicates that it's a TA feedback"
-    )
-    parser.add_argument("--key", type=str, help="API key for the LLM provider")
-    parser.add_argument(
-        "--llm",
-        type=str,
-        default="deepseek",
-        choices=["claude", "gpt", "deepseek", "gemini"],
-        help="LLM provider to use (default: deepseek)"
-    )
-    parser.add_argument(
-        "--skip-confirm",
-        action="store_true",
-        help="Skip confirmation prompts"
-    )
-    args = parser.parse_args()
-
-    USERNAME = args.username or input("Enter your username: ")
-    PASSWORD = args.password or getpass("Enter your password: ")
-    SUBMISSION_ID_MODE = (args.submission_id_mode == "true") or input(
-        "Are you working in submission id mode: "
-    ) == "true"
-    if SUBMISSION_ID_MODE:
-        SUBMISSION_ID = args.submission_id or input(
-            "Enter the submission id: "
+    try:
+        parser = argparse.ArgumentParser(
+            description="Process feedbacks from students"
         )
-        STUDENT_NAME = args.student_name or input("Enter the student name: ")
-    COURSE_ALIAS = args.course_alias or input("Enter the course alias: ")
-    ASSIGNMENT_ALIAS = args.assignment_alias or input(
-        "Enter the assignment alias (leave empty to process all assignments): "
-    )
-    LANGUAGE = args.language or input(
-        'Enter the language (e.g. "Spanish", "English", "Portuguese"): '
-    )
-    TA_FEEDBACK_INDICATOR = args.ta_feedback_indicator or input(
-        "As these feedbacks are AI generated, the input string will be"
-        " added to the feedback. \n(Default: Ese mensaje fue generado por un"
-        " modelo de inteligencia artificial.)\nPlease enter the string: "
-    ) or "Ese mensaje fue generado por un modelo de inteligencia artificial."
-    LLM_PROVIDER = args.llm
-    provider_name = LLM_PROVIDER.upper() if LLM_PROVIDER else "LLM"
-    KEY = args.key or getpass(f"Enter your {provider_name} API key: ")
-    SKIP_CONFIRM = args.skip_confirm
+        parser.add_argument("--username", type=str, help="Your username")
+        parser.add_argument("--password", type=str, help="Your password")
+        parser.add_argument(
+            "--submission_id_mode",
+            action="store_true",
+            help="Yes if you want to process a single submission."
+        )
+        parser.add_argument(
+            "--submission_id",
+            type=str,
+            help="Submission ID to process feedbacks for"
+        )
+        parser.add_argument(
+            "--student_name",
+            type=str,
+            help="Student name to process feedbacks for"
+        )
+        parser.add_argument(
+            "--course_alias",
+            type=str,
+            help="Course alias to process feedbacks for"
+        )
+        parser.add_argument(
+            "--assignment_alias",
+            type=str,
+            help="Assignment alias to process feedbacks for"
+        )
+        parser.add_argument(
+            "--language", type=str, help="Language to use for feedbacks"
+        )
+        parser.add_argument(
+            "--ta_feedback_indicator",
+            type=str,
+            help="Indicates that it's a TA feedback"
+        )
+        parser.add_argument("--key", type=str,
+                            help="API key for the LLM provider")
+        parser.add_argument(
+            "--llm",
+            type=str,
+            default="deepseek",
+            choices=["claude", "gpt", "deepseek", "gemini"],
+            help="LLM provider to use (default: deepseek)"
+        )
+        parser.add_argument(
+            "--skip-confirm",
+            action="store_true",
+            help="Skip confirmation prompts"
+        )
+        args = parser.parse_args()
+
+        try:
+            USERNAME = args.username or input("Enter your username: ")
+            PASSWORD = args.password or getpass("Enter your password: ")
+            SUBMISSION_ID_MODE = args.submission_id_mode or input(
+                "Are you working in submission id mode: "
+            ) == "true"
+            if SUBMISSION_ID_MODE:
+                SUBMISSION_ID = args.submission_id or input(
+                    "Enter the submission id: "
+                )
+                STUDENT_NAME = (args.student_name or
+                                input("Enter the student name: "))
+            COURSE_ALIAS = (args.course_alias or
+                            input("Enter the course alias: "))
+            ASSIGNMENT_ALIAS = (args.assignment_alias or input(
+                "Enter the assignment alias (leave empty to process "
+                "all assignments): ") or None)
+            LANGUAGE = (args.language or input(
+                'Enter the language (e.g. "Spanish", "English", '
+                '"Portuguese"): '))
+            TA_FEEDBACK_INDICATOR = (args.ta_feedback_indicator or input(
+                "As these feedbacks are AI generated, the input string "
+                "will be added to the feedback. \n(Default: Ese mensaje "
+                "fue generado por un modelo de inteligencia artificial.)"
+                "\nPlease enter the string: "
+            ) or "Ese mensaje fue generado por un modelo de "
+                 "inteligencia artificial.")
+            LLM_PROVIDER = args.llm
+            provider_name = LLM_PROVIDER.upper() if LLM_PROVIDER else "LLM"
+            KEY = args.key or getpass(f"Enter your {provider_name} API key: ")
+            SKIP_CONFIRM = args.skip_confirm
+        except KeyboardInterrupt:
+            LOG.info("User interrupted input")
+            raise
+        except EOFError as exc:
+            LOG.error("Unexpected end of input")
+            raise ConfigurationError("Input terminated unexpectedly") from exc
+        except Exception as e:
+            LOG.error("Error during input collection: %s", e)
+            raise ConfigurationError("Failed to collect required input") from e
+
+        if not USERNAME or not PASSWORD:
+            raise ConfigurationError("Username and password are required")
+        if not COURSE_ALIAS:
+            raise ConfigurationError("Course alias is required")
+        if not LANGUAGE:
+            raise ConfigurationError("Language is required")
+        if not KEY:
+            raise ConfigurationError("API key is required")
+        if SUBMISSION_ID_MODE and (not SUBMISSION_ID or not STUDENT_NAME):
+            raise ConfigurationError(
+                "Submission ID and student name are required in "
+                "submission ID mode"
+            )
+
+    except ConfigurationError:
+        raise
+    except Exception as e:
+        LOG.error("Error handling input: %s", e)
+        raise ConfigurationError("Failed to handle input parameters") from e
 
 
 def main() -> None:
@@ -678,14 +1017,45 @@ def main() -> None:
     """
     global CLIENT  # pylint: disable=W0603
 
-    handle_input()
+    try:
+        handle_input()
 
-    if LLM_PROVIDER is None or KEY is None:
-        raise ValueError("LLM_PROVIDER and KEY must be set")
+        if LLM_PROVIDER is None or KEY is None:
+            raise ConfigurationError("LLM_PROVIDER and KEY must be set")
 
-    CLIENT = LLMWrapper(LLM_PROVIDER, KEY)
+        try:
+            CLIENT = LLMWrapper(LLM_PROVIDER, KEY)
+        except Exception as e:
+            LOG.error("Failed to initialize LLM client: %s", e)
+            raise LLMError(
+                "Failed to initialize LLM client. Please check "
+                "your API key and provider."
+            ) from e
 
-    process_feedbacks()
+        process_feedbacks()
+        LOG.info("Successfully completed processing all feedbacks")
+
+    except KeyboardInterrupt:
+        LOG.info("Program interrupted by user")
+        sys.exit(1)
+    except ConfigurationError as e:
+        LOG.error("Configuration error: %s", e)
+        sys.exit(1)
+    except LLMError as e:
+        LOG.error("LLM error: %s", e)
+        sys.exit(1)
+    except APIError as e:
+        LOG.error("API error: %s", e)
+        sys.exit(1)
+    except DataError as e:
+        LOG.error("Data processing error: %s", e)
+        sys.exit(1)
+    except TeachingAssistantError as e:
+        LOG.error("Teaching assistant error: %s", e)
+        sys.exit(1)
+    except Exception as e:  # pylint: disable=broad-except
+        LOG.error("Unexpected error: %s", e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
