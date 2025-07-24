@@ -902,8 +902,8 @@ def handle_input() -> None:  # pylint: disable=R0915, R0912
         parser.add_argument("--password", type=str, help="Your password")
         parser.add_argument(
             "--submission_id_mode",
-            action="store_true",
-            help="Yes if you want to process a single submission."
+            type=str,
+            help="true if you want to process a single submission."
         )
         parser.add_argument(
             "--test_mode",
