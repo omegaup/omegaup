@@ -1008,7 +1008,8 @@ def handle_input() -> None:  # pylint: disable=R0915, R0912
             raise ConfigurationError("Language is required")
         if not KEY:
             raise ConfigurationError("API key is required")
-        if SUBMISSION_ID_MODE == "true" and (not SUBMISSION_ID or not STUDENT_NAME):
+        if (SUBMISSION_ID_MODE == "true" and
+                (not SUBMISSION_ID or not STUDENT_NAME)):
             raise ConfigurationError(
                 "Submission ID and student name are required in "
                 "submission ID mode"
