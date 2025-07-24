@@ -884,7 +884,7 @@ def process_feedbacks() -> None:
                         "unexpected error.") from e
 
 
-def handle_input() -> None:  # pylint: disable=R0915
+def handle_input() -> None:  # pylint: disable=R0915, R0912
     """
     Handles input from the user
     """
