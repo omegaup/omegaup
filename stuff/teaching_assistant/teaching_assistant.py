@@ -229,7 +229,7 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
               for all the latest (at most 30 days old) runs from the course
     """
     try:
-        if SUBMISSION_ID_MODE:
+        if SUBMISSION_ID_MODE == "true":
             if (isinstance(SUBMISSION_ID, str) and
                     isinstance(STUDENT_NAME, str)):
                 return [(SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS)]
@@ -1008,7 +1008,7 @@ def handle_input() -> None:  # pylint: disable=R0915, R0912
             raise ConfigurationError("Language is required")
         if not KEY:
             raise ConfigurationError("API key is required")
-        if SUBMISSION_ID_MODE and (not SUBMISSION_ID or not STUDENT_NAME):
+        if SUBMISSION_ID_MODE == "true" and (not SUBMISSION_ID or not STUDENT_NAME):
             raise ConfigurationError(
                 "Submission ID and student name are required in "
                 "submission ID mode"
