@@ -115,7 +115,10 @@
               </div>
               <div class="collapse show card-body px-2 px-sm-4 tags">
                 <div
-                  v-show="selectedTags.length === 0 && currentLanguages !== ''"
+                  v-show="
+                    (selectedPublicTags.length === 0 || !problemLevel) &&
+                    currentLanguages !== ''
+                  "
                   class="alert alert-info"
                 >
                   {{ T.problemEditTagPublicRequired }}
@@ -568,7 +571,7 @@ export default class ProblemForm extends Vue {
   }
 
   get howToWriteProblemLink(): string {
-    return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
+    return 'https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md';
   }
 
   get buttonText(): string {

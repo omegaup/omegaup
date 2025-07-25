@@ -11,7 +11,8 @@
               highCount: page * length,
             })
       }}
-      <a href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+
+      <a :href="UserRankingFeatureGuideURL"
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
@@ -156,6 +157,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 
+import { getBlogUrl } from '../../urlHelper';
+
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -184,10 +187,10 @@ interface Rank {
 export default class UserRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
-  @Prop() isIndex!: boolean;
+  @Prop({ default: false }) isIndex!: boolean;
   @Prop() isLogged!: boolean;
-  @Prop() availableFilters!: { [key: string]: string };
-  @Prop() filter!: string;
+  @Prop({ default: () => {} }) availableFilters!: { [key: string]: string };
+  @Prop({ default: null }) filter!: string | null;
   @Prop() ranking!: Rank[];
   @Prop() lastUpdated!: Date;
   @Prop() resultTotal!: number;
@@ -199,6 +202,11 @@ export default class UserRank extends Vue {
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
   currentFilter = this.filter;
+
+  get UserRankingFeatureGuideURL(): string {
+    // Use the key defined in blog.json
+    return getBlogUrl('UserRankingFeatureGuideURL');
+  }
 
   get lastUpdatedText(): null | string {
     if (!this.lastUpdated) {

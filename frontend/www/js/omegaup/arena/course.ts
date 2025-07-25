@@ -89,6 +89,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      problemDetails?.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
@@ -105,6 +112,7 @@ OmegaUp.on('ready', async () => {
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
       feedbackMap,
@@ -132,6 +140,7 @@ OmegaUp.on('ready', async () => {
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           socketStatus: socketStore.state.socketStatus,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
@@ -221,6 +230,19 @@ OmegaUp.on('ready', async () => {
                   run,
                 });
               });
+          },
+          'execute-run': ({
+            target,
+          }: {
+            target: Vue & { currentNextExecutionTimestamp: Date };
+          }) => {
+            api.Run.execute()
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                target.currentNextExecutionTimestamp =
+                  response.nextExecutionTimestamp;
+              })
+              .catch(ui.apiError);
           },
           'submit-run': ({
             problem,

@@ -3,10 +3,13 @@
     :accepted-languages="acceptedLanguages"
     :initial-language="initialLanguage"
     :problem="problem"
-    :can-submit="canSubmit"
+    :should-show-submit-button="canSubmit"
     :can-run="canRun"
     :is-embedded="isEmbedded"
     :initial-theme="initialTheme"
+    :next-submission-timestamp="nextSubmissionTimestamp"
+    :next-execution-timestamp="nextExecutionTimestamp"
+    @execute-run="() => this.$emit('execute-run')"
   >
   </ephemeral-ide>
 </template>
@@ -38,6 +41,8 @@ export default class EphemeralGrader extends Vue {
   @Prop({ default: true }) isEmbedded!: boolean;
   @Prop({ default: Util.MonacoThemes.VSLight })
   initialTheme!: Util.MonacoThemes;
+  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: null }) nextExecutionTimestamp!: null | Date;
 
   // note: initial source is for the IDE is also supported
   get initialLanguage() {

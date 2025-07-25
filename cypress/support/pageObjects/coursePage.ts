@@ -158,7 +158,8 @@ export class CoursePage {
     runOptions: RunOptions,
   ): void {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-    cy.get('[data-new-run]').click();
+    cy.waitUntil(() => cy.get('[data-new-run] a').should('be.visible'));
+    cy.get('[data-new-run] a').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').first().type(fileContent);

@@ -97,6 +97,29 @@ export const Admin = {
   >('/api/admin/platformReportStats/'),
 };
 
+export const AiEditorial = {
+  generate: apiCall<
+    messages.AiEditorialGenerateRequest,
+    messages.AiEditorialGenerateResponse
+  >('/api/aiEditorial/generate/'),
+  review: apiCall<
+    messages.AiEditorialReviewRequest,
+    messages.AiEditorialReviewResponse
+  >('/api/aiEditorial/review/'),
+  status: apiCall<
+    messages.AiEditorialStatusRequest,
+    messages._AiEditorialStatusServerResponse,
+    messages.AiEditorialStatusResponse
+  >('/api/aiEditorial/status/', (x) => {
+    if (typeof x.job !== 'undefined' && x.job !== null)
+      x.job = ((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      })(x.job);
+    return x;
+  }),
+};
+
 export const Authorization = {
   problem: apiCall<
     messages.AuthorizationProblemRequest,
@@ -1258,6 +1281,13 @@ export const Problem = {
   >('/api/problem/details/', (x) => {
     x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
     if (
+      typeof x.nextExecutionTimestamp !== 'undefined' &&
+      x.nextExecutionTimestamp !== null
+    )
+      x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+        x.nextExecutionTimestamp,
+      );
+    if (
       typeof x.nextSubmissionTimestamp !== 'undefined' &&
       x.nextSubmissionTimestamp !== null
     )
@@ -1667,6 +1697,26 @@ export const Run = {
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
   >('/api/run/disqualify/'),
+  execute: apiCall<
+    messages.RunExecuteRequest,
+    messages._RunExecuteServerResponse,
+    messages.RunExecuteResponse
+  >('/api/run/execute/', (x) => {
+    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+      x.nextExecutionTimestamp,
+    );
+    return x;
+  }),
+  executeForIDE: apiCall<
+    messages.RunExecuteForIDERequest,
+    messages._RunExecuteForIDEServerResponse,
+    messages.RunExecuteForIDEResponse
+  >('/api/run/executeForIDE/', (x) => {
+    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+      x.nextExecutionTimestamp,
+    );
+    return x;
+  }),
   getSubmissionFeedback: apiCall<
     messages.RunGetSubmissionFeedbackRequest,
     messages._RunGetSubmissionFeedbackServerResponse,

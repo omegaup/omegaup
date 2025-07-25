@@ -13,10 +13,11 @@
               highCount: page * length,
             })
       }}
-      <a href="https://blog.omegaup.com/ranking-de-escuelas-en-omegaup/"
-        ><font-awesome-icon :icon="['fas', 'question-circle']" />
-        {{ T.wordsRankingMeasurement }}</a
-      >
+
+      <a :href="SchoolRankingFeatureGuideURL">
+        <font-awesome-icon :icon="['fas', 'question-circle']" />
+        {{ T.wordsRankingMeasurement }}
+      </a>
     </h5>
     <table class="table mb-0">
       <thead>
@@ -66,6 +67,7 @@ import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getBlogUrl } from '../../urlHelper';
 
 @Component({
   components: {
@@ -84,6 +86,11 @@ export default class SchoolRank extends Vue {
 
   T = T;
   ui = ui;
+
+  get SchoolRankingFeatureGuideURL(): string {
+    // Use the key defined in blog-links-config.json
+    return getBlogUrl('SchoolRankingFeatureGuideURL');
+  }
 }
 </script>
 

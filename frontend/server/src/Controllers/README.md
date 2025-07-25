@@ -1,5 +1,9 @@
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [AiEditorial](#aieditorial)
+  - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
+  - [`/api/aiEditorial/review/`](#apiaieditorialreview)
+  - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -192,6 +196,8 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/execute/`](#apirunexecute)
+  - [`/api/run/executeForIDE/`](#apirunexecuteforide)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -285,6 +291,67 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+# AiEditorial
+
+AI Editorial Controller
+
+## `/api/aiEditorial/generate/`
+
+### Description
+
+Generate AI editorial for a problem
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `language`      | `string` |             |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name     | Type     |
+| -------- | -------- |
+| `job_id` | `string` |
+
+## `/api/aiEditorial/review/`
+
+### Description
+
+Review and approve/reject an AI editorial
+
+When approved, the editorial is published to gitserver
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `action`   | `string`       |             |
+| `job_id`   | `string`       |             |
+| `language` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/aiEditorial/status/`
+
+### Description
+
+Get status of an AI editorial job
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `job_id` | `string` |             |
+
+### Returns
+
+| Name  | Type                          |
+| ----- | ----------------------------- |
+| `job` | `types.AiEditorialJobDetails` |
 
 # Authorization
 
@@ -841,6 +908,7 @@ Creates a new contest
 | `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`       | `float\|null`                                              |             |
 | `problems`                  | `null\|string`                                             |             |
+| `recommended`               | `bool\|null`                                               |             |
 | `requests_user_information` | `bool\|null`                                               |             |
 | `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                | `float\|null`                                              |             |
@@ -1355,7 +1423,7 @@ Search users in contest
 ### Description
 
 Given a contest_alias, sets the recommended flag on/off.
-Only omegaUp admins can call this API.
+Only omegaUp admins and support team members can call this API.
 
 ### Parameters
 
@@ -1422,6 +1490,7 @@ Update a Contest
 | `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`                        | `float\|null`                                              |             |
 | `problems`                                   | `null\|string`                                             |             |
+| `recommended`                                | `bool\|null`                                               |             |
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
@@ -3042,7 +3111,6 @@ List of public and user's private problems
 
 | Name                    | Type                                                                                                                               | Description |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `only_quality_seal`     | `bool`                                                                                                                             |             |
 | `difficulty`            | `null\|string`                                                                                                                     |             |
 | `difficulty_range`      | `null\|string`                                                                                                                     |             |
 | `language`              | `''\|'all'\|'en'\|'es'\|'pt'\|null`                                                                                                |             |
@@ -3052,6 +3120,7 @@ List of public and user's private problems
 | `min_visibility`        | `int\|null`                                                                                                                        |             |
 | `offset`                | `int\|null`                                                                                                                        |             |
 | `only_karel`            | `bool\|null`                                                                                                                       |             |
+| `only_quality_seal`     | `bool\|null`                                                                                                                       |             |
 | `order_by`              | `''\|'accepted'\|'creation_date'\|'difficulty'\|'points'\|'problem_id'\|'quality'\|'ratio'\|'score'\|'submissions'\|'title'\|null` |             |
 | `page`                  | `int\|null`                                                                                                                        |             |
 | `programming_languages` | `null\|string`                                                                                                                     |             |
@@ -3689,7 +3758,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `mixed`                                                          |             |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
 
 ### Returns
 
@@ -3846,13 +3915,13 @@ Create a new run
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `language`      | `string` |             |
-| `problem_alias` | `string` |             |
-| `source`        | `string` |             |
-| `problemset_id` | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `source`        | `string`       |             |
+| `contest_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 
@@ -3910,6 +3979,36 @@ Disqualify one or more submissions based on the received parameters:
 | Name   | Type                                    |
 | ------ | --------------------------------------- |
 | `runs` | `{ guid: string; username: string; }[]` |
+
+## `/api/run/execute/`
+
+### Description
+
+Get the next execution timestamp for a specific problemset:
+
+- Contest
+- Virtual contest
+- Practice contest
+- Course
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
+
+## `/api/run/executeForIDE/`
+
+### Description
+
+Get the next execution timestamp, no user session required, as the IDE
+runs independently.
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
 
 ## `/api/run/getSubmissionFeedback/`
 
@@ -5022,12 +5121,14 @@ Get stats
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `username` | `null\|string` |             |
+| `year`     | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                       |
-| ------ | -------------------------- |
-| `runs` | `types.UserProfileStats[]` |
+| Name      | Type                                                 |
+| --------- | ---------------------------------------------------- |
+| `heatmap` | `{ count: number; date: string; }[]`                 |
+| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
 
 ## `/api/user/statusVerified/`
 

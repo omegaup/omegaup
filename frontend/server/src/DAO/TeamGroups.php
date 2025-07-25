@@ -55,12 +55,11 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     /**
      * Returns all teams groups that a user can manage.
      * @param int $userId
-     * @param int $identityId
      * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
      */
     final public static function getAllTeamsGroupsAdminedByUser(int $userId) {
         $sql = 'SELECT
-                    DISTINCT tg.alias,
+                    tg.alias,
                     tg.create_time,
                     tg.description,
                     tg.name

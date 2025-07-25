@@ -63,6 +63,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
      */
     final public static function getCodersOfTheMonth(string $category = 'all'): array {
         $date = date('Y-m-01', \OmegaUp\Time::get());
+
+        // This query should be always synchronized with the one in the cron
+        // update_ranks.py, specifically in the function get_last_12_coders_of_the_month.
         $sql = "
           SELECT
               cm.time,
@@ -147,7 +150,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
 
     /**
      * Get all coder of the months based on month
-     * @return list<array{classname: string, country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}>
+     * @return list<array{classname: string, country_id: string, email: null|string, problems_solved: int, ranking: int, score: float, time: string, user_id: int, username: string}>
      */
     final public static function getMonthlyList(
         string $firstDay,
@@ -162,7 +165,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             IFNULL(i.country_id, 'xx') AS country_id,
             e.email,
             u.user_id,
-            IFNULL(ur.classname, 'user-rank-unranked') AS classname
+            IFNULL(ur.classname, 'user-rank-unranked') AS classname,
+            cm.score,
+            cm.problems_solved
           FROM
             Coder_Of_The_Month cm
           INNER JOIN
@@ -181,7 +186,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             cm.`ranking` ASC
           LIMIT 100
         ";
-        /** @var list<array{classname: string, country_id: string, email: null|string, ranking: int, time: string, user_id: int, username: string}> */
+        /** @var list<array{classname: string, country_id: string, email: null|string, problems_solved: int, ranking: int, score: float, time: string, user_id: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->getAll(
             $sql,
             [$date, $category]

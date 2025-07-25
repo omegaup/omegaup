@@ -168,6 +168,13 @@ export namespace types {
               x.creation_date,
             );
             if (
+              typeof x.nextExecutionTimestamp !== 'undefined' &&
+              x.nextExecutionTimestamp !== null
+            )
+              x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextExecutionTimestamp,
+              );
+            if (
               typeof x.nextSubmissionTimestamp !== 'undefined' &&
               x.nextSubmissionTimestamp !== null
             )
@@ -928,6 +935,12 @@ export namespace types {
                   x.creation_date = ((x: number) => new Date(x * 1000))(
                     x.creation_date,
                   );
+                  if (
+                    typeof x.nextExecutionTimestamp !== 'undefined' &&
+                    x.nextExecutionTimestamp !== null
+                  )
+                    x.nextExecutionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextExecutionTimestamp);
                   if (
                     typeof x.nextSubmissionTimestamp !== 'undefined' &&
                     x.nextSubmissionTimestamp !== null
@@ -1799,6 +1812,13 @@ export namespace types {
           })(x.clarifications);
         x.problem = ((x) => {
           if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
+          if (
             typeof x.nextSubmissionTimestamp !== 'undefined' &&
             x.nextSubmissionTimestamp !== null
           )
@@ -1934,6 +1954,13 @@ export namespace types {
           x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
+          if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
           if (
             typeof x.nextSubmissionTimestamp !== 'undefined' &&
             x.nextSubmissionTimestamp !== null
@@ -2347,6 +2374,14 @@ export namespace types {
       );
     }
 
+    export function UserDocsPayload(
+      elementId: string = 'payload',
+    ): types.UserDocsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -2465,6 +2500,33 @@ export namespace types {
       );
     }
 
+    export function UserRankTableLoggedOutPayload(
+      elementId: string = 'payload',
+    ): types.UserRankTableLoggedOutPayload {
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -2544,6 +2606,18 @@ export namespace types {
         teachingAssistant: types.CoursesByTimeType;
       };
     };
+  }
+
+  export interface AiEditorialJobDetails {
+    created_at: Date;
+    error_message?: string;
+    is_retriable: boolean;
+    job_id: string;
+    md_en?: string;
+    md_es?: string;
+    md_pt?: string;
+    problem_alias: string;
+    status: string;
   }
 
   export interface ApiToken {
@@ -2893,6 +2967,7 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
@@ -2951,6 +3026,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    canSetRecommended: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
@@ -2969,6 +3045,7 @@ export namespace types {
     points_decay_factor: number;
     problems?: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended?: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3013,6 +3090,7 @@ export namespace types {
     points_decay_factor: number;
     problems: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3078,6 +3156,7 @@ export namespace types {
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
     shouldShowModalToLoginWithRegisteredIdentity: boolean;
+    userBasicInformation: types.UserBasicInformation;
   }
 
   export interface ContestList {
@@ -3128,6 +3207,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    canSetRecommended?: boolean;
     hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
@@ -3521,6 +3601,7 @@ export namespace types {
     is_admin: boolean;
     is_under_13_user: boolean;
     loginIdentity?: dao.Identities;
+    mentor_can_choose_coder: boolean;
     user?: dao.Users;
     user_verification_deadline?: Date;
     valid: boolean;
@@ -3927,6 +4008,7 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
     nextSubmissionTimestamp?: Date;
     nominationStatus: types.NominationStatus;
     order: string;
@@ -3961,10 +4043,13 @@ export namespace types {
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
-    solutionStatus?: string;
+    solutionStatus: string;
     solvers: types.BestSolvers[];
     totalRuns?: number;
     user: types.UserInfoForProblem;
@@ -4054,6 +4139,7 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
     nextSubmissionTimestamp?: Date;
     points: number;
     preferred_language?: string;
@@ -4786,6 +4872,12 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UserBasicInformation {
+    country?: string;
+    school?: number;
+    state?: string;
+  }
+
   export interface UserDependent {
     classname: string;
     name?: string;
@@ -4806,6 +4898,15 @@ export namespace types {
     systemRoles: string[];
     username: string;
     verified: boolean;
+  }
+
+  export interface UserDocsPayload {
+    docs: { [key: string]: types.UserDocument[] };
+  }
+
+  export interface UserDocument {
+    name: string;
+    url: string;
   }
 
   export interface UserInfoForProblem {
@@ -4917,6 +5018,15 @@ export namespace types {
     rank: number;
   }
 
+  export interface UserRankTableLoggedOutPayload {
+    isLogged: boolean;
+    lastUpdated?: Date;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.UserRank;
+  }
+
   export interface UserRankTablePayload {
     availableFilters: { country?: string; school?: string; state?: string };
     filter: string;
@@ -4963,6 +5073,15 @@ export namespace messages {
       };
     };
   };
+
+  // AiEditorial
+  export type AiEditorialGenerateRequest = { [key: string]: any };
+  export type AiEditorialGenerateResponse = { job_id?: string };
+  export type AiEditorialReviewRequest = { [key: string]: any };
+  export type AiEditorialReviewResponse = {};
+  export type AiEditorialStatusRequest = { [key: string]: any };
+  export type _AiEditorialStatusServerResponse = any;
+  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5654,6 +5773,12 @@ export namespace messages {
   export type RunDisqualifyResponse = {
     runs: { guid?: string; username?: string }[];
   };
+  export type RunExecuteRequest = { [key: string]: any };
+  export type _RunExecuteServerResponse = any;
+  export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5851,7 +5976,10 @@ export namespace messages {
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
-  export type UserStatsResponse = { runs: types.UserProfileStats[] };
+  export type UserStatsResponse = {
+    heatmap: { count: number; date: string }[];
+    runs: { date?: string; runs: number; verdict: string }[];
+  };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
     username: string;
@@ -5881,6 +6009,18 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+  }
+
+  export interface AiEditorial {
+    generate: (
+      params?: messages.AiEditorialGenerateRequest,
+    ) => Promise<messages.AiEditorialGenerateResponse>;
+    review: (
+      params?: messages.AiEditorialReviewRequest,
+    ) => Promise<messages.AiEditorialReviewResponse>;
+    status: (
+      params?: messages.AiEditorialStatusRequest,
+    ) => Promise<messages.AiEditorialStatusResponse>;
   }
 
   export interface Authorization {
@@ -6457,6 +6597,12 @@ export namespace controllers {
     disqualify: (
       params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
+    execute: (
+      params?: messages.RunExecuteRequest,
+    ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;

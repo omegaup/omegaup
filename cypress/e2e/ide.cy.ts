@@ -175,9 +175,11 @@ describe('Test IDE', () => {
       .first()
       .should('be.visible')
       .type(caseOutput);
-    cy.get(`li[title="diff"]`).should('be.visible').click();
 
-    cy.get('.editor.original .view-line span span') // lhs is the original text
+    cy.get('li[title="diff"]').should('be.visible').click();
+
+    cy.get('.editor.original .view-line span span', { timeout: 10000 })
+      .should('have.length.greaterThan', 0)
       .then(($spans) => {
         const concatText = Array.from($spans, (span) => span.innerText).join(
           '\n',
@@ -244,7 +246,7 @@ describe('Test IDE', () => {
     cy.login(loginOptions[0]);
 
     // update preferred langauge to py2
-    profilePage.updatePreferredLanguage('py2');
+    profilePage.updatePreferredProgrammingLanguage('py2');
     // go to the link with the editor
     cy.visit(`arena/problem/${problemOptions[0].problemAlias}/`);
 

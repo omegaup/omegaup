@@ -38,7 +38,8 @@ Cypress.Commands.add('loginAdmin', () => {
 // Logouts the user
 Cypress.Commands.add('logout', () => {
   cy.get('a[data-nav-user]').click();
-  cy.get('a[data-logout-button]').click();
+  cy.get('a[data-logout-button]').click({ force: true });
+  cy.get('footer.logout-confirmation-modal>button.btn-primary').click();
   cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 });
 
@@ -77,6 +78,8 @@ Cypress.Commands.add(
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
+    // Click the dropdown toggle to show options
+    cy.get('[data-nav-problems-create-options]').click();
     cy.get('[data-nav-problems-create]').click();
     if (firstTimeVisited) {
       cy.get('.introjs-skipbutton').click();
@@ -276,7 +279,11 @@ Cypress.Commands.add(
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
-      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Wait for the language selector to be visible before trying to interact with it
+      cy.get('[name="language"]', { timeout: 10000 })
+        .should('be.visible')
+        .select(runs[idx].language);
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {

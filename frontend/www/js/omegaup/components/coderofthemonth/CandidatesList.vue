@@ -1,6 +1,8 @@
 <template>
   <div v-if="isDisabled" class="system-in-maintainance m-5 text-center">
-    <omegaup-markdown :markdown="T.systemInMaintainance"></omegaup-markdown>
+    <omegaup-markdown
+      :markdown="T.coderOfTheMonthSystemInMaintainance"
+    ></omegaup-markdown>
     <font-awesome-icon :icon="['fas', 'cogs']" />
   </div>
   <table v-else class="table table-striped table-hover table-responsive-sm">
@@ -48,7 +50,7 @@
         <td class="text-center align-middle">
           {{ coder.score }}
         </td>
-        <slot name="button-select-coder"></slot>
+        <slot name="button-select-coder" :coder="coder"></slot>
       </tr>
     </tbody>
   </table>
@@ -79,7 +81,7 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() coders!: types.CoderOfTheMonthList[];
   @Prop() isMentor!: boolean;
   @Prop() selectedTab!: string;
-  @Prop({ default: true }) isDisabled!: boolean;
+  @Prop({ default: false }) isDisabled!: boolean;
 
   T = T;
 }

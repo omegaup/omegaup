@@ -128,6 +128,36 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
+     * Returns the quality nomination ID and contents for a problem and reviewer.
+     *
+     * @return array{contents: string, qualitynomination_id: int}|null
+     */
+    public static function getQualityNominationContentsForProblemAndReviewer(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ) {
+        $sql = "
+            SELECT
+                qualitynomination_id,
+                contents
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?
+            LIMIT 1";
+
+        /** @var array{contents: string, qualitynomination_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id, $problem->problem_id]
+        );
+    }
+
+    /**
      * Returns the votes from all the assigned reviewers for a particular
      * nomination.
      *

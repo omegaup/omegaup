@@ -34,6 +34,7 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :next-execution-timestamp="currentNextExecutionTimestamp"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
@@ -51,6 +52,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
+              @execute-run="onRunExecuted"
               @show-run="onRunDetails"
               @new-submission-popup-displayed="
                 $emit('new-submission-popup-displayed')
@@ -158,6 +160,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
@@ -167,6 +170,7 @@ export default class ArenaContestPractice extends Vue {
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
   currentRunDetailsData = this.runDetailsData;
 
   get activeProblemAlias(): null | string {
@@ -208,6 +212,10 @@ export default class ArenaContestPractice extends Vue {
     });
   }
 
+  onRunExecuted(): void {
+    this.$emit('execute-run', { target: this });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
@@ -224,6 +232,8 @@ export default class ArenaContestPractice extends Vue {
     }
     this.currentNextSubmissionTimestamp =
       newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextExecutionTimestamp =
+      newValue.nextExecutionTimestamp ?? null;
   }
 
   @Watch('clarifications')

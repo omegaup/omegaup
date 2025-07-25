@@ -1,5 +1,19 @@
 <template>
-  <div></div>
+  <div :class="['h-100', 'd-flex', 'flex-column', theme]">
+    <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
+      <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
+      <select
+        v-model="selectedFontSize"
+        class="custom-select-sm"
+        @change="onFontSizeChange"
+      >
+        <option v-for="size in fontSizes" :key="size" :value="size">
+          {{ size }}px
+        </option>
+      </select>
+    </div>
+    <div ref="editorContainer" class="editor flex-grow-1 w-100 h-100"></div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -8,6 +22,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
+import T from '../lang';
 
 @Component
 export default class MonacoEditor extends Vue {
@@ -21,8 +36,10 @@ export default class MonacoEditor extends Vue {
   _model: monaco.editor.ITextModel | null = null;
 
   // default font size and line height
-  readonly baseFontSize: number = 14;
-  readonly baseLineHeight: number = 19;
+  selectedFontSize: number = 12;
+  fontSizes: number[] = [12, 14, 16, 18, 20];
+
+  T = T; //getting translations
 
   get theme(): string {
     return store.getters['theme'];
@@ -80,18 +97,19 @@ export default class MonacoEditor extends Vue {
   mounted(): void {
     window.addEventListener('code-and-language-set', this.onCodeAndLanguageSet);
 
-    this._editor = monaco.editor.create(
-      this.$el as HTMLElement,
-      {
-        autoIndent: 'brackets',
-        formatOnPaste: true,
-        formatOnType: true,
-        language: Util.supportedLanguages[this.language].modelMapping,
-        readOnly: this.readOnly,
-        theme: this.theme,
-        value: this.contents,
-      } as monaco.editor.IStandaloneEditorConstructionOptions,
-    );
+    const container = this.$refs.editorContainer as HTMLElement;
+    if (!container) return;
+
+    this._editor = monaco.editor.create(container, {
+      autoIndent: 'brackets',
+      formatOnPaste: true,
+      formatOnType: true,
+      language: Util.supportedLanguages[this.language].modelMapping,
+      readOnly: this.readOnly,
+      theme: this.theme,
+      value: this.contents,
+      fontSize: this.selectedFontSize,
+    } as monaco.editor.IStandaloneEditorConstructionOptions);
     this._model = this._editor.getModel();
     if (!this._model) return;
 
@@ -116,11 +134,6 @@ export default class MonacoEditor extends Vue {
       // scaling does not work as intended
       // the cursor does not click where it's supposed to
       // this is an alternative solution to zooming in/out
-
-      this._editor.updateOptions({
-        fontSize: this.baseFontSize * window.devicePixelRatio,
-        lineHeight: this.baseLineHeight * window.devicePixelRatio,
-      });
       this._editor.layout();
     }
   }
@@ -129,12 +142,54 @@ export default class MonacoEditor extends Vue {
     e.detail.code = this.contents;
     e.detail.language = this.language;
   }
+
+  onFontSizeChange(): void {
+    if (this._editor) {
+      this._editor.updateOptions({ fontSize: this.selectedFontSize });
+    }
+  }
 }
 </script>
 
-<style scoped>
-div {
-  width: 100%;
-  height: 100%;
+<style lang="scss" scoped>
+@import '../../../sass/main.scss';
+
+.editor-toolbar {
+  background: var(--monaco-editor-toolbar-background-color);
+  border-bottom: 1px solid var(--monaco-editor-toolbar-border-bottom-color);
+}
+
+.editor-toolbar label {
+  font-size: 12px;
+  background: var(--monaco-editor-toolbar-label-background-color);
+  color: var(--monaco-editor-toolbar-label-color);
+  border: 1px solid var(--monaco-editor-toolbar-label-border-color);
+}
+
+.editor-toolbar select {
+  font-size: 10px;
+}
+
+.editor {
+  border: 1px solid var(--monaco-editor-toolbar-label-border-color);
+}
+
+/* Dark theme styles */
+.vs-dark .editor-toolbar {
+  background: var(--vs-dark-background-color);
+}
+
+.vs-dark .editor-toolbar label {
+  background: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .editor-toolbar select {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .editor {
+  border: 1px solid var(--vs-dark-font-color);
 }
 </style>

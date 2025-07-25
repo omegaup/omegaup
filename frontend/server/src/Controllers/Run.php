@@ -24,6 +24,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
     /** @var int */
     public static $defaultSubmissionGap = 60; // seconds.
+    /** @var int */
+    public static $defaultExecutionGap = 30; // initial default execution gap.
 
     public const VERDICTS = [
         'AC',
@@ -146,10 +148,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      *
-     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      */
     private static function validateCreateRequest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -194,34 +196,32 @@ class Run extends \OmegaUp\Controllers\Controller {
             'language',
             $allowedLanguages
         );
+        $problemsetId = $r->ensureOptionalInt('problemset_id');
+        $contestAlias = $r->ensureOptionalString(
+            'contest_alias',
+            required: false,
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
 
         // Can't set both problemset_id and contest_alias at the same time.
-        if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
+        if (!is_null($problemsetId) && !is_null($contestAlias)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'incompatibleArgs',
                 'problemset_id and contest_alias'
             );
         }
 
-        /** @var null|int */
-        $problemsetId = null;
         /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments */
         $problemsetContainer = null;
         /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = null;
-        if (!empty($r['problemset_id'])) {
-            // Got a problemset id directly.
-            $problemsetId = intval($r['problemset_id']);
+        if (!is_null($problemsetId)) {
             $problemsetContainer = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                 $problemsetId
             );
-        } elseif (!empty($r['contest_alias'])) {
+        } elseif (!is_null($contestAlias)) {
             // Got a contest alias, need to fetch the problemset id.
             // Validate contest
-            $contestAlias = $r->ensureString(
-                'contest_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
             $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
             if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -366,6 +366,39 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get the next execution timestamp, no user session required, as the IDE
+     * runs independently.
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecuteForIDE(\OmegaUp\Request $r): array {
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
+     * Get the next execution timestamp for a specific problemset:
+     * - Contest
+     * - Virtual contest
+     * - Practice contest
+     * - Course
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecute(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
      * Create a new run
      *
      * @throws \Exception
@@ -373,10 +406,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      *
-     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param string $source
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
@@ -384,7 +417,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source');
+        $source = $r->ensureString('source');
         [
             'isPractice' => $isPractice,
             'problem' => $problem,
@@ -536,7 +569,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Call Grader
         try {
-            \OmegaUp\Grader::getInstance()->grade($run, trim($r['source']));
+            \OmegaUp\Grader::getInstance()->grade($run, trim($source));
         } catch (\Exception $e) {
             // Welp, it failed. We cannot make this a real transaction
             // because the Run row would not be visible from the Grader
@@ -1746,12 +1779,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Check filter by problem, is optional
         /** @var null|\OmegaUp\DAO\VO\Problems */
         $problem = null;
-        if (!is_null($r['problem_alias'])) {
-            $problemAlias = $r->ensureString(
-                'problem_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
-
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            required: false,
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        if (!is_null($problemAlias)) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1761,16 +1794,19 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Get user if we have something in username
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
         /** @var null|\OmegaUp\DAO\VO\Identities */
         $identity = null;
-        if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['username'],
-                'username'
-            );
+        if (!is_null($username)) {
             try {
                 $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                    $r['username']
+                    $username
                 );
             } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
