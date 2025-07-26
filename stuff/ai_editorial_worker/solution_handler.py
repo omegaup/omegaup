@@ -67,8 +67,9 @@ class SolutionHandler:
             # Submit normal solution
             logging.info(
                 "Submitting %s solution for %s", language, problem_alias)
-            run_guid = self.api_client.submit_run(
-                problem_alias, source_code, language)
+            result = self.api_client.create_run(
+                problem_alias, language, source_code)
+            run_guid = result.get('guid') if result else None
 
             if run_guid:
                 logging.info("Submission successful: %s", run_guid)
