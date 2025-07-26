@@ -4,7 +4,19 @@ import logging
 import time
 from typing import Any, Dict, Optional, Tuple
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from omegaup_api_client import OmegaUpAPIClient  # type: ignore
+
+
+class KarelProblemException(Exception):
+    """Exception raised when Karel problems are detected."""
+
+    def __init__(self, problem_alias: str):
+        """Initialize Karel problem exception."""
+        self.problem_alias = problem_alias
+        super().__init__(f"Karel problem detected: {problem_alias}")
 
 
 class SolutionHandler:
@@ -50,7 +62,7 @@ class SolutionHandler:
             # Check for Karel problems (special handling)
             if 'karel' in problem_alias.lower():
                 logging.info("Karel problem detected, skipping submission")
-                return "KAREL_SKIP"
+                raise KarelProblemException(problem_alias)
 
             # Submit normal solution
             logging.info(
@@ -79,17 +91,8 @@ class SolutionHandler:
                 verdict, score, memory = (
                     self.api_client.get_run_status_detailed(run_guid))
 
-                # Check if run is complete
-                if verdict in [
-                    'AC',
-                    'WA',
-                    'TLE',
-                    'MLE',
-                    'RE',
-                    'CE',
-                    'RTE',
-                    'PE',
-                    'PA']:
+                # Check if run is complete (not still judging)
+                if verdict != 'JE':
                     logging.info(
                         "Run %s completed with verdict: %s", run_guid, verdict)
                     return verdict, score, memory
@@ -139,11 +142,6 @@ class SolutionHandler:
                     return False, (f"Submission failed after "
                                    f"{max_attempts} attempts")
 
-                # Handle Karel skip
-                if run_guid == "KAREL_SKIP":
-                    logging.info("Karel problem detected, marking as verified")
-                    return True, "Karel problem - verification skipped"
-
                 # Check run status
                 verdict, score, _ = self.check_run_status(run_guid)
 
@@ -160,6 +158,9 @@ class SolutionHandler:
                     logging.info("Waiting 60 seconds before retry...")
                     time.sleep(60)
 
+            except KarelProblemException as e:
+                logging.info("Karel problem detected: %s", e.problem_alias)
+                return True, "Karel problem - verification skipped"
             except (ConnectionError, TypeError, ValueError) as e:
                 logging.error(
                     "Error in verification attempt %d: %s", attempt, e)

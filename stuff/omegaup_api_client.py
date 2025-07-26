@@ -1,9 +1,11 @@
 """
-omegaUp API Client - Handles all API interactions with omegaUp platform
+omegaUp API Client - General-purpose API client for omegaUp platform
 
 This client uses auth_token from user sessions (passed as 'ouat' parameter)
 instead of username/password authentication. This integrates seamlessly with
 omegaUp's session management system.
+
+Can be used by any omegaUp tool/script that needs API access.
 """
 
 import json
@@ -18,24 +20,24 @@ from urllib3.util.retry import Retry
 
 class OmegaUpAPIClient:
     """
-    Production-ready omegaUp API client with auth_token authentication.
-
-    Features:
+    General-purpose omegaUp API client with the following features:
     - Uses session auth_token (no username/password needed)
     - Redis session caching for efficiency
     - Automatic retry with exponential backoff
     - Rate limiting and error handling
-    - Complete omegaUp API coverage for editorial generation
+    - Complete omegaUp API coverage for any tool
     """
 
-    def __init__(self, auth_token: str, base_url: str = 'https://omegaup.com'):
+    def __init__(self, auth_token: str, base_url: str = 'https://omegaup.com',
+                 user_agent: str = 'omegaUp-API-Client/1.0'):
         """
         Initialize API client with user's auth token.
 
         Args:
-                            auth_token: User's session token from PHP
-                    Session::getCurrentSession()
+            auth_token: User's session token from PHP
+                        Session::getCurrentSession()
             base_url: omegaUp base URL (default: https://omegaup.com)
+            user_agent: Custom user agent for requests
         """
         if not auth_token:
             raise ValueError("auth_token is required")
@@ -58,7 +60,7 @@ class OmegaUpAPIClient:
 
         # Set default headers
         self.session.headers.update({
-            'User-Agent': 'omegaUp-AI-Editorial-Worker/1.0',
+            'User-Agent': user_agent,
             'Accept': 'application/json'
         })
 
@@ -257,7 +259,7 @@ class OmegaUpAPIClient:
         problem_alias: str,
         solution: str,
         language: str,
-        message: str = "AI-generated editorial") -> bool:
+        message: str = "Updated solution") -> bool:
         """
         Update problem's editorial/solution.
 
