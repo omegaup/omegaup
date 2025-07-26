@@ -251,5 +251,6 @@ def test_teaching_assistant_submission_mode(
     assert len(feedbacks) >= 2
 
     feedback_thread = feedbacks[1]['feedback_thread']
+    logging.info("Feedback thread: %s", feedback_thread)
     assert feedback_thread is not None, "Feedback thread should not be None"
     assert len(feedback_thread) == 2
