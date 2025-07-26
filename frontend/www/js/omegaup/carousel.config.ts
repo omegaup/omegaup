@@ -70,31 +70,6 @@ const carouselConfig: {
       target: '_self',
     },
   },
-  /*{
-    image: '/media/homepage/CCP25.png',
-    title: {
-      en: 'Challenge Yourself!	',
-      es: '¡Desafía tus límites!',
-      pt: 'Desafie-se!',
-    },
-    description: {
-      en:
-        'Sign up between June 10 and July 7 and represent your community in the Latin America’s largest programming tournament. Develop your skills and win amazing prizes!',
-      es:
-        '¡Regístrate del 10 de junio al 7 de julio y representa a tu comunidad en el torneo de programación más grande de Latinoamérica! Desarrolla tu talento y gana premios increíbles.',
-      pt:
-        'Inscreva-se de 10 de junho a 7 de julho e represente sua comunidade na o maior torneio de programação da América Latina. Desenvolva seu talento e conquiste prêmios incríveis!',
-    },
-    button: {
-      text: {
-        en: 'View call for entries',
-        es: 'Ver convocatoria',
-        pt: 'Ver convocatória',
-      },
-      href: 'https://bit.ly/ccp-2025-convocatoria',
-      target: '_blank',
-    },
-  },*/
   {
   image: '/media/homepage/voces_tech_intro.png',
   title: {
