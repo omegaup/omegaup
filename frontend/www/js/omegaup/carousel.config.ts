@@ -71,55 +71,27 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/CCP25.png',
-    title: {
-      en: 'Challenge Yourself!	',
-      es: '¡Desafía tus límites!',
-      pt: 'Desafie-se!',
-    },
-    description: {
-      en:
-        'Sign up between June 10 and July 7 and represent your community in the Latin America’s largest programming tournament. Develop your skills and win amazing prizes!',
-      es:
-        '¡Regístrate del 10 de junio al 7 de julio y representa a tu comunidad en el torneo de programación más grande de Latinoamérica! Desarrolla tu talento y gana premios increíbles.',
-      pt:
-        'Inscreva-se de 10 de junho a 7 de julho e represente sua comunidade na o maior torneio de programação da América Latina. Desenvolva seu talento e conquiste prêmios incríveis!',
-    },
-    button: {
-      text: {
-        en: 'View call for entries',
-        es: 'Ver convocatoria',
-        pt: 'Ver convocatória',
-      },
-      href: 'https://bit.ly/ccp-2025-convocatoria',
-      target: '_blank',
-    },
+  image: '/media/homepage/voces_tech_intro.png',
+  title: {
+    en: 'Voces Tech: Inspiring Stories',
+    es: 'Voces Tech: Historias que inspiran',
+    pt: 'Voces Tech: Histórias inspiradoras',
   },
-  {
-    image: '/media/homepage/discord_logo.svg',
-    title: {
-      en: 'Join our coders community',
-      es: 'Únete a nuestra comunidad de coders',
-      pt: 'Junte-se à nossa comunidade de coders',
-    },
-    description: {
-      en:
-        "Join omegaUp's Discord server and hang out with your community, get help and learn about new projects.",
-      es:
-        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
-      pt:
-        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
-    },
-    button: {
-      text: {
-        en: 'Join here',
-        es: 'Únete aquí',
-        pt: 'Junte-se aqui',
-      },
-      href: 'https://discord.com/invite/K3JFd9d3wk',
-      target: '_blank',
-    },
+  description: {
+    en: 'Discover Voces Tech, our new YouTube series where leaders and innovators in technology share their experiences and insights to inspire your journey.',
+    es: 'Descubre Voces Tech, nuestra nueva serie de YouTube donde líderes e innovadores en tecnología comparten sus experiencias e ideas para inspirarte en tu camino.',
+    pt: 'Descubra o Voces Tech, nossa nova série do YouTube onde líderes e inovadores em tecnologia compartilham suas experiências e percepções para inspirar sua jornada.',
   },
+  button: {
+    text: {
+      en: 'Watch playlist',
+      es: 'Ver playlist',
+      pt: 'Ver playlist',
+    },
+    href: 'https://www.youtube.com/playlist?list=PLdSCJwXErQ8HDWYi63f9IMg_czC-zbM8L',
+    target: '_blank',
+  },
+},
 ];
 
 export default carouselConfig;
