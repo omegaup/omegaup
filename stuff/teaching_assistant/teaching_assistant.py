@@ -280,7 +280,7 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
                     "username" in item and
                     "suggestions" in item and
                     item["time"] >= a_month_ago and
-                    item["suggestions"] == 0
+                    item["suggestions"] > 0
                 )
             ]
             run_ids_and_usernames.extend(assignment_runs)
