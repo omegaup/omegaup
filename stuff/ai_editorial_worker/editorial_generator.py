@@ -67,76 +67,6 @@ class EditorialGenerator:
             "Editorial generator initialized with provider: %s",
             llm_config['provider'])
 
-    def generate_complete_editorial(
-        self, problem_alias: str, job_id: str) -> Dict[str, Any]:
-        """Generate complete editorial using 3-prompt system with website
-        publishing."""
-
-        logging.info(
-            "Starting complete editorial generation for %s", problem_alias)
-
-        try:
-            # Step 1: Get problem details
-            problem_data = self.api_client.get_problem_details(problem_alias)
-            if not problem_data:
-                return {
-                    'success': False,
-                    'error': f'Failed to fetch problem details for '
-                    f'{problem_alias}'}
-
-            # Step 2: Get AC solution (if available)
-            ac_solution_source = self.solution_handler.find_working_solution(
-                problem_alias)
-            # Convert to expected format or None
-            ac_solution = {
-                'source': ac_solution_source} if ac_solution_source else None
-
-            # Step 3: Generate English editorial (Prompt 1)
-            editorial_en = self.generate_editorial_prompt(
-                problem_data, ac_solution)
-            if not editorial_en:
-                return {
-                    'success': False,
-                    'error': 'Failed to generate English editorial'
-                }
-
-            # Step 4: Verify solution (Prompt 2) - DISABLED for now
-            solution_verification = None
-            if self.llm_config.get('enable_solution_verification', False):
-                solution_verification = self.verify_editorial_solution(
-                    problem_alias, editorial_en, problem_data
-                )
-
-            # Step 5: Generate translations (Prompt 3)
-            editorials = {'en': editorial_en}
-            if self.llm_config.get('enable_multi_language', True):
-                for lang in ['es', 'pt']:
-                    if lang in self.llm_config.get(
-                        'languages', ['en', 'es', 'pt']):
-                        translated = self.generate_translation(
-                            editorial_en, lang)
-                        if translated:
-                            editorials[lang] = translated
-
-            # Add AI disclaimer to all editorials
-            for lang, content in editorials.items():
-                editorials[lang] = self.add_ai_disclaimer(content, lang)
-
-            return {
-                'success': True,
-                'editorials': editorials,
-                'solution_verification': solution_verification,
-                'problem_alias': problem_alias,
-                'job_id': job_id
-            }
-
-        except (ConnectionError, TypeError, ValueError) as e:
-            logging.exception("Error in complete editorial generation: %s", e)
-            return {
-                'success': False,
-                'error': str(e)
-            }
-
     def generate_editorial_prompt(self,
                                   problem_data: Dict[str, Any],
                                   ac_solution: Optional[Dict[str, Any]] = None
@@ -235,49 +165,133 @@ class EditorialGenerator:
 
     def generate_translation(
         self,
-        editorial_en: str,
-        target_lang: str) -> Optional[str]:
-        """Generate translation using Prompt 3: EN Editorial → Target
-        Language."""
-
+        content: str,
+        target_language: str) -> Optional[str]:
+        """Generate translation of editorial content to target language."""
         try:
-            # Get translation prompt
+            # Get translation prompt template
             prompt_template = self.prompts.get('translation', '')
             if not prompt_template:
                 logging.warning("Translation prompt template not found")
                 return None
 
-            # Language mapping
-            lang_names = {
-                'es': 'Spanish',
-                'pt': 'Portuguese'
-            }
+            # Format prompt with content and target language
+            prompt = ("Translate the following editorial content to " +
+                      f"{target_language}:\n\n{content}")
 
-            target_language = lang_names.get(target_lang, target_lang)
-
-            # Format prompt
-            prompt = prompt_template.format(
-                target_language=target_language,
-                editorial_content=editorial_en
-            )
-
-            # Generate translation
+            # Generate translation with LLM
             response = self.llm_wrapper.generate_response(
                 prompt=prompt,
                 temperature=self.llm_config.get('temperature', 0.7)
             )
 
-            if response:
-                return response
-
-            logging.warning(
-                "Failed to generate %s translation", target_lang)
-            return None
+            return response if response else None
 
         except (ConnectionError, TypeError, ValueError) as e:
             logging.exception(
-                "Error generating %s translation: %s", target_lang, e)
+                "Error generating translation to %s: %s",
+                target_language,
+                e)
             return None
+
+    def _get_problem_details(self, problem_alias: str) -> Dict[str, Any]:
+        """Get problem details from API."""
+        problem_data = self.api_client.get_problem_details(problem_alias)
+        if not problem_data:
+            raise ValueError(
+                f'Failed to fetch problem details for {problem_alias}')
+        return problem_data
+
+    def _get_ac_solution(self, problem_alias: str) -> Optional[Dict[str, Any]]:
+        """Get AC solution for the problem."""
+        ac_solution_source = self.solution_handler.find_working_solution(
+            problem_alias)
+        return {'source': ac_solution_source} if ac_solution_source else None
+
+    def _generate_english_editorial(self, problem_data: Dict[str, Any],
+                                    ac_solution: Optional[Dict[str,
+                                                               Any]]) -> str:
+        """Generate English editorial content."""
+        editorial_en = self.generate_editorial_prompt(
+            problem_data, ac_solution)
+        if not editorial_en:
+            raise ValueError('Failed to generate English editorial')
+        return editorial_en
+
+    def _verify_solution_if_enabled(self,
+                                    problem_alias: str,
+                                    editorial_en: str,
+                                    problem_data: Dict[str, Any]
+                                    ) -> Optional[Dict[str, Any]]:
+        """Verify solution if verification is enabled."""
+        if self.llm_config.get('enable_solution_verification', False):
+            return self.verify_editorial_solution(
+                problem_alias, editorial_en, problem_data)
+        return None
+
+    def _generate_translations(self, editorial_en: str) -> Dict[str, str]:
+        """Generate translations for multiple languages."""
+        translations = {}
+        if self.llm_config.get('enable_multi_language', True):
+            for lang in ['es', 'pt']:
+                if lang in self.llm_config.get(
+                    'languages', ['en', 'es', 'pt']):
+                    translated = self.generate_translation(editorial_en, lang)
+                    if translated:
+                        translations[lang] = translated
+        return translations
+
+    def _add_disclaimers_to_all(
+        self, editorials: Dict[str, str]) -> Dict[str, str]:
+        """Add AI disclaimers to all editorial versions."""
+        for lang, content in editorials.items():
+            editorials[lang] = self.add_ai_disclaimer(content, lang)
+        return editorials
+
+    def generate_complete_editorial(
+        self, problem_alias: str, job_id: str) -> Dict[str, Any]:
+        """Generate complete editorial using 3-prompt system with website
+        publishing."""
+
+        logging.info(
+            "Starting complete editorial generation for %s", problem_alias)
+
+        try:
+            # Step 1: Get problem details
+            problem_data = self._get_problem_details(problem_alias)
+
+            # Step 2: Get AC solution (if available)
+            ac_solution = self._get_ac_solution(problem_alias)
+
+            # Step 3: Generate English editorial (Prompt 1)
+            editorial_en = self._generate_english_editorial(
+                problem_data, ac_solution)
+
+            # Step 4: Verify solution (Prompt 2) - DISABLED for now
+            solution_verification = self._verify_solution_if_enabled(
+                problem_alias, editorial_en, problem_data)
+
+            # Step 5: Generate translations (Prompt 3)
+            translated_editorials = self._generate_translations(editorial_en)
+            all_editorials = {'en': editorial_en, **translated_editorials}
+
+            # Step 6: Add AI disclaimer to all editorials
+            final_editorials = self._add_disclaimers_to_all(all_editorials)
+
+            return {
+                'success': True,
+                'editorials': final_editorials,
+                'solution_verification': solution_verification,
+                'problem_alias': problem_alias,
+                'job_id': job_id
+            }
+
+        except (ConnectionError, TypeError, ValueError) as e:
+            logging.exception("Error in complete editorial generation: %s", e)
+            return {
+                'success': False,
+                'error': str(e)
+            }
 
     def build_problem_context(self,
                               problem_data: Dict[str, Any],
