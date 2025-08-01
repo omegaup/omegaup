@@ -54,7 +54,7 @@ COURSE_ALIAS: str | None = None
 ASSIGNMENT_ALIAS: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
-SUBMISSION_ID_MODE = False
+SUBMISSION_ID_MODE: str | None = None
 SUBMISSION_ID = None
 STUDENT_NAME = None
 
@@ -229,7 +229,7 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
               for all the latest (at most 30 days old) runs from the course
     """
     try:
-        if SUBMISSION_ID_MODE:
+        if SUBMISSION_ID_MODE == "true":
             if (isinstance(SUBMISSION_ID, str) and
                     isinstance(STUDENT_NAME, str)):
                 return [(SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS)]
@@ -274,8 +274,14 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
             assignment_runs = [
                 (item["guid"], item["username"], assignment_alias)
                 for item in runs
-                if "time" in item and "guid" in item and "username" in item
-                and item["time"] >= a_month_ago
+                if (
+                    "time" in item and
+                    "guid" in item and
+                    "username" in item and
+                    "suggestions" in item and
+                    item["time"] >= a_month_ago and
+                    item["suggestions"] > 0
+                )
             ]
             run_ids_and_usernames.extend(assignment_runs)
 
@@ -884,7 +890,7 @@ def process_feedbacks() -> None:
                         "unexpected error.") from e
 
 
-def handle_input() -> None:  # pylint: disable=R0915
+def handle_input() -> None:  # pylint: disable=R0915, R0912
     """
     Handles input from the user
     """
@@ -902,8 +908,13 @@ def handle_input() -> None:  # pylint: disable=R0915
         parser.add_argument("--password", type=str, help="Your password")
         parser.add_argument(
             "--submission_id_mode",
+            type=str,
+            help="true if you want to process a single submission."
+        )
+        parser.add_argument(
+            "--test_mode",
             action="store_true",
-            help="Yes if you want to process a single submission."
+            help="Run in local server."
         )
         parser.add_argument(
             "--submission_id",
@@ -939,7 +950,7 @@ def handle_input() -> None:  # pylint: disable=R0915
             "--llm",
             type=str,
             default="deepseek",
-            choices=["claude", "gpt", "deepseek", "gemini"],
+            choices=["claude", "gpt", "deepseek", "gemini", "omegaup"],
             help="LLM provider to use (default: deepseek)"
         )
         parser.add_argument(
@@ -948,14 +959,19 @@ def handle_input() -> None:  # pylint: disable=R0915
             help="Skip confirmation prompts"
         )
         args = parser.parse_args()
+        if args.test_mode:
+            global BASE_URL  # pylint: disable=W0603
+            BASE_URL = "http://localhost:8001"
 
         try:
             USERNAME = args.username or input("Enter your username: ")
             PASSWORD = args.password or getpass("Enter your password: ")
-            SUBMISSION_ID_MODE = args.submission_id_mode or input(
-                "Are you working in submission id mode: "
-            ) == "true"
-            if SUBMISSION_ID_MODE:
+            SUBMISSION_ID_MODE = args.submission_id_mode
+            if SUBMISSION_ID_MODE not in ["true", "false"]:
+                SUBMISSION_ID_MODE = input(
+                    "Are you working in submission id mode: "
+                )
+            if SUBMISSION_ID_MODE == "true":
                 SUBMISSION_ID = args.submission_id or input(
                     "Enter the submission id: "
                 )
@@ -998,7 +1014,8 @@ def handle_input() -> None:  # pylint: disable=R0915
             raise ConfigurationError("Language is required")
         if not KEY:
             raise ConfigurationError("API key is required")
-        if SUBMISSION_ID_MODE and (not SUBMISSION_ID or not STUDENT_NAME):
+        if (SUBMISSION_ID_MODE == "true" and
+                (not SUBMISSION_ID or not STUDENT_NAME)):
             raise ConfigurationError(
                 "Submission ID and student name are required in "
                 "submission ID mode"

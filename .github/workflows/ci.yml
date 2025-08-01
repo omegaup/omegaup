@@ -268,8 +268,11 @@ jobs:
       - name: Validate generated Python API syntax
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
-  cypress:
+  integration-tests:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        test-type: [cypress, teaching-assistant]
 
     steps:
       - uses: actions/checkout@v4
@@ -279,6 +282,11 @@ jobs:
       - name: Install wait-for-it
         run: |
           sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
+      - name: Install retry (for teaching-assistant)
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y retry
 
       - name: Download the Docker containers
         run: |
@@ -352,6 +360,12 @@ jobs:
           python3 -m pip install --user \
             -r stuff/requirements.txt
 
+      - name: Install teaching assistant specific dependencies
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          python3 -m pip install --user \
+            -r stuff/teaching_assistant/requirements.txt
+
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
@@ -368,20 +382,46 @@ jobs:
             python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
           docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
-      - name: Install yarn dependencies
+      - name: Install yarn dependencies (cypress)
+        if: matrix.test-type == 'cypress'
         run: yarn install
 
-      - name: Build webpack resources
+      - name: Build webpack resources (cypress)
+        if: matrix.test-type == 'cypress'
         run: yarn build
 
-      - name: Wait for dependencies
+      - name: Wait for dependencies (cypress)
+        if: matrix.test-type == 'cypress'
         run: |
           wait-for-it -t 30 grader:21680
 
       - name: Run Cypress tests
+        if: matrix.test-type == 'cypress'
         run: |
           ./node_modules/.bin/cypress run --browser chrome
 
+      - name: Run pre setup for course mode
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
+
+      - name: Run the teaching assistant for course mode
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          cd stuff/teaching_assistant
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
+
+      - name: Run post check for course mode
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          pytest stuff/teaching_assistant/test_ta_course_mode_post.py --log-cli-level=INFO -s
+
+      - name: Run check for submission mode
+        if: matrix.test-type == 'teaching-assistant'
+        run: |
+          pytest stuff/teaching_assistant/test_ta_submission_mode.py --log-cli-level=INFO -s
+
+      # Common cleanup steps
       - name: Collect container logs
         if: ${{ always() }}
         run: |
@@ -392,14 +432,14 @@ jobs:
           done
 
       - name: Upload cypress screenshot artifacts
-        if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
+        if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' && matrix.test-type == 'cypress' }}
         uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
-        if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
+        if: ${{ always() && hashFiles('cypress/videos/**/*') != '' && matrix.test-type == 'cypress' }}
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos-${{ github.run_attempt }}
@@ -510,7 +550,7 @@ jobs:
 
       - name: Run Python tests
         run: |
-          docker compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
+          docker compose exec -T frontend python3 -m pytest --verbose --timeout=20 --ignore=./stuff/teaching_assistant/ ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}
