@@ -2608,6 +2608,18 @@ export namespace types {
     };
   }
 
+  export interface AiEditorialJobDetails {
+    created_at: Date;
+    error_message?: string;
+    is_retriable: boolean;
+    job_id: string;
+    md_en?: string;
+    md_es?: string;
+    md_pt?: string;
+    problem_alias: string;
+    status: string;
+  }
+
   export interface ApiToken {
     last_used: Date;
     name: string;
@@ -3016,6 +3028,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    canSetRecommended: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
@@ -3034,6 +3047,7 @@ export namespace types {
     points_decay_factor: number;
     problems?: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended?: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3078,6 +3092,7 @@ export namespace types {
     points_decay_factor: number;
     problems: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3194,6 +3209,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    canSetRecommended?: boolean;
     hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
@@ -4029,6 +4045,9 @@ export namespace types {
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
@@ -5057,6 +5076,15 @@ export namespace messages {
     };
   };
 
+  // AiEditorial
+  export type AiEditorialGenerateRequest = { [key: string]: any };
+  export type AiEditorialGenerateResponse = { job_id?: string };
+  export type AiEditorialReviewRequest = { [key: string]: any };
+  export type AiEditorialReviewResponse = {};
+  export type AiEditorialStatusRequest = { [key: string]: any };
+  export type _AiEditorialStatusServerResponse = any;
+  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
   export type AuthorizationProblemResponse = {
@@ -5762,6 +5790,9 @@ export namespace messages {
   export type RunExecuteRequest = { [key: string]: any };
   export type _RunExecuteServerResponse = any;
   export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5992,6 +6023,18 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+  }
+
+  export interface AiEditorial {
+    generate: (
+      params?: messages.AiEditorialGenerateRequest,
+    ) => Promise<messages.AiEditorialGenerateResponse>;
+    review: (
+      params?: messages.AiEditorialReviewRequest,
+    ) => Promise<messages.AiEditorialReviewResponse>;
+    status: (
+      params?: messages.AiEditorialStatusRequest,
+    ) => Promise<messages.AiEditorialStatusResponse>;
   }
 
   export interface Authorization {
@@ -6571,6 +6614,9 @@ export namespace controllers {
     execute: (
       params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;

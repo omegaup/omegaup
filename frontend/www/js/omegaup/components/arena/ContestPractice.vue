@@ -52,6 +52,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
+              @execute-run="onRunExecuted"
               @show-run="onRunDetails"
               @new-submission-popup-displayed="
                 $emit('new-submission-popup-displayed')
@@ -211,6 +212,10 @@ export default class ArenaContestPractice extends Vue {
         contestAlias: this.contest.alias,
       },
     });
+  }
+
+  onRunExecuted(): void {
+    this.$emit('execute-run', { target: this });
   }
 
   @Watch('problem')

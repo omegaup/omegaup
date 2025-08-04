@@ -1,5 +1,9 @@
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [AiEditorial](#aieditorial)
+  - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
+  - [`/api/aiEditorial/review/`](#apiaieditorialreview)
+  - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -193,6 +197,7 @@
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/execute/`](#apirunexecute)
+  - [`/api/run/executeForIDE/`](#apirunexecuteforide)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -286,6 +291,67 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+# AiEditorial
+
+AI Editorial Controller
+
+## `/api/aiEditorial/generate/`
+
+### Description
+
+Generate AI editorial for a problem
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `language`      | `string` |             |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name     | Type     |
+| -------- | -------- |
+| `job_id` | `string` |
+
+## `/api/aiEditorial/review/`
+
+### Description
+
+Review and approve/reject an AI editorial
+
+When approved, the editorial is published to gitserver
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `action`   | `string`       |             |
+| `job_id`   | `string`       |             |
+| `language` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/aiEditorial/status/`
+
+### Description
+
+Get status of an AI editorial job
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `job_id` | `string` |             |
+
+### Returns
+
+| Name  | Type                          |
+| ----- | ----------------------------- |
+| `job` | `types.AiEditorialJobDetails` |
 
 # Authorization
 
@@ -852,6 +918,7 @@ Creates a new contest
 | `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`       | `float\|null`                                              |             |
 | `problems`                  | `null\|string`                                             |             |
+| `recommended`               | `bool\|null`                                               |             |
 | `requests_user_information` | `bool\|null`                                               |             |
 | `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                | `float\|null`                                              |             |
@@ -1433,6 +1500,7 @@ Update a Contest
 | `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`                        | `float\|null`                                              |             |
 | `problems`                                   | `null\|string`                                             |             |
+| `recommended`                                | `bool\|null`                                               |             |
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
@@ -3700,7 +3768,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `mixed`                                                          |             |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
 
 ### Returns
 
@@ -3926,7 +3994,25 @@ Disqualify one or more submissions based on the received parameters:
 
 ### Description
 
-Get the next execution timestamp
+Get the next execution timestamp for a specific problemset:
+
+- Contest
+- Virtual contest
+- Practice contest
+- Course
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
+
+## `/api/run/executeForIDE/`
+
+### Description
+
+Get the next execution timestamp, no user session required, as the IDE
+runs independently.
 
 ### Returns
 

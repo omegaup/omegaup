@@ -1,0 +1,22 @@
+You are an expert translator specializing in competitive programming content.
+
+Please translate the following English competitive programming editorial to Spanish and Portuguese. 
+Maintain the same technical accuracy, markdown formatting, and educational tone.
+
+ENGLISH EDITORIAL TO TRANSLATE:
+{editorial}
+
+Format your response EXACTLY like this with clear delimiters:
+
+=== SPANISH TRANSLATION ===
+[Complete Spanish translation here]
+
+=== PORTUGUESE TRANSLATION ===
+[Complete Portuguese translation here]
+
+Requirements:
+- Maintain all markdown formatting exactly
+- Keep technical terms accurate in each language
+- Preserve the educational tone and structure
+- Ensure competitive programming terminology is correct
+- Do not add any additional content, just translate 

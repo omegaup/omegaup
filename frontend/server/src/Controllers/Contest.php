@@ -22,9 +22,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, versions: array{log: list<ProblemVersion>, published: string}, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
- * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type ArenaContest=array{alias: string, director: string, finish_time: \OmegaUp\Timestamp|null, start_time: \OmegaUp\Timestamp|null, rerun_id?: int, title: string, window_length?: int}
- * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, canSetRecommended: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, recommended?: bool, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, extra_note?: string|null, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
@@ -37,7 +37,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
  * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, pageSize: int, query: string | null}
- * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
+ * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool, canSetRecommended?: bool}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
@@ -75,6 +75,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestPrintDetailsPayload=array{contestTitle: string, problems: array<int, null|ProblemDetails>}
  */
+
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
@@ -1379,6 +1380,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
                     ),
+                    'canSetRecommended' => \OmegaUp\Authorization::isSupportTeamMember(
+                        $r->identity
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestNew'
@@ -1884,7 +1888,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @return ContestDetails */
             function () use ($contest) {
                 // Initialize response to be the contest information
-                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, score_mode: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
+                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, score_mode: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
                 $result = $contest->asFilteredArray([
                     'admission_mode',
                     'alias',
@@ -1901,6 +1905,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'penalty_type',
                     'points_decay_factor',
                     'problemset_id',
+                    'recommended',
                     'rerun_id',
                     'scoreboard',
                     'scoreboard_url',
@@ -2071,9 +2076,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        // When user is admin or user joins contest in practice mode, saving
+        // When user is admin, support team member, or user joins contest in practice mode, saving
         // first access time is not necessary
-        if ($isPracticeMode || $contestAdmin) {
+        if (
+            $isPracticeMode || $contestAdmin || \OmegaUp\Authorization::isSupportTeamMember(
+                $identity
+            )
+        ) {
             return $result;
         }
 
@@ -2139,6 +2148,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $result['admin'] = true;
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
+        $result['recommended'] = $contest->recommended;
+        $result['canSetRecommended'] = \OmegaUp\Authorization::isSupportTeamMember(
+            $adminIdentity
+        );
         return $result;
     }
 
@@ -2629,6 +2642,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $recommended
+
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2671,6 +2686,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ['partial','all_or_nothing','max_per_group'],
         );
         $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
+
+        // Handle recommended flag - only available for admins and support team
+        $recommendedValue = $r->ensureOptionalBool('recommended');
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2692,6 +2710,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_for_teams' => $forTeams,
             'check_plagiarism' => $checkPlagiarism ? true : false,
         ]);
+
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
 
         self::createContest(
             $problemset,
@@ -4794,6 +4822,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
@@ -4855,6 +4884,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $updateProblemset = true;
         $updateRequests = false;
+
+        // Handle recommended flag - only available for admins and support team
+        $recommendedValue = $r->ensureOptionalBool('recommended');
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
+
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             \OmegaUp\Validators::validateOptionalInEnum(
@@ -5962,6 +6004,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest->recommended = $r->ensureBool('value');
         \OmegaUp\DAO\Contests::update($contest);
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $contestAlias
+        );
 
         return ['status' => 'ok'];
     }

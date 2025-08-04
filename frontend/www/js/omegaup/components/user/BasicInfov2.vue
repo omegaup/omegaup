@@ -40,7 +40,9 @@
             <strong>{{ T.profileCountry }}</strong>
           </div>
           <div class="col-sm-9 field-data" data-user-country>
-            <strong>{{ profile.country }}</strong>
+            <strong>{{
+              profile.country === 'xx' ? T.countryNotSet : profile.country
+            }}</strong>
           </div>
         </div>
 
@@ -76,7 +78,7 @@
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileAuthorRank }}</strong
-            ><a href="https://blog.omegaup.com/categorias/" target="_blank"
+            ><a :href="CategoriesFeatureGuideURL" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
             ></a>
           </div>
@@ -112,7 +114,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
 import * as ui from '../../ui';
-
+import { getBlogUrl } from '../../urlHelper';
 @Component({
   components: {
     'omegaup-user-username': user_Username,
@@ -123,6 +125,10 @@ export default class UserBasicInfo extends Vue {
   @Prop() rank!: string;
   T = T;
   ui = ui;
+
+  get CategoriesFeatureGuideURL(): string {
+    return getBlogUrl('CategoriesFeatureGuideURL');
+  }
 
   get urlUsername(): string {
     return `https://omegaup.com/profile/${this.profile.username}/`;

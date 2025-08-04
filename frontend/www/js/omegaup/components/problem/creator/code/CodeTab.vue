@@ -52,7 +52,12 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-primary" type="submit" @click="updateCode">
+          <button
+            data-problem-creator-code-save-btn
+            class="btn btn-primary .intro-js-code"
+            type="submit"
+            @click="updateCode"
+          >
             {{ T.problemCreatorCodeSave }}
           </button>
         </div>
@@ -68,6 +73,12 @@ import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import creator_CodeView from '../../../arena/CodeView.vue';
 import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
+import VueCookies from 'vue-cookies';
+import { TabIndex } from '../Tabs.vue';
+
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -77,6 +88,7 @@ import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
 export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
+  @Prop() activeTabIndex!: TabIndex;
 
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
@@ -117,6 +129,13 @@ export default class CodeTab extends Vue {
       if (languageInfo) {
         this.selectedLanguage = languageInfo.language;
       }
+    }
+  }
+
+  @Watch('activeTabIndex')
+  onActiveTabIndexChanged(newIndex: TabIndex) {
+    if (newIndex === TabIndex.Code) {
+      this.startIntroGuide();
     }
   }
 
@@ -190,6 +209,50 @@ export default class CodeTab extends Vue {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
     this.$emit('show-update-success-message');
+  }
+
+  startIntroGuide() {
+    if (!this.$cookies.get('has-visited-code-tab')) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title: T.problemCreatorCodeTabIntroSelectLanguageTitle,
+              intro: T.problemCreatorCodeTabIntroSelectLanguageIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-language]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroWriteCodeTitle,
+              intro: T.problemCreatorCodeTabIntroWriteCodeIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-editor]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroUploadFileTitle,
+              intro: T.problemCreatorCodeTabIntroUploadFileIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-input]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroSaveCodeTitle,
+              intro: T.problemCreatorCodeTabIntroSaveCodeIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-save-btn]',
+              ) as Element,
+            },
+          ],
+        })
+        .start();
+
+      this.$cookies.set('has-visited-code-tab', true, -1);
+    }
   }
 }
 </script>
