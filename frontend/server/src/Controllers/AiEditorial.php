@@ -23,10 +23,10 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     /**
      * Generate AI editorial for a problem
      *
-     * @return array{status: string, job_id?: string}
-     *
-     * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $language
+     *
+     * @return array{status: string, job_id?: string}
      */
     public static function apiGenerate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -89,13 +89,13 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Extract auth token from current session for worker authentication
+                // Extract auth token from current session for worker authentication
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession($r);
-        $authToken = $currentSession['auth_token'];
+        $sessionAuthToken = $currentSession['auth_token'];
 
-        if (is_null($authToken)) {
+        if (is_null($sessionAuthToken)) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
-                'sessionAuthTokenRequired'
+                'userNotAllowed'
             );
         }
 
@@ -105,12 +105,12 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $r->identity->user_id
         );
 
-        // Queue the job to Redis for the Python worker with auth token
+                // Queue the job to Redis for the Python worker with auth token
         self::queueJobToRedis(
             $jobId,
             $problemAlias,
             $r->identity->user_id,
-            $authToken,
+            $sessionAuthToken,
             $r->identity->identity_id
         );
 
@@ -127,7 +127,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         string $jobId,
         string $problemAlias,
         int $userId,
-        string $authToken,
+        string $sessionAuthToken,
         int $identityId
     ): void {
         try {
@@ -144,9 +144,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
 
             // Validate auth token before queuing
-            if (strlen($authToken) < 10) {
+            if (strlen($sessionAuthToken) < 10) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'invalidAuthToken'
+                    'parameterInvalid'
                 );
             }
 
@@ -154,7 +154,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 'job_id' => $jobId,
                 'problem_alias' => $problemAlias,
                 'user_id' => $userId,
-                'auth_token' => $authToken,
+                'auth_token' => $sessionAuthToken,
                 'identity_id' => $identityId,
                 'created_at' => date('c'),
                 'source' => 'web_interface',
@@ -189,7 +189,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Re-throw to fail the API call for Redis failures
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                'jobQueueingFailed'
+                'generalError'
             );
         }
     }
