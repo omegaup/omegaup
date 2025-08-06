@@ -89,14 +89,30 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
         }
 
+        // Extract auth token from current session for worker authentication
+        $currentSession = \OmegaUp\Controllers\Session::getCurrentSession($r);
+        $authToken = $currentSession['auth_token'];
+
+        if (is_null($authToken)) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'sessionAuthTokenRequired'
+            );
+        }
+
         // Create the job
         $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
             $problem->problem_id,
             $r->identity->user_id
         );
 
-        // Queue the job to Redis for the Python worker
-        self::queueJobToRedis($jobId, $problemAlias, $r->identity->user_id);
+        // Queue the job to Redis for the Python worker with auth token
+        self::queueJobToRedis(
+            $jobId,
+            $problemAlias,
+            $r->identity->user_id,
+            $authToken,
+            $r->identity->identity_id
+        );
 
         return [
             'status' => 'ok',
@@ -110,7 +126,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     private static function queueJobToRedis(
         string $jobId,
         string $problemAlias,
-        int $userId
+        int $userId,
+        string $authToken,
+        int $identityId
     ): void {
         try {
             // Use environment variables like existing cronjobs
@@ -125,11 +143,22 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 $redis->auth($redisPassword);
             }
 
+            // Validate auth token before queuing
+            if (strlen($authToken) < 10) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidAuthToken'
+                );
+            }
+
             $job = [
                 'job_id' => $jobId,
                 'problem_alias' => $problemAlias,
                 'user_id' => $userId,
-                'created_at' => date('c')
+                'auth_token' => $authToken,
+                'identity_id' => $identityId,
+                'created_at' => date('c'),
+                'source' => 'web_interface',
+                'priority' => 'user'
             ];
 
             // Queue to high priority queue for user-initiated jobs
@@ -137,9 +166,30 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             $redis->close();
         } catch (\Exception $e) {
-            // Log error but don't fail the API call
+            // Log error with security considerations (don't log auth token)
             error_log(
-                "Failed to queue Redis job {$jobId}: " . $e->getMessage()
+                "Failed to queue Redis job {$jobId} for user {$userId}: " .
+                $e->getMessage()
+            );
+
+            // Update job status to failed in database
+            try {
+                \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+                    $jobId,
+                    'failed',
+                    'Failed to queue job for processing',
+                    false // not retriable for Redis failures
+                );
+            } catch (\Exception $dbException) {
+                error_log(
+                    "Failed to update job status for {$jobId}: " .
+                    $dbException->getMessage()
+                );
+            }
+
+            // Re-throw to fail the API call for Redis failures
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'jobQueueingFailed'
             );
         }
     }
