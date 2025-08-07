@@ -23,8 +23,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     /**
      * Generate AI editorial for a problem
      *
-     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $language
+     * @omegaup-request-param string $problem_alias
      *
      * @return array{status: string, job_id?: string}
      */
