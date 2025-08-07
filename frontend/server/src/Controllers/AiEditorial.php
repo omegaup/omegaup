@@ -142,9 +142,11 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             // Set a shorter timeout for testing environments
             // Use PHPUnit detection as primary test environment indicator
             $isTestEnv = (
-                defined('PHPUNIT_RUNNING') || 
+                defined('PHPUNIT_RUNNING') ||
                 class_exists('PHPUnit\Framework\TestCase', false) ||
-                (isset($_ENV['OMEGAUP_ENVIRONMENT']) && $_ENV['OMEGAUP_ENVIRONMENT'] === 'test')
+                (isset(
+                    $_ENV['OMEGAUP_ENVIRONMENT']
+                ) && $_ENV['OMEGAUP_ENVIRONMENT'] === 'test')
             );
             $timeout = $isTestEnv ? 1 : 30;
             $connected = $redis->connect($redisHost, $redisPort, $timeout);
@@ -191,14 +193,14 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                         // In test environments, make Redis failures non-fatal
             $isTestEnvironment = (
                 // Check if we're running in PHPUnit (most reliable test detection)
-                defined('PHPUNIT_RUNNING') || 
+                defined('PHPUNIT_RUNNING') ||
                 class_exists('PHPUnit\Framework\TestCase', false)
             ) || (
-                isset($_ENV['OMEGAUP_ENVIRONMENT']) && 
+                isset($_ENV['OMEGAUP_ENVIRONMENT']) &&
                 $_ENV['OMEGAUP_ENVIRONMENT'] === 'test'
             ) || (
                 // Only check constant if it's not the default production value
-                defined('OMEGAUP_ENVIRONMENT') && 
+                defined('OMEGAUP_ENVIRONMENT') &&
                 OMEGAUP_ENVIRONMENT !== 'production' &&
                 OMEGAUP_ENVIRONMENT === 'test'
             );
