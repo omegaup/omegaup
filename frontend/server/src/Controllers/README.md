@@ -304,10 +304,11 @@ Generate AI editorial for a problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `language`      | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `auth_token`    | `null\|string` |             |
 
 ### Returns
 
