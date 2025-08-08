@@ -9,19 +9,19 @@
 
 namespace OmegaUp\DAO\Base;
 
-/** UserRank Data Access Object (DAO) Base.
+/** AIEditorialJobs Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\UserRank}.
+ * {@link \OmegaUp\DAO\VO\AIEditorialJobs}.
  * @access public
  * @abstract
  */
-abstract class UserRank {
+abstract class AIEditorialJobs {
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\AIEditorialJobs}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
@@ -30,37 +30,35 @@ abstract class UserRank {
      * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
      * llave primaria están vacías.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRank}.
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\AIEditorialJobs}.
      *
      * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
     final public static function replace(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
     ): int {
         if (
-            empty($User_Rank->user_id)
+            empty($AI_Editorial_Jobs->job_id)
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
         $sql = '
             REPLACE INTO
-                User_Rank (
+                AI_Editorial_Jobs (
+                    `job_id`,
+                    `problem_id`,
                     `user_id`,
-                    `ranking`,
-                    `problems_solved_count`,
-                    `score`,
-                    `username`,
-                    `name`,
-                    `country_id`,
-                    `state_id`,
-                    `school_id`,
-                    `author_score`,
-                    `author_ranking`,
-                    `classname`,
-                    `timestamp`
+                    `status`,
+                    `error_message`,
+                    `is_retriable`,
+                    `attempts`,
+                    `created_at`,
+                    `md_en`,
+                    `md_es`,
+                    `md_pt`,
+                    `validation_verdict`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -75,33 +73,28 @@ abstract class UserRank {
                     ?
                 );';
         $params = [
-            $User_Rank->user_id,
+            $AI_Editorial_Jobs->job_id,
             (
-                !is_null($User_Rank->ranking) ?
-                intval($User_Rank->ranking) :
+                !is_null($AI_Editorial_Jobs->problem_id) ?
+                intval($AI_Editorial_Jobs->problem_id) :
                 null
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
             (
-                !is_null($User_Rank->school_id) ?
-                intval($User_Rank->school_id) :
+                !is_null($AI_Editorial_Jobs->user_id) ?
+                intval($AI_Editorial_Jobs->user_id) :
                 null
             ),
-            floatval($User_Rank->author_score),
-            (
-                !is_null($User_Rank->author_ranking) ?
-                intval($User_Rank->author_ranking) :
-                null
-            ),
-            $User_Rank->classname,
+            $AI_Editorial_Jobs->status,
+            $AI_Editorial_Jobs->error_message,
+            intval($AI_Editorial_Jobs->is_retriable),
+            intval($AI_Editorial_Jobs->attempts),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $AI_Editorial_Jobs->created_at
             ),
+            $AI_Editorial_Jobs->md_en,
+            $AI_Editorial_Jobs->md_es,
+            $AI_Editorial_Jobs->md_pt,
+            $AI_Editorial_Jobs->validation_verdict,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -110,117 +103,106 @@ abstract class UserRank {
     /**
      * Actualizar registros.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El objeto de tipo UserRank a actualizar.
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs El objeto de tipo AIEditorialJobs a actualizar.
      *
      * @return int Número de filas afectadas
      */
     final public static function update(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
     ): int {
         $sql = '
             UPDATE
-                `User_Rank`
+                `AI_Editorial_Jobs`
             SET
-                `ranking` = ?,
-                `problems_solved_count` = ?,
-                `score` = ?,
-                `username` = ?,
-                `name` = ?,
-                `country_id` = ?,
-                `state_id` = ?,
-                `school_id` = ?,
-                `author_score` = ?,
-                `author_ranking` = ?,
-                `classname` = ?,
-                `timestamp` = ?
+                `problem_id` = ?,
+                `user_id` = ?,
+                `status` = ?,
+                `error_message` = ?,
+                `is_retriable` = ?,
+                `attempts` = ?,
+                `created_at` = ?,
+                `md_en` = ?,
+                `md_es` = ?,
+                `md_pt` = ?,
+                `validation_verdict` = ?
             WHERE
                 (
-                    `user_id` = ?
+                    `job_id` = ?
                 );';
         $params = [
             (
-                is_null($User_Rank->ranking) ?
+                is_null($AI_Editorial_Jobs->problem_id) ?
                 null :
-                intval($User_Rank->ranking)
+                intval($AI_Editorial_Jobs->problem_id)
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
             (
-                is_null($User_Rank->school_id) ?
+                is_null($AI_Editorial_Jobs->user_id) ?
                 null :
-                intval($User_Rank->school_id)
+                intval($AI_Editorial_Jobs->user_id)
             ),
-            floatval($User_Rank->author_score),
-            (
-                is_null($User_Rank->author_ranking) ?
-                null :
-                intval($User_Rank->author_ranking)
-            ),
-            $User_Rank->classname,
+            $AI_Editorial_Jobs->status,
+            $AI_Editorial_Jobs->error_message,
+            intval($AI_Editorial_Jobs->is_retriable),
+            intval($AI_Editorial_Jobs->attempts),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $AI_Editorial_Jobs->created_at
             ),
-            (
-                is_null($User_Rank->user_id) ?
-                null :
-                intval($User_Rank->user_id)
-            ),
+            $AI_Editorial_Jobs->md_en,
+            $AI_Editorial_Jobs->md_es,
+            $AI_Editorial_Jobs->md_pt,
+            $AI_Editorial_Jobs->validation_verdict,
+            $AI_Editorial_Jobs->job_id,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * Obtener {@link \OmegaUp\DAO\VO\UserRank} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\AIEditorialJobs} por llave primaria.
      *
-     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\AIEditorialJobs}
      * de la base de datos usando sus llaves primarias.
      *
-     * @return ?\OmegaUp\DAO\VO\UserRank Un objeto del tipo
-     * {@link \OmegaUp\DAO\VO\UserRank} o NULL si no hay tal
+     * @return ?\OmegaUp\DAO\VO\AIEditorialJobs Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\AIEditorialJobs} o NULL si no hay tal
      * registro.
      */
     final public static function getByPK(
-        ?int $user_id
-    ): ?\OmegaUp\DAO\VO\UserRank {
+        ?string $job_id
+    ): ?\OmegaUp\DAO\VO\AIEditorialJobs {
         $sql = '
             SELECT
-                `User_Rank`.`user_id`,
-                `User_Rank`.`ranking`,
-                `User_Rank`.`problems_solved_count`,
-                `User_Rank`.`score`,
-                `User_Rank`.`username`,
-                `User_Rank`.`name`,
-                `User_Rank`.`country_id`,
-                `User_Rank`.`state_id`,
-                `User_Rank`.`school_id`,
-                `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`,
-                `User_Rank`.`timestamp`
+                `AI_Editorial_Jobs`.`job_id`,
+                `AI_Editorial_Jobs`.`problem_id`,
+                `AI_Editorial_Jobs`.`user_id`,
+                `AI_Editorial_Jobs`.`status`,
+                `AI_Editorial_Jobs`.`error_message`,
+                `AI_Editorial_Jobs`.`is_retriable`,
+                `AI_Editorial_Jobs`.`attempts`,
+                `AI_Editorial_Jobs`.`created_at`,
+                `AI_Editorial_Jobs`.`md_en`,
+                `AI_Editorial_Jobs`.`md_es`,
+                `AI_Editorial_Jobs`.`md_pt`,
+                `AI_Editorial_Jobs`.`validation_verdict`
             FROM
-                `User_Rank`
+                `AI_Editorial_Jobs`
             WHERE
                 (
-                    `user_id` = ?
+                    `job_id` = ?
                 )
             LIMIT 1;';
-        $params = [$user_id];
+        $params = [$job_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
         }
-        return new \OmegaUp\DAO\VO\UserRank($row);
+        return new \OmegaUp\DAO\VO\AIEditorialJobs($row);
     }
 
     /**
-     * Verificar si existe un {@link \OmegaUp\DAO\VO\UserRank} por llave primaria.
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\AIEditorialJobs} por llave primaria.
      *
-     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\AIEditorialJobs}
      * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
      *
      * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
@@ -229,18 +211,18 @@ abstract class UserRank {
      * @return bool Si existe o no tal registro.
      */
     final public static function existsByPK(
-        ?int $user_id
+        ?string $job_id
     ): bool {
         $sql = '
             SELECT
                 COUNT(*)
             FROM
-                `User_Rank`
+                `AI_Editorial_Jobs`
             WHERE
                 (
-                    `user_id` = ?
+                    `job_id` = ?
                 );';
-        $params = [$user_id];
+        $params = [$job_id];
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
@@ -250,7 +232,7 @@ abstract class UserRank {
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {@link \OmegaUp\DAO\VO\UserRank} suministrado.
+     * el objeto {@link \OmegaUp\DAO\VO\AIEditorialJobs} suministrado.
      * Una vez que se ha eliminado un objeto, este no puede ser restaurado
      * llamando a {@link replace()}, ya que este último creará un nuevo
      * registro con una llave primaria distinta a la que estaba en el objeto
@@ -259,24 +241,24 @@ abstract class UserRank {
      * Si no puede encontrar el registro a eliminar,
      * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo \OmegaUp\DAO\VO\UserRank a eliminar
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs El
+     * objeto de tipo \OmegaUp\DAO\VO\AIEditorialJobs a eliminar
      *
      * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
      * encuentra el objeto a eliminar en la base de datos.
      */
     final public static function delete(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
     ): void {
         $sql = '
             DELETE FROM
-                `User_Rank`
+                `AI_Editorial_Jobs`
             WHERE
                 (
-                    `user_id` = ?
+                    `job_id` = ?
                 );';
         $params = [
-            $User_Rank->user_id
+            $AI_Editorial_Jobs->job_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -290,7 +272,7 @@ abstract class UserRank {
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
      * y construirá un arreglo que contiene objetos de tipo
-     * {@link \OmegaUp\DAO\VO\UserRank}.
+     * {@link \OmegaUp\DAO\VO\AIEditorialJobs}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
@@ -301,8 +283,8 @@ abstract class UserRank {
      * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
-     * @return list<\OmegaUp\DAO\VO\UserRank> Un arreglo que contiene objetos del tipo
-     * {@link \OmegaUp\DAO\VO\UserRank}.
+     * @return list<\OmegaUp\DAO\VO\AIEditorialJobs> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\AIEditorialJobs}.
      */
     final public static function getAll(
         ?int $pagina = null,
@@ -312,21 +294,20 @@ abstract class UserRank {
     ): array {
         $sql = '
             SELECT
-                `User_Rank`.`user_id`,
-                `User_Rank`.`ranking`,
-                `User_Rank`.`problems_solved_count`,
-                `User_Rank`.`score`,
-                `User_Rank`.`username`,
-                `User_Rank`.`name`,
-                `User_Rank`.`country_id`,
-                `User_Rank`.`state_id`,
-                `User_Rank`.`school_id`,
-                `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`,
-                `User_Rank`.`classname`,
-                `User_Rank`.`timestamp`
+                `AI_Editorial_Jobs`.`job_id`,
+                `AI_Editorial_Jobs`.`problem_id`,
+                `AI_Editorial_Jobs`.`user_id`,
+                `AI_Editorial_Jobs`.`status`,
+                `AI_Editorial_Jobs`.`error_message`,
+                `AI_Editorial_Jobs`.`is_retriable`,
+                `AI_Editorial_Jobs`.`attempts`,
+                `AI_Editorial_Jobs`.`created_at`,
+                `AI_Editorial_Jobs`.`md_en`,
+                `AI_Editorial_Jobs`.`md_es`,
+                `AI_Editorial_Jobs`.`md_pt`,
+                `AI_Editorial_Jobs`.`validation_verdict`
             FROM
-                `User_Rank`
+                `AI_Editorial_Jobs`
         ';
         $sql .= (
             ' ORDER BY `' .
@@ -346,7 +327,7 @@ abstract class UserRank {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
         ) {
-            $allData[] = new \OmegaUp\DAO\VO\UserRank(
+            $allData[] = new \OmegaUp\DAO\VO\AIEditorialJobs(
                 $row
             );
         }
@@ -357,37 +338,35 @@ abstract class UserRank {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {@link \OmegaUp\DAO\VO\UserRank}
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\AIEditorialJobs}
      * suministrado.
      *
-     * @param \OmegaUp\DAO\VO\UserRank $User_Rank El
-     * objeto de tipo {@link \OmegaUp\DAO\VO\UserRank}
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\AIEditorialJobs}
      * a crear.
      *
      * @return int Un entero mayor o igual a cero identificando el número de
      *             filas afectadas.
      */
     final public static function create(
-        \OmegaUp\DAO\VO\UserRank $User_Rank
+        \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
     ): int {
         $sql = '
             INSERT INTO
-                `User_Rank` (
+                `AI_Editorial_Jobs` (
+                    `job_id`,
+                    `problem_id`,
                     `user_id`,
-                    `ranking`,
-                    `problems_solved_count`,
-                    `score`,
-                    `username`,
-                    `name`,
-                    `country_id`,
-                    `state_id`,
-                    `school_id`,
-                    `author_score`,
-                    `author_ranking`,
-                    `classname`,
-                    `timestamp`
+                    `status`,
+                    `error_message`,
+                    `is_retriable`,
+                    `attempts`,
+                    `created_at`,
+                    `md_en`,
+                    `md_es`,
+                    `md_pt`,
+                    `validation_verdict`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?,
@@ -402,37 +381,28 @@ abstract class UserRank {
                     ?
                 );';
         $params = [
+            $AI_Editorial_Jobs->job_id,
             (
-                is_null($User_Rank->user_id) ?
+                is_null($AI_Editorial_Jobs->problem_id) ?
                 null :
-                intval($User_Rank->user_id)
+                intval($AI_Editorial_Jobs->problem_id)
             ),
             (
-                is_null($User_Rank->ranking) ?
+                is_null($AI_Editorial_Jobs->user_id) ?
                 null :
-                intval($User_Rank->ranking)
+                intval($AI_Editorial_Jobs->user_id)
             ),
-            intval($User_Rank->problems_solved_count),
-            floatval($User_Rank->score),
-            $User_Rank->username,
-            $User_Rank->name,
-            $User_Rank->country_id,
-            $User_Rank->state_id,
-            (
-                is_null($User_Rank->school_id) ?
-                null :
-                intval($User_Rank->school_id)
-            ),
-            floatval($User_Rank->author_score),
-            (
-                is_null($User_Rank->author_ranking) ?
-                null :
-                intval($User_Rank->author_ranking)
-            ),
-            $User_Rank->classname,
+            $AI_Editorial_Jobs->status,
+            $AI_Editorial_Jobs->error_message,
+            intval($AI_Editorial_Jobs->is_retriable),
+            intval($AI_Editorial_Jobs->attempts),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                $User_Rank->timestamp
+                $AI_Editorial_Jobs->created_at
             ),
+            $AI_Editorial_Jobs->md_en,
+            $AI_Editorial_Jobs->md_es,
+            $AI_Editorial_Jobs->md_pt,
+            $AI_Editorial_Jobs->validation_verdict,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
