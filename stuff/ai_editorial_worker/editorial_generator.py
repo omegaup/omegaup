@@ -195,12 +195,26 @@ class EditorialGenerator:
             return None
 
     def _get_problem_details(self, problem_alias: str) -> Dict[str, Any]:
-        """Get problem details from API."""
-        problem_data = self.api_client.get_problem_details(problem_alias)
-        if not problem_data:
+        """Get problem details from API with authentication."""
+        try:
+            problem_data = self.api_client.get_problem_details(problem_alias)
+            if not problem_data:
+                raise ValueError(
+                    f'Failed to fetch problem details for {problem_alias}')
+            return problem_data
+        except ConnectionError as e:
+            logging.error(
+                'Authentication or connection failed for problem %s: %s',
+                problem_alias, str(e))
             raise ValueError(
-                f'Failed to fetch problem details for {problem_alias}')
-        return problem_data
+                f'Authentication failed when fetching problem {problem_alias}'
+            ) from e
+        except Exception as e:
+            logging.error(
+                'API error fetching problem %s: %s', problem_alias, str(e))
+            raise ValueError(
+                f'API error fetching problem {problem_alias}: {str(e)}'
+            ) from e
 
     def _get_ac_solution(self, problem_alias: str) -> Optional[Dict[str, Any]]:
         """Get AC solution for the problem."""

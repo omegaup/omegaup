@@ -68,16 +68,22 @@ class WebsiteUploader:
             # Prepare content for upload
             prepared_content = self.prepare_editorial_for_upload(content)
 
-            # Upload via API
-            success = self.api_client.update_problem_solution(
-                problem_alias, prepared_content, language)
+            # Upload via API with authentication
+            try:
+                success = self.api_client.update_problem_solution(
+                    problem_alias, prepared_content, language)
 
-            if success:
-                logging.info(
-                    "Successfully uploaded %s editorial for %s",
-                    language,
-                    problem_alias)
-                return True
+                if success:
+                    logging.info(
+                        "Successfully uploaded %s editorial for %s",
+                        language,
+                        problem_alias)
+                    return True
+            except ConnectionError as e:
+                logging.error(
+                    "Authentication failed for editorial upload %s/%s: %s",
+                    problem_alias, language, str(e))
+                return False
 
             logging.error(
                 "API call failed for %s editorial of %s",
