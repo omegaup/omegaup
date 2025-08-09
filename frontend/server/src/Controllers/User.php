@@ -4800,6 +4800,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
         $idToken = $r->ensureOptionalString('credential');
+        $redirect = $r->ensureOptionalString('redirect');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4823,7 +4824,8 @@ class User extends \OmegaUp\Controllers\Controller {
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
-                    $gCsrfToken
+                    $gCsrfToken,
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {
