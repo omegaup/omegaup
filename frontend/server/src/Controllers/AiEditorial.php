@@ -139,16 +139,8 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             $redis = new \Redis();
 
-            // Set a shorter timeout for testing environments
-            // Use PHPUnit detection as primary test environment indicator
-            $isTestEnv = (
-                defined('PHPUNIT_RUNNING') ||
-                class_exists('PHPUnit\Framework\TestCase', false) ||
-                (isset(
-                    $_ENV['OMEGAUP_ENVIRONMENT']
-                ) && $_ENV['OMEGAUP_ENVIRONMENT'] === 'test')
-            );
-            $timeout = $isTestEnv ? 1 : 30;
+            // Set Redis connection timeout
+            $timeout = 30;
             $connected = $redis->connect($redisHost, $redisPort, $timeout);
 
             if (!$connected) {
@@ -190,47 +182,18 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 $e->getMessage()
             );
 
-                        // In test environments, make Redis failures non-fatal
-            $isTestEnvironment = (
-                // Check if we're running in PHPUnit (most reliable test detection)
-                defined('PHPUNIT_RUNNING') ||
-                class_exists('PHPUnit\Framework\TestCase', false)
-            ) || (
-                isset($_ENV['OMEGAUP_ENVIRONMENT']) &&
-                $_ENV['OMEGAUP_ENVIRONMENT'] === 'test'
-            ) || (
-                // Only check constant if it's not the default production value
-                defined('OMEGAUP_ENVIRONMENT') &&
-                OMEGAUP_ENVIRONMENT !== 'production' &&
-                OMEGAUP_ENVIRONMENT === 'test'
-            );
+            // Extract local variables to avoid code repetition
+            $failedStatus = 'failed';
+            $failedMessage = 'Failed to queue job for processing';
+            $notRetriable = false;
 
-            if ($isTestEnvironment) {
-                // In test mode, update job status to 'queued' and don't fail
-                try {
-                    \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
-                        $jobId,
-                        'queued',
-                        'Job queued (Redis unavailable in test mode)',
-                        true
-                    );
-                } catch (\Exception $dbException) {
-                    error_log(
-                        "Failed to update job status for {$jobId}: " .
-                        $dbException->getMessage()
-                    );
-                }
-                // Don't throw exception in test mode - let the API succeed
-                return;
-            }
-
-            // In production, update job status to failed and throw exception
+            // Update job status to failed and throw exception
             try {
                 \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
                     $jobId,
-                    'failed',
-                    'Failed to queue job for processing',
-                    false // not retriable for Redis failures
+                    $failedStatus,
+                    $failedMessage,
+                    $notRetriable
                 );
             } catch (\Exception $dbException) {
                 error_log(
@@ -239,7 +202,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            // Re-throw to fail the API call for Redis failures in production
+            // Re-throw to fail the API call for Redis failures
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError'
             );
