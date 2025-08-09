@@ -20,7 +20,7 @@ const carouselConfig: {
     target: string;
   };
 }[] = [
-  {
+  /*{
     image: '/media/homepage/carousel_slide_1.svg',
     title: {
       en: 'Improve your programming skills',
@@ -42,6 +42,28 @@ const carouselConfig: {
         pt: 'Veja o tutorial',
       },
       href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
+      target: '_blank',
+    },
+  },*/
+  {
+    image: '/media/homepage/egoi25.png',
+    title: {
+      en: 'Mexico present at EGOI 2025',
+      es: 'México presente en la EGOI 2025',
+      pt: 'México presente na EGOI 2025',
+    },
+    description: {
+      en: 'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
+      es: 'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y voluntarios por hacer posible este sueño. 💙',
+      pt: 'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
+    },
+    button: {
+      text: {
+        en: 'EGOI',
+        es: 'EGOI',
+        pt: 'EGOI',
+      },
+      href: 'https://egoi.org/',
       target: '_blank',
     },
   },
