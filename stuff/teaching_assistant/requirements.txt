@@ -1,6 +1,6 @@
 anthropic>=0.54.0
 openai>=1.86.0
-google-genai>=1.19.0
+google-generativeai>=0.8.5
 tqdm>=4.67.1
 requests>=2.32.4
 pytest>=8.4.0
