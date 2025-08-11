@@ -1,7 +1,7 @@
-"""Setups the prerequisites for the teaching to run.
-The pytest adds teacher, student, course, assignment,
-problem and submission and verifies the success.
-Next, the teaching assistant will run on the course.
+"""Tests if the teaching assistant submission mode works.
+The pytest extracts the submission id for the run, adds a
+student feedback, runs the teaching assistant for
+that submission and then checks if the feedback is posted.
 """
 import logging
 from typing import Any
