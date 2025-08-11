@@ -54,7 +54,7 @@ const carouselConfig: {
     },
     description: {
       en: 'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
-      es: 'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y voluntarios por hacer posible este sueño. 💙',
+      es: 'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
       pt: 'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
     },
     button: {
