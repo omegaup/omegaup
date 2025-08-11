@@ -24,7 +24,6 @@ OmegaUp.on('ready', () => {
   }
 
   function redirect(isAccountCreation: boolean): void {
-
     const params = new URLSearchParams(window.location.search);
     const pathname = params.get('redirect');
     const fromLoginParam = '?fromLogin';
@@ -43,7 +42,7 @@ OmegaUp.on('ready', () => {
       window.location.href = pathname;
       return;
     }
-    
+
     window.location.href = `/${fromLoginParam}`;
   }
 

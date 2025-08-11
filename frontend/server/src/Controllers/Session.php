@@ -667,7 +667,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
     }
 
-    private static function redirect(?string $redirect = null, ?bool $isAccountCreation = false): void {
+    private static function redirect(
+        ?string $redirect = null,
+        ?bool $isAccountCreation = false
+    ): void {
         $redirectUrl = $isAccountCreation
         ? '/profile?fromLogin'
         : self::getRedirectUrl($redirect);

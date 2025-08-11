@@ -4787,6 +4787,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
+     * @omegaup-request-param null|string $redirect
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4825,7 +4826,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
                     $gCsrfToken,
-                    $redirect
+                    $redirect ?? ''
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {
