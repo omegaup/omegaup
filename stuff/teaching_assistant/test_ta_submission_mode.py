@@ -1,4 +1,8 @@
-"""Test module for teaching assistant submission mode pre functionality."""
+"""Setups the prerequisites for the teaching to run.
+The pytest adds teacher, student, course, assignment,
+problem and submission and verifies the success.
+Next, the teaching assistant will run on the course.
+"""
 import logging
 from typing import Any
 import subprocess
