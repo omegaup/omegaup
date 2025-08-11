@@ -3,8 +3,8 @@
 from typing import Any
 import anthropic  # type: ignore
 import openai  # type: ignore
-from google import genai  # type: ignore
-from google.genai import types  # type: ignore
+import google.generativeai as genai  # type: ignore
+from google.generativeai import types  # type: ignore
 
 
 class LLMWrapper:

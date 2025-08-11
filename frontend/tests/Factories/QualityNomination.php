@@ -107,7 +107,7 @@ class QualityNomination {
     }
 
     /**
-     * @param array{difficulty?: float, quality?: float, tags?: string[], before_AC?: boolean} $contents
+     * @param array{difficulty?: int, quality?: int, tags?: string[], before_AC?: boolean} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createQualityNomination(
