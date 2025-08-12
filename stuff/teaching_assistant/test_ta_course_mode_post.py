@@ -1,4 +1,7 @@
-"""Test module for teaching assistant course mode post functionality."""
+"""Checks if the teaching assistant course worked correctly.
+This pytest tests if the teaching assistant was successful
+writing feedback for the submissions in a course.
+"""
 import logging
 from typing import Any
 
