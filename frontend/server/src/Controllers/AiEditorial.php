@@ -23,10 +23,11 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     /**
      * Generate AI editorial for a problem
      *
-     * @return array{status: string, job_id?: string}
-     *
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
+     *
+     * @return array{status: string, job_id?: string}
      */
     public static function apiGenerate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -89,14 +90,30 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
         }
 
+                // Extract auth token from current session for worker authentication
+        $currentSession = \OmegaUp\Controllers\Session::getCurrentSession($r);
+        $sessionAuthToken = $currentSession['auth_token'];
+
+        if (is_null($sessionAuthToken)) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
+        }
+
         // Create the job
         $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
             $problem->problem_id,
             $r->identity->user_id
         );
 
-        // Queue the job to Redis for the Python worker
-        self::queueJobToRedis($jobId, $problemAlias, $r->identity->user_id);
+                // Queue the job to Redis for the Python worker with auth token
+        self::queueJobToRedis(
+            $jobId,
+            $problemAlias,
+            $r->identity->user_id,
+            $sessionAuthToken,
+            $r->identity->identity_id
+        );
 
         return [
             'status' => 'ok',
@@ -110,7 +127,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
     private static function queueJobToRedis(
         string $jobId,
         string $problemAlias,
-        int $userId
+        int $userId,
+        string $sessionAuthToken,
+        int $identityId
     ): void {
         try {
             // Use environment variables like existing cronjobs
@@ -119,17 +138,37 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $redisPassword = $_ENV['REDIS_PASSWORD'] ?? null;
 
             $redis = new \Redis();
-            $redis->connect($redisHost, $redisPort);
+
+            // Set Redis connection timeout
+            $timeout = 30;
+            $connected = $redis->connect($redisHost, $redisPort, $timeout);
+
+            if (!$connected) {
+                throw new \Exception(
+                    "Failed to connect to Redis at {$redisHost}:{$redisPort}"
+                );
+            }
 
             if ($redisPassword) {
                 $redis->auth($redisPassword);
+            }
+
+            // Validate auth token before queuing
+            if (strlen($sessionAuthToken) < 10) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid'
+                );
             }
 
             $job = [
                 'job_id' => $jobId,
                 'problem_alias' => $problemAlias,
                 'user_id' => $userId,
-                'created_at' => date('c')
+                'auth_token' => $sessionAuthToken,
+                'identity_id' => $identityId,
+                'created_at' => date('c'),
+                'source' => 'web_interface',
+                'priority' => 'user'
             ];
 
             // Queue to high priority queue for user-initiated jobs
@@ -137,9 +176,35 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             $redis->close();
         } catch (\Exception $e) {
-            // Log error but don't fail the API call
+            // Log error with security considerations (don't log auth token)
             error_log(
-                "Failed to queue Redis job {$jobId}: " . $e->getMessage()
+                "Failed to queue Redis job {$jobId} for user {$userId}: " .
+                $e->getMessage()
+            );
+
+            // Extract local variables to avoid code repetition
+            $failedStatus = 'failed';
+            $failedMessage = 'Failed to queue job for processing';
+            $notRetriable = false;
+
+            // Update job status to failed and throw exception
+            try {
+                \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+                    $jobId,
+                    $failedStatus,
+                    $failedMessage,
+                    $notRetriable
+                );
+            } catch (\Exception $dbException) {
+                error_log(
+                    "Failed to update job status for {$jobId}: " .
+                    $dbException->getMessage()
+                );
+            }
+
+            // Re-throw to fail the API call for Redis failures
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError'
             );
         }
     }
