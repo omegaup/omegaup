@@ -4826,7 +4826,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
                     $gCsrfToken,
-                    $redirect ?? ''
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {

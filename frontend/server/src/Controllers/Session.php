@@ -528,7 +528,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function loginViaGoogle(
         string $idToken,
         string $gCsrfToken,
-        string $redirect
+        ?string $redirect = null
     ): void {
         // Verify the Google ID token on the server side:
         // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
@@ -658,7 +658,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             }
 
             $separator = str_contains($url, '?') ? '&' : '?';
-            return $url . $separator . 'fromLogin';
+            return "{$url}{$separator}fromLogin";
         }
         $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
         if (isset($redirectParsedUrl['port'])) {
