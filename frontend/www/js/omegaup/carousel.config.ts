@@ -20,31 +20,6 @@ const carouselConfig: {
     target: string;
   };
 }[] = [
-  /*{
-    image: '/media/homepage/carousel_slide_1.svg',
-    title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
-    },
-    description: {
-      en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
-      es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
-      pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
-    },
-    button: {
-      text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
-      },
-      href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
-      target: '_blank',
-    },
-  },*/
   {
     image: '/media/homepage/egoi25.png',
     title: {
@@ -53,9 +28,12 @@ const carouselConfig: {
       pt: 'México presente na EGOI 2025',
     },
     description: {
-      en: 'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
-      es: 'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
-      pt: 'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
+      en:
+        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
+      es:
+        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
+      pt:
+        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
     },
     button: {
       text: {
