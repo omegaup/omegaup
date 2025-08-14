@@ -62,7 +62,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        $recentJobs = \OmegaUp\DAO\AiEditorialJobs::countRecentJobsByUser(
+        $recentJobs = \OmegaUp\DAO\AIEditorialJobs::countRecentJobsByUser(
             $r->identity->user_id,
             1 // 1 hour
         );
@@ -77,7 +77,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         if (is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $lastJob = \OmegaUp\DAO\AiEditorialJobs::getLastJobForProblem(
+        $lastJob = \OmegaUp\DAO\AIEditorialJobs::getLastJobForProblem(
             $problem->problem_id
         );
 
@@ -101,7 +101,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         // Create the job
-        $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
+        $jobId = \OmegaUp\DAO\AIEditorialJobs::createJob(
             $problem->problem_id,
             $r->identity->user_id
         );
@@ -189,7 +189,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Update job status to failed and throw exception
             try {
-                \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+                \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                     $jobId,
                     $failedStatus,
                     $failedMessage,
@@ -220,7 +220,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $jobId = $r->ensureString('job_id');
 
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK($jobId);
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
         if (is_null($job)) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
@@ -280,7 +280,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK($jobId);
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
         if (is_null($job)) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
@@ -310,7 +310,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
         if ($action === 'approve') {
             // Update job status
-            \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                 $jobId,
                 self::REVIEW_STATUS_APPROVED
             );
@@ -346,7 +346,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
         } else {
             // Reject the job
-            \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                 $jobId,
                 self::REVIEW_STATUS_REJECTED
             );
