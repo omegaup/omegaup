@@ -193,7 +193,7 @@ abstract class Plagiarisms {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
-     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\Plagiarisms> Un arreglo que contiene objetos del tipo
@@ -202,7 +202,7 @@ abstract class Plagiarisms {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        ?string $orden = null,
+        string $orden = '`Plagiarisms`.`plagiarism_id`',
         string $tipoDeOrden = 'ASC'
     ): array {
         $sql = '
@@ -217,14 +217,12 @@ abstract class Plagiarisms {
             FROM
                 `Plagiarisms`
         ';
-        if (!is_null($orden)) {
-            $sql .= (
-                ' ORDER BY `' .
-                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-                '` ' .
-                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-            );
-        }
+        $sql .= (
+            ' ORDER BY `' .
+            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+            '` ' .
+            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+        );
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

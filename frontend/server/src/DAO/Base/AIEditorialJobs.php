@@ -280,7 +280,11 @@ abstract class AIEditorialJobs {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
+<<<<<<< HEAD
      * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+=======
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+>>>>>>> 20706e109 (Cambiando el campo orden como mandatorio.)
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\AIEditorialJobs> Un arreglo que contiene objetos del tipo
@@ -289,7 +293,11 @@ abstract class AIEditorialJobs {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
+<<<<<<< HEAD
         ?string $orden = null,
+=======
+        string $orden = '`AI_Editorial_Jobs`.`job_id`',
+>>>>>>> 20706e109 (Cambiando el campo orden como mandatorio.)
         string $tipoDeOrden = 'ASC'
     ): array {
         $sql = '
@@ -309,6 +317,7 @@ abstract class AIEditorialJobs {
             FROM
                 `AI_Editorial_Jobs`
         ';
+<<<<<<< HEAD
         if (!is_null($orden)) {
             $sql .= (
                 ' ORDER BY `' .
@@ -317,6 +326,14 @@ abstract class AIEditorialJobs {
                 ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
             );
         }
+=======
+        $sql .= (
+            ' ORDER BY `' .
+            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+            '` ' .
+            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+        );
+>>>>>>> 20706e109 (Cambiando el campo orden como mandatorio.)
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .
