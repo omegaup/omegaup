@@ -29,6 +29,12 @@ class LLMWrapper:
         elif self.provider == 'gemini':
             self.client = genai.Client(api_key=self.api_key)
 
+        elif self.provider == 'omegaup':
+            # Dummy oracle for testing - only works with specific key
+            if self.api_key != "omegaup":
+                raise ValueError("Invalid API key for omegaup provider")
+            self.client = None
+
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")
 
@@ -75,6 +81,14 @@ class LLMWrapper:
                     max_tokens=500
                 )
                 response_text = chat_completion.choices[0].message.content
+
+            elif self.provider == 'omegaup':
+                # Dummy oracle for testing
+                # always returns the same JSON response
+                response_text = (
+                    '{"general advices": "This is dummy oracle", '
+                    '"1": "The oracle call worked."}'
+                )
 
             else:
                 raise ValueError(
