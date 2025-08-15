@@ -1,15 +1,20 @@
 <?php
-// WARNING: This file is auto-generated. Do not modify it directly.
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
 namespace OmegaUp\DAO\VO;
 
 /**
- * Value Object file for table AI_Editorial_Jobs.
+ * Value Object class for table `AI_Editorial_Jobs`.
  *
- * VO does not have any behaviour except for storage.
  * @access public
  */
-class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
+class AIEditorialJobs extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'job_id' => true,
         'problem_id' => true,
@@ -36,34 +41,44 @@ class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['job_id'])) {
-            $this->job_id = strval($data['job_id']);
+            $this->job_id = is_scalar(
+                $data['job_id']
+            ) ? strval($data['job_id']) : '';
         }
         if (isset($data['problem_id'])) {
-            $this->problem_id = intval($data['problem_id']);
-        }
-        if (isset($data['user_id'])) {
-            $this->user_id = intval($data['user_id']);
-        }
-        if (isset($data['status'])) {
-            $this->status = strval($data['status']);
-        }
-        if (isset($data['error_message'])) {
-            $this->error_message = is_null(
-                $data['error_message']
-            ) ? null : strval(
-                $data['error_message']
+            $this->problem_id = intval(
+                $data['problem_id']
             );
         }
+        if (isset($data['user_id'])) {
+            $this->user_id = intval(
+                $data['user_id']
+            );
+        }
+        if (isset($data['status'])) {
+            $this->status = is_scalar(
+                $data['status']
+            ) ? strval($data['status']) : '';
+        }
+        if (isset($data['error_message'])) {
+            $this->error_message = is_scalar(
+                $data['error_message']
+            ) ? strval($data['error_message']) : '';
+        }
         if (isset($data['is_retriable'])) {
-            $this->is_retriable = boolval($data['is_retriable']);
+            $this->is_retriable = boolval(
+                $data['is_retriable']
+            );
         }
         if (isset($data['attempts'])) {
-            $this->attempts = intval($data['attempts']);
+            $this->attempts = intval(
+                $data['attempts']
+            );
         }
         if (isset($data['created_at'])) {
             /**
              * @var \OmegaUp\Timestamp|string|int|float $data['created_at']
-             * @var \OmegaUp\Timestamp
+             * @var \OmegaUp\Timestamp $this->created_at
              */
             $this->created_at = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -71,107 +86,113 @@ class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->created_at = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+            $this->created_at = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['md_en'])) {
-            $this->md_en = is_null(
+            $this->md_en = is_scalar(
                 $data['md_en']
-            ) ? null : strval(
-                $data['md_en']
-            );
+            ) ? strval($data['md_en']) : '';
         }
         if (isset($data['md_es'])) {
-            $this->md_es = is_null(
+            $this->md_es = is_scalar(
                 $data['md_es']
-            ) ? null : strval(
-                $data['md_es']
-            );
+            ) ? strval($data['md_es']) : '';
         }
         if (isset($data['md_pt'])) {
-            $this->md_pt = is_null(
+            $this->md_pt = is_scalar(
                 $data['md_pt']
-            ) ? null : strval(
-                $data['md_pt']
-            );
+            ) ? strval($data['md_pt']) : '';
         }
         if (isset($data['validation_verdict'])) {
-            $this->validation_verdict = is_null(
+            $this->validation_verdict = is_scalar(
                 $data['validation_verdict']
-            ) ? null : strval(
-                $data['validation_verdict']
-            );
+            ) ? strval($data['validation_verdict']) : '';
         }
     }
 
     /**
-     * Identificador único del trabajo de editorial IA
+     * UUID identificador único del trabajo
      * Llave Primaria
+     *
      * @var string|null
      */
     public $job_id = null;
 
     /**
-     * ID del problema para el cual se genera la editorial
+     * Identificador del problema
+     *
      * @var int|null
      */
     public $problem_id = null;
 
     /**
-     * ID del usuario que solicitó la generación
+     * Usuario que solicitó la generación
+     *
      * @var int|null
      */
     public $user_id = null;
 
     /**
-     * Estado del trabajo (queued, processing, completed, failed, approved, rejected)
-     * @var string|null
+     * Estado actual del trabajo
+     *
+     * @var string
      */
     public $status = 'queued';
 
     /**
-     * Mensaje de error si el trabajo falló
+     * Mensaje de error en caso de fallo
+     *
      * @var string|null
      */
     public $error_message = null;
 
     /**
-     * Indica si el error permite reintentos
-     * @var bool|null
+     * Indica si el error permite reintentos (1 = sí, 0 = no)
+     *
+     * @var bool
      */
     public $is_retriable = true;
 
     /**
-     * Número de intentos de procesamiento
-     * @var int|null
+     * Número de intentos realizados
+     *
+     * @var int
      */
     public $attempts = 0;
 
     /**
-     * Timestamp de creación del trabajo
+     * Hora de creación del trabajo
+     *
      * @var \OmegaUp\Timestamp
      */
     public $created_at;  // CURRENT_TIMESTAMP
 
     /**
-     * Editorial generada en inglés (formato Markdown)
+     * Editorial generado en inglés
+     *
      * @var string|null
      */
     public $md_en = null;
 
     /**
-     * Editorial generada en español (formato Markdown)
+     * Editorial generado en español
+     *
      * @var string|null
      */
     public $md_es = null;
 
     /**
-     * Editorial generada en portugués (formato Markdown)
+     * Editorial generado en portugués
+     *
      * @var string|null
      */
     public $md_pt = null;
 
     /**
-     * Veredicto de validación del contenido generado
+     * Veredicto de validación del código generado
+     *
      * @var string|null
      */
     public $validation_verdict = null;
