@@ -146,22 +146,29 @@ abstract class QualityNominationReviewers {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`QualityNomination_Reviewers`.`qualitynomination_id`',
+        string $orden = 'qualitynomination_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `QualityNomination_Reviewers`.`qualitynomination_id`,
                 `QualityNomination_Reviewers`.`user_id`
             FROM
                 `QualityNomination_Reviewers`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

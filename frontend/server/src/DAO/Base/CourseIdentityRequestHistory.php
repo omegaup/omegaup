@@ -197,10 +197,21 @@ abstract class CourseIdentityRequestHistory {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Course_Identity_Request_History`.`history_id`',
+        string $orden = 'history_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Course_Identity_Request_History`.`history_id`,
                 `Course_Identity_Request_History`.`identity_id`,
@@ -210,13 +221,9 @@ abstract class CourseIdentityRequestHistory {
                 `Course_Identity_Request_History`.`admin_id`
             FROM
                 `Course_Identity_Request_History`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

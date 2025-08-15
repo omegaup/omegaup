@@ -180,10 +180,21 @@ abstract class RunsGroups {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Runs_Groups`.`case_run_id`',
+        string $orden = 'case_run_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Runs_Groups`.`case_run_id`,
                 `Runs_Groups`.`run_id`,
@@ -192,13 +203,9 @@ abstract class RunsGroups {
                 `Runs_Groups`.`verdict`
             FROM
                 `Runs_Groups`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

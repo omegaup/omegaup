@@ -273,10 +273,21 @@ abstract class SubmissionLog {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Submission_Log`.`problemset_id`',
+        string $orden = 'problemset_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Submission_Log`.`problemset_id`,
                 `Submission_Log`.`submission_id`,
@@ -286,13 +297,9 @@ abstract class SubmissionLog {
                 `Submission_Log`.`time`
             FROM
                 `Submission_Log`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

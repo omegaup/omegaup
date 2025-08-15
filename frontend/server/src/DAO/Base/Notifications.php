@@ -182,10 +182,21 @@ abstract class Notifications {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Notifications`.`notification_id`',
+        string $orden = 'notification_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Notifications`.`notification_id`,
                 `Notifications`.`user_id`,
@@ -194,13 +205,9 @@ abstract class Notifications {
                 `Notifications`.`contents`
             FROM
                 `Notifications`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

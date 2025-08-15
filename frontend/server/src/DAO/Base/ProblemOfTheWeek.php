@@ -177,10 +177,21 @@ abstract class ProblemOfTheWeek {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Problem_Of_The_Week`.`problem_of_the_week_id`',
+        string $orden = 'problem_of_the_week_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Problem_Of_The_Week`.`problem_of_the_week_id`,
                 `Problem_Of_The_Week`.`problem_id`,
@@ -188,13 +199,9 @@ abstract class ProblemOfTheWeek {
                 `Problem_Of_The_Week`.`difficulty`
             FROM
                 `Problem_Of_The_Week`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

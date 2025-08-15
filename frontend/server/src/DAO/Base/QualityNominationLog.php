@@ -192,10 +192,21 @@ abstract class QualityNominationLog {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`QualityNomination_Log`.`qualitynomination_log_id`',
+        string $orden = 'qualitynomination_log_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `QualityNomination_Log`.`qualitynomination_log_id`,
                 `QualityNomination_Log`.`qualitynomination_id`,
@@ -206,13 +217,9 @@ abstract class QualityNominationLog {
                 `QualityNomination_Log`.`rationale`
             FROM
                 `QualityNomination_Log`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

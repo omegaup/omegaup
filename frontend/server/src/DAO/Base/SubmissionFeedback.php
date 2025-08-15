@@ -200,10 +200,21 @@ abstract class SubmissionFeedback {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        string $orden = '`Submission_Feedback`.`submission_feedback_id`',
+        string $orden = 'submission_feedback_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Submission_Feedback`.`submission_feedback_id`,
                 `Submission_Feedback`.`identity_id`,
@@ -214,13 +225,9 @@ abstract class SubmissionFeedback {
                 `Submission_Feedback`.`range_bytes_end`
             FROM
                 `Submission_Feedback`
-        ';
-        $sql .= (
-            ' ORDER BY `' .
-            \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-            '` ' .
-            ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-        );
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .
