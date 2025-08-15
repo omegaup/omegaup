@@ -29,3 +29,9 @@ services:
       context: ./stuff/docker/
       target: frontend-sidecar
     image: omegaup/frontend-sidecar:${TAG:-latest}
+
+  ai-editorial-worker:
+    build:
+      dockerfile: ./Dockerfile.ai-editorial-worker
+      context: ./stuff/docker/
+    image: omegaup/ai-editorial-worker:${TAG:-latest}

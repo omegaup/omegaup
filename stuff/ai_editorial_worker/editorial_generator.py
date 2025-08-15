@@ -302,7 +302,7 @@ class EditorialGenerator:
 
         except (ConnectionError, TypeError, ValueError) as e:
             logging.exception("Error in complete editorial generation: %s", e)
-            return {
+        return {
                 'success': False,
                 'error': str(e)
             }
