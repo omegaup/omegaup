@@ -265,7 +265,6 @@ class EditorialWorker:
             'ai_deepseek', 'api_key') or os.getenv('DEEPSEEK_API_KEY', '')
         openai_key = self._load_api_key_from_config(
             'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', '')
-        
         if deepseek_key:
             llm_config = {
                 'provider': 'deepseek',
@@ -287,7 +286,8 @@ class EditorialWorker:
         else:
             raise ValueError(
                 'No AI provider configured. Set DEEPSEEK_API_KEY or '
-                'OPENAI_API_KEY environment variable, or configure in ~/.my.cnf'
+                'OPENAI_API_KEY environment variable, or configure in '
+                '~/.my.cnf'
             )
         editorial_generator = EditorialGenerator(
             llm_config=llm_config,
