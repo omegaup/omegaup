@@ -2386,10 +2386,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             "Content-Disposition: attachment;filename={$problem->alias}.zip"
         );
         header('Content-Transfer-Encoding: binary');
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            strval($problem->alias)
-        );
-        $problemArtifacts->download();
+
+        // Try to download from the published branch first. If it doesn't exist,
+        // fallback to the current commit.
+        $problemArtifacts = null;
+        try {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                strval($problem->alias),
+                'published'
+            );
+        } catch (\Exception $e) {
+            // If published revision doesn't exist, fallback to current commit
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                strval($problem->alias),
+                strval($problem->commit)
+            );
+        } finally {
+            // Always execute the download, regardless of which revision was selected
+            if (!is_null($problemArtifacts)) {
+                $problemArtifacts->download();
+            }
+        }
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
