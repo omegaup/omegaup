@@ -4548,7 +4548,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param null|string $lang
      * @omegaup-request-param bool|null $prevent_problemset_open
      * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param mixed $problemset_id
@@ -4563,46 +4562,148 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Do nothing. Not logged user can access here
             $r->identity = null;
         }
-        $preventProblemsetOpen = $r->ensureOptionalBool(
-            'prevent_problemset_open'
-        ) ?? false;
-        $contestAlias = $r->ensureOptionalString(
-            'contest_alias',
-            required: false,
-            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
+
+        $requestData = self::extractRequestData($r);
+
+        [$problem, $details] = self::getProblemBaseData(
+            $r->identity,
+            $requestData
         );
-        $problemAlias = $r->ensureString(
-            'problem_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+
+        $response = self::buildUnloggedResponse($problem, $details);
+
+        if (
+            is_null($r->identity)
+            || is_null($problem->problem_id)
+        ) {
+            return $response;
+        }
+
+        $isAdmin = \OmegaUp\Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
         );
+
+        $isQualityReviewer = \OmegaUp\Authorization::isQualityReviewer(
+            $r->identity
+        );
+
+        if ($isQualityReviewer) {
+            $response = self::enhanceResponseForQualityReviewer(
+                $response,
+                $r->identity,
+                $problem
+            );
+        }
+
+        $response = self::enhanceResponseForLoggedUser(
+            $response,
+            $r->identity,
+            $r->user,
+            $problem,
+            $details,
+            $isAdmin,
+            $isQualityReviewer
+        );
+
+        if ($isAdmin) {
+            $response = self::enhanceResponseForAdmin(
+                $response,
+                $r->identity,
+                $problem
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     *  Extracts and validates request parameters related to problem access.
+     *
+     * @return array{preventProblemsetOpen: bool, contestAlias: null|string, problemAlias: string, statementType: string, problemsetId: int|null}
+     *
+     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param bool|null $prevent_problemset_open
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param null|string $statement_type
+     */
+    private static function extractRequestData(\OmegaUp\Request $r): array {
+        return [
+            'preventProblemsetOpen' => $r->ensureOptionalBool(
+                'prevent_problemset_open'
+            ) ?? false,
+            'contestAlias' => $r->ensureOptionalString(
+                'contest_alias',
+                required: false,
+                validator: fn (string $alias) => \OmegaUp\Validators::alias(
+                    $alias
+                )
+            ),
+            'problemAlias' => $r->ensureString(
+                'problem_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            'statementType' => $r->ensureOptionalString('statement_type') ?? '',
+            'problemsetId' => !is_null(
+                $r['problemset_id']
+            ) ? intval(
+                $r['problemset_id']
+            ) : null
+        ];
+    }
+
+    /**
+     * Retrieves the base data for a problem, including the problem entity,
+     *
+     * @param ?\OmegaUp\DAO\VO\Identities $identity
+     * @param array{preventProblemsetOpen: bool, contestAlias: null|string, problemAlias: string, statementType: string, problemsetId: int|null} $requestData
+     * @return array{\OmegaUp\DAO\VO\Problems, ProblemDetails}
+     */
+    private static function getProblemBaseData(
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        array $requestData
+    ): array {
         [
             'problem' => $problem,
             'problemset' => $problemset,
         ] = self::getValidProblemAndProblemset(
-            $r->identity,
-            $contestAlias,
-            $problemAlias,
-            $r->ensureOptionalString('statement_type') ?? '',
-            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+            $identity,
+            $requestData['contestAlias'],
+            $requestData['problemAlias'],
+            $requestData['statementType'],
+            $requestData['problemsetId']
         );
+
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-
         // Get problem details from API
         $details = self::getProblemDetails(
-            $r->identity,
+            $identity,
             $problem,
             $problemset,
-            \OmegaUp\Controllers\Identity::getPreferredLanguage($r->identity),
+            \OmegaUp\Controllers\Identity::getPreferredLanguage($identity),
             showSolvers: false,
-            preventProblemsetOpen: $preventProblemsetOpen,
-            contestAlias: $contestAlias,
+            preventProblemsetOpen: $requestData['preventProblemsetOpen'],
+            contestAlias: $requestData['contestAlias'],
         );
+
         if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        return [$problem, $details];
+    }
+
+    /**
+     * Builds the problem details response for users who are not logged in.
+     *
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param ProblemDetails $details
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    private static function buildUnloggedResponse($problem, $details): array {
         $sampleInput = null;
         if (
             isset($details['settings']['cases']) &&
@@ -4614,9 +4715,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $allowedSolutionsToSee = 0;
-
-        $response = [
+        return [
             'templateProperties' => [
                 'payload' => [
                     'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
@@ -4673,7 +4772,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'admin' => false,
                         'reviewer' => false,
                     ],
-                    'allowedSolutionsToSee' => $allowedSolutionsToSee,
+                    'allowedSolutionsToSee' => 0,
                     'solutionStatus' => self::SOLUTION_NOT_LOGGED_IN,
                 ],
                 'title' => new \OmegaUp\TranslationString(
@@ -4682,70 +4781,137 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'problem_details',
         ];
+    }
 
-        if (
-            is_null($r->identity)
-            || is_null($problem->problem_id)
-        ) {
-            return $response;
-        }
-
-        $isAdmin = \OmegaUp\Authorization::isProblemAdmin(
-            $r->identity,
+    /**
+     * Enhances the problem details response for a quality reviewer by adding review-related information.
+     *
+     * @param array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}} $response
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    private static function enhanceResponseForQualityReviewer(
+        array $response,
+        \OmegaUp\DAO\VO\Identities $identity,
+        $problem
+    ): array {
+        $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
+            $identity,
             $problem
         );
 
-        $isQualityReviewer = \OmegaUp\Authorization::isQualityReviewer(
-            $r->identity
-        );
-
-        if ($isQualityReviewer) {
-            $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
-                $r->identity,
-                $problem
+        $contents = [];
+        if (!is_null($qualityNomination)) {
+            /**
+             * @var array{tags?: list<string>, quality_seal?: bool, level?: string}|null $contents
+             */
+            $contents = json_decode(
+                $qualityNomination['contents'],
+                associative: true
             );
-            $contents = [];
-            if (!is_null($qualityNomination)) {
-                /**
-                 * @var null|array{tags?: list<string>, quality_seal?: bool, level?: string} $contents
-                 */
-                $contents = json_decode(
-                    $qualityNomination['contents'],
-                    associative: true
-                );
+            if (is_null($contents)) {
+                $contents = [];
             }
-            $response['templateProperties']['payload'] = array_merge(
-                $response['templateProperties']['payload'],
-                [
-                    'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
-                        $problem
-                    ),
-                    'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
-                        $problem,
-                        public: true
-                    ),
-                    'reviewedProblemLevel' => $contents['level'] ?? null,
-                    'reviewedQualitySeal' => $contents['quality_seal'] ?? false,
-                    'reviewedPublicTags' => $contents['tags'] ?? [],
-                    'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
-                ]
-            );
         }
 
+        $response['templateProperties']['payload'] = array_merge(
+            $response['templateProperties']['payload'],
+            [
+                'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                    $problem
+                ),
+                'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                    $problem,
+                    public: true
+                ),
+                'reviewedProblemLevel' => $contents['level'] ?? null,
+                'reviewedQualitySeal' => $contents['quality_seal'] ?? false,
+                'reviewedPublicTags' => $contents['tags'] ?? [],
+                'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
+            ]
+        );
+
+        return $response;
+    }
+
+    /**
+     * Enhances the problem details response for an admin by adding additional information.
+     *
+     * @param array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}} $response
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    private static function enhanceResponseForAdmin(
+        array $response,
+        \OmegaUp\DAO\VO\Identities $identity,
+        $problem
+    ): array {
+        if (is_null($problem->problem_id)) {
+            return $response;
+        }
+
+        [
+            'runs' => $runs,
+            'totalRuns' => $totalRuns,
+        ] = self::getAllRuns($problem->problem_id);
+
+        $response['templateProperties']['payload']['allRuns'] = $runs;
+        $response['templateProperties']['payload']['totalRuns'] = $totalRuns;
+        $response['templateProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
+        $response['templateProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
+        $response['templateProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
+            $identity,
+            $problem
+        ) ?
+        \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problem,
+            public: false
+        ) : []);
+
+        return $response;
+    }
+
+    /**
+     * Enhances the problem details response for a logged-in user by adding user-specific information and runs.
+     *
+     * @param array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}} $response
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param ?\OmegaUp\DAO\VO\Users $user
+     * @param \OmegaUp\DAO\VO\Problems $problem
+     * @param ProblemDetails $details
+     * @param bool $isAdmin
+     * @param bool $isQualityReviewer
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    private static function enhanceResponseForLoggedUser(
+        array $response,
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user,
+        $problem,
+        $details,
+        bool $isAdmin,
+        bool $isQualityReviewer
+    ): array {
         $response['templateProperties']['payload']['user'] = [
             'loggedIn' => true,
             'admin' => $isAdmin,
             'reviewer' => $isQualityReviewer,
         ];
 
+        if (is_null($problem->problem_id) || is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
         $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
             $problem->problem_id,
-            $r->identity->user_id
+            $identity->user_id
         );
 
         $nominationPayload = [
             'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                $r->identity,
+                $identity,
                 $problem
             ),
             'dismissed' => $nominationStatus['dismissed'],
@@ -4753,7 +4919,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'nominated' => $nominationStatus['nominated'],
             'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
             'language' => $details['statement']['language'],
-            'canNominateProblem' => !is_null($r->user),
+            'canNominateProblem' => !is_null($identity->user_id),
             'solved' => false,
             'tried' => false,
         ];
@@ -4771,15 +4937,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
             intval($problem->problem_id),
             problemsetId: null,
-            identityId: intval($r->identity->identity_id)
+            identityId: intval($identity->identity_id)
         );
 
-        if (!is_null($r->user)) {
+        $allowedSolutionsToSee = 0;
+
+        if (!is_null($user)) {
             // Get the count of problems forfeited by the user on the current day.
             $problemsForfeitedCount = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
-                $r->user
+                $user
             );
-
             // Calculate the remaining solutions the user can view by subtracting the number of solutions they have already seen from the daily allowed limit.
             $allowedSolutionsToSee = max(
                 \OmegaUp\Controllers\ProblemForfeited::SOLUTIONS_ALLOWED_TO_SEE_PER_DAY - $problemsForfeitedCount,
@@ -4794,12 +4961,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'runs' => $runsPayload,
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
-                    $r->identity
+                    $identity
                 ),
                 'clarifications' => \OmegaUp\DAO\Clarifications::getProblemClarifications(
                     $problem->problem_id,
                     $isAdmin,
-                    intval($r->identity->identity_id),
+                    intval($identity->identity_id),
                     offset: null,
                     rowcount: 0,
                 ),
@@ -4828,25 +4995,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $response['templateProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
         $response['templateProperties']['payload']['problem']['nextExecutionTimestamp'] = $nextExecutionTimestamp;
-
-        if ($isAdmin) {
-            [
-                'runs' => $runs,
-                'totalRuns' => $totalRuns,
-            ] = self::getAllRuns($problem->problem_id);
-            $response['templateProperties']['payload']['allRuns'] = $runs;
-            $response['templateProperties']['payload']['totalRuns'] = $totalRuns;
-            $response['templateProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
-            $response['templateProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
-            $response['templateProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
-                $r->identity,
-                $problem
-            ) ?
-            \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
-                $problem,
-                public: false
-            ) : []);
-        }
 
         return $response;
     }
