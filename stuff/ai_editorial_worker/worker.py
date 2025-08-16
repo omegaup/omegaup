@@ -260,14 +260,35 @@ class EditorialWorker:
         website_uploader = WebsiteUploader(self.config_manager, api_client)
 
         # Get LLM configuration (following cronjob pattern)
-        llm_config = {
-            'provider': 'openai',
-            'api_key': self._load_api_key_from_config(
-                'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', ''),
-            'model': 'gpt-4o',
-            'max_tokens': 2000,
-            'temperature': 0.7
-        }
+        # Primary: DeepSeek, Fallback: OpenAI
+        deepseek_key = self._load_api_key_from_config(
+            'ai_deepseek', 'api_key') or os.getenv('DEEPSEEK_API_KEY', '')
+        openai_key = self._load_api_key_from_config(
+            'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', '')
+        if deepseek_key:
+            llm_config = {
+                'provider': 'deepseek',
+                'api_key': deepseek_key,
+                'model': 'deepseek-chat',
+                'max_tokens': 2000,
+                'temperature': 0.7
+            }
+            logging.info('Using DeepSeek as primary LLM provider')
+        elif openai_key:
+            llm_config = {
+                'provider': 'openai',
+                'api_key': openai_key,
+                'model': 'gpt-4o',
+                'max_tokens': 2000,
+                'temperature': 0.7
+            }
+            logging.info('Using OpenAI as fallback LLM provider')
+        else:
+            raise ValueError(
+                'No AI provider configured. Set DEEPSEEK_API_KEY or '
+                'OPENAI_API_KEY environment variable, or configure in '
+                '~/.my.cnf'
+            )
         editorial_generator = EditorialGenerator(
             llm_config=llm_config,
             prompts=self.prompts,
