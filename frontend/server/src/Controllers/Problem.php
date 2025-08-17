@@ -4900,7 +4900,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'reviewer' => $isQualityReviewer,
         ];
 
-        if (is_null($problem->problem_id) || is_null($identity->user_id)) {
+        if (is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
