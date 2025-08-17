@@ -21,27 +21,27 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/carousel_slide_1.svg',
+    image: '/media/homepage/egoi25.png',
     title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
+      en: 'Mexico present at EGOI 2025',
+      es: 'México presente en la EGOI 2025',
+      pt: 'México presente na EGOI 2025',
     },
     description: {
       en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
       pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
+        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
     },
     button: {
       text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
+        en: 'EGOI',
+        es: 'EGOI',
+        pt: 'EGOI',
       },
-      href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
+      href: 'https://egoi.org/',
       target: '_blank',
     },
   },
