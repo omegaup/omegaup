@@ -1,0 +1,43 @@
+FROM ubuntu:jammy AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        ca-certificates \
+        curl \
+        git \
+        python3 \
+        python3-pip \
+        && \
+    /usr/sbin/update-ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN useradd --create-home --shell=/bin/bash ubuntu
+
+# Create directories for configuration (as root, then change ownership)
+RUN mkdir -p /etc/omegaup/ai-editorial && \
+    mkdir -p /var/log/omegaup && \
+    chown -R ubuntu /var/log/omegaup && \
+    chown -R ubuntu /etc/omegaup
+
+USER ubuntu
+WORKDIR /opt/omegaup
+
+# Clone the repository (matches existing omegaup pattern)
+ARG BRANCH=release
+ENV BRANCH=$BRANCH
+RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+
+# Install Python dependencies (use requirements.txt from the cloned repo)
+RUN python3 -m pip install -r stuff/ai_editorial_worker/requirements.txt
+
+# Set working directory to ai_editorial_worker
+WORKDIR /opt/omegaup/stuff/ai_editorial_worker
+
+# Health check for Redis connectivity (production monitoring)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python3 -c "import redis; r=redis.Redis(host='redis-service', port=6379); r.ping()" || exit 1
+
+# Start the AI Editorial Worker
+CMD ["python3", "worker.py"]
