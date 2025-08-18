@@ -1,4 +1,8 @@
-"""Test module for teaching assistant submission mode pre functionality."""
+"""Tests if the teaching assistant submission mode works.
+The pytest extracts the submission id for the run, adds a
+student feedback, runs the teaching assistant for
+that submission and then checks if the feedback is posted.
+"""
 import logging
 from typing import Any
 import subprocess

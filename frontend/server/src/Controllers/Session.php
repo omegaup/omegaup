@@ -527,7 +527,8 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     public static function loginViaGoogle(
         string $idToken,
-        string $gCsrfToken
+        string $gCsrfToken,
+        ?string $redirect = null
     ): void {
         // Verify the Google ID token on the server side:
         // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
@@ -573,17 +574,20 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::loginViaGoogleEmail(
             $payload['email'],
-            (isset($payload['name']) ? $payload['name'] : null)
+            (isset($payload['name']) ? $payload['name'] : null),
+            $redirect
         );
     }
 
     public static function loginViaGoogleEmail(
         string $email,
-        ?string $name = null
+        ?string $name = null,
+        ?string $redirect = null
     ): void {
-        self::thirdPartyLogin('Google', $email, $name);
+        $result = self::thirdPartyLogin('Google', $email, $name);
+        $isAccountCreation = $result['isAccountCreation'];
 
-        self::redirect();
+        self::redirect($redirect, $isAccountCreation);
     }
 
     /**
@@ -634,7 +638,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getRedirectUrl(?string $url = null): string {
-        $defaultRedirectUrl = '/profile/';
+        $defaultRedirectUrl = '/?fromLogin';
         if (is_null($url)) {
             return $defaultRedirectUrl;
         }
@@ -649,7 +653,12 @@ class Session extends \OmegaUp\Controllers\Controller {
             empty($redirectParsedUrl['host'])
         ) {
             $path = $redirectParsedUrl['path'] ?? '';
-            return $path !== '/logout/' ? $url : $defaultRedirectUrl;
+            if ($path === '/logout/') {
+                return $defaultRedirectUrl;
+            }
+
+            $separator = str_contains($url, '?') ? '&' : '?';
+            return "{$url}{$separator}fromLogin";
         }
         $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
         if (isset($redirectParsedUrl['port'])) {
@@ -658,8 +667,14 @@ class Session extends \OmegaUp\Controllers\Controller {
         return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
     }
 
-    private static function redirect(?string $redirect = null): void {
-        $redirectUrl = self::getRedirectUrl($redirect);
+    private static function redirect(
+        ?string $redirect = null,
+        ?bool $isAccountCreation = false
+    ): void {
+        $redirectUrl = $isAccountCreation
+        ? '/profile?fromLogin'
+        : self::getRedirectUrl($redirect);
+
         header("Location: {$redirectUrl}");
         throw new \OmegaUp\Exceptions\ExitException();
     }

@@ -3,17 +3,49 @@
 namespace OmegaUp\DAO;
 
 /**
- * AiEditorialJobs Data Access Object (DAO).
+ * AIEditorialJobs Data Access Object (DAO).
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link \OmegaUp\DAO\VO\AiEditorialJobs}.
+ * {@link \OmegaUp\DAO\VO\AIEditorialJobs}.
  *
  * @access public
  */
-class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
+class AIEditorialJobs extends \OmegaUp\DAO\Base\AIEditorialJobs {
     /** @var int Hours that define whether a job is considered recent */
     const RECENT_JOB_HOURS = 1;
+
+    /**
+     * Saves the current state of the given
+     * {@link \OmegaUp\DAO\VO\AIEditorialJobs} object to the database.
+     *
+     * The primary key will determine which instance will be updated in the
+     * database.
+     * If the primary key or combination of primary keys describing a row is not
+     * found in the database, then save() will create a new row and insert the
+     * newly generated ID into the object.
+     *
+     * @param \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs The object of
+     * type {@link \OmegaUp\DAO\VO\AIEditorialJobs} to be saved.
+     * @return int An integer greater than or equal to zero identifying the
+     * number of affected rows.
+     */
+    final public static function save(
+        \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
+    ): int {
+        if (
+            is_null(
+                $AI_Editorial_Jobs->job_id
+            ) || is_null(
+                self::getByPK(
+                    $AI_Editorial_Jobs->job_id
+                )
+            )
+        ) {
+            return AIEditorialJobs::create($AI_Editorial_Jobs);
+        }
+        return AIEditorialJobs::update($AI_Editorial_Jobs);
+    }
 
     /**
      * Creates a new AI editorial job
@@ -26,7 +58,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     ): string {
         $jobId = self::generateUuid();
 
-        $job = new \OmegaUp\DAO\VO\AiEditorialJobs([
+        $job = new \OmegaUp\DAO\VO\AIEditorialJobs([
             'job_id' => $jobId,
             'problem_id' => $problemId,
             'user_id' => $userId,
@@ -121,12 +153,12 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     /**
      * Gets the last job for a problem (for cooldown check)
      *
-     * @return \OmegaUp\DAO\VO\AiEditorialJobs|null
+     * @return \OmegaUp\DAO\VO\AIEditorialJobs|null
      */
-    public static function getLastJobForProblem(int $problemId): ?\OmegaUp\DAO\VO\AiEditorialJobs {
+    public static function getLastJobForProblem(int $problemId): ?\OmegaUp\DAO\VO\AIEditorialJobs {
         $sql = '
             SELECT ' . \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\AiEditorialJobs::FIELD_NAMES,
+            \OmegaUp\DAO\VO\AIEditorialJobs::FIELD_NAMES,
             'AI_Editorial_Jobs'
         ) . '
             FROM AI_Editorial_Jobs
@@ -144,13 +176,13 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             return null;
         }
 
-        return new \OmegaUp\DAO\VO\AiEditorialJobs($rs);
+        return new \OmegaUp\DAO\VO\AIEditorialJobs($rs);
     }
 
     /**
      * Gets jobs by user with optional limit
      *
-     * @return list<\OmegaUp\DAO\VO\AiEditorialJobs>
+     * @return list<\OmegaUp\DAO\VO\AIEditorialJobs>
      */
     public static function getJobsByUser(
         int $userId,
@@ -158,7 +190,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     ): array {
         $sql = '
             SELECT ' . \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\AiEditorialJobs::FIELD_NAMES,
+            \OmegaUp\DAO\VO\AIEditorialJobs::FIELD_NAMES,
             'AI_Editorial_Jobs'
         ) . '
             FROM AI_Editorial_Jobs
@@ -175,7 +207,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
 
         $jobs = [];
         foreach ($rs as $row) {
-            $jobs[] = new \OmegaUp\DAO\VO\AiEditorialJobs($row);
+            $jobs[] = new \OmegaUp\DAO\VO\AIEditorialJobs($row);
         }
 
         return $jobs;
@@ -184,12 +216,12 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     /**
      * Gets jobs by problem
      *
-     * @return list<\OmegaUp\DAO\VO\AiEditorialJobs>
+     * @return list<\OmegaUp\DAO\VO\AIEditorialJobs>
      */
     public static function getJobsByProblem(int $problemId): array {
         $sql = '
             SELECT ' . \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\AiEditorialJobs::FIELD_NAMES,
+            \OmegaUp\DAO\VO\AIEditorialJobs::FIELD_NAMES,
             'AI_Editorial_Jobs'
         ) . '
             FROM AI_Editorial_Jobs
@@ -205,7 +237,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
 
         $jobs = [];
         foreach ($rs as $row) {
-            $jobs[] = new \OmegaUp\DAO\VO\AiEditorialJobs($row);
+            $jobs[] = new \OmegaUp\DAO\VO\AIEditorialJobs($row);
         }
 
         return $jobs;

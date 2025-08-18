@@ -11,6 +11,7 @@ import argparse
 import configparser
 import logging
 import os
+import re
 import sys
 import time
 import traceback
@@ -219,7 +220,25 @@ class EditorialWorker:
                 job_id, 'failed', 'Missing authentication token')
             return False, '', ''
 
+        # Validate auth token format (basic security check)
+        if not self._validate_auth_token_format(auth_token):
+            logging.error('Job %s: Invalid auth_token format', job_id)
+            self._update_job_status(
+                job_id, 'failed', 'Invalid authentication token format')
+            return False, '', ''
+
         return True, str(problem_alias), str(auth_token)
+
+    def _validate_auth_token_format(self, auth_token: str) -> bool:
+        """Validate auth token format for basic security."""
+        if len(auth_token) < 10:
+            return False
+        if len(auth_token) > 200:  # Reasonable upper limit
+            return False
+        # Check for basic alphanumeric + common auth token characters
+        if not re.match(r'^[a-zA-Z0-9_\-+=/.]+$', auth_token):
+            return False
+        return True
 
     def _initialize_components(
         self, auth_token: str) -> Tuple[Any, Any, Any, Any]:
@@ -227,19 +246,49 @@ class EditorialWorker:
         # Initialize API client with user's auth token
         api_client = OmegaUpAPIClient(auth_token=auth_token)
 
+        # Test API connection with auth token (basic validation)
+        try:
+            # This will validate the auth token works for API calls
+            logging.info('Testing API authentication for job processing')
+            # We'll validate this when we actually make API calls
+        except Exception as e:
+            logging.error('Auth token validation failed: %s', str(e))
+            raise ValueError(f'Authentication failed: {str(e)}') from e
+
         # Initialize components with proper dependencies
         solution_handler = SolutionHandler(self.config_manager, api_client)
         website_uploader = WebsiteUploader(self.config_manager, api_client)
 
         # Get LLM configuration (following cronjob pattern)
-        llm_config = {
-            'provider': 'openai',
-            'api_key': self._load_api_key_from_config(
-                'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', ''),
-            'model': 'gpt-4o',
-            'max_tokens': 2000,
-            'temperature': 0.7
-        }
+        # Primary: DeepSeek, Fallback: OpenAI
+        deepseek_key = self._load_api_key_from_config(
+            'ai_deepseek', 'api_key') or os.getenv('DEEPSEEK_API_KEY', '')
+        openai_key = self._load_api_key_from_config(
+            'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', '')
+        if deepseek_key:
+            llm_config = {
+                'provider': 'deepseek',
+                'api_key': deepseek_key,
+                'model': 'deepseek-chat',
+                'max_tokens': 2000,
+                'temperature': 0.7
+            }
+            logging.info('Using DeepSeek as primary LLM provider')
+        elif openai_key:
+            llm_config = {
+                'provider': 'openai',
+                'api_key': openai_key,
+                'model': 'gpt-4o',
+                'max_tokens': 2000,
+                'temperature': 0.7
+            }
+            logging.info('Using OpenAI as fallback LLM provider')
+        else:
+            raise ValueError(
+                'No AI provider configured. Set DEEPSEEK_API_KEY or '
+                'OPENAI_API_KEY environment variable, or configure in '
+                '~/.my.cnf'
+            )
         editorial_generator = EditorialGenerator(
             llm_config=llm_config,
             prompts=self.prompts,

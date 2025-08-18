@@ -182,7 +182,7 @@ abstract class SchoolOfTheMonth {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
-     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\SchoolOfTheMonth> Un arreglo que contiene objetos del tipo
@@ -191,10 +191,21 @@ abstract class SchoolOfTheMonth {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        ?string $orden = null,
+        string $orden = 'school_of_the_month_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `School_Of_The_Month`.`school_of_the_month_id`,
                 `School_Of_The_Month`.`school_id`,
@@ -204,15 +215,9 @@ abstract class SchoolOfTheMonth {
                 `School_Of_The_Month`.`score`
             FROM
                 `School_Of_The_Month`
-        ';
-        if (!is_null($orden)) {
-            $sql .= (
-                ' ORDER BY `' .
-                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-                '` ' .
-                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-            );
-        }
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

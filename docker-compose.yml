@@ -25,6 +25,7 @@ services:
       CI: "${CI:-false}"
       MYSQL_TCP_PORT: 13306
       OPENAI_API_KEY: ""
+      DEEPSEEK_API_KEY: ""
       AI_WORKER_ENABLED: "true"
 
   gitserver:

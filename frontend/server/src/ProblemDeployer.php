@@ -499,10 +499,10 @@ class ProblemDeployer {
     ): void {
         $curl = curl_init();
 
-        $pktline = "${oldOid} ${newOid} refs/heads/published\n";
+        $pktline = "{$oldOid} {$newOid} refs/heads/published\n";
         $pktline = sprintf('%04x%s', 4 + strlen($pktline), $pktline);
 
-        $payload = "${pktline}0000";  // flush.
+        $payload = "{$pktline}0000";  // flush.
         $payload .= "\x50\x41\x43\x4B";  // PACK
         $payload .= "\x00\x00\x00\x02";  // packfile version (2)
         $payload .= "\x00\x00\x00\x00";  // number of objects (0)
