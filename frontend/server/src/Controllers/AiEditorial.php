@@ -132,10 +132,12 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         int $identityId
     ): void {
         try {
-            // Use environment variables like existing cronjobs
-            $redisHost = $_ENV['REDIS_HOST'] ?? 'redis';
-            $redisPort = intval($_ENV['REDIS_PORT'] ?? '6379');
-            $redisPassword = $_ENV['REDIS_PASSWORD'] ?? null;
+            // Use constants like existing Cache.php implementation
+            $redisHost = REDIS_HOST;
+            $redisPort = REDIS_PORT;
+            $redisPassword = REDIS_PASS;
+
+
 
             $redis = new \Redis();
 
@@ -173,7 +175,6 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Queue to high priority queue for user-initiated jobs
             $redis->lpush('editorial_jobs_user', json_encode($job));
-
             $redis->close();
         } catch (\Exception $e) {
             // Log error with security considerations (don't log auth token)

@@ -85,16 +85,14 @@ class EditorialGenerator:
                     "Editorial generation prompt template not found")
 
             # Format prompt with context
+            reference_source = ac_solution.get('source', '') if ac_solution else ''
+            reference_lang = ac_solution.get('language', 'unknown') if ac_solution else 'unknown'
+            
             prompt = prompt_template.format(
                 problem_title=problem_data.get('title', 'Unknown'),
                 problem_statement=problem_data.get('statement', ''),
-                constraints=self.extract_constraints(problem_data),
-                sample_input=self.extract_sample_input(problem_data),
-                sample_output=self.extract_sample_output(problem_data),
-                ac_solution=(ac_solution.get('source', '')
-                             if ac_solution else ''),
-                time_limit=problem_data.get('time_limit', '1s'),
-                memory_limit=problem_data.get('memory_limit', '256MB')
+                reference_language=reference_lang,
+                reference_ac=reference_source
             )
 
             # Generate with LLM

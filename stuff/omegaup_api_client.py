@@ -156,10 +156,12 @@ class OmegaUpAPIClient:
             'problem_alias': problem_alias
         })
 
-        problem_data = response.get('problem', {})
-        if not problem_data:
+        # API returns problem data directly, not nested under 'problem'
+        if not response or 'statement' not in response:
             raise ValueError(
                 f"Problem '{problem_alias}' not found or inaccessible")
+        
+        problem_data = response
 
         logging.info(
             "Retrieved problem: %s", problem_data.get('title', 'Unknown'))
