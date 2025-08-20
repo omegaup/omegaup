@@ -4551,7 +4551,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param bool|null $prevent_problemset_open
      * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
     public static function getProblemDetailsForTypeScript(
