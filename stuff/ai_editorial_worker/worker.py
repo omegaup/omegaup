@@ -108,14 +108,14 @@ class EditorialWorker:
         # Load all prompts for editorial generation
         ai_config = self.config_manager.load_ai_config()
         prompt_configs = ai_config.get('prompts', {})
-        
+
         self.prompts = {}
         for prompt_type, prompt_path in prompt_configs.items():
             prompt_file = os.path.join(
                 os.path.dirname(__file__), prompt_path
             )
-            self.prompts[prompt_type] = self.config_manager.load_prompt_template(
-                prompt_file)
+            template = self.config_manager.load_prompt_template(prompt_file)
+            self.prompts[prompt_type] = template
 
         # Verify we have at least one LLM provider configured (following
         # cronjob pattern like lib.db.py)
@@ -301,12 +301,13 @@ class EditorialWorker:
                 'OPENAI_API_KEY environment variable, or configure in '
                 '~/.my.cnf'
             )
-        editorial_generator = EditorialGenerator(
-            llm_config=llm_config,
-            prompts=self.prompts,
-            redis_client=self.redis_client,
-            api_client=api_client
-        )
+        editorial_generator = EditorialGenerator({
+            'llm_config': llm_config,
+            'prompts': self.prompts,
+            'redis_client': self.redis_client,
+            'api_client': api_client,
+            'full_config': self.config
+        })
 
         return (api_client, solution_handler, website_uploader,
                 editorial_generator)
