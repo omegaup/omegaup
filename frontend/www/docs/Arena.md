@@ -19,8 +19,8 @@ When there is error, the value of `status` will be `error` and there will be fie
 
 | Code | Response            | Description                                                                     |
 | ------ | ----------------------- | -------------------------------------------------------------------------------- |
-| 200    | OK                      | No  problems occurred and the rrquest was successful.                               |
-| 400    | BAD REQUEST             | The request (includeing the JSON message) is malformed                    |
+| 200    | OK                      | No  problems occurred and the request was successful.                               |
+| 400    | BAD REQUEST             | The request (including the JSON message) is malformed                    |
 | 401    | AUTHENTICATION REQUIRED | the request is missing the `auth_token` field, either via a cookie or in the json request. |
 | 403    | FORBIDDEN               | The resource was found, but the user does not have the necessary privileges to access or modify it (e.g., a user trying to read other users’ runs, or enter the contest admin panel). |
 | 404    | NOT FOUND               | The resource was not found (user, problem, contest, run, etc.), or is deliberately hidden (e.g., private contests).|
