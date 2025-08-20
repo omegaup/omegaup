@@ -135,7 +135,6 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             // Use constants like existing Cache.php implementation
             $redisHost = REDIS_HOST;
             $redisPort = REDIS_PORT;
-            $redisPassword = REDIS_PASS;
 
             $redis = new \Redis();
 
@@ -149,8 +148,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if ($redisPassword) {
-                $redis->auth($redisPassword);
+            /** @psalm-suppress RedundantCondition REDIS_PASS is really a variable */
+            if (REDIS_PASS !== '' && !$redis->auth(REDIS_PASS)) {
+                throw new \Exception('Redis authentication failed');
             }
 
             // Validate auth token before queuing
