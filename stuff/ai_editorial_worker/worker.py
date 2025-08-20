@@ -105,10 +105,17 @@ class EditorialWorker:
         # Redis client is now imported at module level
         self.redis_client = RedisJobClient(redis_config)
 
-        # Load prompts for editorial generation
-        self.prompts = {
-            'editorial_generation': self.config_manager.load_prompt_template()
-        }
+        # Load all prompts for editorial generation
+        ai_config = self.config_manager.load_ai_config()
+        prompt_configs = ai_config.get('prompts', {})
+        
+        self.prompts = {}
+        for prompt_type, prompt_path in prompt_configs.items():
+            prompt_file = os.path.join(
+                os.path.dirname(__file__), prompt_path
+            )
+            self.prompts[prompt_type] = self.config_manager.load_prompt_template(
+                prompt_file)
 
         # Verify we have at least one LLM provider configured (following
         # cronjob pattern like lib.db.py)
