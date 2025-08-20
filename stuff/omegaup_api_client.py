@@ -160,7 +160,7 @@ class OmegaUpAPIClient:
         if not response or 'statement' not in response:
             raise ValueError(
                 f"Problem '{problem_alias}' not found or inaccessible")
-        
+
         problem_data = response
 
         logging.info(

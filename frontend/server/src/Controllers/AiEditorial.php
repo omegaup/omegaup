@@ -137,8 +137,6 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             $redisPort = REDIS_PORT;
             $redisPassword = REDIS_PASS;
 
-
-
             $redis = new \Redis();
 
             // Set Redis connection timeout

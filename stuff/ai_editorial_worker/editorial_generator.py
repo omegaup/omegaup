@@ -85,9 +85,14 @@ class EditorialGenerator:
                     "Editorial generation prompt template not found")
 
             # Format prompt with context
-            reference_source = ac_solution.get('source', '') if ac_solution else ''
-            reference_lang = ac_solution.get('language', 'unknown') if ac_solution else 'unknown'
-            
+            reference_source = (
+                ac_solution.get('source', '') if ac_solution else ''
+            )
+            reference_lang = (
+                ac_solution.get('language', 'unknown') 
+                if ac_solution else 'unknown'
+            )
+
             prompt = prompt_template.format(
                 problem_title=problem_data.get('title', 'Unknown'),
                 problem_statement=problem_data.get('statement', ''),
