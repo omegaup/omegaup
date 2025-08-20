@@ -89,7 +89,7 @@ class EditorialGenerator:
                 ac_solution.get('source', '') if ac_solution else ''
             )
             reference_lang = (
-                ac_solution.get('language', 'unknown') 
+                ac_solution.get('language', 'unknown')
                 if ac_solution else 'unknown'
             )
 
