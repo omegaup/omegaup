@@ -377,10 +377,13 @@ class GitServerBrowser {
         if (!is_string($response)) {
             $curlErrno = curl_errno($this->curl);
             $curlError = curl_error($this->curl);
-            \Monolog\Registry::omegaup()->withName('GitBrowser')->error(
-                "Failed to get contents for {$this->url}. " .
-                "cURL {$curlErrno}: \"{$curlError}\""
-            );
+            // Only log error if we're not in passthru mode to avoid sending output before headers
+            if (!$this->passthru) {
+                \Monolog\Registry::omegaup()->withName('GitBrowser')->error(
+                    "Failed to get contents for {$this->url}. " .
+                    "cURL {$curlErrno}: \"{$curlError}\""
+                );
+            }
             throw new \OmegaUp\Exceptions\ServiceUnavailableException();
         }
         return $response;

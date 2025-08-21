@@ -22,7 +22,7 @@ omegaUp es una plataforma educativa donde puedes crear problemas, concursos y cu
 omegaUp is a educational online platform, where you can create programming problems, contest and courses.
 We encourage you to visit our [blog](https://blog.omegaup.com/) for recent updates in the site.
 
- - [How to write problems for omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-escribir-problemas-para-omegaUp.md) 
+ - [How to write problems for omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md)
  - [Implement a course in your school](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Corre-un-concurso-en-tu-escuela.md)
  - [How it works the online judge](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Ambiente-de-evaluaci%C3%B3n.md)
 

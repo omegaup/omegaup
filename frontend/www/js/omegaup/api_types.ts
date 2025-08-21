@@ -2608,6 +2608,18 @@ export namespace types {
     };
   }
 
+  export interface AiEditorialJobDetails {
+    created_at: Date;
+    error_message?: string;
+    is_retriable: boolean;
+    job_id: string;
+    md_en?: string;
+    md_es?: string;
+    md_pt?: string;
+    problem_alias: string;
+    status: string;
+  }
+
   export interface ApiToken {
     last_used: Date;
     name: string;
@@ -4031,6 +4043,9 @@ export namespace types {
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
@@ -5059,6 +5074,15 @@ export namespace messages {
     };
   };
 
+  // AiEditorial
+  export type AiEditorialGenerateRequest = { [key: string]: any };
+  export type AiEditorialGenerateResponse = { job_id?: string };
+  export type AiEditorialReviewRequest = { [key: string]: any };
+  export type AiEditorialReviewResponse = {};
+  export type AiEditorialStatusRequest = { [key: string]: any };
+  export type _AiEditorialStatusServerResponse = any;
+  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
   export type AuthorizationProblemResponse = {
@@ -5985,6 +6009,18 @@ export namespace controllers {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+  }
+
+  export interface AiEditorial {
+    generate: (
+      params?: messages.AiEditorialGenerateRequest,
+    ) => Promise<messages.AiEditorialGenerateResponse>;
+    review: (
+      params?: messages.AiEditorialReviewRequest,
+    ) => Promise<messages.AiEditorialReviewResponse>;
+    status: (
+      params?: messages.AiEditorialStatusRequest,
+    ) => Promise<messages.AiEditorialStatusResponse>;
   }
 
   export interface Authorization {

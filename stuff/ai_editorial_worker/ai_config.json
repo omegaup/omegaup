@@ -1,0 +1,36 @@
+{
+  "llm": {
+    "provider": "deepseek",
+    "model_configs": {
+      "deepseek": {
+        "model": "deepseek-chat",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "gpt": {
+        "model": "gpt-4o",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "claude": {
+        "model": "claude-sonnet-4-20250514",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      },
+      "gemini": {
+        "model": "gemini-2.0-flash-001",
+        "max_tokens": 2500,
+        "temperature": 0.3,
+        "timeout": 90
+      }
+    }
+  },
+  "prompts": {
+    "editorial_generation": "prompts/editorial_generation.txt",
+    "solution_generation": "prompts/solution_generation.txt",
+    "translation": "prompts/translation.txt"
+  }
+}

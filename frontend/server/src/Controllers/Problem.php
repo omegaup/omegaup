@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, reviewedProblemLevel?: null|string, reviewedPublicTags?: list<string>, reviewedQualitySeal?: bool, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -2386,10 +2386,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             "Content-Disposition: attachment;filename={$problem->alias}.zip"
         );
         header('Content-Transfer-Encoding: binary');
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            strval($problem->alias)
-        );
-        $problemArtifacts->download();
+
+        // Try to download from the published branch first. If it doesn't exist,
+        // fallback to the current commit.
+        $problemArtifacts = null;
+        try {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                strval($problem->alias),
+                'published'
+            );
+        } catch (\Exception $e) {
+            // If published revision doesn't exist, fallback to current commit
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                strval($problem->alias),
+                strval($problem->commit)
+            );
+        } finally {
+            // Always execute the download, regardless of which revision was selected
+            if (!is_null($problemArtifacts)) {
+                $problemArtifacts->download();
+            }
+        }
 
         // Since all the headers and response have been sent, make the API
         // caller to exit quietly.
@@ -4699,6 +4716,39 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
+        if ($isQualityReviewer) {
+            $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
+                $r->identity,
+                $problem
+            );
+            $contents = [];
+            if (!is_null($qualityNomination)) {
+                /**
+                 * @var null|array{tags?: list<string>, quality_seal?: bool, level?: string} $contents
+                 */
+                $contents = json_decode(
+                    $qualityNomination['contents'],
+                    associative: true
+                );
+            }
+            $response['templateProperties']['payload'] = array_merge(
+                $response['templateProperties']['payload'],
+                [
+                    'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                        $problem
+                    ),
+                    'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                        $problem,
+                        public: true
+                    ),
+                    'reviewedProblemLevel' => $contents['level'] ?? null,
+                    'reviewedQualitySeal' => $contents['quality_seal'] ?? false,
+                    'reviewedPublicTags' => $contents['tags'] ?? [],
+                    'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
+                ]
+            );
+        }
+
         $response['templateProperties']['payload']['user'] = [
             'loggedIn' => true,
             'admin' => $isAdmin,
@@ -4803,16 +4853,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ] = self::getAllRuns($problem->problem_id);
             $response['templateProperties']['payload']['allRuns'] = $runs;
             $response['templateProperties']['payload']['totalRuns'] = $totalRuns;
-            $response['templateProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
-                $problem
-            );
-            $response['templateProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
             $response['templateProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
             $response['templateProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
-            $response['templateProperties']['payload']['selectedPublicTags'] = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
-                $problem,
-                public: true
-            );
             $response['templateProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
                 $r->identity,
                 $problem

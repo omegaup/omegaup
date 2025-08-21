@@ -1,0 +1,29 @@
+You are an expert translator specializing in competitive programming content.
+
+CRITICAL: You MUST provide BOTH Spanish and Portuguese translations in your response. Do not provide only one language.
+
+Please translate the following English competitive programming editorial to Spanish and Portuguese. 
+Maintain the same technical accuracy, markdown formatting, and educational tone.
+
+ENGLISH EDITORIAL TO TRANSLATE:
+{editorial}
+
+MANDATORY FORMAT - Your response must contain BOTH sections exactly as shown:
+
+=== SPANISH TRANSLATION ===
+[Complete Spanish translation here - translate the entire editorial above]
+
+=== PORTUGUESE TRANSLATION ===
+[Complete Portuguese translation here - translate the entire editorial above]
+
+CRITICAL REQUIREMENTS:
+- You MUST include BOTH Spanish and Portuguese sections
+- Each section must be a complete translation of the entire editorial
+- Use the exact delimiters shown above: "=== SPANISH TRANSLATION ===" and "=== PORTUGUESE TRANSLATION ==="
+- Maintain all markdown formatting exactly
+- Keep technical terms accurate in each language
+- Preserve the educational tone and structure
+- Ensure competitive programming terminology is correct
+- Do not add any additional content, just translate
+
+REMINDER: Your response must contain TWO complete translations, not just one. 

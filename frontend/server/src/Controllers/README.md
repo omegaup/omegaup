@@ -1,5 +1,9 @@
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [AiEditorial](#aieditorial)
+  - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
+  - [`/api/aiEditorial/review/`](#apiaieditorialreview)
+  - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -287,6 +291,68 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+# AiEditorial
+
+AI Editorial Controller
+
+## `/api/aiEditorial/generate/`
+
+### Description
+
+Generate AI editorial for a problem
+
+### Parameters
+
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `auth_token`    | `null\|string` |             |
+
+### Returns
+
+| Name     | Type     |
+| -------- | -------- |
+| `job_id` | `string` |
+
+## `/api/aiEditorial/review/`
+
+### Description
+
+Review and approve/reject an AI editorial
+
+When approved, the editorial is published to gitserver
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `action`   | `string`       |             |
+| `job_id`   | `string`       |             |
+| `language` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/aiEditorial/status/`
+
+### Description
+
+Get status of an AI editorial job
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `job_id` | `string` |             |
+
+### Returns
+
+| Name  | Type                          |
+| ----- | ----------------------------- |
+| `job` | `types.AiEditorialJobDetails` |
 
 # Authorization
 
@@ -3693,7 +3759,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `mixed`                                                          |             |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
 
 ### Returns
 

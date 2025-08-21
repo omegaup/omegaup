@@ -324,12 +324,16 @@
                     }}</a>
                   </template>
                   <div class="dropdown-divider"></div>
+                  <!-- Logout button for desktop - navbar menu -->
                   <a
                     class="dropdown-item"
                     href="#"
                     data-logout-button
                     @click.prevent="logoutModalVisible = true"
-                  ></a>
+                  >
+                    <font-awesome-icon :icon="['fas', 'power-off']" />
+                    {{ T.omegaupTitleLogout }}
+                  </a>
                   <omegaup-common-grader-status
                     v-show="isAdmin"
                     :status="errorMessage !== null ? 'down' : 'ok'"
@@ -340,17 +344,22 @@
               </li>
             </ul>
 
+            <!-- Logout button for mobile -->
             <a
               v-if="isLoggedIn"
-              class="navbar justify-content-end d-lg-none align-items-start pt-4"
+              class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
               href="#"
               @click.prevent="logoutModalVisible = true"
             >
               <font-awesome-icon :icon="['fas', 'power-off']" />
+              <span class="ml-2">
+                {{ T.omegaupTitleLogout }}
+              </span>
             </a>
           </div>
         </div>
 
+        <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block order-1"
@@ -358,6 +367,7 @@
           @click.prevent="logoutModalVisible = true"
         >
           <font-awesome-icon :icon="['fas', 'power-off']" />
+          {{ T.omegaupTitleLogout }}
         </a>
       </div>
     </nav>

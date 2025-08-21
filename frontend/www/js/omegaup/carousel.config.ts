@@ -21,27 +21,27 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/carousel_slide_1.svg',
+    image: '/media/homepage/egoi25.png',
     title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
+      en: 'Mexico present at EGOI 2025',
+      es: 'México presente en la EGOI 2025',
+      pt: 'México presente na EGOI 2025',
     },
     description: {
       en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
       pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
+        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
     },
     button: {
       text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
+        en: 'EGOI',
+        es: 'EGOI',
+        pt: 'EGOI',
       },
-      href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
+      href: 'https://egoi.org/',
       target: '_blank',
     },
   },
@@ -71,27 +71,28 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/discord_logo.svg',
+    image: '/media/homepage/voces_tech_intro.png',
     title: {
-      en: 'Join our coders community',
-      es: 'Únete a nuestra comunidad de coders',
-      pt: 'Junte-se à nossa comunidade de coders',
+      en: 'Voces Tech: Inspiring Stories',
+      es: 'Voces Tech: Historias que inspiran',
+      pt: 'Voces Tech: Histórias inspiradoras',
     },
     description: {
       en:
-        'Join omegaUp´s Discord server and hang out with your community, get help and learn about new projects.',
+        'Discover Voces Tech, our new YouTube series where leaders and innovators in technology share their experiences and insights to inspire your journey.',
       es:
-        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
+        'Descubre Voces Tech, nuestra nueva serie de YouTube donde líderes e innovadores en tecnología comparten sus experiencias e ideas para inspirarte en tu camino.',
       pt:
-        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
+        'Descubra o Voces Tech, nossa nova série do YouTube onde líderes e inovadores em tecnologia compartilham suas experiências e percepções para inspirar sua jornada.',
     },
     button: {
       text: {
-        en: 'Join here',
-        es: 'Únete aquí',
-        pt: 'Junte-se aqui',
+        en: 'Watch playlist',
+        es: 'Ver playlist',
+        pt: 'Ver playlist',
       },
-      href: 'https://discord.com/invite/K3JFd9d3wk',
+      href:
+        'https://www.youtube.com/playlist?list=PLdSCJwXErQ8HDWYi63f9IMg_czC-zbM8L',
       target: '_blank',
     },
   },
