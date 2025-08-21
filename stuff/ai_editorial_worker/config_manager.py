@@ -66,7 +66,7 @@ class ConfigManager:
             prompt_file = os.path.join(
                 os.path.dirname(__file__),
                 ai_config.get('prompts', {}).get(
-                    'editorial_file', 'prompts/editorial.txt'
+                    'editorial_generation', 'prompts/editorial.txt'
                 )
             )
 
