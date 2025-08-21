@@ -101,27 +101,6 @@
                 {{ T.navViewCourses }}
               </a>
             </template>
-            <template v-if="hasTeachingObjective" #problems-items>
-              <a
-                v-if="isLoggedIn && isMainUserIdentity"
-                class="dropdown-item"
-                href="/problem/new/"
-                data-nav-problems-create
-                >{{ T.myproblemsListCreateProblem }}</a
-              >
-              <a
-                class="dropdown-item"
-                href="/problem/collection/"
-                data-nav-problems-collection
-                >{{ T.navViewProblems }}</a
-              >
-              <a class="dropdown-item" href="/submissions/">{{
-                T.navViewLatestSubmissions
-              }}</a>
-              <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
-                T.navQualityNominationQueue
-              }}</a>
-            </template>
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
 
