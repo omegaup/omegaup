@@ -193,7 +193,7 @@ class EditorialWorker:
                     # Check if this looks like an API key for the requested
                     # section
                     if section == 'ai_deepseek' and (
-                        content.startswith('sk-') or 
+                        content.startswith('sk-') or
                         content.startswith('deepseek-')):
                         logging.info(
                             'Loaded %s API key from raw content in %s',
@@ -203,7 +203,7 @@ class EditorialWorker:
                         logging.info(
                             'Loaded %s API key from raw content in %s',
                             section, config_file_path)
-                        return content.strip("'\"")                    
+                        return content.strip("'\"")
             except (OSError, IOError) as e:
                 logging.warning(
                     'Error reading raw content from %s: %s',
