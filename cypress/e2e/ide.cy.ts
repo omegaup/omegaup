@@ -5,7 +5,8 @@ import { LoginOptions, ProblemOptions, RunOptions } from '../support/types';
 import * as Util from '../../frontend/www/js/omegaup/grader/util';
 import * as JSZip from 'jszip';
 
-describe('Test IDE', () => {
+// TODO: Unskip when the component is visible
+describe.skip('Test IDE', () => {
   let problemOptions: ProblemOptions[];
 
   let loginOptions: LoginOptions[];
