@@ -52,7 +52,7 @@ class RedisJobClient:
             # Block and wait for jobs from editorial_jobs_queue
             # Redis library has complex typing, use type: ignore
             result = self.client.brpop(
-                ['editorial_jobs_queue'],
+                ['editorial_jobs_user', 'editorial_jobs_batch'],
                 timeout=timeout)
             if result and len(result) == 2:  # type: ignore
                 queue_name, job_data = str(

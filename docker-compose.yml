@@ -27,6 +27,7 @@ services:
       OPENAI_API_KEY: ""
       DEEPSEEK_API_KEY: ""
       AI_WORKER_ENABLED: "true"
+      REDIS_PASSWORD: "redis"
 
   gitserver:
     image: omegaup/gitserver:v1.9.13

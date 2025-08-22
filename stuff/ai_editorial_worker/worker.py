@@ -105,24 +105,34 @@ class EditorialWorker:
         # Redis client is now imported at module level
         self.redis_client = RedisJobClient(redis_config)
 
-        # Load prompts for editorial generation
-        self.prompts = {
-            'editorial': self.config_manager.load_prompt_template()
-        }
+        # Load all prompts for editorial generation
+        ai_config = self.config_manager.load_ai_config()
+        prompt_configs = ai_config.get('prompts', {})
+
+        self.prompts = {}
+        for prompt_type, prompt_path in prompt_configs.items():
+            prompt_file = os.path.join(
+                os.path.dirname(__file__), prompt_path
+            )
+            template = self.config_manager.load_prompt_template(prompt_file)
+            self.prompts[prompt_type] = template
 
         # Verify we have at least one LLM provider configured (following
         # cronjob pattern like lib.db.py)
-        openai_key = self._load_api_key_from_config('ai_openai', 'api_key')
-        if not openai_key:
-            # Fallback to environment for development
-            openai_key = os.getenv('OPENAI_API_KEY', '')
+        deepseek_key = self._load_api_key_from_config(
+            'ai_deepseek', 'api_key') or os.getenv('DEEPSEEK_API_KEY', '')
+        openai_key = self._load_api_key_from_config(
+            'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', '')
 
-        if not openai_key:
-            logging.warning(
-                'No LLM provider configured - set API key in ~/.my.cnf '
-                '[ai_openai] section')
-        else:
+        if deepseek_key:
+            logging.info('Using LLM provider: deepseek')
+        elif openai_key:
             logging.info('Using LLM provider: openai')
+        else:
+            logging.warning(
+                'No LLM provider configured - set DEEPSEEK_API_KEY or '
+                'OPENAI_API_KEY environment variable, or configure in '
+                '~/.my.cnf')
 
         logging.info('AI Editorial Worker %s initialized', self.worker_id)
 
@@ -244,7 +254,9 @@ class EditorialWorker:
         self, auth_token: str) -> Tuple[Any, Any, Any, Any]:
         """Initialize all components needed for editorial generation."""
         # Initialize API client with user's auth token
-        api_client = OmegaUpAPIClient(auth_token=auth_token)
+        # Default to production, override for local development
+        base_url = os.getenv('OMEGAUP_BASE_URL', 'https://omegaup.com')
+        api_client = OmegaUpAPIClient(auth_token=auth_token, base_url=base_url)
 
         # Test API connection with auth token (basic validation)
         try:
@@ -289,12 +301,13 @@ class EditorialWorker:
                 'OPENAI_API_KEY environment variable, or configure in '
                 '~/.my.cnf'
             )
-        editorial_generator = EditorialGenerator(
-            llm_config=llm_config,
-            prompts=self.prompts,
-            redis_client=self.redis_client,
-            api_client=api_client
-        )
+        editorial_generator = EditorialGenerator({
+            'llm_config': llm_config,
+            'prompts': self.prompts,
+            'redis_client': self.redis_client,
+            'api_client': api_client,
+            'full_config': self.config
+        })
 
         return (api_client, solution_handler, website_uploader,
                 editorial_generator)
