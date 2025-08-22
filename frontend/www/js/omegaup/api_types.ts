@@ -5187,10 +5187,6 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
-  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
-  export type ContestGetNumberOfContestantsResponse = {
-    response: { [key: number]: number };
-  };
   export type ContestListRequest = { [key: string]: any };
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
@@ -6126,9 +6122,6 @@ export namespace controllers {
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
-    getNumberOfContestants: (
-      params?: messages.ContestGetNumberOfContestantsRequest,
-    ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
       params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
