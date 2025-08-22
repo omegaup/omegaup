@@ -145,7 +145,8 @@ class EditorialWorker:
         Follows omegaUp cronjob pattern:
         1. Try ~/.my.cnf file first (production)
         2. Strip quotes like database credentials
-        3. Return None if not found (fallback to env vars)
+        3. Support both INI sections and raw key content for SOPS secrets
+        4. Return None if not found (fallback to env vars)
         """
         # Use same config file path as database credentials
         config_file_path = os.path.join(os.getenv('HOME', '.'), '.my.cnf')
@@ -154,18 +155,58 @@ class EditorialWorker:
             return None
 
         try:
+            # First try to read as INI file
             config = configparser.ConfigParser()
             config.read(config_file_path)
 
+            # Traditional INI section approach [ai_deepseek]
             if section in config and key in config[section]:
-                # Strip quotes like lib.db.py does:
-                # config['client']['password'].strip("'")
                 api_key = config[section][key].strip("'\"")
                 logging.info(
-                    'Loaded %s API key from %s', section, config_file_path)
+                    'Loaded %s API key from %s section', section, 
+                    config_file_path)
                 return api_key
 
-        except (OSError, IOError, configparser.Error) as e:
+            # Try direct key access for SOPS-style secrets
+            direct_key_mapping = {
+                'ai_deepseek': 'deepseek',
+                'ai_openai': 'openai'
+            }
+            
+            if section in direct_key_mapping:
+                direct_key = direct_key_mapping[section]
+                # Try DEFAULT section or any section that has the direct key
+                for section_name in config.sections() + ['DEFAULT']:
+                    if (section_name in config and 
+                        direct_key in config[section_name]):
+                        api_key = config[section_name][direct_key].strip("'\"")
+                        logging.info(
+                            'Loaded %s API key from %s as direct key', 
+                            section, config_file_path)
+                        return api_key
+
+        except configparser.Error:
+            # If INI parsing fails, try reading as raw content (SOPS mount)
+            try:
+                with open(config_file_path, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+                    # Check if this looks like an API key for the requested section
+                    if section == 'ai_deepseek' and (
+                        content.startswith('sk-') or content.startswith('deepseek-')):
+                        logging.info(
+                            'Loaded %s API key from raw content in %s', 
+                            section, config_file_path)
+                        return content.strip("'\"")
+                    elif section == 'ai_openai' and content.startswith('sk-'):
+                        logging.info(
+                            'Loaded %s API key from raw content in %s', 
+                            section, config_file_path)
+                        return content.strip("'\"")
+            except (OSError, IOError) as e:
+                logging.warning(
+                    'Error reading raw content from %s: %s', 
+                    config_file_path, e)
+        except (OSError, IOError) as e:
             logging.warning(
                 'Error reading config file %s: %s', config_file_path, e)
 
