@@ -105,24 +105,34 @@ class EditorialWorker:
         # Redis client is now imported at module level
         self.redis_client = RedisJobClient(redis_config)
 
-        # Load prompts for editorial generation
-        self.prompts = {
-            'editorial': self.config_manager.load_prompt_template()
-        }
+        # Load all prompts for editorial generation
+        ai_config = self.config_manager.load_ai_config()
+        prompt_configs = ai_config.get('prompts', {})
+
+        self.prompts = {}
+        for prompt_type, prompt_path in prompt_configs.items():
+            prompt_file = os.path.join(
+                os.path.dirname(__file__), prompt_path
+            )
+            template = self.config_manager.load_prompt_template(prompt_file)
+            self.prompts[prompt_type] = template
 
         # Verify we have at least one LLM provider configured (following
         # cronjob pattern like lib.db.py)
-        openai_key = self._load_api_key_from_config('ai_openai', 'api_key')
-        if not openai_key:
-            # Fallback to environment for development
-            openai_key = os.getenv('OPENAI_API_KEY', '')
+        deepseek_key = self._load_api_key_from_config(
+            'ai_deepseek', 'api_key') or os.getenv('DEEPSEEK_API_KEY', '')
+        openai_key = self._load_api_key_from_config(
+            'ai_openai', 'api_key') or os.getenv('OPENAI_API_KEY', '')
 
-        if not openai_key:
-            logging.warning(
-                'No LLM provider configured - set API key in ~/.my.cnf '
-                '[ai_openai] section')
-        else:
+        if deepseek_key:
+            logging.info('Using LLM provider: deepseek')
+        elif openai_key:
             logging.info('Using LLM provider: openai')
+        else:
+            logging.warning(
+                'No LLM provider configured - set DEEPSEEK_API_KEY or '
+                'OPENAI_API_KEY environment variable, or configure in '
+                '~/.my.cnf')
 
         logging.info('AI Editorial Worker %s initialized', self.worker_id)
 
@@ -135,7 +145,8 @@ class EditorialWorker:
         Follows omegaUp cronjob pattern:
         1. Try ~/.my.cnf file first (production)
         2. Strip quotes like database credentials
-        3. Return None if not found (fallback to env vars)
+        3. Support both INI sections and raw key content for SOPS secrets
+        4. Return None if not found (fallback to env vars)
         """
         # Use same config file path as database credentials
         config_file_path = os.path.join(os.getenv('HOME', '.'), '.my.cnf')
@@ -144,18 +155,60 @@ class EditorialWorker:
             return None
 
         try:
+            # First try to read as INI file
             config = configparser.ConfigParser()
             config.read(config_file_path)
 
+            # Traditional INI section approach [ai_deepseek]
             if section in config and key in config[section]:
-                # Strip quotes like lib.db.py does:
-                # config['client']['password'].strip("'")
                 api_key = config[section][key].strip("'\"")
                 logging.info(
-                    'Loaded %s API key from %s', section, config_file_path)
+                    'Loaded %s API key from %s section', section,
+                    config_file_path)
                 return api_key
 
-        except (OSError, IOError, configparser.Error) as e:
+            # Try direct key access for SOPS-style secrets
+            direct_key_mapping = {
+                'ai_deepseek': 'deepseek',
+                'ai_openai': 'openai'
+            }
+
+            if section in direct_key_mapping:
+                direct_key = direct_key_mapping[section]
+                # Try DEFAULT section or any section that has the direct key
+                for section_name in config.sections() + ['DEFAULT']:
+                    if (section_name in config and
+                        direct_key in config[section_name]):
+                        api_key = config[section_name][direct_key].strip("'\"")
+                        logging.info(
+                            'Loaded %s API key from %s as direct key',
+                            section, config_file_path)
+                        return api_key
+
+        except configparser.Error:
+            # If INI parsing fails, try reading as raw content (SOPS mount)
+            try:
+                with open(config_file_path, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+                    # Check if this looks like an API key for the requested
+                    # section
+                    if section == 'ai_deepseek' and (
+                        content.startswith('sk-') or
+                        content.startswith('deepseek-')):
+                        logging.info(
+                            'Loaded %s API key from raw content in %s',
+                            section, config_file_path)
+                        return content.strip("'\"")
+                    if section == 'ai_openai' and content.startswith('sk-'):
+                        logging.info(
+                            'Loaded %s API key from raw content in %s',
+                            section, config_file_path)
+                        return content.strip("'\"")
+            except (OSError, IOError) as e:
+                logging.warning(
+                    'Error reading raw content from %s: %s',
+                    config_file_path, e)
+        except (OSError, IOError) as e:
             logging.warning(
                 'Error reading config file %s: %s', config_file_path, e)
 
@@ -244,7 +297,9 @@ class EditorialWorker:
         self, auth_token: str) -> Tuple[Any, Any, Any, Any]:
         """Initialize all components needed for editorial generation."""
         # Initialize API client with user's auth token
-        api_client = OmegaUpAPIClient(auth_token=auth_token)
+        # Default to production, override for local development
+        base_url = os.getenv('OMEGAUP_BASE_URL', 'https://omegaup.com')
+        api_client = OmegaUpAPIClient(auth_token=auth_token, base_url=base_url)
 
         # Test API connection with auth token (basic validation)
         try:
@@ -289,12 +344,13 @@ class EditorialWorker:
                 'OPENAI_API_KEY environment variable, or configure in '
                 '~/.my.cnf'
             )
-        editorial_generator = EditorialGenerator(
-            llm_config=llm_config,
-            prompts=self.prompts,
-            redis_client=self.redis_client,
-            api_client=api_client
-        )
+        editorial_generator = EditorialGenerator({
+            'llm_config': llm_config,
+            'prompts': self.prompts,
+            'redis_client': self.redis_client,
+            'api_client': api_client,
+            'full_config': self.config
+        })
 
         return (api_client, solution_handler, website_uploader,
                 editorial_generator)
