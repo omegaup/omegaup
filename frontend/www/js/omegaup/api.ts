@@ -1071,6 +1071,10 @@ export const Course = {
     messages.CourseStudentsProgressRequest,
     messages.CourseStudentsProgressResponse
   >('/api/course/studentsProgress/'),
+  toggleTeachingAssistant: apiCall<
+    messages.CourseToggleTeachingAssistantRequest,
+    messages.CourseToggleTeachingAssistantResponse
+  >('/api/course/toggleTeachingAssistant/'),
   update: apiCall<messages.CourseUpdateRequest, messages.CourseUpdateResponse>(
     '/api/course/update/',
   ),

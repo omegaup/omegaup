@@ -3428,6 +3428,7 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    teaching_assistant_enabled: boolean;
     unlimited_duration: boolean;
   }
 
@@ -5463,6 +5464,10 @@ export namespace messages {
     nextPage?: number;
     progress: types.StudentProgressInCourse[];
   };
+  export type CourseToggleTeachingAssistantRequest = { [key: string]: any };
+  export type CourseToggleTeachingAssistantResponse = {
+    teaching_assistant_enabled: boolean;
+  };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
   export type CourseUpdateAssignmentRequest = { [key: string]: any };
@@ -6342,6 +6347,9 @@ export namespace controllers {
     studentsProgress: (
       params?: messages.CourseStudentsProgressRequest,
     ) => Promise<messages.CourseStudentsProgressResponse>;
+    toggleTeachingAssistant: (
+      params?: messages.CourseToggleTeachingAssistantRequest,
+    ) => Promise<messages.CourseToggleTeachingAssistantResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
