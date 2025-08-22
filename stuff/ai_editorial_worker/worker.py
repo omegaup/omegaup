@@ -163,7 +163,7 @@ class EditorialWorker:
             if section in config and key in config[section]:
                 api_key = config[section][key].strip("'\"")
                 logging.info(
-                    'Loaded %s API key from %s section', section, 
+                    'Loaded %s API key from %s section', section,
                     config_file_path)
                 return api_key
 
@@ -172,16 +172,16 @@ class EditorialWorker:
                 'ai_deepseek': 'deepseek',
                 'ai_openai': 'openai'
             }
-            
+
             if section in direct_key_mapping:
                 direct_key = direct_key_mapping[section]
                 # Try DEFAULT section or any section that has the direct key
                 for section_name in config.sections() + ['DEFAULT']:
-                    if (section_name in config and 
+                    if (section_name in config and
                         direct_key in config[section_name]):
                         api_key = config[section_name][direct_key].strip("'\"")
                         logging.info(
-                            'Loaded %s API key from %s as direct key', 
+                            'Loaded %s API key from %s as direct key',
                             section, config_file_path)
                         return api_key
 
@@ -190,21 +190,23 @@ class EditorialWorker:
             try:
                 with open(config_file_path, 'r', encoding='utf-8') as f:
                     content = f.read().strip()
-                    # Check if this looks like an API key for the requested section
+                    # Check if this looks like an API key for the requested
+                    # section
                     if section == 'ai_deepseek' and (
-                        content.startswith('sk-') or content.startswith('deepseek-')):
+                        content.startswith('sk-') or 
+                        content.startswith('deepseek-')):
                         logging.info(
-                            'Loaded %s API key from raw content in %s', 
+                            'Loaded %s API key from raw content in %s',
                             section, config_file_path)
                         return content.strip("'\"")
-                    elif section == 'ai_openai' and content.startswith('sk-'):
+                    if section == 'ai_openai' and content.startswith('sk-'):
                         logging.info(
-                            'Loaded %s API key from raw content in %s', 
+                            'Loaded %s API key from raw content in %s',
                             section, config_file_path)
-                        return content.strip("'\"")
+                        return content.strip("'\"")                    
             except (OSError, IOError) as e:
                 logging.warning(
-                    'Error reading raw content from %s: %s', 
+                    'Error reading raw content from %s: %s',
                     config_file_path, e)
         except (OSError, IOError) as e:
             logging.warning(
