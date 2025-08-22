@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, teaching_assistant_enabled: bool, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -5384,6 +5384,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => boolval($course->show_scoreboard),
             'recommended' => boolval($course->recommended),
             'requests_user_information' => $course->requests_user_information,
+            'teaching_assistant_enabled' => boolval(
+                $course->teaching_assistant_enabled
+            ),
             'unlimited_duration' => false,
         ];
 
@@ -6116,6 +6119,53 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
             'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Toggles the AI Teaching Assistant feature for a course
+     *
+     * @return array{status: string, teaching_assistant_enabled: bool}
+     *
+     * @omegaup-request-param string $course_alias
+     */
+    public static function apiToggleTeachingAssistant(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $course = self::validateCourseExists($courseAlias);
+
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $course->teaching_assistant_enabled = !$course->teaching_assistant_enabled;
+
+        try {
+            \OmegaUp\DAO\Courses::update($course);
+        } catch (\Exception $e) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'unableToUpdateTAEnabledField',
+            );
+        }
+
+        self::$log->info(
+            "Course AI TA toggled (alias): {$courseAlias}, enabled: " . ($course->teaching_assistant_enabled ? 'true' : 'false')
+        );
+
+        return [
+            'status' => 'ok',
+            'teaching_assistant_enabled' => $course->teaching_assistant_enabled,
         ];
     }
 
