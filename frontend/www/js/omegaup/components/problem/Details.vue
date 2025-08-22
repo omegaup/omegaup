@@ -98,13 +98,17 @@
                 {{ T.wordsReportProblem }}
               </button>
             </div>
-            <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
+            <div v-if="user.reviewer">
               <button
                 data-rate-problem-button
                 class="btn btn-link"
                 @click="onNewPromotionAsReviewer"
               >
-                {{ T.reviewerNomination }}
+                {{
+                  nominationStatus.alreadyReviewed
+                    ? T.reviewerNominationUpdate
+                    : T.reviewerNomination
+                }}
               </button>
             </div>
           </slot>
@@ -166,6 +170,9 @@
               :level-tags="levelTags"
               :problem-level="problemLevel"
               :public-tags="publicTags"
+              :reviewed-quality-seal="reviewedQualitySeal"
+              :reviewed-problem-level="reviewedProblemLevel"
+              :reviewed-public-tags="reviewedPublicTags"
               :selected-public-tags="selectedPublicTags"
               :selected-private-tags="selectedPrivateTags"
               :problem-alias="problem.alias"
@@ -484,6 +491,9 @@ export default class ProblemDetails extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemLevel!: string;
   @Prop() publicTags!: string[];
+  @Prop() reviewedQualitySeal!: boolean;
+  @Prop() reviewedProblemLevel!: string;
+  @Prop({ default: () => [] }) reviewedPublicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
