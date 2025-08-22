@@ -5,13 +5,12 @@ Uses secure configuration management following omegaUp patterns.
 """
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, cast
 
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from llm_wrapper import LLMWrapper  # type: ignore
-from omegaup_api_client import OmegaUpAPIClient  # type: ignore
 from solution_handler import SolutionHandler  # type: ignore
 
 
@@ -19,16 +18,21 @@ class EditorialGenerator:
     """Generate editorials using a sophisticated 3-prompt system."""
 
     def __init__(self,
-                 llm_config: Dict[str,
-                                  Any],
-                 prompts: Dict[str,
-                               str],
-                 redis_client: Any,
-                 api_client: Optional[OmegaUpAPIClient] = None) -> None:
-        """Initialize with LLM configuration and prompt templates."""
-        self.llm_config = llm_config
-        self.prompts = prompts
-        self.redis_client = redis_client
+                 config: Dict[str, Any]) -> None:
+        """Initialize with configuration dictionary.
+
+        Args:
+            config: Configuration dictionary containing:
+                - llm_config: LLM provider configuration
+                - prompts: Dictionary of prompt templates
+                - redis_client: Redis client instance
+                - api_client: API client instance
+                - full_config: Complete configuration dict
+        """
+        self.llm_config = config['llm_config']
+        self.full_config = config.get('full_config', {})
+        self.prompts = config['prompts']
+        self.redis_client = config['redis_client']
 
         # Map provider names to what LLMWrapper expects
         provider_mapping = {
@@ -39,17 +43,18 @@ class EditorialGenerator:
         }
 
         llm_provider = provider_mapping.get(
-            llm_config['provider'],
-            llm_config['provider']
+            self.llm_config['provider'],
+            self.llm_config['provider']
         )
 
         # Initialize LLM wrapper with proper provider and API key
         self.llm_wrapper = LLMWrapper(
             provider=llm_provider,
-            api_key=llm_config['api_key']
+            api_key=self.llm_config['api_key']
         )
 
         # Initialize API client if not provided
+        api_client = config.get('api_client')
         if api_client:
             self.api_client = api_client
         else:
@@ -65,7 +70,7 @@ class EditorialGenerator:
 
         logging.info(
             "Editorial generator initialized with provider: %s",
-            llm_config['provider'])
+            self.llm_config['provider'])
 
     def generate_editorial_prompt(self,
                                   problem_data: Dict[str, Any],
@@ -85,16 +90,16 @@ class EditorialGenerator:
                     "Editorial generation prompt template not found")
 
             # Format prompt with context
+            reference_source = ac_solution.get(
+                'source', '') if ac_solution else ''
+            reference_lang = ac_solution.get(
+                'language', 'unknown') if ac_solution else 'unknown'
+
             prompt = prompt_template.format(
                 problem_title=problem_data.get('title', 'Unknown'),
                 problem_statement=problem_data.get('statement', ''),
-                constraints=self.extract_constraints(problem_data),
-                sample_input=self.extract_sample_input(problem_data),
-                sample_output=self.extract_sample_output(problem_data),
-                ac_solution=(ac_solution.get('source', '')
-                             if ac_solution else ''),
-                time_limit=problem_data.get('time_limit', '1s'),
-                memory_limit=problem_data.get('memory_limit', '256MB')
+                reference_language=reference_lang,
+                reference_ac=reference_source
             )
 
             # Generate with LLM
@@ -163,6 +168,103 @@ class EditorialGenerator:
             logging.exception("Error in solution verification: %s", e)
             return None
 
+    def _parse_combined_translation(self, response: str) -> Dict[str, str]:
+        """Parse combined Spanish and Portuguese translation response."""
+        translations = {}
+        try:
+            logging.info("Response length: %d characters", len(response))
+            logging.info("Looking for translation delimiters...")
+
+            # Extract Spanish translation
+            spanish_start = response.find('=== SPANISH TRANSLATION ===')
+            portuguese_start = response.find('=== PORTUGUESE TRANSLATION ===')
+
+            logging.info("Spanish delimiter at position: %d", spanish_start)
+            logging.info(
+                "Portuguese delimiter at position: %d",
+                portuguese_start)
+
+            if spanish_start != -1 and portuguese_start != -1:
+                # Extract Spanish content
+                start_pos = spanish_start + len('=== SPANISH TRANSLATION ===')
+                spanish_content = response[start_pos:portuguese_start].strip()
+                if spanish_content:
+                    translations['es'] = spanish_content
+                    msg = ("Successfully extracted Spanish translation "
+                           "(%d chars)")
+                    logging.info(msg, len(spanish_content))
+
+                # Extract Portuguese content
+                pt_start_pos = portuguese_start + \
+                    len('=== PORTUGUESE TRANSLATION ===')
+                portuguese_content = response[pt_start_pos:].strip()
+                if portuguese_content:
+                    translations['pt'] = portuguese_content
+                    msg = ("Successfully extracted Portuguese translation "
+                           "(%d chars)")
+                    logging.info(msg, len(portuguese_content))
+            elif spanish_start != -1:
+                # Only Spanish found - try to extract it anyway
+                logging.warning(
+                    "Only Spanish translation found, extracting what we have")
+                start_pos = spanish_start + len('=== SPANISH TRANSLATION ===')
+                spanish_content = response[start_pos:].strip()
+                if spanish_content:
+                    translations['es'] = spanish_content
+                    logging.info(
+                        "Extracted partial Spanish translation (%d chars)",
+                        len(spanish_content))
+                    # Try to regenerate with more specific prompt for
+                    # Portuguese only
+                    logging.info(
+                        "Attempting to generate Portuguese translation "
+                        "separately")
+                    pt_translation = self._generate_single_translation(
+                        response[:500], 'Portuguese')
+                    if pt_translation:
+                        translations['pt'] = pt_translation
+            else:
+                logging.warning(
+                    "Could not find translation delimiters in response")
+                preview = (response[:500] + "..." if len(response) > 500
+                           else response)
+                logging.info("Response preview: %s", preview)
+
+            return translations
+        except (ValueError, TypeError, KeyError) as e:
+            logging.warning("Failed to parse combined translation: %s", e)
+            return {}
+
+    def _generate_single_translation(
+        self,
+        editorial_text: str,
+        language: str) -> Optional[str]:
+        """Generate translation for a single language as fallback."""
+        try:
+            simple_prompt = (
+                f"Translate the following competitive programming editorial "
+                f"to {language}. Provide only the translation, no additional "
+                f"text:\n\n{editorial_text}")
+
+            response = self.llm_wrapper.generate_response(
+                prompt=simple_prompt,
+                temperature=self.llm_config.get('temperature', 0.7)
+            )
+
+            if response:
+                logging.info(
+                    "Successfully generated %s translation as fallback "
+                    "(%d chars)", language, len(response))
+                return response
+            return None
+
+        except (ConnectionError, TypeError, ValueError) as e:
+            logging.warning(
+                "Failed to generate %s translation as fallback: %s",
+                language,
+                e)
+            return None
+
     def generate_translation(
         self,
         content: str,
@@ -175,9 +277,8 @@ class EditorialGenerator:
                 logging.warning("Translation prompt template not found")
                 return None
 
-            # Format prompt with content and target language
-            prompt = ("Translate the following editorial content to " +
-                      f"{target_language}:\n\n{content}")
+            # Format prompt with content using template
+            prompt = prompt_template.format(editorial=content)
 
             # Generate translation with LLM
             response = self.llm_wrapper.generate_response(
@@ -201,7 +302,7 @@ class EditorialGenerator:
             if not problem_data:
                 raise ValueError(
                     f'Failed to fetch problem details for {problem_alias}')
-            return problem_data
+            return cast(Dict[str, Any], problem_data)
         except ConnectionError as e:
             logging.error(
                 'Authentication or connection failed for problem %s: %s',
@@ -209,7 +310,7 @@ class EditorialGenerator:
             raise ValueError(
                 f'Authentication failed when fetching problem {problem_alias}'
             ) from e
-        except Exception as e:
+        except (TypeError, ValueError) as e:
             logging.error(
                 'API error fetching problem %s: %s', problem_alias, str(e))
             raise ValueError(
@@ -238,21 +339,35 @@ class EditorialGenerator:
                                     problem_data: Dict[str, Any]
                                     ) -> Optional[Dict[str, Any]]:
         """Verify solution if verification is enabled."""
-        if self.llm_config.get('enable_solution_verification', False):
+        if self.full_config.get('enable_solution_verification', False):
             return self.verify_editorial_solution(
                 problem_alias, editorial_en, problem_data)
         return None
 
     def _generate_translations(self, editorial_en: str) -> Dict[str, str]:
-        """Generate translations for multiple languages."""
+        """Generate translations for multiple languages using combined
+        prompt."""
         translations = {}
-        if self.llm_config.get('enable_multi_language', True):
-            for lang in ['es', 'pt']:
-                if lang in self.llm_config.get(
-                    'languages', ['en', 'es', 'pt']):
-                    translated = self.generate_translation(editorial_en, lang)
-                    if translated:
-                        translations[lang] = translated
+        if self.full_config.get('enable_multi_language', True):
+            logging.info(
+                "Starting translation generation for Spanish and Portuguese")
+            # Generate both Spanish and Portuguese in one API call
+            combined_response = self.generate_translation(
+                editorial_en, 'combined')
+            if combined_response:
+                logging.info(
+                    "Received combined translation response, parsing...")
+                # Parse the combined response
+                parsed_translations = self._parse_combined_translation(
+                    combined_response)
+                lang_list = list(parsed_translations.keys())
+                logging.info("Parsed translations for languages: %s",
+                             lang_list)
+                translations.update(parsed_translations)
+            else:
+                logging.warning("No translation response received from LLM")
+        else:
+            logging.info("Multi-language translation disabled in config")
         return translations
 
     def _add_disclaimers_to_all(

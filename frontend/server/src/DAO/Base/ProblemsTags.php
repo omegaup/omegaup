@@ -221,7 +221,7 @@ abstract class ProblemsTags {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
-     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\ProblemsTags> Un arreglo que contiene objetos del tipo
@@ -230,25 +230,30 @@ abstract class ProblemsTags {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        ?string $orden = null,
+        string $orden = 'problem_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Problems_Tags`.`problem_id`,
                 `Problems_Tags`.`tag_id`,
                 `Problems_Tags`.`source`
             FROM
                 `Problems_Tags`
-        ';
-        if (!is_null($orden)) {
-            $sql .= (
-                ' ORDER BY `' .
-                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-                '` ' .
-                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-            );
-        }
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .
