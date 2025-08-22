@@ -45,6 +45,47 @@ define('OMEGAUP_GITSERVER_URL', 'http://omegaup-gitserver-1:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
 define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
+define('APC_USER_CACHE_CONTEST_INFO_TIMEOUT', 10);
+define('MAX_PROBLEMS_IN_CONTEST', 30);
+define(
+    'IMAGES_PATH',
+    sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
+);
+define('IMAGES_URL_PATH', '/img/');
+define('APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT', 60);
+define('APC_USER_CACHE_PROBLEM_STATS_TIMEOUT', 0);
+define('APC_USER_CACHE_PROBLEM_LIST_TIMEOUT', 60 * 30);
+define('IDENTITY_ANONYMOUS', 'identity_anonymous');
+define('IDENTITY_ADMIN', 'identity_admin');
+define('IDENTITY_NORMAL', 'identity_normal');
+define('APC_USER_CACHE_SESSION_TIMEOUT', 8 * 3600);
+define(
+    'TEMPLATES_PATH',
+    sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
+);
+define(
+    'INPUTS_PATH',
+    sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
+);
+define('OMEGAUP_URL', 'http://localhost');
+define('PASSWORD_RESET_TIMEOUT', 2 * 3600);
+define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
+define('AWS_CLI_SECRET_ACCESS_KEY', null);
+define('AWS_CLI_ACCESS_KEY_ID', null);
+define('OMEGAUP_GRADER_SECRET', 'secret');
+define('OMEGAUP_FB_APPID', 'xxxxx');
+define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
+define('OMEGAUP_FB_SECRET', 'xxxxx');
+define('OMEGAUP_MD5_SALT', 'omegaup');
+define(
+    'OMEGAUP_GOOGLE_CLIENTID',
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
+);
+define('OMEGAUP_RECAPTCHA_SECRET', 'xxxx');
+
+define('OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL', 'xxx');
+define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
+define('APC_USER_CACHE_USER_RANK_TIMEOUT', 60 * 30);
 EOF
 ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"
 

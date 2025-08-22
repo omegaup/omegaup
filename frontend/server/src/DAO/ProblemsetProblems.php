@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\ProblemsetProblems}.
  *
  * @access public
+ *
+ * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
@@ -111,7 +113,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter: null|string, order: int, points: float, problem_id: int, quality_payload: null|ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId,
@@ -175,6 +177,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         foreach ($rs as $problem) {
             $problem['accepts_submissions'] = !empty($problem['languages']);
             $problem['has_submissions'] = boolval($problem['has_submissions']);
+            $problem['letter'] = null;
+            $problem['quality_payload'] = null;
             $problems[] = $problem;
         }
         return $problems;
