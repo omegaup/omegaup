@@ -167,6 +167,7 @@ const translations: { [key: string]: string; } = {
   banningDeclinedByReviewer: "Banning declined by reviewer.",
   banningProblemDueToReport: "Banning problem due to account report.",
   birthdayInTheFuture: "You are not old enough to use omegaUp",
+  bulkAction: "Bulk Action",
   bulkOperationError: "There was an error executing the operation",
   bulkUserAddError: "There was an error adding accounts. The following email addresses were not found in omegaUp:<br><br><b>%(userEmail)</b>.<br><br>However, the rest of accounts have been added successfully.",
   bulkUserAddSuccess: "Accounts successfully added!",
@@ -918,6 +919,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "My profile",
   newPublicTagsNotAllowed: "It is not allowed to add new public tags",
   noCoders: "No coders.",
+  noRunsProvided: "No runs provided.",
   nominationsRangeHeader: "Problem reports (from %(lowCount) to %(highCount))",
   notProblemLevelTag: "The tag sent is not a level tag.",
   notificationContestClarificationRequest: "A new clarification has been requested for problem %(problemAlias) of the contest %(contestAlias), that you manage.",
@@ -2144,6 +2146,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
+  zipCreationFailed: "Zip creation failed.",
   zipPrepare: "Prepare zip file",
 };
 
