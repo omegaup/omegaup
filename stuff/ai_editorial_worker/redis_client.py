@@ -61,6 +61,9 @@ class RedisJobClient:
                 return queue_name, job_data
             return None
 
+        except redis.TimeoutError:
+            # Normal timeout - just return None, don't log as error
+            return None
         except redis.RedisError as e:
             logging.error('Redis polling error: %s', e)
             raise
