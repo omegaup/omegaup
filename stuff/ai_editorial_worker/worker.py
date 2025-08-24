@@ -134,6 +134,9 @@ class EditorialWorker:
                 'OPENAI_API_KEY environment variable, or configure in '
                 '~/.my.cnf')
 
+        # Initialize API client attribute for job processing
+        self._current_api_client = None
+
         logging.info('AI Editorial Worker %s initialized', self.worker_id)
 
     def _load_api_key_from_config(
@@ -427,8 +430,11 @@ class EditorialWorker:
 
             # Initialize components for editorial generation
             components = self._initialize_components(auth_token)
-            (_, solution_handler, website_uploader,
+            (api_client, solution_handler, website_uploader,
              editorial_generator) = components
+
+            # Store API client for database updates
+            self._current_api_client = api_client
 
             # Step 1: Get problem details
             logging.info(
@@ -496,14 +502,20 @@ class EditorialWorker:
 
             self._update_job_status(job_id, 'failed', error_msg, error_data)
 
+        finally:
+            # Clean up API client reference to avoid memory leaks
+            if hasattr(self, '_current_api_client'):
+                delattr(self, '_current_api_client')
+
     def _update_job_status(self,
                            job_id: str,
                            status: str,
                            error: Optional[str] = None,
                            extra_data: Optional[Dict[str,
                                                      Any]] = None) -> None:
-        """Update job status in Redis using RedisJobClient interface."""
+        """Update job status in Redis and Database."""
         try:
+            # 1. Update Redis (existing functionality)
             update_data = {
                 'status': status,
                 'updated_at': str(time.time()),
@@ -520,9 +532,76 @@ class EditorialWorker:
 
             self.redis_client.set_job_status(job_id, update_data)
 
+            # 2. Update Database (new functionality)
+            self._update_database_status(job_id, status, error, extra_data)
+
         except (ConnectionError, TypeError, ValueError) as e:
             logging.exception(
                 'Failed to update job status for %s: %s', job_id, e)
+
+    def _update_database_status(
+            self,
+            job_id: str,
+            status: str,
+            error: Optional[str] = None,
+            extra_data: Optional[Dict[str, Any]] = None) -> None:
+        """Update job status in omegaUp database via API."""
+        try:
+            # Extract editorials from extra_data if available
+            editorials = None
+            validation_verdict = None
+
+            if extra_data:
+                editorial_en = extra_data.get('editorial_en', '').strip()
+                editorial_es = extra_data.get('editorial_es', '').strip()
+                editorial_pt = extra_data.get('editorial_pt', '').strip()
+
+                # Only create editorials dict if we have actual content
+                if editorial_en or editorial_es or editorial_pt:
+                    editorials = {}
+                    if editorial_en:
+                        editorials['en'] = editorial_en
+                    if editorial_es:
+                        editorials['es'] = editorial_es
+                    if editorial_pt:
+                        editorials['pt'] = editorial_pt
+
+                validation_verdict = extra_data.get(
+                    'verification_result', '').strip()
+                if not validation_verdict:
+                    validation_verdict = None
+
+            # Get API client from components (it has the user's auth_token)
+            api_client = getattr(self, '_current_api_client', None)
+            if not api_client:
+                logging.warning(
+                    'No API client available for database update of job %s',
+                    job_id)
+                return
+
+            # Update database via API
+            success = api_client.update_job_status(
+                job_id=job_id,
+                status=status,
+                editorials=editorials,
+                error_message=error,
+                validation_verdict=validation_verdict
+            )
+
+            if success:
+                logging.info(
+                    'Successfully updated database status for job %s: %s',
+                    job_id, status)
+            else:
+                logging.warning(
+                    'Failed to update database status for job %s', job_id)
+
+        except (ConnectionError, TypeError, ValueError, KeyError,
+                AttributeError) as e:
+            # Don't fail the entire job if database update fails
+            # Redis update is sufficient for worker operation
+            logging.warning(
+                'Database status update failed for job %s: %s', job_id, e)
 
 
 if __name__ == '__main__':
