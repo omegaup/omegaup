@@ -4211,6 +4211,14 @@ export namespace types {
     tried: boolean;
   }
 
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
+  }
+
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
     Interactive?: {
