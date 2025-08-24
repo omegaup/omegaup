@@ -46,28 +46,28 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/carousel_slide_2.svg',
+    image: '/media/homepage/copa.png',
     title: {
-      en: 'Would you like to learn to program?',
-      es: '¿Te gustaría aprender a programar?',
-      pt: 'Deseja aprender a programar?',
+      en: 'Copa de Comunidades de Programación',
+      es: 'Copa de Comunidades de Programación',
+      pt: 'Copa de Comunidades de Programação',
     },
     description: {
       en:
-        'Join the free Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
       es:
-        'Apúntate al curso gratuito de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
       pt:
-        'Participe do curso gratuito de Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
     },
     button: {
       text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
+        en: 'Final Ranklist',
+        es: 'Ranklist final',
+        pt: 'Ranklist final',
       },
-      href: '/course/introduccion_a_cpp/',
-      target: '_self',
+      href: 'https://omegaup.github.io/CCP/',
+      target: '_blank',
     },
   },
   {
