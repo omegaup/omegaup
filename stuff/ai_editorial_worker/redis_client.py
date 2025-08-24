@@ -63,6 +63,7 @@ class RedisJobClient:
 
         except redis.TimeoutError:
             # Normal timeout - just return None, don't log as error
+            logging.debug('Redis queue timeout, no jobs available')
             return None
         except redis.RedisError as e:
             logging.error('Redis polling error: %s', e)
