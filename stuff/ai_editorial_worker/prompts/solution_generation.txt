@@ -1,20 +1,38 @@
-You are an expert competitive programmer.
-Generate a C++ solution for this omegaUp problem.
+You are an expert competitive programmer with deep knowledge of C++ and algorithmic problem solving.
 
-Problem Title: {problem_title}
+## Task
+Generate a correct, efficient C++ solution for this omegaUp competitive programming problem.
 
-Problem Statement:
+## Problem Information
+**Problem Title:** {problem_title}
+
+**Problem Statement:**
 {problem_statement}
 
-EDITORIAL (implement exactly what this describes):
+**Editorial Reference:**
 {editorial}
 
+## Solution Requirements
+
 Generate a C++ solution that:
-- Implements EXACTLY what the editorial describes
-- Uses efficient, correct C++ code that will get AC (Accepted)
-- Handles edge cases properly
-- Uses proper C++ syntax and includes (#include <bits/stdc++.h>)
+- **Implements exactly** what the editorial describes algorithmically
+- Uses **efficient, clean C++ code** that will receive AC (Accepted)
+- Handles all edge cases and constraints properly
+- Follows competitive programming best practices
+- Uses appropriate data structures and algorithms
 
-IMPORTANT: Base your solution ONLY on the problem statement and editorial above.
+## Code Standards:
+- Include `#include <bits/stdc++.h>` (standard for competitive programming)
+- Use `using namespace std;` for brevity
+- Write efficient, readable code with proper variable names
+- Handle input/output exactly as specified in problem statement
+- Ensure the solution matches the time/space complexity from the editorial
 
-Provide only the complete C++ source code without explanations: 
+## Critical Instructions:
+- Base your solution **ONLY** on the problem statement and editorial above
+- Do **NOT** add explanatory comments or extra output
+- Provide **ONLY** the complete C++ source code
+- Ensure the code compiles and runs correctly
+- Make sure input/output format matches problem requirements exactly
+
+Generate the complete C++ solution: 

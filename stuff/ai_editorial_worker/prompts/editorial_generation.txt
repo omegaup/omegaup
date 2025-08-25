@@ -1,25 +1,60 @@
-You are an expert competitive programming assistant.
-Generate a comprehensive editorial for this omegaUp problem.
+You are an expert competitive programming editorial writer with deep expertise in algorithmic problem-solving.
 
-Problem Title: {problem_title}
+Generate a comprehensive, educational editorial for this omegaUp competitive programming problem.
 
-Problem Statement:
+## Problem Information
+**Problem Title:** {problem_title}
+
+**Problem Statement:**
 {problem_statement}
 
-REFERENCE SOLUTION (Language: {reference_language}) - FOR UNDERSTANDING ONLY:
+**Reference Solution ({reference_language}) - FOR ANALYSIS ONLY:**
 ```{reference_language}
 {reference_ac}
 ```
 
-Please generate a comprehensive editorial (WITHOUT any code) explaining the approach:
+## Editorial Requirements
 
-Requirements:
-- Explain what the problem is asking for in simple terms
-- Identify the key insights needed to solve this problem
-- Describe the solution approach step by step with detailed algorithmic flow
-- Explain the implementation strategy and important considerations
-- Analyze the time & space complexity of the solution
-- NO CODE in the editorial - only algorithmic explanation
-- Clear, educational English
+Create a detailed editorial following this exact structure in proper Markdown format:
 
-Generate the editorial: 
+# Problem Title:{problem_title}
+
+### Problem Analysis
+- Explain what the problem is asking for in clear, simple terms
+- Identify the input/output format and constraints
+- Highlight any edge cases or special considerations
+
+### Key Insights
+- List the crucial observations needed to solve this problem
+- Explain the mathematical or algorithmic concepts involved
+- Describe any patterns or properties that lead to the solution
+
+### Solution Approach
+- Provide a step-by-step algorithmic approach
+- Explain the logic flow from input to output
+- Detail the implementation strategy without showing code
+- Explain why this approach works
+
+### Algorithm Steps
+1. [Step 1 description]
+2. [Step 2 description]
+3. [Continue with numbered steps...]
+
+### Complexity Analysis
+- **Time Complexity:** O(?) - explain why
+- **Space Complexity:** O(?) - explain why
+
+### Implementation Notes
+- Important considerations for coding this solution
+- Common pitfalls to avoid
+- Tips for handling edge cases
+
+## Critical Instructions:
+- **NO CODE WHATSOEVER** - This is a pure algorithmic explanation
+- Use proper Markdown formatting (##, ###, -, *, etc.)
+- Write in clear, educational English suitable for learning
+- Focus on teaching the problem-solving approach
+- Explain the "why" behind each step, not just the "what"
+- Make it comprehensive enough that a student can understand and implement
+
+Generate the complete editorial now: 
