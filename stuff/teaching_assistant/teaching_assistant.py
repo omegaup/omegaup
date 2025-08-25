@@ -410,6 +410,7 @@ def conjure_query(  # pylint: disable=R0913
         ),
         "PA": (
             "The submission got Partial Acceptance (PA). "
+            "The algorithm might be partially correct. What's the issue? "
             "What optimizations can be done to pass all the test cases? "
             "Look for efficiency improvements."
         ),
