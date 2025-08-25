@@ -265,7 +265,7 @@ class ProblemArtifacts {
             passthru: true
         );
         $browser->headers[] = 'Accept: application/zip';
-        $response = $browser->exec();
+        $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
         if (
@@ -275,7 +275,7 @@ class ProblemArtifacts {
         ) {
             $this->log->error(
                 "Failed to download {$this->alias}:{$this->revision}. " .
-                "HTTP {$httpStatusCode}: \"{$response}\""
+                "HTTP {$httpStatusCode}"
             );
             throw new \OmegaUp\Exceptions\ServiceUnavailableException();
         }
@@ -371,13 +371,17 @@ class GitServerBrowser {
         curl_close($this->curl);
     }
 
-    public function exec(): string {
+    public function exec(): string|bool {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
         $response = curl_exec($this->curl);
+        if ($response === true) {
+            //Passthru already sent output to browser, just return true
+            return true; //or return empty string if we don't want to change
+                         //the function signature
+        }
         if (!is_string($response)) {
             $curlErrno = curl_errno($this->curl);
             $curlError = curl_error($this->curl);
-            // Only log error if we're not in passthru mode to avoid sending output before headers
             if (!$this->passthru) {
                 \Monolog\Registry::omegaup()->withName('GitBrowser')->error(
                     "Failed to get contents for {$this->url}. " .
