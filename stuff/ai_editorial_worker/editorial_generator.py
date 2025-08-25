@@ -162,7 +162,8 @@ class EditorialGenerator:
                     "Found code delimiter: %s at %d", delimiter, pos)
                 break
 
-        return editorial_start, editorial_delimiter_len, code_start, code_delimiter_len
+        return (editorial_start, editorial_delimiter_len,
+                code_start, code_delimiter_len)
 
     def _extract_editorial_content(
         self,
@@ -203,8 +204,8 @@ class EditorialGenerator:
                     "Extracted C++ code (%d chars)",
                     len(code_content))
                 return code_content
-            else:
-                logging.warning("No closing ``` found for C++ code")
+
+            logging.warning("No closing ``` found for C++ code")
         else:
             # Try to find code without markdown blocks
             logging.warning(
@@ -234,7 +235,8 @@ class EditorialGenerator:
             editorial_content = response[:code_start].strip()
             if editorial_content:
                 logging.info(
-                    "Fallback: extracted editorial as everything before code (%d chars)",
+                    "Fallback: extracted editorial as everything before "
+                    "code (%d chars)",
                     len(editorial_content))
                 return editorial_content
 
@@ -255,8 +257,9 @@ class EditorialGenerator:
             logging.debug("Response preview: %s", preview)
 
             # Find delimiter positions
-            editorial_start, editorial_delimiter_len, code_start, code_delimiter_len = (
-                self._find_delimiter_positions(response))
+            positions = self._find_delimiter_positions(response)
+            editorial_start, editorial_delimiter_len = positions[:2]
+            code_start, code_delimiter_len = positions[2:]
 
             # Extract content using helper methods
             editorial_content = self._extract_editorial_content(
@@ -394,8 +397,8 @@ class EditorialGenerator:
             'pt': {
                 'verified': (
                     "\n\n---\n*Este editorial foi gerado com assistência de "
-                    "IA e **verificado**. A abordagem da solução foi testada "
-                    "e funciona corretamente.*"
+                    "IA e **verificado**. A abordagem da solução foi "
+                    "testada e funciona corretamente.*"
                 ),
                 'not_verified': (
                     "\n\n---\n*Este editorial foi gerado com assistência de "
@@ -406,8 +409,8 @@ class EditorialGenerator:
                 'error': (
                     "\n\n---\n*Este editorial foi gerado com assistência de "
                     "IA mas **a verificação falhou** devido a problemas "
-                    "técnicos. Por favor verifique a abordagem da solução e "
-                    "reporte quaisquer problemas.*"
+                    "técnicos. Por favor verifique a abordagem da solução "
+                    "e reporte quaisquer problemas.*"
                 )
             }
         }
@@ -595,11 +598,13 @@ class EditorialGenerator:
         if not editorial_content:
             # Fallback: use the raw response as editorial if parsing failed
             logging.warning(
-                "Failed to extract editorial content, using raw response as fallback")
+                "Failed to extract editorial content, using raw response "
+                "as fallback")
             editorial_content = combined_response.strip()
             if not editorial_content:
                 raise ValueError(
-                    'Failed to extract editorial content and response is empty')
+                    'Failed to extract editorial content and response '
+                    'is empty')
 
         # Submit and verify the generated code
         verification_result = None
