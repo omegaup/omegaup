@@ -472,8 +472,8 @@ class EditorialWorker:
                 'editorial_es': editorials.get('es', ''),
                 'editorial_pt': editorials.get('pt', ''),
                 'upload_results': str(upload_results if editorials else {}),
-                'verification_result': str(
-                    editorial_result.get('solution_verification', '')),
+                'verification_result': self._extract_verification_verdict(
+                    editorial_result.get('solution_verification', {})),
                 'completed_at': str(time.time()),
                 'success': str(upload_success)
             }
@@ -539,6 +539,29 @@ class EditorialWorker:
             logging.exception(
                 'Failed to update job status for %s: %s', job_id, e)
 
+    def _extract_verification_verdict(self, verification_data: Any) -> str:
+        """
+        Extract verdict string from verification result for database storage.
+
+        Args:
+            verification_data: Verification result dict or other data
+
+        Returns:
+            Short verdict string (e.g., "AC", "WA") suitable for database
+            storage
+        """
+        if not verification_data:
+            return ''
+
+        if isinstance(verification_data, dict):
+            verdict = verification_data.get('verdict', '')
+            return str(verdict) if verdict else ''
+
+        if isinstance(verification_data, str):
+            return verification_data[:10]  # Limit length for database
+
+        return str(verification_data)[:10]
+
     def _update_database_status(
             self,
             job_id: str,
@@ -556,7 +579,7 @@ class EditorialWorker:
                 editorial_es = extra_data.get('editorial_es', '').strip()
                 editorial_pt = extra_data.get('editorial_pt', '').strip()
 
-                # Only create editorials dict if we have actual content
+                # Create editorials dict if we have content
                 if editorial_en or editorial_es or editorial_pt:
                     editorials = {}
                     if editorial_en:
@@ -571,7 +594,7 @@ class EditorialWorker:
                 if not validation_verdict:
                     validation_verdict = None
 
-            # Get API client from components (it has the user's auth_token)
+            # Get API client with user's auth token
             api_client = getattr(self, '_current_api_client', None)
             if not api_client:
                 logging.warning(
