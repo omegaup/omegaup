@@ -12,27 +12,6 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
-    <div v-if="course.is_admin" class="d-flex justify-content-end mb-3">
-      <button
-        data-button-enable-ai-ta
-        :class="[
-          'btn p-1 p-sm-2 mr-2',
-          isTogglingTA ? 'btn-light' : 'btn-primary',
-        ]"
-        type="button"
-        :disabled="isTogglingTA"
-        @click="toggleTeachingAssistant"
-      >
-        {{ teachingAssistantEnabled ? T.wordsDisableAITA : T.wordsEnableAITA }}
-      </button>
-      <button
-        data-button-run-ai-ta
-        class="btn btn-primary p-1 p-sm-2"
-        type="button"
-      >
-        {{ T.wordsRunAITA }}
-      </button>
-    </div>
     <div v-if="isAdminOrTeachingAssistant" class="my-5">
       <div class="my-4 markdown">
         <omegaup-markdown
@@ -392,13 +371,6 @@ export default class CourseDetails extends Vue {
     [Tab.Content]: T.courseDetailsTabContent,
   };
   selectedTab = Tab.Content;
-  teachingAssistantEnabled = false;
-  isTogglingTA = false;
-
-  mounted() {
-    this.teachingAssistantEnabled =
-      this.course.teaching_assistant_enabled || false;
-  }
 
   get overallCompletedPercentage(): number {
     let score = 0;
@@ -447,20 +419,6 @@ export default class CourseDetails extends Vue {
 
   get aliasWithUsername(): string {
     return `${this.course.alias}_${this.currentUsername}`;
-  }
-
-  toggleTeachingAssistant(): void {
-    if (this.isTogglingTA) return;
-    this.isTogglingTA = true;
-    this.$emit('toggle-teaching-assistant', {
-      course_alias: this.course.alias,
-    });
-  }
-
-  updateTeachingAssistantStatus(enabled: boolean): void {
-    this.teachingAssistantEnabled = enabled;
-    this.$set(this.course, 'teaching_assistant_enabled', enabled);
-    this.isTogglingTA = false;
   }
 }
 </script>
