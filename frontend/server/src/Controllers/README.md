@@ -4,6 +4,7 @@
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
   - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
+  - [`/api/aiEditorial/updateJob/`](#apiaieditorialupdatejob)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -354,6 +355,31 @@ Get status of an AI editorial job
 | Name  | Type                          |
 | ----- | ----------------------------- |
 | `job` | `types.AiEditorialJobDetails` |
+
+## `/api/aiEditorial/updateJob/`
+
+### Description
+
+Update job status and content from AI worker
+
+This endpoint is called by the Python AI worker to update job status
+and content in the database after processing completion.
+
+### Parameters
+
+| Name                 | Type           | Description |
+| -------------------- | -------------- | ----------- |
+| `job_id`             | `string`       |             |
+| `status`             | `string`       |             |
+| `error_message`      | `null\|string` |             |
+| `md_en`              | `null\|string` |             |
+| `md_es`              | `null\|string` |             |
+| `md_pt`              | `null\|string` |             |
+| `validation_verdict` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Authorization
 

@@ -118,6 +118,10 @@ export const AiEditorial = {
       })(x.job);
     return x;
   }),
+  updateJob: apiCall<
+    messages.AiEditorialUpdateJobRequest,
+    messages.AiEditorialUpdateJobResponse
+  >('/api/aiEditorial/updateJob/'),
 };
 
 export const Authorization = {
