@@ -2397,16 +2397,42 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'published'
             );
         } catch (\Exception $e) {
-            // If published revision doesn't exist, fallback to current commit
-            $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-                strval($problem->alias),
-                strval($problem->commit)
+            self::$log->warning(
+                "Failed to get published revision for {$problem->alias}, " .
+                'falling back to current commit',
+                ['exception' => $e],
             );
-        } finally {
-            // Always execute the download, regardless of which revision was selected
+            try {
+                $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                    strval($problem->alias),
+                    strval($problem->commit)
+                );
+            } catch (\Exception $e) {
+                self::$log->error(
+                    "Failed to get problem artifacts for {$problem->alias} " .
+                    'using current commit',
+                    ['exception' => $e],
+                );
+                throw new \OmegaUp\Exceptions\ServiceUnavailableException(
+                    'gitServerError',
+                    $e
+                );
+            }
+        }
+
+        try {
             if (!is_null($problemArtifacts)) {
                 $problemArtifacts->download();
             }
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to download problem {$problem->alias}",
+                ['exception' => $e],
+            );
+            throw new \OmegaUp\Exceptions\ServiceUnavailableException(
+                'downloadError',
+                $e
+            );
         }
 
         // Since all the headers and response have been sent, make the API
