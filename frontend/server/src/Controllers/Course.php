@@ -539,6 +539,23 @@ class Course extends \OmegaUp\Controllers\Controller {
         return $course;
     }
 
+    private static function ensureIsCourseAdmin(
+        string $courseAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): \OmegaUp\DAO\VO\Courses {
+        $course = self::validateCourseExists($courseAlias);
+
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin(
+                $identity,
+                $course
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return $course;
+    }
+
     /**
      * Gets the Group assigned to the Course.
      *
@@ -6138,16 +6155,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $course = self::validateCourseExists($courseAlias);
-
-        if (
-            !\OmegaUp\Authorization::isCourseAdmin(
-                $r->identity,
-                $course
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
+        $course = self::ensureIsCourseAdmin($courseAlias, $r->identity);
 
         $course->teaching_assistant_enabled = !$course->teaching_assistant_enabled;
 

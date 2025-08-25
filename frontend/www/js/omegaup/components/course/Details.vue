@@ -158,62 +158,62 @@
                   {{ T.courseContentEmpty }}
                 </td>
               </tr>
-                              <tr
-                  v-for="assignment in course.assignments"
-                  v-else
-                  :key="assignment.alias"
-                  :data-content-alias="assignment.alias"
-                  class="text-center"
-                >
-                  <td class="align-middle">
-                    <template v-if="assignment.assignment_type === 'homework'">
-                      <font-awesome-icon icon="file-alt" />
-                      <span class="ml-2">{{ T.wordsHomework }}</span>
-                    </template>
-                    <template v-else-if="assignment.assignment_type === 'lesson'">
-                      <font-awesome-icon icon="chalkboard-teacher" />
-                      <span class="ml-2">{{ T.wordsLesson }}</span>
-                    </template>
-                    <template v-else>
-                      <font-awesome-icon icon="list-alt" />
-                      <span class="ml-2">{{ T.wordsExam }}</span>
-                    </template>
-                  </td>
-                  <td>
-                    <a
-                      data-course-homework-button
-                      class="align-middle"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
-                    >
-                      {{ assignment.name }}
-                    </a>
-                  </td>
-                  <td v-if="!isAdminOrTeachingAssistant" class="align-middle">
-                    {{ getAssignmentProgress(progress[assignment.alias]) }}
-                  </td>
-                  <td class="align-middle">
-                    {{ getFormattedTime(assignment.finish_time) }}
-                  </td>
-                  <td v-if="isAdminOrTeachingAssistant" class="align-middle">
-                    <a
-                      data-course-scoreboard-button
-                      class="mr-2"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
-                    >
-                      <font-awesome-icon :icon="['fas', 'link']" />{{
-                        T.courseActionScoreboard
-                      }}</a
-                    >
-                    <a
-                      data-course-submisson-button
-                      class="mr-2"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
-                    >
-                      <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
-                      {{ T.wordsRuns }}
-                    </a>
-                  </td>
-                </tr>
+              <tr
+                v-for="assignment in course.assignments"
+                v-else
+                :key="assignment.alias"
+                :data-content-alias="assignment.alias"
+                class="text-center"
+              >
+                <td class="align-middle">
+                  <template v-if="assignment.assignment_type === 'homework'">
+                    <font-awesome-icon icon="file-alt" />
+                    <span class="ml-2">{{ T.wordsHomework }}</span>
+                  </template>
+                  <template v-else-if="assignment.assignment_type === 'lesson'">
+                    <font-awesome-icon icon="chalkboard-teacher" />
+                    <span class="ml-2">{{ T.wordsLesson }}</span>
+                  </template>
+                  <template v-else>
+                    <font-awesome-icon icon="list-alt" />
+                    <span class="ml-2">{{ T.wordsExam }}</span>
+                  </template>
+                </td>
+                <td>
+                  <a
+                    data-course-homework-button
+                    class="align-middle"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
+                  >
+                    {{ assignment.name }}
+                  </a>
+                </td>
+                <td v-if="!isAdminOrTeachingAssistant" class="align-middle">
+                  {{ getAssignmentProgress(progress[assignment.alias]) }}
+                </td>
+                <td class="align-middle">
+                  {{ getFormattedTime(assignment.finish_time) }}
+                </td>
+                <td v-if="isAdminOrTeachingAssistant" class="align-middle">
+                  <a
+                    data-course-scoreboard-button
+                    class="mr-2"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
+                  >
+                    <font-awesome-icon :icon="['fas', 'link']" />{{
+                      T.courseActionScoreboard
+                    }}</a
+                  >
+                  <a
+                    data-course-submisson-button
+                    class="mr-2"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
+                  >
+                    <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
+                    {{ T.wordsRuns }}
+                  </a>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
