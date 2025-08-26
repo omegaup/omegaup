@@ -459,7 +459,7 @@ class OmegaUpAPIClient:
         Args:
             run_guid: Run identifier to poll
             max_attempts: Maximum number of polling attempts
-            initial_delay: Initial delay between attempts 
+            initial_delay: Initial delay between attempts
                           (exponentially increased)
 
         Returns:

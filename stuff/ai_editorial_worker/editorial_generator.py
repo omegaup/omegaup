@@ -18,6 +18,7 @@ from solution_handler import SolutionHandler  # type: ignore
 
 class EditorialGenerator:
     """Generate editorials using a sophisticated 3-prompt system."""
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self,
                  config: Dict[str, Any]) -> None:
@@ -83,7 +84,8 @@ class EditorialGenerator:
             os.path.dirname(__file__), 'disclaimers.json')
         try:
             with open(disclaimer_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data: Dict[str, Any] = json.load(f)
+                return data
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logging.warning(
                 "Failed to load disclaimers: %s, using fallback", e)
@@ -94,13 +96,25 @@ class EditorialGenerator:
         return {
             'verification_disclaimers': {
                 'en': {
-                    'verified': "\n\n---\n*This editorial was generated using AI assistance and **verified**. The solution approach has been tested and works correctly.*",
-                    'not_verified': "\n\n---\n*This editorial was generated using AI assistance but **could not be verified**. Please verify the solution approach and report any issues.*",
-                    'error': "\n\n---\n*This editorial was generated using AI assistance but **verification failed** due to technical issues. Please verify the solution approach and report any issues.*"
+                    'verified': ("\n\n---\n*This editorial was generated "
+                               "using AI assistance and **verified**. The "
+                               "solution approach has been tested and works "
+                               "correctly.*"),
+                    'not_verified': ("\n\n---\n*This editorial was "
+                                   "generated using AI assistance but "
+                                   "**could not be verified**. Please verify "
+                                   "the solution approach and report any "
+                                   "issues.*"),
+                    'error': ("\n\n---\n*This editorial was generated using "
+                            "AI assistance but **verification failed** due "
+                            "to technical issues. Please verify the solution "
+                            "approach and report any issues.*")
                 }
             },
             'ai_generation_disclaimers': {
-                'en': "\n\n---\n*This editorial was generated using AI assistance. While we strive for accuracy, please verify the solution approach and report any issues.*"
+                'en': ("\n\n---\n*This editorial was generated using AI "
+                      "assistance. While we strive for accuracy, please "
+                      "verify the solution approach and report any issues.*")
             }
         }
 
@@ -366,10 +380,10 @@ class EditorialGenerator:
         lang_disclaimers = disclaimers.get(language, disclaimers.get('en', {}))
 
         if verification_result.get('verified', False):
-            return lang_disclaimers.get('verified', '')
+            return str(lang_disclaimers.get('verified', ''))
         if verification_result.get('verdict'):
-            return lang_disclaimers.get('not_verified', '')
-        return lang_disclaimers.get('error', '')
+            return str(lang_disclaimers.get('not_verified', ''))
+        return str(lang_disclaimers.get('error', ''))
 
     def _parse_combined_translation(self, response: str) -> Dict[str, str]:
         """Parse combined Spanish and Portuguese translation response."""
@@ -725,7 +739,7 @@ class EditorialGenerator:
         """Add AI generation disclaimer to editorial content."""
 
         disclaimers = self.disclaimers.get('ai_generation_disclaimers', {})
-        disclaimer = disclaimers.get(language, disclaimers.get('en', ''))
+        disclaimer = str(disclaimers.get(language, disclaimers.get('en', '')))
         return content + disclaimer
 
     def get_generation_stats(self) -> Dict[str, Any]:
