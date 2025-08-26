@@ -97,24 +97,24 @@ class EditorialGenerator:
             'verification_disclaimers': {
                 'en': {
                     'verified': ("\n\n---\n*This editorial was generated "
-                               "using AI assistance and **verified**. The "
-                               "solution approach has been tested and works "
-                               "correctly.*"),
+                                 "using AI assistance and **verified**. The "
+                                 "solution approach has been tested and works "
+                                 "correctly.*"),
                     'not_verified': ("\n\n---\n*This editorial was "
-                                   "generated using AI assistance but "
-                                   "**could not be verified**. Please verify "
-                                   "the solution approach and report any "
-                                   "issues.*"),
+                                     "generated using AI assistance but "
+                                     "**could not be verified**. Please "
+                                     "verify the solution approach and report "
+                                     "any issues.*"),
                     'error': ("\n\n---\n*This editorial was generated using "
-                            "AI assistance but **verification failed** due "
-                            "to technical issues. Please verify the solution "
-                            "approach and report any issues.*")
+                              "AI assistance but **verification failed** due "
+                              "to technical issues. Please verify the "
+                              "solution approach and report any issues.*")
                 }
             },
             'ai_generation_disclaimers': {
                 'en': ("\n\n---\n*This editorial was generated using AI "
-                      "assistance. While we strive for accuracy, please "
-                      "verify the solution approach and report any issues.*")
+                       "assistance. While we strive for accuracy, please "
+                       "verify the solution approach and report any issues.*")
             }
         }
 
