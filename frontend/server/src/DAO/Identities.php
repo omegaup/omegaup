@@ -534,8 +534,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         int $startTimestamp,
         int $endTimestamp
     ): array {
-        $start = gmdate('Y-m-d H:i:s', $startTimestamp);
-        $end   = gmdate('Y-m-d H:i:s', $endTimestamp);
+        $start = \OmegaUp\DAO\DAO::toMySQLTimestamp($startTimestamp);
+        $end   = \OmegaUp\DAO\DAO::toMySQLTimestamp($endTimestamp);
         $sql = '
             SELECT
                 "total" AS gender,
