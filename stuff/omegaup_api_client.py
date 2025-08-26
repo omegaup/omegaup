@@ -10,6 +10,7 @@ Can be used by any omegaUp tool/script that needs API access.
 
 import json
 import logging
+import random
 import time
 
 from typing import Dict, Any, List, Optional, Tuple
@@ -27,6 +28,7 @@ class OmegaUpAPIClient:
     - Automatic retry with exponential backoff
     - Rate limiting and error handling
     - Complete omegaUp API coverage for any tool
+    - Exponential backoff for verdict polling
     """
 
     def __init__(self, auth_token: str, base_url: str = 'https://omegaup.com',
@@ -449,15 +451,16 @@ class OmegaUpAPIClient:
             logging.error("Error getting detailed run status: %s", e)
             return ('JE', 0.0, '0')
 
-    def wait_for_verdict(self, run_guid: str, max_attempts: int = 30,
-                         delay_seconds: int = 2) -> Dict[str, Any]:
+    def wait_for_verdict(self, run_guid: str, max_attempts: int = 20,
+                         initial_delay: float = 1.0) -> Dict[str, Any]:
         """
-        Wait for run verdict with polling strategy.
+        Wait for run verdict with exponential backoff polling strategy.
 
         Args:
             run_guid: Run identifier to poll
             max_attempts: Maximum number of polling attempts
-            delay_seconds: Initial delay between attempts
+            initial_delay: Initial delay between attempts 
+                          (exponentially increased)
 
         Returns:
             Dict with verdict information: {
@@ -470,6 +473,8 @@ class OmegaUpAPIClient:
         """
 
         logging.info("Waiting for verdict for run: %s", run_guid)
+
+        delay_seconds = initial_delay
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -534,9 +539,20 @@ class OmegaUpAPIClient:
                         run_guid, verdict, attempt)
                     return result
 
-                # Linear backoff
-                if attempt % 5 == 0:
-                    delay_seconds = min(delay_seconds + 1, 5)
+                # Exponential backoff with jitter
+                if attempt < max_attempts:
+                    base_delay = initial_delay
+                    max_delay = 16.0
+                    jitter_factor = 0.1
+
+                    # Exponential: 2^(attempt//3) for grouping
+                    exponential_delay = min(
+                        base_delay * (2 ** (attempt // 3)), max_delay)
+
+                    # Add jitter to avoid thundering herd
+                    jitter = (exponential_delay * jitter_factor *
+                              (2 * random.random() - 1))
+                    delay_seconds = max(0.5, exponential_delay + jitter)
 
             except (ConnectionError, TypeError, ValueError) as e:
                 logging.warning(

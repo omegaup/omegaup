@@ -4,7 +4,9 @@
 Uses secure configuration management following omegaUp patterns.
 """
 
+import json
 import logging
+import re
 from typing import Dict, Any, Optional, List, cast, Tuple
 
 import sys
@@ -68,9 +70,39 @@ class EditorialGenerator:
             api_client=self.api_client
         )
 
+        # Load disclaimers from JSON file
+        self.disclaimers = self._load_disclaimers()
+
         logging.info(
             "Editorial generator initialized with provider: %s",
             self.llm_config['provider'])
+
+    def _load_disclaimers(self) -> Dict[str, Any]:
+        """Load disclaimers from JSON file."""
+        disclaimer_file = os.path.join(
+            os.path.dirname(__file__), 'disclaimers.json')
+        try:
+            with open(disclaimer_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            logging.warning(
+                "Failed to load disclaimers: %s, using fallback", e)
+            return self._get_fallback_disclaimers()
+
+    def _get_fallback_disclaimers(self) -> Dict[str, Any]:
+        """Fallback disclaimers if JSON file fails to load."""
+        return {
+            'verification_disclaimers': {
+                'en': {
+                    'verified': "\n\n---\n*This editorial was generated using AI assistance and **verified**. The solution approach has been tested and works correctly.*",
+                    'not_verified': "\n\n---\n*This editorial was generated using AI assistance but **could not be verified**. Please verify the solution approach and report any issues.*",
+                    'error': "\n\n---\n*This editorial was generated using AI assistance but **verification failed** due to technical issues. Please verify the solution approach and report any issues.*"
+                }
+            },
+            'ai_generation_disclaimers': {
+                'en': "\n\n---\n*This editorial was generated using AI assistance. While we strive for accuracy, please verify the solution approach and report any issues.*"
+            }
+        }
 
     def generate_editorial_prompt(self,
                                   problem_data: Dict[str, Any],
@@ -118,121 +150,132 @@ class EditorialGenerator:
             logging.exception("Error generating editorial: %s", e)
             return None
 
-    def _find_delimiter_positions(
-        self, response: str) -> Tuple[int, int, int, int]:
-        """Find positions of editorial and code delimiters."""
-        editorial_delimiters = [
-            '=== EDITORIAL ===',
-            '== = EDITORIAL == =',
-            '### EDITORIAL',
-            '# EDITORIAL'
-        ]
+    def _parse_editorial_and_code_regex(
+        self, response: str) -> Tuple[str, Optional[str]]:
+        """Parse editorial and code using regex patterns."""
+        try:
+            logging.info("Parsing combined editorial and code response")
+            logging.debug("Response length: %d characters", len(response))
 
-        code_delimiters = [
-            '=== SOLUTION CODE ===',
-            '== = SOLUTION CODE == =',
-            '### SOLUTION CODE',
-            '# SOLUTION CODE',
-            '### Solution',
-            '# Solution'
-        ]
+            # Log first 500 characters for debugging
+            preview = response[:500].replace('\n', '\\n')
+            logging.debug("Response preview: %s", preview)
 
-        editorial_start = -1
-        editorial_delimiter_len = 0
-        code_start = -1
-        code_delimiter_len = 0
+            # Comprehensive regex pattern to match the structure
+            pattern = r'''
+                # Editorial delimiter (flexible matching)
+                (?P<editorial_delim>
+                    ={3,}\s*EDITORIAL\s*={3,}|
+                    ==\s*=\s*EDITORIAL\s*==\s*=|
+                    #{1,3}\s*EDITORIAL
+                )
+                # Editorial content (non-greedy until code section or end)
+                (?P<editorial_content>.*?)
+                (?:
+                    # Code delimiter (flexible matching)
+                    (?P<code_delim>
+                        ={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|
+                        ==\s*=\s*(?:SOLUTION\s*)?CODE\s*==\s*=|
+                        #{1,3}\s*(?:SOLUTION\s*)?(?:CODE|Solution)
+                    )
+                    # Code section content
+                    (?P<code_section>.*)
+                |
+                    # No code section found
+                    $
+                )
+            '''
 
-        # Find editorial delimiter
-        for delimiter in editorial_delimiters:
-            pos = response.find(delimiter)
-            if pos != -1:
-                editorial_start = pos
-                editorial_delimiter_len = len(delimiter)
-                logging.debug(
-                    "Found editorial delimiter: %s at %d", delimiter, pos)
-                break
+            match = re.search(pattern, response, re.DOTALL | re.VERBOSE)
 
-        # Find code delimiter
-        for delimiter in code_delimiters:
-            pos = response.find(delimiter)
-            if pos != -1:
-                code_start = pos
-                code_delimiter_len = len(delimiter)
-                logging.debug(
-                    "Found code delimiter: %s at %d", delimiter, pos)
-                break
+            editorial_content = None
+            code_content = None
 
-        return (editorial_start, editorial_delimiter_len,
-                code_start, code_delimiter_len)
+            if match:
+                # Extract editorial content
+                editorial_raw = match.group('editorial_content')
+                if editorial_raw:
+                    editorial_content = editorial_raw.strip()
+                    if editorial_content:
+                        logging.debug(
+                            "Found editorial delimiter: %s",
+                            match.group('editorial_delim'))
+                        logging.info(
+                            "Extracted editorial (%d chars)",
+                            len(editorial_content))
 
-    def _extract_editorial_content(
-        self,
-        response: str,
-        editorial_start: int,
-        editorial_delimiter_len: int,
-        code_start: int) -> Optional[str]:
-        """Extract editorial content from response."""
-        if editorial_start == -1:
+                # Extract code content if code section exists
+                code_section = match.group('code_section')
+                if code_section:
+                    logging.debug(
+                        "Found code delimiter: %s",
+                        match.group('code_delim'))
+                    code_content = self._extract_cpp_code(code_section)
+
+            # Fallback strategies if no structured content found
+            if not editorial_content:
+                editorial_content = self._apply_fallback_extraction_regex(
+                    response)
+
+            # Log final extraction results
+            logging.info(
+                "Extraction results: editorial=%s chars, code=%s chars",
+                len(editorial_content) if editorial_content else 0,
+                len(code_content) if code_content else 0)
+
+            if not editorial_content:
+                logging.error("Failed to extract editorial content")
+                return "", None
+
+            return editorial_content, code_content
+
+        except (TypeError, ValueError, AttributeError, re.error) as e:
+            logging.exception("Error parsing editorial and code: %s", e)
+            return "", None
+
+    def _extract_cpp_code(self, code_section: str) -> Optional[str]:
+        """Extract C++ code from code section using regex."""
+        if not code_section:
             return None
 
-        start_pos = editorial_start + editorial_delimiter_len
-        if code_start != -1:
-            editorial_content = response[start_pos:code_start].strip()
-        else:
-            editorial_content = response[start_pos:].strip()
+        code_section = code_section.strip()
 
-        logging.info("Extracted editorial (%d chars)", len(editorial_content))
-        return editorial_content
+        # Try to extract C++ code from markdown code block
+        cpp_block_pattern = r'```cpp\s*\n(.*?)\n\s*```'
+        cpp_match = re.search(cpp_block_pattern, code_section, re.DOTALL)
 
-    def _extract_code_content(self, response: str, code_start: int,
-                              code_delimiter_len: int) -> Optional[str]:
-        """Extract code content from response."""
-        if code_start == -1:
-            return None
+        if cpp_match:
+            code_content = cpp_match.group(1).strip()
+            logging.info("Extracted C++ code (%d chars)", len(code_content))
+            return code_content
 
-        start_pos = code_start + code_delimiter_len
-        code_section = response[start_pos:].strip()
+        # Fallback: look for code starting with #include
+        logging.warning("No ```cpp found, trying to extract code directly")
+        include_pattern = r'(#include.*?)(?=\n\s*(?:={3,}|#{1,3}|$))'
+        include_match = re.search(include_pattern, code_section, re.DOTALL)
 
-        # Extract C++ code from markdown code block
-        cpp_start = code_section.find('```cpp')
-        if cpp_start != -1:
-            cpp_content_start = cpp_start + len('```cpp')
-            cpp_end = code_section.find('```', cpp_content_start)
-            if cpp_end != -1:
-                code_content = code_section[cpp_content_start:cpp_end].strip()
-                logging.info(
-                    "Extracted C++ code (%d chars)",
-                    len(code_content))
-                return code_content
+        if include_match:
+            code_content = include_match.group(1).strip()
+            logging.info(
+                "Extracted C++ code without markdown (%d chars)",
+                len(code_content))
+            return code_content
 
-            logging.warning("No closing ``` found for C++ code")
-        else:
-            # Try to find code without markdown blocks
-            logging.warning(
-                "No ```cpp found, trying to extract code directly")
-            # Look for #include as start of C++ code
-            include_pos = code_section.find('#include')
-            if include_pos != -1:
-                code_content = code_section[include_pos:].strip()
-                logging.info(
-                    "Extracted C++ code without markdown (%d chars)",
-                    len(code_content))
-                return code_content
-
+        logging.warning("No C++ code found in code section")
         return None
 
-    def _apply_fallback_extraction(
-        self,
-        response: str,
-        editorial_content: Optional[str],
-        code_start: int) -> str:
-        """Apply fallback extraction strategies for editorial content."""
-        if editorial_content:
-            return editorial_content
+    def _apply_fallback_extraction_regex(self, response: str) -> str:
+        """Apply fallback extraction strategies using regex."""
+        # Try to find any code delimiter and extract everything before it
+        code_delim_pattern = (
+            r'(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|'
+            r'==\s*=\s*(?:SOLUTION\s*)?CODE\s*==\s*=|'
+            r'#{1,3}\s*(?:SOLUTION\s*)?(?:CODE|Solution))'
+        )
 
-        # Try to extract everything before code
-        if code_start != -1:
-            editorial_content = response[:code_start].strip()
+        code_match = re.search(code_delim_pattern, response)
+        if code_match:
+            editorial_content = response[:code_match.start()].strip()
             if editorial_content:
                 logging.info(
                     "Fallback: extracted editorial as everything before "
@@ -248,44 +291,7 @@ class EditorialGenerator:
     def _parse_editorial_and_code(
         self, response: str) -> Tuple[str, Optional[str]]:
         """Parse combined editorial and code response."""
-        try:
-            logging.info("Parsing combined editorial and code response")
-            logging.debug("Response length: %d characters", len(response))
-
-            # Log first 500 characters for debugging
-            preview = response[:500].replace('\n', '\\n')
-            logging.debug("Response preview: %s", preview)
-
-            # Find delimiter positions
-            positions = self._find_delimiter_positions(response)
-            editorial_start, editorial_delimiter_len = positions[:2]
-            code_start, code_delimiter_len = positions[2:]
-
-            # Extract content using helper methods
-            editorial_content = self._extract_editorial_content(
-                response, editorial_start, editorial_delimiter_len, code_start)
-            code_content = self._extract_code_content(
-                response, code_start, code_delimiter_len)
-
-            # Apply fallback extraction
-            editorial_content = self._apply_fallback_extraction(
-                response, editorial_content, code_start)
-
-            # Log final extraction results
-            logging.info(
-                "Extraction results: editorial=%s chars, code=%s chars",
-                len(editorial_content) if editorial_content else 0,
-                len(code_content) if code_content else 0)
-
-            if not editorial_content:
-                logging.error("Failed to extract editorial content")
-                return "", None
-
-            return editorial_content, code_content
-
-        except (TypeError, ValueError, AttributeError) as e:
-            logging.exception("Error parsing editorial and code: %s", e)
-            return "", None
+        return self._parse_editorial_and_code_regex(response)
 
     def _submit_and_verify_solution(self, problem_alias: str,
                                     cpp_code: str) -> Dict[str, Any]:
@@ -355,73 +361,15 @@ class EditorialGenerator:
             str, Any], language: str) -> str:
         """Generate language-specific disclaimer based on verification."""
 
-        disclaimers = {
-            'en': {
-                'verified': (
-                    "\n\n---\n*This editorial was generated using AI "
-                    "assistance and **verified**. "
-                    "The solution approach has been tested "
-                    "and works correctly.*"
-                ),
-                'not_verified': (
-                    "\n\n---\n*This editorial was generated using AI "
-                    "assistance but **could not be verified**. "
-                    "Please verify the solution approach and "
-                    "report any issues.*"
-                ),
-                'error': (
-                    "\n\n---\n*This editorial was generated using AI "
-                    "assistance but **verification failed** due to technical "
-                    "issues. Please verify the solution approach and report "
-                    "any issues.*"
-                )
-            },
-            'es': {
-                'verified': (
-                    "\n\n---\n*Este editorial fue generado con asistencia de "
-                    "IA y **verificado**. El enfoque de solución ha sido "
-                    "probado y funciona correctamente.*"
-                ),
-                'not_verified': (
-                    "\n\n---\n*Este editorial fue generado con asistencia de "
-                    "IA pero **no pudo ser verificado**. Por favor verifica "
-                    "el enfoque de la solución y reporta cualquier problema.*"
-                ),
-                'error': (
-                    "\n\n---\n*Este editorial fue generado con asistencia de "
-                    "IA pero **la verificación falló** debido a problemas "
-                    "técnicos. Por favor verifica el enfoque de la solución "
-                    "y reporta cualquier problema.*"
-                )
-            },
-            'pt': {
-                'verified': (
-                    "\n\n---\n*Este editorial foi gerado com assistência de "
-                    "IA e **verificado**. A abordagem da solução foi "
-                    "testada e funciona corretamente.*"
-                ),
-                'not_verified': (
-                    "\n\n---\n*Este editorial foi gerado com assistência de "
-                    "IA mas **não pôde ser verificado**. Por favor "
-                    "verifique a abordagem da solução e reporte quaisquer "
-                    "problemas.*"
-                ),
-                'error': (
-                    "\n\n---\n*Este editorial foi gerado com assistência de "
-                    "IA mas **a verificação falhou** devido a problemas "
-                    "técnicos. Por favor verifique a abordagem da solução "
-                    "e reporte quaisquer problemas.*"
-                )
-            }
-        }
+        disclaimers = self.disclaimers.get('verification_disclaimers', {})
 
-        lang_disclaimers = disclaimers.get(language, disclaimers['en'])
+        lang_disclaimers = disclaimers.get(language, disclaimers.get('en', {}))
 
         if verification_result.get('verified', False):
-            return lang_disclaimers['verified']
+            return lang_disclaimers.get('verified', '')
         if verification_result.get('verdict'):
-            return lang_disclaimers['not_verified']
-        return lang_disclaimers['error']
+            return lang_disclaimers.get('not_verified', '')
+        return lang_disclaimers.get('error', '')
 
     def _parse_combined_translation(self, response: str) -> Dict[str, str]:
         """Parse combined Spanish and Portuguese translation response."""
@@ -776,21 +724,8 @@ class EditorialGenerator:
     def add_ai_disclaimer(self, content: str, language: str) -> str:
         """Add AI generation disclaimer to editorial content."""
 
-        disclaimers = {
-            'en': ("\n\n---\n*This editorial was generated using AI "
-                   "assistance. While we strive for accuracy, please verify "
-                   "the solution approach and report any issues.*"),
-            'es': ("\n\n---\n*Este editorial fue generado con asistencia de "
-                   "IA. Aunque nos esforzamos por la precisión, por favor "
-                   "verifica el enfoque de la solución y reporta cualquier "
-                   "problema.*"),
-            'pt': ("\n\n---\n*Este editorial foi gerado com assistência de "
-                   "IA. Embora nos esforcemos pela precisão, por favor "
-                   "verifique a abordagem da solução e reporte quaisquer "
-                   "problemas.*")
-        }
-
-        disclaimer = disclaimers.get(language, disclaimers['en'])
+        disclaimers = self.disclaimers.get('ai_generation_disclaimers', {})
+        disclaimer = disclaimers.get(language, disclaimers.get('en', ''))
         return content + disclaimer
 
     def get_generation_stats(self) -> Dict[str, Any]:
