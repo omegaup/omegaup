@@ -151,7 +151,10 @@ class EditorialGenerator:
             # Simple and reliable regex pattern
             # First try: Extract content between === EDITORIAL === and === CODE
             # === (or end)
-            editorial_pattern = r'={3,}\s*EDITORIAL\s*={3,}\s*\n?(.*?)(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|$)'
+            editorial_pattern = (
+                r'={3,}\s*EDITORIAL\s*={3,}\s*\n?(.*?)'
+                r'(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|$)'
+            )
             editorial_match = re.search(editorial_pattern, response, re.DOTALL)
 
             editorial_content = None
@@ -165,7 +168,9 @@ class EditorialGenerator:
                         len(editorial_content))
 
                     # Look for code section
-                    code_pattern = r'={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}\s*\n?(.*?)$'
+                    code_pattern = (
+                        r'={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}\s*\n?(.*?)$'
+                    )
                     code_match = re.search(code_pattern, response, re.DOTALL)
                     if code_match:
                         code_content = self._extract_cpp_code(
@@ -236,14 +241,11 @@ class EditorialGenerator:
         if code_match:
             editorial_content = response[:code_match.start()].strip()
             if editorial_content:
-                # CRITICAL FIX: Remove editorial delimiter from the extracted content
-                # Try to remove === EDITORIAL === pattern from the beginning
-                # Remove editorial delimiter if present
+                # Remove editorial delimiter from the extracted content
+                # Remove === EDITORIAL === pattern if present
                 if '=== EDITORIAL ===' in editorial_content:
                     editorial_content = editorial_content.replace(
                         '=== EDITORIAL ===', '').strip()
-                editorial_content = re.sub(
-                    editorial_delim_pattern, '', editorial_content).strip()
 
                 logging.info(
                     "Fallback: extracted editorial as everything before "
@@ -254,12 +256,10 @@ class EditorialGenerator:
         # Use entire response as fallback
         editorial_content = response.strip()
 
-        # CRITICAL FIX: Remove editorial delimiter from entire response too
-        editorial_delim_pattern = r'^={3,}\s*EDITORIAL\s*={3,}\s*\n?'
-        editorial_content = re.sub(
-            editorial_delim_pattern,
-            '',
-            editorial_content).strip()
+        # Remove editorial delimiter from entire response if present
+        if '=== EDITORIAL ===' in editorial_content:
+            editorial_content = editorial_content.replace(
+                '=== EDITORIAL ===', '').strip()
 
         logging.warning("Fallback: using entire response as editorial")
         return editorial_content
