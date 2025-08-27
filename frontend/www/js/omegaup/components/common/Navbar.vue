@@ -67,61 +67,6 @@
             :is-under13-user="isUnder13User"
             :navbar-section="navbarSection"
           >
-            <template v-if="hasTeachingObjective" #contests-items>
-              <a
-                v-if="isMainUserIdentity"
-                class="dropdown-item"
-                href="/contest/new/"
-                data-nav-contests-create
-              >
-                {{ T.contestsCreate }}
-              </a>
-              <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
-                {{ T.navViewContests }}
-              </a>
-              <a
-                v-if="isMainUserIdentity"
-                class="dropdown-item"
-                href="/scoreboardmerge/"
-              >
-                {{ T.contestsJoinScoreboards }}
-              </a>
-            </template>
-            <template v-if="hasTeachingObjective" #courses-items>
-              <template v-if="isMainUserIdentity">
-                <a
-                  class="dropdown-item"
-                  href="/course/new/"
-                  data-nav-courses-create
-                >
-                  {{ T.courseCreate }}
-                </a>
-              </template>
-              <a class="dropdown-item" href="/course/" data-nav-courses-all>
-                {{ T.navViewCourses }}
-              </a>
-            </template>
-            <template v-if="hasTeachingObjective" #problems-items>
-              <a
-                v-if="isLoggedIn && isMainUserIdentity"
-                class="dropdown-item"
-                href="/problem/new/"
-                data-nav-problems-create
-                >{{ T.myproblemsListCreateProblem }}</a
-              >
-              <a
-                class="dropdown-item"
-                href="/problem/collection/"
-                data-nav-problems-collection
-                >{{ T.navViewProblems }}</a
-              >
-              <a class="dropdown-item" href="/submissions/">{{
-                T.navViewLatestSubmissions
-              }}</a>
-              <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
-                T.navQualityNominationQueue
-              }}</a>
-            </template>
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
 
@@ -228,85 +173,62 @@
                     <a class="dropdown-item" href="/badge/list/">{{
                       T.navViewBadges
                     }}</a>
-                    <template v-if="hasTeachingObjective">
-                      <a class="dropdown-item" href="/problem/mine">{{
-                        T.navMyProblems
-                      }}</a>
-                      <a
-                        class="dropdown-item"
-                        href="/course/mine"
-                        data-nav-courses-mine
-                        >{{ T.navMyCourses }}</a
-                      >
-                      <a
-                        class="dropdown-item"
-                        href="/contest/mine"
-                        data-nav-user-contests
-                        >{{ T.navMyContests }}</a
-                      >
-                      <a
-                        class="dropdown-item"
-                        href="/profile/#created-content"
-                        >{{ T.navMyContent }}</a
-                      >
-                    </template>
-                    <template v-else>
-                      <a class="dropdown-item" href="/profile/#problems">{{
-                        T.navProfileProblems
-                      }}</a>
-                      <a
-                        class="dropdown-item"
-                        href="/course/#enrolled"
-                        data-nav-courses-mine
-                        >{{ T.navCoursesEnrolled }}</a
-                      >
-                      <a
-                        class="dropdown-item"
-                        href="/arena/?page=1&tab_name=current&sort_order=none&filter=signedup"
-                        data-nav-user-contests-enrolled
-                        >{{ T.navContestsEnrolled }}</a
-                      >
-                      <a
-                        v-if="!isUnder13User"
-                        class="dropdown-item"
-                        href="/dependents"
-                        >{{ T.navDependents }}</a
-                      >
-                      <form v-if="!isUnder13User" class="collapse-submenu">
-                        <div class="btn-group">
-                          <a
-                            class="dropdown-item"
-                            href="/profile/#created-content"
-                            >{{ T.navMyContent }}</a
-                          >
-                          <button
-                            type="button"
-                            class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
-                            data-toggle="collapse"
-                            data-target=".collapse-links"
-                            aria-expanded="false"
-                            aria-controls="collapse-links"
-                          ></button>
-                        </div>
-                        <div class="collapse collapse-links pl-3">
-                          <a class="dropdown-item" href="/problem/mine">{{
-                            T.navMyProblems
-                          }}</a>
-                          <a
-                            class="dropdown-item"
-                            href="/course/mine"
-                            data-nav-courses-mine
-                            >{{ T.navMyCourses }}</a
-                          >
-                          <a
-                            class="dropdown-item"
-                            href="/contest/mine"
-                            data-nav-user-contests
-                            >{{ T.navMyContests }}</a
-                          >
-                        </div>
-                      </form>
-                    </template>
+                    <a class="dropdown-item" href="/profile/#problems">{{
+                      T.navProfileProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/#enrolled"
+                      data-nav-courses-mine
+                      >{{ T.navCoursesEnrolled }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/arena/?page=1&tab_name=current&sort_order=none&filter=signedup"
+                      data-nav-user-contests-enrolled
+                      >{{ T.navContestsEnrolled }}</a
+                    >
+                    <a
+                      v-if="!isUnder13User"
+                      class="dropdown-item"
+                      href="/dependents"
+                      >{{ T.navDependents }}</a
+                    >
+                    <form v-if="!isUnder13User" class="collapse-submenu">
+                      <div class="btn-group">
+                        <a
+                          class="dropdown-item"
+                          href="/profile/#created-content"
+                          >{{ T.navMyContent }}</a
+                        >
+                        <button
+                          type="button"
+                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                          data-toggle="collapse"
+                          data-target=".collapse-links"
+                          aria-expanded="false"
+                          aria-controls="collapse-links"
+                        ></button>
+                      </div>
+                      <div class="collapse collapse-links pl-3">
+                        <a class="dropdown-item" href="/problem/mine">{{
+                          T.navMyProblems
+                        }}</a>
+                        <a
+                          class="dropdown-item"
+                          href="/course/mine"
+                          data-nav-courses-mine
+                          >{{ T.navMyCourses }}</a
+                        >
+                        <a
+                          class="dropdown-item"
+                          href="/contest/mine"
+                          data-nav-user-contests
+                          >{{ T.navMyContests }}</a
+                        >
+                      </div>
+                    </form>
+
                     <a
                       class="dropdown-item"
                       href="/group/"
