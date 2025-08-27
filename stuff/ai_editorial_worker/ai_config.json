@@ -30,7 +30,6 @@
   },
   "prompts": {
     "editorial_generation": "prompts/editorial_generation.txt",
-    "solution_generation": "prompts/solution_generation.txt",
     "translation": "prompts/translation.txt"
   }
 }
