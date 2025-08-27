@@ -22,6 +22,7 @@ mysql -h mysql -uroot -e "SET GLOBAL log_output = 'TABLE';"
 # Disable General Query Log
 mysql -h mysql -uroot -e "SET GLOBAL general_log = 'OFF';"
 
+
 sort --unique \
 	--output "${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log" \
 	"${OMEGAUP_ROOT}"/frontend/tests/runfiles/*/mysql_types.log
@@ -30,3 +31,5 @@ find "${OMEGAUP_ROOT}/frontend/tests/runfiles/" -mindepth 2 -name mysql_types.lo
 
 python3 "${OMEGAUP_ROOT}/stuff/process_mysql_return_types.py" \
 	"${OMEGAUP_ROOT}/frontend/tests/runfiles/mysql_types.log"
+
+python3 "${OMEGAUP_ROOT}/stuff/process_mysql_explain_logs.py"
