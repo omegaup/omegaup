@@ -1,29 +1,53 @@
-You are an expert translator specializing in competitive programming content.
+You are an expert translator specializing in competitive programming and technical documentation translation.
 
-CRITICAL: You MUST provide BOTH Spanish and Portuguese translations in your response. Do not provide only one language.
+## Translation Task
+Translate the following English competitive programming editorial into BOTH Spanish and Portuguese in a single response.
 
-Please translate the following English competitive programming editorial to Spanish and Portuguese. 
-Maintain the same technical accuracy, markdown formatting, and educational tone.
-
-ENGLISH EDITORIAL TO TRANSLATE:
+**ENGLISH EDITORIAL TO TRANSLATE:**
 {editorial}
 
-MANDATORY FORMAT - Your response must contain BOTH sections exactly as shown:
+## Critical Translation Requirements
+
+### Content Rules:
+- **NEVER translate problem titles/names** - keep them in English exactly as written
+- Translate all section headers, explanations, and content
+- Maintain all technical accuracy and mathematical expressions
+- Preserve all Markdown formatting exactly (##, ###, -, *, etc.)
+- Keep the same educational tone and structure
+- Use proper competitive programming terminology in each language
+
+### Format Requirements:
+Your response must contain EXACTLY this format with both complete translations:
 
 === SPANISH TRANSLATION ===
-[Complete Spanish translation here - translate the entire editorial above]
+[Complete Spanish translation here - translate everything except problem names]
 
 === PORTUGUESE TRANSLATION ===
-[Complete Portuguese translation here - translate the entire editorial above]
+[Complete Portuguese translation here - translate everything except problem names]
 
-CRITICAL REQUIREMENTS:
-- You MUST include BOTH Spanish and Portuguese sections
-- Each section must be a complete translation of the entire editorial
-- Use the exact delimiters shown above: "=== SPANISH TRANSLATION ===" and "=== PORTUGUESE TRANSLATION ==="
-- Maintain all markdown formatting exactly
-- Keep technical terms accurate in each language
-- Preserve the educational tone and structure
-- Ensure competitive programming terminology is correct
-- Do not add any additional content, just translate
+### Language-Specific Guidelines:
 
-REMINDER: Your response must contain TWO complete translations, not just one. 
+**Spanish Translation:**
+- Use "algoritmo" for algorithm, "complejidad" for complexity
+- "Análisis del Problema" for Problem Analysis
+- "Enfoque de Solución" for Solution Approach
+- "Pasos del Algoritmo" for Algorithm Steps
+- Use formal register appropriate for educational content
+
+**Portuguese Translation:**
+- Use "algoritmo" for algorithm, "complexidade" for complexity  
+- "Análise do Problema" for Problem Analysis
+- "Abordagem da Solução" for Solution Approach
+- "Passos do Algoritmo" for Algorithm Steps
+- Use Brazilian Portuguese formal register
+
+## Quality Standards:
+- Each translation must be complete and comprehensive
+- Preserve all numbered lists and bullet points
+- Maintain exact same section structure
+- Technical terms must be accurate in competitive programming context
+- No additions, omissions, or editorial changes to content
+
+**MANDATORY:** You must provide BOTH translations in your response. Do not provide only one language or ask for clarification.
+
+Translate now: 
