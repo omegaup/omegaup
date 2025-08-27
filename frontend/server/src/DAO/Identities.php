@@ -534,6 +534,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         int $startTimestamp,
         int $endTimestamp
     ): array {
+        $start = \OmegaUp\DAO\DAO::toMySQLTimestamp($startTimestamp);
+        $end   = \OmegaUp\DAO\DAO::toMySQLTimestamp($endTimestamp);
         $sql = '
             SELECT
                 "total" AS gender,
@@ -541,7 +543,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             FROM
                 Identity_Login_Log ill
             WHERE
-                ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+                ill.time BETWEEN ? AND ?
             UNION
             SELECT
                 IFNULL(i.gender, "unknown") AS gender,
@@ -551,14 +553,14 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             INNER JOIN
                 Identities i ON i.identity_id = ill.identity_id
             WHERE
-                ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
+                ill.time BETWEEN ? AND ?
             GROUP BY
                 gender;
             ';
         /** @var array{gender: string, users: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]
+            [$start, $end, $start, $end]
         );
     }
 
