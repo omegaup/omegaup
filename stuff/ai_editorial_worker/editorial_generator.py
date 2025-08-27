@@ -88,35 +88,8 @@ class EditorialGenerator:
                 return data
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logging.warning(
-                "Failed to load disclaimers: %s, using fallback", e)
-            return self._get_fallback_disclaimers()
-
-    def _get_fallback_disclaimers(self) -> Dict[str, Any]:
-        """Fallback disclaimers if JSON file fails to load."""
-        return {
-            'verification_disclaimers': {
-                'en': {
-                    'verified': ("\n\n---\n*This editorial was generated "
-                                 "using AI assistance and **verified**. The "
-                                 "solution approach has been tested and works "
-                                 "correctly.*"),
-                    'not_verified': ("\n\n---\n*This editorial was "
-                                     "generated using AI assistance but "
-                                     "**could not be verified**. Please "
-                                     "verify the solution approach and report "
-                                     "any issues.*"),
-                    'error': ("\n\n---\n*This editorial was generated using "
-                              "AI assistance but **verification failed** due "
-                              "to technical issues. Please verify the "
-                              "solution approach and report any issues.*")
-                }
-            },
-            'ai_generation_disclaimers': {
-                'en': ("\n\n---\n*This editorial was generated using AI "
-                       "assistance. While we strive for accuracy, please "
-                       "verify the solution approach and report any issues.*")
-            }
-        }
+                "Failed to load disclaimers: %s, using empty fallback", e)
+            return {}
 
     def generate_editorial_prompt(self,
                                   problem_data: Dict[str, Any],
@@ -175,56 +148,28 @@ class EditorialGenerator:
             preview = response[:500].replace('\n', '\\n')
             logging.debug("Response preview: %s", preview)
 
-            # Comprehensive regex pattern to match the structure
-            pattern = r'''
-                # Editorial delimiter (flexible matching)
-                (?P<editorial_delim>
-                    ={3,}\s*EDITORIAL\s*={3,}|
-                    ==\s*=\s*EDITORIAL\s*==\s*=|
-                    #{1,3}\s*EDITORIAL
-                )
-                # Editorial content (non-greedy until code section or end)
-                (?P<editorial_content>.*?)
-                (?:
-                    # Code delimiter (flexible matching)
-                    (?P<code_delim>
-                        ={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|
-                        ==\s*=\s*(?:SOLUTION\s*)?CODE\s*==\s*=|
-                        #{1,3}\s*(?:SOLUTION\s*)?(?:CODE|Solution)
-                    )
-                    # Code section content
-                    (?P<code_section>.*)
-                |
-                    # No code section found
-                    $
-                )
-            '''
-
-            match = re.search(pattern, response, re.DOTALL | re.VERBOSE)
+            # Simple and reliable regex pattern
+            # First try: Extract content between === EDITORIAL === and === CODE
+            # === (or end)
+            editorial_pattern = r'={3,}\s*EDITORIAL\s*={3,}\s*\n?(.*?)(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|$)'
+            editorial_match = re.search(editorial_pattern, response, re.DOTALL)
 
             editorial_content = None
             code_content = None
 
-            if match:
-                # Extract editorial content
-                editorial_raw = match.group('editorial_content')
-                if editorial_raw:
-                    editorial_content = editorial_raw.strip()
-                    if editorial_content:
-                        logging.debug(
-                            "Found editorial delimiter: %s",
-                            match.group('editorial_delim'))
-                        logging.info(
-                            "Extracted editorial (%d chars)",
-                            len(editorial_content))
+            if editorial_match:
+                editorial_content = editorial_match.group(1).strip()
+                if editorial_content:
+                    logging.info(
+                        "Extracted editorial (%d chars)",
+                        len(editorial_content))
 
-                # Extract code content if code section exists
-                code_section = match.group('code_section')
-                if code_section:
-                    logging.debug(
-                        "Found code delimiter: %s",
-                        match.group('code_delim'))
-                    code_content = self._extract_cpp_code(code_section)
+                    # Look for code section
+                    code_pattern = r'={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}\s*\n?(.*?)$'
+                    code_match = re.search(code_pattern, response, re.DOTALL)
+                    if code_match:
+                        code_content = self._extract_cpp_code(
+                            code_match.group(1))
 
             # Fallback strategies if no structured content found
             if not editorial_content:
@@ -291,6 +236,15 @@ class EditorialGenerator:
         if code_match:
             editorial_content = response[:code_match.start()].strip()
             if editorial_content:
+                # CRITICAL FIX: Remove editorial delimiter from the extracted content
+                # Try to remove === EDITORIAL === pattern from the beginning
+                # Remove editorial delimiter if present
+                if '=== EDITORIAL ===' in editorial_content:
+                    editorial_content = editorial_content.replace(
+                        '=== EDITORIAL ===', '').strip()
+                editorial_content = re.sub(
+                    editorial_delim_pattern, '', editorial_content).strip()
+
                 logging.info(
                     "Fallback: extracted editorial as everything before "
                     "code (%d chars)",
@@ -299,6 +253,14 @@ class EditorialGenerator:
 
         # Use entire response as fallback
         editorial_content = response.strip()
+
+        # CRITICAL FIX: Remove editorial delimiter from entire response too
+        editorial_delim_pattern = r'^={3,}\s*EDITORIAL\s*={3,}\s*\n?'
+        editorial_content = re.sub(
+            editorial_delim_pattern,
+            '',
+            editorial_content).strip()
+
         logging.warning("Fallback: using entire response as editorial")
         return editorial_content
 
@@ -563,6 +525,12 @@ class EditorialGenerator:
                 "Failed to extract editorial content, using raw response "
                 "as fallback")
             editorial_content = combined_response.strip()
+
+            # Remove editorial delimiter if present
+            if '=== EDITORIAL ===' in editorial_content:
+                editorial_content = editorial_content.replace(
+                    '=== EDITORIAL ===', '').strip()
+
             if not editorial_content:
                 raise ValueError(
                     'Failed to extract editorial content and response '
@@ -628,9 +596,22 @@ class EditorialGenerator:
             return self._add_disclaimers_to_all(editorials)
 
         for lang, content in editorials.items():
+            # Get AI control header for the beginning
+            ai_control_header = self._get_ai_control_header(lang)
+
+            # Get verification disclaimer for the end
             disclaimer = self._generate_verification_disclaimer(
                 verification_result, lang)
-            editorials[lang] = content + disclaimer
+
+            # Combine: header at start + content + disclaimer at end
+            result = ""
+            if ai_control_header:
+                result += ai_control_header + "\n\n"
+            result += content
+            if disclaimer:
+                result += disclaimer
+
+            editorials[lang] = result
         return editorials
 
     def generate_complete_editorial(
@@ -735,12 +716,30 @@ class EditorialGenerator:
             for example in examples
         ]
 
+    def _get_ai_control_header(self, language: str) -> str:
+        """Get language-specific AI control header."""
+        headers = self.disclaimers.get('ai_control_headers', {})
+        return str(headers.get(language, headers.get('en', '')))
+
     def add_ai_disclaimer(self, content: str, language: str) -> str:
         """Add AI generation disclaimer to editorial content."""
 
+        # Get AI control header for the beginning
+        ai_control_header = self._get_ai_control_header(language)
+
+        # Get AI generation disclaimer for the end
         disclaimers = self.disclaimers.get('ai_generation_disclaimers', {})
         disclaimer = str(disclaimers.get(language, disclaimers.get('en', '')))
-        return content + disclaimer
+
+        # Combine: header at start + content + disclaimer at end
+        result = ""
+        if ai_control_header:
+            result += ai_control_header + "\n\n"
+        result += content
+        if disclaimer:
+            result += disclaimer
+
+        return result
 
     def get_generation_stats(self) -> Dict[str, Any]:
         """Get statistics about editorial generation."""

@@ -1,4 +1,9 @@
 {
+  "ai_control_headers": {
+    "en": "<!-- Change the following line to DENY if you don't want automated AI editorial changes for this problem. -->\n<!-- AI_EDITORIALS: ALLOW -->",
+    "es": "<!-- Cambia la siguiente línea a DENY si no quieres que se hagan cambios automatizados con AI a la editorial de este problema. -->\n<!-- AI_EDITORIALS: ALLOW -->",
+    "pt": "<!-- Mude a linha seguinte para DENY se você não quiser mudanças automáticas de IA na editorial deste problema. -->\n<!-- AI_EDITORIALS: ALLOW -->"
+  },
   "verification_disclaimers": {
     "en": {
       "verified": "\n\n---\n*This editorial was generated using AI assistance and **verified**. The solution approach has been tested and works correctly.*",
