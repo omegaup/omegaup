@@ -110,9 +110,18 @@ class WebsiteUploader:
             return False
 
         # Check for required sections (basic validation)
+        # Support English, Spanish, and Portuguese keywords
         content_lower = content.lower()
         has_approach = any(keyword in content_lower for keyword in [
-            'approach', 'solution', 'algorithm', 'strategy'
+            # English keywords
+            'approach', 'solution', 'algorithm', 'strategy', 'method',
+            'solve', 'problem', 'explanation',
+            # Spanish keywords
+            'enfoque', 'solución', 'algoritmo', 'estrategia', 'método',
+            'resolver', 'problema', 'explicación',
+            # Portuguese keywords
+            'abordagem', 'solução', 'algoritmo', 'estratégia', 'método',
+            'resolver', 'problema', 'explicação'
         ])
 
         if not has_approach:

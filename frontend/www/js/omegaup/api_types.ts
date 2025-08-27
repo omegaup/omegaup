@@ -4211,6 +4211,14 @@ export namespace types {
     tried: boolean;
   }
 
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
+  }
+
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
     Interactive?: {
@@ -5082,6 +5090,8 @@ export namespace messages {
   export type AiEditorialStatusRequest = { [key: string]: any };
   export type _AiEditorialStatusServerResponse = any;
   export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+  export type AiEditorialUpdateJobRequest = { [key: string]: any };
+  export type AiEditorialUpdateJobResponse = {};
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -6021,6 +6031,9 @@ export namespace controllers {
     status: (
       params?: messages.AiEditorialStatusRequest,
     ) => Promise<messages.AiEditorialStatusResponse>;
+    updateJob: (
+      params?: messages.AiEditorialUpdateJobRequest,
+    ) => Promise<messages.AiEditorialUpdateJobResponse>;
   }
 
   export interface Authorization {

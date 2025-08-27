@@ -156,10 +156,12 @@ class OmegaUpAPIClient:
             'problem_alias': problem_alias
         })
 
-        problem_data = response.get('problem', {})
-        if not problem_data:
+        # API returns problem data directly, not nested under 'problem'
+        if not response or 'statement' not in response:
             raise ValueError(
                 f"Problem '{problem_alias}' not found or inaccessible")
+
+        problem_data = response
 
         logging.info(
             "Retrieved problem: %s", problem_data.get('title', 'Unknown'))
@@ -433,3 +435,72 @@ class OmegaUpAPIClient:
         except (ConnectionError, TypeError, ValueError) as e:
             logging.error("Error getting detailed run status: %s", e)
             return ('JE', 0.0, '0')
+
+    def update_job_status(
+        self,
+        job_id: str,
+        status: str,
+        **kwargs: Any
+    ) -> bool:
+        """
+        Update AI editorial job status and content in database.
+
+        This method is called by the worker to synchronize job status
+        and generated content from Redis to the omegaUp database.
+
+        Args:
+            job_id: Unique job identifier (UUID)
+            status: Job status ('processing', 'completed', 'failed')
+            **kwargs: Optional parameters:
+                - editorials: Dict with generated editorials
+                - error_message: Error description if status is 'failed'
+                - validation_verdict: Solution validation result
+
+        Returns:
+            True if update successful, False otherwise
+        """
+        logging.info("Updating job status: %s -> %s", job_id, status)
+
+        try:
+            # Extract optional parameters from kwargs
+            editorials = kwargs.get('editorials')
+            error_message = kwargs.get('error_message')
+            validation_verdict = kwargs.get('validation_verdict')
+
+            request_data = {
+                'job_id': job_id,
+                'status': status
+            }
+
+            # Add optional parameters if provided
+            if error_message:
+                request_data['error_message'] = error_message
+
+            if editorials:
+                if 'en' in editorials and editorials['en']:
+                    request_data['md_en'] = editorials['en']
+                if 'es' in editorials and editorials['es']:
+                    request_data['md_es'] = editorials['es']
+                if 'pt' in editorials and editorials['pt']:
+                    request_data['md_pt'] = editorials['pt']
+
+            if validation_verdict:
+                request_data['validation_verdict'] = validation_verdict
+
+            response = self._make_request(
+                '/aiEditorial/updateJob/', request_data)
+
+            # Check for successful update
+            if response.get('status') == 'ok':
+                logging.info(
+                    "Successfully updated job %s status to %s",
+                    job_id,
+                    status)
+                return True
+
+            logging.warning("Job status update failed: %s", response)
+            return False
+
+        except (ConnectionError, TypeError, ValueError) as e:
+            logging.error("Error updating job status for %s: %s", job_id, e)
+            return False
