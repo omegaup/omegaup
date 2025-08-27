@@ -106,7 +106,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         ';
         $sqlCount = '
             SELECT
-                COUNT(1)
+                COUNT(*)
         ';
         $sqlFrom = '
             FROM

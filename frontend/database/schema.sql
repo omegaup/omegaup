@@ -1223,6 +1223,7 @@ CREATE TABLE `User_Rank` (
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
   KEY `idx_user_rank_score_userid` (`score`,`user_id`),
+  KEY `idx_user_rank_author_score_ranking` (`author_score`,`author_ranking`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
