@@ -518,6 +518,7 @@ CREATE TABLE `Identity_Login_Log` (
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `identity_id` (`identity_id`),
+  KEY `idx_loginlog_time_identity` (`time`,`identity_id`),
   CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
