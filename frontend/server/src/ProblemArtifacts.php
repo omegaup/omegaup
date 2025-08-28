@@ -42,6 +42,9 @@ class ProblemArtifacts {
                 'resourceNotFound'
             );
         }
+        if (is_bool($response)) {
+            return '';
+        }
         return $response;
     }
 
@@ -93,6 +96,9 @@ class ProblemArtifacts {
                 'resourceNotFound'
             );
         }
+        if (is_bool($response)) {
+            return '';
+        }
         return $response;
     }
 
@@ -116,7 +122,7 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if ($httpStatusCode != 200) {
+        if ($httpStatusCode != 200 || is_bool($response)) {
             $this->log->error(
                 "Failed to get tree entries for {$this->alias}:{$this->revision}/{$path}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
@@ -196,7 +202,7 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if ($httpStatusCode != 200) {
+        if ($httpStatusCode != 200 || is_bool($response)) {
             $this->log->error(
                 "Invalid commit for problem {$this->alias} at revision {$this->revision}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""
@@ -229,7 +235,7 @@ class ProblemArtifacts {
         $response = $browser->exec();
         /** @var int */
         $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
-        if ($httpStatusCode != 200) {
+        if ($httpStatusCode != 200 || is_bool($response)) {
             $this->log->error(
                 "Failed to get log for problem {$this->alias} at revision {$this->revision}. " .
                 "HTTP {$httpStatusCode}: \"{$response}\""

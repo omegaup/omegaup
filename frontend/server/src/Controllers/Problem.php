@@ -2421,9 +2421,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            if (!is_null($problemArtifacts)) {
-                $problemArtifacts->download();
-            }
+            $problemArtifacts->download();
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to download problem {$problem->alias}",
