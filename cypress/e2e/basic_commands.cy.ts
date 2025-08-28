@@ -78,7 +78,17 @@ describe('Basic Commands Test', () => {
     const problemOptions = problemPage.generateProblemOptions(1);
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
-    coursePage.verifyProblem(problemOptions[0]);
+    problemPage.verifyProblem(problemOptions[0]);
+    cy.logout();
+  });
+
+  it.only('Should download a recently created problem', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    problemPage.verifyProblem(problemOptions[0]);
+    problemPage.downloadProblem(problemOptions[0].problemAlias);
     cy.logout();
   });
 
@@ -96,7 +106,7 @@ describe('Basic Commands Test', () => {
     cy.login({ username: 'user', password: 'user' });
     cy.createProblem(problemOptions);
     cy.createRun(runOptions);
-    coursePage.verifyProblemRun('AC');
+    problemPage.verifyProblemRun('AC');
     cy.logout();
   });
 
