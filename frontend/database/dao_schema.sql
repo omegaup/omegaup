@@ -327,6 +327,7 @@ CREATE TABLE `Courses` (
   `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `recommended` tinyint NOT NULL DEFAULT '0' COMMENT 'Mostrar el curso en la lista de cursos públicos, los cursos que no tengan la bandera encendida pueden ser cursos públicos pero no se mostrarán en la lista.',
+  `teaching_assistant_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el Asistente de enseñanza de IA está habilitado para este curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
