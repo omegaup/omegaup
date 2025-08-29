@@ -5,7 +5,7 @@
 '''Looking for inefficient queries in the MySQL log.'''
 import logging
 import sys
-from typing import Any, Iterable, Tuple
+from typing import Any, Iterable, Tuple, Optional
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
@@ -25,7 +25,7 @@ def normalize_query(query: str) -> str:
 # Establish connection to MySQL
 def create_connection(
     host_name: str, user_name: str, user_password: str, db_name: str
-) -> mysql.connector.MySQLConnection | None:
+) -> Optional[mysql.connector.MySQLConnection]:
     '''Connecting to database'''
     connection = None
     try:
