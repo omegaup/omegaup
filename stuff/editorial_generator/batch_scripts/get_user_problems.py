@@ -184,9 +184,9 @@ class UserProblemsExtractor:
 
             if result.get("status") != "ok":
                 logger.warning(
-                    f"⚠️  API error for {endpoint}: {
-                        result.get(
-                            'error', 'Unknown')}")
+                    f"⚠️  API error for {endpoint}: "
+                    f"{result.get('error', 'Unknown')}"
+                )
                 self.stats['api_errors'] += 1
 
             return result
