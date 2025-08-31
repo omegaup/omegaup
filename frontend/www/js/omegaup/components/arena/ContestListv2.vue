@@ -203,9 +203,7 @@
                   <font-awesome-icon icon="calendar-alt" />
                   <a :href="getTimeLink(contestItem.finish_time)">
                     {{
-                      ui.formatString(T.contestEndTime, {
-                        endDate: finishContestDate(contestItem),
-                      })
+                     finishContestDate(contestItem)
                     }}
                   </a>
                 </b-card-text>
@@ -255,9 +253,7 @@
                   <font-awesome-icon icon="calendar-alt" />
                   <a :href="getTimeLink(contestItem.start_time)">
                     {{
-                      ui.formatString(T.contestStartTime, {
-                        startDate: startContestDate(contestItem),
-                      })
+                      startContestDate(contestItem)
                     }}
                   </a>
                 </b-card-text>
@@ -310,9 +306,7 @@
                   <font-awesome-icon icon="calendar-alt" />
                   <a :href="getTimeLink(contestItem.start_time)">
                     {{
-                      ui.formatString(T.contestStartedTime, {
-                        startedDate: startContestDate(contestItem),
-                      })
+                      startContestDate(contestItem)
                     }}
                   </a>
                 </b-card-text>
@@ -530,11 +524,41 @@ export default class ArenaContestList extends Vue {
   }
 
   finishContestDate(contest: types.ContestListItem): string {
-    return contest.finish_time.toLocaleDateString();
+    const now = new Date();
+    const timeDiff = contest.finish_time.getTime() - now.getTime();
+    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hoursLeft >= 0 && hoursLeft < 48) {
+      if (hoursLeft === 0 && minutesLeft > 0) {
+        return `${minutesLeft} minutes left`;
+      } else if (hoursLeft > 0) {
+        return `${hoursLeft}h ${minutesLeft}m left`;
+      }
+    }
+    return contest.finish_time.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   }
 
   startContestDate(contest: types.ContestListItem): string {
-    return contest.start_time.toLocaleDateString();
+    const now = new Date();
+    const timeDiff = contest.start_time.getTime() - now.getTime();
+    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    if (hoursLeft >= 0 && hoursLeft < 48) {
+      if (hoursLeft === 0 && minutesLeft > 0) {
+        return `Starts in ${minutesLeft} minutes`;
+      } else if (hoursLeft > 0) {
+        return `Starts in ${hoursLeft}h ${minutesLeft}m`;
+      }
+    }
+    return contest.start_time.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   }
 
   getTimeLink(time: Date): string {
