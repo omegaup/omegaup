@@ -31,6 +31,7 @@ const baseCourseFormProps = {
     student_count: 3,
     unlimited_duration: false,
     languages: ['py2'],
+    teaching_assistant_enabled: false,
   } as types.CourseDetails,
   update: true,
   searchResultSchools: [
