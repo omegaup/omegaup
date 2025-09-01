@@ -42,10 +42,21 @@ class ProblemArtifacts {
                 'resourceNotFound'
             );
         }
-        if (is_bool($response)) {
-            return '';
+        // The response body if passthru is false and the request is successful
+        if (is_string($response)) {
+            return $response;
         }
-        return $response;
+        if ($response === true) {
+            // Passthru: response already sent to browser, nothing to return.
+        }
+        if ($response === false) {
+            // There was an error in the request.
+            $this->log->error(
+                "cURL error while getting contents for {$this->alias}:{$this->revision}/{$path}."
+            );
+        }
+        // Return empty string for safety.
+        return '';
     }
 
     public function exists(string $path): bool {
@@ -96,10 +107,21 @@ class ProblemArtifacts {
                 'resourceNotFound'
             );
         }
-        if (is_bool($response)) {
-            return '';
+        // The response body if passthru is false and the request is successful
+        if (is_string($response)) {
+            return $response;
         }
-        return $response;
+        if ($response === true) {
+            // Passthru: response already sent to browser, nothing to return.
+        }
+        if ($response === false) {
+            // There was an error in the request.
+            $this->log->error(
+                "cURL error while getting contents for {$this->alias}:{$this->revision}."
+            );
+        }
+        // Return empty string for safety.
+        return '';
     }
 
     /**
@@ -377,6 +399,12 @@ class GitServerBrowser {
         curl_close($this->curl);
     }
 
+    /**
+     * @return string|bool
+     * - string: response body if passthru is false and request is successful
+     * - true: if passthru is true and response is sent directly to the browser
+     * - false: if there was an error in the request
+     */
     public function exec(): string|bool {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
         $response = curl_exec($this->curl);
