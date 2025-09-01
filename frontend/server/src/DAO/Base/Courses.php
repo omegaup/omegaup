@@ -50,7 +50,8 @@ abstract class Courses {
                 `archived` = ?,
                 `minimum_progress_for_certificate` = ?,
                 `certificates_status` = ?,
-                `recommended` = ?
+                `recommended` = ?,
+                `teaching_assistant_enabled` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -95,6 +96,7 @@ abstract class Courses {
             ),
             $Courses->certificates_status,
             intval($Courses->recommended),
+            intval($Courses->teaching_assistant_enabled),
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -135,7 +137,8 @@ abstract class Courses {
                 `Courses`.`archived`,
                 `Courses`.`minimum_progress_for_certificate`,
                 `Courses`.`certificates_status`,
-                `Courses`.`recommended`
+                `Courses`.`recommended`,
+                `Courses`.`teaching_assistant_enabled`
             FROM
                 `Courses`
             WHERE
@@ -295,7 +298,8 @@ abstract class Courses {
                 `Courses`.`archived`,
                 `Courses`.`minimum_progress_for_certificate`,
                 `Courses`.`certificates_status`,
-                `Courses`.`recommended`
+                `Courses`.`recommended`,
+                `Courses`.`teaching_assistant_enabled`
             FROM
                 `Courses`
             ORDER BY
@@ -358,8 +362,10 @@ abstract class Courses {
                     `archived`,
                     `minimum_progress_for_certificate`,
                     `certificates_status`,
-                    `recommended`
+                    `recommended`,
+                    `teaching_assistant_enabled`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -420,6 +426,7 @@ abstract class Courses {
             ),
             $Courses->certificates_status,
             intval($Courses->recommended),
+            intval($Courses->teaching_assistant_enabled),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
