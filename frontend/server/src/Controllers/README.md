@@ -112,6 +112,7 @@
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
+  - [`/api/course/toggleTeachingAssistant/`](#apicoursetoggleteachingassistant)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -2390,6 +2391,24 @@ Search users in course assignment
 | ---------- | --------------------------------- |
 | `nextPage` | `number`                          |
 | `progress` | `types.StudentProgressInCourse[]` |
+
+## `/api/course/toggleTeachingAssistant/`
+
+### Description
+
+Toggles the AI Teaching Assistant feature for a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+
+### Returns
+
+| Name                         | Type      |
+| ---------------------------- | --------- |
+| `teaching_assistant_enabled` | `boolean` |
 
 ## `/api/course/update/`
 
