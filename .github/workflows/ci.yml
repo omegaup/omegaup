@@ -75,6 +75,7 @@ jobs:
           define('OMEGAUP_DB_HOST', 'localhost:13306');
           define('REDIS_HOST', 'localhost');
           define('REDIS_PASS', '');
+          define('OMEGAUP_RABBITMQ_HOST', 'localhost');
           EOF
 
       - name: Download gitserver
