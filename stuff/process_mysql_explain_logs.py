@@ -5,6 +5,7 @@
 '''Looking for inefficient queries in the MySQL log.'''
 import logging
 import sys
+import os
 from typing import Any, Iterable, Tuple, Optional
 import re
 import mysql.connector
@@ -26,20 +27,38 @@ def normalize_query(query: str) -> str:
 def create_connection(
     host_name: str, user_name: str, user_password: str, db_name: str
 ) -> Optional[mysql.connector.MySQLConnection]:
-    '''Connecting to database'''
-    connection = None
+    """Connect to MySQL."""
+    host = os.getenv(
+        'OMEGAUP_MYSQL_HOST',
+        os.getenv('MYSQL_HOST', host_name),
+    )
+    port = int(os.getenv(
+        'OMEGAUP_MYSQL_PORT',
+        os.getenv('MYSQL_TCP_PORT', '13306'),
+    ))
+    user = os.getenv('OMEGAUP_MYSQL_USER', user_name)
+    db = os.getenv(
+        'OMEGAUP_MYSQL_DB',
+        os.getenv('MYSQL_DATABASE', db_name),
+    )
+    pw = os.getenv(
+        'OMEGAUP_MYSQL_PASSWORD',
+        os.getenv('MYSQL_ROOT_PASSWORD', user_password),
+    )
+
     try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            password=user_password,
-            database=db_name,
-            port=13306
+        conn = mysql.connector.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=pw,
+            database=db,
         )
-        logging.warning("Connection to MySQL DB successful")
+        logging.warning('Connection to MySQL DB successful')
+        return conn
     except Error as e:
         logging.error("The error '%s' occurred", e)
-    return connection
+        return None
 
 
 # Function to retrieve all queries from the general log
