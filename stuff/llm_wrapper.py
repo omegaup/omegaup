@@ -52,7 +52,7 @@ class LLMWrapper:
                         {"role": "user", "content": prompt}
                     ],
                     temperature=temperature,
-                    max_tokens=max_tokens
+                    max_tokens=4000
                 )
                 response_text = message.content[0].text
 
@@ -61,15 +61,16 @@ class LLMWrapper:
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=max_tokens
+                    max_tokens=4000
                 )
                 response_text = chat_completion.choices[0].message.content
 
             elif self.provider == 'gemini':
-                response = self.client.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
-                        max_output_tokens=max_tokens,
+                response = self.client.models.generate_content(
+                    model='gemini-2.0-flash-001',
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        max_output_tokens=4000,
                         temperature=temperature,
                     ),
                 )
@@ -81,6 +82,7 @@ class LLMWrapper:
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
                     max_tokens=max_tokens
+                    max_tokens=4000
                 )
                 response_text = chat_completion.choices[0].message.content
 

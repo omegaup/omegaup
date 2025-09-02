@@ -16,6 +16,30 @@ CREATE TABLE `ACLs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AI_Editorial_Jobs` (
+  `job_id` varchar(36) NOT NULL COMMENT 'UUID identificador único del trabajo',
+  `problem_id` int NOT NULL COMMENT 'Identificador del problema',
+  `user_id` int NOT NULL COMMENT 'Usuario que solicitó la generación',
+  `status` enum('queued','processing','completed','failed','approved','rejected') NOT NULL DEFAULT 'queued' COMMENT 'Estado actual del trabajo',
+  `error_message` text COMMENT 'Mensaje de error en caso de fallo',
+  `is_retriable` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Indica si el error permite reintentos (1 = sí, 0 = no)',
+  `attempts` int NOT NULL DEFAULT '0' COMMENT 'Número de intentos realizados',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora de creación del trabajo',
+  `md_en` mediumtext COMMENT 'Editorial generado en inglés',
+  `md_es` mediumtext COMMENT 'Editorial generado en español',
+  `md_pt` mediumtext COMMENT 'Editorial generado en portugués',
+  `validation_verdict` varchar(10) DEFAULT NULL COMMENT 'Veredicto de validación del código generado',
+  PRIMARY KEY (`job_id`),
+  KEY `idx_problem_id` (`problem_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `fk_aej_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
+  CONSTRAINT `fk_aej_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Trabajos de generación de editoriales con IA';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `API_Tokens` (
   `apitoken_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
@@ -63,6 +87,8 @@ CREATE TABLE `Assignments` (
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_finish_time` (`finish_time`),
+  KEY `idx_assignment_type` (`assignment_type`),
   CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
   CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
@@ -333,6 +359,7 @@ CREATE TABLE `Courses` (
   KEY `fk_ca_acl_id` (`acl_id`),
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
+  KEY `idx_admission_mode_recommended_archived` (`archived`,`admission_mode`,`recommended`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
@@ -491,6 +518,7 @@ CREATE TABLE `Identity_Login_Log` (
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `identity_id` (`identity_id`),
+  KEY `idx_loginlog_time_identity` (`time`,`identity_id`),
   CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1128,6 +1156,7 @@ CREATE TABLE `Team_Groups` (
   PRIMARY KEY (`team_group_id`),
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_create_time` (`create_time`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1193,6 +1222,7 @@ CREATE TABLE `User_Rank` (
   KEY `rank` (`ranking`),
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
+  KEY `idx_user_rank_score_userid` (`score`,`user_id`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
