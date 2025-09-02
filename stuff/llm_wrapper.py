@@ -4,7 +4,6 @@ from typing import Any
 import anthropic  # type: ignore
 import openai  # type: ignore
 import google.generativeai as genai  # type: ignore
-from google.generativeai import types  # type: ignore
 
 
 class LLMWrapper:
@@ -27,7 +26,8 @@ class LLMWrapper:
             )
 
         elif self.provider == 'gemini':
-            self.client = genai.Client(api_key=self.api_key)
+            genai.configure(api_key=self.api_key)
+            self.client = genai.GenerativeModel('gemini-2.0-flash-exp')
 
         elif self.provider == 'omegaup':
             # Dummy oracle for testing - only works with specific key
@@ -38,7 +38,10 @@ class LLMWrapper:
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")
 
-    def generate_response(self, prompt: str, temperature: float = 0.0) -> str:
+    def generate_response(
+        self, prompt: str, temperature: float = 0.0,
+        max_tokens: int = 500,
+    ) -> str:
         """Generate a response from the LLM provider based on the prompt."""
         response_text = ""
         try:
@@ -49,7 +52,7 @@ class LLMWrapper:
                         {"role": "user", "content": prompt}
                     ],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=max_tokens
                 )
                 response_text = message.content[0].text
 
@@ -58,16 +61,15 @@ class LLMWrapper:
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=max_tokens
                 )
                 response_text = chat_completion.choices[0].message.content
 
             elif self.provider == 'gemini':
-                response = self.client.models.generate_content(
-                    model='gemini-2.0-flash-001',
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        max_output_tokens=500,
+                response = self.client.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        max_output_tokens=max_tokens,
                         temperature=temperature,
                     ),
                 )
@@ -78,7 +80,7 @@ class LLMWrapper:
                     model="deepseek-chat",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=max_tokens
                 )
                 response_text = chat_completion.choices[0].message.content
 
