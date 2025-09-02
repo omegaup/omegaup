@@ -4,6 +4,7 @@ from typing import Any
 import anthropic  # type: ignore
 import openai  # type: ignore
 import google.generativeai as genai  # type: ignore
+from google.generativeai import types  # type: ignore
 
 
 class LLMWrapper:
@@ -26,8 +27,7 @@ class LLMWrapper:
             )
 
         elif self.provider == 'gemini':
-            genai.configure(api_key=self.api_key)
-            self.client = genai.GenerativeModel('gemini-2.0-flash-exp')
+            self.client = genai.Client(api_key=self.api_key)
 
         elif self.provider == 'omegaup':
             # Dummy oracle for testing - only works with specific key
@@ -38,10 +38,7 @@ class LLMWrapper:
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")
 
-    def generate_response(
-        self, prompt: str, temperature: float = 0.0,
-        max_tokens: int = 500,
-    ) -> str:
+    def generate_response(self, prompt: str, temperature: float = 0.0) -> str:
         """Generate a response from the LLM provider based on the prompt."""
         response_text = ""
         try:
@@ -81,7 +78,6 @@ class LLMWrapper:
                     model="deepseek-chat",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=max_tokens
                     max_tokens=4000
                 )
                 response_text = chat_completion.choices[0].message.content
