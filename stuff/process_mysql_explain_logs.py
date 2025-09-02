@@ -27,38 +27,52 @@ def normalize_query(query: str) -> str:
 def create_connection(
     host_name: str, user_name: str, user_password: str, db_name: str
 ) -> Optional[mysql.connector.MySQLConnection]:
-    """Connect to MySQL."""
+    """Connect to MySQL (try env pw, then empty, then 'omegaup')."""
     host = os.getenv(
         'OMEGAUP_MYSQL_HOST',
         os.getenv('MYSQL_HOST', host_name),
     )
-    port = int(os.getenv(
-        'OMEGAUP_MYSQL_PORT',
-        os.getenv('MYSQL_TCP_PORT', '13306'),
-    ))
+    port = int(
+        os.getenv(
+            'OMEGAUP_MYSQL_PORT',
+            os.getenv('MYSQL_TCP_PORT', '13306'),
+        )
+    )
     user = os.getenv('OMEGAUP_MYSQL_USER', user_name)
     db = os.getenv(
         'OMEGAUP_MYSQL_DB',
         os.getenv('MYSQL_DATABASE', db_name),
     )
-    pw = os.getenv(
+    pw_env = os.getenv(
         'OMEGAUP_MYSQL_PASSWORD',
         os.getenv('MYSQL_ROOT_PASSWORD', user_password),
     )
 
-    try:
-        conn = mysql.connector.connect(
-            host=host,
-            port=port,
-            user=user,
-            password=pw,
-            database=db,
-        )
-        logging.warning('Connection to MySQL DB successful')
-        return conn
-    except Error as e:
-        logging.error("The error '%s' occurred", e)
-        return None
+    candidates = []
+    for pw_candidate in (pw_env, '', 'omegaup'):
+        if pw_candidate is None or pw_candidate in candidates:
+            continue
+        candidates.append(pw_candidate)
+
+    for pw in candidates:
+        try:
+            conn = mysql.connector.connect(
+                host=host,
+                port=port,
+                user=user,
+                password=pw,
+                database=db,
+            )
+            logging.warning('Connection to MySQL DB successful')
+            return conn
+        except Error as e:
+            if getattr(e, 'errno', None) == 1045:
+                continue
+            logging.error("The error '%s' occurred", e)
+            return None
+
+    logging.error('Auth failed with all password attempts')
+    return None
 
 
 # Function to retrieve all queries from the general log
