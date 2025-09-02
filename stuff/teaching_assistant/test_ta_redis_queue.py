@@ -332,4 +332,4 @@ def test_redis_queue_integration(
     feedback_thread = feedbacks[1]['feedback_thread']
     logging.info("Feedback thread: %s", feedback_thread)
     assert feedback_thread is not None, "Feedback thread should not be None"
-    assert len(feedback_thread) > 2
+    assert len(feedback_thread) == 4
