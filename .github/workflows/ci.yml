@@ -163,6 +163,14 @@ jobs:
           name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
+      - name: Upload inefficient queries
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: inefficient-queries
+          path: stuff/inefficient_queries.xlsx
+          if-no-files-found: ignore
+
   javascript:
     runs-on: ubuntu-22.04
 
