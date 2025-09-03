@@ -6,19 +6,24 @@
 import logging
 import sys
 import os
-from typing import Any, Iterable, Tuple, Optional
+from typing import Any, Iterable, Tuple, Optional, cast
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
+from tqdm import tqdm  # type: ignore
+import pandas as pd  # type: ignore
 
 
 def normalize_query(query: str) -> str:
-    '''eliminate numeric values and strings'''
-    # replace numbers
+    '''
+    Return a normalized version of the query for grouping and printing.
+
+    Replaces:
+    - numbers with '?'
+    - single-quoted and double-quoted strings with '?'
+    '''
     query = re.sub(r'\b\d+\b', '?', query)
-    # replace single-quoted strings
     query = re.sub(r"'[^']*'", '?', query)
-    # replace double-quoted strings
     query = re.sub(r'"[^"]*"', '?', query)
     return query
 
@@ -31,7 +36,9 @@ def create_connection(
     user_password: str,
     db_name: str
 ) -> Optional[mysql.connector.MySQLConnection]:
-    """Connect to MySQL (try env pw, then empty, then 'omegaup')."""
+    """
+    Open a MySQL Connection
+    """
     host = os.getenv(
         'OMEGAUP_MYSQL_HOST',
         os.getenv('MYSQL_HOST', host_name),
@@ -52,170 +59,238 @@ def create_connection(
         os.getenv('MYSQL_ROOT_PASSWORD', user_password),
     )
 
-    candidates = []
-    for pw_candidate in (pw_env, '', 'omegaup'):
-        if pw_candidate is None or pw_candidate in candidates:
-            continue
-        candidates.append(pw_candidate)
-
-    for pw in candidates:
-        try:
-            conn = mysql.connector.connect(
-                host=host,
-                port=port,
-                user=user,
-                password=pw,
-                database=db,
-            )
-            logging.warning('Connection to MySQL DB successful')
-            return conn
-        except Error as e:
-            if getattr(e, 'errno', None) == 1045:
-                continue
-            logging.error("The error '%s' occurred", e)
-            return None
-
-    logging.error('Auth failed with all password attempts')
-    return None
+    try:
+        conn = mysql.connector.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=pw_env,
+            database=db,
+        )
+        return conn
+    except Error as e:
+        logging.error("The error '%s' occurred", e)
+        return None
 
 
 # Function to retrieve all queries from the general log
 def get_queries_from_general_log(
     connection: mysql.connector.MySQLConnection
-) -> Iterable[Tuple[Any, ...]]:
-    '''Get querys from log'''
+) -> list[str]:
+    '''
+    Fetch SELECT/UPDATE/DELETE statements from log
+    '''
     cursor = connection.cursor()
-    cursor.execute("""
-        USE `omegaup-test`
-    """)
-    cursor.execute("""
-        SELECT CONVERT(argument USING utf8) AS logs
-        FROM mysql.general_log
-        WHERE argument IS NOT NULL
-        AND (
-            argument LIKE "SELECT%" OR
-            argument LIKE "UPDATE%" OR
-            argument LIKE "DELETE%"
-            )
-    """)
-    queries = cursor.fetchall()
-    return queries
+    try:
+        cursor.execute("""
+            USE `omegaup-test`
+        """)
+        cursor.execute("""
+            SELECT CONVERT(argument USING utf8) AS logs
+            FROM mysql.general_log
+            WHERE argument IS NOT NULL
+            AND (
+                argument LIKE "SELECT%" OR
+                argument LIKE "UPDATE%" OR
+                argument LIKE "DELETE%"
+                )
+        """)
+        rows = cursor.fetchall()
+        return [r[0] for r in rows]
+    except Error as e:
+        logging.error("The error '%s' occurred", e)
+        return []
+    finally:
+        cursor.close()
 
 
 def explain_queries(
     connection: mysql.connector.MySQLConnection,
     queries: Iterable[Tuple[Any, ...]]
-) -> bool:
-    '''Run explain command on queries'''
-    success = True
+) -> list[dict[str, str]]:
+    """
+    Run EXPLAIN for each query and detect inefficiencies.
+
+    Marks a query inefficient if any EXPLAIN row meets:
+    - type == 'ALL'  OR  key is NULL/empty
+
+    Excludes small/irrelevant tables:
+    - Languages, Roles, Groups_, Tags, Countries, general_log, urc
+    """
+    results: list[dict[str, str]] = []
     cursor = connection.cursor()
-    query_set = set()
-    for query in queries:
-        query_text = query[0]
-        try:
-            cursor.execute(f"EXPLAIN {query_text}")
-            explain_result = cursor.fetchall()
+    query_id_map: dict[str, int] = {}
 
-            # Get the index of the interest columns
-            column_names = [i[0] for i in cursor.description]  # type: ignore
-            type_row_index = column_names.index('type')
-            table_row_index = column_names.index('table')
-            extra_row_index = column_names.index('Extra')
-            # Add the key filter mentioned in the document
-            key_row_index = (
-                column_names.index('key')
-                if 'key' in column_names else None
-            )
-            possible_keys_row_index = (
-                column_names.index('possible_keys')
-                if 'possible_keys' in column_names else None
-            )
-            check_extra = ['no matching row in const table',
-                           'Using index']
-            full_table_scan = 'ALL'
-            exclude = ['Languages',
-                       'general_log',
-                       'Roles', 'Groups_',
-                       'Tags', 'Countries',
-                       'urc']
-            inefficient_count = 0
-            diagnostic = ''
-            for row in explain_result:
-                # Skip benign/irrelevant cases
-                if str(row[extra_row_index]) in check_extra:
-                    continue
-                if (
-                    row[table_row_index] is None
-                    or "<union" in str(row[table_row_index])
-                    or "<derived" in str(row[table_row_index])
-                    or row[table_row_index] in exclude
-                    or str(row[table_row_index]).startswith('full_')
-                ):
-                    continue
-                if (
-                    query_text.startswith('DELETE ')
-                    and ' WHERE ' not in query_text
-                ):
-                    continue
+    queries_list = list(queries)
+    progress_bar = tqdm(
+        total=len(queries_list),
+        desc="Processing queries",
+        unit="query",
+        mininterval=0.5,
+    )
+    try:
+        for query in queries_list:
+            query_text = query[0]
+            if query_text not in query_id_map:
+                query_id_map[query_text] = len(query_id_map) + 1
 
-                # Inefficient if type == 'ALL' OR
-                # key is NULL/empty (when available)
-                is_all = (row[type_row_index] == full_table_scan)
-                key_val = (
-                    row[key_row_index]
-                    if key_row_index is not None else None
-                )
-                key_is_null = (
-                    key_val is None or str(key_val).strip() == ''
-                )
-                if not (is_all or key_is_null):
-                    continue
+            try:
+                cursor.execute(f"EXPLAIN {query_text}")
+                explain_result = cursor.fetchall()
 
-                inefficient_count += 1
-                diag_key = str(key_val)
-                diag_pkeys = (
-                    str(row[possible_keys_row_index])
-                    if possible_keys_row_index is not None else ''
+                desc = cursor.description  # type: ignore[attr-defined]
+                column_names = [i[0] for i in desc]
+                type_idx = column_names.index('type')
+                table_idx = column_names.index('table')
+                extra_idx = column_names.index('Extra')
+                key_idx = (
+                    column_names.index('key')
+                    if 'key' in column_names else None
                 )
-                diagnostic = (
-                    diagnostic +
-                    f"type={row[type_row_index]} table={row[table_row_index]} "
-                    f"key={diag_key} possible_keys={diag_pkeys} "
-                    f"extra={row[extra_row_index]}\n"
+                possible_keys_idx = (
+                    column_names.index('possible_keys')
+                    if 'possible_keys' in column_names else None
                 )
-            if inefficient_count > 0:
-                query_set.add(normalize_query(query_text +
-                                              '\n\ndetected problems:\n' +
-                                              diagnostic))
-        except Error as e:
-            logging.error("Failed to explain query: %s", query_text)
-            logging.error("Error: %s", e)
-            success = False
-    if len(query_set) > 0:
-        success = False
-        for clean_query in query_set:
-            logging.warning(clean_query)
-        logging.warning('%d inefficient queries found', len(query_set))
-    return success
+
+                check_extra = [
+                    'no matching row in const table',
+                    'Using index',
+                ]
+                exclude = [
+                    'Languages',
+                    'general_log',
+                    'Roles',
+                    'Groups_',
+                    'Tags',
+                    'Countries',
+                    'urc',
+                ]
+
+                for row in explain_result:
+                    extra_val = str(row[extra_idx])
+                    if extra_val in check_extra:
+                        continue
+
+                    table_name = str(row[table_idx]) if row[table_idx] else ''
+                    if (
+                        not table_name
+                        or '<union' in table_name
+                        or '<derived' in table_name
+                        or table_name in exclude
+                        or table_name.startswith('full_')
+                    ):
+                        continue
+
+                    if (
+                        query_text.startswith('DELETE ')
+                        and ' WHERE ' not in query_text
+                    ):
+                        continue
+
+                    is_all = (row[type_idx] == 'ALL')
+                    key_val = row[key_idx] if key_idx is not None else None
+                    key_is_null = (
+                        key_val is None or str(key_val).strip() == ''
+                    )
+                    if not (is_all or key_is_null):
+                        continue
+
+                    results.append({
+                        "Query ID": str(query_id_map[query_text]),
+                        "Query": query_text,
+                        "Normalized Query": normalize_query(query_text),
+                        "Table": table_name,
+                        "Type": str(row[type_idx]),
+                        "Key": "" if key_val is None else str(key_val),
+                        "Possible Keys": (
+                            "" if possible_keys_idx is None
+                            else str(row[possible_keys_idx])
+                        ),
+                        "Extra": extra_val,
+                    })
+            except Error as e:
+                logging.error("Failed to explain query: %s", query_text)
+                logging.error("Error: %s", e)
+
+            progress_bar.update(1)
+
+    finally:
+        cursor.close()
+        progress_bar.close()
+
+    # dedupe by (normalized_query, table, type, key, extra)
+    seen = set()
+    deduped: list[dict[str, str]] = []
+    for rec in results:
+        dkey = (
+            rec["Normalized Query"],
+            rec["Table"],
+            rec["Type"],
+            rec["Key"],
+            rec["Extra"],
+        )
+        if dkey in seen:
+            continue
+        seen.add(dkey)
+        deduped.append(rec)
+
+    return deduped
+
+
+def save_to_excel(results: list[dict[str, str]]) -> None:
+    '''Save results to an Excel file'''
+    os.makedirs("stuff", exist_ok=True)
+    df = pd.DataFrame(results)
+    out_path = "stuff/inefficient_queries.xlsx"
+    df.to_excel(out_path, index=False)
+    print(f"Results saved to {out_path}")
 
 
 # Main function to handle the logic
 def _main() -> None:
-    '''Main function to handle the logic'''
-    # Use your credentials
-    connection = create_connection(host_name="mysql",
-                                   port=13306,
-                                   user_name="root",
-                                   user_password="omegaup",
-                                   db_name="omegaup-test", )
-    if connection:
-        queries = get_queries_from_general_log(connection)
-        if queries:
-            if not explain_queries(connection, queries):
-                sys.exit(0)
-        else:
+    """
+    Main function to handle the logic.
+    """
+    connection = create_connection(
+        host_name="mysql",
+        port=13306,
+        user_name="root",
+        user_password="omegaup",
+        db_name="omegaup-test",
+    )
+    if connection is None:
+        logging.error("Could not connect to MySQL")
+        sys.exit(1)
+
+    try:
+        queries_raw: Any = get_queries_from_general_log(connection)
+        if not queries_raw:
             logging.warning("No queries found in the general log")
             sys.exit(0)
+
+        if isinstance(queries_raw, list) and queries_raw and isinstance(
+            queries_raw[0], tuple
+        ):
+            queries_list = cast(list[Tuple[Any, ...]], queries_raw)
+        else:
+            queries_list = [
+                (cast(Any, q),) for q in cast(list[Any], queries_raw)
+            ]
+
+        rows = explain_queries(connection, queries_list)
+
+        if rows:
+            try:
+                save_to_excel(rows)
+            except (
+                ModuleNotFoundError, ImportError, OSError, ValueError
+            ) as exc:
+                logging.error("Failed to save Excel: %s", exc)
+        else:
+            logging.warning("0 inefficient queries")
+
+        sys.exit(0)
+    finally:
         connection.close()
 
 
