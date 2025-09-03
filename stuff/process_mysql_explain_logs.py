@@ -202,7 +202,7 @@ def _main() -> None:
     connection = create_connection(host_name="mysql",
                                    user_name="root",
                                    user_password="omegaup",
-                                   db_name="omegaup", )
+                                   db_name="omegaup-test", )
     if connection:
         queries = get_queries_from_general_log(connection)
         if queries:
