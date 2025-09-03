@@ -52,7 +52,7 @@ Can receive different parameters depending on the contest list you want to view.
 
 #### Response
     {
-        'number_of_results': int // Número de resultados que se muestran
+        'number_of_results': int // Number of results shown
         'results': [
             {
                 'contest_id' : int // Id del concurso
