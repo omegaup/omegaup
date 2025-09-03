@@ -11,7 +11,7 @@ Usage:
     python get_user_problems.py
 
 Prerequisites:
-    - .env file with OMEGAUP_AUTH_TOKEN or 
+    - .env file with OMEGAUP_AUTH_TOKEN or
       OMEGAUP_USERNAME/OMEGAUP_PASSWORD in parent directory
     - Active internet connection to omegaUp
 
