@@ -26,6 +26,13 @@ OmegaUp.on('ready', () => {
   function redirect(isAccountCreation: boolean): void {
     const params = new URLSearchParams(window.location.search);
     const pathname = params.get('redirect');
+    const fromLoginParam = '?fromLogin';
+
+    if (isAccountCreation) {
+      window.location.href = `/profile/${fromLoginParam}`;
+      return;
+    }
+
     if (pathname && pathname.indexOf('/') === 0) {
       window.location.href = pathname + '?fromLogin';
       return;
@@ -35,11 +42,7 @@ OmegaUp.on('ready', () => {
       window.location.href = pathname;
       return;
     }
-    const fromLoginParam = '?fromLogin';
-    if (isAccountCreation) {
-      window.location.href = `/profile/${fromLoginParam}`;
-      return;
-    }
+
     window.location.href = `/${fromLoginParam}`;
   }
 

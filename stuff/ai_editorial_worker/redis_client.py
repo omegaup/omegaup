@@ -52,7 +52,7 @@ class RedisJobClient:
             # Block and wait for jobs from editorial_jobs_queue
             # Redis library has complex typing, use type: ignore
             result = self.client.brpop(
-                ['editorial_jobs_queue'],
+                ['editorial_jobs_user', 'editorial_jobs_batch'],
                 timeout=timeout)
             if result and len(result) == 2:  # type: ignore
                 queue_name, job_data = str(
@@ -61,6 +61,10 @@ class RedisJobClient:
                 return queue_name, job_data
             return None
 
+        except redis.TimeoutError:
+            # Normal timeout - just return None, don't log as error
+            logging.debug('Redis queue timeout, no jobs available')
+            return None
         except redis.RedisError as e:
             logging.error('Redis polling error: %s', e)
             raise

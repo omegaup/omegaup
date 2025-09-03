@@ -49,7 +49,7 @@ class LLMWrapper:
                         {"role": "user", "content": prompt}
                     ],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=4000
                 )
                 response_text = message.content[0].text
 
@@ -58,7 +58,7 @@ class LLMWrapper:
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=4000
                 )
                 response_text = chat_completion.choices[0].message.content
 
@@ -67,7 +67,7 @@ class LLMWrapper:
                     model='gemini-2.0-flash-001',
                     contents=prompt,
                     config=types.GenerateContentConfig(
-                        max_output_tokens=500,
+                        max_output_tokens=4000,
                         temperature=temperature,
                     ),
                 )
@@ -78,7 +78,7 @@ class LLMWrapper:
                     model="deepseek-chat",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=temperature,
-                    max_tokens=500
+                    max_tokens=4000
                 )
                 response_text = chat_completion.choices[0].message.content
 
