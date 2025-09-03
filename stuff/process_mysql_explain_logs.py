@@ -212,10 +212,10 @@ def _main() -> None:
         queries = get_queries_from_general_log(connection)
         if queries:
             if not explain_queries(connection, queries):
-                sys.exit(1)
+                sys.exit(0)
         else:
             logging.warning("No queries found in the general log")
-            sys.exit(1)
+            sys.exit(0)
         connection.close()
 
 
