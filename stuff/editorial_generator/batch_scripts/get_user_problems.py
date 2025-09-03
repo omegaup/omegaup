@@ -11,7 +11,7 @@ Usage:
     python get_user_problems.py
 
 Prerequisites:
-    - .env file with OMEGAUP_USERNAME and OMEGAUP_PASSWORD in parent directory
+    - .env file with OMEGAUP_AUTH_TOKEN in parent directory
     - Active internet connection to omegaUp
 
 Outputs:
@@ -25,13 +25,15 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional, cast
+from typing import List, Dict, Any
 
-import requests
 from dotenv import load_dotenv  # type: ignore[import]
 
-# Add parent directory to path for .env file
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add parent directory to path for omegaup_api_client
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# Import the shared API client
+from omegaup_api_client import OmegaUpAPIClient  # type: ignore[import]
 
 
 class UserProblemsExtractor:
@@ -46,27 +48,30 @@ class UserProblemsExtractor:
         env_path = Path(__file__).parent.parent / ".env"
         load_dotenv(env_path)
 
-        # API Configuration
-        self.api_url = os.getenv("OMEGAUP_API_URL", "https://omegaup.com/api")
-        self.base_url = os.getenv("OMEGAUP_BASE_URL", "https://omegaup.com")
+        # Prefer auth token, fallback to username/password
+        auth_token = os.getenv("OMEGAUP_AUTH_TOKEN")
+        username = os.getenv("OMEGAUP_USERNAME")
+        password = os.getenv("OMEGAUP_PASSWORD")
+        base_url = os.getenv("OMEGAUP_BASE_URL", "https://omegaup.com")
 
-        # Authentication credentials
-        self.username = os.getenv("OMEGAUP_USERNAME")
-        self.password = os.getenv("OMEGAUP_PASSWORD")
-
-        if not self.username or not self.password:
-            raise ValueError(
-                "OMEGAUP_USERNAME and OMEGAUP_PASSWORD must be set in "
-                ".env file"
+        if auth_token:
+            self.api_client = OmegaUpAPIClient(
+                auth_token=auth_token,
+                base_url=base_url,
+                user_agent='omegaUp-UserProblems-Extractor/2.0'
             )
-
-        # Initialize session for persistent connections and cookies
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'omegaUp-UserProblems-Extractor/1.0',
-            'Accept': 'application/json',
-            'Accept-Language': 'en-US,en;q=0.9,es;q=0.8,pt;q=0.7'
-        })
+        elif username and password:
+            self.api_client = OmegaUpAPIClient(
+                username=username,
+                password=password,
+                base_url=base_url,
+                user_agent='omegaUp-UserProblems-Extractor/2.0'
+            )
+        else:
+            raise ValueError(
+                "OMEGAUP_AUTH_TOKEN or OMEGAUP_USERNAME/OMEGAUP_PASSWORD "
+                "must be set in .env file"
+            )
 
         # Statistics tracking
         self.stats = {
@@ -77,8 +82,7 @@ class UserProblemsExtractor:
             'start_time': time.time()
         }
 
-        # Login for authenticated access
-        self._login()
+        self.logger.info("✅ Successfully initialized with shared API client")
 
     def _setup_logging(self) -> logging.Logger:
         """Setup comprehensive logging configuration."""
@@ -106,112 +110,20 @@ class UserProblemsExtractor:
 
         return logger
 
-    def _login(self) -> None:
-        """Login using the official API with username and password."""
-        try:
-            self.logger.info("🔐 Authenticating as %s...", self.username)
-
-            # Login endpoint
-            login_url = f"{self.api_url}/user/login"
-            login_data = {
-                'usernameOrEmail': self.username,
-                'password': self.password
-            }
-
-            # Headers for form data
-            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-
-            # Perform login
-            response = self.session.post(
-                login_url,
-                data=login_data,
-                headers=headers,
-                timeout=(10, 30)
-            )
-
-            self.stats['api_calls_made'] += 1
-
-            if response.status_code == 200:
-                result = response.json()
-                if result.get("status") == "ok":
-                    self.logger.info(
-                        "✅ Successfully authenticated with omegaUp"
-                    )
-                    self.logger.info("   User: %s", self.username)
-                    self.logger.info("   API URL: %s", self.api_url)
-                else:
-                    error_msg = result.get('error', 'Unknown error')
-                    raise Exception(f"Login failed: {error_msg}")
-            else:
-                raise Exception(
-                    f"HTTP {response.status_code}: Login request failed"
-                )
-
-        except Exception as e:
-            self.logger.error("❌ Authentication failed: %s", str(e))
-            raise
-
-    def _make_api_call(self,
-                       endpoint: str,
-                       params: Optional[Dict[str, Any]] = None,
-                       method: str = 'GET') -> Dict[str, Any]:
-        """Make an API call with error handling and logging."""
-        try:
-            url = f"{self.api_url}/{endpoint}"
-            self.stats['api_calls_made'] += 1
-
-            self.logger.debug("🌐 API Call: %s %s", method, endpoint)
-            if params:
-                self.logger.debug("   Parameters: %s", params)
-
-            if method == 'GET':
-                response = self.session.get(
-                    url, params=params, timeout=(10, 30))
-            else:
-                headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-                response = self.session.post(
-                    url, data=params, headers=headers, timeout=(10, 30))
-
-            if response.status_code != 200:
-                self.logger.warning(
-                    "⚠️  HTTP %d for %s", response.status_code, endpoint
-                )
-                self.stats['api_errors'] += 1
-                return {
-                    'status': 'error',
-                    'error': f'HTTP {response.status_code}'
-                }
-
-            result = response.json()
-
-            if result.get("status") != "ok":
-                self.logger.warning(
-                    "⚠️  API error for %s: %s",
-                    endpoint, result.get('error', 'Unknown')
-                )
-                self.stats['api_errors'] += 1
-
-            return cast(Dict[str, Any], result)
-
-        except Exception as e:  # pylint: disable=broad-except
-            self.logger.error(
-                "❌ API call failed for %s: %s", endpoint, str(e)
-            )
-            self.stats['api_errors'] += 1
-            return {'status': 'error', 'error': str(e)}
-
     def get_user_created_problems(self) -> List[str]:
         """Get problems created by the current user."""
         self.logger.info("🔍 Searching for user-created problems...")
 
-        # Use the correct API endpoint for user's own problems
-        result = self._make_api_call("problem/myList", {
-            'page': 1,
-            'rowcount': 1000  # Get a large number of problems
-        })
+        try:
+            # Use the shared API client method
+            response = self.api_client.get_user_problems(
+                page=1,
+                rowcount=1000  # Get a large number of problems
+            )
+            self.stats['api_calls_made'] += 1
 
-        if result.get("status") == "ok":
-            problems = result.get("problems", [])
+            # Extract problems from API response
+            problems = response.get("problems", [])
             problem_aliases = [p.get("alias")
                                for p in problems if p.get("alias")]
 
@@ -223,118 +135,93 @@ class UserProblemsExtractor:
 
             return problem_aliases
 
-        error_msg = result.get('error', 'Unknown error')
-        self.logger.warning(
-            "⚠️  Could not fetch user-created problems: %s", error_msg
-        )
-        return []
-
-    def get_admin_problems(self) -> List[str]:
-        """Get problems where user has admin access using adminList API."""
-        self.logger.info("🔍 Searching for admin-accessible problems...")
-
-        admin_problems = []
-        page = 1
-        page_size = 100
-
-        while True:
-            # Use the correct adminList endpoint
-            result = self._make_api_call("problem/adminList", {
-                'page': page,
-                'page_size': page_size,
-                'query': ''  # Empty query to get all problems
-            })
-
-            if result.get("status") != "ok":
-                error_msg = result.get('error', 'Unknown error')
-                self.logger.warning(
-                    "⚠️  Admin problem search failed on page %d: %s",
-                    page, error_msg
-                )
-                break
-
-            problems = result.get("problems", [])
-            if not problems:
-                self.logger.info(
-                    "📄 No more problems found at page %d", page
-                )
-                break
-
-            self.logger.info(
-                "📄 Found page %d: %d admin problems", page, len(problems)
+        except Exception as e:  # pylint: disable=broad-except
+            self.logger.warning(
+                "⚠️  Could not fetch user-created problems: %s", str(e)
             )
-
-            # Add all problems from this page
-            for problem in problems:
-                alias = problem.get("alias")
-                if alias:
-                    admin_problems.append(alias)
-                    self.logger.info("   ✅ Admin problem: %s", alias)
-                    self.stats['problems_checked'] += 1
-
-            # Check if we should continue
-            if len(problems) < page_size:
-                self.logger.info("📄 Reached end of admin problem list")
-                break
-
-            page += 1
-
-            # Rate limiting - don't overwhelm the API
-            time.sleep(0.5)
-
-        self.logger.info(
-            "🎯 Found %d problems with admin access", len(admin_problems)
-        )
-        return admin_problems
+            self.stats['api_errors'] += 1
+            return []
 
     def extract_all_problems(self) -> List[str]:
-        """Extract all problems where the user has admin access."""
-        self.logger.info("🚀 Starting comprehensive problem extraction...")
+        """Extract all public problems where the user has admin access."""
+        self.logger.info("🚀 Starting public problem extraction...")
 
-        all_problems = set()
-
-        # Method 1: Get user-created problems
-        self.logger.info("\n%s", "=" * 60)
-        self.logger.info("METHOD 1: User-created problems (myList)")
-        self.logger.info("%s", "=" * 60)
+        # Get user-created problems and filter for public ones only
+        self.logger.info("🔍 Searching for user-created public problems...")
 
         created_problems = self.get_user_created_problems()
-        all_problems.update(created_problems)
-        self.stats['admin_problems_found'] += len(created_problems)
 
-        # Method 2: Get admin-accessible problems
-        self.logger.info("\n%s", "=" * 60)
-        self.logger.info("METHOD 2: Admin-accessible problems (adminList)")
-        self.logger.info("%s", "=" * 60)
+        # Filter for public problems only
+        public_problems = []
+        for alias in created_problems:
+            try:
+                # Check if problem is public via problem details
+                problem_details = self.api_client.get_problem_details(alias)
+                visibility = problem_details.get('visibility', 0)
+                if visibility >= 1:  # 1 = public
+                    public_problems.append(alias)
+                    self.logger.info("   ✅ Public problem: %s", alias)
+                else:
+                    self.logger.info(
+                        "   ⏭️  Skipping private problem: %s", alias)
+                self.stats['api_calls_made'] += 1
+            except Exception as e:  # pylint: disable=broad-except
+                self.logger.debug(
+                    "Could not check visibility for %s: %s", alias, e)
 
-        admin_problems = self.get_admin_problems()
+        self.stats['admin_problems_found'] = len(public_problems)
 
-        # Add new admin problems that aren't already in our list
-        new_admin_problems = 0
-        for alias in admin_problems:
-            if alias not in all_problems:
-                all_problems.add(alias)
-                new_admin_problems += 1
-                self.logger.info("   ✅ Additional admin problem: %s", alias)
-
-        self.stats['admin_problems_found'] += new_admin_problems
-
-        final_list = sorted(list(all_problems))
+        # Get statistical information
+        self._log_problem_statistics(public_problems)
 
         self.logger.info("\n%s", "=" * 60)
         self.logger.info("EXTRACTION COMPLETE")
         self.logger.info("%s", "=" * 60)
         self.logger.info(
-            "📊 User-created problems: %d", len(created_problems)
-        )
-        self.logger.info(
-            "📊 Additional admin problems: %d", new_admin_problems
-        )
-        self.logger.info(
-            "📊 Total problems with admin access: %d", len(final_list)
+            "📊 Total public problems found: %d", len(public_problems)
         )
 
-        return final_list
+        return sorted(public_problems)
+
+    def _log_problem_statistics(self, problems_data: List[str]) -> None:
+        """Log statistical information about the problems found."""
+        if not problems_data:
+            return
+
+        # Get full problem data for statistics
+        try:
+            # Get the full problem objects for statistics
+            response = self.api_client.get_admin_problems(
+                page=1,
+                page_size=min(len(problems_data), 100)
+            )
+            problems = response.get("problems", [])
+
+            if problems:
+                stats = self.api_client.extract_problem_statistics(problems)
+                self.stats['api_calls_made'] += 1
+
+                self.logger.info("\n📊 PROBLEM STATISTICS:")
+                self.logger.info(
+                    "   Total problems: %d", stats['total_problems']
+                )
+                self.logger.info(
+                    "   Public problems: %d", stats['public_problems']
+                )
+                self.logger.info(
+                    "   Private problems: %d", stats['private_problems']
+                )
+
+                if stats['visibility_breakdown']:
+                    self.logger.info("   Visibility breakdown:")
+                    for visibility, count in (
+                            stats['visibility_breakdown'].items()):
+                        self.logger.info(
+                            "     %s: %d", visibility, count
+                        )
+
+        except Exception as e:  # pylint: disable=broad-except
+            self.logger.debug("Could not get detailed statistics: %s", str(e))
 
     def save_problems_to_file(
         self,
@@ -349,13 +236,16 @@ class UserProblemsExtractor:
             )
 
             with open(output_path, 'w', encoding='utf-8') as f:
-                f.write("# Problems where current user has admin access\n")
+                f.write(
+                    "# Public problems where current user has admin access\n")
                 f.write(f"# Generated on {datetime.now().isoformat()}\n")
-                f.write(f"# User: {self.username}\n")
-                f.write(f"# Total problems: {len(problems)}\n")
+                f.write(f"# Total public problems: {len(problems)}\n")
                 f.write("#\n")
                 f.write("# One problem alias per line\n")
                 f.write("# Lines starting with # are comments\n")
+                f.write(
+                    "# Note: Only public problems are included "
+                    "(private problems excluded)\n")
                 f.write("\n")
 
                 for problem in problems:
@@ -413,11 +303,11 @@ def main() -> int:
 
         if not problems:
             extractor.logger.warning(
-                "⚠️  No problems found with admin access"
+                "⚠️  No public problems found with admin access"
             )
             extractor.logger.info(
-                "💡 Make sure you have created problems or have admin "
-                "access to existing ones"
+                "💡 Make sure you have created public problems or have admin "
+                "access to existing public ones"
             )
             return 1
 
@@ -427,8 +317,9 @@ def main() -> int:
         # Print statistics
         extractor.print_final_statistics()
 
-        print("\n🎉 SUCCESS! Problem extraction completed.")
-        print(f"📝 Found {len(problems)} problems saved to my_problems.txt")
+        print("\n🎉 SUCCESS! Public problem extraction completed.")
+        print(
+            f"📝 Found {len(problems)} public problems saved to my_problems.txt")
         print("🚀 Ready to run: python batch_generate_editorials.py")
 
         return 0
