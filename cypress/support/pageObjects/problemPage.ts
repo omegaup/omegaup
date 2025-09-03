@@ -104,6 +104,33 @@ export class ProblemPage {
 
     return problems;
   }
+
+  verifyProblem(problemOptions: ProblemOptions): void {
+    cy.location('href').should('include', problemOptions.problemAlias);
+    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
+    cy.get('[name="problem_alias"]').should(
+      'have.value',
+      problemOptions.problemAlias,
+    );
+    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
+  }
+
+  verifyProblemRun(status: string): void {
+    cy.get('[data-run-status] > span').first().should('have.text', 'new');
+
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+    cy.wait(['@runStatus'], { timeout: 10000 });
+
+    cy.get('[data-run-status] > span').first().should('have.text', status);
+  }
+
+  downloadProblem(problemAlias: string): void {
+    cy.visit(`/problem/${problemAlias}/edit/`);
+    cy.get(`[data-tab-download]`).click();
+
+    cy.get('form.form button[type="submit"]').click();
+    cy.readFile(`cypress/downloads/${problemAlias}.zip`).should('exist');
+  }
 }
 
 export const problemPage = new ProblemPage();
