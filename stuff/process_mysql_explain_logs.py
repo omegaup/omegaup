@@ -254,7 +254,7 @@ def _main() -> None:
         host_name="mysql",
         port=13306,
         user_name="root",
-        user_password="omegaup",
+        user_password="",
         db_name="omegaup-test",
     )
     if connection is None:
