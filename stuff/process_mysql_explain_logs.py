@@ -25,7 +25,11 @@ def normalize_query(query: str) -> str:
 
 # Establish connection to MySQL
 def create_connection(
-    host_name: str, user_name: str, user_password: str, db_name: str
+    host_name: str,
+    port: int,
+    user_name: str,
+    user_password: str,
+    db_name: str
 ) -> Optional[mysql.connector.MySQLConnection]:
     """Connect to MySQL (try env pw, then empty, then 'omegaup')."""
     host = os.getenv(
@@ -35,7 +39,7 @@ def create_connection(
     port = int(
         os.getenv(
             'OMEGAUP_MYSQL_PORT',
-            os.getenv('MYSQL_TCP_PORT', '13306'),
+            os.getenv('MYSQL_TCP_PORT', port),
         )
     )
     user = os.getenv('OMEGAUP_MYSQL_USER', user_name)
@@ -82,7 +86,7 @@ def get_queries_from_general_log(
     '''Get querys from log'''
     cursor = connection.cursor()
     cursor.execute("""
-        USE omegaup
+        USE `omegaup-test`
     """)
     cursor.execute("""
         SELECT CONVERT(argument USING utf8) AS logs
@@ -200,6 +204,7 @@ def _main() -> None:
     '''Main function to handle the logic'''
     # Use your credentials
     connection = create_connection(host_name="mysql",
+                                   port=13306,
                                    user_name="root",
                                    user_password="omegaup",
                                    db_name="omegaup-test", )
