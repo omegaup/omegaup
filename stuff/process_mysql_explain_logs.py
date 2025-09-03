@@ -218,7 +218,6 @@ def explain_queries(
         cursor.close()
         progress_bar.close()
 
-    # dedupe by (normalized_query, table, type, key, extra)
     seen = set()
     deduped: list[dict[str, str]] = []
     for rec in results:
