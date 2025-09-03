@@ -25,7 +25,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List
 
 from dotenv import load_dotenv  # type: ignore[import]
 
@@ -62,8 +62,7 @@ class UserProblemsExtractor:
             )
         elif username and password:
             self.api_client = OmegaUpAPIClient(
-                username=username,
-                password=password,
+                credentials=(username, password),
                 base_url=base_url,
                 user_agent='omegaUp-UserProblems-Extractor/2.0'
             )
@@ -319,7 +318,8 @@ def main() -> int:
 
         print("\n🎉 SUCCESS! Public problem extraction completed.")
         print(
-            f"📝 Found {len(problems)} public problems saved to my_problems.txt")
+            f"📝 Found {len(problems)} public problems saved to "
+            "my_problems.txt")
         print("🚀 Ready to run: python batch_generate_editorials.py")
 
         return 0

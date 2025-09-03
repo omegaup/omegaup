@@ -33,9 +33,8 @@ class OmegaUpAPIClient:
 
     def __init__(
         self,
-        auth_token: str = None,
-        username: str = None,
-        password: str = None,
+        auth_token: Optional[str] = None,
+        credentials: Optional[Tuple[str, str]] = None,
         base_url: str = 'https://omegaup.com',
         user_agent: str = 'omegaUp-API-Client/1.0'):
         """
@@ -43,8 +42,7 @@ class OmegaUpAPIClient:
 
         Args:
             auth_token: User's session token from PHP (preferred)
-            username: omegaUp username (optional, fallback)
-            password: omegaUp password (optional, fallback)
+            credentials: Tuple of (username, password) if auth_token not used
             base_url: omegaUp base URL (default: https://omegaup.com)
             user_agent: Custom user agent for requests
         """
@@ -75,13 +73,14 @@ class OmegaUpAPIClient:
             logging.info(
                 "Initialized omegaUp API client for %s (auth_token)",
                 base_url)
-        elif username and password:
+        elif credentials:
+            username, password = credentials
             self.auth_token = self._login_and_get_token(username, password)
             logging.info(
                 "Initialized omegaUp API client for %s (username/password)",
                 base_url)
         else:
-            raise ValueError("auth_token or username/password required")
+            raise ValueError("auth_token or credentials required")
 
     def _login_and_get_token(self, username: str, password: str) -> str:
         """
@@ -108,11 +107,11 @@ class OmegaUpAPIClient:
 
             # Check if auth_token is in response
             if 'auth_token' in result:
-                return result['auth_token']
+                return str(result['auth_token'])
 
             # Otherwise, look for ouat cookie
             for cookie in self.session.cookies:
-                if cookie.name == 'ouat':
+                if cookie.name == 'ouat' and cookie.value:
                     logging.info("Found ouat cookie: %s",
                                  cookie.value[:20] + "...")
                     return cookie.value
@@ -124,33 +123,13 @@ class OmegaUpAPIClient:
                 session_data = session_resp.json()
                 if ('session' in session_data and
                         'ouat' in session_data['session']):
-                    return session_data['session']['ouat']
+                    return str(session_data['session']['ouat'])
 
             raise ValueError(
                 "Could not obtain auth token from login response or cookies")
         except Exception as e:
             logging.error("Failed to login and get auth token: %s", e)
             raise
-
-        # Configure session with retries
-        self.session = requests.Session()
-        retry_strategy = Retry(
-            total=3,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "POST"]
-        )
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        self.session.mount("http://", adapter)
-        self.session.mount("https://", adapter)
-
-        # Set default headers
-        self.session.headers.update({
-            'User-Agent': user_agent,
-            'Accept': 'application/json'
-        })
-
-        logging.info("Initialized omegaUp API client for %s", base_url)
 
     def _make_request(self,
                       endpoint: str,
@@ -914,118 +893,6 @@ class OmegaUpAPIClient:
             "Successfully fetched %d total public problems", total_processed)
         return all_problems
 
-    def get_admin_problems(self,
-                           offset: int = 0,
-                           rowcount: int = 100,
-                           query: str = '') -> Dict[str, Any]:
-        """
-        Get problems accessible to admin (includes private problems).
-
-        Args:
-            offset: Number of problems to skip (pagination)
-            rowcount: Maximum number of problems to return
-            query: Optional search query to filter problems
-
-        Returns:
-            API response containing problem list and metadata
-
-        Raises:
-            requests.RequestException: On API/network errors
-        """
-        logging.debug(
-            "Fetching admin problems: offset=%d, rowcount=%d, query='%s'",
-            offset, rowcount, query)
-
-        request_data = {
-            'offset': str(offset),
-            'rowcount': str(rowcount)
-        }
-
-        if query:
-            request_data['query'] = query
-
-        response = self._make_request('/problem/adminList/', request_data)
-
-        logging.debug(
-            "Admin problems API response keys: %s",
-            list(response.keys()))
-
-        return response
-
-    def get_all_admin_problems(self,
-                               query: str = '',
-                               batch_size: int = 100) -> List[Dict[str, Any]]:
-        """
-        Get all problems accessible to admin using pagination.
-
-        Args:
-            query: Optional search query to filter problems
-            batch_size: Number of problems to fetch per API call
-
-        Returns:
-            List of all problem objects
-
-        Raises:
-            requests.RequestException: On API/network errors
-        """
-        logging.info("Fetching all admin problems with query: '%s'", query)
-
-        all_problems = []
-        offset = 0
-        total_processed = 0
-
-        while True:
-            logging.debug(
-                "Fetching batch at offset %d (batch_size=%d)",
-                offset, batch_size)
-
-            try:
-                response = self.get_admin_problems(
-                    offset=offset,
-                    rowcount=batch_size,
-                    query=query
-                )
-
-                # Extract problems list from response
-                problems = response.get('results', [])
-                if not problems:
-                    logging.debug(
-                        "No more problems found, stopping pagination")
-                    break
-
-                all_problems.extend(problems)
-                batch_count = len(problems)
-                total_processed += batch_count
-
-                logging.debug(
-                    "Batch %d: Found %d problems (total: %d)",
-                    (offset // batch_size) + 1, batch_count, total_processed)
-
-                # Check if we've reached the end
-                if batch_count < batch_size:
-                    logging.debug(
-                        "Received fewer problems than requested, "
-                        "assuming end of results")
-                    break
-
-                offset += batch_size
-
-                # Safety check to prevent infinite loops
-                if total_processed > 10000:
-                    logging.warning(
-                        "Processed over 10,000 problems, stopping pagination")
-                    break
-
-            except requests.RequestException as e:
-                logging.error(
-                    "Error fetching admin problems at offset %d: %s",
-                    offset, e)
-                raise
-
-        logging.info(
-            "Successfully fetched %d total admin problems", total_processed)
-        return all_problems
-
     def extract_problem_statistics(self,
                                    problems: List[Dict[str,
                                                        Any]]) -> Dict[str,
@@ -1039,7 +906,7 @@ class OmegaUpAPIClient:
         Returns:
             Dictionary with statistical breakdown
         """
-        stats = {
+        stats: Dict[str, Any] = {
             'total_problems': len(problems),
             'public_problems': 0,
             'private_problems': 0,
@@ -1055,28 +922,32 @@ class OmegaUpAPIClient:
             # Visibility analysis
             visibility = problem.get('visibility', 'unknown')
             if visibility in ['public', 'public_banned']:
-                stats['public_problems'] += 1
+                stats['public_problems'] = int(stats['public_problems']) + 1
             elif visibility in ['private', 'promoted']:
-                stats['private_problems'] += 1
+                stats['private_problems'] = int(stats['private_problems']) + 1
 
             # Count visibility types
-            if visibility in stats['visibility_breakdown']:
-                stats['visibility_breakdown'][visibility] += 1
+            visibility_breakdown = stats['visibility_breakdown']
+            if visibility in visibility_breakdown:
+                visibility_breakdown[visibility] += 1
             else:
-                stats['visibility_breakdown'][visibility] = 1
+                visibility_breakdown[visibility] = 1
 
             # Difficulty analysis
             difficulty = problem.get('difficulty', 'unknown')
-            if difficulty in stats['difficulty_breakdown']:
-                stats['difficulty_breakdown'][difficulty] += 1
+            difficulty_breakdown = stats['difficulty_breakdown']
+            if difficulty in difficulty_breakdown:
+                difficulty_breakdown[difficulty] += 1
             else:
-                stats['difficulty_breakdown'][difficulty] = 1
+                difficulty_breakdown[difficulty] = 1
 
             # Solution analysis (placeholder - would need additional API call)
             # This is a simplified check based on available data
             if 'solution' in problem and problem['solution']:
-                stats['problems_with_solutions'] += 1
+                stats['problems_with_solutions'] = int(
+                    stats['problems_with_solutions']) + 1
             else:
-                stats['problems_without_solutions'] += 1
+                stats['problems_without_solutions'] = int(
+                    stats['problems_without_solutions']) + 1
 
         return stats
