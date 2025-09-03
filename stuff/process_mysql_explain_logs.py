@@ -6,7 +6,7 @@
 import logging
 import sys
 import os
-from typing import Any, Iterable, Tuple, Optional, cast
+from typing import Any, Iterable, Tuple, Optional, cast, List, Dict
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
@@ -76,7 +76,7 @@ def create_connection(
 # Function to retrieve all queries from the general log
 def get_queries_from_general_log(
     connection: mysql.connector.MySQLConnection
-) -> list[str]:
+) -> List[str]:
     '''
     Fetch SELECT/UPDATE/DELETE statements from log
     '''
@@ -107,7 +107,7 @@ def get_queries_from_general_log(
 def explain_queries(
     connection: mysql.connector.MySQLConnection,
     queries: Iterable[Tuple[Any, ...]]
-) -> list[dict[str, str]]:
+) -> List[Dict[str, str]]:
     """
     Run EXPLAIN for each query and detect inefficiencies.
 
@@ -117,9 +117,9 @@ def explain_queries(
     Excludes small/irrelevant tables:
     - Languages, Roles, Groups_, Tags, Countries, general_log, urc
     """
-    results: list[dict[str, str]] = []
+    results: List[Dict[str, str]] = []
     cursor = connection.cursor()
-    query_id_map: dict[str, int] = {}
+    query_id_map: Dict[str, int] = {}
 
     queries_list = list(queries)
     progress_bar = tqdm(
@@ -219,7 +219,7 @@ def explain_queries(
         progress_bar.close()
 
     seen = set()
-    deduped: list[dict[str, str]] = []
+    deduped: List[Dict[str, str]] = []
     for rec in results:
         dkey = (
             rec["Normalized Query"],
@@ -236,7 +236,7 @@ def explain_queries(
     return deduped
 
 
-def save_to_excel(results: list[dict[str, str]]) -> None:
+def save_to_excel(results: List[Dict[str, str]]) -> None:
     '''Save results to an Excel file'''
     os.makedirs("stuff", exist_ok=True)
     df = pd.DataFrame(results)
@@ -267,13 +267,13 @@ def _main() -> None:
             logging.warning("No queries found in the general log")
             sys.exit(0)
 
-        if isinstance(queries_raw, list) and queries_raw and isinstance(
+        if isinstance(queries_raw, List) and queries_raw and isinstance(
             queries_raw[0], tuple
         ):
-            queries_list = cast(list[Tuple[Any, ...]], queries_raw)
+            queries_list = cast(List[Tuple[Any, ...]], queries_raw)
         else:
             queries_list = [
-                (cast(Any, q),) for q in cast(list[Any], queries_raw)
+                (cast(Any, q),) for q in cast(List[Any], queries_raw)
             ]
 
         rows = explain_queries(connection, queries_list)
