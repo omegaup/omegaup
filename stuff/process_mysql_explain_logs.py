@@ -6,12 +6,12 @@
 import logging
 import sys
 import os
+import csv
 from typing import Any, Iterable, Tuple, Optional, cast, List, Dict
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
 from tqdm import tqdm  # type: ignore
-import pandas as pd  # type: ignore
 
 
 def normalize_query(query: str) -> str:
@@ -236,13 +236,32 @@ def explain_queries(
     return deduped
 
 
-def save_to_excel(results: List[Dict[str, str]]) -> None:
-    '''Save results to an Excel file'''
-    os.makedirs("stuff", exist_ok=True)
-    df = pd.DataFrame(results)
-    out_path = "stuff/inefficient_queries.xlsx"
-    df.to_excel(out_path, index=False)
-    print(f"Results saved to {out_path}")
+def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
+    """
+    Save results to stuff/inefficient_queries.csv (UTF-8).
+    Returns the file path on success, None on error.
+    """
+    try:
+        os.makedirs("stuff", exist_ok=True)
+        path = "stuff/inefficient_queries.csv"
+        fieldnames = [
+            "Query ID",
+            "Query",
+            "Normalized Query",
+            "Table",
+            "Type",
+            "Key",
+            "Possible Keys",
+            "Extra",
+        ]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(results)
+        return path
+    except Error as exc:
+        logging.error("Failed to save CSV: %s", exc)
+        return None
 
 
 # Main function to handle the logic
@@ -280,11 +299,9 @@ def _main() -> None:
 
         if rows:
             try:
-                save_to_excel(rows)
-            except (
-                ModuleNotFoundError, ImportError, OSError, ValueError
-            ) as exc:
-                logging.error("Failed to save Excel: %s", exc)
+                save_to_csv(rows)
+            except (OSError, ValueError) as exc:
+                logging.error("Failed to save CSV: %s", exc)
         else:
             logging.warning("0 inefficient queries")
 

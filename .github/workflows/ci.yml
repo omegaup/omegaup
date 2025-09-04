@@ -156,9 +156,6 @@ jobs:
           chmod +x codecov
           ./codecov
 
-      - name: Install Library for inefficient queries
-        run: pip install --disable-pip-version-check openpyxl
-
       - name: Upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -171,7 +168,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: inefficient-queries
-          path: stuff/inefficient_queries.xlsx
+          path: stuff/inefficient_queries.csv
           if-no-files-found: ignore
 
   javascript:
