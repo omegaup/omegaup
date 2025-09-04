@@ -7,7 +7,7 @@ import logging
 import sys
 import os
 import csv
-from typing import Any, Iterable, Tuple, Optional, cast, List, Dict
+from typing import Any, Iterable, Tuple, Optional, List, Dict
 import re
 import mysql.connector
 from mysql.connector import Error  # type: ignore
@@ -28,7 +28,6 @@ def normalize_query(query: str) -> str:
     return query
 
 
-# Establish connection to MySQL
 def create_connection(
     host_name: str,
     port: int,
@@ -73,7 +72,6 @@ def create_connection(
         return None
 
 
-# Function to retrieve all queries from the general log
 def get_queries_from_general_log(
     connection: mysql.connector.MySQLConnection
 ) -> List[str]:
@@ -82,9 +80,6 @@ def get_queries_from_general_log(
     '''
     cursor = connection.cursor()
     try:
-        cursor.execute("""
-            USE `omegaup-test`
-        """)
         cursor.execute("""
             SELECT CONVERT(argument USING utf8) AS logs
             FROM mysql.general_log
@@ -221,13 +216,7 @@ def explain_queries(
     seen = set()
     deduped: List[Dict[str, str]] = []
     for rec in results:
-        dkey = (
-            rec["Normalized Query"],
-            rec["Table"],
-            rec["Type"],
-            rec["Key"],
-            rec["Extra"],
-        )
+        dkey = rec["Normalized Query"]
         if dkey in seen:
             continue
         seen.add(dkey)
@@ -264,7 +253,6 @@ def save_to_csv(results: List[Dict[str, str]]) -> Optional[str]:
         return None
 
 
-# Main function to handle the logic
 def _main() -> None:
     """
     Main function to handle the logic.
@@ -273,7 +261,7 @@ def _main() -> None:
         host_name="mysql",
         port=13306,
         user_name="root",
-        user_password="",
+        user_password="omegaup",
         db_name="omegaup-test",
     )
     if connection is None:
@@ -281,25 +269,22 @@ def _main() -> None:
         sys.exit(1)
 
     try:
-        queries_raw: Any = get_queries_from_general_log(connection)
+        queries_raw = get_queries_from_general_log(connection)
         if not queries_raw:
             logging.warning("No queries found in the general log")
             sys.exit(0)
 
-        if isinstance(queries_raw, List) and queries_raw and isinstance(
-            queries_raw[0], tuple
-        ):
-            queries_list = cast(List[Tuple[Any, ...]], queries_raw)
-        else:
-            queries_list = [
-                (cast(Any, q),) for q in cast(List[Any], queries_raw)
-            ]
-
+        queries_list = [(q,) for q in queries_raw]
         rows = explain_queries(connection, queries_list)
 
         if rows:
             try:
-                save_to_csv(rows)
+                saved = save_to_csv(rows)
+                logging.warning(
+                    "%d inefficient queries; saved to %s",
+                    len(rows),
+                    saved
+                )
             except (OSError, ValueError) as exc:
                 logging.error("Failed to save CSV: %s", exc)
         else:
