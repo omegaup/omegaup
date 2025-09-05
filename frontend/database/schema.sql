@@ -642,6 +642,7 @@ CREATE TABLE `Problem_Of_The_Week` (
   PRIMARY KEY (`problem_of_the_week_id`),
   UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
   KEY `problem_id` (`problem_id`),
+  KEY `idx_pow_difficulty` (`difficulty`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de problemas de la semana.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1223,6 +1224,7 @@ CREATE TABLE `User_Rank` (
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
   KEY `idx_user_rank_score_userid` (`score`,`user_id`),
+  KEY `idx_user_rank_author_score_ranking` (`author_score`,`author_ranking`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
