@@ -1,8 +1,8 @@
-##Tipos de concursos##
+##Types of Contests##
 
-**Concurso abierto**
-+ Los concursantes se registran en la pagina web ellos mismos. Cualquiera puede participar en el concurso.
+**Open Contests**
++ Contestants register on the website themselves. Anyone can participate in the contest.
 
-**Concurso cerrado**
-+ Tengo una lista de correos electronicos de los usuarios que participaran.
-+ Estoy haciendo un concurso donde no conozco a los concursantes, y repartire usuarios y contrasenas pre-generadas por mi.
+**Closed Contest**
++ I have a list of email addresses of the users who will participate.
++ I am organizing a contest where I don’t know the contestants, and I will distribute pre-generated usernames and passwords myself.
