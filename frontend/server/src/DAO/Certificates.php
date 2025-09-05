@@ -238,7 +238,7 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
                 AND certificate_type = "contest"
             ORDER BY
                 certificate_id ASC;';
-        /** @var list<array<string, mixed>> $rows */
+        /** @var array{certificate_id: int, certificate_type: string, coder_of_the_month_id: int|null, contest_id: int|null, contest_place: int|null, course_id: int|null, identity_id: int, timestamp: \OmegaUp\Timestamp, verification_code: string} $rows */
         $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$contestId]
