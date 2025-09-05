@@ -221,17 +221,9 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
      */
     public static function getByContestId(int $contestId): array {
         $sql = '
-            SELECT
-                `Certificates`.certificate_id,
-                `Certificates`.identity_id,
-                `Certificates`.`timestamp`,
-                `Certificates`.certificate_type,
-                `Certificates`.course_id,
-                `Certificates`.contest_id,
-                `Certificates`.coder_of_the_month_id,
-                `Certificates`.verification_code,
-                `Certificates`.contest_place
-            FROM
+            SELECT ' .
+            join(', ', array_keys(\OmegaUp\DAO\VO\Certificates::FIELD_NAMES)) .
+            ' FROM
                 `Certificates`
             WHERE
                 contest_id = ?
