@@ -127,7 +127,9 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         //Should add one notification per contestant
         $this->assertSame($numOfIdentities, $notifications);
 
-        $certificates = \OmegaUp\DAO\Certificates::getAll();
+        $certificates = \OmegaUp\DAO\Certificates::getByContestId(
+            $contestData['contest']->contest_id
+        );
         $notifications = \OmegaUp\DAO\Notifications::getAll();
 
         //Check the certificates data
