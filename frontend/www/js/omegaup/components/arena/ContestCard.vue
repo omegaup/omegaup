@@ -86,7 +86,7 @@
                 class="button-style d-flex justify-content-center align-items-center"
               >
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                <p class="m-0">{{ T.contestButtonEnter }}</p>
+                {{ T.contestButtonEnter }}
               </b-button>
             </slot>
             <slot name="contest-button-see-details">
@@ -95,31 +95,25 @@
                 ref="contestButtonSeeDetails"
                 :href="getContestURL(contest.alias)"
                 variant="primary"
-                class="text-center"
+                class="d-flex align-items-center justify-content-center"
               >
-                <font-awesome-icon
-                  class="mr-1 d-flex justify-content-center align-items-center"
-                  icon="sign-in-alt"
-                />
-                <p class="m-0">{{ T.contestButtonSeeDetails }}</p>
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                {{ T.contestButtonSeeDetails }}
               </b-button>
             </slot>
           </div>
           <slot name="contest-dropdown">
-            <b-dropdown variant="primary">
+            <b-dropdown variant="primary" class="d-inline-block">
               <template #button-content>
-                <font-awesome-icon
-                  class="mr-1 d-flex justify-content-center align-items-center"
-                  icon="sign-in-alt"
-                />
-                <p class="m-0">{{ T.contestButtonEnter }}</p>
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                {{ T.contestButtonEnter }}
               </template>
-              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
-                T.contestVirtualMode
-              }}</b-dropdown-item>
-              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
-                T.contestPracticeMode
-              }}</b-dropdown-item>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">
+                {{ T.contestVirtualMode }}
+              </b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
+                {{ T.contestPracticeMode }}
+              </b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
