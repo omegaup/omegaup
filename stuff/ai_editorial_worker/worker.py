@@ -92,11 +92,12 @@ class EditorialWorker:
         self.config_manager = ConfigManager()
         self.config = self.config_manager.load_ai_config()
 
-        # Initialize Redis connection using environment variables with config file fallback
+        # Initialize Redis connection using env var with config file fallback
         redis_password = os.getenv('REDIS_PASSWORD')
         if redis_password is None:
-            redis_password = self.config_manager._read_redis_password_from_config()
-        
+            redis_password = (
+                self.config_manager._read_redis_password_from_config())
+
         redis_config = {
             'host': os.getenv('REDIS_HOST', 'localhost'),
             'port': int(os.getenv('REDIS_PORT', '6379')),

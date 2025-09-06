@@ -132,12 +132,12 @@ class ConfigManager:
         config_path = '/etc/redis/redis.conf'
         try:
             if os.path.exists(config_path):
-                with open(config_path, 'r') as f:
+                with open(config_path, 'r', encoding='utf-8') as f:
                     for line in f:
                         line = line.strip()
                         if line.startswith('requirepass '):
                             return line.split('requirepass ', 1)[1].strip()
-        except Exception as e:
+        except (OSError, IOError) as e:
             print(f"Could not read Redis config from {config_path}: {e}")
         return None
 
