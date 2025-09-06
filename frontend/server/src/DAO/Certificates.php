@@ -212,4 +212,35 @@ class Certificates extends \OmegaUp\DAO\Base\Certificates {
 
         return $isValid;
     }
+
+    /**
+     * Returns all certificates associated with the given contest.
+     *
+     * @param int $contestId
+     * @return list<\OmegaUp\DAO\VO\Certificates>
+     */
+    public static function getByContestId(int $contestId): array {
+        $sql = '
+            SELECT ' .
+            join(', ', array_keys(\OmegaUp\DAO\VO\Certificates::FIELD_NAMES)) .
+            ' FROM
+                `Certificates`
+            WHERE
+                contest_id = ?
+                AND certificate_type = "contest"
+            ORDER BY
+                certificate_id ASC;';
+        /** @var list<array{certificate_id: int, certificate_type: string, coder_of_the_month_id: int|null, contest_id: int|null, contest_place: int|null, course_id: int|null, identity_id: int, timestamp: \OmegaUp\Timestamp, verification_code: string}> $rows */
+        $rows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$contestId]
+        );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = new \OmegaUp\DAO\VO\Certificates($row);
+        }
+        /** @var list<\OmegaUp\DAO\VO\Certificates> */
+        return $result;
+    }
 }
