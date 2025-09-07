@@ -28,13 +28,12 @@
               ref="contestButtonScoreboard"
               :href="getContestScoreboardURL(contest.alias)"
               variant="success"
-              class="d-flex justify-content-center align-items-center"
+              class="d-flex justify-content-center align-items-center mb-2"
             >
               <font-awesome-icon class="mr-1" icon="table" />
-              <p class="m-0">{{ T.contestButtonScoreboard }}</p>
+              {{ T.contestButtonScoreboard }}
             </b-button>
           </slot>
-
           <div class="d-flex align-items-center justify-content-center">
             <slot name="contest-enroll-status">
               <b-card-text
@@ -189,5 +188,11 @@ export default class ContestCard extends Vue {
 }
 .btn {
   color: $omegaup-white;
+  &.btn-success:hover {
+    color: $omegaup-white !important;
+  }
+  min-width: 120px;
+  width: 100%;
+  max-width: 200px;
 }
 </style>
