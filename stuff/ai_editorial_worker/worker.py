@@ -524,7 +524,7 @@ class EditorialWorker:
                 delattr(self, '_current_api_client')
 
     def _check_ai_editorials_permission(
-        self, api_client, problem_alias: str) -> bool:
+        self, api_client: Any, problem_alias: str) -> bool:
         """
         Check if existing editorial allows AI modifications.
 
@@ -554,7 +554,7 @@ class EditorialWorker:
                             problem_alias, lang)
                         return False
 
-                except Exception as e:
+                except (ConnectionError, TypeError, ValueError, KeyError) as e:
                     # Log but continue checking other languages
                     logging.debug(
                         'Could not check %s editorial for %s: %s',
@@ -567,7 +567,7 @@ class EditorialWorker:
                 'no DENY directive found', problem_alias)
             return True
 
-        except Exception as e:
+        except (ConnectionError, TypeError, ValueError, KeyError) as e:
             # If we can't check, err on the side of caution and allow
             logging.warning(
                 'Could not check AI_EDITORIALS permission for %s: %s. '
