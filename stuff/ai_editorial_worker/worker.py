@@ -440,7 +440,19 @@ class EditorialWorker:
             # Store API client for database updates
             self._current_api_client = api_client
 
-            # Step 1: Get problem details
+            # Step 1: Check AI editorial permissions (fast check first)
+            logging.info(
+                'Job %s: Checking AI editorial permissions for %s',
+                job_id,
+                problem_alias)
+            if not self._check_ai_editorials_permission(
+                api_client, problem_alias):
+                error_msg = 'Editorial contains AI_EDITORIALS: DENY directive'
+                logging.info('Job %s: %s', job_id, error_msg)
+                self._update_job_status(job_id, 'failed', error_msg)
+                return
+
+            # Step 2: Get problem details
             logging.info(
                 'Job %s: Fetching problem details for %s',
                 job_id,
@@ -448,11 +460,11 @@ class EditorialWorker:
             # problem_data = api_client.get_problem_details(problem_alias)  #
             # Reserved for future use
 
-            # Step 2: Find AC solution (verification disabled)
+            # Step 3: Find AC solution (verification disabled)
             logging.info('Job %s: Finding AC solution for reference', job_id)
             _ = solution_handler.find_working_solution(problem_alias)
 
-            # Step 3: Generate complete editorial
+            # Step 4: Generate complete editorial
             logging.info('Job %s: Generating editorial', job_id)
             editorial_result = editorial_generator.generate_complete_editorial(
                 problem_alias=problem_alias,
@@ -465,11 +477,11 @@ class EditorialWorker:
                 self._update_job_status(job_id, 'failed', error_msg)
                 return
 
-            # Step 4: Publish to website
+            # Step 5: Publish to website
             upload_success, upload_results = self._publish_editorial(
                 job_id, problem_alias, editorial_result, website_uploader)
 
-            # Step 5: Update job status to completed
+            # Step 6: Update job status to completed
             editorials = editorial_result.get('editorials', {})
             result_data = {
                 'editorial_en': editorials.get('en', ''),
@@ -510,6 +522,58 @@ class EditorialWorker:
             # Clean up API client reference to avoid memory leaks
             if hasattr(self, '_current_api_client'):
                 delattr(self, '_current_api_client')
+
+    def _check_ai_editorials_permission(
+        self, api_client, problem_alias: str) -> bool:
+        """
+        Check if existing editorial allows AI modifications.
+
+        Checks for AI_EDITORIALS: DENY directive in existing editorial.
+        If found in any language, AI generation should be blocked.
+
+        Args:
+            api_client: OmegaUp API client instance
+            problem_alias: Problem identifier
+
+        Returns:
+            True if AI generation is allowed,
+            False if blocked by DENY directive
+        """
+        try:
+            # Check all language versions for AI_EDITORIALS directive
+            for lang in ['en', 'es', 'pt']:
+                try:
+                    existing_content = api_client.get_problem_solution(
+                        problem_alias, lang)
+
+                    if (existing_content and
+                        'AI_EDITORIALS: DENY' in existing_content):
+                        logging.info(
+                            'AI editorial generation blocked for %s: '
+                            'AI_EDITORIALS: DENY found in %s version',
+                            problem_alias, lang)
+                        return False
+
+                except Exception as e:
+                    # Log but continue checking other languages
+                    logging.debug(
+                        'Could not check %s editorial for %s: %s',
+                        lang, problem_alias, e)
+                    continue
+
+            # No DENY directive found in any language
+            logging.debug(
+                'AI editorial generation allowed for %s: '
+                'no DENY directive found', problem_alias)
+            return True
+
+        except Exception as e:
+            # If we can't check, err on the side of caution and allow
+            logging.warning(
+                'Could not check AI_EDITORIALS permission for %s: %s. '
+                'Proceeding with generation.',
+                problem_alias, e)
+            return True
 
     def _update_job_status(self,
                            job_id: str,
