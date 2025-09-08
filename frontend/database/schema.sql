@@ -353,6 +353,7 @@ CREATE TABLE `Courses` (
   `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `recommended` tinyint NOT NULL DEFAULT '0' COMMENT 'Mostrar el curso en la lista de cursos públicos, los cursos que no tengan la bandera encendida pueden ser cursos públicos pero no se mostrarán en la lista.',
+  `teaching_assistant_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el Asistente de enseñanza de IA está habilitado para este curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
@@ -517,6 +518,7 @@ CREATE TABLE `Identity_Login_Log` (
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `identity_id` (`identity_id`),
+  KEY `idx_loginlog_time_identity` (`time`,`identity_id`),
   CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -640,6 +642,7 @@ CREATE TABLE `Problem_Of_The_Week` (
   PRIMARY KEY (`problem_of_the_week_id`),
   UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
   KEY `problem_id` (`problem_id`),
+  KEY `idx_pow_difficulty` (`difficulty`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de problemas de la semana.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -688,6 +691,7 @@ CREATE TABLE `Problems` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
+  KEY `idx_problems_title` (`title`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
@@ -1220,6 +1224,8 @@ CREATE TABLE `User_Rank` (
   KEY `rank` (`ranking`),
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
+  KEY `idx_user_rank_score_userid` (`score`,`user_id`),
+  KEY `idx_user_rank_author_score_ranking` (`author_score`,`author_ranking`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)

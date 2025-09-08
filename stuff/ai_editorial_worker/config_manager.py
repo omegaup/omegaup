@@ -66,7 +66,7 @@ class ConfigManager:
             prompt_file = os.path.join(
                 os.path.dirname(__file__),
                 ai_config.get('prompts', {}).get(
-                    'editorial_file', 'prompts/editorial.txt'
+                    'editorial_generation', 'prompts/editorial.txt'
                 )
             )
 
@@ -115,6 +115,9 @@ class ConfigManager:
             port = int(os.getenv('REDIS_PORT', '6379'))
         if password is None:
             password = os.getenv('REDIS_PASSWORD')
+            # If no environment variable, try to read from mounted Redis config
+            if password is None:
+                password = self._read_redis_password_from_config()
 
         return {
             'host': host,
@@ -123,6 +126,20 @@ class ConfigManager:
             'db': 0,
             'timeout': 30
         }
+
+    def _read_redis_password_from_config(self) -> Optional[str]:
+        """Read Redis password from mounted config file."""
+        config_path = '/etc/redis/redis.conf'
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith('requirepass '):
+                            return line.split('requirepass ', 1)[1].strip()
+        except (OSError, IOError) as e:
+            print(f"Could not read Redis config from {config_path}: {e}")
+        return None
 
     def get_openai_config(self, args: argparse.Namespace) -> Dict[str, str]:
         """Get OpenAI config from arguments, config file, or environment."""

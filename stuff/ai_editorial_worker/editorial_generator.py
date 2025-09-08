@@ -4,31 +4,38 @@
 Uses secure configuration management following omegaUp patterns.
 """
 
+import json
 import logging
-from typing import Dict, Any, Optional, List
+import re
+from typing import Dict, Any, Optional, List, cast, Tuple
 
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from llm_wrapper import LLMWrapper  # type: ignore
-from omegaup_api_client import OmegaUpAPIClient  # type: ignore
 from solution_handler import SolutionHandler  # type: ignore
 
 
 class EditorialGenerator:
     """Generate editorials using a sophisticated 3-prompt system."""
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self,
-                 llm_config: Dict[str,
-                                  Any],
-                 prompts: Dict[str,
-                               str],
-                 redis_client: Any,
-                 api_client: Optional[OmegaUpAPIClient] = None) -> None:
-        """Initialize with LLM configuration and prompt templates."""
-        self.llm_config = llm_config
-        self.prompts = prompts
-        self.redis_client = redis_client
+                 config: Dict[str, Any]) -> None:
+        """Initialize with configuration dictionary.
+
+        Args:
+            config: Configuration dictionary containing:
+                - llm_config: LLM provider configuration
+                - prompts: Dictionary of prompt templates
+                - redis_client: Redis client instance
+                - api_client: API client instance
+                - full_config: Complete configuration dict
+        """
+        self.llm_config = config['llm_config']
+        self.full_config = config.get('full_config', {})
+        self.prompts = config['prompts']
+        self.redis_client = config['redis_client']
 
         # Map provider names to what LLMWrapper expects
         provider_mapping = {
@@ -39,17 +46,18 @@ class EditorialGenerator:
         }
 
         llm_provider = provider_mapping.get(
-            llm_config['provider'],
-            llm_config['provider']
+            self.llm_config['provider'],
+            self.llm_config['provider']
         )
 
         # Initialize LLM wrapper with proper provider and API key
         self.llm_wrapper = LLMWrapper(
             provider=llm_provider,
-            api_key=llm_config['api_key']
+            api_key=self.llm_config['api_key']
         )
 
         # Initialize API client if not provided
+        api_client = config.get('api_client')
         if api_client:
             self.api_client = api_client
         else:
@@ -63,9 +71,25 @@ class EditorialGenerator:
             api_client=self.api_client
         )
 
+        # Load disclaimers from JSON file
+        self.disclaimers = self._load_disclaimers()
+
         logging.info(
             "Editorial generator initialized with provider: %s",
-            llm_config['provider'])
+            self.llm_config['provider'])
+
+    def _load_disclaimers(self) -> Dict[str, Any]:
+        """Load disclaimers from JSON file."""
+        disclaimer_file = os.path.join(
+            os.path.dirname(__file__), 'disclaimers.json')
+        try:
+            with open(disclaimer_file, 'r', encoding='utf-8') as f:
+                data: Dict[str, Any] = json.load(f)
+                return data
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            logging.warning(
+                "Failed to load disclaimers: %s, using empty fallback", e)
+            return {}
 
     def generate_editorial_prompt(self,
                                   problem_data: Dict[str, Any],
@@ -85,16 +109,16 @@ class EditorialGenerator:
                     "Editorial generation prompt template not found")
 
             # Format prompt with context
+            reference_source = ac_solution.get(
+                'source', '') if ac_solution else ''
+            reference_lang = ac_solution.get(
+                'language', 'unknown') if ac_solution else 'unknown'
+
             prompt = prompt_template.format(
                 problem_title=problem_data.get('title', 'Unknown'),
                 problem_statement=problem_data.get('statement', ''),
-                constraints=self.extract_constraints(problem_data),
-                sample_input=self.extract_sample_input(problem_data),
-                sample_output=self.extract_sample_output(problem_data),
-                ac_solution=(ac_solution.get('source', '')
-                             if ac_solution else ''),
-                time_limit=problem_data.get('time_limit', '1s'),
-                memory_limit=problem_data.get('memory_limit', '256MB')
+                reference_language=reference_lang,
+                reference_ac=reference_source
             )
 
             # Generate with LLM
@@ -113,54 +137,311 @@ class EditorialGenerator:
             logging.exception("Error generating editorial: %s", e)
             return None
 
-    def verify_editorial_solution(self,
-                                  problem_alias: str,
-                                  editorial: str,
-                                  problem_data: Dict[str, Any]
-                                  ) -> Optional[Dict[str, Any]]:
-        """Verify editorial by generating and testing solution (Prompt 2)."""
-
+    def _parse_editorial_and_code_regex(
+        self, response: str) -> Tuple[str, Optional[str]]:
+        """Parse editorial and code using regex patterns."""
         try:
-            logging.info("Verifying editorial solution for %s", problem_alias)
+            logging.info("Parsing combined editorial and code response")
+            logging.debug("Response length: %d characters", len(response))
 
-            # Get solution generation prompt
-            prompt_template = self.prompts.get('solution_generation', '')
-            if not prompt_template:
-                logging.warning(
-                    "Solution generation prompt template not found")
-                return None
+            # Log first 500 characters for debugging
+            preview = response[:500].replace('\n', '\\n')
+            logging.debug("Response preview: %s", preview)
 
-            # Format prompt
-            prompt = prompt_template.format(
-                editorial=editorial,
-                problem_title=problem_data.get('title', 'Unknown'),
-                constraints=self.extract_constraints(problem_data),
-                sample_input=self.extract_sample_input(problem_data),
-                sample_output=self.extract_sample_output(problem_data)
+            # Simple and reliable regex pattern
+            # First try: Extract content between === EDITORIAL === and === CODE
+            # === (or end)
+            editorial_pattern = (
+                r'={3,}\s*EDITORIAL\s*={3,}\s*\n?(.*?)'
+                r'(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|$)'
+            )
+            editorial_match = re.search(editorial_pattern, response, re.DOTALL)
+
+            editorial_content = None
+            code_content = None
+
+            if editorial_match:
+                editorial_content = editorial_match.group(1).strip()
+                if editorial_content:
+                    logging.info(
+                        "Extracted editorial (%d chars)",
+                        len(editorial_content))
+
+                    # Look for code section
+                    code_pattern = (
+                        r'={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}\s*\n?(.*?)$'
+                    )
+                    code_match = re.search(code_pattern, response, re.DOTALL)
+                    if code_match:
+                        code_content = self._extract_cpp_code(
+                            code_match.group(1))
+
+            # Fallback strategies if no structured content found
+            if not editorial_content:
+                editorial_content = self._apply_fallback_extraction_regex(
+                    response)
+
+            # Log final extraction results
+            logging.info(
+                "Extraction results: editorial=%s chars, code=%s chars",
+                len(editorial_content) if editorial_content else 0,
+                len(code_content) if code_content else 0)
+
+            if not editorial_content:
+                logging.error("Failed to extract editorial content")
+                return "", None
+
+            return editorial_content, code_content
+
+        except (TypeError, ValueError, AttributeError, re.error) as e:
+            logging.exception("Error parsing editorial and code: %s", e)
+            return "", None
+
+    def _extract_cpp_code(self, code_section: str) -> Optional[str]:
+        """Extract C++ code from code section using regex."""
+        if not code_section:
+            return None
+
+        code_section = code_section.strip()
+
+        # Try to extract C++ code from markdown code block
+        cpp_block_pattern = r'```cpp\s*\n(.*?)\n\s*```'
+        cpp_match = re.search(cpp_block_pattern, code_section, re.DOTALL)
+
+        if cpp_match:
+            code_content = cpp_match.group(1).strip()
+            logging.info("Extracted C++ code (%d chars)", len(code_content))
+            return code_content
+
+        # Fallback: look for code starting with #include
+        logging.warning("No ```cpp found, trying to extract code directly")
+        include_pattern = r'(#include.*?)(?=\n\s*(?:={3,}|#{1,3}|$))'
+        include_match = re.search(include_pattern, code_section, re.DOTALL)
+
+        if include_match:
+            code_content = include_match.group(1).strip()
+            logging.info(
+                "Extracted C++ code without markdown (%d chars)",
+                len(code_content))
+            return code_content
+
+        logging.warning("No C++ code found in code section")
+        return None
+
+    def _apply_fallback_extraction_regex(self, response: str) -> str:
+        """Apply fallback extraction strategies using regex."""
+        # Try to find any code delimiter and extract everything before it
+        code_delim_pattern = (
+            r'(?:={3,}\s*(?:SOLUTION\s*)?CODE\s*={3,}|'
+            r'==\s*=\s*(?:SOLUTION\s*)?CODE\s*==\s*=|'
+            r'#{1,3}\s*(?:SOLUTION\s*)?(?:CODE|Solution))'
+        )
+
+        code_match = re.search(code_delim_pattern, response)
+        if code_match:
+            editorial_content = response[:code_match.start()].strip()
+            if editorial_content:
+                # Remove editorial delimiter from the extracted content
+                # Remove === EDITORIAL === pattern if present
+                if '=== EDITORIAL ===' in editorial_content:
+                    editorial_content = editorial_content.replace(
+                        '=== EDITORIAL ===', '').strip()
+
+                logging.info(
+                    "Fallback: extracted editorial as everything before "
+                    "code (%d chars)",
+                    len(editorial_content))
+                return editorial_content
+
+        # Use entire response as fallback
+        editorial_content = response.strip()
+
+        # Remove editorial delimiter from entire response if present
+        if '=== EDITORIAL ===' in editorial_content:
+            editorial_content = editorial_content.replace(
+                '=== EDITORIAL ===', '').strip()
+
+        logging.warning("Fallback: using entire response as editorial")
+        return editorial_content
+
+    def _parse_editorial_and_code(
+        self, response: str) -> Tuple[str, Optional[str]]:
+        """Parse combined editorial and code response."""
+        return self._parse_editorial_and_code_regex(response)
+
+    def _submit_and_verify_solution(self, problem_alias: str,
+                                    cpp_code: str) -> Dict[str, Any]:
+        """Submit generated code and return verification result."""
+        try:
+            logging.info("Submitting solution for verification: %s",
+                         problem_alias)
+
+            if not cpp_code or not cpp_code.strip():
+                logging.error("No C++ code to submit")
+                return {
+                    'verified': False,
+                    'verdict': 'NO_CODE',
+                    'error': 'No C++ code generated',
+                    'run_guid': None
+                }
+
+            # Submit the solution
+            result = self.api_client.create_run(
+                problem_alias=problem_alias,
+                language='cpp17-gcc',  # Use standard C++17
+                source=cpp_code
             )
 
-            # Generate solution code
+            run_guid = result.get('guid')
+            if not run_guid:
+                logging.error("Failed to submit solution - no GUID returned")
+                return {
+                    'verified': False,
+                    'verdict': 'SUBMIT_FAILED',
+                    'error': 'Failed to submit solution',
+                    'run_guid': None
+                }
+
+            logging.info("Submitted solution with GUID: %s", run_guid)
+
+            # Wait for verdict
+            verdict_result = self.api_client.wait_for_verdict(run_guid)
+
+            verification_result = {
+                'verified': verdict_result['success'],
+                'verdict': verdict_result['verdict'],
+                'score': verdict_result['score'],
+                'memory': verdict_result['memory'],
+                'runtime': verdict_result['runtime'],
+                'run_guid': run_guid
+            }
+
+            if verdict_result['success']:
+                logging.info("Solution verified successfully: AC")
+            else:
+                logging.warning("Solution verification failed: %s",
+                                verdict_result['verdict'])
+
+            return verification_result
+
+        except (ConnectionError, TypeError, ValueError) as e:
+            logging.exception("Error submitting solution: %s", e)
+            return {
+                'verified': False,
+                'verdict': 'ERROR',
+                'error': str(e),
+                'run_guid': None
+            }
+
+    def _generate_verification_disclaimer(self, verification_result: Dict[
+            str, Any], language: str) -> str:
+        """Generate language-specific disclaimer based on verification."""
+
+        disclaimers = self.disclaimers.get('verification_disclaimers', {})
+
+        lang_disclaimers = disclaimers.get(language, disclaimers.get('en', {}))
+
+        if verification_result.get('verified', False):
+            return str(lang_disclaimers.get('verified', ''))
+        if verification_result.get('verdict'):
+            return str(lang_disclaimers.get('not_verified', ''))
+        return str(lang_disclaimers.get('error', ''))
+
+    def _parse_combined_translation(self, response: str) -> Dict[str, str]:
+        """Parse combined Spanish and Portuguese translation response."""
+        translations = {}
+        try:
+            logging.info("Response length: %d characters", len(response))
+            logging.info("Looking for translation delimiters...")
+
+            # Extract Spanish translation
+            spanish_start = response.find('=== SPANISH TRANSLATION ===')
+            portuguese_start = response.find('=== PORTUGUESE TRANSLATION ===')
+
+            logging.info("Spanish delimiter at position: %d", spanish_start)
+            logging.info(
+                "Portuguese delimiter at position: %d",
+                portuguese_start)
+
+            if spanish_start != -1 and portuguese_start != -1:
+                # Extract Spanish content
+                start_pos = spanish_start + len('=== SPANISH TRANSLATION ===')
+                spanish_content = response[start_pos:portuguese_start].strip()
+                if spanish_content:
+                    translations['es'] = spanish_content
+                    msg = ("Successfully extracted Spanish translation "
+                           "(%d chars)")
+                    logging.info(msg, len(spanish_content))
+
+                # Extract Portuguese content
+                pt_start_pos = portuguese_start + \
+                    len('=== PORTUGUESE TRANSLATION ===')
+                portuguese_content = response[pt_start_pos:].strip()
+                if portuguese_content:
+                    translations['pt'] = portuguese_content
+                    msg = ("Successfully extracted Portuguese translation "
+                           "(%d chars)")
+                    logging.info(msg, len(portuguese_content))
+            elif spanish_start != -1:
+                # Only Spanish found - try to extract it anyway
+                logging.warning(
+                    "Only Spanish translation found, extracting what we have")
+                start_pos = spanish_start + len('=== SPANISH TRANSLATION ===')
+                spanish_content = response[start_pos:].strip()
+                if spanish_content:
+                    translations['es'] = spanish_content
+                    logging.info(
+                        "Extracted partial Spanish translation (%d chars)",
+                        len(spanish_content))
+                    # Try to regenerate with more specific prompt for
+                    # Portuguese only
+                    logging.info(
+                        "Attempting to generate Portuguese translation "
+                        "separately")
+                    pt_translation = self._generate_single_translation(
+                        response[:500], 'Portuguese')
+                    if pt_translation:
+                        translations['pt'] = pt_translation
+            else:
+                logging.warning(
+                    "Could not find translation delimiters in response")
+                preview = (response[:500] + "..." if len(response) > 500
+                           else response)
+                logging.info("Response preview: %s", preview)
+
+            return translations
+        except (ValueError, TypeError, KeyError) as e:
+            logging.warning("Failed to parse combined translation: %s", e)
+            return {}
+
+    def _generate_single_translation(
+        self,
+        editorial_text: str,
+        language: str) -> Optional[str]:
+        """Generate translation for a single language as fallback."""
+        try:
+            simple_prompt = (
+                f"Translate the following competitive programming editorial "
+                f"to {language}. Provide only the translation, no additional "
+                f"text:\n\n{editorial_text}")
+
             response = self.llm_wrapper.generate_response(
-                prompt=prompt,
+                prompt=simple_prompt,
                 temperature=self.llm_config.get('temperature', 0.7)
             )
 
-            if not response:
-                logging.warning("Failed to generate solution for verification")
-                return None
-
-            generated_code = response
-
-            # Test the generated solution
-            success, message = (
-                self.solution_handler.verify_solution_with_retry(
-                    problem_alias, generated_code, max_attempts=2))
-            verification_result = {'success': success, 'message': message}
-
-            return verification_result  # type: ignore
+            if response:
+                logging.info(
+                    "Successfully generated %s translation as fallback "
+                    "(%d chars)", language, len(response))
+                return response
+            return None
 
         except (ConnectionError, TypeError, ValueError) as e:
-            logging.exception("Error in solution verification: %s", e)
+            logging.warning(
+                "Failed to generate %s translation as fallback: %s",
+                language,
+                e)
             return None
 
     def generate_translation(
@@ -175,9 +456,8 @@ class EditorialGenerator:
                 logging.warning("Translation prompt template not found")
                 return None
 
-            # Format prompt with content and target language
-            prompt = ("Translate the following editorial content to " +
-                      f"{target_language}:\n\n{content}")
+            # Format prompt with content using template
+            prompt = prompt_template.format(editorial=content)
 
             # Generate translation with LLM
             response = self.llm_wrapper.generate_response(
@@ -201,7 +481,10 @@ class EditorialGenerator:
             if not problem_data:
                 raise ValueError(
                     f'Failed to fetch problem details for {problem_alias}')
-            return problem_data
+
+            # Ensure alias is included in problem data
+            problem_data['alias'] = problem_alias
+            return cast(Dict[str, Any], problem_data)
         except ConnectionError as e:
             logging.error(
                 'Authentication or connection failed for problem %s: %s',
@@ -209,7 +492,7 @@ class EditorialGenerator:
             raise ValueError(
                 f'Authentication failed when fetching problem {problem_alias}'
             ) from e
-        except Exception as e:
+        except (TypeError, ValueError) as e:
             logging.error(
                 'API error fetching problem %s: %s', problem_alias, str(e))
             raise ValueError(
@@ -223,36 +506,78 @@ class EditorialGenerator:
         return {'source': ac_solution_source} if ac_solution_source else None
 
     def _generate_english_editorial(self, problem_data: Dict[str, Any],
-                                    ac_solution: Optional[Dict[str,
-                                                               Any]]) -> str:
-        """Generate English editorial content."""
-        editorial_en = self.generate_editorial_prompt(
+                                    ac_solution: Optional[Dict[str, Any]]
+                                    ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        """Generate English editorial and verify with code submission."""
+        # Generate combined editorial and code
+        combined_response = self.generate_editorial_prompt(
             problem_data, ac_solution)
-        if not editorial_en:
-            raise ValueError('Failed to generate English editorial')
-        return editorial_en
+        if not combined_response:
+            raise ValueError('Failed to generate editorial and code')
 
-    def _verify_solution_if_enabled(self,
-                                    problem_alias: str,
-                                    editorial_en: str,
-                                    problem_data: Dict[str, Any]
-                                    ) -> Optional[Dict[str, Any]]:
-        """Verify solution if verification is enabled."""
-        if self.llm_config.get('enable_solution_verification', False):
-            return self.verify_editorial_solution(
-                problem_alias, editorial_en, problem_data)
-        return None
+        # Parse the combined response
+        editorial_content, cpp_code = self._parse_editorial_and_code(
+            combined_response)
+
+        if not editorial_content:
+            # Fallback: use the raw response as editorial if parsing failed
+            logging.warning(
+                "Failed to extract editorial content, using raw response "
+                "as fallback")
+            editorial_content = combined_response.strip()
+
+            # Remove editorial delimiter if present
+            if '=== EDITORIAL ===' in editorial_content:
+                editorial_content = editorial_content.replace(
+                    '=== EDITORIAL ===', '').strip()
+
+            if not editorial_content:
+                raise ValueError(
+                    'Failed to extract editorial content and response '
+                    'is empty')
+
+        # Submit and verify the generated code
+        verification_result = None
+        if cpp_code:
+            problem_alias = problem_data.get('alias', 'unknown')
+            verification_result = self._submit_and_verify_solution(
+                problem_alias, cpp_code)
+            logging.info("Solution verification result: %s",
+                         verification_result.get('verdict', 'UNKNOWN'))
+        else:
+            logging.warning("No C++ code generated for verification")
+            verification_result = {
+                'verified': False,
+                'verdict': 'NO_CODE',
+                'error': 'No C++ code generated'
+            }
+
+        return editorial_content, verification_result
 
     def _generate_translations(self, editorial_en: str) -> Dict[str, str]:
-        """Generate translations for multiple languages."""
+        """Generate translations for multiple languages using combined
+        prompt."""
         translations = {}
-        if self.llm_config.get('enable_multi_language', True):
-            for lang in ['es', 'pt']:
-                if lang in self.llm_config.get(
-                    'languages', ['en', 'es', 'pt']):
-                    translated = self.generate_translation(editorial_en, lang)
-                    if translated:
-                        translations[lang] = translated
+        if self.full_config.get('enable_multi_language', True):
+            logging.info(
+                "Starting translation generation for Spanish and Portuguese")
+            # Generate both Spanish and Portuguese in one API call
+            combined_response = self.generate_translation(
+                editorial_en, 'combined')
+            if combined_response:
+                logging.info(
+                    "Received combined translation response, parsing...")
+                # Parse the combined response
+                parsed_translations = self._parse_combined_translation(
+                    combined_response)
+                lang_list = list(parsed_translations.keys())
+                logging.info("Parsed translations for languages: %s",
+                             lang_list)
+                translations.update(parsed_translations)
+            else:
+                logging.warning("No translation response received from LLM")
+        else:
+            logging.info("Multi-language translation disabled in config")
         return translations
 
     def _add_disclaimers_to_all(
@@ -260,6 +585,33 @@ class EditorialGenerator:
         """Add AI disclaimers to all editorial versions."""
         for lang, content in editorials.items():
             editorials[lang] = self.add_ai_disclaimer(content, lang)
+        return editorials
+
+    def _add_verification_disclaimers_to_all(
+        self, editorials: Dict[str, str],
+        verification_result: Optional[Dict[str, Any]]) -> Dict[str, str]:
+        """Add verification-based disclaimers to all editorial versions."""
+        if not verification_result:
+            # Fallback to standard disclaimers
+            return self._add_disclaimers_to_all(editorials)
+
+        for lang, content in editorials.items():
+            # Get AI control header for the beginning
+            ai_control_header = self._get_ai_control_header(lang)
+
+            # Get verification disclaimer for the end
+            disclaimer = self._generate_verification_disclaimer(
+                verification_result, lang)
+
+            # Combine: header at start + content + disclaimer at end
+            result = ""
+            if ai_control_header:
+                result += ai_control_header + "\n\n"
+            result += content
+            if disclaimer:
+                result += disclaimer
+
+            editorials[lang] = result
         return editorials
 
     def generate_complete_editorial(
@@ -277,25 +629,22 @@ class EditorialGenerator:
             # Step 2: Get AC solution (if available)
             ac_solution = self._get_ac_solution(problem_alias)
 
-            # Step 3: Generate English editorial (Prompt 1)
-            editorial_en = self._generate_english_editorial(
-                problem_data, ac_solution)
+            # Step 3: Generate English editorial with code verification
+            editorial_en, verification_result = (
+                self._generate_english_editorial(problem_data, ac_solution))
 
-            # Step 4: Verify solution (Prompt 2) - DISABLED for now
-            solution_verification = self._verify_solution_if_enabled(
-                problem_alias, editorial_en, problem_data)
-
-            # Step 5: Generate translations (Prompt 3)
+            # Step 4: Generate translations (Prompt 3)
             translated_editorials = self._generate_translations(editorial_en)
             all_editorials = {'en': editorial_en, **translated_editorials}
 
-            # Step 6: Add AI disclaimer to all editorials
-            final_editorials = self._add_disclaimers_to_all(all_editorials)
+            # Step 5: Add verification-based disclaimers to all editorials
+            final_editorials = self._add_verification_disclaimers_to_all(
+                all_editorials, verification_result)
 
             return {
                 'success': True,
                 'editorials': final_editorials,
-                'solution_verification': solution_verification,
+                'solution_verification': verification_result,
                 'problem_alias': problem_alias,
                 'job_id': job_id
             }
@@ -367,25 +716,30 @@ class EditorialGenerator:
             for example in examples
         ]
 
+    def _get_ai_control_header(self, language: str) -> str:
+        """Get language-specific AI control header."""
+        headers = self.disclaimers.get('ai_control_headers', {})
+        return str(headers.get(language, headers.get('en', '')))
+
     def add_ai_disclaimer(self, content: str, language: str) -> str:
         """Add AI generation disclaimer to editorial content."""
 
-        disclaimers = {
-            'en': ("\n\n---\n*This editorial was generated using AI "
-                   "assistance. While we strive for accuracy, please verify "
-                   "the solution approach and report any issues.*"),
-            'es': ("\n\n---\n*Este editorial fue generado con asistencia de "
-                   "IA. Aunque nos esforzamos por la precisión, por favor "
-                   "verifica el enfoque de la solución y reporta cualquier "
-                   "problema.*"),
-            'pt': ("\n\n---\n*Este editorial foi gerado com assistência de "
-                   "IA. Embora nos esforcemos pela precisão, por favor "
-                   "verifique a abordagem da solução e reporte quaisquer "
-                   "problemas.*")
-        }
+        # Get AI control header for the beginning
+        ai_control_header = self._get_ai_control_header(language)
 
-        disclaimer = disclaimers.get(language, disclaimers['en'])
-        return content + disclaimer
+        # Get AI generation disclaimer for the end
+        disclaimers = self.disclaimers.get('ai_generation_disclaimers', {})
+        disclaimer = str(disclaimers.get(language, disclaimers.get('en', '')))
+
+        # Combine: header at start + content + disclaimer at end
+        result = ""
+        if ai_control_header:
+            result += ai_control_header + "\n\n"
+        result += content
+        if disclaimer:
+            result += disclaimer
+
+        return result
 
     def get_generation_stats(self) -> Dict[str, Any]:
         """Get statistics about editorial generation."""
@@ -400,7 +754,4 @@ class EditorialGenerator:
                 0.7),
             'multi_language_enabled': self.llm_config.get(
                 'enable_multi_language',
-                True),
-            'solution_verification_enabled': self.llm_config.get(
-                'enable_solution_verification',
                 True)}

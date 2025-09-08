@@ -10,6 +10,8 @@ Can be used by any omegaUp tool/script that needs API access.
 
 import json
 import logging
+import random
+import time
 
 from typing import Dict, Any, List, Optional, Tuple
 
@@ -26,23 +28,24 @@ class OmegaUpAPIClient:
     - Automatic retry with exponential backoff
     - Rate limiting and error handling
     - Complete omegaUp API coverage for any tool
+    - Exponential backoff for verdict polling
     """
 
-    def __init__(self, auth_token: str, base_url: str = 'https://omegaup.com',
-                 user_agent: str = 'omegaUp-API-Client/1.0'):
+    def __init__(
+        self,
+        auth_token: Optional[str] = None,
+        credentials: Optional[Tuple[str, str]] = None,
+        base_url: str = 'https://omegaup.com',
+        user_agent: str = 'omegaUp-API-Client/1.0'):
         """
-        Initialize API client with user's auth token.
+        Initialize API client with user's auth token or username/password.
 
         Args:
-            auth_token: User's session token from PHP
-                        Session::getCurrentSession()
+            auth_token: User's session token from PHP (preferred)
+            credentials: Tuple of (username, password) if auth_token not used
             base_url: omegaUp base URL (default: https://omegaup.com)
             user_agent: Custom user agent for requests
         """
-        if not auth_token:
-            raise ValueError("auth_token is required")
-
-        self.auth_token = auth_token
         self.base_url = base_url.rstrip('/')
         self.api_url = f"{self.base_url}/api"
 
@@ -64,7 +67,69 @@ class OmegaUpAPIClient:
             'Accept': 'application/json'
         })
 
-        logging.info("Initialized omegaUp API client for %s", base_url)
+        # Determine authentication method
+        if auth_token:
+            self.auth_token = auth_token
+            logging.info(
+                "Initialized omegaUp API client for %s (auth_token)",
+                base_url)
+        elif credentials:
+            username, password = credentials
+            self.auth_token = self._login_and_get_token(username, password)
+            logging.info(
+                "Initialized omegaUp API client for %s (username/password)",
+                base_url)
+        else:
+            raise ValueError("auth_token or credentials required")
+
+    def _login_and_get_token(self, username: str, password: str) -> str:
+        """
+        Log in to omegaUp and retrieve the session auth token (ouat).
+        """
+        login_url = f"{self.api_url}/user/login"
+        login_data = {
+            'usernameOrEmail': username,
+            'password': password
+        }
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        try:
+            resp = self.session.post(
+                login_url,
+                data=login_data,
+                headers=headers,
+                timeout=30)
+            if resp.status_code != 200:
+                raise ValueError(f"Login failed: HTTP {resp.status_code}")
+            result = resp.json()
+            if result.get('status') != 'ok':
+                raise ValueError(
+                    f"Login failed: {result.get('error', 'Unknown error')}")
+
+            # Check if auth_token is in response
+            if 'auth_token' in result:
+                return str(result['auth_token'])
+
+            # Otherwise, look for ouat cookie
+            for cookie in self.session.cookies:
+                if cookie.name == 'ouat' and cookie.value:
+                    logging.info("Found ouat cookie: %s",
+                                 cookie.value[:20] + "...")
+                    return cookie.value
+
+            # If no ouat cookie, try to get from session currentSession API
+            current_session_url = f"{self.api_url}/session/currentSession"
+            session_resp = self.session.get(current_session_url, timeout=30)
+            if session_resp.status_code == 200:
+                session_data = session_resp.json()
+                if ('session' in session_data and
+                        'ouat' in session_data['session']):
+                    return str(session_data['session']['ouat'])
+
+            raise ValueError(
+                "Could not obtain auth token from login response or cookies")
+        except Exception as e:
+            logging.error("Failed to login and get auth token: %s", e)
+            raise
 
     def _make_request(self,
                       endpoint: str,
@@ -156,10 +221,12 @@ class OmegaUpAPIClient:
             'problem_alias': problem_alias
         })
 
-        problem_data = response.get('problem', {})
-        if not problem_data:
+        # API returns problem data directly, not nested under 'problem'
+        if not response or 'statement' not in response:
             raise ValueError(
                 f"Problem '{problem_alias}' not found or inaccessible")
+
+        problem_data = response
 
         logging.info(
             "Retrieved problem: %s", problem_data.get('title', 'Unknown'))
@@ -424,12 +491,463 @@ class OmegaUpAPIClient:
         try:
             response = self.get_run_status(run_guid)
 
-            verdict = response.get('verdict', 'JE')
-            score = float(response.get('score', 0.0))
-            memory = response.get('memory', '0')
+            verdict = 'JE'
+            score = 0.0
+            memory = '0'
 
-            return (verdict, score, str(memory))
+            # Extract from direct fields or nested details
+            if 'verdict' in response and response['verdict']:
+                verdict = str(response['verdict'])
+                score = float(response.get('score', 0.0))
+                memory = str(response.get('memory', '0'))
+            elif ('details' in response and
+                  isinstance(response['details'], dict)):
+                details = response['details']
+                verdict = str(details.get('verdict', 'JE'))
+                score = float(details.get('score', 0.0))
+                memory = str(details.get('memory', '0'))
+
+            return (verdict, score, memory)
 
         except (ConnectionError, TypeError, ValueError) as e:
             logging.error("Error getting detailed run status: %s", e)
             return ('JE', 0.0, '0')
+
+    def wait_for_verdict(self, run_guid: str, max_attempts: int = 20,
+                         initial_delay: float = 1.0) -> Dict[str, Any]:
+        """
+        Wait for run verdict with exponential backoff polling strategy.
+
+        Args:
+            run_guid: Run identifier to poll
+            max_attempts: Maximum number of polling attempts
+            initial_delay: Initial delay between attempts
+                          (exponentially increased)
+
+        Returns:
+            Dict with verdict information: {
+                'verdict': str,
+                'success': bool,
+                'score': float,
+                'memory': str,
+                'runtime': str
+            }
+        """
+
+        logging.info("Waiting for verdict for run: %s", run_guid)
+
+        delay_seconds = initial_delay
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                time.sleep(delay_seconds)
+
+                response = self.get_run_status(run_guid)
+
+                # Extract verdict and status from response
+                # Handle both /run/status/ and /run/details/ response formats
+                verdict = ''
+                status = ''
+                score = 0.0
+                memory = '0'
+                runtime = '0'
+
+                # Check for direct fields first
+                if 'verdict' in response and response['verdict']:
+                    verdict = str(response['verdict']).upper()
+                    score = float(response.get('score', 0.0))
+                    memory = str(response.get('memory', '0'))
+                    runtime = str(response.get('time', '0'))
+
+                # Fall back to nested details field if present
+                elif ('details' in response and
+                      isinstance(response['details'], dict)):
+                    details = response['details']
+                    verdict = str(details.get('verdict', '')).upper()
+                    score = float(details.get('score', 0.0))
+                    memory = str(details.get('memory', '0'))
+                    runtime = str(details.get('time', '0'))
+
+                if 'status' in response:
+                    status = str(response.get('status', '')).lower()
+                elif ('details' in response and
+                      isinstance(response['details'], dict)):
+                    status = str(response['details'].get('status', '')).lower()
+
+                logging.info(
+                    "Attempt %d: Run %s status='%s' verdict='%s' "
+                    "response_keys=%s",
+                    attempt,
+                    run_guid,
+                    status,
+                    verdict,
+                    list(
+                        response.keys()))
+
+                if attempt <= 3:
+                    logging.debug("Full response structure: %s", response)
+
+                # Check if run is finished
+                if verdict and verdict.strip() and verdict not in ['', 'JE']:
+                    result = {
+                        'verdict': verdict,
+                        'success': verdict == 'AC',
+                        'score': score,
+                        'memory': memory,
+                        'runtime': runtime
+                    }
+                    logging.info(
+                        "Final verdict for run %s: %s (attempt %d)",
+                        run_guid, verdict, attempt)
+                    return result
+
+                # Exponential backoff with jitter
+                if attempt < max_attempts:
+                    base_delay = initial_delay
+                    max_delay = 16.0
+                    jitter_factor = 0.1
+
+                    # Exponential: 2^(attempt//3) for grouping
+                    exponential_delay = min(
+                        base_delay * (2 ** (attempt // 3)), max_delay)
+
+                    # Add jitter to avoid thundering herd
+                    jitter = (exponential_delay * jitter_factor *
+                              (2 * random.random() - 1))
+                    delay_seconds = max(0.5, exponential_delay + jitter)
+
+            except (ConnectionError, TypeError, ValueError) as e:
+                logging.warning(
+                    "Error polling run %s (attempt %d): %s",
+                    run_guid, attempt, e)
+                continue
+
+        # Timeout reached
+        logging.warning(
+            "Verdict polling timeout for run %s after %d attempts",
+            run_guid, max_attempts)
+        return {
+            'verdict': 'TIMEOUT',
+            'success': False,
+            'score': 0.0,
+            'memory': '0',
+            'runtime': '0'
+        }
+
+    def update_job_status(
+        self,
+        job_id: str,
+        status: str,
+        **kwargs: Any
+    ) -> bool:
+        """
+        Update AI editorial job status and content in database.
+
+        This method is called by the worker to synchronize job status
+        and generated content from Redis to the omegaUp database.
+
+        Args:
+            job_id: Unique job identifier (UUID)
+            status: Job status ('processing', 'completed', 'failed')
+            **kwargs: Optional parameters:
+                - editorials: Dict with generated editorials
+                - error_message: Error description if status is 'failed'
+                - validation_verdict: Solution validation result
+
+        Returns:
+            True if update successful, False otherwise
+        """
+        logging.info("Updating job status: %s -> %s", job_id, status)
+
+        try:
+            # Extract optional parameters from kwargs
+            editorials = kwargs.get('editorials')
+            error_message = kwargs.get('error_message')
+            validation_verdict = kwargs.get('validation_verdict')
+
+            request_data = {
+                'job_id': job_id,
+                'status': status
+            }
+
+            # Add optional parameters if provided
+            if error_message:
+                request_data['error_message'] = error_message
+
+            if editorials:
+                if 'en' in editorials and editorials['en']:
+                    request_data['md_en'] = editorials['en']
+                if 'es' in editorials and editorials['es']:
+                    request_data['md_es'] = editorials['es']
+                if 'pt' in editorials and editorials['pt']:
+                    request_data['md_pt'] = editorials['pt']
+
+            if validation_verdict:
+                request_data['validation_verdict'] = validation_verdict
+
+            response = self._make_request(
+                '/aiEditorial/updateJob/', request_data)
+
+            # Check for successful update
+            if response.get('status') == 'ok':
+                logging.info(
+                    "Successfully updated job %s status to %s",
+                    job_id,
+                    status)
+                return True
+
+            logging.warning("Job status update failed: %s", response)
+            return False
+
+        except (ConnectionError, TypeError, ValueError) as e:
+            logging.error("Error updating job status for %s: %s", job_id, e)
+            return False
+
+    def get_user_problems(self,
+                          page: int = 1,
+                          rowcount: int = 100,
+                          query: str = '') -> Dict[str, Any]:
+        """
+        Get problems created by the authenticated user.
+
+        Args:
+            page: Page number (1-based indexing)
+            rowcount: Maximum number of problems to return
+            query: Optional search query to filter problems
+
+        Returns:
+            API response containing problem list and metadata
+
+        Raises:
+            requests.RequestException: On API/network errors
+        """
+        logging.debug(
+            "Fetching user problems: page=%d, rowcount=%d, query='%s'",
+            page, rowcount, query)
+
+        request_data = {
+            'page': str(page),
+            'rowcount': str(rowcount)
+        }
+
+        if query:
+            request_data['query'] = query
+
+        response = self._make_request('/problem/myList/', request_data)
+
+        logging.debug(
+            "User problems API response keys: %s",
+            list(response.keys()))
+
+        return response
+
+    def get_admin_problems(self,
+                           page: int = 1,
+                           page_size: int = 100,
+                           query: str = '') -> Dict[str, Any]:
+        """
+        Get problems accessible to admin (includes private problems).
+
+        Args:
+            page: Page number (1-based indexing)
+            page_size: Maximum number of problems to return
+            query: Optional search query to filter problems
+
+        Returns:
+            API response containing problem list and metadata
+
+        Raises:
+            requests.RequestException: On API/network errors
+        """
+        logging.debug(
+            "Fetching admin problems: page=%d, page_size=%d, query='%s'",
+            page, page_size, query)
+
+        request_data = {
+            'page': str(page),
+            'page_size': str(page_size)
+        }
+
+        if query:
+            request_data['query'] = query
+
+        response = self._make_request('/problem/adminList/', request_data)
+
+        logging.debug(
+            "Admin problems API response keys: %s",
+            list(response.keys()))
+
+        return response
+
+    def get_public_problems(self,
+                            page: int = 1,
+                            rowcount: int = 100,
+                            query: str = '') -> Dict[str, Any]:
+        """
+        Get public problems (excludes private problems).
+
+        Args:
+            page: Page number (1-based indexing)
+            rowcount: Maximum number of problems to return
+            query: Optional search query to filter problems
+
+        Returns:
+            API response containing problem list and metadata
+
+        Raises:
+            requests.RequestException: On API/network errors
+        """
+        logging.debug(
+            "Fetching public problems: page=%d, rowcount=%d, query='%s'",
+            page, rowcount, query)
+
+        request_data = {
+            'page': str(page),
+            'rowcount': str(rowcount),
+            'min_visibility': '1'  # 1 = public, 0 = private
+        }
+
+        if query:
+            request_data['query'] = query
+
+        response = self._make_request('/problem/list/', request_data)
+
+        logging.debug(
+            "Public problems API response keys: %s",
+            list(response.keys()))
+
+        return response
+
+    def get_all_public_problems(self,
+                                query: str = '',
+                                batch_size: int = 100) -> List[Dict[str, Any]]:
+        """
+        Get all public problems using pagination.
+
+        Args:
+            query: Optional search query to filter problems
+            batch_size: Number of problems to fetch per API call
+
+        Returns:
+            List of all public problem objects
+
+        Raises:
+            requests.RequestException: On API/network errors
+        """
+        logging.info("Fetching all public problems with query: '%s'", query)
+
+        all_problems = []
+        page = 1
+        total_processed = 0
+
+        while True:
+            logging.debug(
+                "Fetching page %d (rowcount=%d)",
+                page, batch_size)
+
+            try:
+                response = self.get_public_problems(
+                    page=page,
+                    rowcount=batch_size,
+                    query=query
+                )
+
+                # Extract problems list from response
+                problems = response.get('results', [])
+                if not problems:
+                    logging.debug(
+                        "No more problems found, stopping pagination"
+                    )
+                    break
+
+                all_problems.extend(problems)
+                batch_count = len(problems)
+                total_processed += batch_count
+
+                logging.debug(
+                    "Page %d: Found %d problems (total: %d)",
+                    page, batch_count, total_processed)
+
+                # Check if we've reached the end
+                if batch_count < batch_size:
+                    logging.debug(
+                        "Received fewer problems than requested, "
+                        "assuming end of results")
+                    break
+
+                page += 1
+
+                # Safety check to prevent infinite loops
+                if total_processed > 10000:
+                    logging.warning(
+                        "Processed over 10,000 problems, stopping pagination")
+                    break
+
+            except requests.RequestException as e:
+                logging.error(
+                    "Error fetching public problems at page %d: %s",
+                    page, e)
+                raise
+
+        logging.info(
+            "Successfully fetched %d total public problems", total_processed)
+        return all_problems
+
+    def extract_problem_statistics(self,
+                                   problems: List[Dict[str,
+                                                       Any]]) -> Dict[str,
+                                                                      Any]:
+        """
+        Extract statistical information from problem list.
+
+        Args:
+            problems: List of problem objects from API
+
+        Returns:
+            Dictionary with statistical breakdown
+        """
+        stats: Dict[str, Any] = {
+            'total_problems': len(problems),
+            'public_problems': 0,
+            'private_problems': 0,
+            'visibility_breakdown': {},
+            'difficulty_breakdown': {},
+            'problems_with_solutions': 0,
+            'problems_without_solutions': 0,
+            'sample_problems': problems[:5] if problems else []
+        }
+
+        # Analyze each problem
+        for problem in problems:
+            # Visibility analysis
+            visibility = problem.get('visibility', 'unknown')
+            if visibility in ['public', 'public_banned']:
+                stats['public_problems'] = int(stats['public_problems']) + 1
+            elif visibility in ['private', 'promoted']:
+                stats['private_problems'] = int(stats['private_problems']) + 1
+
+            # Count visibility types
+            visibility_breakdown = stats['visibility_breakdown']
+            if visibility in visibility_breakdown:
+                visibility_breakdown[visibility] += 1
+            else:
+                visibility_breakdown[visibility] = 1
+
+            # Difficulty analysis
+            difficulty = problem.get('difficulty', 'unknown')
+            difficulty_breakdown = stats['difficulty_breakdown']
+            if difficulty in difficulty_breakdown:
+                difficulty_breakdown[difficulty] += 1
+            else:
+                difficulty_breakdown[difficulty] = 1
+
+            # Solution analysis (placeholder - would need additional API call)
+            # This is a simplified check based on available data
+            if 'solution' in problem and problem['solution']:
+                stats['problems_with_solutions'] = int(
+                    stats['problems_with_solutions']) + 1
+            else:
+                stats['problems_without_solutions'] = int(
+                    stats['problems_without_solutions']) + 1
+
+        return stats

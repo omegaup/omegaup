@@ -62,7 +62,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        $recentJobs = \OmegaUp\DAO\AiEditorialJobs::countRecentJobsByUser(
+        $recentJobs = \OmegaUp\DAO\AIEditorialJobs::countRecentJobsByUser(
             $r->identity->user_id,
             1 // 1 hour
         );
@@ -77,7 +77,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         if (is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $lastJob = \OmegaUp\DAO\AiEditorialJobs::getLastJobForProblem(
+        $lastJob = \OmegaUp\DAO\AIEditorialJobs::getLastJobForProblem(
             $problem->problem_id
         );
 
@@ -101,7 +101,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         // Create the job
-        $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
+        $jobId = \OmegaUp\DAO\AIEditorialJobs::createJob(
             $problem->problem_id,
             $r->identity->user_id
         );
@@ -132,10 +132,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         int $identityId
     ): void {
         try {
-            // Use environment variables like existing cronjobs
-            $redisHost = $_ENV['REDIS_HOST'] ?? 'redis';
-            $redisPort = intval($_ENV['REDIS_PORT'] ?? '6379');
-            $redisPassword = $_ENV['REDIS_PASSWORD'] ?? null;
+            // Use constants like existing Cache.php implementation
+            $redisHost = REDIS_HOST;
+            $redisPort = REDIS_PORT;
 
             $redis = new \Redis();
 
@@ -149,8 +148,9 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if ($redisPassword) {
-                $redis->auth($redisPassword);
+            /** @psalm-suppress RedundantCondition REDIS_PASS is really a variable */
+            if (REDIS_PASS !== '' && !$redis->auth(REDIS_PASS)) {
+                throw new \Exception('Redis authentication failed');
             }
 
             // Validate auth token before queuing
@@ -173,7 +173,6 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Queue to high priority queue for user-initiated jobs
             $redis->lpush('editorial_jobs_user', json_encode($job));
-
             $redis->close();
         } catch (\Exception $e) {
             // Log error with security considerations (don't log auth token)
@@ -189,7 +188,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Update job status to failed and throw exception
             try {
-                \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+                \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                     $jobId,
                     $failedStatus,
                     $failedMessage,
@@ -220,7 +219,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $jobId = $r->ensureString('job_id');
 
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK($jobId);
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
         if (is_null($job)) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
@@ -280,7 +279,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK($jobId);
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
         if (is_null($job)) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
@@ -310,7 +309,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
         if ($action === 'approve') {
             // Update job status
-            \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                 $jobId,
                 self::REVIEW_STATUS_APPROVED
             );
@@ -346,7 +345,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
         } else {
             // Reject the job
-            \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                 $jobId,
                 self::REVIEW_STATUS_REJECTED
             );
@@ -382,5 +381,100 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
         // Call the existing Problem API to update the solution
         \OmegaUp\Controllers\Problem::apiUpdateSolution($solutionRequest);
+    }
+
+    /**
+     * Update job status and content from AI worker
+     *
+     * This endpoint is called by the Python AI worker to update job status
+     * and content in the database after processing completion.
+     *
+     * @omegaup-request-param string $job_id
+     * @omegaup-request-param string $status
+     * @omegaup-request-param null|string $error_message
+     * @omegaup-request-param null|string $md_en
+     * @omegaup-request-param null|string $md_es
+     * @omegaup-request-param null|string $md_pt
+     * @omegaup-request-param null|string $validation_verdict
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdateJob(\OmegaUp\Request $r): array {
+        // This endpoint is called by the worker using the original user's auth_token
+        $r->ensureIdentity();
+
+        $jobId = $r->ensureString('job_id');
+        $status = $r->ensureString('status');
+        $errorMessage = $r->ensureOptionalString('error_message');
+        $mdEn = $r->ensureOptionalString('md_en');
+        $mdEs = $r->ensureOptionalString('md_es');
+        $mdPt = $r->ensureOptionalString('md_pt');
+        $validationVerdict = $r->ensureOptionalString('validation_verdict');
+
+        // Validate status parameter
+        if (
+            !in_array($status, [
+            self::STATUS_PROCESSING,
+            self::STATUS_COMPLETED,
+            self::STATUS_FAILED
+            ])
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid'
+            );
+        }
+
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
+        if (is_null($job)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
+        }
+
+        // Get problem to check permissions
+        if (is_null($job->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+        $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        // Check if user has admin permissions for this problem
+        // Worker uses the original user's auth_token, so this ensures proper permissions
+        if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        // Update job status
+        \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
+            $jobId,
+            $status,
+            $errorMessage,
+            $status === self::STATUS_FAILED ? false : null // Set is_retriable to false only for failed jobs
+        );
+
+        // Update job content if provided
+        if (
+            !is_null(
+                $mdEn
+            ) || !is_null(
+                $mdEs
+            ) || !is_null(
+                $mdPt
+            ) || !is_null(
+                $validationVerdict
+            )
+        ) {
+            \OmegaUp\DAO\AIEditorialJobs::updateJobContent(
+                $jobId,
+                $mdEn,
+                $mdEs,
+                $mdPt,
+                $validationVerdict
+            );
+        }
+
+        return ['status' => 'ok'];
     }
 }

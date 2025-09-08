@@ -17,14 +17,14 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InternalServerErrorException $e) {
             // Expected Redis failure in test environment
             // Get the job that was created before Redis failure
-            $jobs = \OmegaUp\DAO\AiEditorialJobs::getJobsByProblem(
+            $jobs = \OmegaUp\DAO\AIEditorialJobs::getJobsByProblem(
                 \OmegaUp\DAO\Problems::getByAlias($request['problem_alias'])->problem_id
             );
             $this->assertNotEmpty($jobs);
             $job = $jobs[0];
 
             // Manually update job status as reviewer suggested
-            \OmegaUp\DAO\AiEditorialJobs::updateJobStatus(
+            \OmegaUp\DAO\AIEditorialJobs::updateJobStatus(
                 $job->job_id,
                 'queued',
                 'Job queued (test environment)',
@@ -60,7 +60,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertIsString($response['job_id']);
 
         // Verify job was created in database
-        $jobs = \OmegaUp\DAO\AiEditorialJobs::getJobsByProblem(
+        $jobs = \OmegaUp\DAO\AIEditorialJobs::getJobsByProblem(
             $problemData['problem']->problem_id
         );
         $this->assertSame(1, count($jobs));
@@ -98,7 +98,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Verify no job was created
-        $jobs = \OmegaUp\DAO\AiEditorialJobs::getJobsByProblem(
+        $jobs = \OmegaUp\DAO\AIEditorialJobs::getJobsByProblem(
             $problemData['problem']->problem_id
         );
         $this->assertSame(0, count($jobs));
@@ -113,7 +113,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create 5 jobs directly in database to bypass API cooldown checks
         for ($i = 0; $i < 5; $i++) {
-            $jobId = \OmegaUp\DAO\AiEditorialJobs::createJob(
+            $jobId = \OmegaUp\DAO\AIEditorialJobs::createJob(
                 $problemData['problem']->problem_id,
                 $problemData['author']->user_id
             );
@@ -138,7 +138,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Verify exactly 5 jobs were created
-        $totalJobs = \OmegaUp\DAO\AiEditorialJobs::countRecentJobsByUser(
+        $totalJobs = \OmegaUp\DAO\AIEditorialJobs::countRecentJobsByUser(
             $problemData['author']->user_id,
             1 // 1 hour
         );
@@ -228,14 +228,14 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Manually update job to completed status with content for testing
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK(
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK(
             $generateResponse['job_id']
         );
         $this->assertNotNull($job);
 
         $job->status = 'completed';
         $job->md_en = '# Test Editorial\n\nThis is a test editorial content.';
-        \OmegaUp\DAO\AiEditorialJobs::save($job);
+        \OmegaUp\DAO\AIEditorialJobs::save($job);
 
         // Now approve the job
         $response = \OmegaUp\Controllers\AiEditorial::apiReview(new \OmegaUp\Request([
@@ -248,7 +248,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
 
         // Verify job status was updated
-        $updatedJob = \OmegaUp\DAO\AiEditorialJobs::getByPK(
+        $updatedJob = \OmegaUp\DAO\AIEditorialJobs::getByPK(
             $generateResponse['job_id']
         );
         $this->assertSame('approved', $updatedJob->status);
@@ -269,14 +269,14 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Manually update job to completed status for testing
-        $job = \OmegaUp\DAO\AiEditorialJobs::getByPK(
+        $job = \OmegaUp\DAO\AIEditorialJobs::getByPK(
             $generateResponse['job_id']
         );
         $this->assertNotNull($job);
 
         $job->status = 'completed';
         $job->md_en = '# Test Editorial\n\nThis is a test editorial content.';
-        \OmegaUp\DAO\AiEditorialJobs::save($job);
+        \OmegaUp\DAO\AIEditorialJobs::save($job);
 
         // Now reject the job
         $response = \OmegaUp\Controllers\AiEditorial::apiReview(new \OmegaUp\Request([
@@ -288,7 +288,7 @@ class AiEditorialTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame('ok', $response['status']);
 
         // Verify job status was updated
-        $updatedJob = \OmegaUp\DAO\AiEditorialJobs::getByPK(
+        $updatedJob = \OmegaUp\DAO\AIEditorialJobs::getByPK(
             $generateResponse['job_id']
         );
         $this->assertSame('rejected', $updatedJob->status);

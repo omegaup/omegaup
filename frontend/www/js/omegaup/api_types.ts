@@ -3428,6 +3428,7 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    teaching_assistant_enabled: boolean;
     unlimited_duration: boolean;
   }
 
@@ -4209,6 +4210,14 @@ export namespace types {
     problemAlias: string;
     solved: boolean;
     tried: boolean;
+  }
+
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
   }
 
   export interface ProblemSettings {
@@ -5082,6 +5091,8 @@ export namespace messages {
   export type AiEditorialStatusRequest = { [key: string]: any };
   export type _AiEditorialStatusServerResponse = any;
   export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+  export type AiEditorialUpdateJobRequest = { [key: string]: any };
+  export type AiEditorialUpdateJobResponse = {};
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5462,6 +5473,10 @@ export namespace messages {
   export type CourseStudentsProgressResponse = {
     nextPage?: number;
     progress: types.StudentProgressInCourse[];
+  };
+  export type CourseToggleTeachingAssistantRequest = { [key: string]: any };
+  export type CourseToggleTeachingAssistantResponse = {
+    teaching_assistant_enabled: boolean;
   };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
@@ -6021,6 +6036,9 @@ export namespace controllers {
     status: (
       params?: messages.AiEditorialStatusRequest,
     ) => Promise<messages.AiEditorialStatusResponse>;
+    updateJob: (
+      params?: messages.AiEditorialUpdateJobRequest,
+    ) => Promise<messages.AiEditorialUpdateJobResponse>;
   }
 
   export interface Authorization {
@@ -6342,6 +6360,9 @@ export namespace controllers {
     studentsProgress: (
       params?: messages.CourseStudentsProgressRequest,
     ) => Promise<messages.CourseStudentsProgressResponse>;
+    toggleTeachingAssistant: (
+      params?: messages.CourseToggleTeachingAssistantRequest,
+    ) => Promise<messages.CourseToggleTeachingAssistantResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;

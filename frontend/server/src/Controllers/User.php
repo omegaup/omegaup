@@ -4787,6 +4787,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
+     * @omegaup-request-param null|string $redirect
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4800,6 +4801,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
         $idToken = $r->ensureOptionalString('credential');
+        $redirect = $r->ensureOptionalString('redirect');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4823,7 +4825,8 @@ class User extends \OmegaUp\Controllers\Controller {
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
-                    $gCsrfToken
+                    $gCsrfToken,
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {
