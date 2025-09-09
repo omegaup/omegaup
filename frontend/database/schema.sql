@@ -262,6 +262,7 @@ CREATE TABLE `Contests` (
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
   KEY `fk_cc_rerun_id` (`rerun_id`),
+  KEY `idx_contests_title_archived` (`title`,`archived`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -1289,6 +1290,8 @@ CREATE TABLE `Users` (
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
   KEY `idx_is_private` (`is_private`),
+  KEY `idx_users_parental_verification` (`parental_verification_token`),
+  KEY `idx_users_verified_mailing_list` (`verified`,`in_mailing_list`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
