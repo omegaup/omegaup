@@ -15,10 +15,12 @@ Generate a comprehensive, educational editorial AND a working C++ solution for t
 
 # Output Requirements
 
+Generate a comprehensive **English language editorial** with the following requirements.
+
 You must provide BOTH sections in your response using these exact delimiters:
 
 === EDITORIAL ===
-[Complete editorial content here]
+[Complete editorial content in English here]
 
 === SOLUTION CODE ===
 ```cpp
@@ -27,7 +29,7 @@ You must provide BOTH sections in your response using these exact delimiters:
 
 # Editorial Section Requirements
 
-Create a detailed editorial following this exact structure in proper Markdown format:
+Create a detailed editorial **in English** following this exact structure in proper Markdown format:
 
 # Problem Title: {problem_title}
 
@@ -73,7 +75,8 @@ Generate a complete C++ solution that:
 
 # Critical Instructions:
 - **MANDATORY:** Your response must contain BOTH sections with exact delimiters
-- Editorial: NO CODE WHATSOEVER - pure algorithmic explanation
+- **LANGUAGE:** Write the editorial in clear, professional English
+- Editorial: NO CODE WHATSOEVER - pure algorithmic explanation in English
 - Solution: Complete, compilable C++ code only
 - Use proper Markdown formatting(#, ###, -, *, etc.)
 - Make the editorial educational and comprehensive
