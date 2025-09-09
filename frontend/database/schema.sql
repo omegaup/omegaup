@@ -1291,6 +1291,7 @@ CREATE TABLE `Users` (
   KEY `verification_id` (`verification_id`),
   KEY `idx_is_private` (`is_private`),
   KEY `idx_users_parental_verification` (`parental_verification_token`),
+  KEY `idx_users_verified_mailing_list` (`verified`,`in_mailing_list`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
