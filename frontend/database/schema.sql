@@ -263,6 +263,7 @@ CREATE TABLE `Contests` (
   KEY `fk_cop_problemset_id` (`problemset_id`),
   KEY `fk_cc_rerun_id` (`rerun_id`),
   KEY `idx_contests_title_archived` (`title`,`archived`),
+  KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -1161,6 +1162,7 @@ CREATE TABLE `Team_Groups` (
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_create_time` (`create_time`),
+  KEY `idx_team_groups_name` (`name`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
