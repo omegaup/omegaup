@@ -262,6 +262,8 @@ CREATE TABLE `Contests` (
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
   KEY `fk_cc_rerun_id` (`rerun_id`),
+  KEY `idx_contests_title_archived` (`title`,`archived`),
+  KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -692,6 +694,7 @@ CREATE TABLE `Problems` (
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
   KEY `idx_problems_title` (`title`),
+  KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
@@ -1159,6 +1162,7 @@ CREATE TABLE `Team_Groups` (
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_create_time` (`create_time`),
+  KEY `idx_team_groups_name` (`name`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1289,6 +1293,8 @@ CREATE TABLE `Users` (
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
   KEY `idx_is_private` (`is_private`),
+  KEY `idx_users_parental_verification` (`parental_verification_token`),
+  KEY `idx_users_verified_mailing_list` (`verified`,`in_mailing_list`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)

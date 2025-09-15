@@ -2618,6 +2618,7 @@ export namespace types {
     md_pt?: string;
     problem_alias: string;
     status: string;
+    validation_verdict?: string;
   }
 
   export interface ApiToken {
