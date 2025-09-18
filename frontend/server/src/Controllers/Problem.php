@@ -6697,4 +6697,213 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'problem_print',
         ];
     }
+
+    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
+        // El nombre 'zipFile' debe coincidir con el 'append' del FormData
+        if (!isset($_FILES['zipFile']) || !$_FILES['zipFile']['tmp_name']) {
+            return [
+                'status' => 'error',
+                'message' => 'No se recibió ningún archivo ZIP.',
+            ];
+        }
+        //Obtener el path temporal del archivo subido y el nombre del archivo
+        $tempFilePath = $_FILES['zipFile']['tmp_name'];
+        $problemName =pathinfo($_FILES['zipFile']['name'], PATHINFO_FILENAME); 
+
+        // Inicializar la clase ZipArchive
+        $zip = new \ZipArchive();
+        // Estructura base del cdp
+        $cdp = [
+            "problemName" => $problemName,
+            "problemMarkdown" => "",
+            "problemCodeContent" => "",
+            "problemCodeExtension" => "",
+            "problemSolutionMarkdown" => "",
+            "casesStore" => []
+        ];
+        $cases = [];
+        $testplan = null;
+        
+        // Abrir el archivo ZIP
+        if ($zip->open($tempFilePath) === TRUE) {
+
+            $rgxStatement = '/^statements\/(en|es|pt)\.markdown$/';
+            $rgxSolutions = '/^solutions\/(en|es|pt)\.markdown$/';
+
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                //Obtener el nombre del archivo
+                $name = $zip->getNameIndex($i);
+                // Buscar el archivo statement, manejar error si no existe
+                if (preg_match($rgxStatement, $name)) {
+                    if( !empty($cdp['problemMarkdown'])){
+                        $zip->close();
+                        return [
+                            'status' => 'error',
+                            'message' => 'Existe mas de un statement en el zip.',
+                        ];
+                    }
+                    $cdp['problemMarkdown'] = $zip->getFromName($name);
+                }
+                //Buscar el archivo solution, manejar error si no existe
+                if (preg_match($rgxSolutions, $name)) {
+                    if( !empty($cdp['problemSolutionMarkdown'])){
+                        $zip->close();
+                        return [
+                            'status' => 'error',
+                            'message' => 'Existe mas de una solution en el zip.',
+                        ];
+                    }
+                    $cdp['problemSolutionMarkdown'] = $zip->getFromName($name);
+                }
+                //Filtrar los casos por grupos
+                if( str_starts_with($name, 'cases/') ){
+
+                    $path_parts = pathinfo($name);
+                    // Validar que la extension sea .in o .out y que el nombre del archivo no tenga mas de un punto
+                    if( isset($path_parts['extension']) && ($path_parts['extension'] === "in" || $path_parts['extension'] === "out") && isset($path_parts['filename'])){
+                        $filename = $path_parts['filename'];
+                        $partes = explode('.', $filename);
+                        if( count($partes) > 2){
+                            return [
+                                'status' => 'error',
+                                'message' => 'Los nombres de los casos estan mal',
+                            ];
+                        }
+                        else if(  count($partes) == 2 ){
+                            $cases[$partes[0]][$partes[1]][$path_parts['extension']] = $zip->getFromName($name);
+                        }
+                        else{
+                            $cases["ungrouped"][$partes[0]][$path_parts['extension']] = $zip->getFromName($name);
+                        }
+                    }
+                }    
+                if ($name === "testplan") {
+                    $testplan = $zip->getFromName($name);
+                }
+                            
+            }
+            // Cerrar el archivo
+            $zip->close();
+
+            // Procesar testplan
+            $points = [];
+            if (!is_null($testplan)) {
+                $lines = explode("\n", trim($testplan));
+                foreach ($lines as $line) {
+                    $parts = explode(' ', $line);
+                    if (count($parts) === 2) {
+                        $points[$parts[0]] = intval($parts[1]);
+                    }
+                }
+            }
+            
+            // Construir los grupos y casos
+            $groups = self::buildCases($cases, $points);
+            $cdp['casesStore'] = $groups;
+            // Devolver el CDP
+            return [
+                'status' => 'ok',
+                'message' => 'El ZIP fue inspeccionado correctamente.',
+                'cdp' => $cdp
+            ];
+        } else {
+            // No se pudo abrir el archivo ZIP
+            return [
+                'status' => 'error',
+                'message' => 'No se pudo abrir el archivo ZIP.',
+            ];
+        }
+    }
+   
+    private static function buildCases(array &$cases, array $points = []) : array{
+        $groups = [];
+        foreach ($cases as $groupName => $casesInGroup) {
+            // Generar un UUID para el grupo
+            $groupID = self::generate_uuid_v4();
+            $group = [
+                "groupID" => $groupID,
+                "name" => $groupName === "ungrouped" ? "" : $groupName,
+                "points" => 100, 
+                "autoPoints" => true,
+                "ungroupedCase" => $groupName === "ungrouped",
+                "cases" => []
+            ];
+
+            foreach ($casesInGroup as $caseName => $caseData) {
+                // Verifica que el par .in y .out exista
+                if (!isset($caseData['in']) || !isset($caseData['out'])) {
+                    // Manejar error, el par no existe
+                    continue; 
+                }
+                // Generar un UUID para el caso
+                $caseID = self::generate_uuid_v4();
+
+                // El contenido del archivo .in será la 'line'
+                $inContent = $caseData['in'];
+                $outContent = $caseData['out'];
+                
+                // Genera un UUID para la línea
+                $lineID = self::generate_uuid_v4();
+
+                $casePoints = 100;
+                $casePath = $groupName === "ungrouped" ? $caseName : "$groupName.$caseName";
+                if (array_key_exists($casePath, $points)) {
+                    if (is_numeric($points[$casePath])) {
+                        $casePoints = $points[$casePath];
+                    }
+                }
+
+                $case = [
+                    "caseID" => $caseID,
+                    "groupID" => $groupID,
+                    "lines" => [
+                        [
+                            "lineID" => $lineID,
+                            "caseID" => $caseID,
+                            "label" => "",
+                            "data" => [ 
+                                "kind" => "multiline",
+                                "value" => $inContent 
+                            ]
+                        ]
+                    ],
+                    "points" => $casePoints,
+                    "autoPoints" => true,
+                    "output" => $outContent,
+                    "name" => $caseName
+                ];
+                
+                $group['cases'][] = $case;
+            }
+            
+            $groups[] = $group;
+        }
+
+
+        $firstGroup = !empty($groups) ? $groups[0] : null;
+        $firstCase = !empty($firstGroup['cases']) ? $firstGroup['cases'][0] : null;
+
+        return [
+            "groups" => $groups,
+            "selected" => [
+                "groupID" => !empty($firstGroup) ? $firstGroup['groupID'] : null,
+                "caseID" => !empty($firstCase) ? $firstCase['caseID'] : null
+            ],
+            "layouts" => [],
+            "hide" => false
+        ];
+    }
+    // Metodo para generar un UUID v4 sin usar librerias externas
+    private static function generate_uuid_v4(): string   {
+        // Genera 16 bytes (128 bits) de datos aleatorios
+        $data = random_bytes(16);
+
+        // Fija la versión (4) y las variantes
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // versión 4
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // variante RFC 4122
+
+        // Formatea los bytes en una cadena hexadecimal con guiones
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+    
 }
