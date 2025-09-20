@@ -56,14 +56,22 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        // Validate required fields for job creation
+        if (is_null($problem->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        if (is_null($r->identity->user_id)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
         // Skip rate limiting for system administrators
         if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             // Rate limiting: Check user's recent job count
-            if (is_null($r->identity->user_id)) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'userNotAllowed'
-                );
-            }
             $recentJobs = \OmegaUp\DAO\AIEditorialJobs::countRecentJobsByUser(
                 $r->identity->user_id,
                 1 // 1 hour
@@ -76,9 +84,6 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
             }
 
             // Problem cooldown: Check if there's a recent job for this problem
-            if (is_null($problem->problem_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-            }
             $lastJob = \OmegaUp\DAO\AIEditorialJobs::getLastJobForProblem(
                 $problem->problem_id
             );
