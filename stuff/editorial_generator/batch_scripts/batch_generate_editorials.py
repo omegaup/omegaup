@@ -1102,7 +1102,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 f.write("Rate Limit Hits: %s\n" % api_stats['rate_limit_hits'])
                 f.write(
                     "API Success Rate: %s %%\n\n" %
-                    api_stats['api_success_rate'])
+                    api_stats['api_success_rate_percent'])
 
                 # Validation Statistics
                 f.write("VALIDATION STATISTICS:\n")
@@ -1111,19 +1111,31 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 f.write(
                     "Jobs with Validation: %s\n" %
                     val_stats['total_validated'])
-                f.write("Verdict Breakdown:\n")
-                for verdict, count in val_stats['verdict_breakdown'].items():
-                    f.write("  %s: %s\n" % (verdict, count))
-                f.write(
-                    "Most Common: %s\n\n" % val_stats['most_common_verdict'])
+                if val_stats['verdict_breakdown']:
+                    f.write("Verdict Breakdown:\n")
+                    for verdict, count in val_stats['verdict_breakdown'].items(
+                    ):
+                        percentage = (
+                            count /
+                            val_stats['total_validated'] *
+                            100) if val_stats['total_validated'] > 0 else 0
+                        f.write(
+                            "  %s: %s (%.1f%%)\n" %
+                            (verdict, count, percentage))
+                    f.write(
+                        "Most Common: %s\n" %
+                        val_stats['most_common_verdict'])
+                else:
+                    f.write("No validation data available\n")
+                f.write("\n")
 
                 # Performance Metrics
                 f.write("PERFORMANCE METRICS:\n")
                 f.write("-" * 40 + "\n")
                 perf = report['performance_metrics']
-                f.write(
-                    "Avg Completion Time: "
-                    "%.2fs\n" % perf['avg_completion_time_seconds'])
+                avg_time = perf['average_job_completion_time_seconds']
+                f.write("Avg Completion Time: %ss\n" % (
+                    "%.2f" % avg_time if avg_time else "N/A"))
                 f.write("Jobs/Hour: %.1f\n" % perf['jobs_per_hour'])
                 f.write(
                     "API Calls/Min: %.2f\n\n" % perf['api_calls_per_minute'])
@@ -1131,20 +1143,28 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 # Individual Job Results
                 f.write("INDIVIDUAL JOB RESULTS:\n")
                 f.write("-" * 40 + "\n")
-                for job_data in report['job_details']:
+
+                # Completed jobs
+                for job_data in report['completed_editorials']:
                     f.write("Problem: %s\n" % job_data['problem_alias'])
-                    f.write("  Status: %s\n" % job_data['status'])
+                    f.write("  Status: completed\n")
                     f.write("  Job ID: %s\n" % job_data['job_id'])
                     if job_data.get('validation_verdict'):
-                        f.write(
-                            "  Validation: "
-                            "%s\n" % job_data['validation_verdict'])
-                    if job_data.get('submitted_at'):
-                        f.write("  Submitted: %s\n" % job_data['submitted_at'])
-                    if job_data.get('completed_at'):
-                        f.write("  Completed: %s\n" % job_data['completed_at'])
+                        f.write("  Validation: %s\n" %
+                                job_data['validation_verdict'])
+                    if job_data.get('completion_time'):
+                        f.write("  Completed: %s\n" %
+                                job_data['completion_time'])
+                    f.write("\n")
+
+                # Failed jobs
+                for job_data in report['failed_jobs']:
+                    f.write("Problem: %s\n" % job_data['problem_alias'])
+                    f.write("  Status: failed\n")
+                    f.write("  Job ID: %s\n" % job_data['job_id'])
                     if job_data.get('error_message'):
                         f.write("  Error: %s\n" % job_data['error_message'])
+                    f.write("\n")
                     f.write("\n")
 
                 f.write("=" * 80 + "\n")
@@ -1199,11 +1219,41 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
             "   Jobs with Validation: %s", validation['total_validated'])
         if validation['verdict_breakdown']:
             self.main_logger.info("   Verdict Breakdown:")
+            total_validated = validation['total_validated']
             for verdict, count in validation['verdict_breakdown'].items():
-                self.main_logger.info("     %s: %s", verdict, count)
+                percentage = (
+                    count /
+                    total_validated *
+                    100) if total_validated > 0 else 0
+                self.main_logger.info(
+                    "     %s: %s (%.1f%%)", verdict, count, percentage)
+
             if validation['most_common_verdict']:
                 self.main_logger.info(
                     "   Most Common: %s", validation['most_common_verdict'])
+
+            # Additional validation insights
+            ac_count = validation['verdict_breakdown'].get('AC', 0)
+            wa_count = validation['verdict_breakdown'].get('WA', 0)
+            tle_count = validation['verdict_breakdown'].get('TLE', 0)
+            ce_count = validation['verdict_breakdown'].get('CE', 0)
+
+            self.main_logger.info("   Validation Summary:")
+            self.main_logger.info("     ✅ Accepted (AC): %s", ac_count)
+            if wa_count > 0:
+                self.main_logger.info("     ❌ Wrong Answer (WA): %s", wa_count)
+            if tle_count > 0:
+                self.main_logger.info("     ⏰ Time Limit (TLE): %s", tle_count)
+            if ce_count > 0:
+                self.main_logger.info(
+                    "     🔧 Compile Error (CE): %s", ce_count)
+
+            # Success rate based on AC
+            if total_validated > 0:
+                validation_success_rate = (ac_count / total_validated * 100)
+                self.main_logger.info(
+                    "     📊 Validation Success Rate: %.1f%%",
+                    validation_success_rate)
         else:
             self.main_logger.info("   No validation data available")
 
