@@ -4,7 +4,7 @@ namespace OmegaUp\Controllers;
 
 /**
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter: null|string, order: int, points: float, problem_id?: int, quality_payload: null| ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type ArenaProblemset=array{admin?: bool, admission_mode?: string, alias?: string, courseAssignments?: list<CourseAssignment>, director?: string, feedback?: string, finish_time: \OmegaUp\Timestamp|null, name?: string, opened?: bool, original_contest_alias?: string, original_problemset_id?: int, problems?: list<ProblemsetProblem>, problemset_id?: int, requests_user_information?: string, show_penalty?: bool, start_time?: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp, submissions_gap?: int, title?: string}
  * @psalm-type Problemset=array{admin?: bool, admission_mode?: string, alias?: string, archived?: bool, assignment_type?: null|string, contest_alias?: null|string, courseAssignments?: list<CourseAssignment>, description: null|string, director?: string, feedback?: string, finish_time?: \OmegaUp\Timestamp|null, has_submissions?: bool, languages?: list<string>, name?: string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, score_mode?: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id: int|null, requests_user_information?: string, rerun_id?: int, scoreboard?: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty?: bool, show_scoreboard_after?: bool, start_time?: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, user_id: int|null, username: string}>, window_length?: int|null}
@@ -175,7 +175,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
      */
-    public static function apiScoreboard(\OmegaUp\Request $r): array {
+    public static function apiScoreboard(\OmegaUp\Request $r) {
         [
             'problemset' => $problemset,
             'request' => $r,

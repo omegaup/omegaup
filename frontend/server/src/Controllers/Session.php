@@ -145,7 +145,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      *
      * @return CurrentSession
      */
-    public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
+    public static function getCurrentSession(?\OmegaUp\Request $r = null) {
         if (
             defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
@@ -223,7 +223,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @return CurrentSession
      */
-    private static function getCurrentSessionImplForAuthToken(?string $authToken): array {
+    private static function getCurrentSessionImplForAuthToken(?string $authToken) {
         $identityExt = null;
         if (!empty($authToken)) {
             $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
@@ -265,7 +265,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $apiToken,
         ?string $username,
         string $cacheKey
-    ): array {
+    ) {
         $identityExt = \OmegaUp\DAO\APITokens::getIdentityByToken(
             $apiToken,
             $username

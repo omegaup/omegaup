@@ -9,7 +9,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetCourseProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter: string, order: int, points: float, quality_payload: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type CourseNewPayload=array{is_admin: bool, hasVisitedSection: bool, is_curator: bool, languages: array<string, string>}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, teachingAssistants: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetCourseProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, groupsTeachingAssistants: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
@@ -57,7 +57,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string, myBestScore?: float|null, hasMyRuns?: bool|null}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp, totalRuns: int|null}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard?: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool, isTeachingAssistant: bool}
- * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
+ * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetCourseProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -1993,7 +1993,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * @param list<string> $courseTypes
-     * @return CoursesList
+     * @return array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived: list<FilteredCourse>, teachingAssistant: list<FilteredCourse>}
+ * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: null|string}
      */
     private static function getCoursesList(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -5431,7 +5432,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $alias
      */
-    public static function apiAdminDetails(\OmegaUp\Request $r): array {
+    public static function apiAdminDetails(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
@@ -5656,7 +5657,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given assignment
      *
-     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
+     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetCourseProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
      *
      * @omegaup-request-param string $assignment
      * @omegaup-request-param string $course
@@ -5744,7 +5745,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return list<ProblemsetProblem>
+     * @return list<ProblemsetCourseProblem>
      */
     private static function getProblemsByAssignment(
         string $assignmentAlias,
@@ -5973,7 +5974,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $alias
      */
-    public static function apiDetails(\OmegaUp\Request $r): array {
+    public static function apiDetails(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
@@ -6384,7 +6385,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course
      * @omegaup-request-param null|string $token
      */
-    public static function apiAssignmentScoreboard(\OmegaUp\Request $r): array {
+    public static function apiAssignmentScoreboard(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course',
