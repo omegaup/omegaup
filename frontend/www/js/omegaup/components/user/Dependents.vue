@@ -61,9 +61,9 @@ export default class UserDependents extends Vue {
     if (!parentEmailVerificationDeadline) {
       return null;
     }
-    const today = new Date();
+    const today = Date.now();
     const deadline = new Date(parentEmailVerificationDeadline);
-    const timeDifference = deadline.getTime() - today.getTime();
+    const timeDifference = deadline.getTime() - today;
     const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
     return daysDifference;
   }
