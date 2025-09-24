@@ -1121,63 +1121,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{response: array<int, int>}
-     *
-     * @omegaup-request-param string $contest_ids
-     */
-    public static function apiGetNumberOfContestants(\OmegaUp\Request $r) {
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing.
-            $r->identity = null;
-        }
-
-        $contestIDsAsString = $r->ensureString('contest_ids');
-        $contestIDs = explode(',', $contestIDsAsString);
-        $contestants = [];
-        foreach ($contestIDs as $contestId) {
-            \OmegaUp\Validators::validateNumber($contestId, 'contest_id');
-            $contestID = intval($contestId);
-            try {
-                $contest = \OmegaUp\DAO\Contests::getByPK(intval($contestID));
-                if (is_null($contest)) {
-                    $contestants[$contestID] = 0;
-                    continue;
-                }
-
-                // Only validate access when user is logged in and the admission
-                // mode for the contest is not public
-                if (
-                    !is_null(
-                        $r->identity
-                    ) && $contest->admission_mode !== 'public'
-                ) {
-                    self::validateAccessContest($contest, $r->identity);
-                }
-
-                $callback = /** @return int */ fn () => \OmegaUp\DAO\Contests::getNumberOfContestants(
-                    $contestID
-                );
-
-                $contestants[$contestID] = \OmegaUp\Cache::getFromCacheOrSet(
-                    \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,
-                    $contestId,
-                    $callback
-                );
-            } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-                // For all the contests where user can not have access, we set
-                // the number of contestants in 0
-                $contestants[$contestID] = 0;
-            }
-        }
-
-        return [
-            'response' => $contestants,
-        ];
-    }
-
-    /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
