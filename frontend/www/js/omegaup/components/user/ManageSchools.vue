@@ -54,6 +54,7 @@
         type="submit"
         class="btn btn-primary mr-2"
         data-save-school-changes
+        :disabled="!hasChanges"
       >
         {{ T.wordsSaveChanges }}
       </button>
@@ -89,6 +90,27 @@ export default class UserManageSchools extends Vue {
   school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   scholarDegree = this.profile.scholar_degree;
   isCurrentlyEnrolled = !this.profile.graduation_date;
+
+  get hasChanges(): boolean {
+    const currentSchoolId = this.school?.key ?? null;
+    const currentSchoolName = this.school?.value ?? null;
+    const hasSchoolChanges =
+      currentSchoolId !== this.profile.school_id ||
+      (currentSchoolName !== this.profile.school && currentSchoolId !== null);
+
+    const graduationDateChanged =
+      (this.isCurrentlyEnrolled && this.profile.graduation_date !== null) ||
+      (!this.isCurrentlyEnrolled &&
+        !isNaN(this.graduationDate.getTime()) &&
+        this.graduationDate.toISOString().split('T')[0] !==
+          (this.profile.graduation_date ?? ''));
+
+    return (
+      hasSchoolChanges ||
+      this.scholarDegree !== this.profile.scholar_degree ||
+      graduationDateChanged
+    );
+  }
 
   onUpdateUserSchools(): void {
     this.$emit('update-user-schools', {
