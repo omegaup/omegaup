@@ -60,7 +60,7 @@ import time
 import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 import requests
@@ -428,8 +428,6 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
         # Log error details
         self.main_logger.error("Error logged: %s", error_message)
         # Note: problem_alias and category are logged for future use
-
-
 
     def submit_editorial_job(self, problem_alias: str) -> bool:
         """Submit a single editorial generation job."""
