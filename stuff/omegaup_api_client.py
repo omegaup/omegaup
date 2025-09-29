@@ -384,7 +384,7 @@ class OmegaUpAPIClient:
                 'lang': language
             })
 
-            solution_data = response.get('solution', {})
+            solution_data = response.get('solution', {}) or {}
             return solution_data.get('markdown', '')  # type: ignore
 
         except (ConnectionError, TypeError, ValueError) as e:
