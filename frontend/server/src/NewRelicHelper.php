@@ -8,14 +8,19 @@ namespace OmegaUp;
 class NewRelicHelper {
     /**
      * Report an error to NewRelic if available
+     *
+     * @param string|\Throwable $messageOrException The error message or
+     *        exception to report
+     * @return bool True if NewRelic is available and error was reported, false
+     *         otherwise
      */
     public static function noticeError($messageOrException): bool {
         if (!self::isAvailable()) {
             return false;
         }
 
-        $result = newrelic_notice_error($messageOrException);
-        return !is_null($result) ? boolval($result) : true;
+        newrelic_notice_error(strval($messageOrException));
+        return true;
     }
 
     /**
