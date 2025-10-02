@@ -3115,11 +3115,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['auth_token'],
-            'auth_token'
-        );
+        $filtersList = $r->ensureString('filter');
+        $authToken = $r->ensureOptionalString('auth_token');
 
         $response = [
             'user' => null,
@@ -3129,16 +3126,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset_admin' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
 
-        $filters = explode(',', $r['filter']);
+        $filters = explode(',', $filtersList);
         foreach ($filters as $filter) {
             $tokens = explode('/', $filter);
             if (count($tokens) < 2 || $tokens[0] != '') {
@@ -3173,7 +3168,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'userNotAllowed'
                         );
                     }
-                    if ($tokens[2] != $identity->username && !$session['is_admin']) {
+                    $username = $tokens[2];
+                    if ($username != $identity->username && !$session['is_admin']) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'userNotAllowed'
                         );
@@ -3186,19 +3182,24 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $contestAlias = $tokens[2];
                     $r2 = new \OmegaUp\Request([
-                        'contest_alias' => $tokens[2],
+                        'contest_alias' => $contestAlias,
                     ]);
-                    if (isset($r['auth_token'])) {
-                        $r2['auth_token'] = $r['auth_token'];
+                    if (!is_null($authToken)) {
+                        $r2['auth_token'] = $authToken;
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
-                        $token = $tokens[3];
+                        $token = \OmegaUp\ArrayHelper::getString(
+                            $tokens,
+                            key: 3,
+                            default: ''
+                        );
                         $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
-                        $tokens[2],
+                        $contestAlias,
                         $identity,
                         $token
                     );
@@ -3216,11 +3217,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $problemsetId = $tokens[2];
                     [
                         'request' => $r2,
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
-                        'problemset_id' => $tokens[2],
-                        'auth_token' => $r['auth_token'],
+                        'problemset_id' => $problemsetId,
+                        'auth_token' => $authToken,
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
@@ -3235,7 +3237,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
-                        $response['problemset_admin'][] = intval($tokens[2]);
+                        $response['problemset_admin'][] = intval($problemsetId);
                     }
                     break;
                 case 'problem':
@@ -3245,7 +3247,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    $problem = \OmegaUp\DAO\Problems::getByAlias($tokens[2]);
+                    $problemAlias = $tokens[2];
+                    $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
@@ -3258,7 +3261,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $problem
                         )
                     ) {
-                        $response['problem_admin'][] = $tokens[2];
+                        $response['problem_admin'][] = $problemAlias;
                     } elseif (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'problemIsPrivate'

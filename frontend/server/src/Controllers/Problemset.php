@@ -300,8 +300,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 count($r['tokens']) >= 4
             ) {
                 /** @psalm-suppress MixedArrayAccess $r['tokens'] is definitely an array here. */
-                $token = strval($r['tokens'][3]);
-                $request['token'] = $token;
+                $token = \OmegaUp\ArrayHelper::getString($r['tokens'], 3, '');
+                if (!empty($token)) {
+                    $request['token'] = $token;
+                }
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails(
                 $problemset['contest_alias'],
