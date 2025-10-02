@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp;
+
 /**
  * Helper class for safe array access to prevent undefined key errors
  */
