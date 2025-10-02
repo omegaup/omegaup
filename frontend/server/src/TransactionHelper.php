@@ -1,5 +1,7 @@
 <?php
 
+namespace OmegaUp;
+
 /**
  * Helper class for MySQL transactions with deadlock retry logic
  */
