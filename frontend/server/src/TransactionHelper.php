@@ -1,7 +1,5 @@
 <?php
 
-namespace OmegaUp;
-
 /**
  * Helper class for MySQL transactions with deadlock retry logic
  */
@@ -40,7 +38,12 @@ class TransactionHelper {
                 }
 
                 // Exponential backoff with jitter for deadlock retries
-                $waitTime = min(pow(2, $retryCount - 1) * 100000, 1000000); // Max 1 second
+                $waitTime = max(
+                    value: 0,
+                    values: intval(
+                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
+                    )
+                );
                 $jitter = rand(0, 50000); // Add up to 50ms jitter
                 usleep($waitTime + $jitter);
 
