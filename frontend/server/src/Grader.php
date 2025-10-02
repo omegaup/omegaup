@@ -223,11 +223,11 @@ class Grader {
      *
      * @param string $url        The URL to request
      * @param int    $mode       How to return the result.
-     * @param mixed  $postData   Optional POST data. Will convert key-value
+     * @param string|array<string, mixed>|null $postData Optional POST data. Will convert key-value
      *                           pair dictionaries into JSON.
      * @param bool   $missingOk  Return null if the resource is not found.
      *
-     * @return mixed The result of the request.
+     * @return array{status: string}|null|string|bool The result of the request.
      */
     private function curlRequest(
         string $url,
@@ -258,7 +258,7 @@ class Grader {
                 }
 
                 // Wait before retry (exponential backoff)
-                $waitTime = min(pow(2, $retryCount - 1), 5); // Max 5 seconds
+                $waitTime = max(1, intval(min(pow(2, $retryCount - 1), 5))); // Ensure positive int
                 sleep($waitTime);
 
                 self::$log->warning(
@@ -294,6 +294,10 @@ class Grader {
 
     /**
      * Single cURL request without retry logic
+     *
+     * @param string|array<string, mixed>|null $postData Optional POST data.
+     * Will convert key-value pair dictionaries into JSON.
+     * @return array{status: string}|null|string|bool
      */
     private function curlRequestSingle(
         string $url,

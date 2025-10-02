@@ -426,7 +426,7 @@ class GitServerBrowser {
                 }
 
                 // Wait before retry (exponential backoff)
-                $waitTime = min(pow(2, $retryCount - 1), 5); // Max 5 seconds
+                $waitTime = max(0, intval(min(pow(2, $retryCount - 1), 5)));
                 sleep($waitTime);
 
                 \Monolog\Registry::omegaup()->withName('GitBrowser')->warning(
