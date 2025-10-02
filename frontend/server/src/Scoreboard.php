@@ -959,6 +959,7 @@ class Scoreboard {
             );
         }
 
+        /** @var list<string> $groupNames */
         $groupNames = array_keys($scoreByGroupArray);
 
         if (!isset($identityProblemsScoreByGroup[$identityId])) {
@@ -974,9 +975,25 @@ class Scoreboard {
         }
 
         foreach ($groupNames as $groupName) {
+            // Skip empty group names to prevent "Undefined array key" errors
+            if ($groupName === '') {
+                continue;
+            }
+
+            $currentScore = \OmegaUp\ArrayHelper::getFloat(
+                $scoreByGroupArray,
+                $groupName,
+                0.0
+            );
+            $existingScore = \OmegaUp\ArrayHelper::getFloat(
+                $identityProblemsScoreByGroup[$identityId][$problemId],
+                $groupName,
+                0.0
+            );
+
             $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
-                $scoreByGroupArray[$groupName],
-                $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
+                $currentScore,
+                $existingScore
             );
         }
 
