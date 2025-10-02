@@ -70,9 +70,7 @@ class Request extends \ArrayObject {
         if (is_null($this->method) || is_null($this->methodName)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
-        if (extension_loaded('newrelic')) {
-            newrelic_name_transaction("/api/{$this->methodName}");
-        }
+        \OmegaUp\NewRelicHelper::nameTransaction("/api/{$this->methodName}");
 
         /** @var mixed */
         $response = call_user_func($this->method, $this);
