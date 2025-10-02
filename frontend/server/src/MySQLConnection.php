@@ -404,25 +404,6 @@ class MySQLConnection {
                 // database, let's try to reconnect and do this one more time.
                 $this->connect();
                 return $this->QueryAttempt($query, $resultmode);
-            } elseif ($e->isPacketsOutOfOrder()) {
-                // Handle "Packets out of order" error by clearing the connection state
-                // This typically happens when there are unread results or commands out of sync
-                \Monolog\Registry::omegaup()->withName(
-                    'mysql'
-                )->warning(
-                    'Packets out of order detected, clearing connection state and retrying'
-                );
-
-                // Clear any pending results and reconnect
-                if ($this->_connection->more_results()) {
-                    while ($this->_connection->next_result()) {
-                        if ($result = $this->_connection->store_result()) {
-                            $result->free();
-                        }
-                    }
-                }
-                $this->connect();
-                return $this->QueryAttempt($query, $resultmode);
             }
             \Monolog\Registry::omegaup()->withName(
                 'mysql'

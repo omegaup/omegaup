@@ -27,10 +27,6 @@ class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
         return $this->_errno == 2006;
     }
 
-    public function isPacketsOutOfOrder(): bool {
-        return $this->_errno == 2014; // CR_COMMANDS_OUT_OF_SYNC
-    }
-
     public function isDeadlock(): bool {
         return in_array($this->_errno, [1205, 1213]); // Lock timeout, Deadlock
     }
