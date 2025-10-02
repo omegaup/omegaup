@@ -182,15 +182,20 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
 
                 // Check if this is a deadlock or lock timeout error
                 $errorCode = $e->getCode();
-                $isDeadlock = in_array($errorCode, [1205, 1213]); // Lock timeout, Deadlock
+                $isDeadlock = in_array($errorCode, [1205, 1213]);
 
                 if (!$isDeadlock || $retryCount >= $maxRetries) {
                     throw $e;
                 }
 
                 // Exponential backoff with jitter
-                $waitTime = min(pow(2, $retryCount - 1) * 100000, 1000000); // Max 1 second
-                $jitter = rand(0, 50000); // Add up to 50ms jitter
+                $waitTime = max(
+                    value: 0,
+                    values: intval(
+                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
+                    )
+                );
+                $jitter = rand(0, 50000);
                 usleep($waitTime + $jitter);
 
                 // Log the retry attempt if NewRelic is available

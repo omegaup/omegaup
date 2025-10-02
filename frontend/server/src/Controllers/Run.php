@@ -550,7 +550,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $problem,
             $contest,
             $run
-) {
+        ) {
             // _Now_ that we are in a transaction, we can check whether the run
             // is within the submission gap.
             self::validateWithinSubmissionGap(
