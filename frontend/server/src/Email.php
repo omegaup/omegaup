@@ -36,6 +36,40 @@ class Email {
 
         self::$log->debug('Sending email to ' . join(',', $emails));
 
+        $maxRetries = 3;
+        $retryCount = 0;
+
+        while ($retryCount < $maxRetries) {
+            try {
+                self::sendEmailSingle($emails, $subject, $body);
+                return; // Success, exit retry loop
+            } catch (\Exception $e) {
+                $retryCount++;
+
+                if ($retryCount >= $maxRetries) {
+                    self::$log->error(
+                        "Failed to send email after {$maxRetries} attempts: {$e->getMessage()}"
+                    );
+                    throw new \OmegaUp\Exceptions\EmailVerificationSendException();
+                }
+
+                // Wait before retry
+                sleep(1);
+                self::$log->warning(
+                    "Retrying email send ({$retryCount}/{$maxRetries}) after error: {$e->getMessage()}"
+                );
+            }
+        }
+    }
+
+    /**
+     * Single email send attempt
+     */
+    private static function sendEmailSingle(
+        array $emails,
+        string $subject,
+        string $body
+    ): void {
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
         $mail->IsSMTP();
         $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
@@ -46,6 +80,8 @@ class Email {
         $mail->Port = 465;
         $mail->SMTPSecure = 'ssl';
         $mail->Username = OMEGAUP_EMAIL_SMTP_FROM;
+        $mail->Timeout = 30;
+        $mail->SMTPKeepAlive = true;
 
         $mail->FromName = OMEGAUP_EMAIL_SMTP_FROM;
         foreach ($emails as $email) {
@@ -56,8 +92,7 @@ class Email {
         $mail->Body = $body;
 
         if (!$mail->Send()) {
-            self::$log->error("Failed to send mail: {$mail->ErrorInfo}");
-            throw new \OmegaUp\Exceptions\EmailVerificationSendException();
+            throw new \RuntimeException("PHPMailer error: {$mail->ErrorInfo}");
         }
     }
 
