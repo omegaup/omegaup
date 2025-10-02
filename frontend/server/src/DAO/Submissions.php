@@ -166,6 +166,57 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         int $identityId,
         ?\OmegaUp\DAO\VO\Contests $contest = null
     ): bool {
+        $maxRetries = 3;
+        $retryCount = 0;
+
+        while ($retryCount < $maxRetries) {
+            try {
+                return self::isInsideSubmissionGapSingle(
+                    $submission,
+                    $problemId,
+                    $identityId,
+                    $contest
+                );
+            } catch (\mysqli_sql_exception $e) {
+                $retryCount++;
+
+                // Check if this is a deadlock or lock timeout error
+                $errorCode = $e->getCode();
+                $isDeadlock = in_array($errorCode, [1205, 1213]); // Lock timeout, Deadlock
+
+                if (!$isDeadlock || $retryCount >= $maxRetries) {
+                    throw $e;
+                }
+
+                // Exponential backoff with jitter
+                $waitTime = min(pow(2, $retryCount - 1) * 100000, 1000000); // Max 1 second
+                $jitter = rand(0, 50000); // Add up to 50ms jitter
+                usleep($waitTime + $jitter);
+
+                // Log the retry attempt if NewRelic is available
+                if (extension_loaded('newrelic')) {
+                    \newrelic_notice_error(
+                        "Submission gap deadlock retry attempt {$retryCount}/{$maxRetries}: " . $e->getMessage(),
+                        $e
+                    );
+                }
+            }
+        }
+
+        throw new \RuntimeException(
+            'Maximum retry attempts exceeded for submission gap check'
+        );
+    }
+
+    /**
+     * Single attempt to check submission gap
+     */
+    private static function isInsideSubmissionGapSingle(
+        \OmegaUp\DAO\VO\Submissions $submission,
+        int $problemId,
+        int $identityId,
+        ?\OmegaUp\DAO\VO\Contests $contest = null
+    ): bool {
         $problemsetId = $contest?->problemset_id;
         // Acquire row-level locks using `FOR UPDATE` so that multiple
         // concurrent queries cannot all obtain the same submission time and
