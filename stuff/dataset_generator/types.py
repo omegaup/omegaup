@@ -1,14 +1,19 @@
+"""TypedDicts for seeder request parameter schemas."""
+
 from __future__ import annotations
-from typing import TypedDict, Literal, NotRequired
+
+from typing import Literal, TypedDict
 
 
 class UserCreateParams(TypedDict):
+    """Parameters for /user/create/."""
     username: str
     email: str
     password: str
 
 
 class IdentityCreateParams(TypedDict):
+    """Parameters for /identity/create/."""
     gender: str
     name: str
     password: str
@@ -19,11 +24,13 @@ class IdentityCreateParams(TypedDict):
 
 
 class SchoolCreateParams(TypedDict):
+    """Parameters for /school/create/."""
     name: str
     country_id: str
 
 
 class ProblemCreateParams(TypedDict):
+    """Parameters for /problem/create/."""
     visibility: str
     title: str
     problem_alias: str
@@ -45,6 +52,7 @@ class ProblemCreateParams(TypedDict):
 
 
 class ContestCreateParams(TypedDict):
+    """Parameters for /contest/create/."""
     visibility: int
     title: str
     alias: str
@@ -67,12 +75,14 @@ class ContestCreateParams(TypedDict):
 
 
 class RunCreateParams(TypedDict):
+    """Parameters for /run/create/."""
     language: str
     problem_alias: str
     source: str
 
 
 class CourseCreateParams(TypedDict):
+    """Parameters for /course/create/."""
     alias: str
     name: str
     description: str
@@ -82,12 +92,14 @@ class CourseCreateParams(TypedDict):
 
 
 class CourseAddStudentParams(TypedDict):
+    """Parameters for /course/addStudent/."""
     course_alias: str
     usernameOrEmail: str
     share_user_information: bool
 
 
 class GroupCreateParams(TypedDict):
+    """Parameters for /group/create/."""
     alias: str
     name: str
     description: str
