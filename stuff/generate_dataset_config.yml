@@ -1,0 +1,54 @@
+endpoints:
+  user_create: "/user/create/"
+  identity_create: "/identity/create/"
+  school_create: "/school/create/"
+  problem_create: "/problem/create/"
+  contest_create: "/contest/create/"
+  run_create: "/run/create/"
+  course_create: "/course/create/"
+  course_add_admin: "/course/addAdmin/"
+  course_add_student: "/course/addStudent/"
+  group_create: "/group/create/"
+
+counts:
+  users: 1000
+  identities: 1000
+  schools: 1000
+  problems_public: 500
+  problems_private: 500
+  contests_past: 1000
+  contests_future: 1000
+  contests_active: 100
+  contests_public: 1000
+  contests_private: 1000
+  run: 2000
+  notifications: 2000
+  courses: 1000
+
+langs:
+  - c11-gcc
+  - c11-clang
+  - cpp11-gcc
+  - cpp11-clang
+  - cpp17-gcc
+  - cpp17-clang
+  - cpp20-gcc
+  - cpp20-clang
+  - java
+  - kt
+  - py2
+  - py3
+  - rb
+  - cs
+  - pas
+  - hs
+  - lua
+  - go
+  - rs
+  - js
+
+selected_tags:
+  - tagname: "problemTagBinarySearchTree"
+    public: true
+
+test_zip_path: "frontend/tests/resources/testproblem.zip"
