@@ -45,9 +45,9 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
     }
 
     /**
-     * Test ArrayHelper basic functionality
+     * Test SafeAccessArrayHelper basic functionality
      */
-    public function testArrayHelperBasics() {
+    public function testSafeAccessArrayHelperBasics() {
         $testArray = [
             'string_key' => 'test_value',
             'int_key' => 42,
@@ -61,14 +61,14 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         // Test basic get
         $this->assertEquals(
             'test_value',
-            \OmegaUp\ArrayHelper::get(
+            \OmegaUp\SafeAccessArrayHelper::get(
                 $testArray,
                 'string_key'
             )
         );
         $this->assertEquals(
             'default',
-            \OmegaUp\ArrayHelper::get(
+            \OmegaUp\SafeAccessArrayHelper::get(
                 $testArray,
                 'missing_key',
                 'default'
@@ -78,28 +78,28 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         // Test typed getters
         $this->assertEquals(
             'test_value',
-            \OmegaUp\ArrayHelper::getString(
+            \OmegaUp\SafeAccessArrayHelper::getString(
                 $testArray,
                 'string_key'
             )
         );
         $this->assertEquals(
             42,
-            \OmegaUp\ArrayHelper::getInt(
+            \OmegaUp\SafeAccessArrayHelper::getInt(
                 $testArray,
                 'int_key'
             )
         );
         $this->assertEquals(
             3.14,
-            \OmegaUp\ArrayHelper::getFloat(
+            \OmegaUp\SafeAccessArrayHelper::getFloat(
                 $testArray,
                 'float_key'
             )
         );
         $this->assertEquals(
             true,
-            \OmegaUp\ArrayHelper::getBool(
+            \OmegaUp\SafeAccessArrayHelper::getBool(
                 $testArray,
                 'bool_key'
             )
@@ -107,13 +107,13 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
 
         // Test hasKeys
         $this->assertTrue(
-            \OmegaUp\ArrayHelper::hasKeys(
+            \OmegaUp\SafeAccessArrayHelper::hasKeys(
                 $testArray,
                 ['string_key', 'int_key']
             )
         );
         $this->assertFalse(
-            \OmegaUp\ArrayHelper::hasKeys(
+            \OmegaUp\SafeAccessArrayHelper::hasKeys(
                 $testArray,
                 ['string_key', 'missing_key']
             )
@@ -122,14 +122,14 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         // Test getPath for nested access
         $this->assertEquals(
             'nested_value',
-            \OmegaUp\ArrayHelper::getPath(
+            \OmegaUp\SafeAccessArrayHelper::getPath(
                 $testArray,
                 ['nested', 'deep']
             )
         );
         $this->assertEquals(
             'default',
-            \OmegaUp\ArrayHelper::getPath(
+            \OmegaUp\SafeAccessArrayHelper::getPath(
                 $testArray,
                 ['nested', 'missing'],
                 'default'
@@ -138,16 +138,16 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
     }
 
     /**
-     * Test ArrayHelper edge cases and safety
+     * Test SafeAccessArrayHelper edge cases and safety
      */
-    public function testArrayHelperSafety() {
+    public function testSafeAccessArrayHelperSafety() {
         $emptyArray = [];
 
         // All methods should handle empty arrays gracefully
-        $this->assertNull(\OmegaUp\ArrayHelper::get($emptyArray, 'missing'));
+        $this->assertNull(\OmegaUp\SafeAccessArrayHelper::get($emptyArray, 'missing'));
         $this->assertEquals(
             'default',
-            \OmegaUp\ArrayHelper::getString(
+            \OmegaUp\SafeAccessArrayHelper::getString(
                 $emptyArray,
                 'missing',
                 'default'
@@ -155,7 +155,7 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         );
         $this->assertEquals(
             0,
-            \OmegaUp\ArrayHelper::getInt(
+            \OmegaUp\SafeAccessArrayHelper::getInt(
                 $emptyArray,
                 'missing',
                 0
@@ -163,7 +163,7 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         );
         $this->assertEquals(
             0.0,
-            \OmegaUp\ArrayHelper::getFloat(
+            \OmegaUp\SafeAccessArrayHelper::getFloat(
                 $emptyArray,
                 'missing',
                 0.0
@@ -171,21 +171,21 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         );
         $this->assertEquals(
             false,
-            \OmegaUp\ArrayHelper::getBool(
+            \OmegaUp\SafeAccessArrayHelper::getBool(
                 $emptyArray,
                 'missing',
                 false
             )
         );
         $this->assertFalse(
-            \OmegaUp\ArrayHelper::hasKeys(
+            \OmegaUp\SafeAccessArrayHelper::hasKeys(
                 $emptyArray,
                 ['any_key']
             )
         );
         $this->assertEquals(
             'default',
-            \OmegaUp\ArrayHelper::getPath(
+            \OmegaUp\SafeAccessArrayHelper::getPath(
                 $emptyArray,
                 ['any', 'path'],
                 'default'
@@ -199,7 +199,7 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
     public function testHelperClassesIndependence() {
         // Use both helpers in the same test
         $testArray = ['test' => 'value'];
-        $arrayResult = \OmegaUp\ArrayHelper::get($testArray, 'test');
+        $arrayResult = \OmegaUp\SafeAccessArrayHelper::get($testArray, 'test');
         $newrelicResult = \OmegaUp\NewRelicHelper::isAvailable();
 
         // Both should work independently
