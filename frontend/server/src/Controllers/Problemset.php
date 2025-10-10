@@ -300,7 +300,11 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 count($r['tokens']) >= 4
             ) {
                 /** @psalm-suppress MixedArrayAccess $r['tokens'] is definitely an array here. */
-                $token = \OmegaUp\SafeAccessArrayHelper::getString($r['tokens'], 3, '');
+                $token = \OmegaUp\SafeAccessArrayHelper::getString(
+                    array: $r['tokens'],
+                    key: 3,
+                    default: ''
+                );
                 if (!empty($token)) {
                     $request['token'] = $token;
                 }
