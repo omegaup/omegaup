@@ -24,55 +24,74 @@ def _normalize_now(params: Dict[str, Any], now_ts: float) -> None:
 
 
 def _resource_exists(
-    session_obj: Any, api: str, params: Mapping[str, Any]
+    session_object: Any,
+    api_endpoint: str,
+    request_params: Dict[str, Any]
 ) -> bool:
-    """Best-effort existence checks (mirrors bootstrap logic)."""
-    api_norm = api.lower()
-    if not api_norm.endswith("/"):
-        api_norm += "/"
+    """Check if a resource already exists before making a creation request."""
+    api = api_endpoint.lower()
+    if not api.endswith("/"):
+        api += "/"
 
-    if api_norm == "/problem/create/":
-        alias = params.get("problem_alias")
-        if alias and session_obj.request(
-            "/problem/details/", {"problem_alias": alias}
-        ):
-            logging.warning("Problem %s exists, skipping", alias)
-            return True
+    if api in {"/identity/create/", "/user/create/"}:
+        username = request_params.get("username")
+        if username:
+            response = session_object.request(
+                "/user/profile/", {"username": username}
+            ) or {}
+            return bool(
+                response.get("status") == "ok"
+                and response.get("userinfo", {}).get("username") == username
+            )
 
-    if api_norm == "/contest/create/":
-        alias = params.get("alias")
-        if alias and session_obj.request(
-            "/contest/adminDetails/", {"contest_alias": alias}
-        ):
-            logging.warning("Contest %s exists, skipping", alias)
-            return True
+    if api == "/problem/create/":
+        alias = request_params.get("problem_alias")
+        if alias:
+            response = session_object.request(
+                "/problem/details/", {"problem_alias": alias}
+            ) or {}
+            return bool(
+                response.get("status") == "ok"
+                and response.get("problem", {}).get("alias") == alias
+            )
 
-    if api_norm == "/course/create/":
-        alias = params.get("alias")
-        if alias and session_obj.request(
-            "/course/adminDetails/", {"alias": alias}
-        ):
-            logging.warning("Course %s exists, skipping", alias)
-            return True
+    if api == "/contest/create/":
+        alias = request_params.get("alias")
+        if alias:
+            response = session_object.request(
+                "/contest/adminDetails/", {"contest_alias": alias}
+            ) or {}
+            return bool(
+                response.get("status") == "ok"
+                and response.get("contest", {}).get("alias") == alias
+            )
 
-    if api_norm == "/course/createassignment/":
-        course_alias = params.get("course_alias")
-        assign_alias = params.get("alias")
-        if course_alias and assign_alias:
-            if session_obj.request(
+    if api == "/course/create/":
+        alias = request_params.get("alias")
+        if alias:
+            response = session_object.request(
+                "/course/adminDetails/", {"alias": alias}
+            ) or {}
+            return bool(
+                response.get("status") == "ok"
+                and response.get("course", {}).get("alias") == alias
+            )
+
+    if api == "/course/createassignment/":
+        course_alias = request_params.get("course_alias")
+        assignment_alias = request_params.get("alias")
+        if course_alias and assignment_alias:
+            response = session_object.request(
                 "/course/assignmentDetails/",
-                {"course": course_alias, "assignment": assign_alias},
-            ):
-                logging.warning("Assignment %s exists, skipping", assign_alias)
-                return True
-
-    if api_norm == "/user/create/":
-        username = params.get("username")
-        if username and session_obj.request(
-            "/user/profile/", {"username": username}
-        ):
-            logging.warning("User %s exists, skipping", username)
-            return True
+                {"course": course_alias, "assignment": assignment_alias},
+            ) or {}
+            assignment = {}
+            if response.get("status") == "ok":
+                assignment = response.get("assignment", {})
+            return bool(
+                assignment.get("alias") == assignment_alias
+                and response.get("course", {}).get("alias") == course_alias
+            )
 
     return False
 
@@ -88,7 +107,7 @@ def process_one_request_local(
 ) -> None:
     """
     Execute a single request dict with
-    $NOW$ normalization and fail_ok handling.
+    $NOW$ normalization and optional retry logic.
     """
     api: str = request["api"]  # type: ignore[assignment]
     params: Dict[str, Any] = dict(request.get("params", {}))
@@ -106,7 +125,8 @@ def process_one_request_local(
     while True:
         try:
             logging.info(
-                "invoking one request %r", {"api": api, "params": params}
+                "invoking one request %r",
+                {"api": api, "params": params},
             )
             result = session_obj.request(api, data=params, files=files)
             status = (result or {}).get("status", "error")
@@ -120,6 +140,7 @@ def process_one_request_local(
             if attempt > retries:
                 raise
             logging.warning(
-                "retrying %s (attempt %d): %s", api, attempt, exc
+                "retrying %s (attempt %d): %s",
+                api, attempt, exc
             )
             time.sleep(backoff_sec * attempt)
