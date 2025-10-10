@@ -144,7 +144,12 @@ class NewRelicHelperInfrastructureTest extends \OmegaUp\Test\ControllerTestCase 
         $emptyArray = [];
 
         // All methods should handle empty arrays gracefully
-        $this->assertNull(\OmegaUp\SafeAccessArrayHelper::get($emptyArray, 'missing'));
+        $this->assertNull(
+            \OmegaUp\SafeAccessArrayHelper::get(
+                $emptyArray,
+                'missing'
+            )
+        );
         $this->assertEquals(
             'default',
             \OmegaUp\SafeAccessArrayHelper::getString(
