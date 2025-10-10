@@ -8,11 +8,23 @@ import os
 import random
 import string
 import time
-from typing import Any, Callable, Dict, Iterable, Mapping, Optional, TypeVar, List
-from tqdm import tqdm
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Mapping,
+    Optional,
+    TypeVar,
+    List
+)
 import math
 from concurrent.futures import ThreadPoolExecutor
-#from .runner import process_one_request_local
+
+from tqdm import tqdm
+
+
+# from .runner import process_one_request_local
 
 import yaml
 
@@ -124,7 +136,6 @@ def load_config(config_path: Optional[str], root: str) -> Dict[str, Any]:
     }
 
 
-
 def send_all(  # pylint: disable=too-many-arguments
     session_obj: Any,
     now_ts: float,
@@ -141,6 +152,9 @@ def send_all(  # pylint: disable=too-many-arguments
     password: Optional[str] = None,
     token: Optional[str] = None,
 ) -> None:
+    """
+    Send all API requests in a batched and optionally multi-threaded way.
+    """
     requests_list: List[Dict[str, Any]] = list(reqs)
     progress_bar = tqdm(
         total=len(requests_list),
@@ -150,22 +164,26 @@ def send_all(  # pylint: disable=too-many-arguments
     )
 
     def _run_batch(
-            local_session: Any, 
-            batch: List[Mapping[str, Any]]
-        ) -> None:
+        local_session: Any,
+        batch: List[Mapping[str, Any]]
+    ) -> None:
         for i, req in enumerate(batch, 1):
             attempt = 0
             while True:
                 try:
-                    process_one_request_local(local_session, req, now_ts)
+                    process_one_request_local(
+                        local_session,
+                        req,
+                        now_ts
+                    )
                     progress_bar.update(1)
                     break
                 except Exception as exc:  # pylint: disable=broad-except
                     attempt += 1
                     if attempt > retries:
                         logging.error(
-                            "[%s] failed: %s | req=%r", 
-                            label, 
+                            "[%s] failed: %s | req=%r",
+                            label,
                             exc, {"api": req.get("api")}
                         )
                         progress_bar.update(1)
@@ -173,9 +191,9 @@ def send_all(  # pylint: disable=too-many-arguments
                     time.sleep(backoff_sec * attempt)
             if log_every and i % log_every == 0:
                 logging.info(
-                    "[%s] progress=%d/%d", 
-                    label, 
-                    progress_bar.n, 
+                    "[%s] progress=%d/%d",
+                    label,
+                    progress_bar.n,
                     progress_bar.total
                 )
 
@@ -189,32 +207,35 @@ def send_all(  # pylint: disable=too-many-arguments
                         "For workers=1 provide 'session_obj' or 'session_ctor'"
                     )
                 with session_ctor(
-                    session_args, 
-                    username, 
-                    password, 
+                    session_args,
+                    username,
+                    password,
                     token
-                    ) as s:
+                ) as s:
                     _run_batch(s, requests_list)
         else:
             if session_ctor is None:
                 raise RuntimeError("For workers>1 provide 'session_ctor'.")
-            n = len(requests_list) or 1
-            eff_workers = max(1, min(workers, n))
-            chunk = math.ceil(n / eff_workers)
-            batches = [requests_list[i:i + chunk] for i in range(0, n, chunk)]
+            total_requests = len(requests_list) or 1
+            effective_workers = max(1, min(workers, total_requests))
+            chunk_size = math.ceil(total_requests / effective_workers)
+            batches = [
+                requests_list[i:i + chunk_size]
+                for i in range(0, total_requests, chunk_size)
+            ]
 
             def _open_and_run(batch: List[Mapping[str, Any]]) -> None:
                 with session_ctor(
-                    session_args, 
-                    username, 
-                    password, 
+                    session_args,
+                    username,
+                    password,
                     token
                 ) as s:
                     _run_batch(s, batch)
-            with ThreadPoolExecutor(max_workers=eff_workers) as ex:
+            with ThreadPoolExecutor(max_workers=effective_workers) as ex:
                 for f in [ex.submit(_open_and_run, b) for b in batches]:
                     f.result()
-            
+
         logging.info("[%s] done total=%d", label, len(requests_list))
     finally:
         progress_bar.close()
