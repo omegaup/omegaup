@@ -5,7 +5,7 @@ namespace OmegaUp;
 /**
  * Helper class for safe array access to prevent undefined key errors
  */
-class ArrayHelper {
+class SafeAccessArrayHelper {
     /**
      * Safely get array value with default fallback
      *

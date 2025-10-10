@@ -980,12 +980,12 @@ class Scoreboard {
                 continue;
             }
 
-            $currentScore = \OmegaUp\ArrayHelper::getFloat(
+            $currentScore = \OmegaUp\SafeAccessArrayHelper::getFloat(
                 $scoreByGroupArray,
                 $groupName,
                 0.0
             );
-            $existingScore = \OmegaUp\ArrayHelper::getFloat(
+            $existingScore = \OmegaUp\SafeAccessArrayHelper::getFloat(
                 $identityProblemsScoreByGroup[$identityId][$problemId],
                 $groupName,
                 0.0

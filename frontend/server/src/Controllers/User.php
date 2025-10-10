@@ -3191,7 +3191,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
-                        $token = \OmegaUp\ArrayHelper::getString(
+                        $token = \OmegaUp\SafeAccessArrayHelper::getString(
                             $tokens,
                             key: 3,
                             default: ''
