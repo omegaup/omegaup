@@ -262,6 +262,8 @@ CREATE TABLE `Contests` (
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
   KEY `fk_cc_rerun_id` (`rerun_id`),
+  KEY `idx_contests_title_archived` (`title`,`archived`),
+  KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -642,6 +644,7 @@ CREATE TABLE `Problem_Of_The_Week` (
   PRIMARY KEY (`problem_of_the_week_id`),
   UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
   KEY `problem_id` (`problem_id`),
+  KEY `idx_pow_difficulty` (`difficulty`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de problemas de la semana.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -690,6 +693,8 @@ CREATE TABLE `Problems` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
+  KEY `idx_problems_title` (`title`),
+  KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
@@ -1157,6 +1162,8 @@ CREATE TABLE `Team_Groups` (
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_create_time` (`create_time`),
+  KEY `idx_team_groups_name` (`name`),
+  KEY `idx_team_groups_alias_name` (`alias`,`name`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1223,6 +1230,7 @@ CREATE TABLE `User_Rank` (
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
   KEY `idx_user_rank_score_userid` (`score`,`user_id`),
+  KEY `idx_user_rank_author_score_ranking` (`author_score`,`author_ranking`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
@@ -1286,6 +1294,8 @@ CREATE TABLE `Users` (
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
   KEY `idx_is_private` (`is_private`),
+  KEY `idx_users_parental_verification` (`parental_verification_token`),
+  KEY `idx_users_verified_mailing_list` (`verified`,`in_mailing_list`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)
