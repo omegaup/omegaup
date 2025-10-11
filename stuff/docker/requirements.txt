@@ -1,4 +1,4 @@
-python-json-logger>=3.2.1
+python-json-logger>=4.0.0
 mysql-connector-python>=8.0.28
 boto3>=1.20.26
 pika>=1.2.0
