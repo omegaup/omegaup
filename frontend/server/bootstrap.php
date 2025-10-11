@@ -111,7 +111,14 @@ header('X-Frame-Options: DENY');
 // Configure the root logger
 /** @psalm-suppress UndefinedDocblockClass Level is declared in a phpstan-type annotation. */
 $logLevel = \Monolog\Logger::toMonologLevel(OMEGAUP_LOG_LEVEL);
-$logFormatter = new \NewRelic\Monolog\Enricher\Formatter();
+
+// Use NewRelic formatter only if available, fallback to LineFormatter
+if (class_exists('\NewRelic\Monolog\Enricher\Formatter')) {
+    $logFormatter = new \NewRelic\Monolog\Enricher\Formatter();
+} else {
+    $logFormatter = new \Monolog\Formatter\LineFormatter();
+}
+
 $logHandler = new \Monolog\Handler\StreamHandler(OMEGAUP_LOG_FILE, $logLevel);
 $logHandler->setFormatter($logFormatter);
 
@@ -119,9 +126,14 @@ $rootLogger = new \Monolog\Logger('omegaup');
 $rootLogger->pushProcessor(
     new \Monolog\Processor\WebProcessor()
 );
-$rootLogger->pushProcessor(
-    new \NewRelic\Monolog\Enricher\Processor()
-);
+
+// Add NewRelic processor only if available
+if (class_exists('\NewRelic\Monolog\Enricher\Processor')) {
+    $rootLogger->pushProcessor(
+        new \NewRelic\Monolog\Enricher\Processor()
+    );
+}
+
 $rootLogger->pushHandler($logHandler);
 \Monolog\Registry::addLogger($rootLogger);
 \Monolog\ErrorHandler::register($rootLogger);
