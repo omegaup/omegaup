@@ -20,7 +20,7 @@ class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
 
     def add_fields(
             self,
-            log_record: Dict[str, str],
+            log_record: Dict[str, str],  # pylint: disable=arguments-renamed
             record: logging.LogRecord,
             message_dict: Dict[str, Any],
     ) -> None:
