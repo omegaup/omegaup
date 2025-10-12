@@ -26,4 +26,8 @@ class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
     public function isGoneAway(): bool {
         return $this->_errno == 2006;
     }
+
+    public function isDeadlock(): bool {
+        return in_array($this->_errno, [1205, 1213]); // Lock timeout, Deadlock
+    }
 }
