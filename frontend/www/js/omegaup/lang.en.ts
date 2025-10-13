@@ -461,6 +461,8 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "This contest will begin in %(time)",
   contestsCreate: "Create Contest",
   contestsJoinScoreboards: "Merge Scoreboards",
+  contestsListLoading: "Loading...",
+  contestsListShowMore: "Show more contests",
   countryNotSet: "Country not set",
   courseActionScoreboard: "Scoreboard",
   courseAddContent: "Add content",
