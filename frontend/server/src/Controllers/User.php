@@ -3191,11 +3191,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
-                        $token = \OmegaUp\SafeAccessArrayHelper::getString(
-                            $tokens,
-                            key: 3,
-                            default: ''
-                        );
+                        $token = $tokens[3];
                         $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(

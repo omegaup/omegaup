@@ -1442,16 +1442,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             $details['contest_score'] = 0.0;
             $details['score'] = 0.0;
         } else {
-            $details['contest_score'] = floatval(
-                \OmegaUp\SafeAccessArrayHelper::getFloat(
-                    array: $details,
-                    key: 'contest_score',
-                    default: 0.0
-                )
-            );
-            $details['score'] = floatval(
-                \OmegaUp\SafeAccessArrayHelper::getFloat($details, 'score', 0.0)
-            );
+            $details['contest_score'] = floatval($details['contest_score']);
+            $details['score'] = floatval($details['score']);
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

@@ -975,25 +975,9 @@ class Scoreboard {
         }
 
         foreach ($groupNames as $groupName) {
-            // Skip empty group names to prevent "Undefined array key" errors
-            if ($groupName === '') {
-                continue;
-            }
-
-            $currentScore = \OmegaUp\SafeAccessArrayHelper::getFloat(
-                $scoreByGroupArray,
-                $groupName,
-                0.0
-            );
-            $existingScore = \OmegaUp\SafeAccessArrayHelper::getFloat(
-                $identityProblemsScoreByGroup[$identityId][$problemId],
-                $groupName,
-                0.0
-            );
-
             $identityProblemsScoreByGroup[$identityId][$problemId][$groupName] = max(
-                $currentScore,
-                $existingScore
+                $scoreByGroupArray[$groupName],
+                $identityProblemsScoreByGroup[$identityId][$problemId][$groupName]
             );
         }
 
