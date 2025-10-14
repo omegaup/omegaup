@@ -461,6 +461,8 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "Concurso inciar\u00e1 em %(time)",
   contestsCreate: "Criar Concurso",
   contestsJoinScoreboards: "Juntar Paineis de Avalia\u00e7\u00e3o",
+  contestsListLoading: "Carregando...",
+  contestsListShowMore: "Mostrar mais concursos",
   countryNotSet: "Pa\u00eds n\u00e3o definido",
   courseActionScoreboard: "Painel de avalia\u00e7\u00e3o",
   courseAddContent: "Adicionar conte\u00fado",

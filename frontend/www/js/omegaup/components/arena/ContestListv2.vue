@@ -181,9 +181,9 @@
             <div
               v-for="index in 3"
               :key="`current-${index}`"
-              class="card contest-card mb-3"
+              class="card contest-card mb-2"
             >
-              <div class="line"></div>
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
           <div v-else-if="contestListEmpty" class="empty-category">
@@ -215,11 +215,33 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
-              <div class="line"></div>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Current">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-current-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Current
+            "
+            class="text-center mb-2"
+          >
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -232,10 +254,10 @@
           <template v-if="loading || refreshing">
             <div
               v-for="index in 3"
-              :key="`current-${index}`"
-              class="card contest-card mb-3"
+              :key="`future-${index}`"
+              class="card contest-card mb-2"
             >
-              <div class="line"></div>
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
           <div v-else-if="contestListEmpty" class="empty-category">
@@ -270,11 +292,33 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
-              <div class="line"></div>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Future">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-future-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Future
+            "
+            class="text-center mb-2"
+          >
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -287,10 +331,10 @@
           <template v-if="loading || refreshing">
             <div
               v-for="index in 3"
-              :key="`current-${index}`"
-              class="card contest-card mb-3"
+              :key="`past-${index}`"
+              class="card contest-card mb-2"
             >
-              <div class="line"></div>
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
           <div v-else-if="contestListEmpty" class="empty-category">
@@ -325,11 +369,33 @@
               </template>
             </omegaup-contest-card>
           </template>
-          <template v-if="loading && !contestListEmpty">
-            <div v-for="index in 3" :key="index" class="card contest-card mb-3">
-              <div class="line"></div>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Past">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-past-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Past
+            "
+            class="text-center mb-2"
+          >
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -357,6 +423,7 @@ import {
   LayoutPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
+import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
@@ -397,13 +464,14 @@ export interface UrlParams {
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
+    'omegaup-contest-skeleton': ContestSkeleton,
     FontAwesomeIcon,
   },
   directives: {
     infiniteScroll,
   },
 })
-export default class ArenaContestList extends Vue {
+class ArenaContestList extends Vue {
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
@@ -474,30 +542,14 @@ export default class ArenaContestList extends Vue {
     this.fetchPage(params, urlObj);
   }
   mounted() {
-    window.addEventListener('scroll', this.handleScroll);
     this.fetchInitialContests();
   }
 
   beforeDestroy() {
-    window.removeEventListener('scroll', this.handleScroll);
-  }
-
-  handleScroll() {
-    const bottomOfWindow =
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 250;
-
-    if (
-      !this.contestListEmpty &&
-      bottomOfWindow &&
-      !this.isScrollLoading &&
-      this.hasMore
-    ) {
-      this.loadMoreContests();
-    }
+    // Placeholder for cleanup when infinite scroll is re-implemented
   }
   async loadMoreContests() {
-    if (this.isScrollLoading || !this.hasMore) return;
+    if (this.isScrollLoading || !this.hasMore || this.loading) return;
 
     this.isScrollLoading = true;
     const nextPage = this.currentPage + 1;
@@ -516,6 +568,13 @@ export default class ArenaContestList extends Vue {
 
       // Check if there are more contests to load (based on pageSize)
       this.hasMore = this.contestList.length % this.pageSize === 0;
+    } catch (error) {
+      console.error('Error loading more contests:', error);
+      // On error, re-enable the button after a delay to prevent spam
+      setTimeout(() => {
+        this.isScrollLoading = false;
+      }, 2000);
+      return;
     } finally {
       this.isScrollLoading = false;
     }
@@ -568,11 +627,20 @@ export default class ArenaContestList extends Vue {
   filterBySignedUp() {
     this.currentFilter = ContestFilter.SignedUp;
   }
+
   filterByRecommended() {
     this.currentFilter = ContestFilter.OnlyRecommended;
   }
+
   filterByAll() {
     this.currentFilter = ContestFilter.All;
+  }
+
+  get showMoreContestButtonText(): string {
+    if (this.isScrollLoading) {
+      return T.contestsListLoading;
+    }
+    return T.contestsListShowMore;
   }
 
   get contestList(): types.ContestListItem[] {
@@ -616,6 +684,8 @@ export default class ArenaContestList extends Vue {
     this.fetchInitialContests();
   }
 }
+
+export default ArenaContestList;
 </script>
 
 <style lang="scss" scoped>
@@ -680,24 +750,6 @@ export default class ArenaContestList extends Vue {
   );
   border-radius: 8px;
   animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% {
-    background: var(
-      --arena-submissions-list-skeletonloader-initial-background-color
-    );
-  }
-  50% {
-    background: var(
-      --arena-submissions-list-skeletonloader-final-background-color
-    );
-  }
-  100% {
-    background: var(
-      --arena-submissions-list-skeletonloader-initial-background-color
-    );
-  }
 }
 
 .sidebar {
