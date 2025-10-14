@@ -19,17 +19,20 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of tags
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
      * @return list<array{name: string}>
      */
     public static function apiList(\OmegaUp\Request $r) {
         $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
+        $term = $r->ensureOptionalString('term');
+        $query = $r->ensureOptionalString('query');
+
+        if (!is_null($term)) {
+            $param = $term;
+        } elseif (!is_null($query)) {
+            $param = $query;
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',

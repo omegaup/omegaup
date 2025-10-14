@@ -202,7 +202,7 @@ class ApiCaller {
         //                       ^
         $args = preg_split('/[\/?]/', $apiAsUrl);
 
-        if ($args === false || count($args) < 2) {
+        if ($args === false || count($args) < 4) {
             self::$log->error(
                 'Api called with URI with less args than expected: ' . count(
                     $args
