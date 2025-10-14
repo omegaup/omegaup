@@ -359,9 +359,7 @@ class ApiCaller {
         $stringifiedException = strval($apiException);
         if ($apiException->getCode() >= 500 && $apiException->getCode() < 600) {
             self::$log->error($stringifiedException);
-            if (extension_loaded('newrelic')) {
-                newrelic_notice_error($stringifiedException);
-            }
+            \OmegaUp\NewRelicHelper::noticeError($stringifiedException);
         } else {
             self::$log->info($stringifiedException);
         }
