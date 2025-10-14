@@ -17,3 +17,4 @@ pytest-shutil>=1.7.0
 pytest-timeout==2.1.0
 types-requests==2.27.8
 omegaup-hook-tools==1.0.9
+pyyaml>=6.0
