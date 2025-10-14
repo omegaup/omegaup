@@ -460,6 +460,8 @@
 	"contestWillBeginIn": "(Thi5 c0n7357 wi11 b3gin in %(time))",
 	"contestsCreate": "(Cr3a73 C0n7357)",
 	"contestsJoinScoreboards": "(M3rg3 Sc0r3b0ard5)",
+	"contestsListLoading": "(L0ading...)",
+	"contestsListShowMore": "(Sh0w m0r3 c0n73575)",
 	"countryNotSet": "(C0un7ry n07 537)",
 	"courseActionScoreboard": "(Sc0r3b0ard)",
 	"courseAddContent": "(Add c0n73n7)",
