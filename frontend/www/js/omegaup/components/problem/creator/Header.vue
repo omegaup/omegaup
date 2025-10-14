@@ -131,29 +131,57 @@ export default class Header extends Vue {
       .then((zipContent) => {
         const cdpDataFile = zipContent.file('cdp.data');
         if (!cdpDataFile) {
-          ui.error(T.problemCreatorZipFileIsNotComplete);
-          return;
+          
+          // Ya que no se encontró un cdp.data, usamos la API para convertir el ZIP
+            const formData = new FormData();
+            formData.append('zipFile', this.zipFile!);
+
+            fetch('/api/problem/convertZipToCdp/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok' && data.cdp) {
+                  // Llama a la función de actualización con los datos de la API
+                    this.updateStore(data.cdp);
+                    //ui.error("El ZIP fue convertido y el store actualizado correctamente.");
+                } else {
+                    ui.error("Ocurrió un error en el servidor.");
+                }
+            })
+            .catch(() => {
+                ui.error("Ocurrió un error de red al intentar la conversión.");
+            });
+            return;
         }
-        cdpDataFile.async('text').then((content) => {
-          const storeData = JSON.parse(content);
-          this.$emit('upload-zip-file', storeData);
-          this.name = storeData.problemName;
-          this.$store.replaceState({
-            ...this.$store.state,
-            problemName: storeData.problemName,
-            problemMarkdown: storeData.problemMarkdown,
-            problemCodeContent: storeData.problemCodeContent,
-            problemCodeExtension: storeData.problemCodeExtension,
-            problemSolutionMarkdown: storeData.problemSolutionMarkdown,
+        else{
+          cdpDataFile.async('text').then((content) => {
+            const storeData = JSON.parse(content);
+            this.updateStore(storeData);
           });
-          if (storeData.casesStore) {
-            this.$store.commit('casesStore/replaceState', storeData.casesStore);
-          }
-        });
+        }
+        
       })
       .catch(() => {
         ui.error(T.problemCreatorZipFileIsNotValid);
       });
+  }
+
+  updateStore(storeData: any) {
+    this.$emit('upload-zip-file', storeData);
+    this.name = storeData.problemName;
+    this.$store.replaceState({
+      ...this.$store.state,
+      problemName: storeData.problemName,
+      problemMarkdown: storeData.problemMarkdown,
+      problemCodeContent: storeData.problemCodeContent,
+      problemCodeExtension: storeData.problemCodeExtension,
+      problemSolutionMarkdown: storeData.problemSolutionMarkdown,
+    });
+    if (storeData.casesStore) {
+      this.$store.commit('casesStore/replaceState', storeData.casesStore);
+    }
   }
 
   @Watch('name')
@@ -171,6 +199,11 @@ export default class Header extends Vue {
     const folder = zip.folder('solutions');
     const solutionMarkdownData = this.$store.state.problemSolutionMarkdown;
     folder?.file('es.markdown', solutionMarkdownData);
+  }
+  getCode(zip: JSZip) {
+    const folder = zip.folder('solutions');
+    const codeContent = this.$store.state.problemCodeContent;
+    folder?.file('code.markdown', codeContent);
   }
 
   getCasesAndTestPlan(zip: JSZip) {
@@ -202,6 +235,7 @@ export default class Header extends Vue {
     this.getStatement(this.zip);
     this.getSolution(this.zip);
     this.getCasesAndTestPlan(this.zip);
+    // this.getCode(this.zip);
 
     const problemName: string = this.$store.state.problemName;
     this.$emit('download-zip-file', {
