@@ -460,6 +460,8 @@
 	"contestWillBeginIn": "Este concurso iniciar\u00e1 en %(time)",
 	"contestsCreate": "Crear Concurso",
 	"contestsJoinScoreboards": "Unir Scoreboards",
+	"contestsListLoading": "Cargando...",
+	"contestsListShowMore": "Ver m\u00e1s concursos",
 	"countryNotSet": "Pa\u00eds no establecido",
 	"courseActionScoreboard": "Scoreboard",
 	"courseAddContent": "A\u00f1adir contenido",
