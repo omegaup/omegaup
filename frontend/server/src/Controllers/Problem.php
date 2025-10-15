@@ -6747,4 +6747,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'problem_print',
         ];
     }
+
+    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
+
+        try {
+            \OmegaUp\Validators::validateZipUploadedFile();
+
+            // Obtener datos necesarios
+            $tempFilePath = $_FILES['zipFile']['tmp_name'];
+            $problemName = pathinfo($_FILES['zipFile']['name'], PATHINFO_FILENAME);
+            
+            // Convertir ZIP a CDP
+            $result = \OmegaUp\ZipToCdpConverter::convert($tempFilePath, $problemName);
+
+            return $result;
+
+        } 
+         catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ];
+        }
+    }
 }
