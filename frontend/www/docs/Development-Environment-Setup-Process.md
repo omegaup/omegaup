@@ -1,35 +1,53 @@
-## Development Environment
-Install [`docker-compose`](https://docs.docker.com/compose/install/).
+## Content
 
-If you are running linux, after installing [`docker-compose`](https://docs.docker.com/compose/install/) run `sudo usermod -a -G docker $USER`, log out and log back in so you can start running docker commands.
+- [Videotutorial](#videotutorial)
+- [Installing Development Environment Docker](#installing-development-environment-docker)
+- [Codebase structure](#codebase-structure)
+- [How To Update Your Copy of omegaUp](#how-to-update-your-copy-of-omegaup)
+- [How To Make Changes To The Code](#how-to-make-changes-to-the-code)
+- [The Web App Is Not Showing My Changes](#the-web-app-is-not-showing-my-changes)
+- [Troubleshooting](#troubleshooting)
 
-## `git` Command Line Configuration 
+Before starting, if you are not confident using Git, we recommend you read [this tutorial](https://github.com/shekhargulati/git-the-missing-tutorial) 
 
-Once docker is installed, fork [omegaup/omegaup](https://github.com/omegaup/omegaup) and clone your fork locally:
+## Videotutorial
+[![Videotutorial](http://img.youtube.com/vi/H1PG4Dvje88/0.jpg)](http://www.youtube.com/watch?v=H1PG4Dvje88 "OmegaUp Localhost Setup Video Tutorial")
+
+## Installing Development Environment Docker
+
+### Prerequisites:
+* Install the [docker engine](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+
+* Install [docker compose 2](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually) or if you have already installed `docker compose 1`  you can migrate using the following [instructions](https://docs.docker.com/compose/install/linux/#install-using-the-repository).
+
+If you are running linux, after installing [`docker-compose`](https://docs.docker.com/compose/install/) run 
+```bash
+sudo usermod -a -G docker $USER
+```
+Log out and log back in so you can start running docker commands.
+
+
+After installing docker, fork the [omegaup/omegaup](https://github.com/omegaup/omegaup) repository, clone it to an empty directory
 
 ```shell
-git clone --recurse-submodules https://github.com/<YOUR GITHUB USER>/omegaup
+git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
 cd omegaup
 ```
 
-After that's done, run the following on the root path:
-```shell
+Once you have cloned the repository, inside the directory run:
+
+```
 git submodule update --init --recursive
 ```
 
-If you are not well-versed with Git then you can read the [tutorial](https://github.com/shekhargulati/git-the-missing-tutorial).
-
-
-## Bring up the docker container
-
-Inside (`/omegaup`) run
+and then, only needed the first time, or when the following command complains in the same directory (`omegaup/`) run:
 
 ```shell
-docker-compose pull  # Only necessary the first time, or t
+docker-compose pull
 docker-compose up --no-build
 ```
 
-after a few minutes (2-10 minutes), you should be able to access your local omegaUp instance [http://localhost:8001](http://localhost:8001). Normally the signal that indicates that the container is ready is that the previous command shows something similar to:
+After a few minutes (2-10 minutes), you should be able to access your local omegaUp instance [http://localhost:8001](http://localhost:8001). Normally the signal that indicates that the container is ready is that the previous command shows something similar to:
 
 ```
 frontend_1     | Child frontend:
@@ -54,13 +72,49 @@ frontend_1     |     Child vs/language/typescript/tsWorker:
 frontend_1     |            41 modules
 ```
 
-In order to open the console and run command inside the container you have to run:
+After the first run, the `docker compose up` command can be executed with the `--no-build` flag to avoid rebuilding everything, as the container has already been built.
 
 ```shell
-docker exec -it omegaup_frontend_1 /bin/bash
+docker compose up --no-build
 ```
 
-## Solutions to Common Issues
+In order to open the console and run command inside the container you have to run:
+```shell
+docker exec -it omegaup-frontend-1 /bin/bash
+```
+
+## Codebase structure
+
+omegaUp code can be found at `/opt/omegaup` inside the contianer. The dev installation has two user accounts preconfigured by default: `omegaup` (admin) y `user` (normal user). Their passwords `omegaup` and `user`, respectively.
+
+These are the directories that we are actively using in the development:
+
+* [frontend/server/controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/controllers): The controllers do the business logic and expose the server API.
+* [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs): Libraries and utilities.
+* [frontend/server/libs/dao](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs/dao): Data Access Objects [DAO] and Value Objects [VO]. Classes used to represent database schemes and facilitate their use by the controllers.
+* [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Smarty templates used to generate the HTML that is displayed to users. Also here are the internationalization files for English, Spanish and Portuguese.
+* [frontend/www](https://github.com/omegaup/omegaup/tree/master/frontend/www): The complete contents of the Internet page.
+
+For more details, see [here](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Frontend.md).
+
+## How To Update Your Copy of omegaUp
+
+Before you start making changes to the code, you should update the code to its latest version, that can be done by following [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md).
+
+## How To Make Changes To The Code
+
+When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md).
+
+## The Web App Is Not Showing My Changes!
+
+Make sure Docker is running with the command:
+```shell
+docker compose up --no-build
+```
+
+If the problem persists, ask for help in omegaUp's communication channels.
+
+## Troubleshooting
 
 If your browser keeps ching `http` to `https`, you can disable the security policies for `localhost`. [See this.](https://hmheng.medium.com/exclude-localhost-from-chrome-chromium-browsers-forced-https-redirection-642c8befa9b).
 
@@ -91,10 +145,13 @@ Traceback (most recent call last):
 FileNotFoundError: [Errno 2] No such file or directory: '/usr/bin/mysql'
 error: failed to push some refs to 'https://github.com/user/omegaup'
 ```
+
 This error indicates that MySQL is not installed. To fix it, install outside the container:
 ```shell
 sudo apt-get install mysql-client
 ```
+
+-------------------
 
 In case MySQL is already installed and you get the following error:
 
@@ -117,7 +174,6 @@ Traceback (most recent call last):
   File "/usr/lib/python3.8/subprocess.py", line 512, in run
     raise CalledProcessError(retcode, process.args,
 subprocess.CalledProcessError: Command '['/usr/bin/mysql', '--user=root', '--password=omegaup', 'omegaup', '-NBe', 'SELECT COUNT(*) FROM `PrivacyStatements` WHERE `type` = "contest_optional_consent" AND `git_object_id` = "534d173d57e3814174ac02cc25f92e4253829d9c";']' returned non-zero exit status 1.
-error: failed to push some refs to 'https://github.com/user/omegaup'
 ```
 That means MySQL is not correctly configured. To fix that run the following script (outside the container as well):
 ```shell
@@ -132,11 +188,33 @@ EOF
 ln -sf ~/.mysql.docker.cnf .my.cnf
 ```
 
+-------------------
+
+If you encounter any problems not covered in this section, please file an issue at [https://github.com/omegaup/deploy/issues](https://github.com/omegaup/deploy/issues) with your reproduction steps and the error message you are getting.
+
 ## Authentication
 
 Once omegaup is running on your local environment, you can access `http://localhost:8001/` to se the website. Use the following credentials to log in:
 
-* `omegaup` (password `omegaup`): Admin user.
-* `user` (password `user`): Normal user.
+* `omegaup` (password `omegaup`): User with sysadmin privileges.
+* `user` (password `user`): User with regular privileges.
 
-You can create new users as well. It won't ask for email verification, so you can use any email address.
+There are a huge list of users we use in tests:
+
+| User | Password |
+| -- | -- |
+| test_user_0 | test_user_0 |
+| test_user_1 | test_user_1 |
+| test_user_2 | test_user_2 |
+| test_user_3 | test_user_3 |
+| test_user_4 | test_user_4 |
+| test_user_5 | test_user_5 |
+| test_user_6 | test_user_6 |
+| test_user_7 | test_user_7 |
+| test_user_8 | test_user_8 |
+| test_user_9 | test_user_9 |
+| course_test_user_0 | course_test_user_0 |
+| course_test_user_1 | course_test_user_1 |
+| course_test_user_2 | course_test_user_2 |
+
+Feel free to create as much users as you need to test your changes. In development mode,the email verification is disabled, so you can use dummy emails.

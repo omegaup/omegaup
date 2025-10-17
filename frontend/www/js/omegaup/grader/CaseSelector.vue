@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-column h-100">
+  <div class="root d-flex flex-column h-100" :class="theme">
     <div class="summary">
       {{ summary }}
     </div>
@@ -38,8 +38,7 @@
             type="button"
             :class="{
               'in-group': group.explicit,
-              active: currentCase == item.name && theme == 'vs',
-              'vs-dark': currentCase == item.name && theme == 'vs-dark',
+              active: currentCase == item.name,
             }"
             @click="selectCase(item.name)"
           >
@@ -271,8 +270,67 @@ input[type='number'].case-weight {
   padding-left: 15px;
 }
 
-.vs-dark {
-  background: var(--vs-dark-background-color);
+/* Dark theme styles */
+.vs-dark .summary {
+  color: var(--vs-dark-font-color);
+  background-color: var(--vs-dark-background-color);
+}
+
+.vs-dark .list-group-item {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+  border-color: var(--vs-dark-border-color-medium);
+}
+
+.vs-dark .list-group-item-action {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item-action:hover,
+.vs-dark .list-group-item-action:focus {
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--hover
+  );
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .list-group-item-action.active {
+  background-color: var(
+    --vs-dark-list-group-item-action-background-color--active
+  );
+  border-color: var(--vs-dark-border-color-strong);
+}
+
+.vs-dark .list-group-item-secondary {
+  background-color: var(--vs-dark-list-group-item-secondary-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .close {
+  color: var(--vs-dark-close-color);
+}
+
+.vs-dark .close:hover {
+  color: var(--vs-dark-close-color--hover);
+}
+
+.vs-dark .input-group input.form-control {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+  border-color: var(--vs-dark-border-color-medium);
+}
+
+.vs-dark .btn-secondary {
+  background-color: var(--vs-dark-btn-secondary-background-color);
+  border-color: var(--vs-dark-border-color-strong);
+}
+
+.vs-dark .btn-secondary:hover {
+  background-color: var(--vs-dark-btn-secondary-background-color--hover);
+}
+
+.vs-dark .verdict {
   color: var(--vs-dark-font-color);
 }
 </style>

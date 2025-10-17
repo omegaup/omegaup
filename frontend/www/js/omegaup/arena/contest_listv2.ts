@@ -101,14 +101,12 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contestlist': arena_ContestList },
     data: () => ({
       query: payload.query,
-      contests: contestStore.state.contests,
-      countContests: contestStore.state.countContests,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
-          contests: this.contests,
-          countContests: this.countContests,
+          contests: contestStore.state.contests,
+          countContests: contestStore.state.countContests,
           query: this.query,
           tab,
           page,
@@ -118,7 +116,7 @@ OmegaUp.on('ready', () => {
           loading: contestStore.state.loading,
         },
         on: {
-          'fetch-page': ({
+          'fetch-page': async ({
             params,
             urlObj,
           }: {
@@ -133,7 +131,7 @@ OmegaUp.on('ready', () => {
               }
             }
             window.history.pushState({}, '', urlObj);
-            contestStore.dispatch('fetchContestList', {
+            await contestStore.dispatch('fetchContestList', {
               requestParams: params,
               name: params.tab_name,
             });

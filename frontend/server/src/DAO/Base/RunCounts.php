@@ -155,6 +155,25 @@ abstract class RunCounts {
     }
 
     /**
+     * Contar todos los registros en `Run_Counts`.
+     *
+     * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
+     * útil para pruebas donde sólo se valida el conteo.
+     *
+     * @return int Número total de registros.
+     */
+    final public static function countAll(): int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Run_Counts`;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
+        return intval($count);
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
@@ -206,7 +225,7 @@ abstract class RunCounts {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
-     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\RunCounts> Un arreglo que contiene objetos del tipo
@@ -215,25 +234,30 @@ abstract class RunCounts {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        ?string $orden = null,
+        string $orden = 'date',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Run_Counts`.`date`,
                 `Run_Counts`.`total`,
                 `Run_Counts`.`ac_count`
             FROM
                 `Run_Counts`
-        ';
-        if (!is_null($orden)) {
-            $sql .= (
-                ' ORDER BY `' .
-                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-                '` ' .
-                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-            );
-        }
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .

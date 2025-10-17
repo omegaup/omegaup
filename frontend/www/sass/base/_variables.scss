@@ -151,6 +151,17 @@
   --arena-reset-border-color: #ced4da;
   --arena-reset-text-color: #6c757d;
 
+  // USER HEATMAP
+  --user-heatmap-empty-cell-color: #dddddd;
+  --user-heatmap-low-activity-color: #739de3;
+  --user-heatmap-medium-activity-color: #5588dd;
+  --user-heatmap-high-activity-color: #4670b5;
+  --user-heatmap-background-color: transparent;
+  --user-heatmap-wrapper-background-color: #ffffff;
+  --user-chart-section-background-color: #ffffff;
+  --user-chart-section-heatmap-background-color: #ffffff;
+  --user-chart-title-color: #333333;
+
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
   --finder-wizard-modal-container-background-color: #eee;
@@ -250,7 +261,18 @@
   --vs-font-color: #333;
   --vs-dark-background-color: #222;
   --vs-dark-font-color: #d4d4d4;
-
+  --vs-dark-border-color-medium: #555;
+  --vs-dark-border-color-strong: #666;
+  --vs-dark-list-group-item-disabled-background-color: #333;
+  --vs-dark-list-group-item-disabled-color: #888;
+  --vs-dark-list-group-item-action-background-color--hover: #3a3a3a;
+  --vs-dark-list-group-item-action-background-color--active: #484848;
+  --vs-dark-list-group-item-secondary-background-color: #2d2d2d;
+  --vs-dark-close-color: #aaa;
+  --vs-dark-close-color--hover: #fff;
+  --vs-dark-btn-secondary-background-color: #444;
+  --vs-dark-btn-secondary-background-color--hover: #555;
+  --vs-dark-selected-form-border-color: #007bff;
   // GRADER ZIP BUTTONS
   --zip-button-color--hover: #fff;
 
@@ -284,10 +306,10 @@
   // GENERAL
   --general-in-maintainance-color: #4b4b4b;
 
-  //MONCAO EDITOR
-  --moncao-editor-toolbar-background-color: #f4f4f4;
-  --moncao-editor-toolbar-label-background-color: #e1e1e1;
-  --moncao-editor-toolbar-label-color: #777777;
-  --moncao-editor-toolbar-label-border-color: #cccccc;
-  --moncao-editor-toolbar-border-bottom-color: #ccc;
+  //MONACO EDITOR
+  --monaco-editor-toolbar-background-color: #f4f4f4;
+  --monaco-editor-toolbar-label-background-color: #e1e1e1;
+  --monaco-editor-toolbar-label-color: #777777;
+  --monaco-editor-toolbar-label-border-color: #cccccc;
+  --monaco-editor-toolbar-border-bottom-color: #ccc;
 }

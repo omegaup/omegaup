@@ -23,5 +23,10 @@
     }
   },
   "include": ["./frontend/www/js/omegaup/**/*.vue", "./frontend/www/**/*.ts"],
-  "exclude": ["./node_modules", "./cypress", "./frontend/www/js/omegaup/components/**/**/*.stories.ts"]
+  "exclude": [
+    "./node_modules",
+    "./cypress",
+    "./frontend/www/js/omegaup/components/**/**/*.stories.ts",
+    "./frontend/www/rekarel"
+  ]
 }
