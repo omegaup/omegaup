@@ -11,4 +11,3 @@
 3. **Metabase**
    - **URL**: [https://metabase.omegaup.com/](https://metabase.omegaup.com/)
    - **Description**: Metabase is an open-source data analysis and reporting tool. It allows users to create queries and data visualizations without advanced SQL knowledge. Metabase facilitates data exploration, the creation of interactive dashboards, and the generation of custom reports. It is a valuable tool for gaining data-driven insights and making informed decisions based on the analyses performed.
-   - **Note**: Currently out of service. Waiting for the connection to be restored.
