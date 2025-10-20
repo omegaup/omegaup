@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, Mapping, Optional, cast
+from typing import Any, Dict, Mapping, Optional
 import yaml
+from dataset_generator.types import ResourceCheck, ResourceRule
 
-SETTINGS_PATH = "./stuff/dataset_generator/settings.yml"
+DEFAULT_SETTINGS_PATH = "./stuff/dataset_generator/settings.yml"
 
 
 def _normalize_now(params: Dict[str, Any], now_ts: float) -> None:
@@ -50,91 +51,154 @@ def _deep_get(
     mapping: Mapping[str, object],
     path: str
 ) -> object | None:
-    """Return a nested value from a mapping using a dot-separated path."""
+    """
+    Return a nested value from a mapping using a dot-separated path.
+    """
     current: object = mapping
     for key in path.split("."):
         if not isinstance(current, Mapping) or key not in current:
             return None
-        current = current[key]  # type: ignore[index]
+        current = current[key]
     return current
 
 
-with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
-    _SETTINGS: dict[str, object] = yaml.safe_load(f) or {}
+def _load_settings(
+    settings_path: str
+) -> tuple[Dict[str, str], list[ResourceRule]]:
+    """
+    Load endpoints and resource_checks from settings.yml.
+    """
+    # TODO(@ElPedrangas03): Validar el esquema completo de settings.yml.
+    # - Usar TypedDicts + dataclasses para chequear tipos.
+    # - Verificar claves requeridas: 'endpoints',
+    #   'resource_checks' y sus tipos internos.
+    # - Hacer fail-fast con un mensaje claro si el archivo es
+    #   inválido o le faltan campos.
+    with open(settings_path, "r", encoding="utf-8") as f:
+        settings = yaml.safe_load(f) or {}
 
-_ENDPOINTS: Mapping[str, str] = _SETTINGS.get(
-    "endpoints", {}
-)  # type: ignore[assignment]
-_RULES: list[dict[str, object]] = _SETTINGS.get(
-    "resource_checks", []
-)  # type: ignore[assignment]
+    endpoints: Dict[str, str] = {}
+    endpoints_obj = settings.get("endpoints")
+    if isinstance(endpoints_obj, Mapping):
+        endpoints = {
+            k: v for k, v in endpoints_obj.items()
+            if isinstance(k, str) and isinstance(v, str)
+        }
 
-_RESOURCE_CHECKS: dict[str, dict[str, object]] = {}
-for rule in _RULES:
-    if not isinstance(rule, dict):
-        continue
+    rules: list[ResourceRule] = []
+    rules_obj = settings.get("resource_checks")
+    if isinstance(rules_obj, list):
+        for item in rules_obj:
+            if not isinstance(item, Mapping):
+                continue
+            create = item.get("create")
+            check_api = item.get("check_api")
+            params_map = item.get("params_map")
+            expect = item.get("expect")
+            if not (
+                isinstance(create, str)
+                and isinstance(check_api, str)
+                and isinstance(params_map, Mapping)
+            ):
+                continue
+            rule: ResourceRule = {
+                "create": create,
+                "check_api": check_api,
+                "params_map": {
+                    k: v
+                    for k, v in params_map.items()
+                    if isinstance(k, str) and isinstance(v, str)
+                },
+                "expect": list(expect) if isinstance(
+                    expect,
+                    list
+                ) else [],
+            }
+            rules.append(rule)
 
-    create_key = rule.get("create")
-    if not isinstance(create_key, str):
-        continue
+    return endpoints, rules
 
-    create_endpoint = _ENDPOINTS.get(create_key)
-    if not create_endpoint:
-        continue
 
-    _RESOURCE_CHECKS[_normalize_key(create_endpoint)] = {
-        "check_api": _ensure_slash(str(rule.get("check_api", ""))),
-        "params_map": rule.get("params_map", {}),
-        "expect": rule.get("expect", []),
-    }
+def _build_resource_checks(
+    endpoints: Mapping[str, str],
+    rules: list[ResourceRule],
+) -> dict[str, ResourceCheck]:
+    """
+    Build in-memory resource-check registry from endpoints and rules.
+    """
+    registry: dict[str, ResourceCheck] = {}
+    for rule in rules:
+        create_key = rule.get("create")
+        if not isinstance(create_key, str):
+            continue
+        create_endpoint = endpoints.get(create_key)
+        if not isinstance(create_endpoint, str):
+            continue
+
+        check_api = rule.get("check_api")
+        params_map = rule.get("params_map")
+        expect = rule.get("expect")
+
+        if not isinstance(check_api, str):
+            continue
+
+        params_map_typed: Dict[str, str] = dict(params_map) if isinstance(
+            params_map,
+            Mapping
+        ) else {}
+        expect_typed: list[Dict[str, str]] = list(expect) if isinstance(
+            expect,
+            list
+        ) else []
+
+        registry[_normalize_key(create_endpoint)] = ResourceCheck(
+            check_api=_ensure_slash(check_api),
+            params_map=params_map_typed,
+            expect=expect_typed,
+        )
+    return registry
+
+
+def load_resource_checks(
+    settings_path: str = DEFAULT_SETTINGS_PATH
+) -> dict[str, ResourceCheck]:
+    """
+    Convenience loader that returns a registry keyed by create endpoint.
+    """
+    endpoints, rules = _load_settings(settings_path)
+    return _build_resource_checks(endpoints, rules)
 
 
 def _resource_exists(
     session_object: Any,
     api_endpoint: str,
-    request_params: dict[str, object],
+    request_params: Dict[str, Any],
+    resource_checks: Mapping[str, ResourceCheck],
 ) -> bool:
     """
-    Return True if the resource
-    already exists based on settings.yml rules.
+    Return True if the resource already exists using the provided registry.
     """
-    spec = _RESOURCE_CHECKS.get(_normalize_key(api_endpoint))
-    if not isinstance(spec, dict):
+    spec = resource_checks.get(_normalize_key(api_endpoint))
+    if spec is None:
         return False
-
-    check_api = spec.get("check_api")
-    params_map = spec.get("params_map")
-    expect = spec.get("expect")
-
-    if not isinstance(
-        check_api,
-        str
-    ) or not isinstance(
-        params_map,
-        Mapping
-    ) or not isinstance(
-        expect,
-        list
-    ):
-        return False
-
-    params_map_typed = cast(Mapping[str, str], params_map)
-    expect_typed = cast(list[dict[str, str]], expect)
 
     check_params = {
-        dst: request_params.get(src) for dst, src in params_map_typed.items()
+        dst: request_params.get(src) for dst, src in spec.params_map.items()
     }
     if any(value in (None, "") for value in check_params.values()):
         return False
 
-    resp = session_object.request(check_api, check_params)
+    resp = session_object.request(spec.check_api, check_params)
     if not resp:
         return False
 
-    for cond in expect_typed:
-        if _deep_get(resp, cond["path"]) != request_params.get(cond["from"]):
+    for cond in spec.expect:
+        path = cond.get("path")
+        source = cond.get("from")
+        if not isinstance(path, str) or not isinstance(source, str):
             return False
-
+        if _deep_get(resp, path) != request_params.get(source):
+            return False
     return True
 
 
@@ -145,6 +209,8 @@ def process_one_request_local(
     *,
     retries: int = 0,
     backoff_sec: float = 0.5,
+    settings_path: Optional[str] = None,
+    resource_checks: Optional[Mapping[str, ResourceCheck]] = None,
 ) -> None:
     """
     Execute a single request dict with $NOW$ normalization and retry logic.
@@ -162,7 +228,11 @@ def process_one_request_local(
     ):
         _normalize_now(params, now_ts)
 
-    if _resource_exists(session_obj, api, params):
+    registry = resource_checks or load_resource_checks(
+        settings_path or DEFAULT_SETTINGS_PATH
+    )
+
+    if _resource_exists(session_obj, api, params, registry):
         return
 
     attempt = 0
