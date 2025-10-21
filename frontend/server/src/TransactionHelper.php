@@ -41,9 +41,9 @@ class TransactionHelper {
 
                 // Exponential backoff with jitter for deadlock retries
                 $waitTime = max(
-                    value: 0,
-                    values: intval(
-                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
+                    0,
+                    intval(
+                        min(pow(2, $retryCount - 1) * 100000, 1000000)
                     )
                 );
                 $jitter = rand(0, 50000); // Add up to 50ms jitter
