@@ -270,7 +270,8 @@ def get_cotm_eligible_users(
                 AND i.identity_id NOT IN (
                     SELECT gi.identity_id
                     FROM Group_Roles gr
-                    INNER JOIN Groups_Identities gi ON gi.group_id = gr.group_id
+                    INNER JOIN Groups_Identities gi
+                        ON gi.group_id = gr.group_id
                     WHERE gr.acl_id = 1 AND gr.role_id = 1
                 )
                 {last_12_coders_clause}
