@@ -262,6 +262,17 @@ def get_cotm_eligible_users(
                 s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
                 s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
                 i.user_id IS NOT NULL
+                AND i.user_id NOT IN (
+                    SELECT ur.user_id
+                    FROM User_Roles ur
+                    WHERE ur.acl_id = 1 AND ur.role_id = 1
+                )
+                AND i.identity_id NOT IN (
+                    SELECT gi.identity_id
+                    FROM Group_Roles gr
+                    INNER JOIN Groups_Identities gi ON gi.group_id = gr.group_id
+                    WHERE gr.acl_id = 1 AND gr.role_id = 1
+                )
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
