@@ -589,4 +589,92 @@ class ProblemDeployer {
             throw $error;
         }
     }
+
+    /**
+     * Commits a modified version of the current problem ZIP, excluding certain paths
+     * and adding new files. Uses 'theirs' merge strategy to replace the problem completely.
+     *
+     * @param string $message
+     * @param \OmegaUp\DAO\VO\Identities
+     * @param string $currentZipPath
+     * @param array<string> $pathsToExclude
+     * @param array<string, string> $filesToAdd
+     * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
+     */
+    public function commitModifiedZip(
+        string $message,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $currentZipPath,
+        array $pathsToExclude,
+        array $filesToAdd
+    ){
+        $tmpfile = tmpfile();
+        try {
+            $zipPath = stream_get_meta_data($tmpfile)['uri'];
+            $zipArchive = new \ZipArchive();
+            /** @var true|int */
+            $err = $zipArchive->open(
+                $zipPath,
+                \ZipArchive::OVERWRITE
+            );
+            if($err !== true){
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $err
+                );
+                $this->log->error("commit files failed: {$error}");
+                throw $error;
+            }
+            $currentZip = new \ZipArchive();
+            if( $currentZip->open($currentZipPath) !== true){
+                $zipArchive->close();
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    'Could not open current zip file'
+                );
+            }
+
+            for($i = 0; $i < $currentZip->numFiles; $i++){
+                $filename = $currentZip->getNameIndex($i);
+                $shouldExclude = false;
+                foreach ($pathsToExclude as $excludePath) {
+                    if (str_starts_with($filename, $excludePath)) {
+                        $shouldExclude = true;
+                        break;
+                    }
+                }
+                if ($shouldExclude) {
+                    continue;
+                }
+
+                $contents = $currentZip->getFromIndex($i);
+                if( $contents !== false ){
+                    $zipArchive->addFromString($filename, $contents);
+                }
+            }
+            $currentZip->close();
+
+            foreach ($filesToAdd as $path => $content) {
+                $zipArchive->addFromString($path, $content);
+            }
+
+            $zipArchive->close();
+
+            $result = $this->execute(
+                $zipPath,
+                strval($identity->username),
+                $message,
+                null,
+                null,
+                'theirs', // Use 'theirs' strategy to replace completely
+                false,
+                $this->acceptsSubmissions,
+                $this->updatePublished
+            );
+            $this->processResult($result);
+        } finally {
+            fclose($tmpfile);
+            unlink($zipPath);
+        }
+    }
 }
