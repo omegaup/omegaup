@@ -2142,4 +2142,64 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             )
         ))->modify("first day of -{$monthsLeft} months")->format('Y-m-d');
     }
+
+    /**
+     * Test that site-admins are excluded from Coder of the Month even if they
+     * solve more problems than regular users.
+     *
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testSiteAdminExcludedFromCoderOfTheMonth(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+
+        // Create a regular user who solves few problems
+        ['identity' => $regularIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($regularIdentity, $gender);
+
+        // Create a site-admin user who solves many problems
+        ['identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        self::updateIdentity($adminIdentity, $gender);
+
+        $runCreationDate = self::setFirstDayOfTheLastMonth();
+
+        // Admin solves 10 problems (should be excluded from CotM)
+        $this->createRuns($adminIdentity, $runCreationDate, numRuns: 10);
+
+        // Regular user solves only 2 problems (should win CotM)
+        $this->createRuns($regularIdentity, $runCreationDate, numRuns: 2);
+
+        // Run the ranking calculation
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+
+        // Get the coder of the month
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        // Verify that the regular user won CotM, not the site-admin
+        $this->assertSame(
+            $regularIdentity->username,
+            $response['coderinfo']['username'],
+            'Regular user should be coder of the month, not site-admin'
+        );
+
+        // Verify the admin is not in the candidate list
+        $login = self::login($regularIdentity);
+        $candidateList = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'date' => date('Y-m-d', \OmegaUp\Time::get()),
+                'category' => $category,
+            ])
+        );
+
+        // Check that admin is not in the list
+        foreach ($candidateList['coders'] as $coder) {
+            $this->assertNotSame(
+                $adminIdentity->username,
+                $coder['username'],
+                'Site-admin should not appear in CotM candidate list'
+            );
+        }
+    }
 }
