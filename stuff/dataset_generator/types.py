@@ -1,8 +1,8 @@
 """TypedDicts for seeder request parameter schemas."""
 
 from __future__ import annotations
-
-from typing import Literal, TypedDict
+from dataclasses import dataclass
+from typing import Literal, TypedDict, List, Dict, Mapping
 
 
 class UserCreateParams(TypedDict):
@@ -121,3 +121,19 @@ class ProblemCreateFiles(TypedDict):
 class IdentityBulkCreateFiles(TypedDict):
     """Files for /identity/bulkCreate/ (CSV with identities)."""
     identities: str
+
+
+@dataclass
+class ResourceCheck:
+    """Resolved existence-check rule (built from settings.yml)."""
+    check_api: str
+    params_map: Dict[str, str]
+    expect: List[Dict[str, str]]
+
+
+class ResourceRule(TypedDict, total=False):
+    """Raw rule from settings.yml for resource checks."""
+    create: str
+    check_api: str
+    params_map: Mapping[str, str]
+    expect: List[Dict[str, str]]
