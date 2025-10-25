@@ -113,7 +113,7 @@ We invite you to follow our [Coding Guidelines](https://github.com/omegaup/omega
 
 ```bash
 git checkout -b feature-name origin/main # Creates a new branch and syncs it with omegaUp
-git push upstream feature-name # Pushes your changes to GitHub
+git push --set-upstream origin feature-name # Pushes your branch to GitHub and sets the upstream as your fork
 ```
 
 # Upload your changes and make a new Pull Request
@@ -146,7 +146,7 @@ While this command should not be necessary if you follow the development process
 
 * Push from your commit to your fork: 
 ```bash
-git push -u upstream
+git push origin feature-name
 ```
 
 
@@ -244,3 +244,4 @@ You might be interested in the following topics:
 * [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines.md).
 * [Useful development commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md).
 * [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md).
+
