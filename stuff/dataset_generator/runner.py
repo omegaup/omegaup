@@ -68,7 +68,7 @@ def _load_settings(
     """
     Load endpoints and resource_checks from settings.yml.
     """
-    # TODO(@ElPedrangas03): Validate the full settings.yml schema.
+    # TODO: Validate the full settings.yml schema.
     # - Use TypedDicts + dataclasses to enforce types.
     # - Verify required keys: 'endpoints' and
     #   'resource_checks', including inner types.
