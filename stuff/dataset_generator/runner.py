@@ -68,12 +68,12 @@ def _load_settings(
     """
     Load endpoints and resource_checks from settings.yml.
     """
-    # TODO(@ElPedrangas03): Validar el esquema completo de settings.yml.
-    # - Usar TypedDicts + dataclasses para chequear tipos.
-    # - Verificar claves requeridas: 'endpoints',
-    #   'resource_checks' y sus tipos internos.
-    # - Hacer fail-fast con un mensaje claro si el archivo es
-    #   inválido o le faltan campos.
+    # TODO(@ElPedrangas03): Validate the full settings.yml schema.
+    # - Use TypedDicts + dataclasses to enforce types.
+    # - Verify required keys: 'endpoints' and
+    #   'resource_checks', including inner types.
+    # - Fail fast with a clear error message if
+    #   the file is invalid or missing fields.
     with open(settings_path, "r", encoding="utf-8") as f:
         settings = yaml.safe_load(f) or {}
 
