@@ -95,11 +95,27 @@ export default class CoderOfTheMonth extends Vue {
 .card-header {
   color: var(--coder-of-the-month-card-header-font-color);
   background-color: var(--coder-of-the-month-card-header-background-color);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(
+      --coder-of-the-month-card-header-hover-background-color
+    );
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
 
   &.card-header-female {
-    background-color: var(
-      --coder-of-the-month-card-header-female-background-color
-    );
+    background-color: var(--coder-of-the-month-card-header-female-background-color);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(
+        --coder-of-the-month-card-header-female-hover-background-color
+      );
+    }
   }
 }
 </style>
