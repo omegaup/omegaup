@@ -47,9 +47,9 @@ Executes a previously compiled program with a specific _input set_. This call is
 > }
 > ```
 
-*Grader* initially assumes that *Runner* always has the input set. Once the input set is located, *Runner* extracts the language from the previously mentioned opaque token (jejeje :P), and with that information, the *Sandbox* executes the program for each input, recording the standard output and metadata such as whether the execution had an error, as well as the time and memory used. It then builds a JSON object with this information and returns it. After the response is sent, the temporary folder and all generated files are automatically deleted.
+*Grader* initially assumes that *Runner* always has access to the input set. Once the input set is located, *Runner* extracts the language from the previously mentioned opaque token. Using this information, the *Sandbox* executes the program for each input, capturing the standard output and metadata such as execution errors, runtime, and memory usage. It then constructs a JSON object containing this data and returns it. After the response is delivered, the temporary folder and all generated files are automatically deleted.
 
-If *Runner* does not have the input set, it returns a JSON object with the appropriate error.
+If *Runner* does not detect the input set, it returns a JSON object with the relevant error.
 
 ### Output
 
