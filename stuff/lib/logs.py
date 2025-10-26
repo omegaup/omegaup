@@ -18,7 +18,7 @@ from pythonjsonlogger import jsonlogger  # type: ignore
 class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
     """A JSON formatter that adds the level."""
 
-    def add_fields(  # pylint: disable=arguments-renamed
+    def add_fields(
             self,
             log_data: Dict[str, str],
             record: logging.LogRecord,
