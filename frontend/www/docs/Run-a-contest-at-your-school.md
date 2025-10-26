@@ -9,7 +9,6 @@ The following are optional:
 
 * https://secure.gravatar.com (Optional, displays the user avatar in the top-right corner)
 * https://accounts.google.com (Optional, for logging in via Google)
-* https://connect.facebook.net and https://s-static.*.facebook.com (Optional, for logging in via Facebook)
 
 All of these use HTTPS connections, so only port 443 is required. Connections on port 80 will not work since they are automatically redirected to HTTPS.  
 Also, make sure your firewall is configured to use DENY instead of DROP. Otherwise, the browser will attempt to connect to the domains listed above, and without a response it will wait 20–30 seconds before timing out, causing the page to load very slowly.
@@ -36,5 +35,5 @@ Windows has some issues, such as using `%I64d` instead of `%lld` for printing *l
 
 ## Large Groups and Other Considerations
 
-If you plan to host a large contest with many participants (100 or more), please let us know in advance to ensure we have enough capacity to serve your contest on that day.
+If you plan to host a large contest with many participants (100 or more), please let us know in advance to ensure we have enough capacity to serve your contest on that day. You can contact us at **hello@omegaup.com**
 
