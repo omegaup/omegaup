@@ -142,11 +142,14 @@ export default class CoderOfTheMonthList extends Vue {
 .nav-link.active,
 .nav-link:hover {
   border: none;
-  border-left: 0.0625rem solid #dee2e6;
-  border-right: 0.0625rem solid #dee2e6;
+  border-left: 0.0625rem solid var(--border-color-light);
+  border-right: 0.0625rem solid var(--border-color-light);
   border-top-left-radius: 0rem;
   border-top-right-radius: 0rem;
+  background-color: var(--coder-row-hover-bg);
+  transition: background-color 0.3s ease;
 }
+
 .nav .nav-tabs {
   border-bottom: 0rem;
 }
@@ -155,9 +158,20 @@ export default class CoderOfTheMonthList extends Vue {
   font-weight: medium;
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
+  transition: all 0.3s ease;
 }
+
 .ranking-width {
   max-width: 55rem;
   margin: 0 auto;
+}
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

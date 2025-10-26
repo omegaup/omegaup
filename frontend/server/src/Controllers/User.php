@@ -4754,11 +4754,12 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($coders as $coder) {
             $hashEmail = md5($coder['email'] ?? '');
-            $avatar = "https://secure.gravatar.com/avatar/{$hashEmail}?s=32";
+            $avatar = "https://secure.gravatar.com/avatar/{$hashEmail}?s=100";
             $response[] = [
                 'username' => $coder['username'],
                 'country_id' => $coder['country_id'],
-                'gravatar_32' => $avatar,
+                'gravatar_32' => "https://secure.gravatar.com/avatar/{$hashEmail}?s=32",
+                'gravatar_100' => $avatar,
                 'date' => $coder['time'],
                 'classname' => $coder['classname'],
                 'problems_solved' => $coder['problems_solved'] ?? null,
