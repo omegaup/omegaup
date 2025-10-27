@@ -20,13 +20,9 @@ from typing import (
 )
 import math
 from concurrent.futures import ThreadPoolExecutor
-
 from tqdm import tqdm
-
-
-# from .runner import process_one_request_local
-
 import yaml
+from dataset_generator.runner import process_one_request_local
 
 ParamT = TypeVar("ParamT", bound=Mapping[str, object])
 
@@ -110,7 +106,7 @@ def _extract_test_zip(raw: Dict[str, Any], root: str) -> str:
     return _resolve_path(root, "frontend/tests/resources/testproblem.zip")
 
 
-def load_config(config_path: Optional[str], root: str) -> Dict[str, Any]:
+def load_config(config_path: str, root: str) -> Dict[str, Any]:
     """Load YAML and return a normalized config dict."""
     raw = _safe_load_yaml(config_path)
     endpoints = raw.get("endpoints") or {}
@@ -165,7 +161,7 @@ def send_all(  # pylint: disable=too-many-arguments
 
     def _run_batch(
         local_session: Any,
-        batch: List[Mapping[str, Any]]
+        batch: List[Dict[str, Any]]
     ) -> None:
         for i, req in enumerate(batch, 1):
             attempt = 0
@@ -203,9 +199,8 @@ def send_all(  # pylint: disable=too-many-arguments
                 _run_batch(session_obj, requests_list)
             else:
                 if session_ctor is None:
-                    raise RuntimeError(
-                        "For workers=1 provide 'session_obj' or 'session_ctor'"
-                    )
+                    raise RuntimeError("session_ctor cannot be None here")
+
                 with session_ctor(
                     session_args,
                     username,
@@ -224,7 +219,10 @@ def send_all(  # pylint: disable=too-many-arguments
                 for i in range(0, total_requests, chunk_size)
             ]
 
-            def _open_and_run(batch: List[Mapping[str, Any]]) -> None:
+            def _open_and_run(batch: List[Dict[str, Any]]) -> None:
+                if session_ctor is None:
+                    raise RuntimeError("session_ctor cannot be None here")
+
                 with session_ctor(
                     session_args,
                     username,
