@@ -595,10 +595,11 @@ class ProblemDeployer {
      * and adding new files. Uses 'theirs' merge strategy to replace the problem completely.
      *
      * @param string $message
-     * @param \OmegaUp\DAO\VO\Identities
+     * @param \OmegaUp\DAO\VO\Identities $identity
      * @param string $currentZipPath
      * @param array<string> $pathsToExclude
      * @param array<string, string> $filesToAdd
+     *
      * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
     public function commitModifiedZip(
@@ -607,7 +608,7 @@ class ProblemDeployer {
         string $currentZipPath,
         array $pathsToExclude,
         array $filesToAdd
-    ){
+    ): void {
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
@@ -617,7 +618,7 @@ class ProblemDeployer {
                 $zipPath,
                 \ZipArchive::OVERWRITE
             );
-            if($err !== true){
+            if ($err !== true) {
                 $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
                     $err
@@ -626,7 +627,7 @@ class ProblemDeployer {
                 throw $error;
             }
             $currentZip = new \ZipArchive();
-            if( $currentZip->open($currentZipPath) !== true){
+            if ($currentZip->open($currentZipPath) !== true) {
                 $zipArchive->close();
                 throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                     'problemDeployerInternalError',
@@ -634,7 +635,7 @@ class ProblemDeployer {
                 );
             }
 
-            for($i = 0; $i < $currentZip->numFiles; $i++){
+            for ($i = 0; $i < $currentZip->numFiles; $i++) {
                 $filename = $currentZip->getNameIndex($i);
                 $shouldExclude = false;
                 foreach ($pathsToExclude as $excludePath) {
@@ -648,7 +649,7 @@ class ProblemDeployer {
                 }
 
                 $contents = $currentZip->getFromIndex($i);
-                if( $contents !== false ){
+                if ($contents !== false) {
                     $zipArchive->addFromString($filename, $contents);
                 }
             }
@@ -674,7 +675,9 @@ class ProblemDeployer {
             $this->processResult($result);
         } finally {
             fclose($tmpfile);
-            unlink($zipPath);
+            if (file_exists($currentZipPath)) {
+                @unlink($currentZipPath);
+            }
         }
     }
 }
