@@ -155,6 +155,17 @@ def update_user_rank(
             `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
             `full_u`.`is_private` = 0
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            AND `full_u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
             AND NOT EXISTS (
                 SELECT
                     `pf`.`problem_id`, `pf`.`user_id`
@@ -233,6 +244,17 @@ def update_author_rank(
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
             `full_p`.`quality` IS NOT NULL
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            AND `u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
         GROUP BY
             `u`.`user_id`
         ORDER BY
