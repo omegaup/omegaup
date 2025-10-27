@@ -314,6 +314,15 @@ class Utils {
             \OmegaUp\MySQLConnection::getInstance()->Execute(
                 'ALTER TABLE Contests auto_increment = 100000;'
             );
+            // Make sure acl_id values in tests do not collide, matching production behavior.
+            // Any ACL with ID less than 65536 is meant to be reserved for certain parts of
+            // the system.
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'INSERT INTO ACLs (acl_id, owner_id) VALUES (1, 1);'
+            );
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'ALTER TABLE ACLs auto_increment = 65536;'
+            );
             self::setUpDefaultDataConfig();
         } catch (\Exception $e) {
             echo "Cleanup DB error. Tests will continue anyways: $e";

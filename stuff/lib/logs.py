@@ -20,19 +20,19 @@ class _CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore
 
     def add_fields(
             self,
-            log_record: Dict[str, str],
+            log_data: Dict[str, str],
             record: logging.LogRecord,
             message_dict: Dict[str, Any],
     ) -> None:
         """Add fields to the record."""
-        super().add_fields(log_record, record, message_dict)
-        if not log_record.get('time'):
-            log_record['time'] = datetime.datetime.utcnow().strftime(
+        super().add_fields(log_data, record, message_dict)
+        if not log_data.get('time'):
+            log_data['time'] = datetime.datetime.utcnow().strftime(
                 '%Y-%m-%dT%H:%M:%S.%fZ')
-        if log_record.get('level'):
-            log_record['level'] = log_record['level'].lower()
+        if log_data.get('level'):
+            log_data['level'] = log_data['level'].lower()
         else:
-            log_record['level'] = record.levelname.lower()
+            log_data['level'] = record.levelname.lower()
 
 
 def configure_parser(parser: argparse.ArgumentParser) -> None:

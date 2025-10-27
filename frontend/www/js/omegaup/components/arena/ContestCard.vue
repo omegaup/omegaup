@@ -28,13 +28,12 @@
               ref="contestButtonScoreboard"
               :href="getContestScoreboardURL(contest.alias)"
               variant="success"
-              class="d-flex justify-content-center align-items-center"
+              class="d-flex justify-content-center align-items-center mb-2"
             >
               <font-awesome-icon class="mr-1" icon="table" />
-              <p class="m-0">{{ T.contestButtonScoreboard }}</p>
+              {{ T.contestButtonScoreboard }}
             </b-button>
           </slot>
-
           <div class="d-flex align-items-center justify-content-center">
             <slot name="contest-enroll-status">
               <b-card-text
@@ -86,7 +85,7 @@
                 class="button-style d-flex justify-content-center align-items-center"
               >
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                <p class="m-0">{{ T.contestButtonEnter }}</p>
+                {{ T.contestButtonEnter }}
               </b-button>
             </slot>
             <slot name="contest-button-see-details">
@@ -95,31 +94,25 @@
                 ref="contestButtonSeeDetails"
                 :href="getContestURL(contest.alias)"
                 variant="primary"
-                class="text-center"
+                class="d-flex align-items-center justify-content-center"
               >
-                <font-awesome-icon
-                  class="mr-1 d-flex justify-content-center align-items-center"
-                  icon="sign-in-alt"
-                />
-                <p class="m-0">{{ T.contestButtonSeeDetails }}</p>
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                {{ T.contestButtonSeeDetails }}
               </b-button>
             </slot>
           </div>
           <slot name="contest-dropdown">
-            <b-dropdown variant="primary">
+            <b-dropdown variant="primary" class="d-inline-block">
               <template #button-content>
-                <font-awesome-icon
-                  class="mr-1 d-flex justify-content-center align-items-center"
-                  icon="sign-in-alt"
-                />
-                <p class="m-0">{{ T.contestButtonEnter }}</p>
+                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                {{ T.contestButtonEnter }}
               </template>
-              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
-                T.contestVirtualMode
-              }}</b-dropdown-item>
-              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
-                T.contestPracticeMode
-              }}</b-dropdown-item>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">
+                {{ T.contestVirtualMode }}
+              </b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
+                {{ T.contestPracticeMode }}
+              </b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
@@ -195,5 +188,11 @@ export default class ContestCard extends Vue {
 }
 .btn {
   color: $omegaup-white;
+  &.btn-success:hover {
+    color: $omegaup-white !important;
+  }
+  min-width: 120px;
+  width: 100%;
+  max-width: 200px;
 }
 </style>
