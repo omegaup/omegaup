@@ -7,7 +7,7 @@ Here you will find helpful technical information about our project, as well as d
 # Do you want help us?
 In this table you will find the main topics about our project so you can start coding.
 
-| Topic                                                  | Description                                                  | 
+| Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
 | [First steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) | VM installation, general technical information  |
 | [VM set-up](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md) | Git configuration, how to send a PR                    |
