@@ -14,7 +14,7 @@ In this table you will find the main topics about our project so you can start c
 | [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md)  | omegaUp' software architecture                      |
 | [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md)  | When and how is the deployment                               |
 
-:arrow_forward: :arrow_forward: :computer:  [Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Ligas-%C3%BAtiles.md)  
+:arrow_forward: :arrow_forward: :computer:  [Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-links.md)
 
 # How to use the main features of omegaUp.com?
 
