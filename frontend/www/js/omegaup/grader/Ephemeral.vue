@@ -67,23 +67,33 @@
 
         <button
           v-if="isRunButton"
-          class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button"
+          :disabled="!canExecute"
+          :class="{ disabled: !canExecute }"
+          class="btn btn-sm btn-secondary mr-2 my-sm-0"
           data-run-button
           @click.prevent="handleRun"
         >
-          <span>{{ T.wordsRun }}</span>
-          <span
-            v-if="isRunLoading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <omegaup-countdown
+            v-if="!canExecute"
+            :target-time="nextExecutionTimestamp"
+            :countdown-format="omegaup.CountdownFormat.EventCountdown"
+            @finish="now = Date.now()"
+          ></omegaup-countdown>
+          <template v-else>
+            <span>{{ T.wordsRun }}</span>
+            <span
+              v-if="isRunLoading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </template>
         </button>
         <button
           v-if="isSubmitButton"
           :disabled="!canSubmit"
           :class="{ disabled: !canSubmit }"
-          class="btn btn-sm btn-primary my-2 my-sm-0 ephemeral-button"
+          class="btn btn-sm btn-primary my-2 my-sm-0"
           data-submit-button
           @click.prevent="handleSubmit"
         >
@@ -110,6 +120,8 @@
 </template>
 
 <script lang="ts">
+import * as monaco from 'monaco-editor';
+(window as any).monaco = monaco;
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
@@ -177,6 +189,7 @@ export default class Ephemeral extends Vue {
   @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
   @Prop({ required: true }) problem!: types.ProblemInfo;
   @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: null }) nextExecutionTimestamp!: null | Date;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
@@ -232,6 +245,12 @@ export default class Ephemeral extends Vue {
       return true;
     }
     return this.nextSubmissionTimestamp.getTime() <= this.now;
+  }
+  get canExecute(): boolean {
+    if (!this.nextExecutionTimestamp) {
+      return true;
+    }
+    return this.nextExecutionTimestamp.getTime() <= this.now;
   }
 
   toggleTheme() {
@@ -367,6 +386,16 @@ export default class Ephemeral extends Vue {
   }
   handleRun() {
     if (this.isRunLoading) return;
+
+    postMessage({
+      method: 'executeRun',
+      params: {
+        problem_alias: store.getters['alias'],
+        language: store.getters['request.language'],
+        source: store.getters['request.source'],
+      },
+    });
+    this.$emit('execute-run');
 
     this.isRunLoading = true;
     fetch(`/grader/ephemeral/run/new/`, {
@@ -745,6 +774,12 @@ div {
     background: var(--vs-dark-background-color);
     color: var(--vs-dark-font-color);
     border-bottom: 1px solid var(--vs-dark-background-color);
+
+    /* Target the language selector */
+    .form-control.form-control-sm[data-language-select] {
+      background-color: var(--vs-dark-background-color);
+      color: var(--vs-dark-font-color);
+    }
   }
   &.vs {
     background: var(--vs-background-color);

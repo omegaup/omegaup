@@ -4,10 +4,7 @@
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
         <div class="w-100 text-right">
-          <a
-            target="_blank"
-            href="https://blog.omegaup.com/administracion-de-identidades/"
-          >
+          <a target="_blank" :href="SolutionViewFeatureGuideURL">
             {{ T.teamsGroupsCsvHelpMoreInfo }}
           </a>
         </div>
@@ -134,6 +131,7 @@ import {
   faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
+import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -176,6 +174,9 @@ export default class Upload extends Vue {
   @Prop() isLoading!: boolean;
 
   T = T;
+  get SolutionViewFeatureGuideURL(): string {
+    return getBlogUrl('SolutionViewFeatureGuideURL');
+  }
   identities: types.Identity[] = [];
   identitiesTeams: {
     [team: string]: { username: string; password?: string }[];

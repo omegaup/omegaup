@@ -53,6 +53,7 @@ describe('Edit.vue', () => {
             start_time: new Date(),
             student_count: 1,
             unlimited_duration: false,
+            teaching_assistant_enabled: false,
           },
           allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java' },
           assignmentProblems: [],

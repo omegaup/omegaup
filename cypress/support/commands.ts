@@ -275,7 +275,11 @@ Cypress.Commands.add(
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
-      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Wait for the language selector to be visible before trying to interact with it
+      cy.get('[name="language"]', { timeout: 10000 })
+        .should('be.visible')
+        .select(runs[idx].language);
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {

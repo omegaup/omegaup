@@ -50,7 +50,8 @@ abstract class Courses {
                 `archived` = ?,
                 `minimum_progress_for_certificate` = ?,
                 `certificates_status` = ?,
-                `recommended` = ?
+                `recommended` = ?,
+                `teaching_assistant_enabled` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -95,6 +96,7 @@ abstract class Courses {
             ),
             $Courses->certificates_status,
             intval($Courses->recommended),
+            intval($Courses->teaching_assistant_enabled),
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -135,7 +137,8 @@ abstract class Courses {
                 `Courses`.`archived`,
                 `Courses`.`minimum_progress_for_certificate`,
                 `Courses`.`certificates_status`,
-                `Courses`.`recommended`
+                `Courses`.`recommended`,
+                `Courses`.`teaching_assistant_enabled`
             FROM
                 `Courses`
             WHERE
@@ -178,6 +181,25 @@ abstract class Courses {
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
+    }
+
+    /**
+     * Contar todos los registros en `Courses`.
+     *
+     * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
+     * útil para pruebas donde sólo se valida el conteo.
+     *
+     * @return int Número total de registros.
+     */
+    final public static function countAll(): int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Courses`;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
+        return intval($count);
     }
 
     /**
@@ -232,7 +254,7 @@ abstract class Courses {
      *
      * @param ?int $pagina Página a ver.
      * @param int $filasPorPagina Filas por página.
-     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
      * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
      *
      * @return list<\OmegaUp\DAO\VO\Courses> Un arreglo que contiene objetos del tipo
@@ -241,10 +263,21 @@ abstract class Courses {
     final public static function getAll(
         ?int $pagina = null,
         int $filasPorPagina = 100,
-        ?string $orden = null,
+        string $orden = 'course_id',
         string $tipoDeOrden = 'ASC'
     ): array {
-        $sql = '
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
             SELECT
                 `Courses`.`course_id`,
                 `Courses`.`name`,
@@ -265,18 +298,13 @@ abstract class Courses {
                 `Courses`.`archived`,
                 `Courses`.`minimum_progress_for_certificate`,
                 `Courses`.`certificates_status`,
-                `Courses`.`recommended`
+                `Courses`.`recommended`,
+                `Courses`.`teaching_assistant_enabled`
             FROM
                 `Courses`
-        ';
-        if (!is_null($orden)) {
-            $sql .= (
-                ' ORDER BY `' .
-                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
-                '` ' .
-                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
-            );
-        }
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
         if (!is_null($pagina)) {
             $sql .= (
                 ' LIMIT ' .
@@ -334,8 +362,10 @@ abstract class Courses {
                     `archived`,
                     `minimum_progress_for_certificate`,
                     `certificates_status`,
-                    `recommended`
+                    `recommended`,
+                    `teaching_assistant_enabled`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -396,6 +426,7 @@ abstract class Courses {
             ),
             $Courses->certificates_status,
             intval($Courses->recommended),
+            intval($Courses->teaching_assistant_enabled),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

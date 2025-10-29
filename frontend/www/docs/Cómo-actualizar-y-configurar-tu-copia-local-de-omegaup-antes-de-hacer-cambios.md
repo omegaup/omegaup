@@ -1,6 +1,6 @@
-[Also available in English](https://github.com/omegaup/omegaup/wiki/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes)
+[Also available in English](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md)
 
-Una vez que [instalaste la máquina virtual](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar) sigue estas instrucciones (Las configuraciones de los remotes sólo las tendrás que realizar una vez):
+Una vez que [instalaste la máquina virtual](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) sigue estas instrucciones (Las configuraciones de los remotes sólo las tendrás que realizar una vez):
 
 # Configuración del remote de omegaUp:
 

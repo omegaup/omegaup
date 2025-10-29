@@ -32,6 +32,7 @@ describe('CloneWithToken.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
+          teaching_assistant_enabled: false,
         } as types.CourseDetails,
         username: 'omegaup',
         classname: 'user-rank-unranked',

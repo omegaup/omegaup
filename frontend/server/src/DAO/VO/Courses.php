@@ -36,6 +36,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'minimum_progress_for_certificate' => true,
         'certificates_status' => true,
         'recommended' => true,
+        'teaching_assistant_enabled' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -162,6 +163,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         if (isset($data['recommended'])) {
             $this->recommended = boolval(
                 $data['recommended']
+            );
+        }
+        if (isset($data['teaching_assistant_enabled'])) {
+            $this->teaching_assistant_enabled = boolval(
+                $data['teaching_assistant_enabled']
             );
         }
     }
@@ -307,4 +313,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $recommended = false;
+
+    /**
+     * Indica si el Asistente de enseñanza de IA está habilitado para este curso
+     *
+     * @var bool
+     */
+    public $teaching_assistant_enabled = false;
 }

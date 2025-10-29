@@ -71,7 +71,7 @@
             />
             <label for="checkbox">
               <omegaup-markdown
-                :markdown="T.acceptPrivacyPolicy"
+                :markdown="formattedAcceptPolicyMarkdown"
               ></omegaup-markdown>
             </label>
           </div>
@@ -216,7 +216,7 @@
             <input v-model="termsAndPolicies" type="checkbox" />
             <label for="checkbox" class="pl-1">
               <omegaup-markdown
-                :markdown="T.acceptPrivacyPolicy"
+                :markdown="formattedAcceptPolicyMarkdown"
               ></omegaup-markdown>
             </label>
           </div>
@@ -268,9 +268,11 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
+import * as ui from '../../ui';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
+import { getBlogUrl } from '../../urlHelper';
 Vue.use(VueCookies, { expire: -1 });
 
 @Component({
@@ -284,6 +286,7 @@ export default class Signup extends Vue {
   @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
 
   T = T;
+  ui = ui;
   username: string = '';
   email: string = '';
   dateOfBirth: string = '';
@@ -356,6 +359,20 @@ export default class Signup extends Vue {
 
   expired(): void {
     this.recaptchaResponse = '';
+  }
+
+  // ADD Computed property to format the markdown string
+  get formattedAcceptPolicyMarkdown(): string {
+    const policyUrl = getBlogUrl('PrivacyPolicyURL');
+    const conductUrl = getBlogUrl('CodeofConductPolicyURL');
+
+    // Use ui.formatString to inject the fetched URLs into the translation string
+    const formattedstring = ui.formatString(T.acceptPrivacyPolicy, {
+      PrivacyPolicyURL: policyUrl,
+      CodeofConductPolicyURL: conductUrl,
+    });
+
+    return formattedstring;
   }
 
   get maxDateForTimepicker() {
