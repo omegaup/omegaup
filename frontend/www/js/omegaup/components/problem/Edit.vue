@@ -59,6 +59,18 @@
           >{{ T.problemEditSolution }}</a
         >
       </li>
+
+      <li class="nav-item" role="presentation">
+        <a
+          href="#cases"
+          data-tab-cases
+          class="nav-link"
+          :class="{ active: showTab === 'cases' }"
+          @click="showTab = 'cases'"
+          >{{ 'Edit Cases' }}</a
+        >
+      </li>
+
       <li class="nav-item" role="presentation">
         <a
           href="#admins"
@@ -166,6 +178,14 @@
               )
           "
         ></omegaup-problem-statementedit>
+      </div>
+
+      <div v-if="showTab === 'cases'" class="tab-pane active">
+        <omegaup-problem-creator-cases-tab
+          @hook:mounted="loadCasesStore"
+          @download-zip-file="zipObject => $emit('download-zip-file', zipObject)"
+          @download-input-file="fileObject => $emit('download-input-file', fileObject)"
+        />
       </div>
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
@@ -280,7 +300,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Provide } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -290,6 +310,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
+import problemCreator_CasesTab from './creator/cases/CasesTab.vue';
 
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { ModalPlugin } from 'bootstrap-vue';
@@ -304,6 +325,7 @@ Vue.use(ModalPlugin);
     'omegaup-problem-statementedit': problem_StatementEdit,
     'omegaup-common-admins': common_Admins,
     'omegaup-common-groupadmins': common_GroupAdmins,
+    'omegaup-problem-creator-cases-tab': problemCreator_CasesTab,
   },
 })
 export default class ProblemEdit extends Vue {
@@ -315,13 +337,29 @@ export default class ProblemEdit extends Vue {
   @Prop() statement!: types.ProblemStatement;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) cdp!: Record<string, unknown> | null;
+  
+  @Provide('problemAlias')
+  get providedAlias(): string{
+    return this.data.alias;
+  }
+  @Provide('originalCasesMap')
+  get providedCasesMap(): Map<string, any> {
+    if (!this.casesMapCache) {
+      this.casesMapCache = this.getCasesMap();
+    }
+    return this.casesMapCache;
+  }
 
+  @Provide('isEditing') isEditing = true;
+  private casesMapCache: Map<string, any> | null = null;
   T = T;
   alias = this.data.alias;
   showTab = this.initialTab;
   currentStatement: types.ProblemStatement = this.statement;
   showConfirmationModal = false;
 
+  
   get activeTab(): string {
     switch (this.showTab) {
       case 'edit':
@@ -332,6 +370,8 @@ export default class ProblemEdit extends Vue {
         return T.problemEditChooseVersion;
       case 'solution':
         return T.problemEditSolution;
+      case 'cases':
+        return 'Cases';
       case 'admins':
         return T.problemEditAddAdmin;
       case 'tags':
@@ -356,6 +396,53 @@ export default class ProblemEdit extends Vue {
 
   onGotoPrintableVersion(): void {
     window.location.href = `/arena/problem/${this.alias}/print/`;
+  }
+  
+
+  /**
+   * Generate a Map with the original data for all cases.
+   * @returns Map where the key is the caseID and the value contains the name of the case and the group
+   */
+  private getCasesMap(): Map<string, any> {
+    const casesMap = new Map();
+    const casesStore = this.getCasesStore();
+    if (!casesStore) return casesMap
+    const groups = (casesStore as any).groups || [];
+    
+    for (const group of groups) {
+      for (const caseItem of group.cases || []) {
+        casesMap.set(caseItem.caseID, {
+          oldCaseName: caseItem.name,
+          oldGroupName: group.name,
+          input: this.buildInputText(caseItem.lines),
+          output: caseItem.output
+        });
+      }
+    }
+
+    return casesMap;
+  }
+
+  private buildInputText(lines: any[]): string {
+    if (!lines || !Array.isArray(lines)) return '';
+    
+    return lines
+      .map((line) => line.data?.value || '')
+      .join('\n');
+  }
+
+
+  private getCasesStore(): Record<string, unknown> | null {
+    if (!this.cdp) return null;
+    const cdpData = (this.cdp as any).cdp;
+    if (!cdpData || !cdpData.casesStore) return null;
+    return cdpData.casesStore;
+  }
+
+  private loadCasesStore(): void {
+    const storeData = this.getCasesStore();
+    if (!storeData) return;
+    this.$store.commit('casesStore/replaceState', storeData);
   }
 }
 </script>
