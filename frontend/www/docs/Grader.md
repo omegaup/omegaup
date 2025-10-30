@@ -1,17 +1,34 @@
-_Arena_ (o _Frontend_ para v1) no va a tener nada de lógica para validar los problemas: eso es un trabajo para _Grader_. Además, es capaz de comunicarse con jueces externos!
+# OmegaUp Grader Documentation
 
-_Grader_ es el encargado de manejar la cola de espera para el jueceo de los programas. Una vez que _Arena_/_Frontend_ le notifique el hecho de que tiene que juecear un problema, examina el registro en la base de datos, lo redirige a la cola del evaluador apropiado (local, uva, pku, tju, livearchive, spoj), y cambia su estado a 'espera'. Una vez en ese punto, grader se 'lava las manos' y vuelve a estar a la espera de otra notificación. Una vez que _Arena_ esté terminado, _Grader_ tiene que enviar un callback en cuanto se haya resuelto el resultado de su validación para que notifique vía Comet al usuario final (_Frontend_ tendrá que hacer polling por lo pronto).
+## Overview
 
-Los evaluadores remotos tienen una lista de espera pequeña (UVa tiene una lista de espera de ~10 slots concurrentes y todos los demás de uno. La razón de esto es porque ninguno de ellos tenían contemplado que existieran consumidores automáticos de su información). Una vez que el servidor ha respondido con un veredicto, el evaluador tiene la responsabilidad de actualizar el registro de la ejecución y cambiar los campos correspondientes.
+### Arena (Frontend v1)
+The **Arena** (Frontend for version 1) is designed without any logic for validating problems—that responsibility is handled by the **Grader**. Additionally, Arena supports communication with external judges.
 
-Para el caso de la evaluación local, _Grader_ debe tener una lista de _Runner_ registrados, para que _Grader_ pueda enviarles el código fuente y el input (cacheable) de los casos. _Runner_ regresará, por cada caso, una notificación de error si ocurrió algún problema, o la salida del programa, con metainformación sobre el tiempo de ejecución y la memoria. Una vez con esa información, _Grader_ ejecutará el validador para cada output, comparándolo con el output esperado, y emitirá una calificación final numérica para la ejecución (que generalmente es la suma de las calificaciones de cada caso). _Grader_ entonces debe actualizar el registro de la ejecución de la base de datos.
+### Grader
+The **Grader** manages the queue for evaluating submitted programs. When notified by **Arena** or the **Frontend** to judge a submission, the Grader:
+1. Retrieves the submission record from the database.
+2. Routes it to the appropriate evaluator’s queue (e.g., local, UVa, PKU, TJU, LiveArchive, SPOJ).
+3. Updates the submission status to "pending."
 
-## Modo de Uso
+Once this is done, the Grader waits for the next notification. After the evaluation is complete, the Grader sends a callback with the validation result to Arena, which notifies the end user via Comet. For now, the Frontend relies on polling to check for updates.
 
-Para invocar a Grader desde _Frontend_, lo único que tienes que hacer es enviar un JSON similar a `{'id':1234}` a `https://localhost:21680/grade/`. Es todo.
+### Remote Evaluators
+Remote evaluators have limited queue capacities (e.g., UVa supports ~10 concurrent slots, while others support only one). This is because these systems were not designed for automated consumers. When a server returns a verdict, the evaluator updates the submission record in the database with the relevant fields.
 
-Como es necesario hacer la llamada usando certificados, es necesario usar la librería de cURL de PHP para hacer las llamadas. Pude hacer esto desde la consola usando:
+### Local Evaluation
+For local evaluations, the Grader maintains a list of registered **Runners**. The process is as follows:
+1. The Grader sends the source code and test case inputs (cacheable) to a Runner.
+2. For each test case, the Runner returns:
+   - An error notification if an issue occurs, or
+   - The program’s output, including metadata such as execution time and memory usage.
+3. The Grader runs the validator to compare each output against the expected output.
+4. A final numerical score is calculated for the submission (typically the sum of individual test case scores).
+5. The Grader updates the submission record in the database.
 
-`curl --url https://localhost:21680/grade/ -d '{"id": 12345}' -E frontend/omegaup.pem --cacert ssl/omegaup-ca.crt --insecure`
+## Usage
 
-El --insecure es porque el certificado del grader no incluye su hostname. Si le pongo localhost de CN al certificado del grader, podemos eliminar esa bandera y ser felices todos :)
+To invoke the Grader from the Frontend, send a JSON payload like the following to the Grader’s endpoint:
+
+```json
+{"id": 1234}
