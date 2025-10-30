@@ -849,25 +849,16 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
 
-        // Verify regular user appears in ranking
-        $regularUserFound = false;
-        $adminUserFound = false;
-
-        foreach ($response['rank'] as $rankedUser) {
-            if ($rankedUser['username'] === $regularIdentity->username) {
-                $regularUserFound = true;
-            }
-            if ($rankedUser['username'] === $adminIdentity->username) {
-                $adminUserFound = true;
-            }
-        }
-
-        $this->assertTrue(
-            $regularUserFound,
+        // Verify regular user appears in ranking but admin doesn't
+        $rankedUsers = array_column($response['rank'], 'username');
+        $this->assertContains(
+            $regularIdentity->username,
+            $rankedUsers,
             'Regular user should appear in user ranking'
         );
-        $this->assertFalse(
-            $adminUserFound,
+        $this->assertNotContains(
+            $adminIdentity->username,
+            $rankedUsers,
             'Site-admin should not appear in user ranking'
         );
     }
@@ -949,24 +940,15 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         )['ranking'];
 
         // Verify regular author appears in ranking but admin doesn't
-        $regularAuthorFound = false;
-        $adminAuthorFound = false;
-
-        foreach ($authorsRank as $rankedAuthor) {
-            if ($rankedAuthor['username'] === $regularAuthor->username) {
-                $regularAuthorFound = true;
-            }
-            if ($rankedAuthor['username'] === $adminAuthor->username) {
-                $adminAuthorFound = true;
-            }
-        }
-
-        $this->assertTrue(
-            $regularAuthorFound,
+        $rankedAuthors = array_column($authorsRank, 'username');
+        $this->assertContains(
+            $regularAuthor->username,
+            $rankedAuthors,
             'Regular author should appear in author ranking'
         );
-        $this->assertFalse(
-            $adminAuthorFound,
+        $this->assertNotContains(
+            $adminAuthor->username,
+            $rankedAuthors,
             'Site-admin should not appear in author ranking'
         );
     }

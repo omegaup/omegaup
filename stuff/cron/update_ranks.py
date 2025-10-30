@@ -157,6 +157,7 @@ def update_user_rank(
             `full_u`.`is_private` = 0
             -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
             -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
             AND `full_u`.`user_id` NOT IN (
                 SELECT
                     `ur`.`user_id`
@@ -246,6 +247,7 @@ def update_author_rank(
             `full_p`.`quality` IS NOT NULL
             -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
             -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
             AND `u`.`user_id` NOT IN (
                 SELECT
                     `ur`.`user_id`
