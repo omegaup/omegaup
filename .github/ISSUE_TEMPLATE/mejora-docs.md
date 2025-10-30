@@ -2,7 +2,7 @@
 name: Mejora de documentación
 about: Ayúdanos a mejorar solicitando cambios, aclaraciones o mejoras en la documentación con este formato
 title: "[DOCS] Descripción breve de la mejora propuesta"
-labels: ''
+labels: 'documentation'
 assignees: ''
 ---
 
@@ -12,15 +12,17 @@ assignees: ''
 
 *Ejemplo: La descripción en [ubicación] puede confundir a nuevos contribuidores"*
 
-## Impacto del problema
+
+
+## Impacto del problema (opcional)
 
 *Detalla cómo afecta a usuarios, desarrolladores o nuevos contribuidores.*
 
-## Propuesta de cambio
+## Propuesta de cambio (opcional)
 
 *Describe el cambio sugerido o la mejora esperada.*
 
-## Contexto
+## Contexto (opcional)
 
 *Proveer contexto nos ayuda a encontrar la solución adecuada*
 
