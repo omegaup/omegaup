@@ -1214,7 +1214,6 @@ EOD;
         }
     }
 
-
     public function generateControllersDoc(): void {
         $readmeUrl = 'https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md';
         echo "## API Controllers\n\n";
@@ -1238,8 +1237,6 @@ EOD;
         }
         echo "\n";
     }
-
-
 
     public function generatePythonApi(): void {
         echo "\"\"\"A Python implementation of an omegaUp API client.\n";
