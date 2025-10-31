@@ -89,13 +89,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         $sql = '
-            SELECT DISTINCT acl_id
+            SELECT acl_id
             FROM User_Roles
             WHERE user_id = ? AND role_id = ?
 
             UNION
 
-            SELECT DISTINCT gr.acl_id
+            SELECT gr.acl_id
             FROM Groups_Identities gi
             INNER JOIN Group_Roles gr ON gr.group_id = gi.group_id
             WHERE gi.identity_id = ? AND gr.role_id = ?
@@ -112,7 +112,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ]
         );
 
-        return array_map(fn($row) => intval($row['acl_id']), $results);
+        return array_map(fn($row) => $row['acl_id'], $results);
     }
 
     /**
@@ -338,7 +338,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $accessibleAclIds = self::getAccessibleAclIds($identityId, $userId);
+            $userKey = is_null($userId) ? 'null' : $userId;
+            $callback = /** @return list<int> */ fn (): array =>
+                self::getAccessibleAclIds($identityId, $userId);
+            $cacheKey = "{$identityId}-{$userKey}";
+
+            $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
+                'problems_identity_type',
+                $cacheKey,
+                $callback
+            );
 
             $select = "
                 SELECT
@@ -370,35 +379,28 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $minVisibility
             );
 
-            if (empty($accessibleAclIds)) {
-                $clauses[] = [
-                    '(p.visibility >= ? OR id.identity_id IS NOT NULL)',
-                    [$visibilityThreshold],
-                ];
-            } else {
+            $clause = '(p.visibility >= ? OR id.identity_id IS NOT NULL)';
+            $argsForClause = [$visibilityThreshold];
+
+            if (!empty($accessibleAclIds)) {
                 $placeholders = implode(
                     ',',
-                    array_fill(
-                        0,
-                        count(
-                            $accessibleAclIds
-                        ),
-                        '?'
-                    )
+                    array_fill(0, count($accessibleAclIds), '?')
                 );
-                $clauses[] = [
-                    '(p.visibility >= ? OR id.identity_id IS NOT NULL OR p.acl_id IN (' . $placeholders . '))',
-                    array_merge([$visibilityThreshold], $accessibleAclIds),
-                ];
+                $clause .= ' OR p.acl_id IN (' . $placeholders . ')';
+                $argsForClause = array_merge($argsForClause, $accessibleAclIds);
             }
 
             $clauses[] = [
-                'p.visibility > ?',
-                [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
+                '(' . $clause . ') AND p.visibility > ?',
+                array_merge(
+                    $argsForClause,
+                    [\OmegaUp\ProblemParams::VISIBILITY_DELETED]
+                ),
             ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
             $select = "
-                    SELECT DISTINCT
+                    SELECT
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
@@ -449,10 +451,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $clauses[] = [
                     'pa_acl.owner_id IN (' . $placeholders . ')',
                     $authorUserIds,
-                ];
-            } else {
-                $clauses[] = [
-                    'FALSE', []
                 ];
             }
         }

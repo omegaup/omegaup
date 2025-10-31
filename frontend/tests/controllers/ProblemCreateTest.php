@@ -1160,4 +1160,127 @@ if __name__ == \'__main__\':
             $problem->allow_user_add_tags
         );
     }
+
+    public function testUsersOnlySeeAllowedProblems(): void {
+        ['identity' => $alice] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $bob] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $charlie] = \OmegaUp\Test\Factories\User::createUser();
+
+        $alicePrivate = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $alice,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                'alias' => 'alice_private',
+            ])
+        );
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $alice,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'alias' => 'alice_public',
+            ])
+        );
+
+        $bobPrivate = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $bob,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                'alias' => 'bob_private',
+            ])
+        );
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $bob,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'alias' => 'bob_public',
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $charlie,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                'alias' => 'charlie_private',
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $charlie,
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'alias' => 'charlie_public',
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Problem::addAdminUser(
+            $alicePrivate,
+            $bob
+        );
+
+        \OmegaUp\Test\Factories\Problem::addAdminUser(
+            $alicePrivate,
+            $charlie
+        );
+
+        \OmegaUp\Test\Factories\Problem::addAdminUser(
+            $bobPrivate,
+            $alice
+        );
+
+        $aliceLogin = self::login($alice);
+        $bobLogin = self::login($bob);
+        $charlieLogin = self::login($charlie);
+
+        $delete = function ($identity): void {
+            \OmegaUp\Cache::deleteFromCache(
+                'problems_identity_type',
+                "{$identity->identity_id}-" . ($identity->user_id ?? 'null')
+            );
+        };
+        $delete($alice);
+        $delete($bob);
+        $delete($charlie);
+
+        $aliceList = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $aliceLogin->auth_token,
+            ])
+        );
+        $aliceAliases = array_map(
+            fn ($p) => $p['alias'],
+            $aliceList['results']
+        );
+        $this->assertContains('alice_private', $aliceAliases);
+        $this->assertContains('alice_public', $aliceAliases);
+        $this->assertContains('bob_private', $aliceAliases);
+        # $this->assertNotContains('charlie_private', $aliceAliases);
+
+        $bobList = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $bobLogin->auth_token,
+            ])
+        );
+        $bobAliases = array_map(
+            fn ($p) => $p['alias'],
+            $bobList['results']
+        );
+        $this->assertContains('bob_private', $bobAliases);
+        $this->assertContains('alice_private', $bobAliases);
+        $this->assertContains('alice_public', $bobAliases);
+        # $this->assertNotContains('charlie_public', $bobAliases);
+
+        $charlieList = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $charlieLogin->auth_token,
+            ])
+        );
+        $charlieAliases = array_map(
+            fn ($p) => $p['alias'],
+            $charlieList['results']
+        );
+        $this->assertContains('alice_public', $charlieAliases);
+        $this->assertContains('alice_private', $charlieAliases);
+        $this->assertContains('bob_private', $charlieAliases);
+        # $this->assertNotContains('charlie_private', $charlieAliases);
+    }
 }
