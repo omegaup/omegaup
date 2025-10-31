@@ -1,0 +1,17 @@
+name: Assign issue
+
+on:
+  repository_dispatch:
+    types: [assign-command]
+
+permissions:
+  issues: write
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign issue to commenter
+        uses: peter-evans/assign-issue@v2
+        with:
+          assignees: ${{ github.event.client_payload.slash_command.user.login }}

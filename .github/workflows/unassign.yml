@@ -1,0 +1,17 @@
+name: Unassign issue
+
+on:
+  repository_dispatch:
+    types: [unassign-command]
+
+permissions:
+  issues: write
+
+jobs:
+  unassign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unassign issue
+        uses: peter-evans/unassign-issue@v2
+        with:
+          assignees: ${{ github.event.client_payload.slash_command.user.login }}
