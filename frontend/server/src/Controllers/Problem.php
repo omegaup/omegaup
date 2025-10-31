@@ -5382,6 +5382,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit,
             $lang
         );
+        $cdp = \OmegaUp\Controllers\Problem::getProblemCDP(
+            $problem,
+            strval($problem->commit)
+        );
+
         $publishedRevision = null;
         foreach ($versions['log'] as $revision) {
             if ($versions['published'] === $revision['commit']) {
@@ -5416,6 +5421,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'log' => $versions['log'],
             'publishedRevision' => $publishedRevision,
             'solution' => $solution,
+            'cdp' => $cdp,
         ];
 
         $result = [
@@ -5509,6 +5515,56 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $details = self::getProblemEditDetails($problem, $r->identity);
             $result['templateProperties']['payload']['statement'] = $details['statement'];
         }
+        elseif($request === 'cases'){
+
+            $contents = $r->ensureString('contents');
+            $caseData = json_decode($contents, true);
+            if (!is_array($caseData)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidJson');
+            } 
+
+            self::validateCaseData($caseData);
+             
+            self::updateCases(
+                $r->identity,
+                $r->user,
+                $problem,
+                $caseData,
+                $message,
+                $problemParams->updatePublished
+            );
+        }
+        elseif($request === 'deleteGroupCase'){
+           
+            $contents = $r->ensureString('contents');
+            $caseData = json_decode($contents, true);
+            if (!is_array($caseData)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidJson');
+            } 
+            if (!isset($caseData['name']) || empty($caseData['name'])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('missingOrEmptyName');
+            }
+            $pathsToExclude = ['cases/' . $caseData['name']];
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+            self::processCaseUpdate(
+                $problemArtifacts,
+                $problem,
+                $r->identity,
+                $r->user,
+                $message,
+                $problemParams->updatePublished,
+                [],
+                $pathsToExclude,
+                true // Delete operation
+            );
+
+            \OmegaUp\Cache::deleteFromCache(
+                \OmegaUp\Cache::PROBLEM_CDP_DATA,
+                "{$problem->alias}-{$problem->commit}"
+            );
+        }
+
+
         $result['templateProperties']['payload']['statusSuccess'] = true;
         return $result;
     }
@@ -6754,28 +6810,282 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    /**
-     * Convert an uploaded ZIP file to CDP.
-     *
-     * @param \OmegaUp\Request $r
-     * @return array{status: 'ok', cdp: CDP}
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
-     */
-    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
-        $fileInfo = \OmegaUp\Validators::validateZipUploadedFile();
-        $tempFilePath = $fileInfo['tmpFilePath'];
-        $problemName = $fileInfo['problemName'];
+    public static function getProblemCDP(
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $commit
+    ): ?array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_CDP_DATA,
+            "{$problem->alias}-{$commit}",
+            fn () => \OmegaUp\Controllers\Problem::getProblemCDPImpl([
+                'alias' => strval($problem->alias),
+                'commit' => $commit
+            ]),
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+    }
 
-        // Convert ZIP to CDP
-        $cdp = \OmegaUp\ZipToCdpConverter::convert(
-            $tempFilePath,
-            $problemName
+
+    private static function getProblemCDPImpl(array $params): ?array {
+
+        if (is_null($params['alias'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $params['alias']
         );
 
+        $sourcePath  = 'cdp.data';
+        $zipFilePath = null;
+
+        if (!$problemArtifacts->exists($sourcePath)) {
+            $zipFilePath = $problemArtifacts->getZip();
+        }
+
+        try {
+            if( !is_null($zipFilePath) ){
+                $result = \OmegaUp\ZipToCdpConverter::convert($zipFilePath, $params['alias']);
+            } else {
+                $jsonContent= mb_convert_encoding(
+                    $problemArtifacts->get(
+                        $sourcePath
+                    ),
+                    'utf-8'
+                );
+                $result = json_decode($jsonContent, associative: true);
+            }
+            return $result;
+
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            return null;
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            throw $e;
+        }catch (\Exception $e) {
+            throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
+                'cdpNotFound'
+            );
+        }
+        finally {
+            if ( !is_null($zipFilePath) && file_exists($zipFilePath)) {
+                unlink($zipFilePath);
+            }
+        }
+    }
+
+    private static function validateCaseData(array $caseData): void {
+        $requiredFields = ['group_name', 'case_name', 'input', 'output'];
+        foreach ($requiredFields as $field) {
+            if (!isset($caseData[$field])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException("missing_{$field}");
+            }
+        }
+    }
+
+    private static function updateCases(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Problems $problem,
+        array $caseData,
+        string $message,
+        string $updatePublished
+    ):void{
+        
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        
+
+        $isEditOperation = !is_null($caseData['oldCase']);
+        $data = $isEditOperation 
+            ? self::handleEditCase($caseData, $problemArtifacts)
+            : self::handleNewCase($caseData, $problemArtifacts);
+       
+
+        self::processCaseUpdate(
+            $problemArtifacts,
+            $problem,
+            $identity,
+            $user,
+            $message,
+            $updatePublished,
+            $data['blobUpdate'],
+            $data['pathsToExclude']
+        );
+    
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_CDP_DATA,
+            "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    private static function handleEditCase(
+        array $caseData,
+        \OmegaUp\ProblemArtifacts $problemArtifacts
+    ): array {
+
+        $oldGroupName = $caseData['oldCase']['oldGroupName'];
+        $oldCaseName = $caseData['oldCase']['oldCaseName'];
+        $oldInput = $caseData['oldCase']['input'];
+        $oldOutput = $caseData['oldCase']['output'];
+
+        $oldPathBase = ($oldGroupName === $oldCaseName) || ($oldGroupName === '')
+            ? $oldCaseName // Ungrouped
+            : "{$oldGroupName}.{$oldCaseName}"; // Grouped
+
+        $newGroupName = $caseData['group_name'];
+        $newCaseName = $caseData['case_name'];
+        $newInput = $caseData['input'];
+        $newOutput = $caseData['output'];
+
+        $newPathBase = ($newGroupName === $newCaseName)
+            ? $newCaseName // Ungrouped
+            : "{$newGroupName}.{$newCaseName}"; // Grouped
+
+        $inputChanged = $newInput !== $oldInput;
+        $outputChanged = $newOutput !== $oldOutput;
+
+        $oldInputPath = "cases/{$oldPathBase}.in";
+        $oldOutputPath = "cases/{$oldPathBase}.out";
+
+        $newInputPath = "cases/{$newPathBase}.in";
+        $newOutputPath = "cases/{$newPathBase}.out";
+       
+        if (!$problemArtifacts->exists($oldInputPath) || !$problemArtifacts->exists($oldOutputPath)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('testCaseNotFound');
+        }
+         
+        $nameChanged = ($newGroupName !== $oldGroupName) || ($newCaseName !== $oldCaseName);
+        $blobUpdate = [];
+        $pathsToExclude = [];
+        
+        if ($nameChanged) {
+            if ($problemArtifacts->exists($newInputPath) || $problemArtifacts->exists($newOutputPath)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('testCaseAlreadyExists');
+            }
+            $blobUpdate[$newInputPath] = $newInput;
+            $blobUpdate[$newOutputPath] = $newOutput;
+
+            $pathsToExclude[] = $oldInputPath;
+            $pathsToExclude[] = $oldOutputPath;
+        } else {
+            if ($inputChanged) $blobUpdate[$oldInputPath] = $newInput;
+            if ($outputChanged) $blobUpdate[$oldOutputPath] = $newOutput;
+        }
+
         return [
-            'status' => 'ok',
-            'cdp' => $cdp
+            "blobUpdate" => $blobUpdate,
+            "pathsToExclude" => $pathsToExclude
         ];
     }
+
+    private static function handleNewCase(
+        array $caseData,
+        \OmegaUp\ProblemArtifacts $problemArtifacts
+    ): array {
+        $newGroupName = $caseData['group_name'];
+        $newCaseName = $caseData['case_name'];
+        $newInput = $caseData['input'];
+        $newOutput = $caseData['output'];
+
+        $newPathBase = ($newGroupName === $newCaseName)
+            ? $newCaseName // Ungrouped
+            : "{$newGroupName}.{$newCaseName}"; // Grouped
+
+        $newInputPath = "cases/{$newPathBase}.in";
+        $newOutputPath = "cases/{$newPathBase}.out";
+
+        if ($problemArtifacts->exists($newInputPath) || $problemArtifacts->exists($newOutputPath)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('testCaseAlreadyExists');
+        }
+        $blobUpdate = [];
+        $blobUpdate[$newInputPath] = $newInput;
+        $blobUpdate[$newOutputPath] = $newOutput;
+
+        return [
+            "blobUpdate" => $blobUpdate,
+            "pathsToExclude" => []
+        ];
+    }
+
+    private static function processCaseUpdate(
+        \OmegaUp\ProblemArtifacts $problemArtifacts,
+        \OmegaUp\DAO\VO\Problems $problem, 
+        \OmegaUp\DAO\VO\Identities $identity, 
+        \OmegaUp\DAO\VO\Users $user,
+        string $message,
+        string $updatePublished,
+        array $blobUpdate,
+        array $pathsToExclude,
+        bool $isDelete = false
+    ): void {
+        $problemDeployer = new \OmegaUp\ProblemDeployer(
+            $problem->alias
+        );
+
+        
+        if ($blobUpdate === [] && !$isDelete) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException('noChangesDetected');
+        }
+
+        if( !empty($pathsToExclude) ){
+            $zipFilePath = $problemArtifacts->getZip();
+            $problemDeployer->commitModifiedZip(
+                $message,
+                $identity,
+                $zipFilePath,
+                $pathsToExclude,
+                $blobUpdate
+            );
+        }
+        else{
+            $problemDeployer->commitLooseFiles(
+                $message,
+                $identity,
+                $blobUpdate
+            );
+        }
+        if ($updatePublished !== \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE) {
+            [
+                $problem->commit,
+                $problem->current_version
+            ] = \OmegaUp\Controllers\Problem::resolveCommit(
+                $problem,
+                $problemDeployer->publishedCommit
+            );
+            
+            if ($updatePublished !== \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET) {
+                \OmegaUp\DAO\ProblemsetProblems::updateVersionToCurrent(
+                    $problem,
+                    $user,
+                    $updatePublished
+                );
+            }
+            
+            \OmegaUp\DAO\Problems::update($problem);
+        }
+    }
+
+
+    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
+
+        try {
+            \OmegaUp\Validators::validateZipUploadedFile();
+
+            // Obtener datos necesarios
+            $tempFilePath = $_FILES['zipFile']['tmp_name'];
+            $problemName = pathinfo($_FILES['zipFile']['name'], PATHINFO_FILENAME);
+            
+            // Convertir ZIP a CDP
+            $result = \OmegaUp\ZipToCdpConverter::convert($tempFilePath, $problemName);
+
+            return $result;
+
+        } 
+         catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Error inesperado: ' . $e->getMessage()
+            ];
+        }
+    }
+
 }
