@@ -19,3 +19,4 @@ types-requests==2.27.8
 omegaup-hook-tools==1.0.9
 pyyaml>=6.0
 types-pyyaml>=6.0.12
+types-tqdm>=4.64.0
