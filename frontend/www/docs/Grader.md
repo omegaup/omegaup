@@ -6,7 +6,7 @@ Once _Arena_ is complete, _Grader_ must send a callback when a submission’s re
 
 The remote judges have relatively small waiting queues (UVa supports about ~10 concurrent slots, and all the others only one). The reason is that none of those systems were originally designed to have automated consumers of their information. Once a remote server responds with a verdict, the corresponding evaluator must update the submission record and modify the relevant fields.
 
-For local evaluation, Grader must maintain a list of registered Runners so it can send them the source code and (cacheable) input test cases. Each Runner returns, for each test case, either an error notification (if something went wrong) or the program output along with metadata such as runtime and memory usage. With that information, Grader runs the validator on each output, compares it to the expected output, and produces a final numerical score for the submission (usually the sum of all case scores). Finally, Grader updates the submission record in the database.
+For local evaluation, _Grader_ must maintain a list of registered Runners so it can send them the source code and (cacheable) input test cases. Each Runner returns, for each test case, either an error notification (if something went wrong) or the program output along with metadata such as runtime and memory usage. With that information, Grader runs the validator on each output, compares it to the expected output, and produces a final numerical score for the submission (usually the sum of all case scores). Finally, _Grader_ updates the submission record in the database.
 
 ## Usage
 
