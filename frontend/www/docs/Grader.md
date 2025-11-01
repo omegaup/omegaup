@@ -1,6 +1,6 @@
 Arena (also known as Frontend for v1) won’t contain any logic for problem validation — that’s _Grader’s_ job. Moreover, Grader can communicate with external judges!
 
-Grader is responsible for managing the queue of submissions waiting to be judged. Once Arena/Frontend notifies it that a problem needs to be judged, it checks the corresponding record in the database, forwards it to the appropriate evaluation queue (local, UVa, PKU, TJU, LiveArchive, SPOJ), and changes its status to “waiting.” At that point, Grader “washes its hands” and goes back to waiting for the next notification.
+_Grader_ is responsible for managing the queue of submissions waiting to be judged. Once _Arena_/_Frontend_ notifies it that a problem needs to be judged, it checks the corresponding record in the database, forwards it to the appropriate evaluation queue (local, UVa, PKU, TJU, LiveArchive, SPOJ), and changes its status to “waiting.” At that point, _Grader_ “washes its hands” and goes back to waiting for the next notification.
 
 Once Arena is complete, Grader must send a callback when a submission’s result is ready, so that the user can be notified via Comet (for now, Frontend will handle this through polling).
 
