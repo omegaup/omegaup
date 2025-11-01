@@ -10,7 +10,7 @@ For local evaluation, _Grader_ must maintain a list of registered Runners so it 
 
 ## Usage
 
-To invoke Grader from the Frontend, simply send a JSON payload like `{'id': 1234}` to `https://localhost:21680/grade/`. That’s it.
+To invoke _Grader_ from the Frontend, simply send a JSON payload like `{'id': 1234}` to `https://localhost:21680/grade/`. That’s it.
 
 Since the call must be made using certificates, you need to use PHP’s cURL library to make the request. I was able to do it from the console using:
 
