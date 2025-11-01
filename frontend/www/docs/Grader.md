@@ -2,7 +2,7 @@ Arena (also known as Frontend for v1) won’t contain any logic for problem vali
 
 _Grader_ is responsible for managing the queue of submissions waiting to be judged. Once _Arena_/_Frontend_ notifies it that a problem needs to be judged, it checks the corresponding record in the database, forwards it to the appropriate evaluation queue (local, UVa, PKU, TJU, LiveArchive, SPOJ), and changes its status to “waiting.” At that point, _Grader_ “washes its hands” and goes back to waiting for the next notification.
 
-Once Arena is complete, Grader must send a callback when a submission’s result is ready, so that the user can be notified via Comet (for now, Frontend will handle this through polling).
+Once _Arena_ is complete, _Grader_ must send a callback when a submission’s result is ready, so that the user can be notified via Comet (for now, _Frontend_ will handle this through polling).
 
 The remote judges have relatively small waiting queues (UVa supports about ~10 concurrent slots, and all the others only one). The reason is that none of those systems were originally designed to have automated consumers of their information. Once a remote server responds with a verdict, the corresponding evaluator must update the submission record and modify the relevant fields.
 
