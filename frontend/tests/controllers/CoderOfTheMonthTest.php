@@ -1555,8 +1555,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                     $submissions['numRuns']
                 );
             }
-            $submissions = \OmegaUp\DAO\Submissions::getAll();
-
             \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
             $coderOfTheMonth = $this->getCoderOfTheMonth(
                 $runCreationDate,
