@@ -18,7 +18,6 @@
           :alt="badgeName"
         />
         <button
-          ref="copyButton"
           class="btn btn-sm btn-outline-secondary position-absolute"
           style="top: 5px; right: -35px"
           :title="T.copyBadgeImage"
@@ -108,7 +107,11 @@ export default class ShareBadges extends Vue {
   }
 
   get shareUrl(): string {
-    return `https://omegaup.com/badge/${this.badgeName}`;
+    const origin =
+      typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'https://omegaup.com';
+    return `${origin}/badge/${this.badgeName}`;
   }
 
   shareOnLinkedIn(): void {
@@ -151,9 +154,52 @@ export default class ShareBadges extends Vue {
     }, 3000);
   }
 
-  copyImageToClipboard(): void {
-    // Emit an event to the parent component to handle the copy operation
-    this.$emit('copy-badge-image', this.badgeName);
+  async copyImageToClipboard(): Promise<void> {
+    try {
+      const badgeImageUrl = this.badgeImageUrl;
+      const canvas = document.createElement('canvas');
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = badgeImageUrl;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error('Could not get canvas context');
+      }
+
+      context.drawImage(img, 0, 0);
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve);
+      });
+
+      if (!blob) {
+        throw new Error('Could not create blob from canvas');
+      }
+
+      const clipboardData: Record<string, Blob> = {
+        [blob.type]: blob,
+      };
+
+      if ('ClipboardItem' in window) {
+        const ClipboardItemConstructor = (window as any).ClipboardItem as {
+          new (data: Record<string, Blob>): any;
+        };
+        await navigator.clipboard.write([
+          new ClipboardItemConstructor(clipboardData),
+        ]);
+        this.showTooltip(T.badgeImageCopiedToClipboard);
+      }
+    } catch (error) {
+      this.showTooltip(T.badgeImageManualCopyInstructions);
+    }
   }
 }
 </script>
