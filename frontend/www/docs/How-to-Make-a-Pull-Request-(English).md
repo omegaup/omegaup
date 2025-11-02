@@ -4,6 +4,7 @@
  - [Updating Your main Branch](#updating-your-main-branch)
  - [Additional Settings](#additional-settings)
  - [Starting a New Change](#starting-a-new-change)
+ - [Using the create-branch.sh script (alternative)](#using-the-create-branchsh-script-alternative)
  - [Upload your changes and make a new Pull Request](#upload-your-changes-and-make-a-new-pull-request)
  - [Deleting a Branch](#deleting-a-branch)
  - [What Happens After Submitting My Pull Request](#what-happens-after-submitting-my-pull-request)
@@ -19,12 +20,13 @@ Once you have [set up your development environment](https://github.com/omegaup/o
 You only need to perform these configurations once.
 
 * Visit the URL https://github.com/omegaup/omegaup and click on the following button to fork your own copy of `omegaup/omegaup`:![Screenshot from 2025-03-13 20-18-14](https://github.com/user-attachments/assets/967a0cfe-6ef0-49c2-9b77-3c24b939ef51)
+You can follow [Github instructions of how to fork a repository](https://docs.github.com/es/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
 
-* Then, you can clone the repository into your development environment. To do this, copy the cloning URL as follows:![Screenshot from 2025-03-13 20-18-46](https://github.com/user-attachments/assets/d53c2a8c-5354-4b15-86e9-69b7a13afe55)
+* Navigate to your fork and then by copying the URL you can clone the repository into your development environment. To do this, copy the cloning URL as follows:![Screenshot from 2025-03-13 20-18-46](https://github.com/user-attachments/assets/d53c2a8c-5354-4b15-86e9-69b7a13afe55) 
 
 * From your virtual machine, run the following command:
 ```bash
-git clone https://github.com/omegaup/omegaup.git
+git clone https://github.com/[username]/omegaup
 ```
 
 * Now you can navigate to the directory where the repository was cloned:
@@ -39,28 +41,27 @@ git remote -v
 
 * You should see something similar to this:
 ```bash
-origin        https://github.com/omegaup/omegaup.git (fetch)  
-origin        https://github.com/omegaup/omegaup.git (push)  
+origin        https://github.com/[username]/omegaup.git (fetch)  
+origin        https://github.com/[username]/omegaup.git (push)  
 ```
 
 * If not, you only need to run the following command once to configure origin and be able to fetch changes:
 ```bash
-git remote add origin https://github.com/omegaup/omegaup.git
+git remote add origin https://github.com/[username]/omegaup.git
 ```
 
-* Now you can add the remote for your forked repository:
+* Now you can add the upstream (omegaup repository) for your forked repository:
 ```bash
-git remote add [remote-name] https://github.com/[username]/omegaup
-
+git remote add upstream https://github.com/omegaup/omegaup
 ```
 
 * Finally you should see something similar to:
 ```bash 
 $ git remote -v
-origin	https://github.com/omegaup/omegaup.git (fetch)
-origin	https://github.com/omegaup/omegaup.git (push)
-upstream	https://github.com/[username]/omegaup.git (fetch)
-upstream	https://github.com/[username]/omegaup.git (push)
+origin	https://github.com/[username]/omegaup.git (fetch)
+origin	https://github.com/[username]/omegaup.git (push)
+upstream	https://github.com/omegaup/omegaup.git (fetch)
+upstream	https://github.com/omegaup/omegaup.git (push)
 ```
 
 # Updating Your main Branch
@@ -68,9 +69,9 @@ upstream	https://github.com/[username]/omegaup.git (push)
 It is recommended that you avoid making changes directly in the `main` branch, as it is very difficult to return it to a clean state once your changes have been merged. However, it is still a good idea to update it from time to time:
 ```bash
 git checkout main  # Switch back to main if you were on another branch
-git fetch origin   # Fetch the latest changes from omegaup/main
-git pull --rebase origin main  # Sync your main branch with omegaup/main
-git push upstream
+git fetch upstream   # Fetch the latest changes from omegaup/main
+git pull --rebase upstream main  # Sync your main branch with omegaup/main
+git push
 ```
 
 If `git push upstream` fails, it means you broke the rule of not making changes in `main`. Try running `git push upstream -f`.
@@ -115,6 +116,21 @@ We invite you to follow our [Coding Guidelines](https://github.com/omegaup/omega
 git checkout -b feature-name origin/main # Creates a new branch and syncs it with omegaUp
 git push --set-upstream origin feature-name # Pushes your branch to GitHub and sets the upstream as your fork
 ```
+
+# Using the create-branch.sh script (alternative)
+Instead of creating a new branch manually as described in [starting a new change](#starting-a-new-change), you can use the `create-branch.sh` script. This script will automatically:
+
+- Fetch the latest version of `main` from the upstream omegaUp repository.
+- Create a new branch based on `upstream/main`.
+- Push that branch to your fork and set it as the upstream branch.
+
+
+From inside the repository, run:
+```bash
+./create-branch.sh <branch-name>
+```
+
+
 
 # Upload your changes and make a new Pull Request
 
@@ -179,7 +195,12 @@ git commit -m" Put a description of the changes here. "
 ```bash
 git push
 ```
-As you can see, in the last command, the `-u` flag is no longer needed because your branch is now linked to a defined upstream.
+
+If your branch is a few commits behind the OmegaUp repository, make sure your main branch is up to date, and then run the following command:
+```bash
+git fetch origin
+git pull --rebase origin
+```
 
 # Deleting a Branch
 
@@ -244,4 +265,3 @@ You might be interested in the following topics:
 * [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines.md).
 * [Useful development commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md).
 * [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md).
-
