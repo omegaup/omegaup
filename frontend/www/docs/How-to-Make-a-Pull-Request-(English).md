@@ -127,9 +127,8 @@ Instead of creating a new branch manually as described in [starting a new change
 
 From inside the repository, run:
 ```bash
-./create-branch.sh <branch-name>
+stuff/create-branch.sh <branch-name>
 ```
-
 
 
 # Upload your changes and make a new Pull Request
@@ -188,7 +187,7 @@ git add .
   
 * Add your commit or commits:  
 ```bash
-git commit -m" Put a description of the changes here. "
+git commit -m "Put a description of the changes here."
 ```  
   
 * Push from your commit to your fork:  
@@ -265,3 +264,4 @@ You might be interested in the following topics:
 * [Coding guidelines](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Coding-guidelines.md).
 * [Useful development commands](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md).
 * [How to use Cypress in omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-use-Cypress-in-omegaUp.md).
+
