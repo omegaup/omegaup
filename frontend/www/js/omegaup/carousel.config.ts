@@ -91,8 +91,7 @@ const carouselConfig: {
         es: 'Síguenos',
         pt: 'Siga-nos',
       },
-      href:
-        'https://www.instagram.com/omegaup_org/',
+      href: 'https://www.instagram.com/omegaup_org/',
       target: '_blank',
     },
   },
