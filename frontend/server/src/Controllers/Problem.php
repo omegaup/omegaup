@@ -699,19 +699,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
 
-        if (!is_null($group)) {
-            $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
-                $group
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
             );
-            foreach ($groupIdentities as $row) {
-                $identity = \OmegaUp\DAO\Identities::getByPK(
-                    $row['identity_id']
-                );
-                if (is_null($identity)) {
-                    continue;
-                }
-                self::invalidateProblemsAclCacheForIdentity($identity);
+            if (is_null($identity)) {
+                continue;
             }
+            self::invalidateProblemsAclCacheForIdentity($identity);
         }
 
         return ['status' => 'ok'];
@@ -974,19 +972,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (!is_null($group)) {
-            $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
-                $group
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
             );
-            foreach ($groupIdentities as $row) {
-                $identity = \OmegaUp\DAO\Identities::getByPK(
-                    $row['identity_id']
-                );
-                if (is_null($identity)) {
-                    continue;
-                }
-                self::invalidateProblemsAclCacheForIdentity($identity);
+            if (is_null($identity)) {
+                continue;
             }
+            self::invalidateProblemsAclCacheForIdentity($identity);
         }
 
         \OmegaUp\Controllers\ACL::removeGroup(
