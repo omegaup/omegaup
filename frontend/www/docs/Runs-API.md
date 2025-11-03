@@ -1,83 +1,88 @@
 ## GET `runs/:run_alias`
 
-### Descripción
-Regresa los detalles de un run en particular.
+### Description
+Returns the details of a specific run.
 
-### Privilegios
-Usuario loggeado. 
+### Privileges
+Logged-in user.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`guid`|string|Identificación del run|
-|`language`|string|Lenguaje del envío.|
-|`status`|string|Status del problema en el proceso de calificación. Posibles valores: 'new','waiting','compiling','running','ready'|
-|`veredict`|string|Veredicto del juez sobre el problema. Veredictos posibles: 'AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE'|
-|`runtime`|int|Tiempo total de ejecución en milisegundos que tardó el envío en resolver los casos del problema.|
-|`memory`|int|Memoria total que usó el run para resolver los casos de prueba.|
-|`score`|double|Double entre `0` y `1` que indica el total de casos resueltos, donde `1` significa que se resolvieron todos los casos.|
-|`contest_score`|int|Puntaje ponderado del run. Es el puntaje que se muestra en el scoreboard.|
-|`time`|int|Hora de envío del run en formato UNIX timestamp|
-|`submit_delay`|int|Minutos que pasaron desde el inicio del concurso hasta que se envió el run.|
-|`source`|string|Código fuente del run en cuestión|
+| Parameter | Type | Description |
+| ---------- |:----:| :----------- |
+| `guid` | string | Unique identifier of the run. |
+| `language` | string | Programming language of the submission. |
+| `status` | string | Status of the problem during the grading process. Possible values: `new`, `waiting`, `compiling`, `running`, `ready`. |
+| `veredict` | string | Judge’s verdict on the problem. Possible verdicts: `AC`, `PA`, `PE`, `WA`, `TLE`, `OLE`, `MLE`, `RTE`, `RFE`, `CE`, `JE`. |
+| `runtime` | int | Total execution time in milliseconds taken by the submission to solve the problem’s test cases. |
+| `memory` | int | Total memory used by the run to solve the test cases. |
+| `score` | double | A double between `0` and `1` indicating the total number of cases solved, where `1` means all cases were solved. |
+| `contest_score` | int | Weighted score of the run (the score shown on the scoreboard). |
+| `time` | int | Submission time of the run in UNIX timestamp format. |
+| `submit_delay` | int | Number of minutes elapsed from the start of the contest until the run was submitted. |
+| `source` | string | Source code of the corresponding run. |
 
+---
 
 ## GET `runs/:run_alias/adminDetails`
 
-### Descripción
-Regresa los detalles completos de run de interés para el administrador del concurso, incluyendo un diff entre los casos oficiales y las salidas producidas por el run.
+### Description
+Returns complete details of a run for the contest administrator, including a diff between the official test cases and the outputs produced by the run.
 
-### Privilegios
-Administrador de un concurso o superior.
+### Privileges
+Contest administrator or higher.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 **Pending**
+
+---
 
 ## POST `runs/create`
 
-### Descripción
-Crea un nuevo run para un problema **en un concurso**.
+### Description
+Creates a new run for a problem **within a contest**.
 
-### Privilegios
-Usuario loggeado. 
+### Privileges
+Logged-in user.
 
-### Parámetros
+### Parameters
 
-| Parámetro | Tipo | Descripción  | Opcional? |
-| -------- |:-------------:| :-----|:-----|
-|`problem_alias`|string|Alias del problema||
-|`contest_alias`|string|Alias del concurso||
-|`language`|string|Lenguaje de programación usado para la solución. Posibles valores: 'kp', 'kj', 'c', 'cpp', 'java', 'py', 'rb', 'pl', 'cs', 'p'||
-|source|string|Código fuente de la solución||
+| Parameter | Type | Description | Optional? |
+| ---------- |:----:| :----------- | :---------: |
+| `problem_alias` | string | Alias of the problem. |  |
+| `contest_alias` | string | Alias of the contest. |  |
+| `language` | string | Programming language used for the solution. Possible values: `kp`, `kj`, `c`, `cpp`, `java`, `py`, `rb`, `pl`, `cs`, `p`. |  |
+| `source` | string | Source code of the solution. |  |
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
+| Parameter | Type | Description |
+| ---------- |:----:| :----------- |
+| `status` | string | If the request was successful, returns `ok`. |
+
+---
 
 ## GET `runs/:run_alias/source`
 
-### Descripción
-Regresa el código fuente de un run. Si el código no compiló, regresa el error de compilación.
+### Description
+Returns the source code of a run. If the code failed to compile, it returns the compilation error.
 
-### Privilegios
-Usuario loggeado. 
+### Privileges
+Logged-in user.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
-| -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
-|`source`|string|Código fuente del problema|
-|`compile_error`|string|Error de compilación, si existe.|
+| Parameter | Type | Description |
+| ---------- |:----:| :----------- |
+| `status` | string | If the request was successful, returns `ok`. |
+| `source` | string | Source code of the problem. |
+| `compile_error` | string | Compilation error, if it exists. |
