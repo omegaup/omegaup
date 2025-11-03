@@ -71,7 +71,7 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/instagram.png',
+    image: '/media/homepage/Instagram.png',
     title: {
       en: 'Do you already follow us on Instagram?',
       es: '¿Ya nos sigues en Instagram?',
