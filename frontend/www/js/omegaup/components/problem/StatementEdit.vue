@@ -216,16 +216,16 @@ export default class ProblemStatementEdit extends Vue {
 
 .row {
   display: flex;
-  
+
   .col-md-6 {
     display: flex;
     flex-direction: column;
-    
+
     &:first-child {
       .wmd-button-bar {
         flex-shrink: 0;
       }
-      
+
       .wmd-input {
         flex: 1;
         min-height: 400px;
@@ -233,15 +233,15 @@ export default class ProblemStatementEdit extends Vue {
         resize: vertical;
       }
     }
-    
+
     &:last-child {
       display: flex;
       flex-direction: column;
-      
+
       .title {
         flex-shrink: 0;
       }
-      
+
       omegaup-markdown {
         flex: 1;
         min-height: 400px;
@@ -250,7 +250,7 @@ export default class ProblemStatementEdit extends Vue {
         padding: 10px;
         margin-bottom: 10px;
       }
-      
+
       hr,
       div {
         flex-shrink: 0;

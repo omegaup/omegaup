@@ -108,16 +108,16 @@ export default class StatementTab extends Vue {
 
 .row {
   display: flex;
-  
+
   .col-md-6 {
     display: flex;
     flex-direction: column;
-    
+
     &:first-child {
       .wmd-button-bar {
         flex-shrink: 0;
       }
-      
+
       .wmd-input {
         flex: 1;
         min-height: 400px;
@@ -125,7 +125,7 @@ export default class StatementTab extends Vue {
         resize: vertical;
       }
     }
-    
+
     &:last-child {
       omegaup-markdown {
         flex: 1;
