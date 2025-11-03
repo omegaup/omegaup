@@ -353,8 +353,14 @@ class GitServerBrowser {
             [
                 CURLOPT_URL => $this->url,
                 CURLOPT_RETURNTRANSFER => !$this->passthru,
-                CURLOPT_CONNECTTIMEOUT => 2,
-                CURLOPT_TIMEOUT => 10,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_TCP_KEEPALIVE => 1,
+                CURLOPT_TCP_KEEPIDLE => 30,
+                CURLOPT_TCP_KEEPINTVL => 15,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS => 5,
             ]
         );
     }
@@ -406,6 +412,36 @@ class GitServerBrowser {
      * - false: if there was an error in the request
      */
     public function exec(): string|bool {
+        $maxRetries = 3;
+        $retryCount = 0;
+
+        while ($retryCount < $maxRetries) {
+            try {
+                return $this->execSingle();
+            } catch (\OmegaUp\Exceptions\ServiceUnavailableException $e) {
+                $retryCount++;
+
+                if ($retryCount >= $maxRetries) {
+                    throw $e;
+                }
+
+                // Wait before retry (exponential backoff)
+                $waitTime = max(0, intval(min(pow(2, $retryCount - 1), 5)));
+                sleep($waitTime);
+
+                \Monolog\Registry::omegaup()->withName('GitBrowser')->warning(
+                    "Retrying GitServer request ($retryCount/$maxRetries) for {$this->url}"
+                );
+            }
+        }
+
+        throw new \OmegaUp\Exceptions\ServiceUnavailableException();
+    }
+
+    /**
+     * Single attempt to execute GitServer request
+     */
+    private function execSingle(): string|bool {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
         $response = curl_exec($this->curl);
         if ($response === true) {

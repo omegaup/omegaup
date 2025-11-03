@@ -959,6 +959,7 @@ class Scoreboard {
             );
         }
 
+        /** @var list<string> $groupNames */
         $groupNames = array_keys($scoreByGroupArray);
 
         if (!isset($identityProblemsScoreByGroup[$identityId])) {
