@@ -105,4 +105,36 @@ export default class StatementTab extends Vue {
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
 }
+
+.row {
+  display: flex;
+  
+  .col-md-6 {
+    display: flex;
+    flex-direction: column;
+    
+    &:first-child {
+      .wmd-button-bar {
+        flex-shrink: 0;
+      }
+      
+      .wmd-input {
+        flex: 1;
+        min-height: 400px;
+        height: auto !important;
+        resize: vertical;
+      }
+    }
+    
+    &:last-child {
+      omegaup-markdown {
+        flex: 1;
+        min-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+      }
+    }
+  }
+}
 </style>
