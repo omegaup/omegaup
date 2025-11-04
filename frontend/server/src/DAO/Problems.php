@@ -123,7 +123,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (empty($usernames)) {
             return [];
         }
-        // Crea placeholders (?, ?, ?) para cada username
+        // Create placeholders (?, ?, ?) for each username
         $placeholders = implode(',', array_fill(0, count($usernames), '?'));
         $sql = "SELECT user_id FROM User_Rank WHERE username IN ({$placeholders})";
 
@@ -344,7 +344,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $cacheKey = "{$identityId}-{$userKey}";
 
             $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
-                'problems_identity_type',
+                \OmegaUp\Cache::PROBLEM_CLEAR_CACHE,
                 $cacheKey,
                 $callback
             );

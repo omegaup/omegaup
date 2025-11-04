@@ -1162,125 +1162,140 @@ if __name__ == \'__main__\':
     }
 
     public function testUsersOnlySeeAllowedProblems(): void {
-        ['identity' => $alice] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $bob] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $charlie] = \OmegaUp\Test\Factories\User::createUser();
+        // Define the structure of users, problems and permissions
+        $testScenario = [
+            'owner1' => [
+                'problems' => [
+                    'owner1_private' => [
+                        'visibility' => 'private',
+                        'admins' => ['guest1'],
+                    ],
+                    'owner1_public' => [
+                        'visibility' => 'public',
+                        'admins' => [],
+                    ],
+                ],
+            ],
+            'owner2' => [
+                'problems' => [
+                    'owner2_private' => [
+                        'visibility' => 'private',
+                        'admins' => ['guest2'],
+                    ],
+                    'owner2_public' => [
+                        'visibility' => 'public',
+                        'admins' => [],
+                    ],
+                ],
+            ],
+        ];
 
-        $alicePrivate = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $alice,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
-                'alias' => 'alice_private',
-            ])
-        );
-        \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $alice,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                'alias' => 'alice_public',
-            ])
-        );
+        $guestUsers = ['guest1', 'guest2'];
 
-        $bobPrivate = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $bob,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
-                'alias' => 'bob_private',
-            ])
-        );
-        \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $bob,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                'alias' => 'bob_public',
-            ])
-        );
+        // Create all users
+        $users = [];
+        foreach (array_keys($testScenario) as $userName) {
+            ['identity' => $users[$userName]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+        foreach ($guestUsers as $guestName) {
+            ['identity' => $users[$guestName]] = \OmegaUp\Test\Factories\User::createUser();
+        }
 
-        \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $charlie,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
-                'alias' => 'charlie_private',
-            ])
-        );
+        // Create all problems
+        $problems = [];
+        foreach ($testScenario as $ownerName => $ownerData) {
+            foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                $problems[$problemAlias] = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                        'author' => $users[$ownerName],
+                        'visibility' => $problemData['visibility'],
+                        'alias' => $problemAlias,
+                    ])
+                );
+            }
+        }
 
-        \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'author' => $charlie,
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                'alias' => 'charlie_public',
-            ])
-        );
-
-        \OmegaUp\Test\Factories\Problem::addAdminUser(
-            $alicePrivate,
-            $bob
-        );
-
-        \OmegaUp\Test\Factories\Problem::addAdminUser(
-            $alicePrivate,
-            $charlie
-        );
-
-        \OmegaUp\Test\Factories\Problem::addAdminUser(
-            $bobPrivate,
-            $alice
-        );
-
-        $aliceLogin = self::login($alice);
-        $bobLogin = self::login($bob);
-        $charlieLogin = self::login($charlie);
-
-        $delete = function ($identity): void {
-            \OmegaUp\Cache::deleteFromCache(
-                'problems_identity_type',
-                "{$identity->identity_id}-" . ($identity->user_id ?? 'null')
+        // Verify that each guest only sees public problems (before adding permissions)
+        foreach ($guestUsers as $guestName) {
+            $guestLogin = self::login($users[$guestName]);
+            $response = \OmegaUp\Controllers\Problem::apiList(
+                new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
             );
-        };
-        $delete($alice);
-        $delete($bob);
-        $delete($charlie);
+            $list = array_map(
+                fn($problem) => $problem['alias'],
+                $response['results']
+            );
 
-        $aliceList = \OmegaUp\Controllers\Problem::apiList(
-            new \OmegaUp\Request([
-                'auth_token' => $aliceLogin->auth_token,
-            ])
-        );
-        $aliceAliases = array_map(
-            fn ($p) => $p['alias'],
-            $aliceList['results']
-        );
-        $this->assertContains('alice_private', $aliceAliases);
-        $this->assertContains('alice_public', $aliceAliases);
-        $this->assertContains('bob_private', $aliceAliases);
-        # $this->assertNotContains('charlie_private', $aliceAliases);
+            // Verify that they DON'T see any private problem
+            foreach ($testScenario as $ownerData) {
+                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                    if ($problemData['visibility'] === 'private') {
+                        self::assertArrayNotContainsWithPredicate(
+                            $list,
+                            fn(string $a) => $a == $problemAlias,
+                            "{$guestName} should not see private problem {$problemAlias}"
+                        );
+                    }
+                }
+            }
 
-        $bobList = \OmegaUp\Controllers\Problem::apiList(
-            new \OmegaUp\Request([
-                'auth_token' => $bobLogin->auth_token,
-            ])
-        );
-        $bobAliases = array_map(
-            fn ($p) => $p['alias'],
-            $bobList['results']
-        );
-        $this->assertContains('bob_private', $bobAliases);
-        $this->assertContains('alice_private', $bobAliases);
-        $this->assertContains('alice_public', $bobAliases);
-        # $this->assertNotContains('charlie_public', $bobAliases);
+            // Verify that they DO see all public problems
+            foreach ($testScenario as $ownerData) {
+                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                    if ($problemData['visibility'] === 'public') {
+                        self::assertArrayContainsWithPredicate(
+                            $list,
+                            fn(string $a) => $a == $problemAlias,
+                            "{$guestName} should see public problem {$problemAlias}"
+                        );
+                    }
+                }
+            }
+        }
 
-        $charlieList = \OmegaUp\Controllers\Problem::apiList(
-            new \OmegaUp\Request([
-                'auth_token' => $charlieLogin->auth_token,
-            ])
-        );
-        $charlieAliases = array_map(
-            fn ($p) => $p['alias'],
-            $charlieList['results']
-        );
-        $this->assertContains('alice_public', $charlieAliases);
-        $this->assertContains('alice_private', $charlieAliases);
-        $this->assertContains('bob_private', $charlieAliases);
-        # $this->assertNotContains('charlie_private', $charlieAliases);
+        // Add admins to problems according to configuration
+        foreach ($testScenario as $ownerData) {
+            foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                foreach ($problemData['admins'] as $adminName) {
+                    \OmegaUp\Test\Factories\Problem::addAdminUser(
+                        $problems[$problemAlias],
+                        $users[$adminName]
+                    );
+                }
+            }
+        }
+
+        // Verify that each guest now sees the problems they were added to as admin
+        foreach ($guestUsers as $guestName) {
+            $guestLogin = self::login($users[$guestName]);
+            $response = \OmegaUp\Controllers\Problem::apiList(
+                new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
+            );
+            $list = array_map(
+                fn($problem) => $problem['alias'],
+                $response['results']
+            );
+
+            foreach ($testScenario as $ownerData) {
+                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                    $shouldSee = $problemData['visibility'] === 'public' ||
+                                in_array($guestName, $problemData['admins']);
+
+                    if ($shouldSee) {
+                        self::assertArrayContainsWithPredicate(
+                            $list,
+                            fn(string $a) => $a == $problemAlias,
+                            "{$guestName} should see problem {$problemAlias}"
+                        );
+                    } else {
+                        self::assertArrayNotContainsWithPredicate(
+                            $list,
+                            fn(string $a) => $a == $problemAlias,
+                            "{$guestName} should not see problem {$problemAlias}"
+                        );
+                    }
+                }
+            }
+        }
     }
 }

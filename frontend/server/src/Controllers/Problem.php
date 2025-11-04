@@ -2015,11 +2015,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
         $identityId = $identity->identity_id;
-        $userId = $identity->user_id ?? null;
-        $cacheKey = "{$identityId}-" . ($userId ?? 'null');
+        $userId = $identity->user_id ?? 'null';
+        $cacheKey = "{$identityId}-{$userId}";
 
         \OmegaUp\Cache::deleteFromCache(
-            'problems_identity_type',
+            \OmegaUp\Cache::PROBLEM_CLEAR_CACHE,
             $cacheKey
         );
     }
