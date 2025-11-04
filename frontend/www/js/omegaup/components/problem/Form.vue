@@ -16,7 +16,13 @@
       </p>
     </div>
     <div class="card-body px-2 px-sm-4">
-      <form ref="form" class="form" @submit.prevent="submitForm">
+      <form
+        ref="form"
+        :method="isUpdate ? 'POST' : undefined"
+        class="form"
+        :enctype="isUpdate ? 'multipart/form-data' : undefined"
+        @submit.prevent="handleSubmit"
+      >
         <div class="accordion mb-3">
           <div class="card">
             <div class="card-header">
@@ -36,7 +42,10 @@
             </div>
             <div class="collapse show card-body px-2 px-sm-4 basic-info">
               <div class="row">
-                <div class="form-group col-md-4 introjs-title">
+                <div
+                  class="form-group introjs-title"
+                  :class="isUpdate ? 'col-md-6' : 'col-md-4'"
+                >
                   <label class="control-label">{{ T.wordsTitle }}</label>
                   <input
                     v-model="title"
@@ -48,7 +57,10 @@
                     @blur="onGenerateAlias"
                   />
                 </div>
-                <div class="form-group col-md-4 introjs-short-title">
+                <div
+                  class="form-group introjs-short-title"
+                  :class="isUpdate ? 'col-md-6' : 'col-md-4'"
+                >
                   <label class="control-label">{{ T.wordsAlias }}</label>
                   <input
                     ref="alias"
@@ -63,7 +75,10 @@
                     :disabled="isUpdate"
                   />
                 </div>
-                 <div class="form-group col-md-4 introjs-origin">
+                 <div
+                    v-if="!isUpdate"
+                    class="form-group col-md-4 introjs-origin"
+                  >
                   <label class="control-label">{{ T.problemEditSource }}</label>
                   <input
                     v-model="source"
@@ -75,40 +90,69 @@
                   />
                 </div>
               </div>
+              <div v-if="isUpdate" class="row">
+                <div class="form-group col-md-6 introjs-origin">
+                  <label class="control-label">{{ T.problemEditSource }}</label>
+                  <input
+                    v-model="source"
+                    required
+                    name="source"
+                    type="text"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.includes('source') }"
+                  />
+                </div>
 
-            </div>
-          </div>
-
-          
-          <div class="card">
-            <div class="card-header">
-              <h2 class="mb-0">
-                <button
-                  ref="problem-creator-section"
-                  class="btn btn-link btn-block text-left"
-                  type="button"
-                  data-toggle="collapse"
-                  data-target=".problem-creator-section"
-                  aria-expanded="true"
-                  aria-controls="problem-form-problem"
-                >
-                <!-- Change to variable t language -->
-                  Creador de Problemas
-                </button>
-              </h2>
-            </div>
-            <div class="collapse show card-body px-2 px-sm-4 problem-creator-section">
-              <div class="collapse show card-body problem-creator-section">
-                <problem-creator
-                  @show-update-success-message="handleShowSuccess"
-                  @download-zip-file="handleDownloadZip"
-                  @download-input-file="handleDownloadInput"
-                  @file-changed="onFileChanged"
-                ></problem-creator>
+                <div class="form-group col-md-6 introjs-file">
+                  <label class="control-label">{{
+                    T.problemEditFormFile
+                  }}</label>
+                  <input
+                    :required="!isUpdate"
+                    name="problem_contents"
+                    type="file"
+                    accept=".zip"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': errors.includes('problem_contents'),
+                    }"
+                    @change="onUploadFile"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
+          <template v-if="!isUpdate">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="mb-0">
+                  <button
+                    ref="problem-creator-section"
+                    class="btn btn-link btn-block text-left"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target=".problem-creator-section"
+                    aria-expanded="true"
+                    aria-controls="problem-form-problem"
+                  >
+                  <!-- Change to variable t language -->
+                    Creador de Problemas
+                  </button>
+                </h2>
+              </div>
+              <div class="collapse show card-body px-2 px-sm-4 problem-creator-section">
+                <div class="collapse show card-body problem-creator-section">
+                  <problem-creator
+                    @show-update-success-message="handleShowSuccess"
+                    @download-zip-file="handleDownloadZip"
+                    @download-input-file="handleDownloadInput"
+                    @file-changed="onFileChanged"
+                  ></problem-creator>
+                </div>
+              </div>
+            </div>
+          </template>
           <template v-if="!isUpdate">
             <div class="card">
               <div class="card-header">
@@ -796,14 +840,24 @@ export default class ProblemForm extends Vue {
   onFileChanged(file: File | null) {
     this.originalFile = file;
   }
+
+  handleSubmit() {
+    if (!this.isUpdate) {
+      this.submitForm();
+    }
+  }
+
   async submitForm() {
     const formElement = this.formRef as HTMLFormElement;
     const formData = new FormData(formElement);
 
     const state = JSON.parse(JSON.stringify(this.$store.state));
     const zip = await buildProblemZip(state, this.originalFile);
-    if (!zip) { ui.error('ZIP inválido.'); return; }
-    
+    if (!zip) {
+      ui.error('ZIP inválido.');
+      return;
+    }
+  
     const problemName = (state.problemName || 'problem').replace(/ /g, '_');
 
     formData.set('problem_contents', zip, `${problemName}`);
