@@ -264,6 +264,7 @@ def get_cotm_eligible_users(
                 i.user_id IS NOT NULL
                 -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
                 -- role_id = 1 is ADMIN_ROLE)
+                -- TODO: Replace magic numbers with constants
                 AND i.user_id NOT IN (
                     SELECT ur.user_id
                     FROM User_Roles ur
