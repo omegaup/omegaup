@@ -72,11 +72,13 @@ import {
   faLock,
   faUnlock,
   faQuestionCircle,
+  faCogs,
 } from '@fortawesome/free-solid-svg-icons';
 import { getBlogUrl } from '../../urlHelper';
 library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
+library.add(faCogs);
 
 import omegaup_problemMarkdown from './Markdown.vue';
 
