@@ -75,6 +75,17 @@ You need to install the dependency:
 sudo apt-get install libasound2
 ```
 
+If you are using Ubuntu 24.04 or a newer version, install the required dependency with:
+```bash
+sudo apt install libasound2t64
+```
+
+**Note:** If you encounter any unexpected errors, try running:
+```bash
+sudo apt update
+```
+and then try the process again.
+
 ## Introduction
 **Note:** Currently, tests are run outside of the Docker container.
 
