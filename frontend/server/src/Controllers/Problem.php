@@ -4697,7 +4697,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
-    private static function extractRequestData(\OmegaUp\Request $r): array {
+    private static function extractRequestData(\OmegaUp\Request $r) {
         return [
             'preventProblemsetOpen' => $r->ensureOptionalBool(
                 'prevent_problemset_open'
@@ -4727,7 +4727,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemBaseData(
         ?\OmegaUp\DAO\VO\Identities $identity,
-        array $requestData
+        $requestData
     ): array {
         [
             'problem' => $problem,
