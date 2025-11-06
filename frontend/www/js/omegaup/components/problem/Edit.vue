@@ -183,8 +183,12 @@
       <div v-if="showTab === 'cases'" class="tab-pane active">
         <omegaup-problem-creator-cases-tab
           @hook:mounted="loadCasesStore"
-          @download-zip-file="zipObject => $emit('download-zip-file', zipObject)"
-          @download-input-file="fileObject => $emit('download-input-file', fileObject)"
+          @download-zip-file="
+            (zipObject) => $emit('download-zip-file', zipObject)
+          "
+          @download-input-file="
+            (fileObject) => $emit('download-input-file', fileObject)
+          "
         />
       </div>
 
@@ -338,28 +342,19 @@ export default class ProblemEdit extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
   @Prop({ default: null }) cdp!: Record<string, unknown> | null;
-  
+
   @Provide('problemAlias')
-  get providedAlias(): string{
+  get providedAlias(): string {
     return this.data.alias;
   }
-  @Provide('originalCasesMap')
-  get providedCasesMap(): Map<string, any> {
-    if (!this.casesMapCache) {
-      this.casesMapCache = this.getCasesMap();
-    }
-    return this.casesMapCache;
-  }
-
   @Provide('isEditing') isEditing = true;
-  private casesMapCache: Map<string, any> | null = null;
+
   T = T;
   alias = this.data.alias;
   showTab = this.initialTab;
   currentStatement: types.ProblemStatement = this.statement;
   showConfirmationModal = false;
 
-  
   get activeTab(): string {
     switch (this.showTab) {
       case 'edit':
@@ -397,45 +392,17 @@ export default class ProblemEdit extends Vue {
   onGotoPrintableVersion(): void {
     window.location.href = `/arena/problem/${this.alias}/print/`;
   }
-  
-
-  /**
-   * Generate a Map with the original data for all cases.
-   * @returns Map where the key is the caseID and the value contains the name of the case and the group
-   */
-  private getCasesMap(): Map<string, any> {
-    const casesMap = new Map();
-    const casesStore = this.getCasesStore();
-    if (!casesStore) return casesMap
-    const groups = (casesStore as any).groups || [];
-    
-    for (const group of groups) {
-      for (const caseItem of group.cases || []) {
-        casesMap.set(caseItem.caseID, {
-          oldCaseName: caseItem.name,
-          oldGroupName: group.name,
-          input: this.buildInputText(caseItem.lines),
-          output: caseItem.output
-        });
-      }
-    }
-
-    return casesMap;
-  }
 
   private buildInputText(lines: any[]): string {
     if (!lines || !Array.isArray(lines)) return '';
-    
-    return lines
-      .map((line) => line.data?.value || '')
-      .join('\n');
-  }
 
+    return lines.map((line) => line.data?.value || '').join('\n');
+  }
 
   private getCasesStore(): Record<string, unknown> | null {
     if (!this.cdp) return null;
-    const cdpData = (this.cdp as any).cdp;
-    if (!cdpData || !cdpData.casesStore) return null;
+    const cdpData = this.cdp as any;
+    if (!cdpData.casesStore) return null;
     return cdpData.casesStore;
   }
 

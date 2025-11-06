@@ -1,55 +1,49 @@
 <template>
-  <div class="card-body">
-    <hr class="my-3" />
+  <b-collapse :visible="visible" class="w-100 mt-2">
     <form enctype="multipart/form-data" method="post" @submit="onSubmit">
+      <div class="p-3 border rounded bg-light item-active-for-delete">
+        <div class="form-group">
+          <label class="control-label">{{ T.problemEditCommitMessage }}</label>
+          <input v-model="commitMessage" class="form-control" />
+        </div>
 
-      <div class="form-group col-md-12">
-        <label class="control-label">{{ T.problemEditCommitMessage }}</label>
-        <input v-model="commitMessage" class="form-control" />
-      </div>
+        <!-- Campos ocultos del formulario -->
+        <input type="hidden" name="request" value="deleteGroupCase" />
+        <input type="hidden" name="problem_alias" :value="alias" />
+        <input type="hidden" name="message" :value="commitMessage" />
+        <input type="hidden" name="contents" :value="contentsPayload" />
 
-      <!-- Campos ocultos del formulario -->
-      <input type="hidden" name="request" value="delete" />
-      <input type="hidden" name="problem_alias" :value="alias" />
-      <input type="hidden" name="message" :value="commitMessage" />
-      <input type="hidden" name="contents" :value="contentsPayload" />
+        <div class="button-container mt-3">
+          <button
+            class="btn btn-danger"
+            type="submit"
+            :disabled="commitMessage === ''"
+          >
+            {{ 'Confirmar eliminación' }}
+          </button>
 
-      <div class="d-flex flex-column flex-sm-row mt-3">
-        <button
-          class="btn btn-danger w-100 w-sm-auto mb-2 mb-sm-0"
-          type="submit"
-          :disabled="commitMessage === ''"
-        >
-          {{ 'Confirmar eliminación' }}
-        </button>
-
-        <button
-          class="btn btn-secondary w-100 w-sm-auto ml-sm-2"
-          type="button"
-          @click="handleCancel"
-        >
-          {{ 'Cancelar' }}
-        </button>
+          <button class="btn btn-secondary" type="button" @click="handleCancel">
+            {{ 'Cancelar' }}
+          </button>
+        </div>
       </div>
     </form>
-  </div>
+  </b-collapse>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch, Inject } from 'vue-property-decorator';
 import T from '../../../../lang';
-
+import * as ui from '@/js/omegaup/ui';
 @Component
 export default class DeleteConfirmationForm extends Vue {
   @Inject('problemAlias') readonly alias!: string;
-
   @Prop({ required: true, type: Boolean }) visible!: boolean;
   @Prop({ required: true, type: String }) itemName!: string;
+  @Prop({ required: false, type: String }) itemId!: string;
   @Prop({ required: true, type: Function }) onCancel!: () => void;
-
   T = T;
   commitMessage: string = '';
-
   @Watch('visible')
   onVisibleChange(newValue: boolean) {
     if (newValue) {
@@ -58,21 +52,18 @@ export default class DeleteConfirmationForm extends Vue {
       this.commitMessage = '';
     }
   }
-
   get contentsPayload(): string {
     return JSON.stringify({
-      name: this.itemName,
+      id: this.itemId,
     });
   }
-
   onSubmit(e: Event) {
     if (!this.commitMessage.trim()) {
+      ui.error(T.editFieldRequired);
       e.preventDefault();
-      alert('El mensaje de commit es obligatorio.');
       return;
     }
   }
-
   handleCancel() {
     this.onCancel();
     this.commitMessage = '';
@@ -81,7 +72,19 @@ export default class DeleteConfirmationForm extends Vue {
 </script>
 
 <style scoped>
-.card-body {
-  padding: 1rem 1.5rem;
+.item-active-for-delete {
+  border-left: 3px solid #dc3545 !important;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.button-container .btn {
+  flex: 1 1 140px;
+  margin: 0 !important;
+  white-space: normal;
 }
 </style>

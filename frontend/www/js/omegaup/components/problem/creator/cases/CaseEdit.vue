@@ -7,7 +7,7 @@
           {{ getSelectedGroup.name }}
         </h5>
       </div>
-      <div  v-if="!confirmingDelete">
+      <div v-if="!confirmingDelete">
         <b-button
           variant="light"
           class="mr-2"
@@ -61,14 +61,9 @@
             </div>
           </div>
         </b-button>
-        <b-dropdown
-          variant="light"
-          class="mr-2"
-          right
-          no-caret
-        >
+        <b-dropdown variant="light" class="mr-2" right no-caret>
           <template #button-content>
-            {{"Generar input" }}
+            {{ 'Generar input' }}
           </template>
 
           <b-button
@@ -139,11 +134,19 @@
       v-if="isEditing"
       :visible="confirmingDelete"
       :item-name="itemNameForDelete"
+      :item-id="getSelectedCase.caseID"
       :on-cancel="cancelDelete"
     />
     <hr class="border-top my-2" />
-    <b-alert v-if="isInputTruncated || isOutputTruncated" variant="warning" show class="mb-2">
-      {{ "Please note that the input or output content is truncated. Editing is disabled to avoid memory overload." }}
+    <b-alert
+      v-if="isInputTruncated || isOutputTruncated"
+      variant="warning"
+      show
+      class="mb-2"
+    >
+      {{
+        'Please note that the input or output content is truncated. Editing is disabled to avoid memory overload.'
+      }}
     </b-alert>
     <div>
       <table class="table">
@@ -217,11 +220,12 @@
           </tr>
         </tbody>
       </table>
-    <CaseSimpleForm
-      v-if="isEditing"
-      :is-truncated-input="isInputTruncated"
-      :is-truncated-output="isOutputTruncated"
-    />
+      <CaseSimpleForm
+        v-if="isEditing"
+        :is-truncated-input="isInputTruncated"
+        :is-truncated-output="isOutputTruncated"
+        :is-case-edit="true"
+      />
     </div>
     <b-modal
       v-model="arrayModalEdit"
@@ -268,10 +272,7 @@
 
         <b-row class="mt-2 mb-4">
           <b-col class="text-left">
-            <b-form-checkbox
-              v-model="arrayDistinct"
-              data-array-modal-checkbox
-            >
+            <b-form-checkbox v-model="arrayDistinct" data-array-modal-checkbox>
               {{ T.arrayModalDistinctValues }}
             </b-form-checkbox>
           </b-col>
@@ -421,7 +422,6 @@
         />
       </b-container>
     </b-modal>
-
   </div>
 </template>
 
@@ -467,7 +467,7 @@ const TRUNC_SUFFIX = '...[TRUNCATED]';
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
-    'CaseSimpleForm': CaseSimpleForm,
+    CaseSimpleForm: CaseSimpleForm,
     'delete-confirmation-form': DeleteConfirmationForm,
   },
 })
@@ -797,17 +797,20 @@ export default class CaseEdit extends Vue {
     });
   }
 
-
   @Inject({ default: false }) readonly isEditing!: boolean;
-  
+
   get inputText(): string {
-    return this.getLinesFromSelectedCase.map(l => l.data.value ?? '').join('\n');
+    return this.getLinesFromSelectedCase
+      .map((l) => l.data.value ?? '')
+      .join('\n');
   }
   set inputText(v: string) {
-    if (this.isInputTruncated) return; 
+    if (this.isInputTruncated) return;
     this.deleteLinesForSelectedCase();
     this.addNewLine();
-    const last = this.getLinesFromSelectedCase[this.getLinesFromSelectedCase.length - 1];
+    const last = this.getLinesFromSelectedCase[
+      this.getLinesFromSelectedCase.length - 1
+    ];
     this.editLineKind([last.lineID, 'multiline']);
     this.editLineValue([last.lineID, v]);
   }
@@ -816,7 +819,9 @@ export default class CaseEdit extends Vue {
     if (this.isInputTruncated) return;
     this.deleteLinesForSelectedCase();
     this.addNewLine();
-    const last = this.getLinesFromSelectedCase[this.getLinesFromSelectedCase.length - 1];
+    const last = this.getLinesFromSelectedCase[
+      this.getLinesFromSelectedCase.length - 1
+    ];
     this.editLineKind([last.lineID, 'multiline']);
     this.editLineValue([last.lineID, '']);
   }
@@ -845,7 +850,7 @@ export default class CaseEdit extends Vue {
   get itemNameForDelete(): string {
     const group = this.getSelectedGroup?.name ?? '';
     const name = this.getSelectedCase?.name ?? '';
-    return (group === name  || group === '') ? name : `${group}.${name}`;
+    return group === name || group === '' ? name : `${group}.${name}`;
   }
 
   handleDeleteClick() {
@@ -858,8 +863,6 @@ export default class CaseEdit extends Vue {
       });
     }
   }
-    
-  
 }
 </script>
 
