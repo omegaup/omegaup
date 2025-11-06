@@ -5359,10 +5359,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!empty($r['problem']) && is_string($r['problem'])) {
             $r['problem_alias'] = $r['problem'];
         }
+        
         $problemParams = self::convertRequestToProblemParams(
             $r,
             isRequired: false
         );
+      
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemParams->problemAlias
         );
@@ -5371,7 +5373,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'problemNotFound'
             );
         }
-
         $versions = self::getVersions($problem, $r->identity);
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
             $r->identity,
@@ -5386,7 +5387,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem,
             strval($problem->commit)
         );
-
         $publishedRevision = null;
         foreach ($versions['log'] as $revision) {
             if ($versions['published'] === $revision['commit']) {
@@ -5447,6 +5447,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Validate commit message.
         $message = $r->ensureString('message');
         $request = $r->ensureString('request');
+    
         if ($request === 'submit') {
             $redirect = $r->ensureOptionalBool('redirect') ?? false;
             try {
@@ -5513,61 +5514,74 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $details = self::getProblemEditDetails($problem, $r->identity);
-            $result['templateProperties']['payload']['statement'] = $details['statement'];
-        }
-        elseif($request === 'cases'){
-
+        }elseif($request === 'cases'){
+           
             $contents = $r->ensureString('contents');
-            $caseData = json_decode($contents, true);
-            if (!is_array($caseData)) {
+            $data = json_decode($contents, true);
+            if (!is_array($data)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException('invalidJson');
             } 
+            
+            $isCase = isset($data['case']) && isset($data['group']);
+            $isGroup = isset($data['group']) && !isset($data['case']);
+          
+            if (!$isCase && !$isGroup) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidDataType');
+            }
+            self::validateData($data, $isCase);
+            if ($isCase) {
+                self::updateCase(
+                    $r->identity,
+                    $r->user,
+                    $problem,
+                    $data['case'],
+                    $data['group'],
+                    $cdp,
+                    $message,
+                    $problemParams->updatePublished
+                );
+            } else {
+                self::updateGroup(
+                    $r->identity,
+                    $r->user,
+                    $problem,
+                    $data['group'],
+                    $cdp,
+                    $message,
+                    $problemParams->updatePublished
+                );
+            }
+         
+            $result['templateProperties']['payload']['cdp'] = $cdp;
+        }
+        elseif($request === 'deleteGroupCase'){
+            
+            $contents = $r->ensureString('contents');
+            $data = json_decode($contents, true);
 
-            self::validateCaseData($caseData);
-             
-            self::updateCases(
+            if (!is_array($data)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidJson');
+            }
+            
+            if (!isset($data['id']) || empty($data['id'])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('missingOrEmptyId');
+            }
+            
+            self::deleteGroupOrCase(
                 $r->identity,
                 $r->user,
                 $problem,
-                $caseData,
+                $data['id'],
+                $cdp,
                 $message,
                 $problemParams->updatePublished
             );
+            $result['templateProperties']['payload']['cdp'] = $cdp;
         }
-        elseif($request === 'deleteGroupCase'){
-           
-            $contents = $r->ensureString('contents');
-            $caseData = json_decode($contents, true);
-            if (!is_array($caseData)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('invalidJson');
-            } 
-            if (!isset($caseData['name']) || empty($caseData['name'])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException('missingOrEmptyName');
-            }
-            $pathsToExclude = ['cases/' . $caseData['name']];
-            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
-            self::processCaseUpdate(
-                $problemArtifacts,
-                $problem,
-                $r->identity,
-                $r->user,
-                $message,
-                $problemParams->updatePublished,
-                [],
-                $pathsToExclude,
-                true // Delete operation
-            );
-
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::PROBLEM_CDP_DATA,
-                "{$problem->alias}-{$problem->commit}"
-            );
-        }
-
-
         $result['templateProperties']['payload']['statusSuccess'] = true;
         return $result;
     }
+
 
     /**
      * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupScorePolicy: null|string, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: ProblemsetterInfo, showDiff: string, source: string, statement: ProblemStatement, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
@@ -6825,7 +6839,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
     }
 
-
     private static function getProblemCDPImpl(array $params): ?array {
 
         if (is_null($params['alias'])) {
@@ -6846,6 +6859,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         try {
             if( !is_null($zipFilePath) ){
                 $result = \OmegaUp\ZipToCdpConverter::convert($zipFilePath, $params['alias']);
+                if( !isset($result['cdp']) ){
+                    throw new \OmegaUp\Exceptions\InvalidParameterException("missing_cdp");
+                }
+                $result = $result['cdp'];
             } else {
                 $jsonContent= mb_convert_encoding(
                     $problemArtifacts->get(
@@ -6873,44 +6890,66 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
     }
 
-    private static function validateCaseData(array $caseData): void {
-        $requiredFields = ['group_name', 'case_name', 'input', 'output'];
-        foreach ($requiredFields as $field) {
-            if (!isset($caseData[$field])) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException("missing_{$field}");
+    private static function validateData(array $data, bool $isCase): void {
+
+        if (!isset($data['group']) || !is_array($data['group'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException('missing_group');
+        }
+
+        $groupRequiredFields = ['groupID', 'name', 'points', 'autoPoints', 'ungroupedCase', 'cases'];
+        foreach ($groupRequiredFields as $field) {
+            if (!isset($data['group'][$field])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException("missing_group_{$field}");
             }
         }
+
+        if ($isCase) {
+            if (!isset($data['case']) || !is_array($data['case'])) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException('missing_case');
+            }
+            
+            $caseRequiredFields = ['caseID', 'groupID', 'name', 'points', 'autoPoints', 'lines', 'output'];
+            foreach ($caseRequiredFields as $field) {
+                if (!isset($data['case'][$field])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException("missing_case_{$field}");
+                }
+            }
+        }
+
     }
 
-    private static function updateCases(
+    private static function updateCase(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Problems $problem,
-        array $caseData,
+        array $newCaseData,
+        array $groupData,
+        array &$cdp,
         string $message,
         string $updatePublished
-    ):void{
-        
+    ): void {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+
+        // Search to see if the case exists in the CDP
+        $caseInfo = self::findCaseInCDP($cdp, $newCaseData['caseID']);
         
+        $isEditOperation = !is_null($caseInfo);
 
-        $isEditOperation = !is_null($caseData['oldCase']);
-        $data = $isEditOperation 
-            ? self::handleEditCase($caseData, $problemArtifacts)
-            : self::handleNewCase($caseData, $problemArtifacts);
-       
+        $result = $isEditOperation 
+            ? self::handleEditCase($newCaseData, $groupData, $cdp, $problemArtifacts)
+            : self::handleNewCase($newCaseData, $groupData, $cdp, $problemArtifacts);
 
-        self::processCaseUpdate(
+        self::commitChanges(
             $problemArtifacts,
             $problem,
             $identity,
             $user,
             $message,
             $updatePublished,
-            $data['blobUpdate'],
-            $data['pathsToExclude']
+            $result['blobUpdate'],
+            $result['pathsToExclude']
         );
-    
+
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::PROBLEM_CDP_DATA,
             "{$problem->alias}-{$problem->commit}"
@@ -6918,59 +6957,190 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     private static function handleEditCase(
-        array $caseData,
+        array $newCaseData,
+        array $groupData,
+        array &$cdp,
         \OmegaUp\ProblemArtifacts $problemArtifacts
     ): array {
+        $caseID = $newCaseData['caseID'];
+        //Search for original case in CDP
+        $caseInfo = self::findCaseInCDP($cdp, $caseID);
+        if (is_null($caseInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('testCaseNotFound');
+        }
 
-        $oldGroupName = $caseData['oldCase']['oldGroupName'];
-        $oldCaseName = $caseData['oldCase']['oldCaseName'];
-        $oldInput = $caseData['oldCase']['input'];
-        $oldOutput = $caseData['oldCase']['output'];
+        $uploadedInput = null;
+        $uploadedOutput = null;
+        
+        if (isset($_FILES['input_file'])) {
+            $uploadedInput = self::processUploadedFile($_FILES['input_file']);
+        }
+        
+        if (isset($_FILES['output_file'])) {
+            $uploadedOutput = self::processUploadedFile($_FILES['output_file']);
+        }
 
-        $oldPathBase = ($oldGroupName === $oldCaseName) || ($oldGroupName === '')
-            ? $oldCaseName // Ungrouped
-            : "{$oldGroupName}.{$oldCaseName}"; // Grouped
+        $oldCase = $caseInfo['case'];
+        $oldGroup = $caseInfo['group'];
+        $caseIndex = $caseInfo['caseIndex'];
+        $groupIndex = $caseInfo['groupIndex'];
+        
+        //Old data (from the CDP)
+        $oldGroupID = $oldCase['groupID'];
+        $oldCaseName = $oldCase['name'];
+        $oldInput = self::getLineValues($oldCase);
+        $oldOutput = $oldCase['output'] ?? '';
+        
+        //New data (from the CDP)
+        $newGroupID = $newCaseData['groupID'];
+        $newCaseName = $newCaseData['name'];
+        $newInput = $uploadedInput !== null
+            ? $uploadedInput['truncated']
+            : self::getLineValues($newCaseData);
 
-        $newGroupName = $caseData['group_name'];
-        $newCaseName = $caseData['case_name'];
-        $newInput = $caseData['input'];
-        $newOutput = $caseData['output'];
+        $newOutput = $uploadedOutput !== null
+            ? $uploadedOutput['truncated']
+            : ($newCaseData['output'] ?? '');
+        
+        // Detect if it is ungrouped
+        $oldGroupName = $oldGroup['name'];
+        $isOldUngrouped = ($oldGroup['ungroupedCase'] ?? false);
+        $isNewUngrouped = ($groupData['ungroupedCase'] ?? false);
+        
+        // Detect changes
+        $nameChanged = ($newCaseName !== $oldCaseName);
+        $groupChanged = ($newGroupID !== $oldGroupID);
+        $inputChanged = ($newInput !== $oldInput);
+        $outputChanged = ($newOutput !== $oldOutput);
+        
+        $oldPathBase = $isOldUngrouped 
+        ? $oldCaseName 
+        : "{$oldGroupName}.{$oldCaseName}";
 
-        $newPathBase = ($newGroupName === $newCaseName)
-            ? $newCaseName // Ungrouped
-            : "{$newGroupName}.{$newCaseName}"; // Grouped
-
-        $inputChanged = $newInput !== $oldInput;
-        $outputChanged = $newOutput !== $oldOutput;
-
+        $newGroupName = $groupData['name'];
+        $newPathBase = $isNewUngrouped 
+            ? $newCaseName 
+            : "{$newGroupName}.{$newCaseName}";
+     
         $oldInputPath = "cases/{$oldPathBase}.in";
         $oldOutputPath = "cases/{$oldPathBase}.out";
-
         $newInputPath = "cases/{$newPathBase}.in";
         $newOutputPath = "cases/{$newPathBase}.out";
-       
+ 
+    
+        // Verify that the old files exist
         if (!$problemArtifacts->exists($oldInputPath) || !$problemArtifacts->exists($oldOutputPath)) {
             throw new \OmegaUp\Exceptions\NotFoundException('testCaseNotFound');
         }
-         
-        $nameChanged = ($newGroupName !== $oldGroupName) || ($newCaseName !== $oldCaseName);
+        
         $blobUpdate = [];
         $pathsToExclude = [];
         
-        if ($nameChanged) {
+        // Managing file changes
+        if ($nameChanged || $groupChanged) {
+            //Verify that the new route does not exist
             if ($problemArtifacts->exists($newInputPath) || $problemArtifacts->exists($newOutputPath)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('testCaseAlreadyExists');
             }
-            $blobUpdate[$newInputPath] = $newInput;
-            $blobUpdate[$newOutputPath] = $newOutput;
+            
+            $blobUpdate[$newInputPath]  = $uploadedInput !== null  ? $uploadedInput['full']  : $newInput;
+            $blobUpdate[$newOutputPath] = $uploadedOutput !== null ? $uploadedOutput['full'] : $newOutput;
 
             $pathsToExclude[] = $oldInputPath;
             $pathsToExclude[] = $oldOutputPath;
         } else {
-            if ($inputChanged) $blobUpdate[$oldInputPath] = $newInput;
-            if ($outputChanged) $blobUpdate[$oldOutputPath] = $newOutput;
+             if ($uploadedInput !== null) {
+                $blobUpdate[$oldInputPath] = $uploadedInput['full'];
+            } elseif ($inputChanged) {
+                $blobUpdate[$oldInputPath] = $newInput;
+            }
+
+            if ($uploadedOutput !== null) {
+                $blobUpdate[$oldOutputPath] = $uploadedOutput['full'];
+            } elseif ($outputChanged) {
+                $blobUpdate[$oldOutputPath] = $newOutput;
+            }
         }
 
+        $newLine = $uploadedInput == null
+            ? $newCaseData['lines']
+            :[[
+                'lineID' => $newCaseData['lines'][0]['lineID'],
+                'caseID' => $caseID,
+                'label'  => '',
+                'data'   => ['kind' => 'multiline', 'value' => $uploadedInput['truncated']],
+            ]];
+        
+        // Update CDP
+        if ($groupChanged) {
+            // Move case to another group
+            $targetGroupIndex = null;
+            
+            if ($isNewUngrouped) {
+                // Search for or create an ungrouped group
+                foreach ($cdp['casesStore']['groups'] as $idx => $grp) {
+                    if ($grp['ungroupedCase'] ?? false) {
+                        $targetGroupIndex = $idx;
+                        break;
+                    }
+                }
+                
+                if (is_null($targetGroupIndex)) {
+                    $cdp['casesStore']['groups'][] = [
+                        'groupID' => $groupData['groupID'],
+                        'name' => $groupData['name'],
+                        'points' => $groupData['points'],
+                        'autoPoints' => $groupData['autoPoints'],
+                        'ungroupedCase' => true,
+                        'cases' => []
+                    ];
+                    $targetGroupIndex = count($cdp['casesStore']['groups']) - 1;
+                }
+            } else {
+                // Search for or create a normal group
+                $newGroupInfo = self::findGroupInCDP($cdp, $newGroupID);
+                
+                if (is_null($newGroupInfo)) {
+                    // Create new group 
+                    $cdp['casesStore']['groups'][] = [
+                        'groupID' => $groupData['groupID'],
+                        'name' => $groupData['name'],
+                        'points' => $groupData['points'],
+                        'autoPoints' => $groupData['autoPoints'],
+                        'ungroupedCase' => false,
+                        'cases' => []
+                    ];
+                    $targetGroupIndex = count($cdp['casesStore']['groups']) - 1;
+                } else {
+                    $targetGroupIndex = $newGroupInfo['groupIndex'];
+                }
+            }
+            
+            // Remove from the previous group
+            array_splice($cdp['casesStore']['groups'][$groupIndex]['cases'], $caseIndex, 1);
+            
+            // Add to new group
+            $cdp['casesStore']['groups'][$targetGroupIndex]['cases'][] = [
+                'caseID' => $caseID,
+                'groupID' => $newGroupID,
+                'lines' => $newLine,
+                'points' => $newCaseData['points'],
+                'autoPoints' => $newCaseData['autoPoints'],
+                'output' => $newOutput,
+                'name' => $newCaseName
+            ];
+        } else {
+            // Same group, update in-place
+            $cdp['casesStore']['groups'][$groupIndex]['cases'][$caseIndex] = [
+                'caseID' => $caseID,
+                'groupID' => $newGroupID,
+                'lines' => $newLine,
+                'points' => $newCaseData['points'],
+                'autoPoints' => $newCaseData['autoPoints'],
+                'output' => $newOutput,
+                'name' => $newCaseName
+            ];
+        }
         return [
             "blobUpdate" => $blobUpdate,
             "pathsToExclude" => $pathsToExclude
@@ -6978,71 +7148,307 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     private static function handleNewCase(
-        array $caseData,
+        array $newCaseData,
+        array $groupData,
+        array &$cdp,
         \OmegaUp\ProblemArtifacts $problemArtifacts
     ): array {
-        $newGroupName = $caseData['group_name'];
-        $newCaseName = $caseData['case_name'];
-        $newInput = $caseData['input'];
-        $newOutput = $caseData['output'];
-
-        $newPathBase = ($newGroupName === $newCaseName)
-            ? $newCaseName // Ungrouped
-            : "{$newGroupName}.{$newCaseName}"; // Grouped
-
-        $newInputPath = "cases/{$newPathBase}.in";
-        $newOutputPath = "cases/{$newPathBase}.out";
-
+        $newGroupID = $newCaseData['groupID'];
+        $newCaseName = $newCaseData['name'];
+        $newInput = self::getLineValues($newCaseData);
+        $newOutput = $newCaseData['output'] ?? '';
+        
+        // Determine if it is ungrouped using the group data
+        $isUngrouped = ($groupData['ungroupedCase'] ?? false);
+        
+        // Search for or create the group
+        $groupInfo = self::findGroupInCDP($cdp, $newGroupID);
+        $targetGroupIndex = null;
+        
+        if ($isUngrouped) {
+            // Search for ungrouped group
+            foreach ($cdp['casesStore']['groups'] as $idx => $grp) {
+                if ($grp['ungroupedCase'] ?? false) {
+                    $targetGroupIndex = $idx;
+                    break;
+                }
+            }
+            
+            if (is_null($targetGroupIndex)) {
+                // Create ungrouped group with frontend data
+                $cdp['casesStore']['groups'][] = [
+                    'groupID' => $groupData['groupID'],
+                    'name' => $groupData['name'],
+                    'points' => $groupData['points'],
+                    'autoPoints' => $groupData['autoPoints'],
+                    'ungroupedCase' => true,
+                    'cases' => []
+                ];
+                $targetGroupIndex = count($cdp['casesStore']['groups']) - 1;
+            }
+        } else {
+            if (is_null($groupInfo)) {
+                // The group does not exist; create it with the frontend data.
+                $cdp['casesStore']['groups'][] = [
+                    'groupID' => $groupData['groupID'],
+                    'name' => $groupData['name'],
+                    'points' => $groupData['points'],
+                    'autoPoints' => $groupData['autoPoints'],
+                    'ungroupedCase' => false,
+                    'cases' => []
+                ];
+                $targetGroupIndex = count($cdp['casesStore']['groups']) - 1;
+            } else {
+                $targetGroupIndex = $groupInfo['groupIndex'];
+            }
+        }
+        
+        // Generate file path
+        $newGroupName = $groupData['name'];
+        $pathBase = $isUngrouped 
+            ? $newCaseName 
+            : "{$newGroupName}.{$newCaseName}";
+        
+        $newInputPath = "cases/{$pathBase}.in";
+        $newOutputPath = "cases/{$pathBase}.out";
+        
+        // Verify that there are no files with that name.
         if ($problemArtifacts->exists($newInputPath) || $problemArtifacts->exists($newOutputPath)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('testCaseAlreadyExists');
         }
+        
         $blobUpdate = [];
         $blobUpdate[$newInputPath] = $newInput;
         $blobUpdate[$newOutputPath] = $newOutput;
-
+        
+        // Agregar caso al CDP
+        $cdp['casesStore']['groups'][$targetGroupIndex]['cases'][] = [
+            'caseID' => $newCaseData['caseID'],
+            'groupID' => $newGroupID,
+            'name' => $newCaseName,
+            'lines' => $newCaseData['lines'],
+            'points' => $newCaseData['points'],
+            'autoPoints' => $newCaseData['autoPoints'],
+            'output' => $newOutput
+        ];
+        
         return [
-            "blobUpdate" => $blobUpdate,
-            "pathsToExclude" => []
+            'blobUpdate' => $blobUpdate,
+            'pathsToExclude' => []
         ];
     }
 
-    private static function processCaseUpdate(
+    private static function updateGroup(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Problems $problem,
+        array $newGroupData,
+        array &$cdp,
+        string $message,
+        string $updatePublished
+    ): void {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        
+        // Search to see if the group exists in the CDP
+        $groupInfo = self::findGroupInCDP($cdp, $newGroupData['groupID']);
+
+        if (is_null($groupInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
+        }
+        
+        $result = self::handleEditGroup($newGroupData, $cdp, $groupInfo);
+        
+        self::commitChanges(
+            $problemArtifacts,
+            $problem,
+            $identity,
+            $user,
+            $message,
+            $updatePublished,
+            [], //blobUpdate
+            [], // pathsToExclude
+            $result['pathsToRename']
+
+        );
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_CDP_DATA,
+            "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    private static function handleEditGroup(
+        array $newGroupData,
+        array &$cdp,
+        array $groupInfo
+    ): array {
+        $groupID = $newGroupData['groupID'];
+        
+        $oldGroup = $groupInfo['group'];
+        $groupIndex = $groupInfo['groupIndex'];
+        
+        if ($oldGroup['ungroupedCase'] ?? false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException('cannotEditUngroupedGroup');
+        }
+        
+        $oldGroupName = $oldGroup['name'];
+        $newGroupName = $newGroupData['name'];
+        $nameChanged = ($newGroupName !== $oldGroupName);
+
+        $pathsToRename = [];
+        if ($nameChanged) {
+            // Verify that there is no other group with that name.
+            foreach ($cdp['casesStore']['groups'] as $idx => $grp) {
+                if ($idx !== $groupIndex && $grp['name'] === $newGroupName) {
+                    throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException('groupAlreadyExists');
+                }
+            }
+            // Rename ALL files in the group.
+            $pathsToRename["cases/{$oldGroupName}."] = "cases/{$newGroupName}.";
+            
+            $cdp['casesStore']['groups'][$groupIndex]['name'] = $newGroupName;
+        }
+        
+        $cdp['casesStore']['groups'][$groupIndex]['points'] = $newGroupData['points'];
+        $cdp['casesStore']['groups'][$groupIndex]['autoPoints'] = $newGroupData['autoPoints'];
+        
+        return [
+            'pathsToRename' => $pathsToRename
+        ];
+    }
+
+    private static function deleteGroupOrCase(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $id,
+        array &$cdp,
+        string $message,
+        string $updatePublished
+    ): void {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        
+        // First try searching as a case
+        $caseInfo = self::findCaseInCDP($cdp, $id);
+        
+        if (!is_null($caseInfo)) {
+            $result = self::handleDeleteCase($caseInfo, $cdp);
+        } else {
+            $groupInfo = self::findGroupInCDP($cdp, $id);
+            
+            if (is_null($groupInfo)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('caseOrGroupNotFound');
+            }
+             $result = self::handleDeleteGroup($groupInfo, $cdp);
+        }
+        
+        self::commitChanges(
+            $problemArtifacts,
+            $problem,
+            $identity,
+            $user,
+            $message,
+            $updatePublished,
+            [], //blobUpdate
+            $result['pathsToExclude'],
+            [], //pathsToRename
+            true //isDelete
+        );
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_CDP_DATA,
+            "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    private static function handleDeleteCase(
+        array $caseInfo,
+        array &$cdp,
+    ): array {
+        $case = $caseInfo['case'];
+        $group = $caseInfo['group'];
+        $caseIndex = $caseInfo['caseIndex'];
+        $groupIndex = $caseInfo['groupIndex'];
+        
+        $caseName = $case['name'];
+        $groupName = $group['name'];
+        $isUngrouped = ($group['ungroupedCase'] ?? false);
+        
+        $pathBase = $isUngrouped 
+            ? $caseName 
+            : "{$groupName}.{$caseName}";
+        
+        $pathsToExclude = ['cases/' . $pathBase];
+        // Remove case from the CDP
+        array_splice($cdp['casesStore']['groups'][$groupIndex]['cases'], $caseIndex, 1);
+        
+        // If the group is empty, delete the group as well.
+        if (empty($cdp['casesStore']['groups'][$groupIndex]['cases'])) {
+            array_splice($cdp['casesStore']['groups'], $groupIndex, 1);
+        }
+        
+        return [
+            'pathsToExclude' => $pathsToExclude
+        ];
+    }
+
+    private static function handleDeleteGroup(
+        array $groupInfo,
+        array &$cdp,
+    ): array {
+        $group = $groupInfo['group'];
+        $groupIndex = $groupInfo['groupIndex'];
+        
+        
+        $groupName = $group['name'];
+        $pathsToExclude = ['cases/' . $groupName];
+        
+        // Remove group from the CDP
+        array_splice($cdp['casesStore']['groups'], $groupIndex, 1);
+        
+        return [
+            'blobUpdate' => [],
+            'pathsToExclude' => $pathsToExclude,
+        ];
+    }
+
+    private static function commitChanges(
         \OmegaUp\ProblemArtifacts $problemArtifacts,
-        \OmegaUp\DAO\VO\Problems $problem, 
-        \OmegaUp\DAO\VO\Identities $identity, 
+        \OmegaUp\DAO\VO\Problems $problem,
+        \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Users $user,
         string $message,
         string $updatePublished,
         array $blobUpdate,
         array $pathsToExclude,
-        bool $isDelete = false
+        array $pathsToRename = [],
+        bool $isDelete = false,
     ): void {
-        $problemDeployer = new \OmegaUp\ProblemDeployer(
-            $problem->alias
-        );
 
-        
-        if ($blobUpdate === [] && !$isDelete) {
+        if (empty($blobUpdate) && !$isDelete && empty($pathsToRename)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException('noChangesDetected');
         }
 
-        if( !empty($pathsToExclude) ){
+        $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
+
+        if (!empty($pathsToExclude) || !empty($pathsToRename)) {
             $zipFilePath = $problemArtifacts->getZip();
             $problemDeployer->commitModifiedZip(
                 $message,
                 $identity,
                 $zipFilePath,
                 $pathsToExclude,
-                $blobUpdate
+                $blobUpdate,
+                $pathsToRename
             );
-        }
-        else{
+        } else {
             $problemDeployer->commitLooseFiles(
                 $message,
                 $identity,
                 $blobUpdate
             );
         }
+        
         if ($updatePublished !== \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE) {
             [
                 $problem->commit,
@@ -7063,7 +7469,108 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problems::update($problem);
         }
     }
+    
+    private static function processUploadedFile(
+        array $fileInfo,
+        int $limitBytes = \OmegaUp\Validators::ZIP_CASE_SIZE_LIMIT_BYTES
+    ): ?array {
+        // Verificar si hay error o no hay archivo
+        if (!isset($fileInfo['error']) || $fileInfo['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        
+        if ($fileInfo['error'] !== UPLOAD_ERR_OK) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'fileUploadError'
+            );
+        }
+        
+        $tmpName = $fileInfo['tmp_name'];
+        if (!file_exists($tmpName)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'fileNotFound'
+            );
+        }
+        
+        $fullContent = file_get_contents($tmpName);
+        if ($fullContent === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'fileReadError'
+            );
+        }
+        
+        $fileSize = strlen($fullContent);
+        if ($fileSize > $limitBytes) {
+            $truncatedContent = substr($fullContent, 0, $limitBytes) . ' ...[TRUNCATED]';
+        } else {
+            $truncatedContent = $fullContent;
+        }
+        
+        return [
+            'full' => $fullContent,
+            'truncated' => $truncatedContent
+        ];
+    }
 
+    private static function findCaseInCDP(array $cdp, string $caseID): ?array {
+        if (!isset($cdp['casesStore'])  || !isset($cdp['casesStore']['groups']  )) {
+            return null;
+        }
+        foreach ($cdp['casesStore']['groups'] as $groupIndex => $group) {
+            if (!isset($group['cases'])) {
+                continue;
+            }
+            
+            foreach ($group['cases'] as $caseIndex => $case) {
+                if (($case['caseID'] ?? '') === $caseID) {
+                    unset($group['cases']);
+                    return [
+                        'case' => $case,
+                        'caseIndex' => $caseIndex,
+                        'group' => $group,
+                        'groupIndex' => $groupIndex
+                    ];
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    private static function findGroupInCDP(array $cdp, string $groupID): ?array {
+        if (!isset($cdp['casesStore'])  || !isset($cdp['casesStore']['groups']  )) {
+            return null;
+        }
+        
+        foreach ($cdp['casesStore']['groups'] as $groupIndex => $group) {
+            if (($group['groupID'] ?? '') === $groupID) {
+                unset($group['cases']);
+                return [
+                    'group' => $group,
+                    'groupIndex' => $groupIndex
+                ];
+            }
+        }
+        
+        return null;
+    }
+
+    private static function getLineValues(array $data): string {
+        $allLinesString = '';
+
+        if (!isset($data['lines']) || !is_array($data['lines'])) {
+            return '';
+        }
+
+        foreach ($data['lines'] as $line) {
+            if (isset($line['data']['value'])) {
+                $allLinesString .= $line['data']['value'];
+            }
+            $allLinesString .= "\n";
+        }
+
+        return rtrim($allLinesString, "\n");
+    }
 
     public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
 
