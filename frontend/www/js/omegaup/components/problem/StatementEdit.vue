@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
@@ -32,9 +32,10 @@
             class="wmd-input"
           ></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
+            data-statement-edit-markdown
             :markdown="currentMarkdown"
             :source-mapping="statement.sources"
             :image-mapping="statement.images"
@@ -215,47 +216,33 @@ export default class ProblemStatementEdit extends Vue {
 }
 
 .row {
-  display: flex;
+  .wmd-button-bar {
+    flex-shrink: 0;
+  }
 
-  .col-md-6 {
-    display: flex;
-    flex-direction: column;
+  .wmd-input {
+    flex: 1;
+    min-height: 400px;
+    height: auto !important;
+    resize: vertical;
+  }
 
-    &:first-child {
-      .wmd-button-bar {
-        flex-shrink: 0;
-      }
+  .title {
+    flex-shrink: 0;
+  }
 
-      .wmd-input {
-        flex: 1;
-        min-height: 400px;
-        height: auto !important;
-        resize: vertical;
-      }
-    }
+  [data-statement-edit-markdown] {
+    flex: 1;
+    min-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--markdown-preview-border-color);
+    padding: 10px;
+    margin-bottom: 10px;
+  }
 
-    &:last-child {
-      display: flex;
-      flex-direction: column;
-
-      .title {
-        flex-shrink: 0;
-      }
-
-      omegaup-markdown {
-        flex: 1;
-        min-height: 400px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-
-      hr,
-      div {
-        flex-shrink: 0;
-      }
-    }
+  hr,
+  div {
+    flex-shrink: 0;
   }
 }
 </style>
