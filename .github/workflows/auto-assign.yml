@@ -1,0 +1,22 @@
+name: Auto Assign / Unassign Issue
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  assign_issue:
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request == null  # only issues, not PRs
+
+    steps:
+      - name: Check for /assign or /unassign command
+        uses: peter-evans/slash-command-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commands: |
+            assign
+            unassign
