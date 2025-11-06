@@ -591,7 +591,7 @@ class ProblemDeployer {
     }
 
     /**
-     * Commits a modified version of the current problem ZIP, excluding certain paths
+     * Commits a modified version of the current problem ZIP, excluding or rename certain paths
      * and adding new files. Uses 'theirs' merge strategy to replace the problem completely.
      *
      * @param string $message
@@ -599,6 +599,7 @@ class ProblemDeployer {
      * @param string $currentZipPath
      * @param array<string> $pathsToExclude
      * @param array<string, string> $filesToAdd
+     * @param array<string, string> $pathsToRenam
      *
      * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
@@ -607,7 +608,8 @@ class ProblemDeployer {
         \OmegaUp\DAO\VO\Identities $identity,
         string $currentZipPath,
         array $pathsToExclude,
-        array $filesToAdd
+        array $filesToAdd,
+        array $pathsToRename = []
     ): void {
         $tmpfile = tmpfile();
         try {
@@ -648,9 +650,24 @@ class ProblemDeployer {
                     continue;
                 }
 
+                // Check if file should be renamed (by prefix)
+                $newFilename = $filename;
+                foreach ($pathsToRename as $oldPrefix => $newPrefix) {
+                    if (str_starts_with($filename, $oldPrefix)) {
+                        // Replace only the prefix, keep the rest
+                        $newFilename = $newPrefix . substr(
+                            $filename,
+                            strlen(
+                                $oldPrefix
+                            )
+                        );
+                        break;
+                    }
+                }
+
                 $contents = $currentZip->getFromIndex($i);
                 if ($contents !== false) {
-                    $zipArchive->addFromString($filename, $contents);
+                    $zipArchive->addFromString($newFilename, $contents);
                 }
             }
             $currentZip->close();
