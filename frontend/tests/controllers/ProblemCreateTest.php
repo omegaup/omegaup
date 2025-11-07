@@ -1188,17 +1188,30 @@ if __name__ == \'__main__\':
                     ],
                 ],
             ],
+            'guest1' => [
+                'problems' => [],
+            ],
+            'guest2' => [
+                'problems' => [],
+            ],
         ];
 
         $guestUsers = ['guest1', 'guest2'];
+
+        $expectedProblemsBeforeAdmins = [
+            'guest1' => ['owner1_public', 'owner2_public'],
+            'guest2' => ['owner1_public', 'owner2_public'],
+        ];
+
+        $expectedProblemsAfterAdmins = [
+            'guest1' => ['owner1_private', 'owner1_public', 'owner2_public'],
+            'guest2' => ['owner1_public', 'owner2_private', 'owner2_public'],
+        ];
 
         // Create all users
         $users = [];
         foreach (array_keys($testScenario) as $userName) {
             ['identity' => $users[$userName]] = \OmegaUp\Test\Factories\User::createUser();
-        }
-        foreach ($guestUsers as $guestName) {
-            ['identity' => $users[$guestName]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         // Create all problems
@@ -1226,27 +1239,24 @@ if __name__ == \'__main__\':
                 $response['results']
             );
 
-            // Verify that they DON'T see any private problem
             foreach ($testScenario as $ownerData) {
                 foreach ($ownerData['problems'] as $problemAlias => $problemData) {
-                    if ($problemData['visibility'] === 'private') {
-                        self::assertArrayNotContainsWithPredicate(
-                            $list,
-                            fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should not see private problem {$problemAlias}"
-                        );
-                    }
-                }
-            }
+                    $shouldSee = in_array(
+                        $problemAlias,
+                        $expectedProblemsBeforeAdmins[$guestName]
+                    );
 
-            // Verify that they DO see all public problems
-            foreach ($testScenario as $ownerData) {
-                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
-                    if ($problemData['visibility'] === 'public') {
+                    if ($shouldSee) {
                         self::assertArrayContainsWithPredicate(
                             $list,
                             fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should see public problem {$problemAlias}"
+                            "{$guestName} should see problem {$problemAlias}"
+                        );
+                    } else {
+                        self::assertArrayNotContainsWithPredicate(
+                            $list,
+                            fn(string $a) => $a == $problemAlias,
+                            "{$guestName} should not see problem {$problemAlias}"
                         );
                     }
                 }
@@ -1278,8 +1288,10 @@ if __name__ == \'__main__\':
 
             foreach ($testScenario as $ownerData) {
                 foreach ($ownerData['problems'] as $problemAlias => $problemData) {
-                    $shouldSee = $problemData['visibility'] === 'public' ||
-                                in_array($guestName, $problemData['admins']);
+                    $shouldSee = in_array(
+                        $problemAlias,
+                        $expectedProblemsAfterAdmins[$guestName]
+                    );
 
                     if ($shouldSee) {
                         self::assertArrayContainsWithPredicate(
