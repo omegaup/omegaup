@@ -1302,7 +1302,7 @@
 	"problemSettingsSummaryTitleWithProblemId": "%(problem_id). %(problem_title)",
 	"problemSettingsSummaryTitleWithProblemsetTitleAndLetter": "%(problemset_title) - %(letter). %(problem_title)",
 	"problemSolutionNotVisible": "You don't have permission to view the problem's solution. Try solving the problem first.",
-	"problemSolutionSystemInMaintainance": "Problem solutions system is under maintenance.\n\nWe will be back soon.",
+	"problemSolutionSystemInMaintainance": "The functionality to view problem solutions is under maintenance.\n\nWe will be back soon.",
 	"problemSuccessfullyAdded": "Problem successfully added",
 	"problemSuccessfullyRemoved": "Problem successfully removed",
 	"problemSuccessfullyUpdated": "Problem successfully updated",
