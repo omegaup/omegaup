@@ -278,4 +278,3 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/user/updateMainEmail/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserupdatemainemail)
   - [`/api/user/validateFilter/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserverifyemail)
-
