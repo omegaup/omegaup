@@ -4591,8 +4591,6 @@ export namespace types {
     rank: types.School[];
     showHeader: boolean;
     totalRows: number;
-    availableFilters?: { [key: string]: string };
-    filter?: string;
   }
 
   export interface SchoolUser {

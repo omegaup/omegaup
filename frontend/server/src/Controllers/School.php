@@ -281,7 +281,6 @@ class School extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\Enum\SchoolRankFilter::NONE,
                 \OmegaUp\DAO\Enum\SchoolRankFilter::COUNTRY,
                 \OmegaUp\DAO\Enum\SchoolRankFilter::STATE,
-                \OmegaUp\DAO\Enum\SchoolRankFilter::SCHOOL,
             ]
         );
         $currentFilter = $filter ?? \OmegaUp\DAO\Enum\SchoolRankFilter::NONE;
@@ -380,23 +379,6 @@ class School extends \OmegaUp\Controllers\Controller {
                     'wordsFilterByState'
                 );
         }
-        $schoolId = null;
-        if (!is_null($loggedIdentity->current_identity_school_id)) {
-            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $loggedIdentity->current_identity_school_id
-            );
-            if (!is_null($identitySchool)) {
-                $schoolId = $identitySchool->school_id;
-            }
-        }
-
-        if (!is_null($schoolId)) {
-            $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
-                    'wordsFilterBySchool'
-                );
-        }
-
         $selectedFilter = self::getSelectedFilter(
             $loggedIdentity,
             $filteredBy
@@ -462,35 +444,6 @@ class School extends \OmegaUp\Controllers\Controller {
                 'filteredBy' => $filteredBy,
                 'value' => "{$identity->country_id}-{$identity->state_id}"
             ];
-        }
-        if ($filteredBy === 'school') {
-            $schoolCountryId = null;
-            $schoolStateId = null;
-            if (!is_null($identity->current_identity_school_id)) {
-                $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                    $identity->current_identity_school_id
-                );
-                if (!is_null($identitySchool)) {
-                    $school = \OmegaUp\DAO\Schools::getByPK($identitySchool->school_id);
-                    if (!is_null($school)) {
-                        $schoolCountryId = $school->country_id;
-                        $schoolStateId = $school->state_id;
-                    }
-                }
-            }
-            // Use state filtering if state is available, otherwise country filtering
-            if ($schoolStateId) {
-                return [
-                    'filteredBy' => 'state',
-                    'value' => "{$schoolCountryId}-{$schoolStateId}"
-                ];
-            } elseif ($schoolCountryId) {
-                return [
-                    'filteredBy' => 'country',
-                    'value' => $schoolCountryId
-                ];
-            }
-            return ['filteredBy' => null, 'value' => null];
         }
         return ['filteredBy' => null, 'value' => null];
     }
@@ -588,6 +541,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         // Now get the school data
+        /** @var int $schoolOfTheMonthId */
         $school = \OmegaUp\DAO\Schools::getByPK($schoolOfTheMonthId);
 
         if (is_null($school)) {
