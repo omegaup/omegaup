@@ -107,6 +107,9 @@ class JsIncludeNode extends \Twig\Node\Node {
         }
         /** @var array{css: list<string>, js: list<string>} */
         $jsonContents = json_decode($textContents, associative: true);
+        if ($jsonContents === null) {
+            die('Invalid JSON in dependency file: ' . $jsonPath);
+        }
         return $jsonContents['js'];
     }
 }
