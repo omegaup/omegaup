@@ -324,7 +324,10 @@ class School extends \OmegaUp\Controllers\Controller {
         $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
             "{$offset}-{$rowCount}",
-            fn () => \OmegaUp\DAO\SchoolsRank::getFilteredRank($offset, $rowCount),
+            fn () => \OmegaUp\DAO\SchoolsRank::getFilteredRank(
+                $offset,
+                $rowCount
+            ),
             3600 // 1 hour
         );
 

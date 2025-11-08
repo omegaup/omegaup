@@ -4585,14 +4585,14 @@ export namespace types {
   }
 
   export interface SchoolRankPayload {
+    availableFilters?: { [key: string]: string };
+    filter?: string;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
     rank: types.School[];
     showHeader: boolean;
     totalRows: number;
-    availableFilters?: { [key: string]: string };
-    filter?: string;
   }
 
   export interface SchoolUser {
