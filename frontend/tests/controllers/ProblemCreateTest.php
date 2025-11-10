@@ -1164,59 +1164,57 @@ if __name__ == \'__main__\':
     public function testUsersOnlySeeAllowedProblems(): void {
         // Define the structure of users, problems and permissions
         $testScenario = [
-            'owner1' => [
-                'problems' => [
-                    'owner1_private' => [
-                        'visibility' => 'private',
-                        'admins' => ['guest1'],
-                    ],
-                    'owner1_public' => [
-                        'visibility' => 'public',
-                        'admins' => [],
-                    ],
-                ],
-            ],
-            'owner2' => [
-                'problems' => [
-                    'owner2_private' => [
-                        'visibility' => 'private',
-                        'admins' => ['guest2'],
-                    ],
-                    'owner2_public' => [
-                        'visibility' => 'public',
-                        'admins' => [],
+            'users' => [
+                'owner1' => [
+                    'problems' => [
+                        'owner1_private' => [
+                            'visibility' => 'private',
+                            'admins' => ['guest1'],
+                        ],
+                        'owner1_public' => [
+                            'visibility' => 'public',
+                            'admins' => [],
+                        ],
                     ],
                 ],
+                'owner2' => [
+                    'problems' => [
+                        'owner2_private' => [
+                            'visibility' => 'private',
+                            'admins' => ['guest2'],
+                        ],
+                        'owner2_public' => [
+                            'visibility' => 'public',
+                            'admins' => [],
+                        ],
+                    ],
+                ],
+                'guest1' => [
+                    'problems' => [],
+                ],
+                'guest2' => [
+                    'problems' => [],
+                ],
             ],
-            'guest1' => [
-                'problems' => [],
+            'expectedProblemsListByUserBeforeAdmins' => [
+                'guest1' => ['owner1_public', 'owner2_public'],
+                'guest2' => ['owner1_public', 'owner2_public'],
             ],
-            'guest2' => [
-                'problems' => [],
+            'expectedProblemsListByUserAfterAdmins' => [
+                'guest1' => ['owner1_private', 'owner1_public', 'owner2_public'],
+                'guest2' => ['owner1_public', 'owner2_private', 'owner2_public'],
             ],
-        ];
-
-        $guestUsers = ['guest1', 'guest2'];
-
-        $expectedProblemsBeforeAdmins = [
-            'guest1' => ['owner1_public', 'owner2_public'],
-            'guest2' => ['owner1_public', 'owner2_public'],
-        ];
-
-        $expectedProblemsAfterAdmins = [
-            'guest1' => ['owner1_private', 'owner1_public', 'owner2_public'],
-            'guest2' => ['owner1_public', 'owner2_private', 'owner2_public'],
         ];
 
         // Create all users
         $users = [];
-        foreach (array_keys($testScenario) as $userName) {
+        foreach (array_keys($testScenario['users']) as $userName) {
             ['identity' => $users[$userName]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         // Create all problems
         $problems = [];
-        foreach ($testScenario as $ownerName => $ownerData) {
+        foreach ($testScenario['users'] as $ownerName => $ownerData) {
             foreach ($ownerData['problems'] as $problemAlias => $problemData) {
                 $problems[$problemAlias] = \OmegaUp\Test\Factories\Problem::createProblem(
                     new \OmegaUp\Test\Factories\ProblemParams([
@@ -1229,42 +1227,23 @@ if __name__ == \'__main__\':
         }
 
         // Verify that each guest only sees public problems (before adding permissions)
-        foreach ($guestUsers as $guestName) {
+        $problemsByGuest = $testScenario['expectedProblemsListByUserBeforeAdmins'];
+        foreach ($problemsByGuest as $guestName => $expectedProblemsBeforeAdmins) {
             $guestLogin = self::login($users[$guestName]);
             $response = \OmegaUp\Controllers\Problem::apiList(
                 new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
             );
-            $list = array_map(
-                fn($problem) => $problem['alias'],
-                $response['results']
-            );
-
-            foreach ($testScenario as $ownerData) {
-                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
-                    $shouldSee = in_array(
-                        $problemAlias,
-                        $expectedProblemsBeforeAdmins[$guestName]
-                    );
-
-                    if ($shouldSee) {
-                        self::assertArrayContainsWithPredicate(
-                            $list,
-                            fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should see problem {$problemAlias}"
-                        );
-                    } else {
-                        self::assertArrayNotContainsWithPredicate(
-                            $list,
-                            fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should not see problem {$problemAlias}"
-                        );
-                    }
-                }
+            foreach ($expectedProblemsBeforeAdmins as $selectedProblemAlias) {
+                self::assertArrayContainsWithPredicate(
+                    $response['results'],
+                    fn(array $problem) => $problem['alias'] == $selectedProblemAlias,
+                    "{$guestName} should see problem {$selectedProblemAlias}"
+                );
             }
         }
 
         // Add admins to problems according to configuration
-        foreach ($testScenario as $ownerData) {
+        foreach ($testScenario['users'] as $ownerData) {
             foreach ($ownerData['problems'] as $problemAlias => $problemData) {
                 foreach ($problemData['admins'] as $adminName) {
                     \OmegaUp\Test\Factories\Problem::addAdminUser(
@@ -1276,37 +1255,18 @@ if __name__ == \'__main__\':
         }
 
         // Verify that each guest now sees the problems they were added to as admin
-        foreach ($guestUsers as $guestName) {
+        $problemsByGuest = $testScenario['expectedProblemsListByUserAfterAdmins'];
+        foreach ($problemsByGuest as $guestName => $expectedProblemsAfterAdmins) {
             $guestLogin = self::login($users[$guestName]);
             $response = \OmegaUp\Controllers\Problem::apiList(
                 new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
             );
-            $list = array_map(
-                fn($problem) => $problem['alias'],
-                $response['results']
-            );
-
-            foreach ($testScenario as $ownerData) {
-                foreach ($ownerData['problems'] as $problemAlias => $problemData) {
-                    $shouldSee = in_array(
-                        $problemAlias,
-                        $expectedProblemsAfterAdmins[$guestName]
-                    );
-
-                    if ($shouldSee) {
-                        self::assertArrayContainsWithPredicate(
-                            $list,
-                            fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should see problem {$problemAlias}"
-                        );
-                    } else {
-                        self::assertArrayNotContainsWithPredicate(
-                            $list,
-                            fn(string $a) => $a == $problemAlias,
-                            "{$guestName} should not see problem {$problemAlias}"
-                        );
-                    }
-                }
+            foreach ($expectedProblemsAfterAdmins as $selectedProblemAlias) {
+                self::assertArrayContainsWithPredicate(
+                    $response['results'],
+                    fn(array $problem) => $problem['alias'] == $selectedProblemAlias,
+                    "{$guestName} should see problem {$selectedProblemAlias}"
+                );
             }
         }
     }

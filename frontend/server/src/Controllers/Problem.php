@@ -2019,7 +2019,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $cacheKey = "{$identityId}-{$userId}";
 
         \OmegaUp\Cache::deleteFromCache(
-            \OmegaUp\Cache::PROBLEM_CLEAR_CACHE,
+            \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
             $cacheKey
         );
     }

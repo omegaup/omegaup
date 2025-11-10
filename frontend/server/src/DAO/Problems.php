@@ -344,7 +344,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $cacheKey = "{$identityId}-{$userKey}";
 
             $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::PROBLEM_CLEAR_CACHE,
+                \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
                 $cacheKey,
                 $callback
             );
