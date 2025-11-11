@@ -3,10 +3,22 @@
 namespace OmegaUp;
 
 use ZipArchive;
+/**
+ * @psalm-type CDPLine=array{lineID: string,caseID: string, label: string, data: array{kind: 'line'|'multiline'|'array'|'matrix', value: string}}
+ * @psalm-type CDPCase=array{caseID: string,groupID: string, lines: list<CDPLine>, points: int,autoPoints: bool,output: string,name: string}
+ * @psalm-type CDPGroup=array{groupID: string,name: string,points: int,autoPoints: bool,ungroupedCase: bool,cases: list<CDPCase>}
+ * @psalm-type CDPCasesStore=array{groups: list<CDPGroup>,selected: array{groupID: string|null, caseID: string|null},layouts: list<array<string, string>>,hide: bool}
+ * @psalm-type CDP=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore}
+ * @psalm-type CDPRaw=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore, __cases: array<string, array<string, array<string,string>>>, __testplan: string|null}
+ */
 
 class CdpBuilder {
-
-
+    /**
+     * Initialize the CDP structure for a problem.
+     *
+     * @param string $problemName The name of the problem to create.
+     * @return CDPRaw Base CDP structure with empty initial values.
+     */
     public static function initialize(string $problemName): array {
         return [
             'problemName' => $problemName,
@@ -20,26 +32,57 @@ class CdpBuilder {
         ];
     }
 
-    public static function setProblemMarkdown(array &$cdp, string $markdown): void {
+    /**
+     * Set the problem statement markdown.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     * @param string $markdown Markdown content of the problem statement.
+     * @throws \OmegaUp\Exceptions\InvalidParameterException If the statement is already set.
+     */
+    public static function setProblemMarkdown(
+        array &$cdp,
+        string $markdown
+    ): void {
         if (!empty($cdp['problemMarkdown'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidSetProblemMarkdown',
+                'parameterInvalidProblemStatementNotEmpty',
                 'statement'
             );
         }
         $cdp['problemMarkdown'] = $markdown;
     }
 
-    public static function setSolutionMarkdown(array &$cdp, string $markdown): void {
+    /**
+     * Set the problem solution markdown.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     * @param string $markdown Markdown content of the problem solution.
+     * @throws \OmegaUp\Exceptions\InvalidParameterException If the solution is already set.
+     */
+    public static function setSolutionMarkdown(
+        array &$cdp,
+        string $markdown
+    ): void {
         if (!empty($cdp['problemSolutionMarkdown'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidSetSolutionMarkdown',
+                'parameterInvalidProblemSolutionNotEmpty',
                 'solution'
             );
         }
         $cdp['problemSolutionMarkdown'] = $markdown;
     }
 
+    /**
+     * Adds a test case to the CDP under a specific group.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     * @param string $groupName Name of the group the case belongs to.
+     * @param string $caseName Name of the test case.
+     * @param string $extension File extension for input/output (e.g., "in", "out").
+     * @param string $content File content.
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException  If the case file name or extension are invalid.
+     */
     public static function addCase(
         array &$cdp,
         string $groupName,
@@ -47,24 +90,42 @@ class CdpBuilder {
         string $extension,
         string $content
     ): void {
-        \OmegaUp\Validators::validateZipCaseFileName($caseName,$extension);
-
+        \OmegaUp\Validators::validateZipCaseFileName($caseName, $extension);
 
         $cdp['__cases'][$groupName] ??= [];
         $cdp['__cases'][$groupName][$caseName] ??= [];
         $cdp['__cases'][$groupName][$caseName][$extension] = $content;
     }
 
+     /**
+     * Sets the testplan associated with the test cases.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     * @param string|null $testplan Testplan content or null if not provided.
+     */
     public static function setTestplan(array &$cdp, ?string $testplan): void {
         $cdp['__testplan'] = $testplan;
     }
 
+    /**
+     * Builds the complete structure of test cases within the CDP,
+     * generating groups, cases, and assigning points according to the testplan.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     */
     public static function buildCases(array &$cdp): void {
         $points = self::parseTestplan($cdp['__testplan']);
         $groups = self::buildCaseGroups($cdp['__cases'], $points);
         $cdp['casesStore'] = $groups;
     }
 
+    /**
+     * Converts all image references in the Markdown to Base64 format
+     * using files within a Zip archive.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to modify.
+     * @param ZipArchive $zip Zip archive containing the images.
+     */
     public static function processImages(array &$cdp, ZipArchive $zip): void {
         $cdp['problemMarkdown'] = self::convertImagesToBase64(
             $cdp['problemMarkdown'],
@@ -72,6 +133,14 @@ class CdpBuilder {
         );
     }
 
+    /**
+     * Build the CDP, removing internal properties
+     * and returning the structure ready to use.
+     *
+     * @param CDPRaw $cdp Reference to the CDP to finalize.
+     * @return CDP Final CDP structure.
+     * @throws \OmegaUp\Exceptions\InvalidParameterException If the problem statement is empty.
+     */
     public static function build(array &$cdp): array {
         if (empty($cdp['problemMarkdown'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -80,13 +149,20 @@ class CdpBuilder {
             );
         }
         unset($cdp['__cases'], $cdp['__testplan']);
+
         return $cdp;
     }
 
+    /**
+     * Parses the testplan content into an array of points per case.
+     *
+     * @param string|null $testplan Testplan content or null if not provided.
+     * @return array<string,int> Associative array where the key is the case path and the value is the points.
+     */
     private static function parseTestplan(?string $testplan): array {
         $points = [];
 
-        if ($testplan === null) {
+        if (is_null($testplan)) {
             return $points;
         }
         $lines = explode("\n", trim($testplan));
@@ -100,7 +176,17 @@ class CdpBuilder {
         return $points;
     }
 
-    private static function buildCaseGroups(array &$cases, array $points): array {
+    /**
+     * Builds case groups with their respective cases from the internal CDP data.
+     *
+     * @param array<string, array<string, array<string, string>>> $cases Cases organized by group.
+     * @param array<string,int> $points Points assigned for each case according to the testplan.
+     * @return CDPCasesStore Structure of groups and cases ready for the CDP.
+     */
+    private static function buildCaseGroups(
+        array &$cases,
+        array $points
+    ): array {
         $groups = [];
 
         foreach ($cases as $groupName => $casesInGroup) {
@@ -121,7 +207,7 @@ class CdpBuilder {
 
                 $caseID = self::generate_uuid_v4();
                 $lineID = self::generate_uuid_v4();
-                
+
                 $casePath = $groupName === 'ungrouped' ? $caseName : "$groupName.$caseName";
                 $casePoints = $points[$casePath] ?? 100;
 
@@ -151,13 +237,19 @@ class CdpBuilder {
             $groups[] = $group;
         }
 
-        $firstGroup = !empty($groups) ? $groups[0] : null;
-        $firstCase = !empty($firstGroup['cases']) ? $firstGroup['cases'][0] : null;
+        $firstGroup = $groups[0] ?? null;
+        $firstCase = null;
+
+        if (!is_null($firstGroup) && !empty($firstGroup['cases'])) {
+            $firstCase = $firstGroup['cases'][0];
+        }
 
         return [
             'groups' => $groups,
             'selected' => [
-                'groupID' => !empty($firstGroup) ? $firstGroup['groupID'] : null,
+                'groupID' => !empty(
+                    $firstGroup
+                ) ? $firstGroup['groupID'] : null,
                 'caseID' => !empty($firstCase) ? $firstCase['caseID'] : null
             ],
             'layouts' => [],
@@ -165,11 +257,17 @@ class CdpBuilder {
         ];
     }
 
+    /**
+     * Replaces image references in Markdown with Base64-encoded images.
+     *
+     * @param string $markdownContent Original Markdown content.
+     * @param ZipArchive $zip Zip archive containing the images.
+     * @return string Markdown with embedded Base64 images.
+     */
     private static function convertImagesToBase64(
         string $markdownContent,
         ZipArchive $zip
     ): string {
-
         $processedImages = [];
         $imageCounter = 0;
         $pattern = '/!\[([^\]]+)\]\(([^)]+)\)/';
@@ -181,7 +279,10 @@ class CdpBuilder {
                 $filePathInZip = $matches[2];
 
                 try {
-                    $fileContent = ZipFileProcessor::getFileContent($zip, $filePathInZip);
+                    $fileContent = ZipFileProcessor::getFileContent(
+                        $zip,
+                        $filePathInZip
+                    );
                 } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
                     return $matches[0];
                 }
@@ -216,6 +317,11 @@ class CdpBuilder {
         return "{$newMarkdown}\n\n{$base64Appendix}";
     }
 
+    /**
+     * Generates a random UUID version 4.
+     *
+     * @return string UUID v4 in standard format.
+     */
     private static function generate_uuid_v4(): string {
         $data = random_bytes(16);
         $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
@@ -223,5 +329,4 @@ class CdpBuilder {
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
-    
 }
