@@ -1303,6 +1303,7 @@ const translations: { [key: string]: string; } = {
   problemSettingsSummaryTitleWithProblemId: "(%(problem_id). %(problem_title))",
   problemSettingsSummaryTitleWithProblemsetTitleAndLetter: "(%(problemset_title) - %(letter). %(problem_title))",
   problemSolutionNotVisible: "(Y0u d0n'7 hav3 p3rmi55i0n 70 vi3w 7h3 pr0b13m'5 501u7i0n. Try 501ving 7h3 pr0b13m fir57.)",
+  problemSolutionSystemInMaintainance: "(Th3 func7i0na1i7y 70 vi3w pr0b13m 501u7i0n5 i5 und3r main73nanc3.\n\nW3 wi11 b3 back 500n.)",
   problemSuccessfullyAdded: "(Pr0b13m 5ucc355fu11y add3d)",
   problemSuccessfullyRemoved: "(Pr0b13m 5ucc355fu11y r3m0v3d)",
   problemSuccessfullyUpdated: "(Pr0b13m 5ucc355fu11y upda73d)",
