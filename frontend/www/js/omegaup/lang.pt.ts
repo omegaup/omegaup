@@ -1303,6 +1303,7 @@ const translations: { [key: string]: string; } = {
   problemSettingsSummaryTitleWithProblemId: "%(problem_id). %(problem_title)",
   problemSettingsSummaryTitleWithProblemsetTitleAndLetter: "%(problemset_title) - %(letter). %(problem_title)",
   problemSolutionNotVisible: "Voc\u00ea n\u00e3o tem permiss\u00e3o para visualizar a solu\u00e7\u00e3o do problema. Tente resolver o problema primeiro.",
+  problemSolutionSystemInMaintainance: "A funcionalidade para visualizar solu\u00e7\u00f5es de problemas est\u00e1 em manuten\u00e7\u00e3o.\n\nVoltaremos em breve.",
   problemSuccessfullyAdded: "Problema adicionado com sucesso",
   problemSuccessfullyRemoved: "Problema removido com sucesso",
   problemSuccessfullyUpdated: "Problema atualizado com sucesso",

@@ -456,6 +456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             self::convertRequestToProblemParams($r)
         );
+        self::invalidateProblemsAclCacheForIdentity($r->identity);
         return [
             'status' => 'ok',
         ];
@@ -649,6 +650,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Controllers\ACL::addUser($problem->acl_id, $user->user_id);
 
+        $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['usernameOrEmail']
+        );
+        self::invalidateProblemsAclCacheForIdentity($adminIdentity);
+
         return [
             'status' => 'ok',
         ];
@@ -692,6 +698,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
+
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
+            );
+            if (is_null($identity)) {
+                continue;
+            }
+            self::invalidateProblemsAclCacheForIdentity($identity);
+        }
 
         return ['status' => 'ok'];
     }
@@ -900,6 +919,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
+        $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['usernameOrEmail']
+        );
+        self::invalidateProblemsAclCacheForIdentity($adminIdentity);
+
         \OmegaUp\Controllers\ACL::removeUser(
             $problem->acl_id,
             $identity->user_id
@@ -946,6 +970,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Only admin is alowed to make modifications
         if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
+            );
+            if (is_null($identity)) {
+                continue;
+            }
+            self::invalidateProblemsAclCacheForIdentity($identity);
         }
 
         \OmegaUp\Controllers\ACL::removeGroup(
@@ -1971,6 +2008,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    private static function invalidateProblemsAclCacheForIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        $identityId = $identity->identity_id;
+        $userId = $identity->user_id ?? 'null';
+        $cacheKey = "{$identityId}-{$userId}";
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
+            $cacheKey
         );
     }
 
@@ -4697,7 +4747,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
-    private static function extractRequestData(\OmegaUp\Request $r): array {
+    private static function extractRequestData(\OmegaUp\Request $r) {
         return [
             'preventProblemsetOpen' => $r->ensureOptionalBool(
                 'prevent_problemset_open'
@@ -4727,7 +4777,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemBaseData(
         ?\OmegaUp\DAO\VO\Identities $identity,
-        array $requestData
+        $requestData
     ): array {
         [
             'problem' => $problem,
