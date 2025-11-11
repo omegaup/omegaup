@@ -177,6 +177,7 @@
         :users="users"
         :problem-alias="problems.length != 0 ? problems[0].alias : null"
         :username="contestAdmin && users.length != 0 ? users[0].username : null"
+        :current-user-class-name="currentUserClassName"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :show-new-clarification-popup="showNewClarificationPopup"
@@ -289,6 +290,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: false }) lockdown!: boolean;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: 'user-rank-unranked' }) currentUserClassName!: string;
 
   T = T;
   ui = ui;
