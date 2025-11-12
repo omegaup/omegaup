@@ -1,84 +1,146 @@
 #!/usr/bin/env python3
 """
-Ephemeral Runner actualizado - funcionando correctamente
+Ephemeral Runner - Updated and working correctly
 """
 
-import hashlib
+import re
+import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import requests
 
-from token_utils import get_token, parse_token_from_args, parse_url_from_args
+from token_utils import parse_url_from_args
+
+
+def parse_demo_flag() -> bool:
+    """Parse --demo flag from arguments."""
+    return '--demo' in sys.argv
 
 
 class EphemeralRunner:
-    """Runner para ejecutar código en modo ephemeral sin rastros en DB"""
-    def __init__(self, token: Optional[str] = None,
-                 base_url: Optional[str] = None) -> None:
+    """Runner for executing code in ephemeral mode without DB traces"""
+    def __init__(self, base_url: Optional[str] = None) -> None:
         self.base_url = base_url or 'http://localhost:8001'
-        self.token = get_token(token)
-        print(f"🌐 Usando servidor: {self.base_url}")
+        print(f"🌐 Using server: {self.base_url}")
+        print("🔓 Ephemeral mode: No authentication required")
 
     def get_aliases_file(self) -> str:
-        """Determinar qué archivo de aliases usar según la URL"""
+        """Determine which aliases file to use based on URL"""
         if 'omegaup.com' in self.base_url:
             return 'stuff/prod_test_aliases.txt'
         return 'stuff/aliases.txt'
 
     def load_solution(self, problem_alias: str) -> Optional[str]:
-        """Cargar solución desde archivo"""
+        """Load solution from file"""
         solution_path = Path(f'solutions/{problem_alias}.py')
 
         if not solution_path.exists():
-            print(f"❌ No se encuentra solución: {solution_path}")
+            print(f"❌ Solution not found: {solution_path}")
             return None
 
         solution_code = solution_path.read_text(encoding='utf-8')
-        print(f"✅ Solución cargada: {len(solution_code)} caracteres")
+        print(f"✅ Solution loaded: {len(solution_code)} characters")
         return solution_code
 
     def get_problem_details(
         self,
         problem_alias: str) -> Optional[Dict[str, Any]]:
-        """Obtener detalles del problema desde la API"""
+        """Get problem details from API"""
         try:
             session = requests.Session()
-            # No enviar token/cookies para consultas públicas
+            # Don't send token/cookies for public queries
             url = f"{self.base_url}/api/problem/details/"
             response = session.get(url,
                                    params={'problem_alias': problem_alias},
                                    timeout=10)
 
             if response.status_code == 200:
-                # Mostrar hash corto y conteo de casos para comprobar cambios
+                # Show short hash and case count to verify changes
                 try:
-                    text = response.text
-                    hash_short = hashlib.md5(
-                        text.encode('utf-8')).hexdigest()[:8]
                     data = cast(Dict[str, Any], response.json())
-                    cases = data.get('settings', {}).get('cases', {})
-                    cases_count = len(cases) if isinstance(cases, dict) else 0
                 except (ValueError, KeyError, TypeError):
-                    hash_short = '????????'
-                    cases_count = 0
+                    data = {}
                     data = None
 
-                print(f"   📡 details: alias={problem_alias}, "
-                      f"md5={hash_short}, cases={cases_count}")
                 return data
-            print(f"   ⚠️  Error obteniendo detalles del problema: "
-                  f"{response.status_code}")
             return None
-        except (requests.RequestException, ConnectionError) as e:
-            print(f"   ⚠️  Error conectando con API: {e}")
+        except (requests.RequestException, ConnectionError):
             return None
+
+    def _parse_judge_response(self, response_text: str) -> (
+            Optional[Dict[str, Any]]):
+        """Parse multipart judge response to extract verdict."""
+        try:
+            # Ephemeral response is multipart/form-data with status updates
+            # Look for latest status and verdict information
+
+            verdict = 'Unknown'
+            score = 0.0
+
+            # Look for status updates in multipart response
+            if 'running' in response_text:
+                verdict = 'Running/Completed'
+            elif 'queueing' in response_text:
+                verdict = 'Queued'
+            elif 'waiting' in response_text:
+                verdict = 'Waiting'
+
+            # Look for verdict information in response
+            if 'AC\n' in response_text:
+                verdict = 'AC'
+                score = 1.0
+            elif 'WA\n' in response_text:
+                verdict = 'WA'
+            elif 'RTE\n' in response_text:
+                verdict = 'RTE'
+            elif 'TLE\n' in response_text:
+                verdict = 'TLE'
+            elif 'MLE\n' in response_text:
+                verdict = 'MLE'
+
+            # Extract time and memory if available
+            time_used = 'N/A'
+            memory_used = 'N/A'
+
+            # Look for time/memory patterns in response
+            time_match = re.search(r'time:\s*([0-9.]+)', response_text)
+            if time_match:
+                time_used = f"{time_match.group(1)}s"
+
+            memory_match = re.search(r'memory:\s*([0-9]+)', response_text)
+            if memory_match:
+                memory_used = f"{int(memory_match.group(1))/1024/1024:.2f}MB"
+
+            return {
+                'verdict': verdict,
+                'score': score,
+                'time': time_used,
+                'memory': memory_used,
+                'groups': [],
+                'raw_response': (response_text[:300] + '...'
+                                 if len(response_text) > 300
+                                 else response_text)
+            }
+
+        except (ValueError, KeyError, TypeError, AttributeError):
+            # If any error occurs, return basic information
+            return {
+                'verdict': 'Executed',
+                'score': 0,
+                'time': 'N/A',
+                'memory': 'N/A',
+                'groups': [],
+                'raw_response': (response_text[:200] + '...'
+                                 if len(response_text) > 200
+                                 else response_text)
+            }
 
     def _build_request_data(self, problem_settings: Optional[Dict[str, Any]],
                             source_code: str, language: str) -> Dict[str, Any]:
-        """Construir datos del request usando detalles del problema"""
-        # Construir casos
+        """Build request data using problem details"""
+        # Build cases
         if problem_settings and 'cases' in problem_settings:
             cases = problem_settings['cases']
             sample_case = list(cases.values())[0] if cases else {}
@@ -90,7 +152,7 @@ class EphemeralRunner:
             sample_output = "3\n"
             sample_weight = 1
 
-        # Obtener límites
+        # Get limits
         if problem_settings and 'limits' in problem_settings:
             limits = problem_settings['limits']
             time_limit = limits.get('TimeLimit', '1s')
@@ -105,7 +167,7 @@ class EphemeralRunner:
             overall_wall_time = '1s'
             extra_wall_time = '0s'
 
-        # Obtener validador
+        # Get validator
         if problem_settings and 'validator' in problem_settings:
             validator = problem_settings['validator']
         else:
@@ -136,32 +198,26 @@ class EphemeralRunner:
     def run_ephemeral(self, problem_alias: str,
                       source_code: Optional[str] = None,
                       language: str = 'py3') -> Dict[str, Any]:
-        """Ejecutar código usando el endpoint ephemeral (sin rastros en DB)"""
+        """Execute code using ephemeral endpoint (no DB traces)"""
 
         if source_code is None:
             source_code = self.load_solution(problem_alias)
             if source_code is None:
                 return {'success': False,
-                        'error': 'No se pudo cargar la solución'}
+                        'error': 'Could not load solution'}
 
-        print(f"\n🚀 Ejecutando ephemeral: {problem_alias} ({language})")
-        print("   🎯 Sin rastros en base de datos")
-
-        # Obtener detalles del problema desde la API
-        print("   📡 Obteniendo detalles del problema...")
+        # Get problem details from API
         problem_details = self.get_problem_details(problem_alias)
 
         if not problem_details:
-            print("   ⚠️  Usando valores por defecto")
             problem_settings = None
         else:
             problem_settings = problem_details.get('settings', {})
-            print("   ✅ Detalles del problema obtenidos")
 
         try:
-            # Configurar sesión (no enviar token/cookies)
+            # Configure session (don't send token/cookies)
             session = requests.Session()
-            # Headers básicos
+            # Basic headers
             session.headers.update({
                 'Content-Type': 'application/json',
                 'User-Agent': 'omegaup-ephemeral-runner/1.0',
@@ -169,13 +225,15 @@ class EphemeralRunner:
                 'Referer': f'{self.base_url}/grader/ephemeral/'
             })
 
-            # Usar método auxiliar para construir datos del request
+            # Use helper method to build request data
             request_data = self._build_request_data(
                 problem_settings, source_code, language)
 
             url = f"{self.base_url}/grader/ephemeral/run/new/"
 
-            # Enviar como JSON
+            print(f"🚀 Running ephemeral: {problem_alias} ({language})", end="")
+
+            # Send as JSON
             response = session.post(url, json=request_data, timeout=30)
 
             if response.status_code == 200:
@@ -183,14 +241,28 @@ class EphemeralRunner:
                 ephemeral_token = response.headers.get(
                     'X-Omegaup-Ephemeraltoken', '')
                 success = bool(ephemeral_token)
+
+                # Parse judge response if available
+                judge_result = self._parse_judge_response(response_text)
+
+                # Show verdict immediately
+                if judge_result:
+                    verdict = judge_result['verdict']
+                    score = judge_result['score']
+                    print(f" → {verdict} (Score: {score})")
+                else:
+                    print(" → Executed")
+
                 return {
                     'success': success,
                     'response': response_text,
                     'status_code': response.status_code,
                     'ephemeral_token': ephemeral_token,
-                    'problem_alias': problem_alias
+                    'problem_alias': problem_alias,
+                    'judge_result': judge_result
                 }
 
+            print(f" → Error HTTP {response.status_code}")
             return {
                 'success': False,
                 'error': f"HTTP {response.status_code}",
@@ -198,7 +270,7 @@ class EphemeralRunner:
             }
 
         except (requests.RequestException, ConnectionError) as e:
-            print(f"   ❌ Error de conexión: {e}")
+            print(f" → Error: {e}")
             return {
                 'success': False,
                 'error': str(e)
@@ -207,10 +279,7 @@ class EphemeralRunner:
     def run_batch_ephemeral(self,
                             problems: List[Dict[str, Any]]
                             ) -> List[Dict[str, Any]]:
-        """Ejecutar múltiples problemas en modo ephemeral"""
-
-        print(f"🎯 Ejecutando batch ephemeral: {len(problems)} problemas")
-        print("   💡 Ideal para problemsetters - sin rastros en DB")
+        """Execute multiple problems in ephemeral mode"""
 
         results = []
 
@@ -227,82 +296,80 @@ class EphemeralRunner:
                 'result': result
             })
 
-            # Pausa pequeña entre ejecuciones
+            # Small pause between executions
             time.sleep(0.5)
 
-        # Resumen
+        # Simplified summary
         successful = sum(1 for r in results if r['success'])
-        print("\n📊 Resumen batch ephemeral:")
-        print(f"   ✅ Exitosas: {successful}/{len(problems)}")
-        print(f"   ❌ Fallidas: {len(problems) - successful}/{len(problems)}")
-        print("   🎯 Todas las ejecuciones sin rastros en DB")
+        print(f"\n📊 Summary: {successful}/{len(problems)} successful | "
+              "No DB traces")
 
         return results
 
 
 def main() -> None:
-    """Función principal - ejemplos de uso"""
+    """Main function - usage examples"""
 
-    # Obtener token y URL desde argumentos o archivo
-    provided_token = parse_token_from_args()
+    # Get URL and demo flag from arguments
     provided_url = parse_url_from_args()
-    runner = EphemeralRunner(provided_token, provided_url)
+    demo_mode = parse_demo_flag()
+    runner = EphemeralRunner(provided_url)
 
-    # Determinar qué archivo de aliases usar
+    # Determine which aliases file to use
+    # Constant for number of aliases to test
+    max_test_aliases = 2
+
     aliases_file = runner.get_aliases_file()
-    print(f"📁 Usando archivo de aliases: {aliases_file}")
+    print(f"📁 Using aliases file: {aliases_file}")
 
-    # Cargar algunos aliases del archivo correspondiente
+    # Load some aliases from corresponding file
     try:
         with open(aliases_file, 'r', encoding='utf-8') as f:
-            # Tomar los primeros 3
+            # Take first max_test_aliases
             aliases = [line.strip() for line in f.readlines()
-                       if line.strip()][:3]
+                       if line.strip()][:max_test_aliases]
 
         if not aliases:
-            print(f"⚠️  No se encontraron aliases en {aliases_file}, "
-                  "usando valores por defecto")
+            print(f"⚠️  No aliases found in {aliases_file}, "
+                  "using default values")
             aliases = ['sumas']  # Fallback
 
-        print(f"🎯 Aliases a probar: {aliases}")
+        if demo_mode:
+            print(f"🎯 Demo mode: testing only '{aliases[0]}'")
+        else:
+            print(f"🎯 Aliases to test: {aliases}")
 
     except FileNotFoundError:
-        print(f"⚠️  Archivo {aliases_file} no encontrado, "
-              "usando alias por defecto")
+        print(f"⚠️  File {aliases_file} not found, "
+              "using default alias")
         aliases = ['sumas']  # Fallback
 
-    # Test individual con el primer alias
-    first_alias = aliases[0]
-    print(f"\n🧪 Test ephemeral individual con: {first_alias}")
-    result = runner.run_ephemeral(
-        problem_alias=first_alias,
-        source_code='a, b = map(int, input().split())\nprint(a + b)',
-        language='py3'
-    )
+    if demo_mode:
+        # Demo mode: single individual test to demonstrate functionality
+        first_alias = aliases[0]
+        print(f"\n🧪 Individual ephemeral test (demo mode) with: {first_alias}")
+        runner.run_ephemeral(
+            problem_alias=first_alias,
+            source_code='a, b = map(int, input().split())\nprint(a + b)',
+            language='py3'
+        )
 
-    if result['success']:
-        print(f"✅ Ephemeral exitoso para '{first_alias}'")
+        # Result already shown inline during execution
+
+        print("\n💡 Demo mode completed. Use without --demo to process "
+              "all aliases.")
     else:
-        print(f"❌ Error en ephemeral: {result.get('error')}")
+        # Normal mode: run all aliases in batch
+        problems = []
 
-    # Test batch con los aliases disponibles
-    print("\n🧪 Test batch ephemeral con aliases reales:")
-    problems = []
+        for alias in aliases:
+            problems.append({
+                'alias': alias,
+                'source': 'a, b = map(int, input().split())\nprint(a + b)',
+                'language': 'py3'
+            })
 
-    for alias in aliases[:2]:  # Solo los primeros 2 para no sobrecargar
-        problems.append({
-            'alias': alias,
-            'source': 'a, b = map(int, input().split())\nprint(a + b)',
-            'language': 'py3'
-        })
-
-    runner.run_batch_ephemeral(problems)
-
-    print("\n🎯 Ephemeral runner listo para problemsetters!")
-    print("   💡 Ejecuta código sin dejar rastros en la base de datos")
-    print("   🚀 Perfecto para probar soluciones durante "
-          "desarrollo de problemas")
-    print(f"   📁 Usando aliases de: {aliases_file}")
+        runner.run_batch_ephemeral(problems)
 
 
 if __name__ == "__main__":

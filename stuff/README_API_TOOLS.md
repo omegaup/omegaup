@@ -7,7 +7,7 @@ Este directorio contiene herramientas para interactuar con endpoints alternativo
 ### ✅ `bulk_submit.py`
 **Sistema de Submissions Estándar**
 - **Endpoint**: `/api/run/create/`
-- **Propósito**: Submissions que **SÍ** se guardan en base de datos
+- **Purpose**: Submissions that **ARE** saved to database
 - **Autenticación**: Authorization header con token
 - **Características**:
   - Submissions reales con veredictos AC/WA/TLE
@@ -21,9 +21,9 @@ python3 bulk_submit.py
 ```
 
 ### ✅ `ephemeral_runner.py`
-**Sistema Ephemeral (Sin Rastros)**
+**Ephemeral System (No Traces)**
 - **Endpoint**: `/grader/ephemeral/run/new/`
-- **Propósito**: Ejecuciones **SIN rastros** en base de datos
+- **Purpose**: Executions **WITHOUT traces** in database
 - **Autenticación**: Cookie `ouat` con token
 - **Características**:
   - Ideal para problemsetters
@@ -52,7 +52,7 @@ Los scripts requieren un token de API válido de omegaUp. El token se maneja aut
 #### Opción 1: Parámetro de línea de comandos
 ```bash
 python3 bulk_submit.py aliases.txt solution.py --token tu_token_aqui
-python3 ephemeral_runner.py -t tu_token_aqui
+python3 ephemeral_runner.py -t your_token_here
 ```
 
 #### Opción 2: Archivo .token (recomendado)
@@ -64,22 +64,22 @@ python3 bulk_submit.py aliases.txt solution.py
 #### Opción 3: Input interactivo
 ```bash
 python3 ephemeral_runner.py
-# Se solicitará el token por teclado y se guardará en .token
+# Token will be prompted via keyboard and saved to .token
 ```
 
-### Obtener tu token:
-Puedes generar un token en: https://omegaup.com/profile/edit/#api-tokens
+### Get your token:
+You can generate a token at: https://omegaup.com/profile/edit/#api-tokens
 
-## 🎯 Casos de Uso
+## 🎯 Use Cases
 
-| Caso | Herramienta | Rastros DB | Ideal Para |
-|------|-------------|------------|-------------|
-| **Submissions Reales** | `bulk_submit.py` | ✅ SÍ | Usuarios normales, testing de verdaderos submissions |
-| **Testing Privado** | `ephemeral_runner.py` | ❌ NO | Testing sin afectar estadísticas |
+| Case | Tool | DB Traces | Ideal For |
+|------|------|-----------|-----------|
+| **Real Submissions** | `bulk_submit.py` | ✅ YES | Normal users, testing real submissions |
+| **Private Testing** | `ephemeral_runner.py` | ❌ NO | Testing without affecting statistics |
 
-## 🚀 Diferencias Técnicas
+## 🚀 Technical Differences
 
-### Submissions Estándar
+### Standard Submissions
 ```json
 {
   "problem_alias": "sumas",
@@ -104,7 +104,7 @@ Puedes generar un token en: https://omegaup.com/profile/edit/#api-tokens
 ## 📊 Resultados de Testing
 
 - **Bulk Submissions**: ✅ 4/4 exitosas (100% AC)
-- **Ephemeral Runner**: ✅ 2/2 exitosas (100% success)
+- **Ephemeral Runner**: ✅ 2/2 successful (100% success)
 - **Nginx**: ✅ Rutas corregidas y funcionales
 - **Autenticación**: ✅ Ambos métodos funcionando
 
