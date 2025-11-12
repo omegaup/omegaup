@@ -1,6 +1,8 @@
 <?php
 
 define('OMEGAUP_ROOT', dirname(__DIR__, 2));
+define('GITHUB_BASE_URL', 'https://github.com/omegaup/omegaup/blob/main');
+
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 $rootLogger = new \Monolog\Logger('omegaup');
@@ -1214,6 +1216,30 @@ EOD;
         }
     }
 
+    public function generateControllersDoc(): void {
+        $readmeUrl = GITHUB_BASE_URL . '/frontend/server/src/Controllers/README.md';
+        echo "## API Controllers\n\n";
+        echo "For more information about the API controllers, please refer to the [Controllers README]({$readmeUrl}).\n\n";
+        echo "### Index\n\n";
+        ksort($this->controllers);
+        foreach ($this->controllers as $controller) {
+            echo (
+                "- [{$controller->classBasename}]({$readmeUrl}#" .
+                strtolower($controller->classBasename) .
+                ")\n"
+            );
+            ksort($controller->methods);
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo (
+                    "  - [`/api/{$controller->apiName}/{$apiMethodName}/`]({$readmeUrl}#" .
+                    strtolower("api{$controller->apiName}{$apiMethodName}") .
+                    ")\n"
+                );
+            }
+        }
+        echo "\n";
+    }
+
     public function generatePythonApi(): void {
         echo "\"\"\"A Python implementation of an omegaUp API client.\n";
         echo "\n";
@@ -1622,6 +1648,8 @@ if ($options['file'] == 'api_types.ts') {
     $apiGenerator->generateDocumentation();
 } elseif ($options['file'] == 'api.py') {
     $apiGenerator->generatePythonApi();
+} elseif ($options['file'] == 'Controllers.md') {
+    $apiGenerator->generateControllersDoc();
 } else {
     throw new \Exception("Invalid option for --file: {$options['file']}");
 }
