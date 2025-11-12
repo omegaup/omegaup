@@ -72,7 +72,7 @@ def _safe_load_yaml(path: str) -> Dict[str, Any]:
 
 
 def _extract_counts(raw: Dict[str, Any], env_name: str) -> Dict[str, int]:
-    """Extract counts from environment/environtment or legacy root-level."""
+    """Extract counts from environment or legacy root-level."""
     environments = raw.get("environment") or raw.get("environtment") or {}
     if isinstance(environments, dict):
         env_block = environments.get(env_name) or {}
