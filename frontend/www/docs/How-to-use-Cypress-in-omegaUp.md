@@ -75,13 +75,36 @@ You need to install the dependency:
 sudo apt-get install libasound2
 ```
 
+If you are using Ubuntu 24.04 or a newer version, install the required dependency with:
+```bash
+sudo apt install libasound2t64
+```
+
+**Note:** If you encounter any unexpected errors, try running:
+```bash
+sudo apt update
+```
+and then try the process again.
+
 ## Introduction
 **Note:** Currently, tests are run outside of the Docker container.
 
 Everything related to Cypress is located inside the `./cypress` folder at the root directory.
 
 ## GUI
-To run the Cypress GUI (which is great), use `npx cypress run` `./node_modules/.bin/cypress open`. This will open a screen with all available tests.
+To run Cypress, use one of the following commands:
+
+- To run the tests from the command line:
+  ```bash
+  npx cypress run
+  ```
+- To open the Cypress GUI:
+  ```bash
+  npx cypress open
+  # or
+  ./node_modules/.bin/cypress open
+  ```
+The GUI will open a window listing all available tests.
 
 ![image](https://github.com/user-attachments/assets/a3bf6b11-0e9a-4290-b5e5-fec6884be3e7)
 

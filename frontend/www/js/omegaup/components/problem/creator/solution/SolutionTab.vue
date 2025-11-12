@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <div
             ref="markdownButtonBar"
             class="wmd-button-bar"
@@ -15,7 +15,7 @@
             class="wmd-input"
           ></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <omegaup-markdown
             data-problem-creator-solution-previewer-markdown
             :markdown="
@@ -168,5 +168,26 @@ export default class SolutionTab extends Vue {
 .wmd-preview,
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
+}
+
+.row {
+  .wmd-button-bar {
+    flex-shrink: 0;
+  }
+
+  .wmd-input {
+    flex: 1;
+    min-height: 400px;
+    height: auto !important;
+    resize: vertical;
+  }
+
+  [data-problem-creator-solution-previewer-markdown] {
+    flex: 1;
+    min-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--markdown-preview-border-color);
+    padding: 10px;
+  }
 }
 </style>

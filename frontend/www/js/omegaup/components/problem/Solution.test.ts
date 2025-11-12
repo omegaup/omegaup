@@ -13,6 +13,7 @@ describe('Solution.vue', () => {
         status: 'locked',
         availableTokens: 0,
         allTokens: 0,
+        isDisabled: false,
       },
     });
 
@@ -26,6 +27,7 @@ describe('Solution.vue', () => {
         status: 'unlocked',
         availableTokens: 0,
         allTokens: 0,
+        isDisabled: false,
       },
     });
 
@@ -42,6 +44,7 @@ describe('Solution.vue', () => {
         status: 'unlocked',
         availableTokens: 0,
         allTokens: 0,
+        isDisabled: false,
       },
     });
 
@@ -67,6 +70,7 @@ Here we can add code.
         status: 'unlocked',
         availableTokens: 0,
         allTokens: 0,
+        isDisabled: false,
       },
     });
 
@@ -103,6 +107,7 @@ Here we can add code.
         status: 'unlocked',
         availableTokens: 0,
         allTokens: 0,
+        isDisabled: false,
       },
     });
 

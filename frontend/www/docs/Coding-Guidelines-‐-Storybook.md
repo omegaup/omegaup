@@ -1,43 +1,42 @@
-## Qué es storybook?
+## What is Storybook?
 
-Storybook es una herramienta de desarrollo de componentes web que proporciona un entorno interactivo para desarrollar, probar y documentar componentes de interfaz de usuario de forma aislada. Permite a los desarrolladores crear y visualizar los diferentes estados y variaciones de sus componentes de manera fácil y rápida.
+Storybook is a web component development tool that provides an interactive environment to develop, test, and document user interface components in isolation. It allows developers to create and visualize the different states and variations of their components easily and quickly.
 
-Al utilizar Storybook, los desarrolladores pueden separar el desarrollo de componentes de la lógica de la aplicación principal. Esto facilita la re-utilización de componentes, mejora la colaboración entre equipos y permite una mayor eficiencia en el desarrollo.
+By using Storybook, developers can separate component development from the main application logic. This facilitates component re-use, improves collaboration between teams, and allows for greater efficiency in development.
 
-Storybook ayuda a mejorar la calidad del código y la experiencia de usuario al proporcionar una forma sencilla de visualizar y probar los componentes en diferentes situaciones y estados. Además, facilita la documentación de los componentes al permitir incluir ejemplos interactivos, descripciones y notas adicionales.
+Storybook helps improve code quality and user experience by providing a simple way to visualize and test components in different situations and states. Additionally, it facilitates component documentation by allowing the inclusion of interactive examples, descriptions, and additional notes.
 
-En resumen, Storybook es una herramienta fundamental para el desarrollo de componentes web, ya que agiliza el proceso de desarrollo, mejora la colaboración entre equipos y garantiza la consistencia y calidad de los componentes.
+In summary, Storybook is a fundamental tool for web component development, as it streamlines the development process, improves collaboration between teams, and guarantees the consistency and quality of the components.
 
-## Como funciona storybook
+## How Storybook Works
 
-En OmegaUp, tenemos un script disponible para correr storybook (no es necesario levantar docker):
+At OmegaUp, we have a script available to run Storybook (it is not necessary to spin up Docker):
 
-```jsx
+```bash
 $ yarn storybook
 ```
+This will spin up the collection of available stories in our component library and launch a dashboard at ```localhost:6006``` or ```(http://localhost:6006)``` where we can consult each one of them.
 
-Esto levantará la colección de `stories` disponibles en nuestra biblioteca de componentes y lanzará un dashboard en `[localhost:6006](http://localhost:6006)` donde podremos consultar cada una de ellas.
+## Adding Stories to the Library
+- Inside the folder of the component you are working on, you must create a file COMPONENT.stories.ts, replacing COMPONENT with the name of the component. For example, if you have a Badge component, create a file called Badge.stories.ts.
 
-## Agregando Stories a la biblioteca
+- In each story file, import the Vue component and define a function that renders the component with different props and states to show the component's variations.
 
-1. Dentro de la carpeta del componente que estés trabajando, debes crear un archivo `COMPONENT.stories.ts` reemplazando `COMPONENT` por el nombre del componente. Por ejemplo, si tienes un componente `Badge`, crea un archivo llamado `Badge.stories.ts`.
-2. En cada archivo de historia, importa el componente Vue y define una función que renderice el componente con diferentes props y estados para mostrar las variaciones del componente.
-3. Ejecuta el comando `npm run storybook` en tu proyecto para iniciar el servidor de Storybook y ver las historias de tus componentes Vue existentes.
+- Run the npm run storybook command in your project to start the Storybook server and see the stories for your existing Vue components.
 
-¡Y eso es todo! Ahora puedes agregar historias a tus componentes Vue existentes en Storybook y visualizar y probar sus diferentes estados y variaciones de manera interactiva.
+And that's it! Now you can add stories to your existing Vue components in Storybook and visualize and test their different states and variations interactively.
 
-Ejemplo:
-
-```tsx
+## Example
+```typescript
 import { StoryObj, Meta } from '@storybook/vue';
 import Badge from 'Badge.vue';
 
 const meta: Meta<typeof Badge> = {
 	component: Badge,
 	
-	// argTypes define un objeto de propiedades que el componente espera
-	// y permite agregar controles dinámicos que serán presentados en el dashboard
-	// para agregar información dinámicamente
+	// argTypes defines an object of properties that the component expects
+	// and allows adding dynamic controls that will be presented on the dashboard
+	// to add information dynamically
 	argTypes: {},
 };
 
@@ -46,26 +45,25 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const MyStory: Story = {
-	// args define un objeto de props que son pasadas al componente
+	// args defines an object of props that are passed to the component
 	args: {
 		badge_alias: '100solvedProblems',
 		unlocked: true,
 	},
 
-	// En caso de que necesitemos hacer algun custom template con nuestro componente
-	// podemos utilizar la función render y sobre-escribir el meta object.
+	// In case we need to make a custom template with our component
+	// we can use the render function and overwrite the meta object.
 	/*
 	* render: (args, { argTypes }) => ({
-	*   components: { Badge },
-	*   template: '<Badge :badge="$props" />'
-	*  }),
+	*  	components: { Badge },
+	*  	template: '<Badge :badge="$props" />'
+	*  }),
 	*/
 };
 
-// Nombre con el que será presentado el componente en el dashboard
+// Name with which the component will be presented on the dashboard
 MyStory.storyName = 'My Awesome Story';
 ```
 
-### Referencia
-
-[Documentación Storybook](https://storybook.js.org/docs/vue/writing-stories/introduction)
+## Reference
+[Storybook Documentation](https://storybook.js.org/docs/vue/writing-stories/introduction)

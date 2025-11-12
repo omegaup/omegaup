@@ -71,3 +71,35 @@ selected_tags:
 
 paths:
   - test_zip: "frontend/tests/resources/testproblem.zip"
+
+resource_checks:
+  - create: user_create
+    check_api: "/user/profile/"
+    params_map:
+      username: username
+
+  - create: identity_create
+    check_api: "/user/profile/"
+    params_map:
+      username: username
+
+  - create: problem_create
+    check_api: "/problem/details/"
+    params_map:
+      problem_alias: problem_alias
+
+  - create: contest_create
+    check_api: "/contest/adminDetails/"
+    params_map:
+      contest_alias: alias
+
+  - create: course_create
+    check_api: "/course/adminDetails/"
+    params_map:
+      alias: alias
+
+  - create: course_createassignment
+    check_api: "/course/assignmentDetails/"
+    params_map:
+      course: course_alias
+      assignment: alias
