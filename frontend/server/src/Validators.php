@@ -767,16 +767,15 @@ class Validators {
     /**
      * Check that the ZIP file was uploaded correctly and return its info.
      *
-     * @psalm-suppress Superglobals
-     * @return array{name: string, tmp_name: string}
+     * @return array{problemName: string, tmpFilePath: string}
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function validateZipUploadedFile(): array {
         if (
             !isset(
-                $_FILES['zipFile']
-            ) || $_FILES['zipFile']['error'] !== UPLOAD_ERR_OK || !is_uploaded_file(
-                $_FILES['zipFile']['tmp_name']
+                $_FILES['zipFile']['error'],
+                $_FILES['zipFile']['tmp_name'],
+                $_FILES['zipFile']['name']
             )
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -784,12 +783,23 @@ class Validators {
                 'zipFile'
             );
         }
+
+        $file = $_FILES['zipFile'];
+
+        if (
+            $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file(
+                $file['tmp_name']
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidValidZipUpload',
+                'zipFile'
+            );
+        }
+
         return [
-            'problemName' => pathinfo(
-                $_FILES['zipFile']['name'],
-                PATHINFO_FILENAME
-            ),
-            'tmpFilePath' => $_FILES['zipFile']['tmp_name'],
+            'problemName' => pathinfo($file['name'], PATHINFO_FILENAME),
+            'tmpFilePath' => $file['tmp_name']
         ];
     }
 

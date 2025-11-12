@@ -9,7 +9,7 @@ use ZipArchive;
  * @psalm-type CDPGroup=array{groupID: string,name: string,points: int,autoPoints: bool,ungroupedCase: bool,cases: list<CDPCase>}
  * @psalm-type CDPCasesStore=array{groups: list<CDPGroup>,selected: array{groupID: string|null, caseID: string|null},layouts: list<array<string, string>>,hide: bool}
  * @psalm-type CDP=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore}
- * @psalm-type CDPRaw=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore, __cases: array<string, array<string, array<string,string>>>, __testplan: string|null}
+ * @psalm-type CDPRaw=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore|array<empty, empty>, __cases: array<string, array<string, array<string,string>>>|array<empty, empty>, __testplan: string|null}
  */
 
 class CdpBuilder {
@@ -138,7 +138,9 @@ class CdpBuilder {
      * and returning the structure ready to use.
      *
      * @param CDPRaw $cdp Reference to the CDP to finalize.
+     * @param-out CDP $cdp
      * @return CDP Final CDP structure.
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException If the problem statement is empty.
      */
     public static function build(array &$cdp): array {
@@ -149,7 +151,10 @@ class CdpBuilder {
             );
         }
         unset($cdp['__cases'], $cdp['__testplan']);
-
+        /**
+         * @var CDP
+         * @psalm-suppress ReferenceConstraintViolation
+         */
         return $cdp;
     }
 
