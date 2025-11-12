@@ -599,7 +599,7 @@ class ProblemDeployer {
      * @param string $currentZipPath
      * @param array<string> $pathsToExclude
      * @param array<string, string> $filesToAdd
-     * @param array<string, string> $pathsToRenam
+     * @param array<string, string> $pathsToRename
      *
      * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
      */
