@@ -611,6 +611,13 @@ class ProblemDeployer {
         array $filesToAdd,
         array $pathsToRename = []
     ): void {
+        if (!file_exists($currentZipPath)) {
+            throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerInternalError',
+                'Current zip file does not exist'
+            );
+        }
+
         $tmpfile = tmpfile();
         try {
             $zipPath = stream_get_meta_data($tmpfile)['uri'];
@@ -666,9 +673,12 @@ class ProblemDeployer {
                 }
 
                 $contents = $currentZip->getFromIndex($i);
-                if ($contents !== false) {
-                    $zipArchive->addFromString($newFilename, $contents);
+                if ($contents === false) {
+                    $this->log->warning("Could not read file: {$filename}");
+                    continue;
                 }
+
+                $zipArchive->addFromString($newFilename, $contents);
             }
             $currentZip->close();
 
