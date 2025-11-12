@@ -5,8 +5,9 @@ Utilidad para manejo de tokens de omegaUp
 
 import sys
 from pathlib import Path
+from typing import Optional
 
-def get_token(provided_token=None):
+def get_token(provided_token: Optional[str] = None):
     """
     Obtener token de API de omegaUp con la siguiente prioridad:
     1. Token proporcionado como parámetro
@@ -74,7 +75,7 @@ def parse_token_from_args():
     
     return None
 
-def parse_url_from_args():
+def parse_url_from_args() -> Optional[str]:
     """
     Parsear URL base desde argumentos de línea de comandos
     
@@ -85,12 +86,12 @@ def parse_url_from_args():
     Returns:
         str or None: URL si se proporcionó en argumentos
     """
-    
+
     if len(sys.argv) >= 3:
         for i, arg in enumerate(sys.argv[1:], 1):
             if arg in ['--url', '-u'] and i + 1 < len(sys.argv):
                 return sys.argv[i + 1]
-    
+
     return None
 
 if __name__ == "__main__":
