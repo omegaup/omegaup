@@ -604,7 +604,7 @@ export default class Sidebar extends Vue {
       const group = this.groups.find(
         (g) => g.groupID === this.confirmingDelete.groupID,
       );
-      return `grupo: ${group?.name || this.confirmingDelete.groupID}`;
+      return `${T.wordsGroup}: ${group?.name || this.confirmingDelete.groupID}`;
     } else {
       const group = this.groups.find(
         (g) => g.groupID === this.confirmingDelete.groupID,
@@ -612,7 +612,7 @@ export default class Sidebar extends Vue {
       const caseItem = group?.cases.find(
         (c) => c.caseID === this.confirmingDelete.caseID,
       );
-      return `caso: ${group?.name || ''}.${
+      return `${T.wordsCase}: ${group?.name || ''}.${
         caseItem?.name || this.confirmingDelete.caseID
       }`;
     }
@@ -656,7 +656,6 @@ export default class Sidebar extends Vue {
   }
   shouldSubmitForm = false;
   handleModalOk(groupID: string) {
-    console.log('aqui andamos');
     this.updateGroupInfo(groupID);
 
     this.shouldSubmitForm = true;

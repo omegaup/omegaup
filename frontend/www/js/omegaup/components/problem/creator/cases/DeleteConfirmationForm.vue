@@ -7,7 +7,6 @@
           <input v-model="commitMessage" class="form-control" />
         </div>
 
-        <!-- Campos ocultos del formulario -->
         <input type="hidden" name="request" value="deleteGroupCase" />
         <input type="hidden" name="problem_alias" :value="alias" />
         <input type="hidden" name="message" :value="commitMessage" />
@@ -19,11 +18,11 @@
             type="submit"
             :disabled="commitMessage === ''"
           >
-            {{ 'Confirmar eliminación' }}
+            {{ T.problemEditConfirmDeletion }}
           </button>
 
           <button class="btn btn-secondary" type="button" @click="handleCancel">
-            {{ 'Cancelar' }}
+            {{ T.wordsCancel }}
           </button>
         </div>
       </div>
@@ -47,7 +46,7 @@ export default class DeleteConfirmationForm extends Vue {
   @Watch('visible')
   onVisibleChange(newValue: boolean) {
     if (newValue) {
-      this.commitMessage = `Eliminando ${this.itemName}`;
+      this.commitMessage = `${T.problemEditDeletingPrefix} ${this.itemName}`;
     } else {
       this.commitMessage = '';
     }

@@ -63,7 +63,7 @@
         </b-button>
         <b-dropdown variant="light" class="mr-2" right no-caret>
           <template #button-content>
-            {{ 'Generar input' }}
+            {{ T.problemCreatorGenerateInput }}
           </template>
 
           <b-button
@@ -144,9 +144,7 @@
       show
       class="mb-2"
     >
-      {{
-        'Please note that the input or output content is truncated. Editing is disabled to avoid memory overload.'
-      }}
+      {{ T.problemCreatorTruncatedWarning }}
     </b-alert>
     <div>
       <table class="table">
@@ -156,7 +154,7 @@
               <b-container fluid class="bg-light">
                 <b-row class="d-flex justify-content-between" align-v="center">
                   <b-col class="pr-1 text-center">
-                    <h5>Input</h5>
+                    <h5>{{ T.wordsInput }}</h5>
                     <b-form-textarea
                       v-model="inputText"
                       :disabled="isInputTruncated"
@@ -189,7 +187,7 @@
               <b-container fluid class="bg-light">
                 <b-row class="d-flex justify-content-between" align-v="center">
                   <b-col class="pr-1 text-center">
-                    <h5>Output</h5>
+                    <h5>{{ T.wordsOutput }}</h5>
                     <b-form-textarea
                       v-model="getSelectedCase.output"
                       :disabled="isOutputTruncated"
@@ -197,7 +195,7 @@
                       class="mt-3 mb-3 text-nowrap overflow-auto w-100"
                       rows="5"
                       max-rows="7"
-                      :placeholder="T.problemCreatorOutputPlaceHolder"
+                      :placeholder="T.problemCreatorContentPlaceHolder"
                     >
                     </b-form-textarea>
                   </b-col>
@@ -839,7 +837,6 @@ export default class CaseEdit extends Vue {
   confirmingDelete: boolean = false;
 
   startDeleteConfirmation() {
-    console.log('Starting delete confirmation', this.isEditing);
     this.confirmingDelete = true;
   }
 

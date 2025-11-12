@@ -8,7 +8,7 @@
       </div>
 
       <div v-if="isTruncatedInput" class="form-group col-md-6">
-        <label class="control-label">Archivo de entrada (.in)</label>
+        <label class="control-label">{{ T.problemEditInputFile }}</label>
         <input
           type="file"
           class="form-control"
@@ -18,7 +18,7 @@
       </div>
 
       <div v-if="isTruncatedOutput" class="form-group col-md-6">
-        <label class="control-label">Archivo de salida (.out)</label>
+        <label class="control-label">{{ T.problemEditOutputFile }}</label>
         <input
           type="file"
           class="form-control"
@@ -40,7 +40,7 @@
           type="submit"
           :disabled="commitMessage === ''"
         >
-          {{ 'Save case' }}
+          {{ T.problemEditSaveCase }}
         </button>
       </div>
     </form>
@@ -67,7 +67,9 @@ export default class CasesForm extends Vue {
   @Prop({ default: null }) readonly editGroup!: Group;
 
   T = T;
-  commitMessage = this.isCaseEdit ? 'Updating case' : 'Updating group';
+  commitMessage = this.isCaseEdit
+    ? T.problemEditUpdatingCase
+    : T.problemEditUpdatingGroup;
 
   @casesStore.Getter('getSelectedCase') getSelectedCase!: Case;
   @casesStore.Getter('getSelectedGroup') getSelectedGroup!: Group;
@@ -98,7 +100,6 @@ export default class CasesForm extends Vue {
 
   @Watch('triggerSubmit')
   onTriggerSubmitChange(newVal: boolean) {
-    console.log('abemus cambio');
     if (newVal && this.isEmbedded) {
       this.$nextTick(() => {
         const btn = this.$refs.submitButton as HTMLButtonElement | undefined;

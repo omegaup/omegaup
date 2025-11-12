@@ -67,7 +67,7 @@
           class="nav-link"
           :class="{ active: showTab === 'cases' }"
           @click="showTab = 'cases'"
-          >{{ 'Edit Cases' }}</a
+          >{{ T.problemEditCases }}</a
         >
       </li>
 
@@ -366,7 +366,7 @@ export default class ProblemEdit extends Vue {
       case 'solution':
         return T.problemEditSolution;
       case 'cases':
-        return 'Cases';
+        return T.problemEditCases;
       case 'admins':
         return T.problemEditAddAdmin;
       case 'tags':
@@ -391,12 +391,6 @@ export default class ProblemEdit extends Vue {
 
   onGotoPrintableVersion(): void {
     window.location.href = `/arena/problem/${this.alias}/print/`;
-  }
-
-  private buildInputText(lines: any[]): string {
-    if (!lines || !Array.isArray(lines)) return '';
-
-    return lines.map((line) => line.data?.value || '').join('\n');
   }
 
   private getCasesStore(): Record<string, unknown> | null {
