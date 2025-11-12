@@ -75,10 +75,10 @@
                     :disabled="isUpdate"
                   />
                 </div>
-                 <div
-                    v-if="!isUpdate"
-                    class="form-group col-md-4 introjs-origin"
-                  >
+                <div
+                  v-if="!isUpdate"
+                  class="form-group col-md-4 introjs-origin"
+                >
                   <label class="control-label">{{ T.problemEditSource }}</label>
                   <input
                     v-model="source"
@@ -136,12 +136,13 @@
                     aria-expanded="true"
                     aria-controls="problem-form-problem"
                   >
-                  <!-- Change to variable t language -->
-                    Creador de Problemas
+                    {{ T.problemCreatorTitle }}
                   </button>
                 </h2>
               </div>
-              <div class="collapse show card-body px-2 px-sm-4 problem-creator-section">
+              <div
+                class="collapse show card-body px-2 px-sm-4 problem-creator-section"
+              >
                 <div class="collapse show card-body problem-creator-section">
                   <problem-creator
                     @show-update-success-message="handleShowSuccess"
@@ -521,11 +522,8 @@ import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import CreatorComponent from './creator/Creator.vue';
-import JSZip from 'jszip';
 import * as ui from '../../ui';
 import { buildProblemZip } from './creator/problemZipBuilder';
-import { BIconArrowReturnLeft } from 'bootstrap-vue';
-
 
 Vue.use(VueCookies, { expire: -1 });
 
@@ -827,14 +825,13 @@ export default class ProblemForm extends Vue {
     fileName: string;
     zipContent: Blob;
   }): void {
-
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(zipContent);
-      link.download = `${fileName}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(zipContent);
+    link.download = `${fileName}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
   }
 
   onFileChanged(file: File | null) {
@@ -854,15 +851,21 @@ export default class ProblemForm extends Vue {
     const state = JSON.parse(JSON.stringify(this.$store.state));
     const zip = await buildProblemZip(state, this.originalFile);
     if (!zip) {
-      ui.error('ZIP inválido.');
+      ui.error(T.problemCreatorZipFileIsNotValid);
       return;
     }
-  
+
     const problemName = (state.problemName || 'problem').replace(/ /g, '_');
 
     formData.set('problem_contents', zip, `${problemName}`);
 
-    const aliasFromForm = (formData.get('problem_alias') ?? this.alias ?? '').toString().trim();
+    const aliasFromForm: string = (
+      formData.get('problem_alias') ??
+      this.alias ??
+      ''
+    )
+      .toString()
+      .trim();
 
     try {
       const resp = await fetch(formElement.action || '/problem/new/', {
@@ -874,7 +877,9 @@ export default class ProblemForm extends Vue {
       });
 
       if (resp.ok) {
-        const target = (resp.redirected && resp.url) || (aliasFromForm ? `/problem/${aliasFromForm}/edit/` : '');
+        const target =
+          (resp.redirected && resp.url) ||
+          (aliasFromForm ? `/problem/${aliasFromForm}/edit/` : '');
 
         if (target) {
           window.location.href = target;
@@ -884,13 +889,10 @@ export default class ProblemForm extends Vue {
 
       const errorText = await resp.text().catch(() => '');
       throw new Error(errorText || `Error HTTP ${resp.status}`);
-
     } catch (err) {
-      console.error('Error al enviar o redirigir:', err);
-      ui.error('No se pudo mostrar la página de edición');
+      /// ui.error(T.problemEditRedirectError);
     }
   }
-
 }
 </script>
 

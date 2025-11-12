@@ -123,54 +123,58 @@ export default class Header extends Vue {
     this.$emit('file-changed', this.zipFile);
   }
 
-  retrieveStore(): void {
-    if (!this.zipFile) {
+  // En la declaración del método:
+  async retrieveStore(): Promise<void> {
+    const zipFile = this.zipFile;
+
+    if (!zipFile) {
       return;
     }
-    const zipUploaded = new JSZip();
-    zipUploaded
-      .loadAsync(this.zipFile)
-      .then((zipContent) => {
-        const cdpDataFile = zipContent.file('cdp.data');
-        if (!cdpDataFile) {
-          
-          // Ya que no se encontró un cdp.data, usamos la API para convertir el ZIP
-            const formData = new FormData();
-            formData.append('zipFile', this.zipFile!);
 
-            fetch('/api/problem/convertZipToCdp/', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok' && data.cdp) {
-                  // Llama a la función de actualización con los datos de la API
-                    this.updateStore(data.cdp);
-                    console.log(data);
-                    //ui.error("El ZIP fue convertido y el store actualizado correctamente.");
-                } else {
-                    ui.error(data.message);
-                    console.log(data);
-                }
-            })
-            .catch(error => {
-                console.error('Ocurrió un error:', error); 
-                ui.error("Ocurrió un error de red al intentar la conversión.");
-            });
-            return;
-        }
-        else{
-          cdpDataFile.async('text').then((content) => {
-            const storeData = JSON.parse(content);
-            this.updateStore(storeData);
-          });
-        }
-        
-      })
-      .catch(() => {
-        ui.error(T.problemCreatorZipFileIsNotValid);
+    try {
+      const zipUploaded = new JSZip();
+      const zipContent = await zipUploaded.loadAsync(zipFile);
+
+      const cdpDataFile = zipContent.file('cdp.data');
+
+      if (cdpDataFile) {
+        // The cdp.data file exists, we read it directly.
+        const content = await cdpDataFile.async('text');
+        const storeData = JSON.parse(content);
+        this.updateStore(storeData);
+        return;
+      }
+
+      // If there is no cdp.data, we use the conversion API.
+      const formData = new FormData();
+      formData.append('zipFile', zipFile);
+
+      const response = await fetch('/api/problem/convertZipToCdp/', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.status === 'ok' && data.cdp) {
+        this.updateStore(data.cdp);
+      } else {
+        ui.error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof TypeError) {
+        ui.error(T.errorNetwork);
+      } else if (error instanceof Error && error.message?.startsWith('HTTP')) {
+        ui.error(T.errorServer + ` ${error.message}`);
+      } else {
+        ui.error(T.errorUnexpectedZip);
+      }
+    }
   }
 
   updateStore(storeData: any) {
@@ -184,7 +188,7 @@ export default class Header extends Vue {
       problemCodeExtension: storeData.problemCodeExtension,
       problemSolutionMarkdown: storeData.problemSolutionMarkdown,
     });
-    console.log(JSON.stringify(storeData,null,2));
+    console.log(JSON.stringify(storeData, null, 2));
     if (storeData.casesStore) {
       this.$store.commit('casesStore/replaceState', storeData.casesStore);
     }
@@ -250,21 +254,15 @@ export default class Header extends Vue {
     window.location.reload();
   }
   async generateFinalProblem() {
+    const stateSnapshot = JSON.parse(JSON.stringify(this.$store.state));
 
-      const originalFile = this.zipFile; 
-      const stateSnapshot = JSON.parse(JSON.stringify(this.$store.state));
+    const zipBlob = await buildProblemZip(stateSnapshot, this.zipFile);
 
-      const zipBlob = await buildProblemZip(
-        stateSnapshot, 
-        this.zipFile
-      );
-
-      const problemName = stateSnapshot.problemName;
-      this.$emit('download-zip-file', {
-        fileName: problemName.replace(/ /g, '_'),
-        zipContent: zipBlob,
-      });
+    const problemName = stateSnapshot.problemName;
+    this.$emit('download-zip-file', {
+      fileName: problemName.replace(/ /g, '_'),
+      zipContent: zipBlob,
+    });
   }
-  
 }
 </script>
