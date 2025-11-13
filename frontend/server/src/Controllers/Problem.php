@@ -57,7 +57,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type LibinteractiveError=array{description: string, field: string}
  * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  * @psalm-type ProblemRequestData=array{preventProblemsetOpen: bool, contestAlias: null|string, problemAlias: string, statementType: string, problemsetId: int|null}
+ * @psalm-type CDPLine=array{lineID: string,caseID: string, label: string, data: array{kind: 'line'|'multiline'|'array'|'matrix', value: string}}
+ * @psalm-type CDPCase=array{caseID: string,groupID: string, lines: list<CDPLine>, points: int,autoPoints: bool,output: string,name: string}
+ * @psalm-type CDPGroup=array{groupID: string,name: string,points: int,autoPoints: bool,ungroupedCase: bool,cases: list<CDPCase>}
+ * @psalm-type CDPCasesStore=array{groups: list<CDPGroup>,selected: array{groupID: string|null, caseID: string|null},layouts: list<array<string, string>>,hide: bool}
+ * @psalm-type CDP=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore}
  */
+
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
     const SOLUTION_NOT_FOUND = 'not_found';
@@ -6745,6 +6751,31 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'problem_print',
+        ];
+    }
+
+    /**
+     * Convert an uploaded ZIP file to CDP.
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{status: 'ok', cdp: CDP}
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
+     */
+    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
+        $fileInfo = \OmegaUp\Validators::validateZipUploadedFile();
+        $tempFilePath = $fileInfo['tmpFilePath'];
+        $problemName = $fileInfo['problemName'];
+
+        // Convert ZIP to CDP
+        $cdp = \OmegaUp\ZipToCdpConverter::convert(
+            $tempFilePath,
+            $problemName
+        );
+
+        return [
+            'status' => 'ok',
+            'cdp' => $cdp
         ];
     }
 }

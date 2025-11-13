@@ -159,6 +159,7 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/problem/admins/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemadmins)
   - [`/api/problem/bestScore/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblembestscore)
   - [`/api/problem/clarifications/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemcreate)
   - [`/api/problem/delete/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemdelete)
   - [`/api/problem/details/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiproblemdetails)
