@@ -19,6 +19,25 @@
         {{ T.wordsRankingMeasurement }}
       </a>
     </h5>
+    <div v-if="!showHeader" class="card-body form-row">
+      <template v-if="Object.keys(availableFilters).length > 0">
+        <select
+          v-model="currentFilter"
+          class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
+        >
+          <option value="">
+            {{ T.wordsSelectFilter }}
+          </option>
+          <option
+            v-for="(item, key, index) in availableFilters"
+            :key="index"
+            :value="key"
+          >
+            {{ item }}
+          </option>
+        </select>
+      </template>
+    </div>
     <table class="table mb-0">
       <thead>
         <tr>
@@ -58,7 +77,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
@@ -83,13 +102,37 @@ export default class SchoolRank extends Vue {
   @Prop() totalRows!: number;
   @Prop() rank!: omegaup.SchoolsRank[];
   @Prop() pagerItems!: types.PageItem[];
+  @Prop({ default: () => {} }) availableFilters!: { [key: string]: string };
+  @Prop({ default: null }) filter!: string | null;
 
   T = T;
   ui = ui;
+  currentFilter = this.filter;
 
   get SchoolRankingFeatureGuideURL(): string {
     // Use the key defined in blog-links-config.json
     return getBlogUrl('SchoolRankingFeatureGuideURL');
+  }
+
+  @Watch('currentFilter')
+  onFilterChange(newFilter: string): void {
+    // change url parameters with jquery
+    // https://samaxes.com/2011/09/change-url-parameters-with-jquery/
+    let queryParameters: { [key: string]: string } = {};
+    const re = /([^&=]+)=([^&]*)/g;
+    const queryString = location.search.substring(1);
+    let m: string[] | null = null;
+    while ((m = re.exec(queryString))) {
+      queryParameters[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+    }
+    if (newFilter !== '') {
+      queryParameters['filter'] = newFilter;
+      // When a filter is selected, the parameter 'page' must be reset.
+      delete queryParameters['page'];
+    } else {
+      delete queryParameters['filter'];
+    }
+    window.location.search = ui.buildURLQuery(queryParameters);
   }
 }
 </script>
