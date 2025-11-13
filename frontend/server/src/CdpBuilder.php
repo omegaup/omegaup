@@ -2,7 +2,6 @@
 
 namespace OmegaUp;
 
-use ZipArchive;
 /**
  * @psalm-type CDPLine=array{lineID: string,caseID: string, label: string, data: array{kind: 'line'|'multiline'|'array'|'matrix', value: string}}
  * @psalm-type CDPCase=array{caseID: string,groupID: string, lines: list<CDPLine>, points: int,autoPoints: bool,output: string,name: string}
@@ -124,9 +123,9 @@ class CdpBuilder {
      * using files within a Zip archive.
      *
      * @param CDPRaw $cdp Reference to the CDP to modify.
-     * @param ZipArchive $zip Zip archive containing the images.
+     * @param \ZipArchive $zip Zip archive containing the images.
      */
-    public static function processImages(array &$cdp, ZipArchive $zip): void {
+    public static function processImages(array &$cdp, \ZipArchive $zip): void {
         $cdp['problemMarkdown'] = self::convertImagesToBase64(
             $cdp['problemMarkdown'],
             $zip
@@ -266,12 +265,12 @@ class CdpBuilder {
      * Replaces image references in Markdown with Base64-encoded images.
      *
      * @param string $markdownContent Original Markdown content.
-     * @param ZipArchive $zip Zip archive containing the images.
+     * @param \ZipArchive $zip Zip archive containing the images.
      * @return string Markdown with embedded Base64 images.
      */
     private static function convertImagesToBase64(
         string $markdownContent,
-        ZipArchive $zip
+        \ZipArchive $zip
     ): string {
         $processedImages = [];
         $imageCounter = 0;

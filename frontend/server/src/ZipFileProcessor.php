@@ -2,20 +2,18 @@
 
 namespace OmegaUp;
 
-use ZipArchive;
-
 class ZipFileProcessor{
     /**
      * Get the content of a file inside a ZIP.
      *
-     * @param ZipArchive $zip
+     * @param \ZipArchive $zip
      * @param string $fileName
      * @return string
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException if the file cannot be read
      */
     public static function getFileContent(
-        ZipArchive $zip,
+        \ZipArchive $zip,
         string $fileName
     ): string {
         $content = $zip->getFromName($fileName);
@@ -34,7 +32,7 @@ class ZipFileProcessor{
      * If the file is larger than $limitBytes, return only the first $limitBytes
      * followed by a truncation indicator.
      *
-     * @param ZipArchive $zip
+     * @param \ZipArchive $zip
      * @param string $fileName
      * @param int $limitBytes
      * @return string
@@ -42,7 +40,7 @@ class ZipFileProcessor{
      * @throws \OmegaUp\Exceptions\InvalidParameterException if the file cannot be read or stream cannot be opened
      */
     public static function getFileContentWithLimit(
-        ZipArchive $zip,
+        \ZipArchive $zip,
         string $fileName,
         int $limitBytes
     ): string {
@@ -74,13 +72,13 @@ class ZipFileProcessor{
     /**
      * Iterate over all files inside a ZIP archive, ignoring directories.
      *
-     * @param ZipArchive $zip
+     * @param \ZipArchive $zip
      * @param callable(string): void $callback Callback invoked for each file path
      *
      * @return void
      */
     public static function iterateFiles(
-        ZipArchive $zip,
+        \ZipArchive $zip,
         callable $callback
     ): void {
         for ($i = 0; $i < $zip->numFiles; $i++) {

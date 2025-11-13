@@ -6758,7 +6758,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Convert an uploaded ZIP file to CDP.
      *
      * @param \OmegaUp\Request $r
-     * @return array{status: 'ok', message: string, cdp: CDP}
+     * @return array{status: 'ok', cdp: CDP}
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
      */
@@ -6768,9 +6768,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemName = $fileInfo['problemName'];
 
         // Convert ZIP to CDP
-        return \OmegaUp\ZipToCdpConverter::convert(
+        $cdp = \OmegaUp\ZipToCdpConverter::convert(
             $tempFilePath,
             $problemName
         );
+
+        return [
+            'status' => 'ok',
+            'cdp' => $cdp
+        ];
     }
 }

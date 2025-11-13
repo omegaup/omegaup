@@ -5640,10 +5640,7 @@ export namespace messages {
     clarifications: types.Clarification[];
   };
   export type ProblemConvertZipToCdpRequest = { [key: string]: any };
-  export type ProblemConvertZipToCdpResponse = {
-    cdp: types.CDP;
-    message: string;
-  };
+  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP };
   export type ProblemCreateRequest = { [key: string]: any };
   export type ProblemCreateResponse = {};
   export type ProblemDeleteRequest = { [key: string]: any };

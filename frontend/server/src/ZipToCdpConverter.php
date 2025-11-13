@@ -2,7 +2,6 @@
 
 namespace OmegaUp;
 
-use ZipArchive;
 /**
  * @psalm-type CDPLine=array{lineID: string,caseID: string, label: string, data: array{kind: 'line'|'multiline'|'array'|'matrix', value: string}}
  * @psalm-type CDPCase=array{caseID: string,groupID: string, lines: list<CDPLine>, points: int,autoPoints: bool,output: string,name: string}
@@ -18,7 +17,7 @@ class ZipToCdpConverter{
      *
      * @param string $zipFilePath Path to the ZIP file.
      * @param string $problemName The name of the problem.
-     * @return array{status: 'ok', message: string, cdp: CDP}
+     * @return CDP
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
      */
@@ -29,7 +28,7 @@ class ZipToCdpConverter{
         \OmegaUp\Validators::validateZipFileSize($zipFilePath);
         \OmegaUp\Validators::validateZipIntegrity($zipFilePath);
 
-        $zip = new ZipArchive();
+        $zip = new \ZipArchive();
         $zip->open($zipFilePath);
 
         /** @var CDPRaw $cdp */
@@ -40,24 +39,21 @@ class ZipToCdpConverter{
 
         $zip->close();
 
-        return [
-            'status' => 'ok',
-            'message' => 'El ZIP fue convertido correctamente a CDP.',
-            'cdp' => CdpBuilder::build($cdp)
-        ];
+        /** @var CDP */
+        return CdpBuilder::build($cdp);
     }
 
     /**
      * Populates the CDP raw structure with content  (statements, solutions, cases, testplan) from the ZIP.
      *
      * @param CDPRaw $cdp Reference to the CDP structure being built.
-     * @param ZipArchive $zip Open ZIP archive.
+     * @param \ZipArchive $zip Open ZIP archive.
      * @return void
      *
      */
     private static function populateBuilder(
         array &$cdp,
-        ZipArchive $zip
+        \ZipArchive $zip
     ): void {
         $rgxStatement = '/^statements\/(en|es|pt)\.markdown$/';
         $rgxSolutions = '/^solutions\/(en|es|pt)\.markdown$/';

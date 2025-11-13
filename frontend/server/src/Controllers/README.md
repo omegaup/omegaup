@@ -3081,10 +3081,9 @@ Convert an uploaded ZIP file to CDP.
 
 ### Returns
 
-| Name      | Type        |
-| --------- | ----------- |
-| `cdp`     | `types.CDP` |
-| `message` | `string`    |
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
 
 ## `/api/problem/create/`
 
