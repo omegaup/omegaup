@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from argparse import Namespace
 import json
 import logging
 import os
@@ -16,7 +17,9 @@ from typing import (
     Mapping,
     Optional,
     TypeVar,
-    List
+    List,
+    Union,
+    Tuple
 )
 import math
 from concurrent.futures import ThreadPoolExecutor
@@ -38,7 +41,7 @@ def random_base(length: int, rng: random.Random) -> str:
 def make_request(
     api: str,
     params: ParamT,
-    files: Optional[Dict[str, str]] = None,
+    files: Optional[Dict[str, Union[str, Tuple[str, str]]]] = None,
 ) -> Dict[str, object]:
     """Build a request dict expected by `_process_one_request`."""
     if not api or not isinstance(api, str):
@@ -143,7 +146,7 @@ def send_all(  # pylint: disable=too-many-arguments
     *,
     workers: int = 1,
     session_ctor: Optional[Callable[..., Any]] = None,
-    session_args: Optional[Mapping[str, Any]] = None,
+    session_args: Optional[Union[Namespace, Mapping[str, Any]]] = None,
     username: Optional[str] = None,
     password: Optional[str] = None,
     token: Optional[str] = None,

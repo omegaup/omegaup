@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-import argparse
+from argparse import Namespace
 import os
 import random
 import time
-from typing import Dict, Iterable, List, Optional, cast, Type, Any
-from .runner import process_one_request_local
+import tempfile
+from typing import Dict, Iterable, List, Optional, Type, Any, Mapping, Union
+from dataset_generator.runner import process_one_request_local
 
-from .types import (
+from dataset_generator.types import (
     UserCreateParams,
     IdentityCreateParams,
     SchoolCreateParams,
@@ -19,8 +20,14 @@ from .types import (
     CourseCreateParams,
     CourseAddStudentParams,
     GroupCreateParams,
+    IdentityBulkCreateFiles,
 )
-from .utils import random_base, make_request, load_config, send_all
+from dataset_generator.utils import (
+    random_base,
+    make_request,
+    load_config,
+    send_all
+)
 
 
 def _iter_users(
@@ -64,6 +71,57 @@ def _iter_identities(
             "group_alias": "grupo_generico",
         }
         yield make_request(endpoints["identity_create"], params)
+
+
+def _make_identity_bulk_create(
+    count: int,
+    rng: random.Random,
+    endpoints: Dict[str, str],
+    counts: Dict[str, int],
+) -> Dict[str, object]:
+    """
+    Create a single bulk identity creation request with CSV data.
+    """
+    csv_lines = [
+        "username,name,password,country_id,state_id,gender,school_name"
+    ]
+
+    for idx in range(count):
+        username = f"identity_{idx}_{random_base(6, rng)}"
+        name = f"Identity {idx}"
+        password = "Secret.123"
+        country_id = "mx"
+        state_id = ""
+        gender = "male"
+        school_name = f"Escuela {idx % max(1, counts.get('schools', 1))}"
+
+        csv_lines.append(
+            f"{username},{name},{password},"
+            f"{country_id},{state_id},{gender},{school_name}"
+        )
+
+    csv_content = "\n".join(csv_lines)
+
+    tmp = tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        suffix=".csv",
+        delete=False,
+    )
+    with tmp:
+        tmp.write(csv_content)
+
+    csv_path = tmp.name
+
+    params: IdentityBulkCreateFiles = {
+        "group_alias": "grupo_generico",
+    }
+
+    return make_request(
+        endpoints["identity_bulk_create"],
+        params,
+        files={"identities": csv_path},
+    )
 
 
 def _iter_schools(
@@ -138,11 +196,15 @@ def _iter_contests(
     Yield /contest/create/ requests with fixed parameters.
     """
     if kind == "past":
-        start_time, finish_time = "$NOW$+-5400", "$NOW$+-1800"
+        start_time = "$NOW$-5400"
+        finish_time = "$NOW$-1800"
     elif kind == "future":
-        start_time, finish_time = "$NOW$+3600", "$NOW$+7200"
+        start_time = "$NOW$+3600"
+        finish_time = "$NOW$+7200"
     else:
-        start_time, finish_time = "$NOW$+-1800", "$NOW$+7200"
+        start_time = "$NOW$-1800"
+        finish_time = "$NOW$+7200"
+
     for idx in range(count):
         alias = f"contest_{kind}_{idx}_{random_base(4, rng)}"
         params: ContestCreateParams = {
@@ -207,7 +269,7 @@ def _iter_courses(
             "alias": alias,
             "name": f"Curso {idx} (public active)",
             "description": "Curso público activo",
-            "start_time": "$NOW$+-1800",
+            "start_time": "$NOW$-1800",
             "finish_time": "$NOW$+7200",
             "admission_mode": "public",
         }
@@ -246,10 +308,7 @@ def _make_group(
         "name": name,
         "description": description,
     }
-    return cast(
-        Dict[str, object],
-        make_request(endpoints["group_create"], params)
-    )
+    return make_request(endpoints["group_create"], params)
 
 
 def seed_synthetic(
@@ -259,7 +318,7 @@ def seed_synthetic(
     config_path: str,
     seeder_env: str = "testing",
     log_every_runs: int = 50_000,
-    session_args: Optional[argparse.Namespace] = None,
+    session_args: Optional[Union[Namespace, Mapping[str, Any]]] = None,
     ou_username: Optional[str] = None,
     ou_password: Optional[str] = None,
     ou_token: Optional[str] = None,
@@ -340,7 +399,7 @@ def seed_synthetic(
                 endpoints,
             ),
             "identities",
-            workers=4,
+            workers=1,
             session_ctor=session,
             session_args=args,
             username=username,
@@ -418,7 +477,7 @@ def seed_synthetic(
                     langs_csv,
                 ),
                 f"contests_{kind}",
-                workers=4,
+                workers=1,
                 session_ctor=session,
                 session_args=args,
                 username=username,
@@ -440,7 +499,7 @@ def seed_synthetic(
             ),
             "runs",
             log_every=log_every_runs,
-            workers=16,
+            workers=1,
             session_ctor=session,
             session_args=args,
             username=username,

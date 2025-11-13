@@ -10,6 +10,7 @@ endpoints:
   course_add_admin: "/course/addAdmin/"
   course_add_student: "/course/addStudent/"
   group_create: "/group/create/"
+  identity_bulk_create: "/api/identity/bulkCreate/"
 
 environtment:
   development:

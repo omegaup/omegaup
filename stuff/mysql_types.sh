@@ -17,8 +17,6 @@ mysql -h mysql -uroot -e "TRUNCATE TABLE mysql.general_log;"
 mysql -h mysql -uroot -e "SET GLOBAL general_log = 'ON';"
 mysql -h mysql -uroot -e "SET GLOBAL log_output = 'TABLE';"
 
-python3 "${OMEGAUP_ROOT}/stuff/generate_synthetic_dataset.py"
-
 "${OMEGAUP_ROOT}/stuff/run-php-tests.sh"
 
 # Disable General Query Log

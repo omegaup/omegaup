@@ -120,7 +120,7 @@ class ProblemCreateFiles(TypedDict):
 
 class IdentityBulkCreateFiles(TypedDict):
     """Files for /identity/bulkCreate/ (CSV with identities)."""
-    identities: str
+    group_alias: str
 
 
 @dataclass
