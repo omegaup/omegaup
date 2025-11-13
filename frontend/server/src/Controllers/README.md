@@ -153,6 +153,7 @@
   - [`/api/problem/admins/`](#apiproblemadmins)
   - [`/api/problem/bestScore/`](#apiproblembestscore)
   - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](#apiproblemcreate)
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
@@ -3072,6 +3073,18 @@ Entry point for Problem clarifications API
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
 
+## `/api/problem/convertZipToCdp/`
+
+### Description
+
+Convert an uploaded ZIP file to CDP.
+
+### Returns
+
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
+
 ## `/api/problem/create/`
 
 ### Description
@@ -4381,10 +4394,10 @@ Gets a list of tags
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
