@@ -1003,7 +1003,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $pageSize,
         ];
 
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, highest_role: int}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, highest_role: int|null, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, teaching_assistant_enabled: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = ['admin' => [], 'teachingAssistant' => []];
