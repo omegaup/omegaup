@@ -6,7 +6,8 @@ from argparse import Namespace
 import os
 import random
 import time
-import tempfile
+import csv
+import json
 from typing import Dict, Iterable, List, Optional, Type, Any, Mapping, Union
 from dataset_generator.runner import process_one_request_local
 
@@ -20,7 +21,7 @@ from dataset_generator.types import (
     CourseCreateParams,
     CourseAddStudentParams,
     GroupCreateParams,
-    IdentityBulkCreateFiles,
+    IdentityBulkCreateParams,
 )
 from dataset_generator.utils import (
     random_base,
@@ -73,55 +74,42 @@ def _iter_identities(
         yield make_request(endpoints["identity_create"], params)
 
 
-def _make_identity_bulk_create(
+def _iter_identity_bulk(
     count: int,
-    rng: random.Random,
+    group_alias: str,
     endpoints: Dict[str, str],
-    counts: Dict[str, int],
-) -> Dict[str, object]:
+    csv_path: str,
+) -> Iterable[Dict[str, object]]:
     """
-    Create a single bulk identity creation request with CSV data.
+    Yield /identity/bulkCreate/ requests using existing CSV file.
+    Each call creates the existing identities from csv_path
     """
-    csv_lines = [
-        "username,name,password,country_id,state_id,gender,school_name"
-    ]
 
-    for idx in range(count):
-        username = f"identity_{idx}_{random_base(6, rng)}"
-        name = f"Identity {idx}"
-        password = "Secret.123"
-        country_id = "mx"
-        state_id = ""
-        gender = "male"
-        school_name = f"Escuela {idx % max(1, counts.get('schools', 1))}"
+    # Use the provided csv_path parameter
+    # Read CSV and convert to JSON format that the API expects
+    identities: List[Dict[str, str]] = []
+    with open(csv_path, 'r', encoding='utf-8-sig') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            identity = {
+                "username": f"{group_alias}:{row['username']}",
+                "name": row['name'],
+                "country_id": row['country_id'].upper(),
+                "state_id": row['state_id'].upper(),
+                "gender": row['gender'],
+                "school_name": row['school_name'],
+                "password": "Secret.123",
+            }
+            identities.append(identity)
 
-        csv_lines.append(
-            f"{username},{name},{password},"
-            f"{country_id},{state_id},{gender},{school_name}"
-        )
+    identities_json = json.dumps(identities)
 
-    csv_content = "\n".join(csv_lines)
-
-    tmp = tempfile.NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        suffix=".csv",
-        delete=False,
-    )
-    with tmp:
-        tmp.write(csv_content)
-
-    csv_path = tmp.name
-
-    params: IdentityBulkCreateFiles = {
-        "group_alias": "grupo_generico",
-    }
-
-    return make_request(
-        endpoints["identity_bulk_create"],
-        params,
-        files={"identities": csv_path},
-    )
+    for _ in range(count):
+        params: IdentityBulkCreateParams = {
+            "group_alias": group_alias,
+            "identities": identities_json,
+        }
+        yield make_request(endpoints["identity_bulk_create"], params)
 
 
 def _iter_schools(
@@ -341,14 +329,23 @@ def seed_synthetic(
     now_ts = time.time()
     rng = random.Random(12345)
 
+    dynamic_alias = f"grupo_{int(now_ts)}_{random_base(6, rng)}"
+    group_config = cfg.get("generic_group", {}).copy()
+    group_config.update({
+        "alias": dynamic_alias,
+        "name": group_config.get("name", "Grupo Genérico"),
+        "description": group_config.get("description",
+                                        "Grupo para identidades sintéticas"),
+    })
+
     with session(args, username, password, token) as session_obj:
         process_one_request_local(
             session_obj,
             _make_group(
                 endpoints,
-                "grupo_generico",
-                "Grupo Genérico",
-                "Grupo para identidades sintéticas",
+                group_config["alias"],
+                group_config["name"],
+                group_config["description"],
             ),
             now_ts,
         )
@@ -370,7 +367,7 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
+            backoff_sec=0.1,
         )
 
         if counts.get("schools", 0) > 0:
@@ -385,8 +382,8 @@ def seed_synthetic(
                 username=username,
                 password=password,
                 token=token,
-                backoff_sec=0.75,
-                retries=10,
+                backoff_sec=0.1,
+                retries=2,
             )
 
         send_all(
@@ -405,9 +402,30 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
+            backoff_sec=0.1,
             retries=2,
         )
+
+        if counts.get("identities_bulk", 0) > 0:
+            send_all(
+                None,
+                now_ts,
+                _iter_identity_bulk(
+                    counts.get("identities_bulk", 0),
+                    group_config["alias"],
+                    endpoints,
+                    cfg["identities_csv_path"],
+                ),
+                "identities_bulk",
+                workers=1,
+                session_ctor=session,
+                session_args=args,
+                username=username,
+                password=password,
+                token=token,
+                backoff_sec=0.1,
+                retries=2,
+            )
 
         pub_aliases: List[str] = []
         priv_aliases: List[str] = []
@@ -431,7 +449,7 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
+            backoff_sec=0.1,
             retries=2,
         )
 
@@ -455,7 +473,7 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
+            backoff_sec=0.1,
             retries=2,
         )
 
@@ -483,7 +501,7 @@ def seed_synthetic(
                 username=username,
                 password=password,
                 token=token,
-                backoff_sec=0.75,
+                backoff_sec=0.1,
                 retries=2,
             )
 
@@ -505,8 +523,8 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
-            retries=3,
+            backoff_sec=0.1,
+            retries=2,
         )
 
         course_aliases: List[str] = []
@@ -526,6 +544,6 @@ def seed_synthetic(
             username=username,
             password=password,
             token=token,
-            backoff_sec=0.75,
+            backoff_sec=0.1,
             retries=2,
         )

@@ -88,6 +88,28 @@ def _extract_counts(raw: Dict[str, Any], env_name: str) -> Dict[str, int]:
     return {}
 
 
+def _extract_identities_csv(raw: Dict[str, Any], root: str) -> str:
+    """
+    Extract identities CSV path from paths.identities_csv, list entry, or
+    use default.
+    """
+    paths = raw.get("paths")
+    if isinstance(paths, dict):
+        val = paths.get("identities_csv")
+        if isinstance(val, str) and val:
+            return _resolve_path(root, val)
+    if isinstance(paths, list):
+        for item in paths:
+            if (
+                isinstance(item, dict)
+                and "identities_csv" in item
+                and isinstance(item["identities_csv"], str)
+            ):
+                return _resolve_path(root, item["identities_csv"])
+    # Default path if not configured
+    return _resolve_path(root, "frontend/tests/resources/identities.csv")
+
+
 def _extract_test_zip(raw: Dict[str, Any], root: str) -> str:
     """Extract ZIP path from paths.test_zip, list entry, or legacy key."""
     paths = raw.get("paths")
@@ -126,12 +148,19 @@ def load_config(config_path: str, root: str) -> Dict[str, Any]:
         selected_tags = []
     selected_tags_json = json.dumps(selected_tags, ensure_ascii=False)
     test_zip_path = _extract_test_zip(raw, root)
+
+    identities_csv_path = _extract_identities_csv(raw, root)
+    generic_group = raw.get("generic_group") or {}
+    if not isinstance(generic_group, dict):
+        generic_group = {}
     return {
         "endpoints": endpoints,
         "counts": counts,
         "langs_csv": langs_csv,
         "selected_tags_json": selected_tags_json,
         "test_zip_path": test_zip_path,
+        "identities_csv_path": identities_csv_path,
+        "generic_group": generic_group,
     }
 
 
