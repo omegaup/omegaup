@@ -5,7 +5,6 @@ import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import store from './store';
 import T from '../../lang';
 import * as ui from '../../ui';
-import JSZip from 'jszip';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -47,18 +46,16 @@ OmegaUp.on('ready', () => {
             zipContent: zipContent,
           }: {
             fileName: string;
-            zipContent: JSZip;
+            zipContent: Blob;
           }) => {
-            zipContent.generateAsync({ type: 'blob' }).then((content) => {
-              // The following codeblock just adds a link element to the document for the download, clicks on it to download, removes the link from the document and then frees up the memory.
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(content);
-              link.download = `${fileName}.zip`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(link.href);
-            });
+            // The following codeblock just adds a link element to the document for the download, clicks on it to download, removes the link from the document and then frees up the memory.
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(zipContent);
+            link.download = `${fileName}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
           },
         },
       });

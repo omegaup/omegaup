@@ -5,14 +5,23 @@ import Vue from 'vue';
 import problem_New from '../components/problem/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
+import store from './creator/store';
+
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 OmegaUp.on('ready', () => {
+  Vue.use(BootstrapVue);
+  Vue.use(BootstrapVueIcons);
+
   const payload = types.payloadParsers.ProblemFormPayload();
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
   const problemNew = new Vue({
     el: '#main-container',
+    store,
     components: {
       'omegaup-problem-new': problem_New,
     },
