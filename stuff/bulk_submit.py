@@ -13,7 +13,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 # Import our existing clients
-sys.path.append('/home/jpgomez/Development/omegaup/stuff')
+# Add the directory containing this script to sys.path for importing
+# token_utils
+script_dir = Path(__file__).parent
+sys.path.insert(0, str(script_dir))
 from token_utils import get_token, parse_token_from_args, parse_url_from_args
 
 
@@ -59,7 +62,7 @@ class BulkSubmissionRunner:
         return aliases
 
     def submit_to_problem(self, problem_name: str,
-                          language: str = 'py3') -> tuple[bool, str]:
+                          language: str = 'cpp11-gcc') -> tuple[bool, str]:
         """Submit solution to a specific problem."""
         try:
             print(f"\n🚀 Submitting to: {problem_name}")

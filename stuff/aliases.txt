@@ -1,8 +1,4 @@
-# Problemas de prueba existentes
 colas
 filas
 pilas
 sumas
-
-# Agregar más problemas aquí cuando los encuentres
-# Usa: curl -H "Authorization: token TU_TOKEN" http://localhost:8001/api/problem/list/

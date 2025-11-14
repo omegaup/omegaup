@@ -3,7 +3,7 @@
 Ephemeral Runner - Updated and working correctly
 """
 
-import re
+import json
 import sys
 import time
 from pathlib import Path
@@ -28,9 +28,10 @@ class EphemeralRunner:
 
     def get_aliases_file(self) -> str:
         """Determine which aliases file to use based on URL"""
+        script_dir = Path(__file__).parent
         if 'omegaup.com' in self.base_url:
-            return 'stuff/prod_test_aliases.txt'
-        return 'stuff/aliases.txt'
+            return str(script_dir / 'prod_test_aliases.txt')
+        return str(script_dir / 'aliases.txt')
 
     def load_solution(self, problem_alias: str) -> Optional[str]:
         """Load solution from file"""
@@ -69,73 +70,137 @@ class EphemeralRunner:
         except (requests.RequestException, ConnectionError):
             return None
 
+    def show_problem_details(self, problem_alias: str) -> None:
+        """Show detailed problem information including examples"""
+        print(f"\n📋 Problem Details: {problem_alias}")
+        print("=" * 50)
+
+        details = self.get_problem_details(problem_alias)
+        if not details:
+            print("❌ Could not fetch problem details")
+            return
+
+        # Problem basic info
+        problem = details.get('problem', {})
+        print(f"Title: {problem.get('title', 'N/A')}")
+        print(f"Points: {problem.get('points', 'N/A')}")
+        print(f"Memory Limit: {problem.get('memory_limit', 'N/A')} bytes")
+        print(f"Time Limit: {problem.get('time_limit', 'N/A')} ms")
+
+        # Examples
+        examples = details.get('examples', [])
+        if examples:
+            print(f"\n📝 Examples ({len(examples)} found):")
+            for i, example in enumerate(examples, 1):
+                print(f"\n  Example {i}:")
+                print(f"    Input:  {repr(example.get('input', ''))}")
+                print(f"    Output: {repr(example.get('output', ''))}")
+        else:
+            print("\n⚠️  No examples found")
+
+        # Settings info
+        settings = details.get('settings', {})
+        if settings:
+            print("\n⚙️  Settings:")
+            cases = settings.get('cases', {})
+            limits = settings.get('limits', {})
+            validator = settings.get('validator', {})
+
+            print(f"  Cases: {len(cases)} found")
+            if limits:
+                print(f"  Time Limit: {limits.get('TimeLimit', 'N/A')}")
+                print(f"  Memory Limit: {limits.get('MemoryLimit', 'N/A')}")
+            if validator:
+                print(f"  Validator: {validator.get('name', 'N/A')}")
+
+        print("=" * 50)
+
+    def _extract_json_from_multipart(
+            self, response_text: str) -> Optional[str]:
+        """Extract JSON content from multipart response."""
+        lines = response_text.split('\n')
+        json_content = ""
+        collecting = False
+        brace_count = 0
+
+        for i in range(len(lines) - 1, -1, -1):
+            line = lines[i]
+
+            if line.startswith('--') and len(line) > 10:
+                continue
+
+            if collecting:
+                json_content = line + '\n' + json_content
+                brace_count += line.count('}') - line.count('{')
+
+                if brace_count == 0 and line.strip().startswith('{'):
+                    break
+
+            if '}' in line and not collecting:
+                collecting = True
+                json_content = line + '\n'
+                brace_count = line.count('}') - line.count('{')
+
+        return json_content.strip() if json_content else None
+
+    def _extract_verdict_from_data(
+            self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract verdict information from judge data."""
+        verdict = 'Unknown'
+        score = 0.0
+        time_used = 'N/A'
+        memory_used = 'N/A'
+
+        if 'groups' in data and data['groups']:
+            group = data['groups'][0]
+            if 'cases' in group and group['cases']:
+                case = group['cases'][0]
+                if 'verdict' in case:
+                    verdict = case['verdict']
+                    score = case.get('score', 0.0)
+
+                    if 'meta' in case:
+                        meta = case['meta']
+                        if 'time' in meta and meta['time']:
+                            time_used = f"{meta['time']*1000:.1f}ms"
+                        if 'memory' in meta and meta['memory']:
+                            memory_used = f"{meta['memory']/1024:.1f}KB"
+
+        return {
+            'verdict': verdict,
+            'score': score,
+            'time': time_used,
+            'memory': memory_used,
+            'groups': data.get('groups', [])
+        }
+
+    def _parse_status_updates(self, response_text: str) -> Dict[str, Any]:
+        """Parse status updates from response text."""
+        if 'running' in response_text:
+            return {'verdict': 'Running/Completed'}
+        if 'queueing' in response_text:
+            return {'verdict': 'Queued'}
+        if 'waiting' in response_text:
+            return {'verdict': 'Waiting'}
+        return {'verdict': 'Unknown'}
+
     def _parse_judge_response(self, response_text: str) -> (
             Optional[Dict[str, Any]]):
         """Parse multipart judge response to extract verdict."""
-        try:
-            # Ephemeral response is multipart/form-data with status updates
-            # Look for latest status and verdict information
+        json_content = self._extract_json_from_multipart(response_text)
 
-            verdict = 'Unknown'
-            score = 0.0
+        if json_content:
+            try:
+                data = json.loads(json_content)
+                result = self._extract_verdict_from_data(data)
+                result['raw_response'] = (response_text[:300] + '...'
+                                          if len(response_text) > 300
+                                          else response_text)
+                return result
+            except json.JSONDecodeError:
+                pass
 
-            # Look for status updates in multipart response
-            if 'running' in response_text:
-                verdict = 'Running/Completed'
-            elif 'queueing' in response_text:
-                verdict = 'Queued'
-            elif 'waiting' in response_text:
-                verdict = 'Waiting'
-
-            # Look for verdict information in response
-            if 'AC\n' in response_text:
-                verdict = 'AC'
-                score = 1.0
-            elif 'WA\n' in response_text:
-                verdict = 'WA'
-            elif 'RTE\n' in response_text:
-                verdict = 'RTE'
-            elif 'TLE\n' in response_text:
-                verdict = 'TLE'
-            elif 'MLE\n' in response_text:
-                verdict = 'MLE'
-
-            # Extract time and memory if available
-            time_used = 'N/A'
-            memory_used = 'N/A'
-
-            # Look for time/memory patterns in response
-            time_match = re.search(r'time:\s*([0-9.]+)', response_text)
-            if time_match:
-                time_used = f"{time_match.group(1)}s"
-
-            memory_match = re.search(r'memory:\s*([0-9]+)', response_text)
-            if memory_match:
-                memory_used = f"{int(memory_match.group(1))/1024/1024:.2f}MB"
-
-            return {
-                'verdict': verdict,
-                'score': score,
-                'time': time_used,
-                'memory': memory_used,
-                'groups': [],
-                'raw_response': (response_text[:300] + '...'
-                                 if len(response_text) > 300
-                                 else response_text)
-            }
-
-        except (ValueError, KeyError, TypeError, AttributeError):
-            # If any error occurs, return basic information
-            return {
-                'verdict': 'Executed',
-                'score': 0,
-                'time': 'N/A',
-                'memory': 'N/A',
-                'groups': [],
-                'raw_response': (response_text[:200] + '...'
-                                 if len(response_text) > 200
-                                 else response_text)
-            }
+        return self._parse_status_updates(response_text)
 
     def _build_request_data(self, problem_settings: Optional[Dict[str, Any]],
                             source_code: str, language: str) -> Dict[str, Any]:
@@ -317,7 +382,7 @@ def main() -> None:
 
     # Determine which aliases file to use
     # Constant for number of aliases to test
-    max_test_aliases = 2
+    max_test_aliases = 48
 
     aliases_file = runner.get_aliases_file()
     print(f"📁 Using aliases file: {aliases_file}")
@@ -348,10 +413,23 @@ def main() -> None:
         # Demo mode: single individual test to demonstrate functionality
         first_alias = aliases[0]
         print(f"\n🧪 Individual ephemeral test (demo mode) with: {first_alias}")
+
+        # First, show problem details
+        runner.show_problem_details(first_alias)
+
+        # Then run the test
         runner.run_ephemeral(
             problem_alias=first_alias,
-            source_code='a, b = map(int, input().split())\nprint(a + b)',
-            language='py3'
+            source_code=(
+                '#include <iostream>\n'
+                'using namespace std;\n\n'
+                'int main()\n{\n'
+                '   int a,b;\n'
+                '   cin>>a>>b;\n'
+                '   cout<<a+b<<endl;\n'
+                '   return 0;\n}'
+            ),
+            language='cpp11-gcc'
         )
 
         # Result already shown inline during execution
@@ -365,8 +443,16 @@ def main() -> None:
         for alias in aliases:
             problems.append({
                 'alias': alias,
-                'source': 'a, b = map(int, input().split())\nprint(a + b)',
-                'language': 'py3'
+                'source': (
+                    '#include <iostream>\n'
+                    'using namespace std;\n\n'
+                    'int main()\n{\n'
+                    '   int a,b;\n'
+                    '   cin>>a>>b;\n'
+                    '   cout<<a+b<<endl;\n'
+                    '   return 0;\n}'
+                ),
+                'language': 'cpp11-gcc'
             })
 
         runner.run_batch_ephemeral(problems)
