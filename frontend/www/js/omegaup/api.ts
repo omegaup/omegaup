@@ -1274,6 +1274,10 @@ export const Problem = {
     })(x.clarifications);
     return x;
   }),
+  convertZipToCdp: apiCall<
+    messages.ProblemConvertZipToCdpRequest,
+    messages.ProblemConvertZipToCdpResponse
+  >('/api/problem/convertZipToCdp/'),
   create: apiCall<
     messages.ProblemCreateRequest,
     messages.ProblemCreateResponse
