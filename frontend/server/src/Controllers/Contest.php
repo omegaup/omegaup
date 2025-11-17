@@ -6101,6 +6101,248 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * Downloads the scoreboard in CSV, XLSX, or ODS format
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $format - One of: csv, xlsx, ods
+     */
+    public static function apiScoreboardDownload(\OmegaUp\Request $r): void {
+        $r->ensureIdentity();
+
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $format = $r->ensureEnum(
+            'format',
+            ['csv', 'xlsx']
+        );
+
+        [
+            'contest' => $contest,
+            'problemset' => $problemset,
+        ] = self::validateBasicDetails($contestAlias);
+
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        // Check if user is contest admin
+        if (!\OmegaUp\Authorization::isContestAdmin($r->identity, $contest)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        // Get scoreboard data
+        $scoreboard = self::getScoreboard($contest, $problemset, $r->identity);
+
+        // Generate and download the file
+        self::generateScoreboardFile($scoreboard, $format, $contest->title);
+    }
+
+    /**
+     * Generates and downloads scoreboard file in specified format
+     *
+     * @param Scoreboard $scoreboard
+     * @param string $format
+     * @param string $contestTitle
+     */
+    private static function generateScoreboardFile(
+        array $scoreboard,
+        string $format,
+        string $contestTitle
+    ): void {
+        $filename = sprintf(
+            'scoreboard_%s_%s.%s',
+            preg_replace('/[^a-zA-Z0-9_-]/', '_', $contestTitle),
+            date('Y-m-d_H-i-s'),
+            $format
+        );
+
+        // Prepare data for export
+        $data = self::prepareScoreboardDataForExport($scoreboard);
+
+        switch ($format) {
+            case 'csv':
+                self::generateCSV($data, $filename);
+                break;
+            case 'xlsx':
+                self::generateXLSX($data, $filename, $contestTitle);
+                break;
+        }
+    }
+
+    /**
+     * Prepares scoreboard data for export format
+     *
+     * @param Scoreboard $scoreboard
+     * @return array<array<string>>
+     */
+    private static function prepareScoreboardDataForExport(array $scoreboard): array {
+        $data = [];
+
+        // Header row
+        $header = ['Rank', 'Username', 'Total Score'];
+        foreach ($scoreboard['problems'] as $problem) {
+            $header[] = $problem['alias'];
+        }
+        $header[] = 'Penalty';
+        $data[] = $header;
+
+        // Data rows
+        foreach ($scoreboard['ranking'] as $entry) {
+            $row = [
+                $entry['place'] ?? '-',
+                $entry['username'],
+                number_format($entry['total']['points'], 2),
+            ];
+
+            // Add problem-wise scores
+            foreach ($entry['problems'] as $problem) {
+                $score = $problem['points'] > 0 ?
+                    number_format($problem['points'], 2) : '-';
+                $row[] = $score;
+            }
+
+            // Add penalty
+            $row[] = $entry['total']['penalty'];
+
+            $data[] = $row;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Generates CSV file
+     *
+     * @param array<array<string>> $data
+     * @param string $filename
+     */
+    private static function generateCSV(array $data, string $filename): void {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'w');
+
+        foreach ($data as $row) {
+            fputcsv($output, $row);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    /**
+     * Generates XLSX file using PhpSpreadsheet
+     *
+     * @param array<array<string>> $data
+     * @param string $filename
+     * @param string $contestTitle
+     */
+    private static function generateXLSX(
+        array $data,
+        string $filename,
+        string $contestTitle
+    ): void {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set title
+        $sheet->setTitle('Scoreboard');
+
+        // Add contest title
+        $sheet->setCellValue('A1', $contestTitle);
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->mergeCells(
+            'A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                count(
+                    $data[0]
+                )
+            ) . '1'
+        );
+
+        // Add data starting from row 3
+        $rowIndex = 3;
+        foreach ($data as $row) {
+            $colIndex = 1;
+            foreach ($row as $cell) {
+                $coordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                    $colIndex
+                ) . $rowIndex;
+                $sheet->setCellValue($coordinate, $cell);
+                $colIndex++;
+            }
+            $rowIndex++;
+        }
+
+        // Auto-size columns
+        foreach (range(1, count($data[0])) as $col) {
+            $sheet->getColumnDimension(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+                    $col
+                )
+            )->setAutoSize(
+                true
+            );
+        }
+
+        // Style header row
+        $headerRange = 'A3:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(
+            count(
+                $data[0]
+            )
+        ) . '3';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle(
+            $headerRange
+        )->getFill()->setFillType(
+            \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+        )->getStartColor()->setRGB(
+            'CCCCCC'
+        );
+
+        self::outputSpreadsheet($spreadsheet, $filename, 'Xlsx');
+    }
+
+    /**
+     * Outputs spreadsheet to browser
+     *
+     * @param \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet
+     * @param string $filename
+     * @param string $writerType
+     */
+    private static function outputSpreadsheet(
+        \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet,
+        string $filename,
+        string $writerType
+    ): void {
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter(
+            $spreadsheet,
+            $writerType
+        );
+
+        // Set correct content type based on format
+        $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+        header('Content-Type: ' . $contentType);
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
     public static function isPublic(string $admissionMode): bool {
         return $admissionMode !== \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE;
     }

@@ -119,6 +119,8 @@
         :show-all-contestants="
           contest.default_show_all_contestants_in_scoreboard
         "
+        :show-download-button="contestAdmin"
+        @download-scoreboard="downloadScoreboard"
       >
         <template #scoreboard-header><div></div></template>
       </omegaup-arena-scoreboard>
@@ -394,6 +396,13 @@ export default class ArenaContest extends Vue {
 
   onRunExecuted(): void {
     this.$emit('execute-run', { target: this });
+  }
+
+  downloadScoreboard(format: string): void {
+    const url = `/api/contest/scoreboardDownload/?contest_alias=${encodeURIComponent(
+      this.contest.alias,
+    )}&format=${encodeURIComponent(format)}`;
+    window.location.href = url;
   }
 
   onRunAdminDetails(guid: string): void {
