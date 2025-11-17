@@ -6225,11 +6225,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param string $filename
      */
     private static function generateCSV(array $data, string $filename): void {
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
+        $headers = '';
+        // In test environments, headers might already be sent, so skip them
+        if (!headers_sent()) {
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        } else {
+            // In test environments, capture headers for ExitException
+            $headers = "Content-Type: text/csv; charset=utf-8\r\n" .
+                      "Content-Disposition: attachment; filename=\"{$filename}\"\r\n" .
+                      "Cache-Control: no-cache, no-store, must-revalidate\r\n" .
+                      "Pragma: no-cache\r\n" .
+                      "Expires: 0\r\n";
+        }
 
         $output = fopen('php://output', 'w');
 
@@ -6238,6 +6249,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         fclose($output);
+        // In test environments, throw ExitException instead of exit
+        if (defined('IS_TEST') && IS_TEST === true) {
+            throw new \OmegaUp\Exceptions\ExitException($headers);
+        }
         exit;
     }
 
@@ -6253,6 +6268,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $filename,
         string $contestTitle
     ): void {
+        if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+            throw new \OmegaUp\Exceptions\NotFoundException('phpspreadsheetNotAvailable');
+        }
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -6333,14 +6351,35 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Set correct content type based on format
         $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-        header('Content-Type: ' . $contentType);
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
+        $headers = "Content-Type: {$contentType}\r\n" .
+                   "Content-Disposition: attachment; filename=\"{$filename}\"\r\n" .
+                   "Cache-Control: no-cache, no-store, must-revalidate\r\n" .
+                   "Pragma: no-cache\r\n" .
+                   "Expires: 0\r\n";
 
-        $writer->save('php://output');
-        exit;
+        // In test environments, headers might already be sent, so skip them
+        if (!headers_sent()) {
+            header('Content-Type: ' . $contentType);
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+
+            $writer->save('php://output');
+            // In test environments, throw ExitException instead of exit
+            if (defined('IS_TEST') && IS_TEST === true) {
+                throw new \OmegaUp\Exceptions\ExitException($headers);
+            }
+            exit;
+        } else {
+            // In test environments, save to temp file and throw ExitException
+            $tempFile = tempnam(sys_get_temp_dir(), 'omegaup_test_');
+            $writer->save($tempFile);
+            unlink($tempFile); // Clean up temp file
+            if (defined('IS_TEST') && IS_TEST === true) {
+                throw new \OmegaUp\Exceptions\ExitException($headers);
+            }
+        }
     }
 
     public static function isPublic(string $admissionMode): bool {

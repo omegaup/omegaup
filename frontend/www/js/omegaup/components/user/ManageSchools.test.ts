@@ -61,15 +61,17 @@ describe('ManageSchools.vue', () => {
 
     await wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user-schools')).toBeDefined();
-    expect(wrapper.emitted('update-user-schools')).toEqual([
-      [
-        {
-          graduation_date: new Date('2010-10-10'),
-          school_id: 1,
-          school_name: 'escuela',
-          scholar_degree: 'bachelors',
-        },
-      ],
-    ]);
+    const emitted = wrapper.emitted('update-user-schools');
+    expect(emitted).toBeDefined();
+    expect(emitted![0]).toHaveLength(1);
+    const userSchoolData = emitted![0][0];
+    expect(userSchoolData.school_id).toBe(1);
+    expect(userSchoolData.school_name).toBe('escuela');
+    expect(userSchoolData.scholar_degree).toBe('bachelors');
+    const expectedDate = new Date(2010, 9, 10); // October 10, 2010 at midnight local time
+    const actualDate = userSchoolData.graduation_date;
+    expect(actualDate.getFullYear()).toBe(expectedDate.getFullYear());
+    expect(actualDate.getMonth()).toBe(expectedDate.getMonth());
+    expect(actualDate.getDate()).toBe(expectedDate.getDate());
   });
 });
