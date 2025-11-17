@@ -6142,7 +6142,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $scoreboard = self::getScoreboard($contest, $problemset, $r->identity);
 
         // Generate and download the file
-        self::generateScoreboardFile($scoreboard, $format, $contest->title);
+        self::generateScoreboardFile($scoreboard, $format, $contest->title ?? 'contest');
     }
 
     /**
@@ -6181,7 +6181,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Prepares scoreboard data for export format
      *
      * @param Scoreboard $scoreboard
-     * @return array<array<string>>
+     * @return array<array<mixed>>
      */
     private static function prepareScoreboardDataForExport(array $scoreboard): array {
         $data = [];
@@ -6253,6 +6253,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         fclose($output);
         // In test environments, throw ExitException instead of exit
         if (defined('IS_TEST') && IS_TEST === true) {
+            /** @psalm-suppress TranslationStringNotALiteralString */
             throw new \OmegaUp\Exceptions\ExitException($headers);
         }
         exit;
@@ -6272,7 +6273,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'phpspreadsheetNotAvailable'
+                'PhpSpreadsheet library not available'
             );
         }
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -6374,6 +6375,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $writer->save('php://output');
             // In test environments, throw ExitException instead of exit
             if (defined('IS_TEST') && IS_TEST === true) {
+                /** @psalm-suppress TranslationStringNotALiteralString */
                 throw new \OmegaUp\Exceptions\ExitException($headers);
             }
             exit;
@@ -6383,6 +6385,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $writer->save($tempFile);
             unlink($tempFile); // Clean up temp file
             if (defined('IS_TEST') && IS_TEST === true) {
+                /** @psalm-suppress TranslationStringNotALiteralString */
                 throw new \OmegaUp\Exceptions\ExitException($headers);
             }
         }
