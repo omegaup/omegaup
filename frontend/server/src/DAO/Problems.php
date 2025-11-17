@@ -78,6 +78,65 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * @return list<int>
+     */
+    private static function getAccessibleAclIds(
+        ?int $identityId,
+        ?int $userId
+    ): array {
+        if (is_null($identityId) || is_null($userId)) {
+            return [];
+        }
+
+        $sql = '
+            SELECT acl_id
+            FROM User_Roles
+            WHERE user_id = ? AND role_id = ?
+
+            UNION
+
+            SELECT gr.acl_id
+            FROM Groups_Identities gi
+            INNER JOIN Group_Roles gr ON gr.group_id = gi.group_id
+            WHERE gi.identity_id = ? AND gr.role_id = ?
+        ';
+
+        /** @var list<array{acl_id: int}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $userId,
+                \OmegaUp\Authorization::ADMIN_ROLE,
+                $identityId,
+                \OmegaUp\Authorization::ADMIN_ROLE
+            ]
+        );
+
+        return array_map(fn($row) => $row['acl_id'], $results);
+    }
+
+    /**
+     * @param list<string> $usernames
+     * @return list<int>
+     */
+    private static function getUserIdsByUsername(array $usernames): array {
+        if (empty($usernames)) {
+            return [];
+        }
+        // Create placeholders (?, ?, ?) for each username
+        $placeholders = implode(',', array_fill(0, count($usernames), '?'));
+        $sql = "SELECT user_id FROM User_Rank WHERE username IN ({$placeholders})";
+
+        /** @var list<array{user_id: int}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $usernames
+        );
+
+        return array_map(fn($row) => intval($row['user_id']), $results);
+    }
+
+    /**
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
@@ -279,71 +338,69 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
+            $userKey = is_null($userId) ? 'null' : $userId;
+            $callback = /** @return list<int> */ fn (): array =>
+                self::getAccessibleAclIds($identityId, $userId);
+            $cacheKey = "{$identityId}-{$userKey}";
+
+            $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
+                \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
+                $cacheKey,
+                $callback
+            );
+
             $select = "
-                SELECT DISTINCT
+                SELECT
                     ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
-                    p.accepted / GREATEST(1, p.submissions)     AS ratio,
-                    ROUND(100 * IFNULL(ps.score, 0), 2)   AS score,
+                    p.accepted / GREATEST(1, p.submissions) AS ratio,
+                    ROUND(100 * IFNULL(ps.score, 0), 2) AS score,
                     {$fields}
             ";
+
             $sql = '
-                FROM
-                    Problems p
-                INNER JOIN
-                    ACLs a
-                ON
-                    a.acl_id = p.acl_id
+                FROM Problems p
+                INNER JOIN ACLs a ON a.acl_id = p.acl_id
+                LEFT JOIN Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
                 LEFT JOIN (
                     SELECT
                         s.problem_id,
-                        s.identity_id,
                         MAX(r.score) AS score
-                    FROM
-                        Submissions s
-                    INNER JOIN
-                        Runs r ON r.run_id = s.current_run_id
-                    WHERE
-                        s.identity_id = ?
-                    GROUP BY
-                        s.problem_id, s.identity_id
-                ) ps ON ps.problem_id = p.problem_id
-                LEFT JOIN
-                    User_Roles ur ON ur.user_id = ? AND p.acl_id = ur.acl_id AND ur.role_id = ?
-                LEFT JOIN
-                    Identities id ON id.identity_id = ? AND a.owner_id = id.user_id
-                LEFT JOIN (
-                    SELECT DISTINCT
-                        gr.acl_id
-                    FROM
-                        Groups_Identities gi
-                    INNER JOIN
-                        Group_Roles gr ON gr.group_id = gi.group_id
-                    WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin . $levelJoin;
-            $args[] = $identityId;
-            $args[] = $userId;
-            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
+                    FROM Submissions s
+                    INNER JOIN Runs r ON r.run_id = s.current_run_id
+                    WHERE s.identity_id = ?
+                    GROUP BY s.problem_id
+                ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
+
             $args[] = $identityId;
             $args[] = $identityId;
-            $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
+
+            $visibilityThreshold = max(
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                $minVisibility
+            );
+
+            $clause = '(p.visibility >= ? OR id.identity_id IS NOT NULL)';
+            $argsForClause = [$visibilityThreshold];
+
+            if (!empty($accessibleAclIds)) {
+                $placeholders = implode(
+                    ',',
+                    array_fill(0, count($accessibleAclIds), '?')
+                );
+                $clause .= ' OR p.acl_id IN (' . $placeholders . ')';
+                $argsForClause = array_merge($argsForClause, $accessibleAclIds);
+            }
 
             $clauses[] = [
-                '(p.visibility >= ? OR id.identity_id = ? OR ur.acl_id IS NOT NULL OR gr.acl_id IS NOT NULL)',
-                [
-                    max(
-                        \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                        $minVisibility
-                    ),
-                    $identityId,
-                ],
-            ];
-            $clauses[] = [
-                'p.visibility > ?',
-                [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
+                '(' . $clause . ') AND p.visibility > ?',
+                array_merge(
+                    $argsForClause,
+                    [\OmegaUp\ProblemParams::VISIBILITY_DELETED]
+                ),
             ];
         } elseif ($identityType === IDENTITY_ANONYMOUS) {
             $select = "
-                    SELECT DISTINCT
+                    SELECT
                         0.0 AS score,
                         ROUND(100 / LOG2(GREATEST(p.accepted, 1) + 1), 2) AS points,
                         accepted / GREATEST(1, p.submissions)  AS ratio,
@@ -375,31 +432,27 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!empty($authors)) {
-            $placeholders = join(',', array_fill(0, count($authors), '?'));
-            $sql .= "
-                INNER JOIN (
-                    SELECT
-                        pp.problem_id
-                    FROM
-                        Problems pp
-                    INNER JOIN
-                        ACLs acl
-                    ON
-                        pp.acl_id = acl.acl_id
-                    INNER JOIN
-                        User_Rank ur
-                    ON
-                        ur.user_id = acl.owner_id
-                    WHERE ur.user_id IN (
-                        SELECT
-                            user_id
-                        FROM
-                            User_Rank
-                        WHERE username IN ($placeholders)
-                    )
-                ) pa ON pa.problem_id = p.problem_id";
+            $authorUserIds = self::getUserIdsByUsername($authors);
 
-            $args = array_merge($args, $authors);
+            if (!empty($authorUserIds)) {
+                $placeholders = join(
+                    ',',
+                    array_fill(
+                        0,
+                        count(
+                            $authorUserIds
+                        ),
+                        '?'
+                    )
+                );
+                $sql .= '
+                    INNER JOIN ACLs pa_acl ON pa_acl.acl_id = p.acl_id
+                ';
+                $clauses[] = [
+                    'pa_acl.owner_id IN (' . $placeholders . ')',
+                    $authorUserIds,
+                ];
+            }
         }
 
         if ($onlyQualitySeal) {
