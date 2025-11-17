@@ -6229,7 +6229,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // In test environments, headers might already be sent, so skip them
         if (!headers_sent()) {
             header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header(
+                'Content-Disposition: attachment; filename="' . $filename . '"'
+            );
             header('Cache-Control: no-cache, no-store, must-revalidate');
             header('Pragma: no-cache');
             header('Expires: 0');
@@ -6269,7 +6271,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $contestTitle
     ): void {
         if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
-            throw new \OmegaUp\Exceptions\NotFoundException('phpspreadsheetNotAvailable');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'phpspreadsheetNotAvailable'
+            );
         }
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -6360,7 +6364,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // In test environments, headers might already be sent, so skip them
         if (!headers_sent()) {
             header('Content-Type: ' . $contentType);
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header(
+                'Content-Disposition: attachment; filename="' . $filename . '"'
+            );
             header('Cache-Control: no-cache, no-store, must-revalidate');
             header('Pragma: no-cache');
             header('Expires: 0');

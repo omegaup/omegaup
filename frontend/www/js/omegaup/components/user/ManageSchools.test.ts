@@ -60,10 +60,12 @@ describe('ManageSchools.vue', () => {
     await wrapper.findComponent(datePicker).setValue('2010-10-10');
 
     await wrapper.find('button[type="submit"]').trigger('submit');
-    expect(wrapper.emitted('update-user-schools')).toBeDefined();
     const emitted = wrapper.emitted('update-user-schools');
     expect(emitted).toBeDefined();
+    expect(emitted).toHaveLength(1);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(emitted![0]).toHaveLength(1);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const userSchoolData = emitted![0][0];
     expect(userSchoolData.school_id).toBe(1);
     expect(userSchoolData.school_name).toBe('escuela');
