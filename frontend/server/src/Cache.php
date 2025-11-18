@@ -106,8 +106,6 @@ abstract class CacheAdapter {
             }
             return $returnValue;
         }
-        $log = \Monolog\Registry::omegaup()->withName('cache');
-
         // Get a lock to prevent multiple requests from trying to create the
         // same cache entry. The name of the lockfile is derived from the
         // provided lock group, not the full key, since it is still preferred
@@ -138,6 +136,7 @@ abstract class CacheAdapter {
             /** @var T */
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
+
             if (!is_null($cacheUsed)) {
                 $cacheUsed = false;
             }
