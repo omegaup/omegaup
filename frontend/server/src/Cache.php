@@ -138,7 +138,6 @@ abstract class CacheAdapter {
             /** @var T */
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
-            
             if (!is_null($cacheUsed)) {
                 $cacheUsed = false;
             }
