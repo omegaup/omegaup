@@ -463,6 +463,7 @@ const translations: { [key: string]: string; } = {
   contestsJoinScoreboards: "Unir Scoreboards",
   contestsListLoading: "Cargando...",
   contestsListShowMore: "Ver m\u00e1s concursos",
+  couldNotCreateTemporaryFile: "No se pudo crear el archivo temporal",
   countryNotSet: "Pa\u00eds no establecido",
   courseActionScoreboard: "Scoreboard",
   courseAddContent: "A\u00f1adir contenido",

@@ -2506,4 +2506,107 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $response['statement']['markdown']
         );
     }
+
+    public function testCommitModifiedZipExcludesEasyCases(): void {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = $problemData['problem'];
+        $identity = $problemData['author'];
+
+        //Get the current ZIP file with all the files
+        $artifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias
+        );
+        $currentZipPath = $artifacts->getZip();
+
+        // Define changes
+        $pathsToExclude = [
+            'cases/sample',
+            'cases/easy.01',
+        ];
+        $filesToAdd = [
+            'cases/easy.001.in'  => "10 5\n",
+            'cases/easy.001.out' => "15\n",
+        ];
+        $pathsToRename = [
+            'cases/medium.'  => 'cases/hard.',
+        ];
+
+        $deployer = new \OmegaUp\ProblemDeployer(
+            $problem->alias
+        );
+
+        //  Commit the changes to the ZIP file
+        $deployer->commitModifiedZip(
+            'Test complex edit on cases',
+            $identity,
+            $currentZipPath,
+            $pathsToExclude,
+            $filesToAdd,
+            $pathsToRename,
+        );
+        if (is_file($currentZipPath)) {
+            unlink($currentZipPath);
+        }
+        // Retrieve the modified ZIP file
+        $newArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias
+        );
+        $newZipPath = $newArtifacts->getZip();
+
+        $zip = new \ZipArchive();
+        $this->assertTrue(
+            $zip->open($newZipPath) === true,
+            'The resulting ZIP file could not be opened.'
+        );
+
+        // Excluded: the new ZIP file must not contain any files beginning with these prefixes.
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+
+            foreach ($pathsToExclude as $excludePrefix) {
+                if (str_starts_with($name, $excludePrefix)) {
+                    $this->fail("The excluded file {$name} still exists.");
+                }
+            }
+        }
+
+        // Aggregates: cases must exist and have the expected content
+        foreach ($filesToAdd as $path => $expectedContent) {
+            $this->assertNotFalse(
+                $zip->locateName($path),
+                "The file {$path} should exist"
+            );
+            $this->assertSame(
+                $expectedContent,
+                $zip->getFromName($path),
+                "Incorrect content in {$path}"
+            );
+        }
+
+        // Renamed: there should be no cases with the previous prefix.
+        foreach ($pathsToRename as $oldPrefix => $newPrefix) {
+            $hasNewPrefix = false;
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = $zip->getNameIndex($i);
+                $this->assertFalse(
+                    str_starts_with($name, $oldPrefix),
+                    "The file {$name} must not start with the old prefix {$oldPrefix}."
+                );
+                if (str_starts_with($name, $newPrefix)) {
+                    $hasNewPrefix = true;
+                }
+            }
+            $this->assertTrue(
+                $hasNewPrefix,
+                "No file with the new prefix {$newPrefix} was found."
+            );
+        }
+
+        $zip->close();
+
+        if (is_file($newZipPath)) {
+            unlink($newZipPath);
+        }
+    }
 }
