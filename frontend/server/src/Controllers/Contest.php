@@ -6142,7 +6142,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $scoreboard = self::getScoreboard($contest, $problemset, $r->identity);
 
         // Generate and download the file
-        self::generateScoreboardFile($scoreboard, $format, $contest->title ?? 'contest');
+        self::generateScoreboardFile(
+            $scoreboard,
+            $format,
+            $contest->title ?? 'contest'
+        );
     }
 
     /**
@@ -6272,6 +6276,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $contestTitle
     ): void {
         if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+            /** @psalm-suppress TranslationStringNotFound */
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'PhpSpreadsheet library not available'
             );
