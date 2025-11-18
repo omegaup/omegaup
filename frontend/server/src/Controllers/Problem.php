@@ -5537,7 +5537,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             self::validateData($data, $isCase);
             if ($isCase) {
-                self::updateCase(
+                $cdp = self::updateCase(
                     $r->identity,
                     $r->user,
                     $problem,
@@ -5548,7 +5548,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemParams->updatePublished
                 );
             } else {
-                self::updateGroup(
+                $cdp = self::updateGroup(
                     $r->identity,
                     $r->user,
                     $problem,
@@ -5582,7 +5582,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            self::deleteGroupOrCase(
+            $cdp = self::deleteGroupOrCase(
                 $r->identity,
                 $r->user,
                 $problem,
@@ -6894,12 +6894,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $zipFilePath,
                     $params['alias']
                 );
-                if (!isset($result['cdp'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'cdpNotFound'
-                    );
-                }
-                $result = $result['cdp'];
             } else {
                 $jsonContent = mb_convert_encoding(
                     $problemArtifacts->get(
@@ -6984,7 +6978,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string $message Commit message
      * @param string $updatePublished Update published problems/assignments mode
      *
-     * @return void
+     * @return CDP Modified CDP structure
      *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
@@ -6998,10 +6992,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         array $newCaseData,
         array $groupData,
-        array &$cdp,
+        array $cdp,
         string $message,
         string $updatePublished
-    ): void {
+    ): array {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7041,6 +7035,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_CDP_DATA,
             "{$problem->alias}-{$problem->commit}"
         );
+        /** @var CDP */
+        return $result['cdp'];
     }
 
     /**
@@ -7053,18 +7049,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @param-out CDP $cdp
      *
-     * @return array Array with blobUpdate and pathsToExclude
+     * @return array{blobUpdate: array<string, string>, pathsToExclude: list<string>, cdp: CDP}
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @psalm-suppress ReferenceConstraintViolation
      */
     private static function handleEditCase(
         array $newCaseData,
         array $groupData,
-        array &$cdp,
+        array $cdp,
         \OmegaUp\ProblemArtifacts $problemArtifacts
     ): array {
         $caseID = $newCaseData['caseID'];
@@ -7267,10 +7262,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'name' => $newCaseName
             ];
         }
-
+        /** @var array<string, string> $blobUpdate*/
+        $blobUpdate;
+        /** @var list<string> $pathsToExclude*/
+        $pathsToExclude;
+        /** @var CDP $cdp*/
+        $cdp;
         return [
             'blobUpdate' => $blobUpdate,
-            'pathsToExclude' => $pathsToExclude
+            'pathsToExclude' => $pathsToExclude,
+            'cdp' => $cdp
         ];
     }
 
@@ -7282,18 +7283,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param CDP $cdp CDP data structure (modified in place)
      * @param \OmegaUp\ProblemArtifacts $problemArtifacts Problem artifacts helper
      *
-     * @param-out CDP $cdp
-     *
-     * @return array Array with blobUpdate and pathsToExclude
+     * @return array{blobUpdate: array<string, string>, pathsToExclude: list<string>, cdp: CDP}
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
-     * @psalm-suppress ReferenceConstraintViolation
      */
     private static function handleNewCase(
         array $newCaseData,
         array $groupData,
-        array &$cdp,
+        array $cdp,
         \OmegaUp\ProblemArtifacts $problemArtifacts
     ): array {
         $newGroupID = $newCaseData['groupID'];
@@ -7382,10 +7380,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'autoPoints' => $newCaseData['autoPoints'],
             'output' => $newOutput
         ];
-
+        /** @var array<string, string> $blobUpdate */
+        $blobUpdate;
+        /** @var CDP $cdp */
+        $cdp;
         return [
             'blobUpdate' => $blobUpdate,
-            'pathsToExclude' => []
+            'pathsToExclude' => [],
+            'cdp' => $cdp
         ];
     }
 
@@ -7400,7 +7402,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string $message Commit message
      * @param string $updatePublished Update published problems/assignments mode
      *
-     * @return void
+     * @return CDP Modified CDP structure
      *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
@@ -7412,10 +7414,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Problems $problem,
         array $newGroupData,
-        array &$cdp,
+        array $cdp,
         string $message,
         string $updatePublished
-    ): void {
+    ): array {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7446,6 +7448,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_CDP_DATA,
             "{$problem->alias}-{$problem->commit}"
         );
+        return $result['cdp'];
     }
 
      /**
@@ -7457,16 +7460,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @param-out CDP $cdp
      *
-     * @return array Array with pathsToRename
+     * @return array{pathsToRename: array<string, string>, cdp: CDP}
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @psalm-suppress ReferenceConstraintViolation
      */
     private static function handleEditGroup(
         array $newGroupData,
-        array &$cdp,
+        array $cdp,
         array $groupInfo
     ): array {
         $oldGroup = $groupInfo['group'];
@@ -7500,9 +7502,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $cdp['casesStore']['groups'][$groupIndex]['points'] = $newGroupData['points'];
         $cdp['casesStore']['groups'][$groupIndex]['autoPoints'] = $newGroupData['autoPoints'];
-
+        /** @var CDP $cdp */
+        $cdp;
         return [
-            'pathsToRename' => $pathsToRename
+            'pathsToRename' => $pathsToRename,
+            'cdp' => $cdp
         ];
     }
 
@@ -7517,7 +7521,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param string $message Commit message
      * @param string $updatePublished Update published problems/assignments mode
      *
-     * @return void
+     * @return CDP Modified CDP structure
      *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
@@ -7529,10 +7533,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Users $user,
         \OmegaUp\DAO\VO\Problems $problem,
         string $id,
-        array &$cdp,
+        array $cdp,
         string $message,
         string $updatePublished
-    ): void {
+    ): array {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7571,6 +7575,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::PROBLEM_CDP_DATA,
             "{$problem->alias}-{$problem->commit}"
         );
+        /** @var CDP $cdp */
+        return $result['cdp'];
     }
 
     /**
@@ -7579,11 +7585,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param array $caseInfo Case metadata (case, group and indexes)
      * @param CDP $cdp CDP data structure (modified in place)
      *
-     * @return array Array with pathsToExclude
+     * @return array{pathsToExclude: list<string>, cdp: CDP}
      */
     private static function handleDeleteCase(
         array $caseInfo,
-        array &$cdp,
+        array $cdp,
     ): array {
         $case = $caseInfo['case'];
         $group = $caseInfo['group'];
@@ -7610,9 +7616,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (empty($cdp['casesStore']['groups'][$groupIndex]['cases'])) {
             array_splice($cdp['casesStore']['groups'], $groupIndex, 1);
         }
-
+        /** @var CDP $cdp */
+        $cdp;
         return [
-            'pathsToExclude' => $pathsToExclude
+            'pathsToExclude' => $pathsToExclude,
+            'cdp' => $cdp
         ];
     }
 
@@ -7622,11 +7630,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param array $groupInfo Group metadata (group and index)
      * @param CDP $cdp CDP data structure (modified in place)
      *
-     * @return array Array with blobUpdate and pathsToExclude
+     * @return array{blobUpdate: array<empty, empty>, pathsToExclude: list<string>, cdp: CDP}
      */
     private static function handleDeleteGroup(
         array $groupInfo,
-        array &$cdp,
+        array $cdp,
     ): array {
         $group = $groupInfo['group'];
         $groupIndex = $groupInfo['groupIndex'];
@@ -7636,10 +7644,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Remove group from the CDP
         array_splice($cdp['casesStore']['groups'], $groupIndex, 1);
-
+        /** @var CDP $cdp */
+        $cdp;
         return [
             'blobUpdate' => [],
             'pathsToExclude' => $pathsToExclude,
+            'cdp' => $cdp
         ];
     }
 
