@@ -2509,14 +2509,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testCommitModifiedZipExcludesEasyCases(): void {
         // Get a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problem = $problemData['problem'];
-        $identity = $problemData['author'];
+        [
+            'problem' => $problem,
+            'author' => $identity,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem();
 
         //Get the current ZIP file with all the files
-        $artifacts = new \OmegaUp\ProblemArtifacts(
-            $problem->alias
-        );
+        $artifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
         $currentZipPath = $artifacts->getZip();
 
         // Define changes
@@ -2532,9 +2531,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'cases/medium.'  => 'cases/hard.',
         ];
 
-        $deployer = new \OmegaUp\ProblemDeployer(
-            $problem->alias
-        );
+        $deployer = new \OmegaUp\ProblemDeployer($problem->alias);
 
         //  Commit the changes to the ZIP file
         $deployer->commitModifiedZip(
@@ -2556,7 +2553,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $zip = new \ZipArchive();
         $this->assertTrue(
-            $zip->open($newZipPath) === true,
+            $zip->open($newZipPath),
             'The resulting ZIP file could not be opened.'
         );
 
@@ -2565,9 +2562,11 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $name = $zip->getNameIndex($i);
 
             foreach ($pathsToExclude as $excludePrefix) {
-                if (str_starts_with($name, $excludePrefix)) {
-                    $this->fail("The excluded file {$name} still exists.");
-                }
+                $this->assertStringStartsNotWith(
+                    $excludePrefix,
+                    $name,
+                    "The excluded file {$name} still exists."
+                );
             }
         }
 
@@ -2589,8 +2588,9 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $hasNewPrefix = false;
             for ($i = 0; $i < $zip->numFiles; $i++) {
                 $name = $zip->getNameIndex($i);
-                $this->assertFalse(
-                    str_starts_with($name, $oldPrefix),
+                $this->assertStringStartsNotWith(
+                    $oldPrefix,
+                    $name,
                     "The file {$name} must not start with the old prefix {$oldPrefix}."
                 );
                 if (str_starts_with($name, $newPrefix)) {
