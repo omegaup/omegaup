@@ -1008,14 +1008,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         UNION DISTINCT
         (SELECT
             contest_id,
-            (participating.identity_id IS NOT NULL) AS participating
+            FALSE AS participating
         FROM
             Contests
-        LEFT JOIN
-            Problemset_Identities participating
-        ON
-            participating.problemset_id = Contests.problemset_id AND
-            participating.identity_id = ?
         WHERE
             admission_mode <> 'private'
         )
@@ -1062,7 +1057,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,    // Admin via Group
             \OmegaUp\Authorization::ADMIN_ROLE,
-            $identityId,    // Participant check
         ];
 
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
