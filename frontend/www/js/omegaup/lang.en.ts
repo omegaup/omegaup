@@ -463,6 +463,7 @@ const translations: { [key: string]: string; } = {
   contestsJoinScoreboards: "Merge Scoreboards",
   contestsListLoading: "Loading...",
   contestsListShowMore: "Show more contests",
+  couldNotCreateTemporaryFile: "Could not create temporary file",
   countryNotSet: "Country not set",
   courseActionScoreboard: "Scoreboard",
   courseAddContent: "Add content",
