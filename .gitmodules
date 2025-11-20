@@ -10,10 +10,6 @@
 [submodule "frontend/www/js/mathjax"]
 	path = frontend/www/third_party/js/mathjax
 	url = https://github.com/mathjax/MathJax.git
-[submodule "frontend/www/js/pagedown"]
-	path = frontend/www/third_party/js/pagedown
-	url = https://github.com/omegaup/pagedown.git
-	shallow = true
 [submodule "okfn/csv.js"]
 	path = frontend/www/third_party/js/csv.js
 	url = https://github.com/okfn/csv.js/
