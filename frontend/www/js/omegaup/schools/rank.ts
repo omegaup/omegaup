@@ -20,6 +20,8 @@ OmegaUp.on('ready', () => {
           rank: payload.rank,
           totalRows: payload.totalRows,
           pagerItems: payload.pagerItems,
+          availableFilters: payload.availableFilters,
+          filter: payload.filter,
         },
       });
     },
