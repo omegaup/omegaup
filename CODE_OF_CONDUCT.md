@@ -30,7 +30,7 @@ Community leaders are responsible for clarifying and enforcing our standards of 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community team at **conduct@project.com**.  
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community team at **hr@omegaup.com**.  
 All complaints will be reviewed and investigated promptly and fairly.  
 
 Community leaders are obligated to respect the privacy and security of the reporter of any incident.
