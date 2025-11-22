@@ -125,20 +125,17 @@
             </template>
             <template v-else>
               <form class="collapse-submenu">
-                <div class="btn-group d-flex">
-                  <span class="dropdown-item">
-                    {{ T.myproblemsListCreateProblem }}
-                  </span>
-                  <button
-                    type="button"
-                    class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
-                    data-toggle="collapse"
-                    data-target=".collapse-links"
-                    data-nav-problems-create-options
-                    aria-expanded="false"
-                    aria-controls="collapse-links"
-                  ></button>
-                </div>
+                <button
+                  type="button"
+                  class="dropdown-item dropdown-toggle"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
+                  data-nav-problems-create-options
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
+                >
+                  {{ T.myproblemsListCreateProblem }}
+                </button>
                 <div class="collapse collapse-links pl-3">
                   <a class="dropdown-item" href="/problem/creator/">{{
                     T.myproblemsListCreateZipFileProblem
