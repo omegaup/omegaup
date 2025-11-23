@@ -106,8 +106,6 @@ abstract class CacheAdapter {
             }
             return $returnValue;
         }
-        $log = \Monolog\Registry::omegaup()->withName('cache');
-
         // Get a lock to prevent multiple requests from trying to create the
         // same cache entry. The name of the lockfile is derived from the
         // provided lock group, not the full key, since it is still preferred
@@ -135,11 +133,9 @@ abstract class CacheAdapter {
             }
 
             // Get the value from the function provided
-            $log->info('Calling $setFunc');
             /** @var T */
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
-            $log->info('Committed value');
 
             if (!is_null($cacheUsed)) {
                 $cacheUsed = false;
@@ -618,7 +614,7 @@ class Cache {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
-            $this->log->warning(
+            $this->log->debug(
                 "Failed to invalidate cache for key: {$this->key}"
             );
             return false;
@@ -640,7 +636,7 @@ class Cache {
         /** @var false|mixed */
         $result = CacheAdapter::getInstance()->fetch($this->key);
         if ($result === false) {
-            $this->log->info("Cache miss for key: {$this->key}");
+            $this->log->debug("Cache miss for key: {$this->key}");
             return null;
         }
         $this->log->debug("Cache hit for key: {$this->key}");
