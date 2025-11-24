@@ -232,14 +232,13 @@ export default class ProblemStatementEdit extends Vue {
   }
 
   [data-statement-edit-markdown] {
-    flex: 1;
-    min-height: 400px;
-    overflow-y: auto;
-    border: 1px solid var(--markdown-preview-border-color);
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-
+  flex: 1;
+  min-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--markdown-preview-border-color);
+  padding: 12px;
+  margin-bottom: 20px;
+}
   hr,
   div {
     flex-shrink: 0;
