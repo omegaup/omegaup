@@ -27,357 +27,505 @@
         </button>
       </div>
       <form class="contest-form" @submit.prevent="onSubmit">
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.wordsTitle }}</label>
-            <input
-              v-model="title"
-              class="form-control introjs-contest-title"
-              :class="{
-                'is-invalid': invalidParameterName === 'title',
-              }"
-              name="title"
-              data-title
-              :placeholder="titlePlaceHolder"
-              size="30"
-              type="text"
-              required="required"
-            />
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitleAlias }}</label>
-            <input
-              v-model="alias"
-              class="form-control introjs-short-title"
-              :class="{
-                'is-invalid': invalidParameterName === 'alias',
-              }"
-              name="alias"
-              :disabled="update"
-              type="text"
-              required="required"
-            />
-            <p class="help-block">
-              {{ T.contestNewFormShortTitleAliasDesc }}
-            </p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormStartDate }}</label>
-            <omegaup-datetimepicker
-              v-model="startTime"
-              data-start-date
-              :start="minDateTimeForContest"
-            ></omegaup-datetimepicker>
-            <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormEndDate }}</label>
-            <omegaup-datetimepicker
-              v-model="finishTime"
-              data-end-date
-              :is-invalid="invalidParameterName === 'finish_time'"
-            ></omegaup-datetimepicker>
-            <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6 introjs-description">
-            <label>{{ T.contestNewFormDescription }}</label>
-            <textarea
-              v-model="description"
-              class="form-control"
-              :class="{
-                'is-invalid': invalidParameterName === 'description',
-              }"
-              data-description
-              name="description"
-              cols="30"
-              rows="10"
-              required="required"
-            ></textarea>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormDifferentStarts }}</label>
-            <div class="checkbox">
-              <label
-                ><input
-                  v-model="windowLengthEnabled"
-                  data-different-start-check
-                  type="checkbox"
-                />
-                {{ T.wordsEnable }}</label
-              >
+        <div class="accordion mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="basicInfo"
+                  class="btn btn-link btn-block text-left"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".basic-info"
+                  aria-expanded="true"
+                >
+                  {{ T.contestNewFormBasicInfo }}
+                </button>
+              </h2>
             </div>
-            <input
-              v-model="windowLength"
-              class="form-control"
-              data-different-start-time-input
-              :class="{
-                'is-invalid': invalidParameterName === 'window_length',
-              }"
-              size="3"
-              type="text"
-              :disabled="!windowLengthEnabled"
-            />
-            <p class="help-block">{{ T.contestNewFormDifferentStartsDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
-            <input
-              v-model="scoreboard"
-              data-score-board-visible-time
-              class="form-control scoreboard-time-percent"
-              :class="{
-                'is-invalid': invalidParameterName === 'scoreboard',
-              }"
-              name="scoreboard"
-              size="3"
-              type="text"
-              required="required"
-            />
-            <p class="help-block">
-              {{ T.contestNewFormScoreboardTimePercentDesc }}
-            </p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
-            <input
-              v-model="submissionsGap"
-              class="form-control"
-              :class="{
-                'is-invalid': invalidParameterName === 'submissions_gap',
-              }"
-              size="2"
-              type="text"
-              required="required"
-            />
-            <p class="help-block">
-              {{ T.contestNewFormSubmissionsSeparationDesc }}
-            </p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormPenaltyType }}</label>
-            <select v-model="penaltyType" class="form-control">
-              <option value="none">
-                {{ T.contestNewFormNoPenalty }}
-              </option>
-              <option value="problem_open">
-                {{ T.contestNewFormByProblem }}
-              </option>
-              <option value="contest_start">
-                {{ T.contestNewFormByContests }}
-              </option>
-              <option value="runtime">
-                {{ T.contestNewFormByRuntime }}
-              </option>
-            </select>
-            <p class="help-block">{{ T.contestNewFormPenaltyTypeDesc }}</p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.wordsPenalty }}</label>
-            <input
-              v-model="penalty"
-              class="form-control"
-              :class="{
-                'is-invalid': invalidParameterName === 'penalty',
-              }"
-              size="2"
-              type="text"
-              required="required"
-            />
-            <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.wordsFeedback }}</label>
-            <select v-model="feedback" class="form-control">
-              <option value="none">
-                {{ T.wordsNone }}
-              </option>
-              <option value="summary">
-                {{ T.wordsSummary }}
-              </option>
-              <option value="detailed">
-                {{ T.wordsDetailed }}
-              </option>
-            </select>
-            <p class="help-block">
-              {{ T.contestNewFormImmediateFeedbackDesc }}
-            </p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormForTeams }}</label>
-            <div class="checkbox">
-              <label>
-                <input
-                  v-model="currentContestForTeams"
-                  data-contest-for-teams
-                  type="checkbox"
-                  :disabled="update"
-                />
-                {{ T.wordsEnable }}
-              </label>
+            <div class="collapse show card-body basic-info">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>{{ T.wordsTitle }}</label>
+                  <input
+                    v-model="title"
+                    class="form-control introjs-contest-title"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'title',
+                    }"
+                    name="title"
+                    data-title
+                    :placeholder="titlePlaceHolder"
+                    size="30"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormShortTitleAlias }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormShortTitleAliasDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <input
+                    v-model="alias"
+                    class="form-control introjs-short-title"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'alias',
+                    }"
+                    name="alias"
+                    :disabled="update"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormStartDate }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormStartDateDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <omegaup-datetimepicker
+                    v-model="startTime"
+                    data-start-date
+                    :start="minDateTimeForContest"
+                  ></omegaup-datetimepicker>
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormEndDate }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormEndDateDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <omegaup-datetimepicker
+                    v-model="finishTime"
+                    data-end-date
+                    :is-invalid="invalidParameterName === 'finish_time'"
+                  ></omegaup-datetimepicker>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6 introjs-description">
+                  <label>{{ T.contestNewFormDescription }}</label>
+                  <textarea
+                    v-model="description"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'description',
+                    }"
+                    data-description
+                    name="description"
+                    cols="30"
+                    rows="10"
+                    required="required"
+                  ></textarea>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>{{ T.wordsLanguages }}</label
+                  ><br />
+                  <multiselect
+                    :value="languages"
+                    :options="Object.keys(allLanguages)"
+                    :multiple="true"
+                    :placeholder="T.contestNewFormLanguages"
+                    :close-on-select="false"
+                    :allow-empty="false"
+                    @remove="onRemove"
+                    @select="onSelect"
+                  >
+                  </multiselect>
+                  <p class="help-block">{{ T.contestNewFormLanguages }}</p>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <omegaup-common-typeahead
-              v-if="currentContestForTeams && !hasSubmissions"
-              :class="{
-                'is-invalid': invalidParameterName === 'teams_group_alias',
-              }"
-              :existing-options="searchResultTeamsGroups"
-              :options="searchResultTeamsGroups"
-              :value.sync="currentTeamsGroupAlias"
-              @update-existing-options="updateTeamsGroups"
-            >
-            </omegaup-common-typeahead>
-            <input
-              v-else
-              class="form-control"
-              disabled
-              :value="teamsGroupName"
-            />
-            <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select
-              v-model="showScoreboardAfter"
-              data-show-scoreboard-at-end
-              class="form-control"
-            >
-              <option :value="true">
-                {{ T.wordsYes }}
-              </option>
-              <option :value="false">
-                {{ T.wordsNo }}
-              </option>
-            </select>
-            <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormScoreMode }}</label>
-            <select
-              v-model="currentScoreMode"
-              data-score-mode
-              class="form-control"
-            >
-              <option :value="ScoreMode.Partial">
-                {{ T.contestNewFormScoreModePartial }}
-              </option>
-              <option :value="ScoreMode.AllOrNothing">
-                {{ T.contestNewFormScoreModeAllOrNothing }}
-              </option>
-              <option :value="ScoreMode.MaxPerGroup">
-                {{ T.contestNewFormScoreModeMaxPerGroup }}
-              </option>
-            </select>
-            <p class="help-block">{{ T.contestNewFormScoreModeDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormPointDecrementFactor }}</label>
-            <input
-              v-model="pointsDecayFactor"
-              class="form-control"
-              :class="{
-                'is-invalid': invalidParameterName === 'points_decay_factor',
-              }"
-              size="4"
-              type="text"
-              required="required"
-            />
-            <p class="help-block">
-              {{ T.contestNewFormPointDecrementFactorDesc }}
-            </p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.wordsLanguages }}</label
-            ><br />
-            <multiselect
-              :value="languages"
-              :options="Object.keys(allLanguages)"
-              :multiple="true"
-              :placeholder="T.contestNewFormLanguages"
-              :close-on-select="false"
-              :allow-empty="false"
-              @remove="onRemove"
-              @select="onSelect"
-            >
-            </multiselect>
-            <p class="help-block">{{ T.contestNewFormLanguages }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormBasicInformationRequired }}</label>
-            <div class="checkbox form-check">
-              <input
-                v-model="needsBasicInformation"
-                data-basic-information-required
-                class="form-check-input"
-                type="checkbox"
-              />
-              <label class="form-check-label"> {{ T.wordsEnable }}</label>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="logistics"
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".logistics"
+                  aria-expanded="false"
+                  @click.prevent
+                >
+                  {{ T.contestNewFormLogistics }}
+                </button>
+              </h2>
             </div>
-            <p class="help-block">
-              {{ T.contestNewFormBasicInformationRequiredDesc }}
-            </p>
-          </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormUserInformationRequired }}</label>
-            <select
-              v-model="requestsUserInformation"
-              data-request-user-information
-              class="form-control"
-            >
-              <option value="no">
-                {{ T.wordsNo }}
-              </option>
-              <option value="optional">
-                {{ T.wordsOptional }}
-              </option>
-              <option value="required">
-                {{ T.wordsRequired }}
-              </option>
-            </select>
-            <p class="help-block">
-              {{ T.contestNewFormUserInformationRequiredDesc }}
-            </p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormRecommended }}</label>
-            <div v-if="canSetRecommended" class="checkbox form-check">
-              <input
-                v-model="recommended"
-                data-recommended
-                class="form-check-input"
-                type="checkbox"
-              />
-              <label class="form-check-label"> {{ T.wordsEnable }}</label>
+            <div class="collapse show card-body logistics">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormDifferentStarts }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormDifferentStartsDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <div class="checkbox">
+                    <label
+                      ><input
+                        v-model="windowLengthEnabled"
+                        data-different-start-check
+                        type="checkbox"
+                      />
+                      {{ T.wordsEnable }}</label
+                    >
+                  </div>
+                  <input
+                    v-model="windowLength"
+                    class="form-control"
+                    data-different-start-time-input
+                    :class="{
+                      'is-invalid': invalidParameterName === 'window_length',
+                    }"
+                    size="3"
+                    type="text"
+                    :disabled="!windowLengthEnabled"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormForTeams }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormForTeamsDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="currentContestForTeams"
+                        data-contest-for-teams
+                        type="checkbox"
+                        :disabled="update"
+                      />
+                      {{ T.wordsEnable }}
+                    </label>
+                  </div>
+
+                  <omegaup-common-typeahead
+                    v-if="currentContestForTeams && !hasSubmissions"
+                    :class="{
+                      'is-invalid':
+                        invalidParameterName === 'teams_group_alias',
+                    }"
+                    :existing-options="searchResultTeamsGroups"
+                    :options="searchResultTeamsGroups"
+                    :value.sync="currentTeamsGroupAlias"
+                    @update-existing-options="updateTeamsGroups"
+                  >
+                  </omegaup-common-typeahead>
+                  <input
+                    v-else
+                    class="form-control"
+                    disabled
+                    :value="teamsGroupName"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormScoreboardAtEnd }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormScoreboardAtEndDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <select
+                    v-model="showScoreboardAfter"
+                    data-show-scoreboard-at-end
+                    class="form-control"
+                  >
+                    <option :value="true">
+                      {{ T.wordsYes }}
+                    </option>
+                    <option :value="false">
+                      {{ T.wordsNo }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormScoreboardTimePercent }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormScoreboardTimePercentDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <input
+                    v-model="scoreboard"
+                    data-score-board-visible-time
+                    class="form-control scoreboard-time-percent"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'scoreboard',
+                    }"
+                    name="scoreboard"
+                    size="3"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormRecommended }}
+                    <font-awesome-icon
+                      :title="
+                        canSetRecommended
+                          ? T.contestNewFormRecommendedTextAdmin
+                          : T.contestNewFormRecommendedTextNonAdmin
+                      "
+                      icon="info-circle"
+                    />
+                  </label>
+                  <div v-if="canSetRecommended" class="checkbox form-check">
+                    <input
+                      v-model="recommended"
+                      data-recommended
+                      class="form-check-input"
+                      type="checkbox"
+                    />
+                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p class="help-block">
-              {{
-                canSetRecommended
-                  ? T.contestNewFormRecommendedTextAdmin
-                  : T.contestNewFormRecommendedTextNonAdmin
-              }}
-            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="scoringRules"
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".scoring-rules"
+                  aria-expanded="false"
+                >
+                  {{ T.contestNewFormScoringRules }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body scoring-rules">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormScoreMode }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormScoreModeDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <select
+                    v-model="currentScoreMode"
+                    data-score-mode
+                    class="form-control"
+                  >
+                    <option :value="ScoreMode.Partial">
+                      {{ T.contestNewFormScoreModePartial }}
+                    </option>
+                    <option :value="ScoreMode.AllOrNothing">
+                      {{ T.contestNewFormScoreModeAllOrNothing }}
+                    </option>
+                    <option :value="ScoreMode.MaxPerGroup">
+                      {{ T.contestNewFormScoreModeMaxPerGroup }}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.wordsFeedback }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormImmediateFeedbackDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <select v-model="feedback" class="form-control">
+                    <option value="none">
+                      {{ T.wordsNone }}
+                    </option>
+                    <option value="summary">
+                      {{ T.wordsSummary }}
+                    </option>
+                    <option value="detailed">
+                      {{ T.wordsDetailed }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormSubmissionsSeparation }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormSubmissionsSeparationDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <input
+                    v-model="submissionsGap"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'submissions_gap',
+                    }"
+                    size="2"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormPenaltyType }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormPenaltyTypeDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <select v-model="penaltyType" class="form-control">
+                    <option value="none">
+                      {{ T.contestNewFormNoPenalty }}
+                    </option>
+                    <option value="problem_open">
+                      {{ T.contestNewFormByProblem }}
+                    </option>
+                    <option value="contest_start">
+                      {{ T.contestNewFormByContests }}
+                    </option>
+                    <option value="runtime">
+                      {{ T.contestNewFormByRuntime }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.wordsPenalty }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormPenaltyDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <input
+                    v-model="penalty"
+                    class="form-control"
+                    :class="{
+                      'is-invalid': invalidParameterName === 'penalty',
+                    }"
+                    size="2"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormPointDecrementFactor }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormPointDecrementFactorDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <input
+                    v-model="pointsDecayFactor"
+                    class="form-control"
+                    :class="{
+                      'is-invalid':
+                        invalidParameterName === 'points_decay_factor',
+                    }"
+                    size="4"
+                    type="text"
+                    required="required"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  ref="privacy"
+                  class="btn btn-link btn-block text-left collapsed"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target=".privacy"
+                  aria-expanded="false"
+                >
+                  {{ T.contestNewFormPrivacy }}
+                </button>
+              </h2>
+            </div>
+            <div class="collapse card-body privacy">
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormBasicInformationRequired }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormBasicInformationRequiredDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <div class="checkbox form-check">
+                    <input
+                      v-model="needsBasicInformation"
+                      data-basic-information-required
+                      class="form-check-input"
+                      type="checkbox"
+                    />
+                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >{{ T.contestNewFormUserInformationRequired }}
+                    <font-awesome-icon
+                      :title="T.contestNewFormUserInformationRequiredDesc"
+                      icon="info-circle"
+                    />
+                  </label>
+                  <select
+                    v-model="requestsUserInformation"
+                    data-request-user-information
+                    class="form-control"
+                  >
+                    <option value="no">
+                      {{ T.wordsNo }}
+                    </option>
+                    <option value="optional">
+                      {{ T.wordsOptional }}
+                    </option>
+                    <option value="required">
+                      {{ T.wordsRequired }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary introjs-schedule" type="submit">
+          <button
+            class="btn btn-primary introjs-schedule"
+            type="submit"
+            @click="openCollapsedIfRequired()"
+          >
             {{
               update
                 ? T.contestNewFormUpdateContest
@@ -400,6 +548,18 @@ import { types } from '../../api_types';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
+
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 Vue.use(VueCookies, { expire: -1 });
 
 export enum ScoreMode {
@@ -412,7 +572,13 @@ export enum ScoreMode {
   components: {
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
     Multiselect,
+  },
+  directives: {
+    tooltip: VTooltip,
   },
 })
 export default class NewForm extends Vue {
