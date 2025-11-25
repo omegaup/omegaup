@@ -55,24 +55,28 @@ jobs:
           create_or_update_label "size/XL" "b60205" "Extra large PR (>1000 lines)"
 
       - name: Remove existing PR size labels
-        run: |
-          pr_number=${{ github.event.pull_request.number }}
-          labels=$(curl -s \
-            -H "Authorization: token ${{ github.token }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/$pr_number/labels")
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sizeLabels = ['size/XS', 'size/S', 'size/M', 'size/L', 'size/XL'];
+            const issueNumber = context.payload.pull_request.number;
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
 
-          echo "$labels" | jq -r '.[].name' | while read -r label; do
-            if [[ $label == size/* ]]; then
-              encoded_label=$(jq -rn --arg value "$label" '$value|@uri')
-              curl -s -X DELETE \
-                -H "Authorization: token ${{ github.token }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                "https://api.github.com/repos/${{ github.repository }}/issues/$pr_number/labels/$encoded_label" \
-                -o /dev/null
-              echo "Removed label '$label'"
-            fi
-          done
+            for (const label of labels) {
+              if (sizeLabels.includes(label.name)) {
+                core.info(`Removing label ${label.name}`);
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name: label.name,
+                });
+              }
+            }
 
       - uses: codelytv/pr-size-labeler@v1
         with:
