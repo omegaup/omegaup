@@ -54,6 +54,26 @@ jobs:
           create_or_update_label "size/L" "d93f0b" "Large PR (≤1000 lines)"
           create_or_update_label "size/XL" "b60205" "Extra large PR (>1000 lines)"
 
+      - name: Remove existing PR size labels
+        run: |
+          pr_number=${{ github.event.pull_request.number }}
+          labels=$(curl -s \
+            -H "Authorization: token ${{ github.token }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$pr_number/labels")
+
+          echo "$labels" | jq -r '.[].name' | while read -r label; do
+            if [[ $label == size/* ]]; then
+              encoded_label=$(jq -rn --arg value "$label" '$value|@uri')
+              curl -s -X DELETE \
+                -H "Authorization: token ${{ github.token }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/${{ github.repository }}/issues/$pr_number/labels/$encoded_label" \
+                -o /dev/null
+              echo "Removed label '$label'"
+            fi
+          done
+
       - uses: codelytv/pr-size-labeler@v1
         with:
           xs_label: "size/XS"
