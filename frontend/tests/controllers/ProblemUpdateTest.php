@@ -2609,4 +2609,62 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             unlink($newZipPath);
         }
     }
+
+    public function testTriangulosZipToCdp() {
+        $zipPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip';
+        $problemName = 'triangulos';
+
+        // Convert ZIP to CDP
+        $cdp = \OmegaUp\ZipToCdpConverter::convert($zipPath, $problemName);
+
+        // Normalize UUIDs for comparison
+        $normalizedCdp = $this->normalizeUuids($cdp);
+
+        // Load expected JSON
+        $expectedJsonPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_expected_cdp.json';
+        $this->assertFileExists(
+            $expectedJsonPath,
+            'Expected JSON file not found'
+        );
+
+        $expectedJson = file_get_contents($expectedJsonPath);
+        $expected = json_decode($expectedJson, true);
+
+        $this->assertIsArray($expected, 'Expected JSON should be valid');
+
+        // Normalize UUIDs for comparison
+        $normalizedExpected = $this->normalizeUuids($expected);
+
+        $this->assertEquals($normalizedExpected, $normalizedCdp);
+    }
+
+    /**
+     * Recursively replace all UUID values with a deterministic counter
+     */
+    private function normalizeUuids(
+        array $data,
+        array &$uuidMap = [],
+        int &$counter = 1
+    ): array {
+        foreach ($data as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->normalizeUuids($value, $uuidMap, $counter);
+                continue;
+            }
+
+            if (
+                is_string($value) &&
+                in_array($key, ['groupID', 'caseID', 'lineID'], true)
+            ) {
+                if (!isset($uuidMap[$value])) {
+                    $uuidMap[$value] = sprintf(
+                        '%08d-0000-0000-0000-000000000000',
+                        $counter++
+                    );
+                }
+                $value = $uuidMap[$value];
+            }
+        }
+        return $data;
+    }
 }

@@ -1,0 +1,129 @@
+{
+    "problemName": "triangulos",
+    "problemMarkdown": "# Descripción\n\nEl perímetro de un triángulo con aristas de largo $a, b, c$ es $a+b+c$.\n\nTienes varias palos de diferentes longitudes. Regresa el máximo perímetro posible de un triángulo que puede ser construido con los palos que tienes a tus disposición. Cada lado del triángulo debe ser construido usando un sólo palo. Tampoco puedes romper los palos existentes. Regresa $-1$ si el triángulo no puede ser construido.\n\n# Nota\nPuedes construir un triángulo con aristas de largo $ x \\leq y \\leq y$ si y sólo si $x + y \\gt z$\n\n# Entrada\nLa primer línea de entrada contendrá el número $3 \\leq N \\leq 50$ de elementos. La segunda línea contendrá los $1 \\leq N_i \\leq 1000$ elementos separados por un espacio.\n\n||input\n6\n2 3 2 3 2 4\n||output\n10\n||end",
+    "problemCodeContent": "",
+    "problemCodeExtension": "",
+    "problemSolutionMarkdown": "# Solución\nEste es el ejemplo de una solución.\nAquí se describirá la manera en que un problema puede ser resuelto, permitiendo que los usuarios aprendan estrategias nuevas y mejoren sus habilidades.\n\n# Nota\nCuando la solución de un problema es mostrada a pedido de un usuario, este problema no contará para calcular la puntuación del mismo en el ranking de omegaUp.\n",
+    "casesStore": {
+        "groups": [
+            {
+                "groupID": "b5d28105-b88d-418a-a14d-61afdf52bf69",
+                "name": "1",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "82300a15-1cd1-4f7f-b33c-63e9f821f3ee",
+                        "groupID": "b5d28105-b88d-418a-a14d-61afdf52bf69",
+                        "lines": [
+                            {
+                                "lineID": "2756fc4b-6eed-4b59-988d-b4c520fa765f",
+                                "caseID": "82300a15-1cd1-4f7f-b33c-63e9f821f3ee",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "3\n1 2 3"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "-1\n",
+                        "name": "1"
+                    }
+                ]
+            },
+            {
+                "groupID": "ca352d6a-4d80-4669-8880-351ca9b1ee19",
+                "name": "2",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "f0921411-f322-4c21-a2d6-73e575cea07f",
+                        "groupID": "ca352d6a-4d80-4669-8880-351ca9b1ee19",
+                        "lines": [
+                            {
+                                "lineID": "dd8b58b1-cafd-4cc8-9cb2-86ac00745894",
+                                "caseID": "f0921411-f322-4c21-a2d6-73e575cea07f",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "3\n1000 1000 1000\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "3000\n",
+                        "name": "2"
+                    }
+                ]
+            },
+            {
+                "groupID": "69c8899d-5a43-4d01-a6d5-a1889662973c",
+                "name": "3",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "00c3db09-5d5c-41ef-8e63-444b9b33adb5",
+                        "groupID": "69c8899d-5a43-4d01-a6d5-a1889662973c",
+                        "lines": [
+                            {
+                                "lineID": "261cd309-6fc2-4302-a148-5081dfc509aa",
+                                "caseID": "00c3db09-5d5c-41ef-8e63-444b9b33adb5",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "9\n215 968 124 73 839 485 315 911 272\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "2718\n",
+                        "name": "3"
+                    }
+                ]
+            },
+            {
+                "groupID": "b9c8a7eb-e47c-4d7b-81d8-72feb245b682",
+                "name": "4",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "e7e6f9c3-73b4-49a3-bf1f-f8f9096f20e6",
+                        "groupID": "b9c8a7eb-e47c-4d7b-81d8-72feb245b682",
+                        "lines": [
+                            {
+                                "lineID": "34a2e38d-cbe3-4990-ae5f-9f1ae9eccd64",
+                                "caseID": "e7e6f9c3-73b4-49a3-bf1f-f8f9096f20e6",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "42\n878 101 332 288 321 157 469 821 114 703 747 970 819 87 947 8 759 185 727 330 258 396 85 552 620 694 352 590 84 788 181 492 945 876 260 458 564 881 998 975 409 314\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "2943\n",
+                        "name": "4"
+                    }
+                ]
+            }
+        ],
+        "selected": {
+            "groupID": "00000000-0000-0000-0000-000000000000",
+            "caseID": "00000000-0000-0000-0000-000000000000"
+        },
+        "layouts": [],
+        "hide": false
+    }
+}
