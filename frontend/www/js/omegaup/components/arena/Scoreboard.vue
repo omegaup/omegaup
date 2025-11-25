@@ -33,22 +33,51 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <label class="float-right"
-      >{{ T.scoreboardShowParticipantsNames }}:
-      <select
-        v-model="nameDisplayOptions"
-        class="form-control"
-        data-scoreboard-options
-      >
-        <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
-        <option :value="ui.NameDisplayOptions.Username">
-          {{ T.scoreboardAccountName }}
-        </option>
-        <option :value="ui.NameDisplayOptions.NameAndUsername">
-          {{ T.scoreboardNameAndAccountName }}
-        </option>
-      </select>
-    </label>
+    <div class="float-right">
+      <div v-if="showDownloadButton" class="btn-group mr-2">
+        <button
+          type="button"
+          class="btn btn-primary dropdown-toggle scoreboard-download-btn"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <span class="download-text">{{
+            T.scoreboardDownload || 'Download'
+          }}</span>
+        </button>
+        <div class="dropdown-menu">
+          <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="downloadScoreboard('csv')"
+            >{{ T.scoreboardDownloadCsv || 'CSV' }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="downloadScoreboard('xlsx')"
+            >{{ T.scoreboardDownloadXlsx || 'XLSX' }}</a
+          >
+        </div>
+      </div>
+      <label
+        >{{ T.scoreboardShowParticipantsNames }}:
+        <select
+          v-model="nameDisplayOptions"
+          class="form-control"
+          data-scoreboard-options
+        >
+          <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
+          <option :value="ui.NameDisplayOptions.Username">
+            {{ T.scoreboardAccountName }}
+          </option>
+          <option :value="ui.NameDisplayOptions.NameAndUsername">
+            {{ T.scoreboardNameAndAccountName }}
+          </option>
+        </select>
+      </label>
+    </div>
     <div class="table-responsive">
       <table data-table-scoreboard class="table">
         <thead>
@@ -155,6 +184,7 @@ export default class ArenaScoreboard extends Vue {
   @Prop() title!: string;
   @Prop({ default: null }) finishTime!: null | Date;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
+  @Prop({ default: false }) showDownloadButton!: boolean;
 
   T = T;
   ui = ui;
@@ -225,6 +255,11 @@ export default class ArenaScoreboard extends Vue {
     // are visible in scoreboard.
     if (!this.showInvitedUsersFilter) return true;
     return userIsInvited || !this.onlyShowExplicitlyInvited;
+  }
+
+  downloadScoreboard(format: string): void {
+    // This will be overridden by parent components to handle the actual download
+    this.$emit('download-scoreboard', format);
   }
 }
 </script>
@@ -358,6 +393,50 @@ export default class ArenaScoreboard extends Vue {
   .clock {
     font-size: 3em;
     line-height: 0.4em;
+  }
+
+  /* Download button styling */
+  .scoreboard-download-btn {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 0.5rem 1rem !important;
+    min-width: 100px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .scoreboard-download-btn:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+  }
+
+  .download-text {
+    color: white !important;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .dropdown-menu {
+    min-width: 140px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .dropdown-item {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    color: #212529 !important;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    color: #007bff !important;
   }
 }
 </style>
