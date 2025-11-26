@@ -49,10 +49,10 @@ jobs:
 
           # Create labels with specified colors
           create_or_update_label "size/XS" "0e8a16" "Very small PR (≤10 lines)"
-          create_or_update_label "size/S" "28a745" "Small PR (≤100 lines)"
-          create_or_update_label "size/M" "fbca04" "Medium PR (≤500 lines)"
-          create_or_update_label "size/L" "d93f0b" "Large PR (≤1000 lines)"
-          create_or_update_label "size/XL" "b60205" "Extra large PR (>1000 lines)"
+          create_or_update_label "size/S" "28a745" "Small PR (≤50 lines)"
+          create_or_update_label "size/M" "fbca04" "Medium PR (≤100 lines)"
+          create_or_update_label "size/L" "d93f0b" "Large PR (≤200 lines)"
+          create_or_update_label "size/XL" "b60205" "Extra large PR (>200 lines)"
 
       - name: Remove existing PR size labels
         uses: actions/github-script@v7
@@ -83,17 +83,19 @@ jobs:
           xs_label: "size/XS"
           xs_max_size: "10"
           s_label: "size/S"
-          s_max_size: "100"
+          s_max_size: "50"
           m_label: "size/M"
-          m_max_size: "500"
+          m_max_size: "100"
           l_label: "size/L"
-          l_max_size: "1000"
+          l_max_size: "200"
           xl_label: "size/XL"
           fail_if_xl: "false"
           message_if_xl: >
-            This PR exceeds the recommended size of 1000 lines.
-            Please make sure you are NOT addressing multiple issues with one PR.
-            Note this PR might be rejected due to its size.
+            ⚠️ This PR exceeds the recommended size of 200 lines.
+
+            Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
+
+            Note: This PR might require additional review time due to its size.
           github_api_url: "https://api.github.com"
           files_to_ignore: |
             composer.lock
