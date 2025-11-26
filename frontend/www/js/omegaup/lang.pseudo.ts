@@ -2150,6 +2150,10 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
   zipPrepare: "(Pr3par3 zip fi13)",
+  contestNewFormBasicInfo: "Ba5ic Inf0rma7i0n",
+  contestNewFormLogistics: "L0gi57ic5 (0p7i0na1)",
+  contestNewFormPrivacy: "Privacy (0p7i0na1)",
+  contestNewFormScoringRules: "Sc0ring Ru135 (0p7i0na1)",
 };
 
 export {translations as default};
