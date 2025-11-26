@@ -43,21 +43,21 @@
           aria-expanded="false"
         >
           <span class="download-text">{{
-            T.scoreboardDownload || 'Download'
+            T.scoreboardDownload
           }}</span>
         </button>
         <div class="dropdown-menu">
           <a
             class="dropdown-item"
             href="#"
-            @click.prevent="downloadScoreboard('csv')"
-            >{{ T.scoreboardDownloadCsv || 'CSV' }}</a
+            @click.prevent="downloadScoreboard(ScoreboardDownloadFormat.Csv)"
+            >{{ T.scoreboardDownloadCsv }}</a
           >
           <a
             class="dropdown-item"
             href="#"
-            @click.prevent="downloadScoreboard('xlsx')"
-            >{{ T.scoreboardDownloadXlsx || 'XLSX' }}</a
+            @click.prevent="downloadScoreboard(ScoreboardDownloadFormat.Xlsx)"
+            >{{ T.scoreboardDownloadXlsx }}</a
           >
         </div>
       </div>
@@ -165,6 +165,11 @@ import * as time from '../../time';
 import omegaup_Countdown from '../Countdown.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
+export enum ScoreboardDownloadFormat {
+  Csv = 'csv',
+  Xlsx = 'xlsx',
+}
+
 @Component({
   components: {
     highcharts: Chart,
@@ -189,6 +194,7 @@ export default class ArenaScoreboard extends Vue {
   T = T;
   ui = ui;
   INF = '∞';
+  ScoreboardDownloadFormat = ScoreboardDownloadFormat;
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
   nameDisplayOptions: ui.NameDisplayOptions =
@@ -257,7 +263,7 @@ export default class ArenaScoreboard extends Vue {
     return userIsInvited || !this.onlyShowExplicitlyInvited;
   }
 
-  downloadScoreboard(format: string): void {
+  downloadScoreboard(format: ScoreboardDownloadFormat): void {
     // This will be overridden by parent components to handle the actual download
     this.$emit('download-scoreboard', format);
   }
@@ -397,9 +403,9 @@ export default class ArenaScoreboard extends Vue {
 
   /* Download button styling */
   .scoreboard-download-btn {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
-    color: white !important;
+    background-color: var(--arena-button-background-color) !important;
+    border-color: var(--arena-button-border-color) !important;
+    color: var(--arena-button-text-color) !important;
     font-weight: bold;
     padding: 0.5rem 1rem !important;
     min-width: 100px;
@@ -409,12 +415,12 @@ export default class ArenaScoreboard extends Vue {
   }
 
   .scoreboard-download-btn:hover {
-    background-color: #0056b3 !important;
-    border-color: #0056b3 !important;
+    background-color: var(--arena-button-hover-background-color) !important;
+    border-color: var(--arena-button-hover-border-color) !important;
   }
 
   .download-text {
-    color: white !important;
+    color: var(--arena-button-text-color) !important;
     font-weight: bold;
     margin-right: 0.5rem;
     font-size: 14px;
@@ -423,20 +429,20 @@ export default class ArenaScoreboard extends Vue {
 
   .dropdown-menu {
     min-width: 140px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--arena-dropdown-menu-shadow);
   }
 
   .dropdown-item {
     padding: 0.5rem 1rem !important;
     font-size: 0.875rem !important;
-    color: #212529 !important;
+    color: var(--arena-dropdown-item-text-color) !important;
     font-weight: 500;
     cursor: pointer;
   }
 
   .dropdown-item:hover {
-    background-color: #f8f9fa !important;
-    color: #007bff !important;
+    background-color: var(--arena-dropdown-item-hover-background-color) !important;
+    color: var(--arena-dropdown-item-hover-text-color) !important;
   }
 }
 </style>

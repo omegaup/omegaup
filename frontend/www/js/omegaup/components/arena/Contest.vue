@@ -224,7 +224,9 @@ import arena_NavbarMiniranking from './NavbarMiniranking.vue';
 import arena_Runs from './Runs.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Summary from './Summary.vue';
-import arena_Scoreboard from './Scoreboard.vue';
+import arena_Scoreboard, {
+  ScoreboardDownloadFormat,
+} from './Scoreboard.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -398,11 +400,11 @@ export default class ArenaContest extends Vue {
     this.$emit('execute-run', { target: this });
   }
 
-  downloadScoreboard(format: string): void {
-    const url = `/api/contest/scoreboardDownload/?contest_alias=${encodeURIComponent(
-      this.contest.alias,
-    )}&format=${encodeURIComponent(format)}`;
-    window.location.href = url;
+  downloadScoreboard(format: ScoreboardDownloadFormat): void {
+    this.$emit('download-scoreboard', {
+      contestAlias: this.contest.alias,
+      format,
+    });
   }
 
   onRunAdminDetails(guid: string): void {
