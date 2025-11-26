@@ -4627,6 +4627,8 @@ export namespace types {
   }
 
   export interface SchoolRankPayload {
+    availableFilters?: { [key: string]: string };
+    filter?: string;
     length: number;
     page: number;
     pagerItems: types.PageItem[];

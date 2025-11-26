@@ -105,8 +105,11 @@ class JsIncludeNode extends \Twig\Node\Node {
                 'Please run <tt style="background: #eee">cd /opt/omegaup && yarn install && yarn run dev-all</tt>.'
             );
         }
-        /** @var array{css: list<string>, js: list<string>} */
         $jsonContents = json_decode($textContents, associative: true);
+        if (is_null($jsonContents)) {
+            die('Invalid JSON in dependency file: ' . $jsonPath);
+        }
+        /** @var array{css: list<string>, js: list<string>} $jsonContents */
         return $jsonContents['js'];
     }
 }
