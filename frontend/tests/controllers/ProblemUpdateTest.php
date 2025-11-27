@@ -2611,8 +2611,8 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testTriangulosZipToCdp() {
-        $zipPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip';
-        $problemName = 'triangulos';
+        $zipPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended.zip';
+        $problemName = 'triangulos_extended';
 
         // Convert ZIP to CDP
         $cdp = \OmegaUp\ZipToCdpConverter::convert($zipPath, $problemName);
@@ -2621,7 +2621,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $normalizedCdp = $this->normalizeUuids($cdp);
 
         // Load expected JSON
-        $expectedJsonPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_expected_cdp.json';
+        $expectedJsonPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended_expected_cdp.json';
         $this->assertFileExists(
             $expectedJsonPath,
             'Expected JSON file not found'
