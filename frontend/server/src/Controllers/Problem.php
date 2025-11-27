@@ -57,7 +57,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type LibinteractiveError=array{description: string, field: string}
  * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  * @psalm-type ProblemRequestData=array{preventProblemsetOpen: bool, contestAlias: null|string, problemAlias: string, statementType: string, problemsetId: int|null}
+ * @psalm-type CDPLine=array{lineID: string,caseID: string, label: string, data: array{kind: 'line'|'multiline'|'array'|'matrix', value: string}}
+ * @psalm-type CDPCase=array{caseID: string,groupID: string, lines: list<CDPLine>, points: int,autoPoints: bool,output: string,name: string}
+ * @psalm-type CDPGroup=array{groupID: string,name: string,points: int,autoPoints: bool,ungroupedCase: bool,cases: list<CDPCase>}
+ * @psalm-type CDPCasesStore=array{groups: list<CDPGroup>,selected: array{groupID: string|null, caseID: string|null},layouts: list<array<string, string>>,hide: bool}
+ * @psalm-type CDP=array{problemName: string,problemMarkdown: string,problemCodeContent: string,problemCodeExtension: string, problemSolutionMarkdown: string, casesStore: CDPCasesStore}
  */
+
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
     const SOLUTION_NOT_FOUND = 'not_found';
@@ -456,6 +462,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             self::convertRequestToProblemParams($r)
         );
+        self::invalidateProblemsAclCacheForIdentity($r->identity);
         return [
             'status' => 'ok',
         ];
@@ -649,6 +656,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\Controllers\ACL::addUser($problem->acl_id, $user->user_id);
 
+        $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['usernameOrEmail']
+        );
+        self::invalidateProblemsAclCacheForIdentity($adminIdentity);
+
         return [
             'status' => 'ok',
         ];
@@ -692,6 +704,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
+
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
+            );
+            if (is_null($identity)) {
+                continue;
+            }
+            self::invalidateProblemsAclCacheForIdentity($identity);
+        }
 
         return ['status' => 'ok'];
     }
@@ -900,6 +925,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
+        $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r['usernameOrEmail']
+        );
+        self::invalidateProblemsAclCacheForIdentity($adminIdentity);
+
         \OmegaUp\Controllers\ACL::removeUser(
             $problem->acl_id,
             $identity->user_id
@@ -946,6 +976,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Only admin is alowed to make modifications
         if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $groupIdentities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+            $group
+        );
+        foreach ($groupIdentities as $row) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $row['identity_id']
+            );
+            if (is_null($identity)) {
+                continue;
+            }
+            self::invalidateProblemsAclCacheForIdentity($identity);
         }
 
         \OmegaUp\Controllers\ACL::removeGroup(
@@ -1971,6 +2014,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}"
+        );
+    }
+
+    private static function invalidateProblemsAclCacheForIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        $identityId = $identity->identity_id;
+        $userId = $identity->user_id ?? 'null';
+        $cacheKey = "{$identityId}-{$userId}";
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::PROBLEM_IDENTITY_TYPE,
+            $cacheKey
         );
     }
 
@@ -4697,7 +4753,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
-    private static function extractRequestData(\OmegaUp\Request $r): array {
+    private static function extractRequestData(\OmegaUp\Request $r) {
         return [
             'preventProblemsetOpen' => $r->ensureOptionalBool(
                 'prevent_problemset_open'
@@ -4727,7 +4783,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemBaseData(
         ?\OmegaUp\DAO\VO\Identities $identity,
-        array $requestData
+        $requestData
     ): array {
         [
             'problem' => $problem,
@@ -6695,6 +6751,31 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'problem_print',
+        ];
+    }
+
+    /**
+     * Convert an uploaded ZIP file to CDP.
+     *
+     * @param \OmegaUp\Request $r
+     * @return array{status: 'ok', cdp: CDP}
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
+     */
+    public static function apiConvertZipToCdp(\OmegaUp\Request $r): array {
+        $fileInfo = \OmegaUp\Validators::validateZipUploadedFile();
+        $tempFilePath = $fileInfo['tmpFilePath'];
+        $problemName = $fileInfo['problemName'];
+
+        // Convert ZIP to CDP
+        $cdp = \OmegaUp\ZipToCdpConverter::convert(
+            $tempFilePath,
+            $problemName
+        );
+
+        return [
+            'status' => 'ok',
+            'cdp' => $cdp
         ];
     }
 }

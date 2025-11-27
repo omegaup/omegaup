@@ -8,7 +8,10 @@ namespace OmegaUp;
 class Validators {
     // The maximum length for aliases.
     const ALIAS_MAX_LENGTH = 32;
-
+    const ZIP_MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+    const ZIP_CASE_SIZE_LIMIT_BYTES = 8 * 1024; // 8 KB
+    const ZIP_ALLOWED_CASE_EXTENSIONS = ['in', 'out'];
+    const ZIP_FORBIDDEN_PATH_CHARS = ['..'];
     /**
      * Check if email is valid
      */
@@ -758,6 +761,143 @@ class Validators {
     ): void {
         if (!in_array($badgeAlias, $allExistingBadges)) {
             throw new \OmegaUp\Exceptions\NotFoundException('badgeNotExist');
+        }
+    }
+
+    /**
+     * Check that the ZIP file was uploaded correctly and return its info.
+     *
+     * @return array{problemName: string, tmpFilePath: string}
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateZipUploadedFile(): array {
+        if (
+            !isset(
+                $_FILES['zipFile']['error'],
+                $_FILES['zipFile']['tmp_name'],
+                $_FILES['zipFile']['name']
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidValidZipUpload',
+                'zipFile'
+            );
+        }
+
+        $file = $_FILES['zipFile'];
+
+        if (
+            $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file(
+                $file['tmp_name']
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidValidZipUpload',
+                'zipFile'
+            );
+        }
+
+        return [
+            'problemName' => pathinfo($file['name'], PATHINFO_FILENAME),
+            'tmpFilePath' => $file['tmp_name']
+        ];
+    }
+
+    /**
+     * Check the size of the ZIP file
+     *
+     * @param string $filePath
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateZipFileSize(string $filePath): void {
+        $fileSize = filesize($filePath);
+
+        if ($fileSize === false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidFile',
+                'zipFile'
+            );
+        }
+
+        if ($fileSize > self::ZIP_MAX_FILE_SIZE_BYTES) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidZipFileSizeTooLong',
+                'zipFile',
+                ['max_length' => strval(
+                    self::ZIP_MAX_FILE_SIZE_BYTES / (1024 * 1024)
+                )]
+            );
+        }
+
+        if ($fileSize === 0) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'zipFile'
+            );
+        }
+    }
+
+    /**
+     * Check that it is a valid ZIP file
+     *
+     * @param string $filePath
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateZipIntegrity(string $filePath): void {
+        $zip = new \ZipArchive();
+
+        if ($zip->open($filePath) !== true) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidZipIntegrity',
+                'zipFile'
+            );
+        }
+
+        $zip->close();
+    }
+
+    /**
+     * Check the path of a file within the ZIP (prevents path traversal)
+     *
+     * @param string $filePath
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateZipFilePath(string $filePath): void {
+        foreach (self::ZIP_FORBIDDEN_PATH_CHARS as $char) {
+            if (strpos($filePath, $char) !== false) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidZipFilePath',
+                    'zipFile'
+                );
+            }
+        }
+    }
+
+    /**
+     * Check the file extension and case name
+     *
+     * @param string $filename
+     * @param string $extension
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateZipCaseFileName(
+        string $filename,
+        string $extension
+    ): void {
+        if (!in_array($extension, self::ZIP_ALLOWED_CASE_EXTENSIONS)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidCaseExtension',
+                'zipFile'
+            );
+        }
+
+        // Ensure the filename contains at most one period (e.g., 'name.ext').
+        $parts = explode('.', $filename);
+        if (count($parts) > 2) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidCaseName',
+                'zipFile'
+            );
         }
     }
 }
