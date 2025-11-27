@@ -4,7 +4,7 @@ import T from '../../lang';
 
 import contest_Form from './Form.vue';
 
-import { Multiselect } from 'vue-multiselect'; 
+import { Multiselect } from 'vue-multiselect';
 
 import { types } from '../../api_types';
 
@@ -34,7 +34,9 @@ describe('Form.vue', () => {
       },
     });
 
-    expect(wrapper.find('div.card .card-header').text()).toContain(T.contestNew);
+    expect(wrapper.find('div.card .card-header').text()).toContain(
+      T.contestNew,
+    );
 
     const contest = {
       alias: 'contestAlias',
@@ -152,7 +154,3 @@ describe('Form.vue', () => {
     expect(wrapper.vm.currentScoreMode).toBe('partial');
   });
 });
-
-
-
-
