@@ -42,9 +42,7 @@
           aria-haspopup="true"
           aria-expanded="false"
         >
-          <span class="download-text">{{
-            T.scoreboardDownload
-          }}</span>
+          <span class="download-text">{{ T.scoreboardDownload }}</span>
         </button>
         <div class="dropdown-menu">
           <a
@@ -441,7 +439,9 @@ export default class ArenaScoreboard extends Vue {
   }
 
   .dropdown-item:hover {
-    background-color: var(--arena-dropdown-item-hover-background-color) !important;
+    background-color: var(
+      --arena-dropdown-item-hover-background-color
+    ) !important;
     color: var(--arena-dropdown-item-hover-text-color) !important;
   }
 }

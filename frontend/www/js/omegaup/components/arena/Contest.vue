@@ -224,9 +224,7 @@ import arena_NavbarMiniranking from './NavbarMiniranking.vue';
 import arena_Runs from './Runs.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Summary from './Summary.vue';
-import arena_Scoreboard, {
-  ScoreboardDownloadFormat,
-} from './Scoreboard.vue';
+import arena_Scoreboard, { ScoreboardDownloadFormat } from './Scoreboard.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
