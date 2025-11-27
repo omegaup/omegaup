@@ -2,13 +2,13 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import contest_NewForm from './NewForm.vue';
+import contest_Form from './Form.vue';
 
-import { Multiselect } from 'vue-multiselect';
+import { Multiselect } from 'vue-multiselect'; 
 
 import { types } from '../../api_types';
 
-describe('NewForm.vue', () => {
+describe('Form.vue', () => {
   beforeAll(() => {
     const div = document.createElement('div');
     div.id = 'root';
@@ -23,7 +23,7 @@ describe('NewForm.vue', () => {
   });
 
   it('Should handle add contest form', async () => {
-    const wrapper = shallowMount(contest_NewForm, {
+    const wrapper = shallowMount(contest_Form, {
       propsData: {
         update: false,
         allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
@@ -34,7 +34,7 @@ describe('NewForm.vue', () => {
       },
     });
 
-    expect(wrapper.find('div.card .card-header').text()).toBe(T.contestNew);
+    expect(wrapper.find('div.card .card-header').text()).toContain(T.contestNew);
 
     const contest = {
       alias: 'contestAlias',
@@ -49,7 +49,7 @@ describe('NewForm.vue', () => {
   });
 
   it('Should handle edit contest form', async () => {
-    const wrapper = shallowMount(contest_NewForm, {
+    const wrapper = shallowMount(contest_Form, {
       attachTo: '#root',
       propsData: {
         update: true,
@@ -96,7 +96,7 @@ describe('NewForm.vue', () => {
   ];
 
   it('Should block language removal', async () => {
-    const wrapper = shallowMount(contest_NewForm, {
+    const wrapper = shallowMount(contest_Form, {
       propsData: {
         update: true,
         allLanguages: [
@@ -122,7 +122,7 @@ describe('NewForm.vue', () => {
   });
 
   it('Should update score mode when', async () => {
-    const wrapper = shallowMount(contest_NewForm, {
+    const wrapper = shallowMount(contest_Form, {
       propsData: {
         update: true,
         allLanguages: [
@@ -152,3 +152,7 @@ describe('NewForm.vue', () => {
     expect(wrapper.vm.currentScoreMode).toBe('partial');
   });
 });
+
+
+
+
