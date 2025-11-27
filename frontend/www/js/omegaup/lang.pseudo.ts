@@ -372,6 +372,7 @@ const translations: { [key: string]: string; } = {
   contestNewForm: "(IOI S7y13)",
   contestNewFormAdmissionMode: "(Admi55i0n m0d3)",
   contestNewFormAdmissionModeDescription: "(S313c7 c0n7357 admi55i0n m0d3. Th3r3 ar3 7hr33 diff3r3n7 m0da1i7i35:<br /><u1><1i>Priva73: C0n7357 i5 0n1y vi5ib13 70 c0d3r5 wh0 hav3 b33n 3xp1ici71y invi73d.</1i><1i>R3gi57ra7i0n/0p3n: Any0n3 can r3gi573r, 0n1y p30p13 admi773d by admin5 hav3 acc355.</1i><1i>Pub1ic: Any0n3 can par7icipa73.</1i></u1>)",
+  contestNewFormBasicInfo: "(Ba5ic Inf0rma7i0n)",
   contestNewFormBasicInformationRequired: "(Ba5ic inf0rma7i0n i5 r3quir3d)",
   contestNewFormBasicInformationRequiredDesc: "(If ac7iva73d, a11 c0n7357an75 mu57 hav3 r3gi57r3d 7h3ir ba5ic inf0rma7i0n 70 j0in 7h3 c0n7357 (c0un7ry, 57a73, 5ch001))",
   contestNewFormByContests: "(In ca53 0f a 7i3, i7 wi11 b3 br0k3n by 7im3. Tim3 wi11 b3 m3a5ur3d b37w33n 7h3 m0m3n7 7ha7 7h3 c0n7357 57ar73d and 7h3 m0m3n7 3ach pr0b13m wa5 501v3d.)",
@@ -391,6 +392,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormImmediateSummaryFeedbackDesc: "(Af73r 3va1ua7ing 3ach 5ubmi55i0n, 7h3 5ummary 0f 5c0r35 and v3rdic75 f0r 3ach gr0up 0f ca535 wi11 b3 5h0wn.)",
   contestNewFormLanguageRemoveBlockedWarning: "(Cann07 r3m0v3 \"%(language)\" fr0m 1anguag35 b3cau53 7h3r3 i5 a7 13a57 0n3 pr0b13m 7ha7 r3quir35 i7)",
   contestNewFormLanguages: "(S37 1anguag35 70 7h3 curr3n7 c0n7357)",
+  contestNewFormLogistics: "(L0gi57ic5 (0p7i0na1))",
   contestNewFormNoPenalty: "(C0d3r5 wi7h 7h3 5am3 5c0r3 wi11 3nd up in a draw, r3gard1355 0f 7h3 7im3 i7 ha5 7ak3n 3ach c0d3r.)",
   contestNewFormNumberOfContestants: "(Numb3r 0f c0n7357an75)",
   contestNewFormNumberOfContestantsDesc: "(Numb3r 0f c0n7357an75 a110w3d f0r 3v3ry 73am)",
@@ -400,6 +402,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormPenaltyTypeDesc: "(Indica735 h0w 7h3 5ubmi55i0n p3na17y i5 ca1cu1a73d: minu735 5inc3 7h3 b3ginning 0f 7h3 c0n7357, minu735 5inc3 7h3 pr0b13m wa5 0p3n3d, 0r pr0gram 3x3cu7i0n 7im3 (mi11i53c0nd5).)",
   contestNewFormPointDecrementFactor: "(Sc0r3 D3cr3m3n7 Fac70r)",
   contestNewFormPointDecrementFactorDesc: "(A numb3r b37w33n 0 and 1, inc1u5iv3. If 7h3 numb3r i5 diff3r3n7 fr0m 0, 7h3 5c0r3 award3d f0r a c0rr3c7 5ubmi55i0n wi11 d3cay a5 7im3 pa5535, acc0rding 70 7h3 f0110wing f0rmu1a: (1 - p0in75_d3cay_fac70r) + p0in75_d3cay_fac70r * TT^2 / (10 * PT^2 + TT^2), wh3r3 PT i5 7h3 p3na17y 0f 7h3 5ubmi55i0n in minu735 and TT 7h3 707a1 13ng7h 0f 7h3 c0n7357 in minu735.)",
+  contestNewFormPrivacy: "(Privacy (0p7i0na1))",
   contestNewFormRecommended: "(R3c0mm3nd3d C0n7357)",
   contestNewFormRecommendedTextAdmin: "(Enab13 7hi5 0p7i0n if y0u wan7 y0ur c0n7357 70 app3ar in 7h3 R3c0mm3nd3d C0n73575 1i57.)",
   contestNewFormRecommendedTextNonAdmin: "(T0 5h0w y0ur c0n7357 in 7h3 R3c0mm3nd3d C0n73575 1i57, c0n7ac7 50p0r73@0m3gaup.c0m.)",
@@ -415,6 +418,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormScoreboardAtEndDesc: "(Sh0w 7h3 c0mp1373 5c0r3b0ard a7 7h3 3nd 0f 7h3 c0n7357.)",
   contestNewFormScoreboardTimePercent: "(Vi5ib13 5c0r3b0ard 7im3 (%))",
   contestNewFormScoreboardTimePercentDesc: "(In73g3r b37w33n 0 and 100, indica7ing 7h3 p3rc3n7ag3 0f 7h3 c0n7357'5 707a1 7im3 wh3r3 7h3 5c0r3b0ard wi11 b3 vi5ib13.)",
+  contestNewFormScoringRules: "(Sc0ring Ru135 (0p7i0na1))",
   contestNewFormShortTitleAlias: "(Sh0r7 7i713 (a1ia5))",
   contestNewFormShortTitleAliasDesc: "(Th3 a1ia5 i5 u53d 70 c0n57ruc7 7h3 c0n7357'5 URL (3.g. C0dingCup2023, OFMI2024, C0paC3n7r0Am3ricana2024, 37c.) I7 cann07 c0n7ain 5pac35.)",
   contestNewFormStartDate: "(S7ar7 da73)",
@@ -2150,10 +2154,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
   zipPrepare: "(Pr3par3 zip fi13)",
-  contestNewFormBasicInfo: "Ba5ic Inf0rma7i0n",
-  contestNewFormLogistics: "L0gi57ic5 (0p7i0na1)",
-  contestNewFormPrivacy: "Privacy (0p7i0na1)",
-  contestNewFormScoringRules: "Sc0ring Ru135 (0p7i0na1)",
 };
 
 export {translations as default};

@@ -219,7 +219,8 @@
                   <omegaup-common-typeahead
                     v-if="currentContestForTeams && !hasSubmissions"
                     :class="{
-                      'is-invalid': invalidParameterName === 'teams_group_alias',
+                      'is-invalid':
+                        invalidParameterName === 'teams_group_alias',
                     }"
                     :existing-options="searchResultTeamsGroups"
                     :options="searchResultTeamsGroups"
@@ -862,7 +863,9 @@ export default class Form extends Vue {
   }
 
   openCollapsedIfRequired() {
-    const formData = new FormData(this.$el.querySelector('form') as HTMLFormElement);
+    const formData = new FormData(
+      this.$el.querySelector('form') as HTMLFormElement,
+    );
 
     let basicInfoCollapsed = true;
     let logisticsCollapsed = true;
@@ -902,6 +905,12 @@ export default class Form extends Vue {
         ) {
           (this.$refs.scoringRules as HTMLElement).click();
           scoringRulesCollapsed = false;
+          continue;
+        }
+
+        if (privacyCollapsed && key === 'requests_user_information') {
+          (this.$refs.privacy as HTMLElement).click();
+          privacyCollapsed = false;
           continue;
         }
       }
