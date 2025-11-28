@@ -9,17 +9,14 @@ import time
 import csv
 import json
 from typing import Dict, Iterable, List, Optional, Type, Any, Mapping, Union
-from dataset_generator.runner import process_one_request_local
 
 from dataset_generator.types import (
     UserCreateParams,
-    IdentityCreateParams,
     SchoolCreateParams,
     ProblemCreateParams,
     ContestCreateParams,
     RunCreateParams,
     CourseCreateParams,
-    CourseAddStudentParams,
     GroupCreateParams,
     IdentityBulkCreateParams,
 )
@@ -27,7 +24,9 @@ from dataset_generator.utils import (
     random_base,
     make_request,
     load_config,
-    send_all
+    send_all,
+    distribute_users_to_requests,
+    send_all_with_distributed_users
 )
 
 
@@ -35,7 +34,8 @@ def _iter_users(
     count: int,
     rng: random.Random,
     endpoints: Dict[str, str],
-    out_usernames: Optional[List[str]] = None,
+    out_usernames: Optional[List[Dict[str, str]]] = None,
+    password: str = "Secret.123"
 ) -> Iterable[Dict[str, object]]:
     """
     Yield /user/create/ requests.
@@ -43,7 +43,7 @@ def _iter_users(
     for idx in range(count):
         username = f"user_{idx}_{random_base(6, rng)}"
         if out_usernames is not None:
-            out_usernames.append(username)
+            out_usernames.append({'username': username, 'password': password})
         params: UserCreateParams = {
             "username": username,
             "email": f"{username}@example.com",
@@ -52,59 +52,45 @@ def _iter_users(
         yield make_request(endpoints["user_create"], params)
 
 
-def _iter_identities(
-    count: int,
-    rng: random.Random,
-    counts: Dict[str, int],
-    endpoints: Dict[str, str],
-) -> Iterable[Dict[str, object]]:
-    """
-    Yield /identity/create/ requests for a fixed group.
-    """
-    for idx in range(count):
-        params: IdentityCreateParams = {
-            "gender": "male",
-            "name": f"Identity {idx}",
-            "password": "Secret.123",
-            "school_name": f"Escuela {idx % max(1, counts.get('schools', 1))}",
-            "username": f"grupo_generico:identity_{idx}_{random_base(6, rng)}",
-            "country_id": "mx",
-            "group_alias": "grupo_generico",
-        }
-        yield make_request(endpoints["identity_create"], params)
-
-
 def _iter_identity_bulk(
     count: int,
-    group_alias: str,
     endpoints: Dict[str, str],
     csv_path: str,
+    rng: random.Random,
 ) -> Iterable[Dict[str, object]]:
     """
     Yield /identity/bulkCreate/ requests using existing CSV file.
     Each call creates the existing identities from csv_path
     """
-
     # Use the provided csv_path parameter
     # Read CSV and convert to JSON format that the API expects
-    identities: List[Dict[str, str]] = []
-    with open(csv_path, 'r', encoding='utf-8-sig') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            identity = {
-                "username": f"{group_alias}:{row['username']}",
-                "name": row['name'],
-                "country_id": row['country_id'].upper(),
-                "state_id": row['state_id'].upper(),
-                "gender": row['gender'],
-                "school_name": row['school_name'],
-                "password": "Secret.123",
-            }
-            identities.append(identity)
+    for i in range(count):
+        group_alias = f"synthetic_group_{random_base(6, rng)}"
 
-    identities_json = json.dumps(identities)
+        yield _make_group(
+            endpoints,
+            alias=group_alias,
+            name=f"Grupo Sintético {i+1}",
+            description="Grupo para identidades bulk sintéticas",
+        )
 
-    for _ in range(count):
+        identities: List[Dict[str, str]] = []
+        with open(csv_path, 'r', encoding='utf-8-sig') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                identity = {
+                    "username": f"{group_alias}:{row['username']}",
+                    "name": row['name'],
+                    "country_id": row['country_id'].upper(),
+                    "state_id": row['state_id'].upper(),
+                    "gender": row['gender'],
+                    "school_name": row['school_name'],
+                    "password": "Secret.123",
+                }
+                identities.append(identity)
+
+        identities_json = json.dumps(identities)
+
         params: IdentityBulkCreateParams = {
             "group_alias": group_alias,
             "identities": identities_json,
@@ -247,7 +233,7 @@ def _iter_courses(
     out_aliases: Optional[List[str]] = None,
 ) -> Iterable[Dict[str, object]]:
     """
-    Yield /course/create/ requests for public active courses.
+    Yield /course/create/ requests for private active courses.
     """
     for idx in range(count):
         alias = f"course_active_{idx}_{random_base(5, rng)}"
@@ -256,30 +242,12 @@ def _iter_courses(
         params: CourseCreateParams = {
             "alias": alias,
             "name": f"Curso {idx} (public active)",
-            "description": "Curso público activo",
+            "description": "Curso privado activo",
             "start_time": "$NOW$-1800",
             "finish_time": "$NOW$+7200",
-            "admission_mode": "public",
+            "admission_mode": "private",
         }
         yield make_request(endpoints["course_create"], params)
-
-
-def _iter_course_add_students_admin(
-    course_alias: str,
-    usernames: List[str],
-    endpoints: Dict[str, str],
-    share_user_information: bool = False,
-) -> Iterable[Dict[str, object]]:
-    """
-    Yield /course/addStudent/ requests as admin actions.
-    """
-    for user_name in usernames:
-        params: CourseAddStudentParams = {
-            "course_alias": course_alias,
-            "usernameOrEmail": user_name,
-            "share_user_information": bool(share_user_information),
-        }
-        yield make_request(endpoints["course_add_student"], params)
 
 
 def _make_group(
@@ -297,6 +265,18 @@ def _make_group(
         "description": description,
     }
     return make_request(endpoints["group_create"], params)
+
+
+def get_workers_for_endpoint(
+    workers: Dict[str, int],
+    endpoint_key: str
+) -> int:
+    """
+    Return the position of the specific worker
+    """
+    if endpoint_key in workers:
+        return int(workers[endpoint_key])
+    return int(workers.get("default", 1))
 
 
 def seed_synthetic(
@@ -327,30 +307,10 @@ def seed_synthetic(
     token = ou_token
 
     now_ts = time.time()
-    rng = random.Random(12345)
+    rng = random.Random(int(now_ts * 1000000))
 
-    dynamic_alias = f"grupo_{int(now_ts)}_{random_base(6, rng)}"
-    group_config = cfg.get("generic_group", {}).copy()
-    group_config.update({
-        "alias": dynamic_alias,
-        "name": group_config.get("name", "Grupo Genérico"),
-        "description": group_config.get("description",
-                                        "Grupo para identidades sintéticas"),
-    })
-
-    with session(args, username, password, token) as session_obj:
-        process_one_request_local(
-            session_obj,
-            _make_group(
-                endpoints,
-                group_config["alias"],
-                group_config["name"],
-                group_config["description"],
-            ),
-            now_ts,
-        )
-
-        user_usernames: List[str] = []
+    with session(args, username, password, token):
+        user_credentials: List[Dict[str, str]] = []
         send_all(
             None,
             now_ts,
@@ -358,10 +318,10 @@ def seed_synthetic(
                 counts.get("users", 0),
                 rng,
                 endpoints,
-                out_usernames=user_usernames,
+                out_usernames=user_credentials,
             ),
             "users",
-            workers=8,
+            workers=get_workers_for_endpoint(cfg["workers"], "user_create"),
             session_ctor=session,
             session_args=args,
             username=username,
@@ -370,41 +330,25 @@ def seed_synthetic(
             backoff_sec=0.1,
         )
 
-        if counts.get("schools", 0) > 0:
-            send_all(
-                None,
-                now_ts,
+        if user_credentials:
+            schools_reqs = distribute_users_to_requests(
+                user_credentials,
                 _iter_schools(counts["schools"], rng, endpoints),
+            )
+            send_all_with_distributed_users(
+                now_ts,
+                schools_reqs,
                 "schools",
-                workers=1,
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "school_create"
+                ),
                 session_ctor=session,
                 session_args=args,
-                username=username,
-                password=password,
                 token=token,
                 backoff_sec=0.1,
                 retries=2,
             )
-
-        send_all(
-            None,
-            now_ts,
-            _iter_identities(
-                counts.get("identities", 0),
-                rng,
-                counts,
-                endpoints,
-            ),
-            "identities",
-            workers=1,
-            session_ctor=session,
-            session_args=args,
-            username=username,
-            password=password,
-            token=token,
-            backoff_sec=0.1,
-            retries=2,
-        )
 
         if counts.get("identities_bulk", 0) > 0:
             send_all(
@@ -412,12 +356,15 @@ def seed_synthetic(
                 now_ts,
                 _iter_identity_bulk(
                     counts.get("identities_bulk", 0),
-                    group_config["alias"],
                     endpoints,
                     cfg["identities_csv_path"],
+                    rng,
                 ),
                 "identities_bulk",
-                workers=1,
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "identity_bulk_create"
+                ),
                 session_ctor=session,
                 session_args=args,
                 username=username,
@@ -429,121 +376,144 @@ def seed_synthetic(
 
         pub_aliases: List[str] = []
         priv_aliases: List[str] = []
-        send_all(
-            None,
-            now_ts,
-            _iter_problems(
-                counts.get("problems_public", 0),
-                "public",
-                rng,
-                endpoints,
-                langs_csv,
-                selected_tags_json,
-                test_zip_path,
-                pub_aliases,
-            ),
-            "problems_public",
-            workers=1,
-            session_ctor=session,
-            session_args=args,
-            username=username,
-            password=password,
-            token=token,
-            backoff_sec=0.1,
-            retries=2,
-        )
-
-        send_all(
-            None,
-            now_ts,
-            _iter_problems(
-                counts.get("problems_private", 0),
-                "private",
-                rng,
-                endpoints,
-                langs_csv,
-                selected_tags_json,
-                test_zip_path,
-                priv_aliases,
-            ),
-            "problems_private",
-            workers=1,
-            session_ctor=session,
-            session_args=args,
-            username=username,
-            password=password,
-            token=token,
-            backoff_sec=0.1,
-            retries=2,
-        )
-
-        for kind, key in [
-            ("past", "contests_past"),
-            ("future", "contests_future"),
-            ("active", "contests_active"),
-            ("public", "contests_public"),
-            ("private", "contests_private"),
-        ]:
-            send_all(
-                None,
-                now_ts,
-                _iter_contests(
-                    counts.get(key, 0),
-                    kind,
+        if user_credentials:
+            problems_public_reqs = distribute_users_to_requests(
+                user_credentials,
+                _iter_problems(
+                    counts.get("problems_public", 0),
+                    "public",
                     rng,
                     endpoints,
                     langs_csv,
+                    selected_tags_json,
+                    test_zip_path,
+                    pub_aliases,
                 ),
-                f"contests_{kind}",
-                workers=1,
+            )
+            send_all_with_distributed_users(
+                now_ts,
+                problems_public_reqs,
+                "problems_public",
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "problem_create"
+                ),
                 session_ctor=session,
                 session_args=args,
-                username=username,
-                password=password,
                 token=token,
                 backoff_sec=0.1,
                 retries=2,
             )
 
-        problem_pool = pub_aliases or priv_aliases
-        send_all(
-            None,
-            now_ts,
-            _iter_run(
-                counts.get("run", 0),
-                problem_pool,
-                rng,
-                endpoints,
-            ),
-            "runs",
-            log_every=log_every_runs,
-            workers=1,
-            session_ctor=session,
-            session_args=args,
-            username=username,
-            password=password,
-            token=token,
-            backoff_sec=0.1,
-            retries=2,
-        )
+            problems_private_reqs = distribute_users_to_requests(
+                user_credentials,
+                _iter_problems(
+                    counts.get("problems_private", 0),
+                    "private",
+                    rng,
+                    endpoints,
+                    langs_csv,
+                    selected_tags_json,
+                    test_zip_path,
+                    priv_aliases,
+                ),
+            )
+            send_all_with_distributed_users(
+                now_ts,
+                problems_private_reqs,
+                "problems_private",
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "problem_create"
+                ),
+                session_ctor=session,
+                session_args=args,
+                token=token,
+                backoff_sec=0.1,
+                retries=2,
+            )
 
-        course_aliases: List[str] = []
-        send_all(
-            None,
-            now_ts,
-            _iter_courses(
-                counts.get("courses", 0),
-                rng,
-                endpoints,
-                out_aliases=course_aliases,
-            ),
-            "courses",
-            workers=4,
-            session_ctor=session,
-            session_args=args,
-            username=username,
-            password=password,
-            token=token,
-            backoff_sec=0.1,
-            retries=2,
-        )
+        if user_credentials:
+            for kind, key in [
+                ("past", "contests_past"),
+                ("future", "contests_future"),
+                ("active", "contests_active"),
+                ("public", "contests_public"),
+                ("private", "contests_private"),
+            ]:
+                contests_reqs = distribute_users_to_requests(
+                    user_credentials,
+                    _iter_contests(
+                        counts.get(key, 0),
+                        kind,
+                        rng,
+                        endpoints,
+                        langs_csv,
+                    ),
+                )
+                send_all_with_distributed_users(
+                    now_ts,
+                    contests_reqs,
+                    f"contests_{kind}",
+                    workers=get_workers_for_endpoint(
+                        cfg["workers"],
+                        "contest_create"
+                    ),
+                    session_ctor=session,
+                    session_args=args,
+                    token=token,
+                    backoff_sec=0.1,
+                    retries=2,
+                )
+
+        if user_credentials:
+            problem_pool = pub_aliases or priv_aliases
+            runs_reqs = distribute_users_to_requests(
+                user_credentials,
+                _iter_run(
+                    counts.get("run", 0),
+                    problem_pool,
+                    rng,
+                    endpoints,
+                ),
+            )
+            send_all_with_distributed_users(
+                now_ts,
+                runs_reqs,
+                "runs",
+                log_every=log_every_runs,
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "run_create"
+                ),
+                session_ctor=session,
+                session_args=args,
+                token=token,
+                backoff_sec=0.1,
+                retries=2,
+            )
+
+            course_aliases: List[str] = []
+            courses_reqs = distribute_users_to_requests(
+                user_credentials,
+                _iter_courses(
+                    counts.get("courses", 0),
+                    rng,
+                    endpoints,
+                    out_aliases=course_aliases,
+                ),
+            )
+            send_all_with_distributed_users(
+                now_ts,
+                courses_reqs,
+                "courses",
+                workers=get_workers_for_endpoint(
+                    cfg["workers"],
+                    "course_create"
+                ),
+                session_ctor=session,
+                session_args=args,
+                token=token,
+                backoff_sec=0.1,
+                retries=2,
+            )

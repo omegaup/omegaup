@@ -16,6 +16,16 @@ generic_group:
   description: "Grupo para identidades sintéticas"
   alias: "grupo_1_generico"
 
+workers:
+  user_create: 32
+  identity_bulk_create: 1
+  school_create: 16
+  problem_create: 16
+  contest_create: 16
+  run_create: 4
+  course_create: 16
+  default: 16
+
 environtment:
   development:
     counts:
