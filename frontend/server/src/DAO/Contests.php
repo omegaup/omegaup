@@ -1573,7 +1573,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::TITLE ||
             $orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ORGANIZER
         ) {
-            $orderMode = 'ASC';
+            // $orderMode = 'ASC'; // Removed forced ASC
         }
 
         $result = "{$order} {$orderMode}";
