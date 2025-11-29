@@ -631,12 +631,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $order = self::getOrder($orderBy, 'finish_time');
 
-        $limits = '
-            ORDER BY ';
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $limits .= 'recommended DESC, ';
-        }
-        $limits .= "
+        $limits = "
+            ORDER BY
+                recommended DESC,
                 {$order}
             LIMIT ?, ?;
         ";
@@ -1034,8 +1031,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         COALESCE(contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
-                    IF(window_length IS NULL, TIMESTAMPDIFF(MINUTE, start_time, finish_time), window_length) AS duration_minutes,
-                    BIT_OR(rc.participating) AS participating";
+                        TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
+                        BIT_OR(rc.participating) AS participating";
         $sql = "
         FROM
             ($sqlRelevantContests) rc
@@ -1083,12 +1080,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $order = self::getOrder($orderBy);
 
-        $limits = '
-            ORDER BY ';
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $limits .= 'recommended DESC, ';
-        }
-        $limits .= "
+        $limits = "
+            ORDER BY
+                recommended DESC,
                 {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
             LIMIT ?, ?";
@@ -1143,8 +1137,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         COALESCE(contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
-                    IF(window_length IS NULL, TIMESTAMPDIFF(MINUTE, start_time, finish_time), window_length) AS duration_minutes,
-                    FALSE AS `participating`
+                        TIMESTAMPDIFF(MINUTE, start_time, finish_time) AS duration_minutes,
+                        FALSE AS `participating`
                         ";
         $sql = "
                 FROM
@@ -1184,12 +1178,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $order = self::getOrder($orderBy);
 
-        $limits = '
-            ORDER BY ';
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $limits .= '`recommended` DESC, ';
-        }
-        $limits .= "
+        $limits = "
+            ORDER BY
+                `recommended` DESC,
                 {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
             LIMIT ?, ?";
@@ -1277,15 +1268,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $order = self::getOrder($orderBy);
 
-        $limits = '
-            ORDER BY ';
-        if ($orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::NONE) {
-            $limits .= '`recommended` DESC, ';
-        }
-        $limits .= "
+        $limits = "
+            ORDER BY
+                `recommended` DESC,
                 {$order},
                 CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC
-            LIMIT ?, ?";
+            LIMIT ?, ?;";
 
         $params[] = max(0, $page - 1) * $rowsPerPage;
         $params[] = intval($rowsPerPage);
@@ -1569,15 +1557,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $orderBy
         ) ?: $defaultOrder;
 
-        if (
-            $orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::TITLE ||
-            $orderBy === \OmegaUp\DAO\Enum\ContestOrderStatus::ORGANIZER
-        ) {
-            $orderMode = 'ASC';
-        }
-
-        $result = "{$order} {$orderMode}";
-
-        return $result;
+        return "{$order} {$orderMode}";
     }
 }
