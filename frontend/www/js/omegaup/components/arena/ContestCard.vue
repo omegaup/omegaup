@@ -47,6 +47,7 @@
         <slot name="contest-enroll-status">
           <div
             v-if="contest.participating"
+            ref="contestEnrollStatus"
             class="text-success d-flex align-items-center small font-weight-bold"
           >
             <font-awesome-icon class="mr-1" icon="check-circle" />

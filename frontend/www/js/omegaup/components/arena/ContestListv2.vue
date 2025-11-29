@@ -167,13 +167,20 @@
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
-      <div v-for="(tab, index) in [ContestTab.Current, ContestTab.Future, ContestTab.Past]" :key="tab" class="mb-5 section-container" :class="{ 'section-separator': index < 2 }">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
-          <h3 class="m-0">{{ getTabTitle(tab) }}</h3>
+      <!-- Current Contests -->
+      <b-container
+        fluid
+        ref="currentContestTab"
+        class="p-0 mb-5 section-container section-separator"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center mb-3 px-3"
+        >
+          <h3 class="m-0">{{ getTabTitle(ContestTab.Current) }}</h3>
           <b-button
-            v-if="getContestsForTab(tab).length > 0"
+            v-if="getContestsForTab(ContestTab.Current).length > 0"
             variant="link"
-            @click="setViewAll(tab)"
+            @click="setViewAll(ContestTab.Current)"
           >
             {{ T.wordsViewAll }}
           </b-button>
@@ -181,66 +188,44 @@
 
         <div class="position-relative scroll-wrapper">
           <b-button
-            v-if="canScrollLeft(tab)"
+            v-if="canScrollLeft(ContestTab.Current)"
             variant="light"
             class="scroll-btn scroll-left shadow-sm"
-            @click="scrollLeft(tab)"
+            @click="scrollLeft(ContestTab.Current)"
           >
             <font-awesome-icon icon="chevron-left" />
           </b-button>
 
-          <div :ref="`scrollContainer_${tab}`" class="horizontal-scroll-container px-3 pb-3" @scroll="onScroll(tab)">
-            <div v-if="getContestsForTab(tab).length === 0" class="text-muted font-italic ml-3">
+          <div
+            ref="scrollContainer_current"
+            class="horizontal-scroll-container px-3 pb-3"
+            @scroll="onScroll(ContestTab.Current)"
+          >
+            <div
+              v-if="getContestsForTab(ContestTab.Current).length === 0"
+              class="text-muted font-italic ml-3"
+            >
               {{ T.contestListEmpty }}
             </div>
             <div v-else class="d-flex">
               <div
-                v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
+                v-for="contestItem in getContestsForTab(ContestTab.Current).slice(0, 10)"
                 :key="contestItem.contest_id"
                 class="mr-3"
-                style="min-width: 300px; max-width: 300px;"
+                style="min-width: 300px; max-width: 300px"
               >
                 <omegaup-contest-card :contest="contestItem">
-                  <!-- Slots -->
-                  <template #contest-button-scoreboard>
-                    <div v-if="tab === ContestTab.Current || tab === ContestTab.Future"></div>
-                  </template>
-
                   <template #text-contest-date>
-                    <b-card-text v-if="tab === ContestTab.Current">
+                    <b-card-text>
                       <font-awesome-icon icon="calendar-alt" />
                       <a :href="getTimeLink(contestItem.finish_time)">
-                        {{ ui.formatString(T.contestEndTime, { endDate: finishContestDate(contestItem) }) }}
+                        {{
+                          ui.formatString(T.contestEndTime, {
+                            endDate: finishContestDate(contestItem),
+                          })
+                        }}
                       </a>
                     </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Future">
-                      <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartTime, { startDate: startContestDate(contestItem) }) }}
-                      </a>
-                    </b-card-text>
-                    <b-card-text v-else-if="tab === ContestTab.Past">
-                      <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartedTime, { startedDate: startContestDate(contestItem) }) }}
-                      </a>
-                    </b-card-text>
-                  </template>
-
-                  <template #contest-dropdown>
-                    <div v-if="tab === ContestTab.Current || tab === ContestTab.Future"></div>
-                  </template>
-
-                  <template #contest-button-enter>
-                    <div v-if="tab === ContestTab.Future || tab === ContestTab.Past"></div>
-                  </template>
-
-                  <template #contest-enroll-status>
-                    <div v-if="tab === ContestTab.Past"></div>
-                  </template>
-
-                  <template #contest-button-see-details>
-                    <div v-if="tab === ContestTab.Past"></div>
                   </template>
                 </omegaup-contest-card>
               </div>
@@ -248,15 +233,173 @@
           </div>
 
           <b-button
-            v-if="canScrollRight(tab)"
+            v-if="canScrollRight(ContestTab.Current)"
             variant="light"
             class="scroll-btn scroll-right shadow-sm"
-            @click="scrollRight(tab)"
+            @click="scrollRight(ContestTab.Current)"
           >
             <font-awesome-icon icon="chevron-right" />
           </b-button>
         </div>
-      </div>
+      </b-container>
+
+      <!-- Future Contests -->
+      <b-container
+        fluid
+        ref="futureContestTab"
+        class="p-0 mb-5 section-container section-separator"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center mb-3 px-3"
+        >
+          <h3 class="m-0">{{ getTabTitle(ContestTab.Future) }}</h3>
+          <b-button
+            v-if="getContestsForTab(ContestTab.Future).length > 0"
+            variant="link"
+            @click="setViewAll(ContestTab.Future)"
+          >
+            {{ T.wordsViewAll }}
+          </b-button>
+        </div>
+
+        <div class="position-relative scroll-wrapper">
+          <b-button
+            v-if="canScrollLeft(ContestTab.Future)"
+            variant="light"
+            class="scroll-btn scroll-left shadow-sm"
+            @click="scrollLeft(ContestTab.Future)"
+          >
+            <font-awesome-icon icon="chevron-left" />
+          </b-button>
+
+          <div
+            ref="scrollContainer_future"
+            class="horizontal-scroll-container px-3 pb-3"
+            @scroll="onScroll(ContestTab.Future)"
+          >
+            <div
+              v-if="getContestsForTab(ContestTab.Future).length === 0"
+              class="text-muted font-italic ml-3"
+            >
+              {{ T.contestListEmpty }}
+            </div>
+            <div v-else class="d-flex">
+              <div
+                v-for="contestItem in getContestsForTab(ContestTab.Future).slice(0, 10)"
+                :key="contestItem.contest_id"
+                class="mr-3"
+                style="min-width: 300px; max-width: 300px"
+              >
+                <omegaup-contest-card :contest="contestItem">
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a :href="getTimeLink(contestItem.start_time)">
+                        {{
+                          ui.formatString(T.contestStartTime, {
+                            startDate: startContestDate(contestItem),
+                          })
+                        }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                </omegaup-contest-card>
+              </div>
+            </div>
+          </div>
+
+          <b-button
+            v-if="canScrollRight(ContestTab.Future)"
+            variant="light"
+            class="scroll-btn scroll-right shadow-sm"
+            @click="scrollRight(ContestTab.Future)"
+          >
+            <font-awesome-icon icon="chevron-right" />
+          </b-button>
+        </div>
+      </b-container>
+
+      <!-- Past Contests -->
+      <b-container
+        fluid
+        ref="pastContestTab"
+        class="p-0 mb-5 section-container"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center mb-3 px-3"
+        >
+          <h3 class="m-0">{{ getTabTitle(ContestTab.Past) }}</h3>
+          <b-button
+            v-if="getContestsForTab(ContestTab.Past).length > 0"
+            variant="link"
+            @click="setViewAll(ContestTab.Past)"
+          >
+            {{ T.wordsViewAll }}
+          </b-button>
+        </div>
+
+        <div class="position-relative scroll-wrapper">
+          <b-button
+            v-if="canScrollLeft(ContestTab.Past)"
+            variant="light"
+            class="scroll-btn scroll-left shadow-sm"
+            @click="scrollLeft(ContestTab.Past)"
+          >
+            <font-awesome-icon icon="chevron-left" />
+          </b-button>
+
+          <div
+            ref="scrollContainer_past"
+            class="horizontal-scroll-container px-3 pb-3"
+            @scroll="onScroll(ContestTab.Past)"
+          >
+            <div
+              v-if="getContestsForTab(ContestTab.Past).length === 0"
+              class="text-muted font-italic ml-3"
+            >
+              {{ T.contestListEmpty }}
+            </div>
+            <div v-else class="d-flex">
+              <div
+                v-for="contestItem in getContestsForTab(ContestTab.Past).slice(0, 10)"
+                :key="contestItem.contest_id"
+                class="mr-3"
+                style="min-width: 300px; max-width: 300px"
+              >
+                <omegaup-contest-card :contest="contestItem">
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a :href="getTimeLink(contestItem.start_time)">
+                        {{
+                          ui.formatString(T.contestStartedTime, {
+                            startedDate: startContestDate(contestItem),
+                          })
+                        }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-enroll-status>
+                    <div></div>
+                  </template>
+                  <template #contest-button-see-details>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </div>
+            </div>
+          </div>
+
+          <b-button
+            v-if="canScrollRight(ContestTab.Past)"
+            variant="light"
+            class="scroll-btn scroll-right shadow-sm"
+            @click="scrollRight(ContestTab.Past)"
+          >
+            <font-awesome-icon icon="chevron-right" />
+          </b-button>
+        </div>
+      </b-container>
     </div>
 
     <!-- Full Grid View -->
