@@ -890,7 +890,7 @@ export default class ProblemForm extends Vue {
       const errorText = await resp.text().catch(() => '');
       throw new Error(errorText || `Error HTTP ${resp.status}`);
     } catch (err) {
-      /// ui.error(T.problemEditRedirectError);
+      ui.error(T.problemEditRedirectError);
     }
   }
 }

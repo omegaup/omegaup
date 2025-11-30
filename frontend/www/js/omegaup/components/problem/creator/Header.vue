@@ -123,7 +123,6 @@ export default class Header extends Vue {
     this.$emit('file-changed', this.zipFile);
   }
 
-  // En la declaración del método:
   async retrieveStore(): Promise<void> {
     const zipFile = this.zipFile;
 
@@ -234,18 +233,6 @@ export default class Header extends Vue {
 
     zip.file('testplan', testPlanData);
     zip.file('cdp.data', JSON.stringify(this.$store.state));
-  }
-  // This previous method was left to avoid errors with the test.
-  generateProblem() {
-    this.getStatement(this.zip);
-    this.getSolution(this.zip);
-    this.getCasesAndTestPlan(this.zip);
-
-    const problemName: string = this.$store.state.problemName;
-    this.$emit('download-zip-file', {
-      fileName: problemName.replace(/ /g, '_'),
-      zipContent: this.zip,
-    });
   }
 
   createNewProblem() {
