@@ -192,15 +192,88 @@ class CdpBuilder {
         array $points
     ): array {
         $groups = [];
+        $autoPoints = empty($points);
+
+        /**
+         * @psalm-param array{in: string, out: string} $caseData
+         * @psalm-return CDPCase
+         */
+        $buildCase = function (
+            string $groupID,
+            string $groupName,
+            string $caseName,
+            array $caseData
+        ) use (
+            $points,
+            $autoPoints
+        ): array {
+            $caseID = self::generate_uuid_v4();
+            $lineID = self::generate_uuid_v4();
+
+            $casePath = $groupName === 'ungrouped' ? $caseName : "$groupName.$caseName";
+            $casePoints = $points[$casePath] ?? 100;
+
+            /** @var string $input */
+            $input = $caseData['in'];
+            /** @var string $output */
+            $output = $caseData['out'];
+
+            return [
+                'caseID' => $caseID,
+                'groupID' => $groupID,
+                'lines' => [
+                    [
+                        'lineID' => $lineID,
+                        'caseID' => $caseID,
+                        'label' => '',
+                        'data' => [
+                            'kind' => 'multiline',
+                            'value' => $input
+                        ]
+                    ]
+                ],
+                'points' => $casePoints,
+                'autoPoints' => $autoPoints,
+                'output' => $output,
+                'name' => strval($caseName)
+            ];
+        };
 
         foreach ($cases as $groupName => $casesInGroup) {
+            uksort($casesInGroup, 'strnatcmp');
+            if ($groupName === 'ungrouped') {
+                foreach ($casesInGroup as $caseName => $caseData) {
+                    if (!isset($caseData['in'], $caseData['out'])) {
+                        continue;
+                    }
+                    $groupID = self::generate_uuid_v4();
+
+                    $case = $buildCase(
+                        $groupID,
+                        $groupName,
+                        $caseName,
+                        $caseData
+                    );
+
+                    $groups[] = [
+                        'groupID' => $groupID,
+                        'name' => strval($caseName),
+                        'points' => $case['points'],
+                        'autoPoints' => $autoPoints,
+                        'ungroupedCase' => true,
+                        'cases' => [$case]
+                    ];
+                }
+                continue;
+            }
+
             $groupID = self::generate_uuid_v4();
             $group = [
                 'groupID' => $groupID,
-                'name' => $groupName === 'ungrouped' ? '' : $groupName,
+                'name' => strval($groupName),
                 'points' => 100,
-                'autoPoints' => true,
-                'ungroupedCase' => $groupName === 'ungrouped',
+                'autoPoints' => $autoPoints,
+                'ungroupedCase' => false,
                 'cases' => []
             ];
 
@@ -208,32 +281,12 @@ class CdpBuilder {
                 if (!isset($caseData['in']) || !isset($caseData['out'])) {
                     continue;
                 }
-
-                $caseID = self::generate_uuid_v4();
-                $lineID = self::generate_uuid_v4();
-
-                $casePath = $groupName === 'ungrouped' ? $caseName : "$groupName.$caseName";
-                $casePoints = $points[$casePath] ?? 100;
-
-                $case = [
-                    'caseID' => $caseID,
-                    'groupID' => $groupID,
-                    'lines' => [
-                        [
-                            'lineID' => $lineID,
-                            'caseID' => $caseID,
-                            'label' => '',
-                            'data' => [
-                                'kind' => 'multiline',
-                                'value' => $caseData['in']
-                            ]
-                        ]
-                    ],
-                    'points' => $casePoints,
-                    'autoPoints' => true,
-                    'output' => $caseData['out'],
-                    'name' => $caseName
-                ];
+                $case = $buildCase(
+                    $groupID,
+                    $groupName,
+                    $caseName,
+                    $caseData
+                );
 
                 $group['cases'][] = $case;
             }
@@ -241,20 +294,11 @@ class CdpBuilder {
             $groups[] = $group;
         }
 
-        $firstGroup = $groups[0] ?? null;
-        $firstCase = null;
-
-        if (!is_null($firstGroup) && !empty($firstGroup['cases'])) {
-            $firstCase = $firstGroup['cases'][0];
-        }
-
         return [
             'groups' => $groups,
             'selected' => [
-                'groupID' => !empty(
-                    $firstGroup
-                ) ? $firstGroup['groupID'] : null,
-                'caseID' => !empty($firstCase) ? $firstCase['caseID'] : null
+                'groupID' => '00000000-0000-0000-0000-000000000000',
+                'caseID' => '00000000-0000-0000-0000-000000000000'
             ],
             'layouts' => [],
             'hide' => false
@@ -315,6 +359,10 @@ class CdpBuilder {
         $base64References = [];
         foreach ($processedImages as $data) {
             $base64References[] = "[{$data['id']}]: {$data['data']}";
+        }
+
+        if (empty($base64References)) {
+            return $newMarkdown;
         }
 
         $base64Appendix = implode("\n", $base64References);
