@@ -16,7 +16,7 @@ jobs:
         steps:
             - uses: actions/stale@v10
               with:
-                  # Mark issues as stale after 90 days of inactivity
+                  # Mark issues as stale after 45 days of inactivity
                   days-before-issue-stale: 45
                   # Mark PRs as stale after 45 days of inactivity
                   days-before-pr-stale: 45
