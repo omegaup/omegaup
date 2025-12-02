@@ -1150,8 +1150,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         $columns,
                         COALESCE(contestants, 0) AS contestants,
                         ANY_VALUE(organizer.username) AS organizer,
-                    IF(window_length IS NULL, TIMESTAMPDIFF(MINUTE, start_time, finish_time), window_length) AS duration_minutes,
-                    FALSE AS `participating`
+                        IF(
+                            window_length IS NULL,
+                            TIMESTAMPDIFF(
+                                MINUTE,
+                                start_time,
+                                finish_time
+                            ),
+                            window_length
+                        ) AS duration_minutes,
+                        FALSE AS `participating`
                         ";
         $sql = "
                 FROM
