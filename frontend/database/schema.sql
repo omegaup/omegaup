@@ -636,6 +636,18 @@ CREATE TABLE `PrivacyStatements` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Problem_Bookmarks` (
+  `user_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`,`problem_id`),
+  KEY `problem_id` (`problem_id`),
+  CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pb_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas que los usuarios marcaron como bookmark';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problem_Of_The_Week` (
   `problem_of_the_week_id` int NOT NULL AUTO_INCREMENT,
   `problem_id` int NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
