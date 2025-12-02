@@ -11,7 +11,7 @@
       "bootstrap-datepicker",
       "bootstrap.v3.datetimepicker"
     ],
-    "module": "es6",
+    "module": "es2020",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "listFiles": true,
