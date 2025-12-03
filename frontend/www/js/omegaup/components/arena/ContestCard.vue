@@ -1,7 +1,10 @@
 <template>
   <b-card class="mb-2 h-100 shadow-sm contest-card-vertical">
     <div class="d-flex justify-content-between align-items-start mb-2">
-      <h5 class="m-0 font-weight-bold text-truncate w-100" :title="contest.title">
+      <h5
+        class="m-0 font-weight-bold text-truncate w-100"
+        :title="contest.title"
+      >
         <a
           :href="getContestURL(contest.alias)"
           class="text-dark text-decoration-none"
@@ -14,7 +17,6 @@
         ref="contestIconRecommended"
         class="text-warning ml-2"
         icon="award"
-        :title="T.contestRecommended"
       />
     </div>
 

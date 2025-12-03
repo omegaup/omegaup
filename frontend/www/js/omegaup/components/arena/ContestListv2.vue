@@ -49,11 +49,7 @@
                   {{ T.contestOrderBy }}
                 </div>
               </template>
-              <b-dropdown-item
-                href="#"
-                data-order-by-ends
-                @click="orderByEnds"
-              >
+              <b-dropdown-item href="#" data-order-by-ends @click="orderByEnds">
                 <font-awesome-icon
                   v-if="currentOrder === ContestOrder.Ends"
                   icon="check"
@@ -126,11 +122,7 @@
                 <font-awesome-icon icon="filter" />
                 {{ T.contestFilterBy }}
               </template>
-              <b-dropdown-item
-                href="#"
-                data-filter-by-all
-                @click="filterByAll"
-              >
+              <b-dropdown-item href="#" data-filter-by-all @click="filterByAll">
                 <font-awesome-icon
                   v-if="currentFilter === ContestFilter.All"
                   icon="check"
@@ -167,15 +159,26 @@
 
     <!-- Summary View (Horizontal Scrolling) -->
     <div v-if="!viewAllCategory">
-      <div v-for="(tab, index) in [ContestTab.Current, ContestTab.Future, ContestTab.Past]" :key="tab" class="mb-5 section-container" :class="{ 'section-separator': index < 2 }">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+      <div
+        v-for="(tab, index) in [
+          ContestTab.Current,
+          ContestTab.Future,
+          ContestTab.Past,
+        ]"
+        :key="tab"
+        class="mb-5 section-container"
+        :class="{ 'section-separator': index < 2 }"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center mb-3 px-3"
+        >
           <h3 class="m-0">{{ getTabTitle(tab) }}</h3>
           <b-button
             v-if="getContestsForTab(tab).length > 0"
             variant="link"
             @click="setViewAll(tab)"
           >
-            {{ T.wordsViewAll }}
+            View all
           </b-button>
         </div>
 
@@ -189,8 +192,15 @@
             <font-awesome-icon icon="chevron-left" />
           </b-button>
 
-          <div :ref="`scrollContainer_${tab}`" class="horizontal-scroll-container px-3 pb-3" @scroll="onScroll(tab)">
-            <div v-if="getContestsForTab(tab).length === 0" class="text-muted font-italic ml-3">
+          <div
+            :ref="`scrollContainer_${tab}`"
+            class="horizontal-scroll-container px-3 pb-3"
+            @scroll="onScroll(tab)"
+          >
+            <div
+              v-if="getContestsForTab(tab).length === 0"
+              class="text-muted font-italic ml-3"
+            >
               {{ T.contestListEmpty }}
             </div>
             <div v-else class="d-flex">
@@ -198,41 +208,65 @@
                 v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
                 :key="contestItem.contest_id"
                 class="mr-3"
-                style="min-width: 300px; max-width: 300px;"
+                style="min-width: 300px; max-width: 300px"
               >
                 <omegaup-contest-card :contest="contestItem">
                   <!-- Slots -->
                   <template #contest-button-scoreboard>
-                    <div v-if="tab === ContestTab.Current || tab === ContestTab.Future"></div>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
                   </template>
 
                   <template #text-contest-date>
                     <b-card-text v-if="tab === ContestTab.Current">
                       <font-awesome-icon icon="calendar-alt" />
                       <a :href="getTimeLink(contestItem.finish_time)">
-                        {{ ui.formatString(T.contestEndTime, { endDate: finishContestDate(contestItem) }) }}
+                        {{
+                          ui.formatString(T.contestEndTime, {
+                            endDate: finishContestDate(contestItem),
+                          })
+                        }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Future">
                       <font-awesome-icon icon="calendar-alt" />
                       <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartTime, { startDate: startContestDate(contestItem) }) }}
+                        {{
+                          ui.formatString(T.contestStartTime, {
+                            startDate: startContestDate(contestItem),
+                          })
+                        }}
                       </a>
                     </b-card-text>
                     <b-card-text v-else-if="tab === ContestTab.Past">
                       <font-awesome-icon icon="calendar-alt" />
                       <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartedTime, { startedDate: startContestDate(contestItem) }) }}
+                        {{
+                          ui.formatString(T.contestStartedTime, {
+                            startedDate: startContestDate(contestItem),
+                          })
+                        }}
                       </a>
                     </b-card-text>
                   </template>
 
                   <template #contest-dropdown>
-                    <div v-if="tab === ContestTab.Current || tab === ContestTab.Future"></div>
+                    <div
+                      v-if="
+                        tab === ContestTab.Current || tab === ContestTab.Future
+                      "
+                    ></div>
                   </template>
 
                   <template #contest-button-enter>
-                    <div v-if="tab === ContestTab.Future || tab === ContestTab.Past"></div>
+                    <div
+                      v-if="
+                        tab === ContestTab.Future || tab === ContestTab.Past
+                      "
+                    ></div>
                   </template>
 
                   <template #contest-enroll-status>
@@ -262,7 +296,12 @@
     <!-- Full Grid View -->
     <div v-else>
       <div class="d-flex align-items-center mb-4 px-3">
-        <b-button variant="outline-secondary" class="mr-3" :title="T.wordsBack" @click="setViewAll(null)">
+        <b-button
+          variant="outline-secondary"
+          class="mr-3"
+          :title="T.wordsBack"
+          @click="setViewAll(null)"
+        >
           <font-awesome-icon icon="arrow-left" />
         </b-button>
         <h2 class="m-0">{{ getTabTitle(viewAllCategory) }}</h2>
@@ -270,7 +309,14 @@
 
       <template v-if="loading || refreshing">
         <b-row>
-          <b-col v-for="index in 6" :key="`skeleton-${index}`" cols="12" md="6" lg="4" class="mb-4">
+          <b-col
+            v-for="index in 6"
+            :key="`skeleton-${index}`"
+            cols="12"
+            md="6"
+            lg="4"
+            class="mb-4"
+          >
             <omegaup-contest-skeleton></omegaup-contest-skeleton>
           </b-col>
         </b-row>
@@ -289,54 +335,86 @@
             class="mb-4"
           >
             <omegaup-contest-card :contest="contestItem">
-                 <!-- Slots -->
-                 <template #contest-button-scoreboard>
-                   <div v-if="viewAllCategory === ContestTab.Current || viewAllCategory === ContestTab.Future"></div>
-                 </template>
+              <!-- Slots -->
+              <template #contest-button-scoreboard>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
+                  "
+                ></div>
+              </template>
 
-                 <template #text-contest-date>
-                    <b-card-text v-if="viewAllCategory === ContestTab.Current">
-                      <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.finish_time)">
-                        {{ ui.formatString(T.contestEndTime, { endDate: finishContestDate(contestItem) }) }}
-                      </a>
-                    </b-card-text>
-                    <b-card-text v-else-if="viewAllCategory === ContestTab.Future">
-                      <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartTime, { startDate: startContestDate(contestItem) }) }}
-                      </a>
-                    </b-card-text>
-                    <b-card-text v-else-if="viewAllCategory === ContestTab.Past">
-                      <font-awesome-icon icon="calendar-alt" />
-                      <a :href="getTimeLink(contestItem.start_time)">
-                        {{ ui.formatString(T.contestStartedTime, { startedDate: startContestDate(contestItem) }) }}
-                      </a>
-                    </b-card-text>
-                 </template>
+              <template #text-contest-date>
+                <b-card-text v-if="viewAllCategory === ContestTab.Current">
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.finish_time)">
+                    {{
+                      ui.formatString(T.contestEndTime, {
+                        endDate: finishContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+                <b-card-text v-else-if="viewAllCategory === ContestTab.Future">
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartTime, {
+                        startDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+                <b-card-text v-else-if="viewAllCategory === ContestTab.Past">
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartedTime, {
+                        startedDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
 
-                 <template #contest-dropdown>
-                   <div v-if="viewAllCategory === ContestTab.Current || viewAllCategory === ContestTab.Future"></div>
-                 </template>
+              <template #contest-dropdown>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Current ||
+                    viewAllCategory === ContestTab.Future
+                  "
+                ></div>
+              </template>
 
-                 <template #contest-button-enter>
-                   <div v-if="viewAllCategory === ContestTab.Future || viewAllCategory === ContestTab.Past"></div>
-                 </template>
+              <template #contest-button-enter>
+                <div
+                  v-if="
+                    viewAllCategory === ContestTab.Future ||
+                    viewAllCategory === ContestTab.Past
+                  "
+                ></div>
+              </template>
 
-                 <template #contest-enroll-status>
-                   <div v-if="viewAllCategory === ContestTab.Past"></div>
-                 </template>
+              <template #contest-enroll-status>
+                <div v-if="viewAllCategory === ContestTab.Past"></div>
+              </template>
 
-                 <template #contest-button-see-details>
-                   <div v-if="viewAllCategory === ContestTab.Past"></div>
-                 </template>
+              <template #contest-button-see-details>
+                <div v-if="viewAllCategory === ContestTab.Past"></div>
+              </template>
             </omegaup-contest-card>
           </b-col>
         </b-row>
       </template>
 
       <div
-        v-if="!loading && !contestListEmpty && hasMore && contestList.length > showMoreThreshold"
+        v-if="
+          !loading &&
+          !contestListEmpty &&
+          hasMore &&
+          contestList.length > showMoreThreshold
+        "
         class="text-center mb-2"
       >
         <button
@@ -487,19 +565,27 @@ class ArenaContestList extends Vue {
   getTabTitle(tab: ContestTab | null): string {
     if (!tab) return '';
     switch (tab) {
-      case ContestTab.Current: return this.T.contestListCurrent;
-      case ContestTab.Future: return this.T.contestListFuture;
-      case ContestTab.Past: return this.T.contestListPast;
-      default: return '';
+      case ContestTab.Current:
+        return this.T.contestListCurrent;
+      case ContestTab.Future:
+        return this.T.contestListFuture;
+      case ContestTab.Past:
+        return this.T.contestListPast;
+      default:
+        return '';
     }
   }
 
   getContestsForTab(tab: ContestTab): types.ContestListItem[] {
     switch (tab) {
-      case ContestTab.Current: return this.contests.current || [];
-      case ContestTab.Future: return this.contests.future || [];
-      case ContestTab.Past: return this.contests.past || [];
-      default: return [];
+      case ContestTab.Current:
+        return this.contests.current || [];
+      case ContestTab.Future:
+        return this.contests.future || [];
+      case ContestTab.Past:
+        return this.contests.past || [];
+      default:
+        return [];
     }
   }
 
@@ -528,22 +614,24 @@ class ArenaContestList extends Vue {
       this.fetchPage(params, urlObj);
     } else {
       // Fetch all for summary view
-      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(tab => {
-        const urlObj = new URL(window.location.href);
-        const params: UrlParams = {
-          page: 1,
-          tab_name: tab,
-          query: this.currentQuery,
-          sort_order: this.currentOrder,
-          filter: this.currentFilter,
-        };
-        // Only update URL for the Current tab to avoid overwriting it multiple times
-        // or setting it to 'past' which might be confusing.
-        // Actually, if we are in summary view, we probably don't want to set tab_name in URL at all?
-        // But the parent logic sets it based on params.tab_name.
-        // Let's just update for Current.
-        this.fetchPage(params, urlObj, tab === ContestTab.Current);
-      });
+      [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(
+        (tab) => {
+          const urlObj = new URL(window.location.href);
+          const params: UrlParams = {
+            page: 1,
+            tab_name: tab,
+            query: this.currentQuery,
+            sort_order: this.currentOrder,
+            filter: this.currentFilter,
+          };
+          // Only update URL for the Current tab to avoid overwriting it multiple times
+          // or setting it to 'past' which might be confusing.
+          // Actually, if we are in summary view, we probably don't want to set tab_name in URL at all?
+          // But the parent logic sets it based on params.tab_name.
+          // Let's just update for Current.
+          this.fetchPage(params, urlObj, tab === ContestTab.Current);
+        },
+      );
     }
   }
   mounted() {
@@ -567,24 +655,34 @@ class ArenaContestList extends Vue {
   }
 
   scrollLeft(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as HTMLElement[])[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       container.scrollBy({ left: -600, behavior: 'smooth' });
     }
   }
 
   scrollRight(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as HTMLElement[])[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       container.scrollBy({ left: 600, behavior: 'smooth' });
     }
   }
 
   onScroll(tab: ContestTab) {
-    const container = (this.$refs[`scrollContainer_${tab}`] as HTMLElement[])[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       this.$set(this.scrollPositions, tab, container.scrollLeft);
-      this.$set(this.maxScrollPositions, tab, container.scrollWidth - container.clientWidth);
+      this.$set(
+        this.maxScrollPositions,
+        tab,
+        container.scrollWidth - container.clientWidth,
+      );
     }
   }
 
@@ -600,14 +698,14 @@ class ArenaContestList extends Vue {
     const maxScroll = this.maxScrollPositions[tab] || 0;
     // If maxScroll is 0, we might not have calculated it yet, so check if we have enough items
     if (maxScroll === 0) {
-       return true;
+      return true;
     }
     return currentScroll < maxScroll - 10; // -10 for tolerance
   }
 
   updated() {
     // Recalculate scroll limits when DOM updates
-    [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach(tab => {
+    [ContestTab.Current, ContestTab.Future, ContestTab.Past].forEach((tab) => {
       this.onScroll(tab);
     });
   }
