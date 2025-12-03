@@ -161,9 +161,9 @@
     "prepare": "husky"
   },
   "lint-staged": {
-  "*.{js,ts,vue}": ["eslint --fix"],
-  "*.{css,scss}": ["stylelint --fix"],
-  "*.py": ["flake8"],
-  "*.php": ["composer run-script lint"]
-}
+    "*.{js,ts,vue}": ["eslint --fix"],
+    "*.{css,scss}": ["stylelint --fix"],
+    "*.py": ["flake8"],
+    "*.php": ["composer run-script lint"]
+  }
 }
