@@ -121,7 +121,7 @@ jobs:
                     resolve(data);
                   } else {
                     console.log('❌ Discord API error:', res.statusCode, data);
-                    reject(new Error(`Discord API returned ${res.statusCode}`));
+                    reject(new Error(`Discord API returned ${res.statusCode}: ${data}`));
                   }
                 });
               });
