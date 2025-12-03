@@ -95,7 +95,11 @@ jobs:
               }]
             };
             
-            const webhookUrl = new URL(process.env.DISCORD_WEBHOOK_URL + '?wait=true');
+            const webhookUrlString = process.env.DISCORD_WEBHOOK_URL;
+            if (!webhookUrlString) {
+              throw new Error('DISCORD_WEBHOOK_URL environment variable is not set');
+            }
+            const webhookUrl = new URL(webhookUrlString + '?wait=true');
             
             const options = {
               hostname: webhookUrl.hostname,
