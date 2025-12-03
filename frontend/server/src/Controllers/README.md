@@ -40,7 +40,6 @@
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
   - [`/api/contest/details/`](#apicontestdetails)
-  - [`/api/contest/getNumberOfContestants/`](#apicontestgetnumberofcontestants)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
@@ -986,22 +985,6 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 ```typescript
 types.ContestDetails;
 ```
-
-## `/api/contest/getNumberOfContestants/`
-
-### Description
-
-### Parameters
-
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `contest_ids` | `string` |             |
-
-### Returns
-
-| Name       | Type                         |
-| ---------- | ---------------------------- |
-| `response` | `{ [key: number]: number; }` |
 
 ## `/api/contest/list/`
 
