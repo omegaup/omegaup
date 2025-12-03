@@ -62,7 +62,7 @@ jobs:
             // Create thread name (max 100 chars)
             let threadName = `Issue #${issue.number}: ${issue.title}`;
             if (threadName.length > 100) {
-              threadName = threadName.substring(0, 97) + '...';
+              threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
             
             const payload = {
