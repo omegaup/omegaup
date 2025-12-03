@@ -7,7 +7,7 @@ on:
 jobs:
   notify-discord:
     runs-on: ubuntu-22.04
-
+    
     steps:
       - name: Check Label Conditions
         id: check-label
@@ -274,4 +274,4 @@ jobs:
               req.write(JSON.stringify(payload));
               req.end();
             });
-
+            
