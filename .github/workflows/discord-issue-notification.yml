@@ -12,7 +12,7 @@ jobs:
       - name: Check Label Conditions
         id: check-label
         run: |
-          ALLOWED_LABELS=("GSoC" "Good first issue")
+          ALLOWED_LABELS=("GSoC" "good first issue")
           CURRENT_LABEL="${{ github.event.label.name }}"
           
           # For 'opened' events, check all labels
