@@ -1584,7 +1584,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $orderBy
         ) ?: $defaultOrder;
 
-
         $result = "{$order} {$orderMode}";
 
         return $result;
