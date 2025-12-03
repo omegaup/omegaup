@@ -621,6 +621,8 @@ jobs:
             -r stuff/requirements.txt
           python3 -m pip install --user \
             -r stuff/teaching_assistant/requirements.txt
+          python3 -m pip install --user \
+            -r stuff/teaching_assistant_worker/requirements.txt
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -654,3 +656,7 @@ jobs:
       - name: Run check for submission mode
         run: |
           pytest stuff/teaching_assistant/test_ta_submission_mode.py --log-cli-level=INFO -s
+
+      - name: Run check for redis queue integration
+        run: |
+          pytest stuff/teaching_assistant/test_ta_redis_queue.py --log-cli-level=INFO -s
