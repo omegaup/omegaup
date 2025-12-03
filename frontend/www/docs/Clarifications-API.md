@@ -1,66 +1,66 @@
 ## POST `clarification/create`
 
-### Descripción
-Crea una nueva clarificación para un problema **en un concurso**. Las clarificaciones son creadas como privadas por default.
+### Description
+Creates a new clarification for a problem **in a contest**. Clarifications are created as private by default.
 
-### Privilegios
-Usuario loggeado.
+### Privileges
+Logged-in user.
 
-### Parámetros
+### Parameters
 
-| Parámetro | Tipo | Descripción  | Opcional? |
+| Parameter | Type | Description  | Optional? |
 | -------- |:-------------:| :-----|:-----|
-|`contest_alias`|string|Alias del concurso||
-|`problem_alias`|string|Alias del problema||
-|`message`|string|Contenido de la clarificación||
+|`contest_alias`|string|Contest alias||
+|`problem_alias`|string|Problem alias||
+|`message`|string|Clarification content||
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description  |
 | -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
-|`clarification_id`|int|Id de la clarificación recién enviada|
+|`status`|string|If the request was successful, returns `ok`| 
+|`clarification_id`|int|ID of the newly submitted clarification|
 
 ## GET clarifications/:clarification_id
 
-#### Descripción
-Regresa los detalles de una clarificación de un problema **en un concurso**.
+#### Description
+Returns the details of a clarification for a problem **in a contest**.
 
-#### Privilegios
-Usuario loggeado y con acceso al concurso.
+#### Privileges
+Logged-in user with access to the contest.
 
-### Parámetros
-Ninguno
+### Parameters
+None
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description  |
 | -------- |:-------------:| :-----|
-|`message`|string|El mensaje de la clarificación| 
-|`answer`|string|La respuesta a la clarificación|
-|`time`|datetime|Fecha de la última modificación a la clarificación|
-|`problem_id`|int|Id del problema|
-|`contest_id`|int|Id del concurso|
+|`message`|string|Clarification message| 
+|`answer`|string|Clarification answer|
+|`time`|datetime|Date of the last modification to the clarification|
+|`problem_id`|int|Problem ID|
+|`contest_id`|int|Contest ID|
 
 
 ## POST clarifications/:clarification_id/update
 
-### Descripción
-Actualizar contenidos de una clarificación de un problema **en un concurso**.
+### Description
+Update the contents of a clarification for a problem **in a contest**.
 
-### Privilegios
-Administrador de concurso o superior
+### Privileges
+Contest administrator or higher
 
-### Parámetros
-| Parámetro | Tipo | Descripción  | Opcional? |
+### Parameters
+| Parameter | Type | Description  | Optional? |
 | -------- |:-------------:| :-----|:-----|
-|`contest_alias`|string|Alias del concurso|Opcional|
-|`problem_alias`|string|Alias del problema|Opcional|
-|`message`|string|Contenido de la clarificación|Opcional|
+|`contest_alias`|string|Contest alias|Optional|
+|`problem_alias`|string|Problem alias|Optional|
+|`message`|string|Clarification content|Optional|
 
-### Regresa
+### Returns
 
-| Parámetro | Tipo | Descripción  |
+| Parameter | Type | Description  |
 | -------- |:-------------:| :-----|
-|`status`|string|Si el request fue exitoso, regresa `ok`| 
+|`status`|string|If the request was successful, returns `ok`| 
 
