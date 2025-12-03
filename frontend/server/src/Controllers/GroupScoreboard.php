@@ -189,7 +189,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $group_alias
      * @omegaup-request-param string $scoreboard_alias
      */
-    public static function apiDetails(\OmegaUp\Request $r): array {
+    public static function apiDetails(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $groupAlias = $r->ensureString(
             'group_alias',

@@ -28,7 +28,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
         $results = [];
         foreach ($aliases as $alias) {
             /** @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string. */
-            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
+            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/{$alias}")) {
                 continue;
             }
             $results[] = $alias;
@@ -116,7 +116,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $badge_alias
      */
-    public static function apiBadgeDetails(\OmegaUp\Request $r): array {
+    public static function apiBadgeDetails(\OmegaUp\Request $r) {
         $badgeAlias = $r->ensureString(
             'badge_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)

@@ -1257,7 +1257,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         string $directory,
         string $problemAlias,
         string $revision
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
             "{$problemAlias}-{$revision}-{$directory}",
@@ -1611,8 +1611,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         $signingAlgorithm = 'AWS4-HMAC-SHA256';
 
         $now = \OmegaUp\Time::get();
-        $datestamp = gmstrftime('%Y%m%d', $now);
-        $timestamp = gmstrftime('%Y%m%dT%H%M%SZ', $now);
+        $date = new \DateTimeImmutable('@' . $now);
+        $date = $date->setTimezone(new \DateTimeZone('UTC'));
+        $datestamp = $date->format('Ymd');
+        $timestamp = $date->format('Ymd\THis\Z');
         $emptySHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
         $headers = [
             'Host' => "{$bucketName}.{$serviceName}.amazonaws.com",

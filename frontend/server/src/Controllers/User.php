@@ -1550,7 +1550,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $omit_rank
      * @omegaup-request-param null|string $username
      */
-    public static function apiProfile(\OmegaUp\Request $r): array {
+    public static function apiProfile(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -2008,7 +2008,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     private static function getContestStats(
         \OmegaUp\DAO\VO\Identities $identity
-    ): array {
+    ) {
         // Get contests where identity had at least 1 run
         $contestsParticipated = \OmegaUp\DAO\Contests::getContestsParticipated(
             intval($identity->identity_id)
@@ -2834,7 +2834,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getAuthorsRank(
         int $offset,
         int $rowCount
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK,
             "{$offset}-{$rowCount}",
@@ -2888,7 +2888,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getAuthorsRankWithQualityProblems(
         int $offset,
         int $rowCount
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK_WITH_QUALITY_PROBLEMS,
             "{$offset}-{$rowCount}",

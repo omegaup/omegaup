@@ -2336,7 +2336,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     private static function getProblemSettings(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
-    ): array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS,
             "{$problem->alias}-{$problem->commit}",
