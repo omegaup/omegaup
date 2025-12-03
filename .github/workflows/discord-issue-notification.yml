@@ -48,7 +48,7 @@ jobs:
         with:
           script: |
             const https = require('https');
-            const url = require('url');
+            
             
             const issue = context.payload.issue;
             const label = '${{ steps.check-label.outputs.matched_label }}';
