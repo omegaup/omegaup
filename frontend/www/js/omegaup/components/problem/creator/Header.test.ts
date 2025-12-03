@@ -83,7 +83,9 @@ describe('Header.vue', () => {
   it('Should download the zip file', async () => {
     const wrapper = mount(Header, { localVue, store });
 
-    const generateProblemSpy = jest.spyOn(wrapper.vm, 'generateProblem');
+    const generateProblemSpy = jest
+      .spyOn(wrapper.vm, 'generateFinalProblem')
+      .mockResolvedValue();
 
     const downloadButton = wrapper.find('button[data-download-zip]');
     expect(downloadButton.exists()).toBe(true);
@@ -137,10 +139,36 @@ describe('Header.vue', () => {
     const downloadButton = wrapper.find('button[data-download-zip]');
     expect(downloadButton.exists()).toBe(true);
 
-    await downloadButton.trigger('click');
-    await Vue.nextTick();
+    const generateFinalProblemSpy = jest.spyOn(
+      wrapper.vm as any,
+      'generateFinalProblem',
+    );
 
-    expect(Object.keys(wrapper.vm.zip.files)).toStrictEqual(fileFolderList);
+    await downloadButton.trigger('click');
+
+    expect(generateFinalProblemSpy).toHaveBeenCalledTimes(1);
+
+    const result = generateFinalProblemSpy.mock.results[0]?.value;
+    if (result && typeof (result as any).then === 'function') {
+      (await result) as Promise<void>;
+    }
+
+    const emitted = wrapper.emitted()['download-zip-file'];
+    expect(emitted).toBeTruthy();
+    expect(emitted).toHaveLength(1);
+
+    const payload = emitted?.[0]?.[0];
+    expect(payload).toBeDefined();
+
+    if (!payload) {
+      return;
+    }
+    expect(payload.fileName).toBe(store.state.problemName.replace(/ /g, '_'));
+    //We load the Blob as a zip file using JSZip.
+    const zipBlob = payload.zipContent as Blob;
+    const zip = await JSZip.loadAsync(zipBlob);
+
+    expect(Object.keys(zip.files)).toStrictEqual(fileFolderList);
 
     jest.restoreAllMocks();
   });
@@ -175,7 +203,7 @@ describe('Header.vue', () => {
 
     await fileInput.trigger('change');
 
-    wrapper.vm.retrieveStore();
+    await wrapper.vm.retrieveStore();
     expect(mockReadFileMethod).toHaveBeenCalled();
 
     const emittedStoreData = {
@@ -255,7 +283,7 @@ describe('Header.vue', () => {
       },
     };
 
-    await new Promise((r) => setTimeout(r, 1000)); // Waiting for the JSZIp to complete extracting the file.
+    // await new Promise((r) => setTimeout(r, 1000)); // Waiting for the JSZIp to complete extracting the file.
 
     expect(wrapper.emitted()['upload-zip-file']).toStrictEqual([
       [emittedStoreData],

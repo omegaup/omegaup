@@ -46,7 +46,7 @@
         class="mr-2"
         variant="primary"
         size="sm"
-        @click="generateProblem()"
+        @click="generateFinalProblem()"
       >
         <BIconDownload class="mr-1" />
         <span class="d-none d-md-inline">
@@ -89,6 +89,7 @@ import { namespace } from 'vuex-class';
 import T from '../../../lang';
 import * as ui from '../../../ui';
 import { Group, CaseGroupID } from '@/js/omegaup/problem/creator/types';
+import { buildProblemZip } from './problemZipBuilder';
 
 const casesStore = namespace('casesStore');
 
@@ -119,41 +120,77 @@ export default class Header extends Vue {
 
   handleZipFile(ev: Event): void {
     this.zipFile = this.readFile(ev.target as HTMLInputElement);
+    this.$emit('file-changed', this.zipFile);
   }
 
-  retrieveStore(): void {
-    if (!this.zipFile) {
+  async retrieveStore(): Promise<void> {
+    const zipFile = this.zipFile;
+
+    if (!zipFile) {
       return;
     }
-    const zipUploaded = new JSZip();
-    zipUploaded
-      .loadAsync(this.zipFile)
-      .then((zipContent) => {
-        const cdpDataFile = zipContent.file('cdp.data');
-        if (!cdpDataFile) {
-          ui.error(T.problemCreatorZipFileIsNotComplete);
-          return;
-        }
-        cdpDataFile.async('text').then((content) => {
-          const storeData = JSON.parse(content);
-          this.$emit('upload-zip-file', storeData);
-          this.name = storeData.problemName;
-          this.$store.replaceState({
-            ...this.$store.state,
-            problemName: storeData.problemName,
-            problemMarkdown: storeData.problemMarkdown,
-            problemCodeContent: storeData.problemCodeContent,
-            problemCodeExtension: storeData.problemCodeExtension,
-            problemSolutionMarkdown: storeData.problemSolutionMarkdown,
-          });
-          if (storeData.casesStore) {
-            this.$store.commit('casesStore/replaceState', storeData.casesStore);
-          }
-        });
-      })
-      .catch(() => {
-        ui.error(T.problemCreatorZipFileIsNotValid);
+
+    try {
+      const zipUploaded = new JSZip();
+      const zipContent = await zipUploaded.loadAsync(zipFile);
+
+      const cdpDataFile = zipContent.file('cdp.data');
+
+      if (cdpDataFile) {
+        // The cdp.data file exists, we read it directly.
+        const content = await cdpDataFile.async('text');
+        const storeData = JSON.parse(content);
+        this.updateStore(storeData);
+        return;
+      }
+
+      // If there is no cdp.data, we use the conversion API.
+      const formData = new FormData();
+      formData.append('zipFile', zipFile);
+
+      const response = await fetch('/api/problem/convertZipToCdp/', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.status === 'ok' && data.cdp) {
+        this.updateStore(data.cdp);
+      } else {
+        ui.error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error instanceof TypeError) {
+        ui.error(T.errorNetwork);
+      } else if (error instanceof Error && error.message?.startsWith('HTTP')) {
+        ui.error(T.errorServer + ` ${error.message}`);
+      } else {
+        ui.error(T.errorUnexpectedZip);
+      }
+    }
+  }
+
+  updateStore(storeData: any) {
+    this.$emit('upload-zip-file', storeData);
+    this.name = storeData.problemName;
+    this.$store.replaceState({
+      ...this.$store.state,
+      problemName: storeData.problemName,
+      problemMarkdown: storeData.problemMarkdown,
+      problemCodeContent: storeData.problemCodeContent,
+      problemCodeExtension: storeData.problemCodeExtension,
+      problemSolutionMarkdown: storeData.problemSolutionMarkdown,
+    });
+    console.log(JSON.stringify(storeData, null, 2));
+    if (storeData.casesStore) {
+      this.$store.commit('casesStore/replaceState', storeData.casesStore);
+    }
   }
 
   @Watch('name')
@@ -198,22 +235,21 @@ export default class Header extends Vue {
     zip.file('cdp.data', JSON.stringify(this.$store.state));
   }
 
-  generateProblem() {
-    this.getStatement(this.zip);
-    this.getSolution(this.zip);
-    this.getCasesAndTestPlan(this.zip);
-
-    const problemName: string = this.$store.state.problemName;
-    this.$emit('download-zip-file', {
-      fileName: problemName.replace(/ /g, '_'),
-      zipContent: this.zip,
-    });
-  }
-
   createNewProblem() {
     this.$store.commit('resetStore');
     this.$store.commit('casesStore/resetStore');
     window.location.reload();
+  }
+  async generateFinalProblem() {
+    const stateSnapshot = JSON.parse(JSON.stringify(this.$store.state));
+
+    const zipBlob = await buildProblemZip(stateSnapshot, this.zipFile);
+
+    const problemName = stateSnapshot.problemName;
+    this.$emit('download-zip-file', {
+      fileName: problemName.replace(/ /g, '_'),
+      zipContent: zipBlob,
+    });
   }
 }
 </script>
