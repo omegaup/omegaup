@@ -56,7 +56,7 @@ jobs:
             // Truncate description
             let description = issue.body || 'No description provided';
             if (description.length > 200) {
-              description = description.substring(0, 200) + '...';
+              description = description.substring(0, 200).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
             
             // Create thread name (max 100 chars)
