@@ -229,22 +229,13 @@ jobs:
                 timestamp: new Date().toISOString()
               }]
             };
-
+            
             const webhookUrlString = process.env.DISCORD_WEBHOOK_URL;
             if (!webhookUrlString) {
               throw new Error('DISCORD_WEBHOOK_URL environment variable is not set');
             }
-
-            // Validate Discord webhook URL format
-            const DISCORD_WEBHOOK_PREFIX = 'https://discord.com/api/webhooks/';
-            if (!webhookUrlString.startsWith(DISCORD_WEBHOOK_PREFIX)) {
-              throw new Error(
-                `Invalid Discord webhook URL format. URL must start with "${DISCORD_WEBHOOK_PREFIX}"`
-              );
-            }
-
             const webhookUrl = new URL(webhookUrlString + '?wait=true');
-
+            
             const options = {
               hostname: webhookUrl.hostname,
               path: webhookUrl.pathname + webhookUrl.search,
