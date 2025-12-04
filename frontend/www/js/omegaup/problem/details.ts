@@ -35,7 +35,7 @@ import {
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
-  const locationHash = window.location.hash.substr(1).split('/');
+  const locationHash = window.location.hash.substring(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
 
@@ -84,6 +84,9 @@ OmegaUp.on('ready', async () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
+      reviewedProblemLevel: payload.reviewedProblemLevel,
+      reviewedQualitySeal: payload.reviewedQualitySeal,
+      reviewedPublicTags: payload.reviewedPublicTags,
       guid,
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
@@ -112,6 +115,9 @@ OmegaUp.on('ready', async () => {
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
           publicTags: payload.publicTags,
+          reviewedProblemLevel: this.reviewedProblemLevel,
+          reviewedQualitySeal: this.reviewedQualitySeal,
+          reviewedPublicTags: this.reviewedPublicTags,
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
@@ -211,21 +217,27 @@ OmegaUp.on('ready', async () => {
           },
           'rate-problem-as-reviewer': ({
             tags,
-            qualitySeal,
+            level,
+            quality_seal,
           }: {
             tags: string[];
-            qualitySeal: boolean;
+            level: string;
+            quality_seal: boolean;
           }) => {
-            const contents: { quality_seal?: boolean; tag?: string } = {};
-            if (tags) {
-              contents.tag = tags[0];
-            }
-            contents.quality_seal = qualitySeal;
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
               nomination: 'quality_tag',
-              contents: JSON.stringify(contents),
-            }).catch(ui.apiError);
+              contents: JSON.stringify({ tags, level, quality_seal }),
+            })
+              .then(() => {
+                this.reviewedPublicTags = tags;
+                this.reviewedProblemLevel = level;
+                this.reviewedQualitySeal = quality_seal;
+                if (this.nominationStatus) {
+                  this.nominationStatus.alreadyReviewed = true;
+                }
+              })
+              .catch(ui.apiError);
           },
           'submit-demotion': (source: qualitynomination_Demotion) => {
             api.QualityNomination.create({

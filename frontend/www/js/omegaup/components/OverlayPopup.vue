@@ -23,6 +23,7 @@ div[data-overlay-popup] {
   max-height: 90%;
   margin: auto;
   border: 2px solid var(--overlay-popup-border-color);
+  border-radius: 1.5rem;
   padding: 1em;
   position: absolute;
   overflow-y: auto;
