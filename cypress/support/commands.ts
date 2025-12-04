@@ -211,6 +211,7 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-target=".logistics"]').click();
     cy.get('[data-score-board-visible-time]')
       .clear()
       .type(scoreBoardVisibleTime);
@@ -219,7 +220,9 @@ Cypress.Commands.add(
       cy.get('[data-different-start-time-input]').type(differentStartTime);
     }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
+    cy.get('[data-target=".scoring-rules"]').click();
     cy.get('[data-score-mode]').select(`${scoreMode}`);
+    cy.get('[data-target=".privacy"]').click();
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
