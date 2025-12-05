@@ -53,14 +53,60 @@ jobs:
             const issue = context.payload.issue;
             const label = '${{ steps.check-label.outputs.matched_label }}';
 
-            // Truncate description
+            // Label emoji mapping
+            const labelEmojis = {
+              'GSoC': '☀️',
+              'good first issue': '👋',
+              'bug': '🐛',
+              'enhancement': '✨',
+              'documentation': '📚',
+              'help wanted': '🆘',
+              'question': '❓',
+              'invalid': '⛔',
+              'duplicate': '♻️',
+              'wontfix': '🚫'
+            };
+            const labelEmoji = labelEmojis[label] || '🏷️';
+
+            // Sanitize and truncate description
             let description = issue.body || 'No description provided';
+
+            // Remove images: ![alt](url) or <img> tags
+            description = description.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
+            description = description.replace(/<img[^>]*>/gi, '');
+
+            // Remove code blocks (``` ... ```)
+            description = description.replace(/```[\s\S]*?```/g, '[code block removed]');
+
+            // Remove inline code (`code`)
+            description = description.replace(/`[^`]+`/g, '');
+
+            // Convert links [text](url) to just text
+            description = description.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+            // Remove raw URLs (http:// or https://)
+            description = description.replace(/https?:\/\/[^\s]+/g, '[link]');
+
+            // Remove HTML tags
+            description = description.replace(/<[^>]+>/g, '');
+
+            // Remove excessive whitespace and newlines
+            description = description.replace(/\n{3,}/g, '\n\n');
+            description = description.replace(/[ \t]+/g, ' ');
+            description = description.trim();
+
+            // Truncate after sanitization
             if (description.length > 200) {
               description = description.substring(0, 200).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
 
-            // Create thread name (max 100 chars)
-            let threadName = `Issue #${issue.number}: ${issue.title}`;
+            // Fallback if sanitization removed everything
+            if (!description || description.trim() === '') {
+              description = 'No text description available (contains only images/code/links)';
+            }
+
+            // Create thread name (max 100 chars) - include label emoji
+            let threadName = `${labelEmoji} Issue #${issue.number}: ${issue.title}`;
             if (threadName.length > 100) {
               threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
@@ -68,7 +114,7 @@ jobs:
             const payload = {
               thread_name: threadName,
               embeds: [{
-                title: `🆕 Issue #${issue.number}: ${issue.title}`,
+                title: `${labelEmoji} Issue #${issue.number}: ${issue.title}`,
                 url: issue.html_url,
                 color: 0x58ACFF,
                 fields: [
@@ -79,7 +125,7 @@ jobs:
                   },
                   {
                     name: '🏷️ Label',
-                    value: label,
+                    value: `${labelEmoji} ${label}`,
                     inline: true
                   },
                   {
