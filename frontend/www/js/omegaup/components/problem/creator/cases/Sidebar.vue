@@ -140,7 +140,7 @@
                 </div>
               </b-row>
             </b-dropdown-item>
-            <b-dropdown-item @click="deleteUngroupedCases()"
+            <b-dropdown-item v-if="!isEditing" @click="deleteUngroupedCases()"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
@@ -180,7 +180,8 @@
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item @click="deleteCase({ groupID, caseID: '' })"
+                  <b-dropdown-item
+                    @click="handleDeleteClick('case', groupID, cases[0].caseID)"
                     ><b-row>
                       <div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
@@ -191,6 +192,15 @@
                     </b-row>
                   </b-dropdown-item>
                 </b-dropdown>
+                <delete-confirmation-form
+                  v-if="isEditing"
+                  :visible="
+                    isConfirmingDelete('case', groupID, cases[0].caseID)
+                  "
+                  :item-name="getItemNameForDelete()"
+                  :item-id="getItemIdForDelete()"
+                  :on-cancel="cancelDelete"
+                />
               </b-row>
             </b-card>
           </b-collapse>
@@ -246,7 +256,7 @@
             </b-dropdown-item>
             <b-dropdown-item
               data-sidebar-edit-group-dropdown="delete group"
-              @click="deleteGroup(groupID)"
+              @click="handleDeleteClick('group', groupID)"
               ><b-row>
                 <div class="ml-6">
                   <BIconTrash variant="danger" font-scale=".95" />
@@ -257,6 +267,7 @@
               </b-row>
             </b-dropdown-item>
             <b-dropdown-item
+              v-if="!isEditing"
               data-sidebar-edit-group-dropdown="delete cases"
               @click="deleteGroupCases(groupID)"
               ><b-row>
@@ -293,6 +304,13 @@
               </b-row>
             </b-dropdown-item>
           </b-dropdown>
+          <delete-confirmation-form
+            v-if="isEditing"
+            :visible="isConfirmingDelete('group', groupID)"
+            :item-name="getItemNameForDelete()"
+            :item-id="getItemIdForDelete()"
+            :on-cancel="cancelDelete"
+          />
           <b-collapse v-model="showCases[groupID]" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
@@ -321,7 +339,8 @@
                   <template #button-content>
                     <BIconThreeDotsVertical />
                   </template>
-                  <b-dropdown-item @click="deleteCase({ groupID, caseID })"
+                  <b-dropdown-item
+                    @click="handleDeleteClick('case', groupID, caseID)"
                     ><b-row>
                       <div class="ml-6">
                         <BIconTrash variant="danger" font-scale=".95" />
@@ -332,6 +351,13 @@
                     </b-row>
                   </b-dropdown-item>
                 </b-dropdown>
+                <delete-confirmation-form
+                  v-if="isEditing"
+                  :visible="isConfirmingDelete('case', groupID, caseID)"
+                  :item-name="getItemNameForDelete()"
+                  :item-id="getItemIdForDelete()"
+                  :on-cancel="cancelDelete"
+                />
               </b-row>
             </b-card>
           </b-collapse>
@@ -345,7 +371,7 @@
             cancel-variant="danger"
             static
             lazy
-            @ok="updateGroupInfo(groupID)"
+            @ok="handleModalOk(groupID)"
           >
             <div class="mt-3">
               <b-form-group
@@ -361,6 +387,7 @@
                   autocomplete="off"
                 />
               </b-form-group>
+
               <b-form-group
                 v-show="!editGroupAutoPoints[groupID]"
                 :label="T.problemCreatorPoints"
@@ -374,6 +401,7 @@
                   min="0"
                 />
               </b-form-group>
+
               <b-form-group
                 :label="T.problemCreatorAutomaticPoints"
                 :description="T.problemCreatorAutomaticPointsHelperGroup"
@@ -382,9 +410,16 @@
                   data-sidebar-edit-group-modal="edit autoPoints"
                   :checked="editGroupAutoPoints[groupID]"
                   @change="toggleGroupAutoPoints(groupID)"
-                >
-                </b-form-checkbox>
+                />
               </b-form-group>
+
+              <div v-if="isEditing">
+                <CaseSimpleForm
+                  :is-embedded="true"
+                  :trigger-submit="shouldSubmitForm"
+                  :edit-group="getGroupById(groupID)"
+                />
+              </div>
             </div>
           </b-modal>
         </b-row>
@@ -394,8 +429,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch, Inject } from 'vue-property-decorator';
 import problemCreator_LayoutSidebar from './LayoutSidebar.vue';
+import DeleteConfirmationForm from './DeleteConfirmationForm.vue';
+import CaseSimpleForm from './CasesForm.vue';
 import { namespace } from 'vuex-class';
 import T from '../../../../lang';
 import {
@@ -411,6 +448,8 @@ const casesStore = namespace('casesStore');
 @Component({
   components: {
     'omegaup-problem-creator-layout-sidebar': problemCreator_LayoutSidebar,
+    CaseSimpleForm: CaseSimpleForm,
+    'delete-confirmation-form': DeleteConfirmationForm,
   },
 })
 export default class Sidebar extends Vue {
@@ -532,6 +571,114 @@ export default class Sidebar extends Vue {
       fileName: targetGroup.name,
       zipContent: groupZip,
     });
+  }
+
+  @Inject({ default: false }) readonly isEditing!: boolean;
+
+  confirmingDelete: {
+    type: 'group' | 'case' | null;
+    groupID: GroupID | null;
+    caseID: CaseID | null;
+  } = {
+    type: null,
+    groupID: null,
+    caseID: null,
+  };
+
+  startDeleteConfirmation(
+    type: 'group' | 'case',
+    groupID: GroupID,
+    caseID: CaseID = '',
+  ) {
+    this.confirmingDelete = {
+      type,
+      groupID,
+      caseID,
+    };
+  }
+
+  getItemNameForDelete(): string {
+    if (!this.confirmingDelete.type) return '';
+
+    if (this.confirmingDelete.type === 'group') {
+      const group = this.groups.find(
+        (g) => g.groupID === this.confirmingDelete.groupID,
+      );
+      return `${T.wordsGroup}: ${group?.name || this.confirmingDelete.groupID}`;
+    } else {
+      const group = this.groups.find(
+        (g) => g.groupID === this.confirmingDelete.groupID,
+      );
+      const caseItem = group?.cases.find(
+        (c) => c.caseID === this.confirmingDelete.caseID,
+      );
+      return `${T.wordsCase}: ${group?.name || ''}.${
+        caseItem?.name || this.confirmingDelete.caseID
+      }`;
+    }
+  }
+
+  getItemIdForDelete(): string {
+    if (!this.confirmingDelete.type) {
+      return '';
+    }
+
+    if (this.confirmingDelete.type === 'group') {
+      return this.confirmingDelete.groupID ?? '';
+    } else {
+      return this.confirmingDelete.caseID ?? '';
+    }
+  }
+
+  getGroupById(groupID: GroupID): Group | null {
+    const group = this.groups.find((g) => g.groupID === groupID);
+    return group ?? null;
+  }
+
+  cancelDelete() {
+    this.confirmingDelete = {
+      type: null,
+      groupID: null,
+      caseID: null,
+    };
+  }
+
+  isConfirmingDelete(
+    type: 'group' | 'case',
+    groupID: GroupID,
+    caseID: CaseID = '',
+  ): boolean {
+    return (
+      this.confirmingDelete.type === type &&
+      this.confirmingDelete.groupID === groupID &&
+      (type === 'group' || this.confirmingDelete.caseID === caseID)
+    );
+  }
+  shouldSubmitForm = false;
+  handleModalOk(groupID: string) {
+    this.updateGroupInfo(groupID);
+
+    this.shouldSubmitForm = true;
+
+    this.$nextTick(() => {
+      this.shouldSubmitForm = false;
+    });
+  }
+
+  handleDeleteClick(
+    type: 'group' | 'case',
+    groupID: GroupID,
+    caseID: CaseID = '',
+  ) {
+    if (this.isEditing) {
+      this.startDeleteConfirmation(type, groupID, caseID);
+    } else {
+      if (type === 'group') {
+        this.deleteGroup(groupID);
+      } else {
+        this.deleteCase({ groupID, caseID });
+      }
+    }
   }
 }
 </script>
