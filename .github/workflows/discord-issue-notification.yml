@@ -53,7 +53,22 @@ jobs:
             const issue = context.payload.issue;
             const label = '${{ steps.check-label.outputs.matched_label }}';
 
-            // Truncate description
+            // Label emoji mapping
+            const labelEmojis = {
+              'GSoC': '☀️',
+              'good first issue': '👋',
+              'bug': '🐛',
+              'enhancement': '✨',
+              'documentation': '📚',
+              'help wanted': '🆘',
+              'question': '❓',
+              'invalid': '⛔',
+              'duplicate': '♻️',
+              'wontfix': '🚫'
+            };
+            const labelEmoji = labelEmojis[label] || '🏷️';
+
+            // Sanitize and truncate description
             let description = issue.body || 'No description provided';
 
             // Remove images: ![alt](url) or <img> tags
@@ -85,8 +100,13 @@ jobs:
               description = description.substring(0, 200).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
 
-            // Create thread name (max 100 chars)
-            let threadName = `Issue #${issue.number}: ${issue.title}`;
+            // Fallback if sanitization removed everything
+            if (!description || description.trim() === '') {
+              description = 'No text description available (contains only images/code/links)';
+            }
+
+            // Create thread name (max 100 chars) - include label emoji
+            let threadName = `${labelEmoji} Issue #${issue.number}: ${issue.title}`;
             if (threadName.length > 100) {
               threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
@@ -104,9 +124,9 @@ jobs:
                     inline: false
                   },
                   {
-                    name: '🏷️ Labels',
-                    value: labelsDisplay,
-                    inline: false
+                    name: '🏷️ Label',
+                    value: `${labelEmoji} ${label}`,
+                    inline: true
                   },
                   {
                     name: '👤 Author',
