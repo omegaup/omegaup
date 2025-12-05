@@ -7,14 +7,14 @@ on:
 jobs:
   notify-discord:
     runs-on: ubuntu-22.04
-    
+
     steps:
       - name: Check Label Conditions
         id: check-label
         run: |
           ALLOWED_LABELS=("GSoC" "good first issue")
           CURRENT_LABEL="${{ github.event.label.name }}"
-          
+
           # For 'opened' events, check all labels
           if [ "${{ github.event.action }}" == "opened" ]; then
             ISSUE_LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
@@ -26,7 +26,7 @@ jobs:
               fi
             done
           fi
-          
+
           # For 'labeled' events, check the specific label
           if [ "${{ github.event.action }}" == "labeled" ]; then
             for label in "${ALLOWED_LABELS[@]}"; do
@@ -37,7 +37,7 @@ jobs:
               fi
             done
           fi
-          
+
           echo "should_notify=false" >> $GITHUB_OUTPUT
 
       - name: Send Discord Notification
@@ -48,23 +48,23 @@ jobs:
         with:
           script: |
             const https = require('https');
-            
-            
+
+
             const issue = context.payload.issue;
             const label = '${{ steps.check-label.outputs.matched_label }}';
-            
+
             // Truncate description
             let description = issue.body || 'No description provided';
             if (description.length > 200) {
               description = description.substring(0, 200).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
-            
+
             // Create thread name (max 100 chars)
             let threadName = `Issue #${issue.number}: ${issue.title}`;
             if (threadName.length > 100) {
               threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
             }
-            
+
             const payload = {
               thread_name: threadName,
               embeds: [{
@@ -94,13 +94,22 @@ jobs:
                 timestamp: new Date().toISOString()
               }]
             };
-            
+
             const webhookUrlString = process.env.DISCORD_WEBHOOK_URL;
             if (!webhookUrlString) {
               throw new Error('DISCORD_WEBHOOK_URL environment variable is not set');
             }
+
+            // Validate Discord webhook URL format
+            const DISCORD_WEBHOOK_PREFIX = 'https://discord.com/api/webhooks/';
+            if (!webhookUrlString.startsWith(DISCORD_WEBHOOK_PREFIX)) {
+              throw new Error(
+                `Invalid Discord webhook URL format. URL must start with "${DISCORD_WEBHOOK_PREFIX}"`
+              );
+            }
+
             const webhookUrl = new URL(webhookUrlString + '?wait=true');
-            
+
             const options = {
               hostname: webhookUrl.hostname,
               path: webhookUrl.pathname + webhookUrl.search,
@@ -109,7 +118,7 @@ jobs:
                 'Content-Type': 'application/json'
               }
             };
-            
+
             return new Promise((resolve, reject) => {
               const req = https.request(options, (res) => {
                 let data = '';
@@ -130,5 +139,3 @@ jobs:
               req.write(JSON.stringify(payload));
               req.end();
             });
-            
-            
