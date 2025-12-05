@@ -143,7 +143,7 @@
     "wrapper-webpack-plugin": "^2.1"
   },
   "scripts": {
-    "test": "TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
+    "test": "cross-env TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
     "test:watch": "jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
     "test:coverage": "jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
     "dev": "cross-env webpack --config-name=frontend --mode=development --stats=minimal --color",
