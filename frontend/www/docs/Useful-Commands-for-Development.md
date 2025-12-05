@@ -76,11 +76,18 @@ find frontend/ \
 **Description:** Runs unit tests for an individual PHP file. To run all tests, omit the file name.  
 **Execution Location:** Inside the Docker container, in the root directory.  
 
-### Apply changes to schema.sql
+### Regenerate DAO files from schema
 ```bash
 ./stuff/update-dao.sh
 ```
-**Description:** Applies changes to the `schema.sql` file when adding a new migration file in `.sql`. Works until the migration file is committed.
+**Description:** Updates DAO (Data Access Object) files after modifying the database schema. This script should be run as part of a **two-step deployment process**:
+
+1. **First commit:** Modify `schema.sql` and add migration scripts (`database/*.sql`). Deploy to production and verify everything works correctly.
+2. **Second commit (after verification):** Run this script to:
+   - Copy `schema.sql` to `dao_schema.sql`
+   - Regenerate all DAO Base and VO PHP files in `frontend/server/src/DAO/`
+
+**Why separate commits?** This allows safe rollback if the schema migration fails in production. Since DAOs aren't regenerated yet, the old code continues working, and you can manually revert database changes without code conflicts.
 
 **Execution Location:** Inside the Docker container, in the root directory.  
 
