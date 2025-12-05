@@ -1,0 +1,112 @@
+name: PR Size Labeler
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  labeler:
+    permissions:
+      pull-requests: write
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    name: Label the PR size
+    steps:
+      - name: Create PR size labels if they don't exist
+        run: |
+          create_or_update_label() {
+            local name=$1
+            local color=$2
+            local description=$3
+            # URL encode the label name (replace / with %2F)
+            local encoded_name=$(echo "$name" | sed 's|/|%2F|g')
+            
+            # Try to create the label first
+            local create_response=$(curl -s -w "\n%{http_code}" -X POST \
+              -H "Authorization: token ${{ github.token }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/labels" \
+              -d "{\"name\":\"$name\",\"color\":\"$color\",\"description\":\"$description\"}")
+            
+            local http_code=$(echo "$create_response" | tail -n1)
+            
+            if [ "$http_code" = "201" ]; then
+              echo "Created label '$name'"
+            elif [ "$http_code" = "422" ]; then
+              # Label already exists, update it
+              echo "Label '$name' already exists, updating..."
+              curl -X PATCH \
+                -H "Authorization: token ${{ github.token }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/${{ github.repository }}/labels/$encoded_name" \
+                -d "{\"name\":\"$name\",\"color\":\"$color\",\"description\":\"$description\"}" \
+                -f -s -o /dev/null || true
+            else
+              echo "Warning: Failed to create/update label '$name' (HTTP $http_code)"
+            fi
+          }
+
+          # Create labels with specified colors
+          create_or_update_label "size/XS" "0e8a16" "Very small PR (≤10 lines)"
+          create_or_update_label "size/S" "28a745" "Small PR (≤50 lines)"
+          create_or_update_label "size/M" "fbca04" "Medium PR (≤100 lines)"
+          create_or_update_label "size/L" "d93f0b" "Large PR (≤200 lines)"
+          create_or_update_label "size/XL" "b60205" "Extra large PR (>200 lines)"
+
+      - name: Remove existing PR size labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sizeLabels = ['size/XS', 'size/S', 'size/M', 'size/L', 'size/XL'];
+            const issueNumber = context.payload.pull_request.number;
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            for (const label of labels) {
+              if (sizeLabels.includes(label.name)) {
+                core.info(`Removing label ${label.name}`);
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name: label.name,
+                });
+              }
+            }
+
+      - uses: codelytv/pr-size-labeler@v1
+        with:
+          xs_label: "size/XS"
+          xs_max_size: "10"
+          s_label: "size/S"
+          s_max_size: "50"
+          m_label: "size/M"
+          m_max_size: "100"
+          l_label: "size/L"
+          l_max_size: "200"
+          xl_label: "size/XL"
+          fail_if_xl: "false"
+          message_if_xl: >
+            ⚠️ This PR exceeds the recommended size of 200 lines.
+
+            Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
+
+            Note: This PR might require additional review time due to its size.
+          github_api_url: "https://api.github.com"
+          files_to_ignore: |
+            composer.lock
+            yarn.lock
+            *.lock
+            frontend/www/js/dist/*
+            frontend/www/css/dist/*
+            frontend/www/media/dist/*
+            coverage/*
+            coverage.xml
+            frontend/www/grader/ephemeral/index-light.html
+            frontend/www/grader/ephemeral/index.html
+          ignore_line_deletions: "false"
+          ignore_file_deletions: "false"
