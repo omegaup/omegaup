@@ -1,0 +1,64 @@
+# Language labels based on file extensions
+javascript:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.js'
+          - '**/*.jsx'
+          - '**/*.ts'
+          - '**/*.tsx'
+
+php:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.php'
+
+python:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.py'
+
+# Component labels based on file paths
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/database/**'
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file: 'frontend/server/**'
+      - all-globs-to-all-files: '!frontend/server/src/Controllers/**'
+      - all-globs-to-all-files: '!frontend/server/src/RabbitMQConnection.php'
+
+'API Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/server/src/Controllers/**'
+          - 'frontend/www/api/**'
+          - 'frontend/server/src/ApiCaller.php'
+          - 'frontend/server/src/ApiUtils.php'
+          - 'frontend/server/src/Request.php'
+          - 'frontend/server/src/Exceptions/ApiException.php'
+          - 'frontend/server/cmd/APITool.php'
+
+'Cronjobs/RabbitMQ':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'stuff/cron/**'
+          - 'stuff/pipelines/rabbitmq*'
+          - 'frontend/server/src/RabbitMQConnection.php'
+
+documentation:
+  - all:
+      - changed-files:
+          - any-glob-to-any-file: '**/*.md'
+          - all-globs-to-all-files: '!frontend/database/**'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'composer.json'
+          - 'yarn.lock'
+          - 'composer.lock'
+          - 'requirements.txt'
+          - 'package-lock.json'
