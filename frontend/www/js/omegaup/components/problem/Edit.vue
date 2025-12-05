@@ -59,6 +59,18 @@
           >{{ T.problemEditSolution }}</a
         >
       </li>
+
+      <li class="nav-item" role="presentation">
+        <a
+          href="#cases"
+          data-tab-cases
+          class="nav-link"
+          :class="{ active: showTab === 'cases' }"
+          @click="showTab = 'cases'"
+          >{{ T.problemEditCases }}</a
+        >
+      </li>
+
       <li class="nav-item" role="presentation">
         <a
           href="#admins"
@@ -166,6 +178,18 @@
               )
           "
         ></omegaup-problem-statementedit>
+      </div>
+
+      <div v-if="showTab === 'cases'" class="tab-pane active">
+        <omegaup-problem-creator-cases-tab
+          @hook:mounted="loadCasesStore"
+          @download-zip-file="
+            (zipObject) => $emit('download-zip-file', zipObject)
+          "
+          @download-input-file="
+            (fileObject) => $emit('download-input-file', fileObject)
+          "
+        />
       </div>
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
@@ -280,7 +304,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Provide } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -290,6 +314,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import omegaup_Markdown from '../Markdown.vue';
+import problemCreator_CasesTab from './creator/cases/CasesTab.vue';
 
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { ModalPlugin } from 'bootstrap-vue';
@@ -304,6 +329,7 @@ Vue.use(ModalPlugin);
     'omegaup-problem-statementedit': problem_StatementEdit,
     'omegaup-common-admins': common_Admins,
     'omegaup-common-groupadmins': common_GroupAdmins,
+    'omegaup-problem-creator-cases-tab': problemCreator_CasesTab,
   },
 })
 export default class ProblemEdit extends Vue {
@@ -315,6 +341,13 @@ export default class ProblemEdit extends Vue {
   @Prop() statement!: types.ProblemStatement;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
+  @Prop({ default: null }) cdp!: Record<string, unknown> | null;
+
+  @Provide('problemAlias')
+  get providedAlias(): string {
+    return this.data.alias;
+  }
+  @Provide('isEditing') isEditing = true;
 
   T = T;
   alias = this.data.alias;
@@ -332,6 +365,8 @@ export default class ProblemEdit extends Vue {
         return T.problemEditChooseVersion;
       case 'solution':
         return T.problemEditSolution;
+      case 'cases':
+        return T.problemEditCases;
       case 'admins':
         return T.problemEditAddAdmin;
       case 'tags':
@@ -356,6 +391,19 @@ export default class ProblemEdit extends Vue {
 
   onGotoPrintableVersion(): void {
     window.location.href = `/arena/problem/${this.alias}/print/`;
+  }
+
+  private getCasesStore(): Record<string, unknown> | null {
+    if (!this.cdp) return null;
+    const cdpData = this.cdp as any;
+    if (!cdpData.casesStore) return null;
+    return cdpData.casesStore;
+  }
+
+  private loadCasesStore(): void {
+    const storeData = this.getCasesStore();
+    if (!storeData) return;
+    this.$store.commit('casesStore/replaceState', storeData);
   }
 }
 </script>
