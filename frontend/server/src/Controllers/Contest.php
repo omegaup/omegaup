@@ -1318,7 +1318,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_listv2',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
