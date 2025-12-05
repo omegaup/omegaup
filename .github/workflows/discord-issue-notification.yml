@@ -53,20 +53,109 @@ jobs:
             const issue = context.payload.issue;
             const label = '${{ steps.check-label.outputs.matched_label }}';
 
-            // Label emoji mapping
+            // Label emoji mapping for omegaUp labels
             const labelEmojis = {
+              // Programs & Events
               'GSoC': '☀️',
+              'hacktoberfest-accepted': '🎃',
+              
+              // Difficulty / Onboarding
+              'Good first issue': '👋',
               'good first issue': '👋',
+              'Good second issue': '✌️',
+              'help wanted': '🆘',
+              
+              // Issue Types
               'bug': '🐛',
+              'feature-request': '💡',
               'enhancement': '✨',
               'documentation': '📚',
-              'help wanted': '🆘',
+              'refactor': '🔧',
+              'regression': '⏪',
+              'security': '🔒',
+              'privacy': '🛡️',
+              
+              // Priority
+              'P0': '🚨',
+              'P1': '🔴',
+              'P2': '🟠',
+              'P3': '🟡',
+              
+              // Status
+              'assigned': '👤',
+              'blocked → not yet ready': '⏳',
+              'blocked → waiting input': '💬',
+              'blocked → waiting parent': '⛓️',
+              'waiting-review': '👀',
+              'final-review': '✅',
+              'Stale': '🧊',
+              
+              // Tech Stack
+              'javascript': '🟨',
+              'php': '🐘',
+              'python': '🐍',
+              'database': '🗄️',
+              'backend': '⚙️',
+              'sandbox': '📦',
+              'dependencies': '📦',
+              
+              // Task Types
+              'Admin Task': '🔑',
+              'API Task': '🔌',
+              'UI Task': '🎨',
+              'UX Task': '🖌️',
+              
+              // omegaUp Features
+              'omegaUp Courses': '📖',
+              'omegaUp for Contests': '🏆',
+              'omegaUp for Work': '💼',
+              'omegaUp Judge': '⚖️',
+              'omegaUp Problems': '🧩',
+              'Karel': '🤖',
+              
+              // Community & Feedback
+              'omi-buzon': '📬',
+              'ofmi-buzon': '📬',
+              'profesores-buzon': '👨‍🏫',
+              'soporte': '🛠️',
+              'badge proposal': '🏅',
+              'developer happiness': '😊',
+              'Quality Assurance': '🔍',
+              'PeerReview': '👥',
+              'Reconocimiento y Motivación': '🌟',
+              'Content-classification': '📋',
+              'Cronjobs/RabbitMQ': '🐰',
+              
+              // Time Estimates (hours)
+              '1 hour': '⏱️',
+              '2 hours': '⏱️',
+              '3 hours': '⏱️',
+              '4 hours': '⏱️',
+              '5 hours': '⏱️',
+              '6 hours': '⏱️',
+              '7 hours': '⏱️',
+              '8 hours': '⏱️',
+              '9 hours': '⏱️',
+              '10 hours': '⏱️',
+              '11 hours': '⏱️',
+              '12 hours': '⏱️',
+              '13 hours': '⏱️',
+              '21 hours': '⏱️',
+              '> 21 hours': '⏱️',
+              
+              // Generic fallbacks
               'question': '❓',
               'invalid': '⛔',
               'duplicate': '♻️',
               'wontfix': '🚫'
             };
             const labelEmoji = labelEmojis[label] || '🏷️';
+
+            // Get all labels with their emojis
+            const allLabels = issue.labels
+              .map(l => `${labelEmojis[l.name] || '🏷️'} ${l.name}`)
+              .join(' • ');
+            const labelsDisplay = allLabels || 'No labels';
 
             // Sanitize and truncate description
             let description = issue.body || 'No description provided';
@@ -124,9 +213,9 @@ jobs:
                     inline: false
                   },
                   {
-                    name: '🏷️ Label',
-                    value: `${labelEmoji} ${label}`,
-                    inline: true
+                    name: '🏷️ Labels',
+                    value: labelsDisplay,
+                    inline: false
                   },
                   {
                     name: '👤 Author',
@@ -185,3 +274,4 @@ jobs:
               req.write(JSON.stringify(payload));
               req.end();
             });
+
