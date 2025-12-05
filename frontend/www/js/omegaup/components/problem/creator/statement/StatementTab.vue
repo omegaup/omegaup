@@ -122,8 +122,10 @@ export default class StatementTab extends Vue {
     flex: 1;
     min-height: 400px;
     overflow-y: auto;
-    border: 1px solid var(--markdown-preview-border-color);
+    border: 2px solid #999999;
     padding: 10px;
+      box-sizing: border-box;
+        text-align: left;
   }
 }
 </style>
