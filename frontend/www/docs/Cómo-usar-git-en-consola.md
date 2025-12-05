@@ -28,4 +28,4 @@ Es muy probable que ya lo tengas instalado, para revisar abre la consola (Termin
 
 # Actualiza tu copia local
 
-¡Estás listo! Ahora sigue los pasos de este artículo https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-actualizar-tu-copia-local-de-omegaup-antes-de-hacer-cambios.md
+¡Estás listo! Ahora sigue los pasos de este artículo https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/C%C3%B3mo-actualizar-y-configurar-tu-copia-local-de-omegaup-antes-de-hacer-cambios.md
