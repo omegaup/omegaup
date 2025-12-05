@@ -159,11 +159,5 @@
     "test:e2e": "cypress run --browser chrome",
     "storybook": "storybook dev -p 6006",
     "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{js,ts,vue}": ["eslint --fix"],
-    "*.{css,scss}": ["stylelint --fix"],
-    "*.py": ["flake8"],
-    "*.php": ["composer run-script lint"]
   }
 }
