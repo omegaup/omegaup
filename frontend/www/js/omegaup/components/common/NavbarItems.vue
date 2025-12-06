@@ -249,3 +249,39 @@ export default class NavbarItems extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+.nav-link {
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    text-decoration: none;
+  }
+}
+
+.dropdown-menu {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  min-width: 20rem;
+  max-width: 80vw;
+  width: max-content;
+  padding: 12px 14px;
+}
+
+.dropdown-item {
+  border-radius: 4px;
+  margin-bottom: 2px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(187, 187, 187, 0.3); 
+  }
+}
+</style>

@@ -139,7 +139,7 @@
                     >
                       <font-awesome-icon :icon="['fas', 'user']" />
                       {{ T.navViewProfile }}
-                      <div v-if="profileProgress !== 0" class="progress mt-2">
+                      <div v-if="profileProgress !== 0" class="progress mt-2 position-relative">
                         <div
                           class="progress-bar progress-bar-striped bg-info"
                           role="progressbar"
@@ -148,6 +148,7 @@
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
+                        <small class="progress-text">{{ profileProgress.toFixed(1) }}%</small>
                       </div>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -271,6 +272,7 @@
               v-if="isLoggedIn"
               class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
               href="#"
+              data-logout-button
               @click.prevent="logoutModalVisible = true"
             >
               <font-awesome-icon :icon="['fas', 'power-off']" />
@@ -286,6 +288,7 @@
           v-if="isLoggedIn"
           class="navbar justify-content-end d-none d-lg-block order-1"
           href="#"
+          data-logout-button
           @click.prevent="logoutModalVisible = true"
         >
           <font-awesome-icon :icon="['fas', 'power-off']" />
@@ -466,6 +469,14 @@ nav.navbar {
 
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
+    
+    img {
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    &:hover img {
+      transform: scale(1.1);
+    }
   }
 
   a.dropdown-item {
@@ -484,13 +495,18 @@ nav.navbar {
     overflow-y: auto;
     max-height: 75vh;
     scrollbar-width: none;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 10px;
   }
 }
 
 .allow-overflow {
   overflow-y: scroll;
   height: 65vh;
-  max-width: 40vw;
+  max-width: 70vw;
 }
 
 .nav-login-text {
@@ -501,6 +517,82 @@ nav.navbar {
 .navbar-nav {
   .nav-item {
     width: 100% !important;
+
+    .nav-link {
+      transition: background-color 0.2s ease;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.15); 
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.nav-user-link img {
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.nav-user-link:hover img {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.dropdown-item {
+  border-radius: 4px;
+  margin-bottom: 2px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(187, 187, 187, 0.3); 
+  }
+}
+
+a[data-logout-button] {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(221, 85, 136, 0.2); 
+    color: $omegaup-pink !important;
+    
+    svg, i {
+      color: $omegaup-pink !important;
+    }
+  }
+}
+
+.progress {
+  position: relative;
+  height: 20px;
+  border: 1px solid $omegaup-grey; 
+  border-radius: 4px;
+  
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 600;
+    color: $omegaup-grey; 
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 992px) {
+  .navbar-nav .dropdown:hover > .dropdown-menu {
+    display: block;
+    margin-top: 0;
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  .fullwidth-mobile-fit-lg {
+    width: fit-content;
   }
 }
 
@@ -515,12 +607,6 @@ nav.navbar {
   max-width: 20vw;
   display: inline-block;
   vertical-align: middle;
-}
-
-@media (min-width: 992px) {
-  .fullwidth-mobile-fit-lg {
-    width: fit-content;
-  }
 }
 
 @media only screen and (min-width: 385px) {
