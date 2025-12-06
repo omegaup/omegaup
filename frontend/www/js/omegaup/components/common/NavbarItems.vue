@@ -281,7 +281,7 @@ export default class NavbarItems extends Vue {
   white-space: nowrap;
 
   &:hover {
-    background-color: rgba(187, 187, 187, 0.3); 
+    background-color: rgba(187, 187, 187, 0.3);
   }
 }
 </style>

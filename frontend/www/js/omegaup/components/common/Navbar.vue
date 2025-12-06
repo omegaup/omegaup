@@ -139,7 +139,10 @@
                     >
                       <font-awesome-icon :icon="['fas', 'user']" />
                       {{ T.navViewProfile }}
-                      <div v-if="profileProgress !== 0" class="progress mt-2 position-relative">
+                      <div
+                        v-if="profileProgress !== 0"
+                        class="progress mt-2 position-relative"
+                      >
                         <div
                           class="progress-bar progress-bar-striped bg-info"
                           role="progressbar"
@@ -148,7 +151,9 @@
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
-                        <small class="progress-text">{{ profileProgress.toFixed(1) }}%</small>
+                        <small class="progress-text"
+                          >{{ profileProgress.toFixed(1) }}%</small
+                        >
                       </div>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -469,11 +474,11 @@ nav.navbar {
 
   .navbar-brand {
     background-color: var(--header-navbar-brand-background-color);
-    
+
     img {
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
+
     &:hover img {
       transform: scale(1.1);
     }
@@ -523,7 +528,7 @@ nav.navbar {
       border-radius: 4px;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.15); 
+        background-color: rgba(255, 255, 255, 0.15);
         text-decoration: none;
       }
     }
@@ -545,18 +550,19 @@ nav.navbar {
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: rgba(187, 187, 187, 0.3); 
+    background-color: rgba(187, 187, 187, 0.3);
   }
 }
 
 a[data-logout-button] {
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: rgba(221, 85, 136, 0.2); 
+    background-color: rgba(221, 85, 136, 0.2);
     color: $omegaup-pink !important;
-    
-    svg, i {
+
+    svg,
+    i {
       color: $omegaup-pink !important;
     }
   }
@@ -565,9 +571,9 @@ a[data-logout-button] {
 .progress {
   position: relative;
   height: 20px;
-  border: 1px solid $omegaup-grey; 
+  border: 1px solid $omegaup-grey;
   border-radius: 4px;
-  
+
   .progress-text {
     position: absolute;
     top: 50%;
@@ -575,13 +581,19 @@ a[data-logout-button] {
     transform: translate(-50%, -50%);
     font-size: 11px;
     font-weight: 600;
-    color: $omegaup-grey; 
+    color: $omegaup-grey;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 992px) {
@@ -590,7 +602,7 @@ a[data-logout-button] {
     margin-top: 0;
     animation: fadeIn 0.2s ease-out;
   }
-  
+
   .fullwidth-mobile-fit-lg {
     width: fit-content;
   }
