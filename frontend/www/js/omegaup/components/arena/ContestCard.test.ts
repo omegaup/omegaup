@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import arena_ContestCard from './ContestCard.vue';
-import { ContestTab } from './ContestListv2.vue';
+import { ContestTab } from './ContestList.vue';
 
 describe('ContestCard.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
