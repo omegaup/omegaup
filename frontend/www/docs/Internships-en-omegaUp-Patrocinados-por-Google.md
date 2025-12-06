@@ -210,7 +210,7 @@ Para familiarizarte con omegaUp.com y comenzar a desarrollar te recomendamos seg
   * **Como escogemos a nuestros becarios?** Vamos a revisar todas las aplicaciones que recibamos y que estén completas y vamos a escoger a nuestros candidatos basados en 3 cosas:
     * Nivel de habilidad. Esto se busca medir en las 4 fases de la aplicación.
     * Plan de trabajo presentado en tu aplicación. Debe de estar bien estructurado y ser realista en cuanto a tiempos.
-    * Cultural fit. Nos gusta trabajar con gente que promueve la inclusión y que pro activamente buscan ayudar a sus compañeros. Una buena manera de mostrar eso es ayudando a otros candidatos que hacen preguntas en el [canal de Discordhttps://discord.gg/gMEMX7Mrwe).
+    * Cultural fit. Nos gusta trabajar con gente que promueve la inclusión y que pro activamente buscan ayudar a sus compañeros. Una buena manera de mostrar eso es ayudando a otros candidatos que hacen preguntas en el [canal de Discord](https://discord.gg/gMEMX7Mrwe).
 * **Hay aplicaciones de muestra?** Estos son 2 buenos ejemplos:
  * Carlos Cordova - [2018](https://docs.google.com/document/d/1ZEnC33hW4WjZ1WcsDjEtuIeNPuvW62q_hBFjhFosLOI/edit#heading=h.30j0zll)
  * 
