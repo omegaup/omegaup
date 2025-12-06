@@ -2161,6 +2161,7 @@ const translations: { [key: string]: string; } = {
   wordsUsersFeedback: "(C0d3r5 F33dback)",
   wordsVerdict: "(V3rdic7)",
   wordsVerdictsOf: "(V3rdic75 0f %(alias))",
+  wordsViewAll: "(Vi3w a11)",
   wordsWallTimeInSeconds: "(Wa11-7im3 (S3c))",
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
