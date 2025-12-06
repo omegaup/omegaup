@@ -16,6 +16,18 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'
+          cache: 'pip'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.local/lib/python3.9
+            ~/.local/bin
+          key: ${{ runner.os }}-python-yapf-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
 
       - name: Use PHP 8.1
         run: |
@@ -24,6 +36,14 @@ jobs:
           echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.1/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
           echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.1/cli/conf.d/20-xdebug.ini >/dev/null
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
