@@ -35,6 +35,6 @@ Install Git using one of the following commands:
 You're ready!  
 Now follow the steps in this article:
 
-https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-update-and-configure-your-local-copy-of-omegaup-before-making-changes.md
+https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md
 
 
