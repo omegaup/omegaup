@@ -2908,12 +2908,14 @@ export namespace types {
     answer?: string;
     assignment_alias?: string;
     author: string;
+    author_classname: string;
     clarification_id: number;
     contest_alias?: string;
     message: string;
     problem_alias: string;
     public: boolean;
     receiver?: string;
+    receiver_classname?: string;
     time: Date;
   }
 
@@ -5180,7 +5182,19 @@ export namespace messages {
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type _ClarificationCreateServerResponse = any;
-  export type ClarificationCreateResponse = types.Clarification;
+  export type ClarificationCreateResponse = {
+    answer?: string;
+    author: string;
+    author_classname: string;
+    clarification_id: number;
+    contest_alias?: string;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    receiver_classname: string;
+    time: Date;
+  };
   export type ClarificationDetailsRequest = { [key: string]: any };
   export type _ClarificationDetailsServerResponse = any;
   export type ClarificationDetailsResponse = {

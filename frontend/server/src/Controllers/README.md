@@ -589,9 +589,19 @@ Creates a Clarification for a contest or an assignment of a course
 
 ### Returns
 
-```typescript
-types.Clarification;
-```
+| Name                 | Type      |
+| -------------------- | --------- |
+| `answer`             | `string`  |
+| `author`             | `string`  |
+| `author_classname`   | `string`  |
+| `clarification_id`   | `number`  |
+| `contest_alias`      | `string`  |
+| `message`            | `string`  |
+| `problem_alias`      | `string`  |
+| `public`             | `boolean` |
+| `receiver`           | `string`  |
+| `receiver_classname` | `string`  |
+| `time`               | `Date`    |
 
 ## `/api/clarification/details/`
 

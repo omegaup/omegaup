@@ -27,7 +27,15 @@
       }}
       <span data-author>
         <span class="font-weight-bold">{{ T.clarificationsAskedBy }}</span>
-        {{ clarificationAuthorReceiver }}
+        <template v-if="clarification.receiver">
+          {{ clarificationAuthorReceiver }}
+        </template>
+        <template v-else>
+          <omegaup-user-username
+            :username="clarification.author"
+            :classname="clarification.author_classname"
+          ></omegaup-user-username>
+        </template>
       </span>
       <span class="font-weight-bold">{{ T.clarificationTime }}</span>
       {{ time.formatDateTime(clarification.time) }}
@@ -113,8 +121,13 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
+import user_Username from '../user/Username.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-user-username': user_Username,
+  },
+})
 export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
   @Prop({ default: false }) isAdmin!: boolean;
@@ -122,6 +135,7 @@ export default class ArenaClarification extends Vue {
 
   T = T;
   time = time;
+  ui = ui;
 
   isPublic = this.clarification.public;
   message = '';
@@ -149,6 +163,20 @@ export default class ArenaClarification extends Vue {
       text: T.wordsOther,
     },
   ];
+
+  formatStringWithUsernames(
+    template: string,
+    params: {
+      author: { username: string; classname: string };
+      receiver: { username: string; classname: string };
+    },
+  ): string {
+    const authorSpan = `<span class="${params.author.classname} font-weight-bold">${params.author.username}</span>`;
+    const receiverSpan = `<span class="${params.receiver.classname} font-weight-bold">${params.receiver.username}</span>`;
+    return template
+      .replace('%(author)', authorSpan)
+      .replace('%(receiver)', receiverSpan);
+  }
 
   get clarificationAuthorReceiver(): string {
     if (this.clarification.receiver) {
@@ -180,12 +208,19 @@ export default class ArenaClarification extends Vue {
     const response: types.Clarification = {
       clarification_id: this.clarification.clarification_id,
       author: this.clarification.author,
+      author_classname: this.clarification.author_classname,
       answer: this.responseText,
       public: this.isPublic,
       message: this.message,
       problem_alias: this.clarification.problem_alias,
       time: new Date(),
     };
+
+    if (this.clarification.receiver && this.clarification.receiver_classname) {
+      response.receiver = this.clarification.receiver;
+      response.receiver_classname = this.clarification.receiver_classname;
+    }
+
     this.showUpdateAnswer = false;
     this.$emit('clarification-response', response);
   }

@@ -88,6 +88,7 @@ export default class ArenaNewClarificationPopup extends Vue {
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: null }) username!: null | string;
+  @Prop({ default: 'user-rank-unranked' }) currentUserClassName!: string;
 
   T = T;
   message: null | string = null;
@@ -120,6 +121,7 @@ export default class ArenaNewClarificationPopup extends Vue {
     const clarificationRequest: types.Clarification = {
       clarification_id: 0,
       author: this.currentUsername ?? '',
+      author_classname: this.currentUserClassName ?? 'user-rank-unranked',
       problem_alias: this.currentProblemAlias,
       message: this.message,
       public:
@@ -127,6 +129,7 @@ export default class ArenaNewClarificationPopup extends Vue {
         this.currentUsername != null &&
         this.ownerUsername == this.currentUsername,
       time: new Date(),
+      receiver_classname: 'user-rank-unranked',
     };
     this.$emit('new-clarification', {
       clarification: clarificationRequest,

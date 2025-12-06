@@ -212,6 +212,7 @@
           :users="users"
           :problem-alias="problems.length != 0 ? problems[0].alias : null"
           :username="isAdmin && users.length != 0 ? users[0].username : null"
+          :current-user-class-name="currentUserClassName"
           :clarifications="currentClarifications"
           :is-admin="isAdmin"
           :allow-filter-by-assignment="true"
