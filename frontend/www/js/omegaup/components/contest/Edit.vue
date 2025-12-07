@@ -125,7 +125,11 @@
 
     <keep-alive>
       <div class="tab-content mt-2">
-        <div v-show="showTab === 'new_form'" class="tab-pane" :class="{ active: showTab === 'new_form' }">
+        <div
+          v-show="showTab === 'new_form'"
+          class="tab-pane"
+          :class="{ active: showTab === 'new_form' }"
+        >
           <omegaup-contest-new-form
             :admission-mode="details.admission_mode"
             :default-show-all-contestants-in-scoreboard="
@@ -147,7 +151,9 @@
             :initial-show-scoreboard-after="details.show_scoreboard_after"
             :score-mode="details.score_mode"
             :initial-needs-basic-information="details.needs_basic_information"
-            :initial-requests-user-information="details.requests_user_information"
+            :initial-requests-user-information="
+              details.requests_user_information
+            "
             :all-languages="details.available_languages"
             :teams-group-alias="teamsGroupAlias"
             :contest-for-teams="details.contest_for_teams"
@@ -166,7 +172,11 @@
             "
           ></omegaup-contest-new-form>
         </div>
-        <div v-show="showTab === 'problems'" class="tab-pane" :class="{ active: showTab === 'problems' }">
+        <div
+          v-show="showTab === 'problems'"
+          class="tab-pane"
+          :class="{ active: showTab === 'problems' }"
+        >
           <omegaup-contest-add-problem
             :contest-alias="details.alias"
             :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
@@ -187,7 +197,11 @@
           >
           </omegaup-contest-add-problem>
         </div>
-        <div v-show="showTab === 'publish'" class="tab-pane" :class="{ active: showTab === 'publish' }">
+        <div
+          v-show="showTab === 'publish'"
+          class="tab-pane"
+          :class="{ active: showTab === 'publish' }"
+        >
           <omegaup-common-publish
             :default-show-all-contestants-in-scoreboard="
               details.default_show_all_contestants_in_scoreboard
@@ -202,7 +216,11 @@
             "
           ></omegaup-common-publish>
         </div>
-        <div v-show="showTab === 'contestants'" class="tab-pane contestants" :class="{ active: showTab === 'contestants' }">
+        <div
+          v-show="showTab === 'contestants'"
+          class="tab-pane contestants"
+          :class="{ active: showTab === 'contestants' }"
+        >
           <omegaup-contest-add-contestant
             :contest="details"
             :users="users"
@@ -227,10 +245,16 @@
               (query) => $emit('update-search-result-groups', query)
             "
             @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
-            @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
+            @emit-remove-group="
+              (groupAlias) => $emit('remove-group', groupAlias)
+            "
           ></omegaup-contest-groups>
         </div>
-        <div v-show="showTab === 'groups'" class="tab-pane groups" :class="{ active: showTab === 'groups' }">
+        <div
+          v-show="showTab === 'groups'"
+          class="tab-pane groups"
+          :class="{ active: showTab === 'groups' }"
+        >
           <omegaup-contest-teams-groups
             :teams-group="teamsGroup"
             :search-result-teams-groups="searchResultTeamsGroups"
@@ -243,7 +267,11 @@
             "
           ></omegaup-contest-teams-groups>
         </div>
-        <div v-show="showTab === 'admins'" class="tab-pane" :class="{ active: showTab === 'admins' }">
+        <div
+          v-show="showTab === 'admins'"
+          class="tab-pane"
+          :class="{ active: showTab === 'admins' }"
+        >
           <omegaup-common-admins
             :admins="admins"
             :search-result-users="searchResultUsers"
@@ -268,7 +296,11 @@
             "
           ></omegaup-common-group-admins>
         </div>
-        <div v-show="showTab === 'links'" class="tab-pane" :class="{ active: showTab === 'links' }">
+        <div
+          v-show="showTab === 'links'"
+          class="tab-pane"
+          :class="{ active: showTab === 'links' }"
+        >
           <omegaup-contest-links
             :data="details"
             @download-csv-scoreboard="
@@ -276,7 +308,11 @@
             "
           ></omegaup-contest-links>
         </div>
-        <div v-show="showTab === 'clone'" class="tab-pane" :class="{ active: showTab === 'clone' }">
+        <div
+          v-show="showTab === 'clone'"
+          class="tab-pane"
+          :class="{ active: showTab === 'clone' }"
+        >
           <omegaup-contest-clone
             @clone="
               ({ title, alias, description, startTime }) =>
@@ -284,7 +320,11 @@
             "
           ></omegaup-contest-clone>
         </div>
-        <div v-show="showTab === 'archive'" class="tab-pane" :class="{ active: showTab === 'archive' }">
+        <div
+          v-show="showTab === 'archive'"
+          class="tab-pane"
+          :class="{ active: showTab === 'archive' }"
+        >
           <omegaup-common-archive
             :already-archived="alreadyArchived"
             :archive-button-description="archiveButtonDescription"
@@ -294,7 +334,11 @@
             @archive="onArchiveContest"
           ></omegaup-common-archive>
         </div>
-        <div v-show="showTab === 'certificates'" class="tab-pane" :class="{ active: showTab === 'certificates' }">
+        <div
+          v-show="showTab === 'certificates'"
+          class="tab-pane"
+          :class="{ active: showTab === 'certificates' }"
+        >
           <omegaup-contest-certificates
             :certificates-details="certificatesDetails"
             @generate="

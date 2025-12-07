@@ -103,7 +103,11 @@
 
     <keep-alive>
       <div class="tab-content mt-2">
-        <div v-show="showTab === 'edit'" class="tab-pane" :class="{ active: showTab === 'edit' }">
+        <div
+          v-show="showTab === 'edit'"
+          class="tab-pane"
+          :class="{ active: showTab === 'edit' }"
+        >
           <omegaup-problem-form
             :data="data"
             :original-visibility="data.originalVisibility"
@@ -111,7 +115,11 @@
           ></omegaup-problem-form>
         </div>
 
-        <div v-show="showTab === 'markdown'" class="tab-pane" :class="{ active: showTab === 'markdown' }">
+        <div
+          v-show="showTab === 'markdown'"
+          class="tab-pane"
+          :class="{ active: showTab === 'markdown' }"
+        >
           <omegaup-problem-statementedit
             :statement="currentStatement"
             markdown-type="statements"
@@ -132,7 +140,11 @@
           ></omegaup-problem-statementedit>
         </div>
 
-        <div v-show="showTab === 'version'" class="tab-pane" :class="{ active: showTab === 'version' }">
+        <div
+          v-show="showTab === 'version'"
+          class="tab-pane"
+          :class="{ active: showTab === 'version' }"
+        >
           <omegaup-problem-versions
             :log="data.log"
             :published-revision="data.publishedRevision"
@@ -149,7 +161,11 @@
           ></omegaup-problem-versions>
         </div>
 
-        <div v-show="showTab === 'solution'" class="tab-pane" :class="{ active: showTab === 'solution' }">
+        <div
+          v-show="showTab === 'solution'"
+          class="tab-pane"
+          :class="{ active: showTab === 'solution' }"
+        >
           <omegaup-problem-statementedit
             :statement="
               data.solution || { markdown: '', language: 'es', images: {} }
@@ -169,7 +185,11 @@
           ></omegaup-problem-statementedit>
         </div>
 
-        <div v-show="showTab === 'admins'" class="tab-pane" :class="{ active: showTab === 'admins' }">
+        <div
+          v-show="showTab === 'admins'"
+          class="tab-pane"
+          :class="{ active: showTab === 'admins' }"
+        >
           <omegaup-common-admins
             :admins="admins"
             :search-result-users="searchResultUsers"
@@ -194,7 +214,11 @@
           ></omegaup-common-groupadmins>
         </div>
 
-        <div v-show="showTab === 'tags'" class="tab-pane" :class="{ active: showTab === 'tags' }">
+        <div
+          v-show="showTab === 'tags'"
+          class="tab-pane"
+          :class="{ active: showTab === 'tags' }"
+        >
           <omegaup-problem-tags
             :alias="data.alias"
             :title="data.title"
@@ -223,7 +247,11 @@
           ></omegaup-problem-tags>
         </div>
 
-        <div v-show="showTab === 'download'" class="tab-pane" :class="{ active: showTab === 'download' }">
+        <div
+          v-show="showTab === 'download'"
+          class="tab-pane"
+          :class="{ active: showTab === 'download' }"
+        >
           <div class="card">
             <div class="card-body">
               <form class="form" @submit.prevent="onDownload">
@@ -244,7 +272,11 @@
           </div>
         </div>
 
-        <div v-show="showTab === 'delete'" class="tab-pane" :class="{ active: showTab === 'delete' }">
+        <div
+          v-show="showTab === 'delete'"
+          class="tab-pane"
+          :class="{ active: showTab === 'delete' }"
+        >
           <div class="card">
             <div class="card-body">
               <div class="form-group">
