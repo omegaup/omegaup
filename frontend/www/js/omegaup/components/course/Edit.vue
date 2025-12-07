@@ -89,8 +89,9 @@
       </li>
     </ul>
 
-    <div class="tab-content mt-2">
-      <div v-if="showTab === 'course'" class="tab-pane active" role="tabpanel">
+    <keep-alive>
+      <div class="tab-content mt-2">
+        <div v-show="showTab === 'course'" class="tab-pane" :class="{ active: showTab === 'course' }" role="tabpanel">
         <omegaup-course-form
           :update="true"
           :course="data.course"
@@ -105,12 +106,13 @@
         ></omegaup-course-form>
       </div>
 
-      <div
-        v-if="showTab === 'content'"
-        data-content-tab
-        class="tab-pane active"
-        role="tabpanel"
-      >
+        <div
+          v-show="showTab === 'content'"
+          data-content-tab
+          class="tab-pane"
+          :class="{ active: showTab === 'content' }"
+          role="tabpanel"
+        >
         <omegaup-course-assignment-list
           :content="assignments"
           :course-alias="data.course.alias"
@@ -175,12 +177,13 @@
         >
       </div>
 
-      <div
-        v-if="showTab === 'admission-mode'"
-        data-admission-mode-tab
-        class="tab-pane active"
-        role="tabpanel"
-      >
+        <div
+          v-show="showTab === 'admission-mode'"
+          data-admission-mode-tab
+          class="tab-pane"
+          :class="{ active: showTab === 'admission-mode' }"
+          role="tabpanel"
+        >
         <omegaup-course-admision-mode
           :admission-mode="data.course.admission_mode"
           :should-show-public-option="data.course.is_curator"
@@ -192,12 +195,13 @@
         ></omegaup-course-admision-mode>
       </div>
 
-      <div
-        v-if="showTab === 'students'"
-        data-students-tab
-        class="tab-pane active"
-        role="tabpanel"
-      >
+        <div
+          v-show="showTab === 'students'"
+          data-students-tab
+          class="tab-pane"
+          :class="{ active: showTab === 'students' }"
+          role="tabpanel"
+        >
         <omegaup-course-add-students
           :students="data.students"
           :course-alias="data.course.alias"
@@ -215,11 +219,12 @@
         ></omegaup-course-add-students>
       </div>
 
-      <div
-        v-if="showTab === 'admins'"
-        class="tab-pane active pane-admins d-flex row"
-        role="tabpanel"
-      >
+        <div
+          v-show="showTab === 'admins'"
+          class="tab-pane pane-admins d-flex row"
+          :class="{ active: showTab === 'admins' }"
+          role="tabpanel"
+        >
         <div class="col-md-6">
           <omegaup-common-admins
             :admins="data.admins"
@@ -279,7 +284,7 @@
         </div>
       </div>
 
-      <div v-if="showTab === 'clone'" class="tab-pane active" role="tabpanel">
+        <div v-show="showTab === 'clone'" class="tab-pane" :class="{ active: showTab === 'clone' }" role="tabpanel">
         <div class="card">
           <div class="card-body">
             <omegaup-course-clone
@@ -300,7 +305,7 @@
           </div>
         </div>
       </div>
-      <div v-if="showTab === 'archive'" class="tab-pane active" role="tabpanel">
+        <div v-show="showTab === 'archive'" class="tab-pane" :class="{ active: showTab === 'archive' }" role="tabpanel">
         <omegaup-common-archive
           :already-archived="alreadyArchived"
           :archive-button-description="
@@ -311,8 +316,9 @@
           :archive-help-text="T.courseArchiveHelpText"
           @archive="onArchiveCourse"
         ></omegaup-common-archive>
+        </div>
       </div>
-    </div>
+    </keep-alive>
   </div>
 </template>
 
