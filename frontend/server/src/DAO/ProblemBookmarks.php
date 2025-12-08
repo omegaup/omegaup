@@ -1,0 +1,80 @@
+<?php
+
+namespace OmegaUp\DAO;
+
+/**
+ * ProblemBookmarks Data Access Object (DAO).
+ *
+ * {@link \OmegaUp\DAO\VO\ProblemBookmarks}.
+ * @access public
+ * @package docs
+ */
+class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
+    /**
+     * Get all bookmarked problems for a specific identity
+     *
+     * @return list<\OmegaUp\DAO\VO\Problems>
+     */
+    public static function getAllBookmarkedProblems(int $userIdentityId): array {
+        $query = '
+            SELECT
+                ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . '
+            FROM
+                Problems
+            INNER JOIN
+                Problem_Bookmarks pb
+            ON
+                Problems.problem_id = pb.problem_id
+            WHERE
+                pb.identity_id = ?
+            ORDER BY
+                pb.created_at DESC;';
+        $queryParams = [$userIdentityId];
+        /** @var list<array<string, mixed>> */
+        $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $query,
+            $queryParams
+        );
+        $bookmarkedProblems = [];
+        foreach ($resultRows as $rowData) {
+            $bookmarkedProblems[] = new \OmegaUp\DAO\VO\Problems($rowData);
+        }
+        return $bookmarkedProblems;
+    }
+
+    /**
+     * Get count of bookmarked problems for a specific identity
+     *
+     * @return int
+     */
+    public static function getBookmarkedProblemsCount(int $userIdentityId): int {
+        $countQuery = '
+            SELECT
+                COUNT(*)
+            FROM
+                Problem_Bookmarks
+            WHERE
+                identity_id = ?;';
+        $queryParams = [$userIdentityId];
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->getOne(
+            $countQuery,
+            $queryParams
+        );
+    }
+
+    /**
+     * Check if a problem is bookmarked by an identity
+     *
+     * @return bool
+     */
+    public static function isProblemBookmarked(
+        int $userIdentityId,
+        int $targetProblemId
+    ): bool {
+        return self::existsByPK($userIdentityId, $targetProblemId);
+    }
+}
