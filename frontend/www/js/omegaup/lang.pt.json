@@ -1038,8 +1038,6 @@
 	"parameterInvalidCaseName": "O nome do caso \u00e9 inv\u00e1lido",
 	"parameterInvalidFile": "N\u00e3o foi poss\u00edvel ler o arquivo ou ele \u00e9 inv\u00e1lido",
 	"parameterInvalidGroupAlias": "Par\u00e2metro inv\u00e1lido: grupo. Esse grupo n\u00e3o existe, crie-o em https://omegaup.com/group/new/",
-	"parameterInvalidProblemSolutionNotEmpty": "S\u00f3 pode haver uma solu\u00e7\u00e3o do problema",
-	"parameterInvalidProblemStatementNotEmpty": "S\u00f3 pode haver uma reda\u00e7\u00e3o do problema",
 	"parameterInvalidStateDoesNotBelongToCountry": "O estado selecionado n\u00e3o pertence ao pa\u00eds baseado em ISO 3166-2.",
 	"parameterInvalidStateNeedsToBelongToCountry": "Voc\u00ea precisa selecionar o pa\u00eds para selecionar um estado.",
 	"parameterInvalidValidZipUpload": "O arquivo ZIP n\u00e3o foi enviado corretamente ou \u00e9 inv\u00e1lido",
