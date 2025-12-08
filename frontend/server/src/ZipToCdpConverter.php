@@ -17,13 +17,15 @@ class ZipToCdpConverter{
      *
      * @param string $zipFilePath Path to the ZIP file.
      * @param string $problemName The name of the problem.
+     * @param string $languagePreference Preferred language code (en|es|pt).
      * @return CDP
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException If the ZIP is invalid or a validation fails.
      */
     public static function convert(
         string $zipFilePath,
-        string $problemName
+        string $problemName,
+        string $languagePreference = 'es'
     ): array {
         \OmegaUp\Validators::validateZipFileSize($zipFilePath);
         \OmegaUp\Validators::validateZipIntegrity($zipFilePath);
@@ -33,7 +35,7 @@ class ZipToCdpConverter{
 
         /** @var CDPRaw $cdp */
         $cdp = CdpBuilder::initialize($problemName);
-        self::populateBuilder($cdp, $zip);
+        self::populateBuilder($cdp, $zip, $languagePreference);
         CdpBuilder::buildCases($cdp);
         CdpBuilder::processImages($cdp, $zip);
 
@@ -48,15 +50,20 @@ class ZipToCdpConverter{
      *
      * @param CDPRaw $cdp Reference to the CDP structure being built.
      * @param \ZipArchive $zip Open ZIP archive.
+     * @param string $languagePreference Preferred language code (en|es|pt).
      * @return void
      *
      */
     private static function populateBuilder(
         array &$cdp,
-        \ZipArchive $zip
+        \ZipArchive $zip,
+        string $languagePreference
     ): void {
         $rgxStatement = '/^statements\/(en|es|pt)\.markdown$/';
         $rgxSolutions = '/^solutions\/(en|es|pt)\.markdown$/';
+
+        $currentStatementLanguage = null;
+        $currentSolutionLanguage = null;
 
         ZipFileProcessor::iterateFiles(
             $zip,
@@ -67,24 +74,41 @@ class ZipToCdpConverter{
                 &$cdp,
                 $rgxStatement,
                 $rgxSolutions,
-                $zip
+                $zip,
+                $languagePreference,
+                &$currentStatementLanguage,
+                &$currentSolutionLanguage,
             ) {
                 \OmegaUp\Validators::validateZipFilePath($fileName);
 
-                if (preg_match($rgxStatement, $fileName)) {
+                if (preg_match($rgxStatement, $fileName, $matches)) {
                     $content = ZipFileProcessor::getFileContent(
                         $zip,
                         $fileName
                     );
-                    CdpBuilder::setProblemMarkdown($cdp, $content);
+                    $language = $matches[1];
+                    CdpBuilder::setProblemMarkdown(
+                        $cdp,
+                        $content,
+                        $language,
+                        $languagePreference,
+                        $currentStatementLanguage
+                    );
                 }
 
-                if (preg_match($rgxSolutions, $fileName)) {
+                if (preg_match($rgxSolutions, $fileName, $matches)) {
                     $content = ZipFileProcessor::getFileContent(
                         $zip,
                         $fileName
                     );
-                    CdpBuilder::setSolutionMarkdown($cdp, $content);
+                    $language = $matches[1];
+                    CdpBuilder::setSolutionMarkdown(
+                        $cdp,
+                        $content,
+                        $language,
+                        $languagePreference,
+                        $currentSolutionLanguage
+                    );
                 }
 
                 if (str_starts_with($fileName, 'cases/')) {
