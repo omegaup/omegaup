@@ -1470,6 +1470,25 @@ export const Problem = {
   }),
 };
 
+export const ProblemBookmark = {
+  create: apiCall<
+    messages.ProblemBookmarkCreateRequest,
+    messages.ProblemBookmarkCreateResponse
+  >('/api/problemBookmark/create/'),
+  delete: apiCall<
+    messages.ProblemBookmarkDeleteRequest,
+    messages.ProblemBookmarkDeleteResponse
+  >('/api/problemBookmark/delete/'),
+  exists: apiCall<
+    messages.ProblemBookmarkExistsRequest,
+    messages.ProblemBookmarkExistsResponse
+  >('/api/problemBookmark/exists/'),
+  list: apiCall<
+    messages.ProblemBookmarkListRequest,
+    messages.ProblemBookmarkListResponse
+  >('/api/problemBookmark/list/'),
+};
+
 export const ProblemForfeited = {
   getCounts: apiCall<
     messages.ProblemForfeitedGetCountsRequest,
