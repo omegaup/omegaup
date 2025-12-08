@@ -53,12 +53,10 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\ProblemBookmarks::create($newBookmark);
 
         // Invalidate extraProfileDetails cache to reflect the new bookmark
-        if (!is_null($r->identity->username)) {
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::USER_PROFILE,
-                "{$r->identity->username}-extraProfileDetails"
-            );
-        }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_PROFILE,
+            "{$r->identity->username}-extraProfileDetails"
+        );
 
         return ['success' => true];
     }
@@ -99,12 +97,10 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\ProblemBookmarks::delete($existingBookmark);
 
         // Invalidate extraProfileDetails cache to reflect the removed bookmark
-        if (!is_null($r->identity->username)) {
-            \OmegaUp\Cache::deleteFromCache(
-                \OmegaUp\Cache::USER_PROFILE,
-                "{$r->identity->username}-extraProfileDetails"
-            );
-        }
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_PROFILE,
+            "{$r->identity->username}-extraProfileDetails"
+        );
 
         return ['success' => true];
     }
