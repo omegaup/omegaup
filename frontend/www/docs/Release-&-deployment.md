@@ -16,7 +16,6 @@ Before a Pull Request (PR) is approved and merged into `main`, it must pass a se
 - **javascript**: Unit tests for **Vue.js**, written in **TypeScript + Jest**.  
 - **lint**: Style and format validators for all languages used in the project, as well as type validators in **Psalm** for PHP.  
 - **cypress**: **End-to-end (E2E) tests** to validate the proper functioning of critical platform flows.  
-- **selenium**: Previously used for integration testing, currently **deprecated** in favor of Cypress.  
 - **python**: Automated tests written in **pytest**.  
 
 ## Code Coverage  
