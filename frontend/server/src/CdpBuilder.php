@@ -31,11 +31,19 @@ class CdpBuilder {
         ];
     }
 
-    private static function shouldOverrideMarkdown(
+    /**
+     * Determines whether to override the markdown based on language preferences.
+     *
+     * @param ?string $currentLanguage Currently selected language
+     * @param string $candidateLanguage Language of the candidate content.
+     * @param string $languagePreference User's preferred language.
+     *
+     * @return bool
+     */
+    public static function shouldOverrideMarkdown(
         ?string $currentLanguage,
         string $candidateLanguage,
         string $languagePreference,
-        string $defaultLanguage = 'es'
     ): bool {
         if (is_null($currentLanguage)) {
             return true;
@@ -45,20 +53,16 @@ class CdpBuilder {
             return false;
         }
 
-        if (
-            $currentLanguage !== $languagePreference &&
-            $candidateLanguage === $languagePreference
-        ) {
+        if ($candidateLanguage === $languagePreference) {
             return true;
         }
 
         if (
-            $currentLanguage !== $defaultLanguage &&
-            $candidateLanguage === $defaultLanguage
+            $currentLanguage !== \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE &&
+            $candidateLanguage === \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE
         ) {
             return true;
         }
-
         return false;
     }
 

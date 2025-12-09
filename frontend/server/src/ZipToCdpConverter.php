@@ -25,7 +25,7 @@ class ZipToCdpConverter{
     public static function convert(
         string $zipFilePath,
         string $problemName,
-        string $languagePreference = 'es'
+        string $languagePreference = \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE
     ): array {
         \OmegaUp\Validators::validateZipFileSize($zipFilePath);
         \OmegaUp\Validators::validateZipIntegrity($zipFilePath);

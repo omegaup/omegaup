@@ -2667,4 +2667,55 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
         return $data;
     }
+
+    /**
+     * @dataProvider shouldOverrideMarkdownProvider
+     * @param ?string $current
+     * @param string $candidate
+     * @param string $preference
+     * @param bool $expected
+     */
+    public function testShouldOverrideMarkdown(
+        ?string $current,
+        string $candidate,
+        string $preference,
+        bool $expected
+    ): void {
+        $result = \OmegaUp\CdpBuilder::shouldOverrideMarkdown(
+            $current,
+            $candidate,
+            $preference
+        );
+
+        $this->assertSame(
+            $expected,
+            $result
+        );
+    }
+
+    /**
+     * Data provider for shouldOverrideMarkdown with 5 main flow cases.
+     * Format: [currentLanguage, candidateLanguage, languagePreference, expectedResult]
+     *
+     * @return array<string, array{?string, string, string, bool}>
+     */
+    public function shouldOverrideMarkdownProvider(): array {
+        return [
+            'null_current_overrides' => [
+                null, 'en', 'es', true
+            ],
+            'current_equals_preference' => [
+                'es', 'es', 'es', false
+            ],
+            'candidate_equals_preference' => [
+                'en', 'es', 'es', true
+            ],
+            'candidate_is_default' => [
+                'en', 'es', 'pt', true
+            ],
+            'no_rule_matches' => [
+                'en', 'pt', 'es', false
+            ],
+        ];
+    }
 }
