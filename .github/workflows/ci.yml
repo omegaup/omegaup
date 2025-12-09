@@ -2,10 +2,30 @@ name: CI
 
 on:
   workflow_call: # make this workflow reusable
-  pull_request: {}
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'composer.**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      - '.gitmodules'
+      - '.github/workflows/ci.yml'
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'composer.**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      - '.gitmodules'
+      - '.github/workflows/ci.yml'
 
 jobs:
   php:
