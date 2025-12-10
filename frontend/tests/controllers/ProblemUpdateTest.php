@@ -2670,13 +2670,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * @dataProvider shouldOverrideMarkdownProvider
-     * @param ?string $current
+     * @param null|string $current
      * @param string $candidate
      * @param string $preference
      * @param bool $expected
      */
     public function testShouldOverrideMarkdown(
-        ?string $current,
+        null|string $current,
         string $candidate,
         string $preference,
         bool $expected
@@ -2697,7 +2697,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Data provider for shouldOverrideMarkdown with 5 main flow cases.
      * Format: [currentLanguage, candidateLanguage, languagePreference, expectedResult]
      *
-     * @return array<string, array{?string, string, string, bool}>
+     * @return array<string, array{0: null|string, 1: string, 2: string, 3: bool}>
      */
     public function shouldOverrideMarkdownProvider(): array {
         return [
