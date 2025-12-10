@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call: # make this workflow reusable
   pull_request: {}
   push:
     branches:
@@ -38,14 +39,20 @@ jobs:
           RABBITMQ_DEFAULT_PASS: 'omegaup'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+
+      - name: Add mysql as alias to localhost
+        run: |
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 mysql
+          EOF
 
       - name: Add rabbitmq as alias to localhost
         run: |
@@ -124,6 +131,8 @@ jobs:
             validate --all < /dev/null
 
       - name: Run tests
+        env:
+          MYSQL_TCP_PORT: 13306
         timeout-minutes: 20
         run: ./stuff/mysql_types.sh
 
@@ -149,34 +158,29 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
+
+      - name: Upload inefficient queries
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: inefficient-queries
+          path: stuff/inefficient_queries.csv
+          if-no-files-found: ignore
 
   javascript:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Run JavaScript tests
         run: yarn test:coverage
@@ -192,7 +196,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -212,20 +216,7 @@ jobs:
           EOF
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
@@ -289,110 +280,17 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Install wait-for-it
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Download the Docker containers
-        run: |
-          docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
-          docker-compose up --no-build --detach
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 mysql grader runner gitserver broadcaster redis
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 gitserver:33861
-          wait-for-it -t 30 redis:6379
-
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                     -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                     -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
-        run: |
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
-          define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
-          EOF
-
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user setuptools
-          python3 -m pip install --user wheel
-          python3 -m pip install --user \
-            -r stuff/requirements.txt
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Initialize database
-        run: |
-          mysql \
-            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+        with:
+          install_host_python_deps: true
 
       - name: Install yarn dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-          NODE_MAJOR=18
-          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-          sudo apt-get update
-          sudo apt-get install nodejs -y
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          sudo apt-get install -y python3
-          yarn global add node-gyp
-          yarn install
+        run: yarn install
 
       - name: Build webpack resources
         run: yarn build
@@ -415,118 +313,38 @@ jobs:
           done
 
       - name: Upload cypress screenshot artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
+        uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-screenshots-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
+        uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: cypress-videos-${{ github.run_attempt }}
           path: cypress/videos
 
   python:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install wait-for-it
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+
+      - name: Wait for RabbitMQ
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Install retry
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y retry
-
-      - name: Download the Docker containers
-        run: |
-          docker-compose pull
-
-      - name: Start the Docker containers
-        run: |
-          docker-compose up --no-build --detach
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 rabbitmq mysql
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 mysql:13306
-          retry -t 5 -d 5 -- docker-compose exec -T rabbitmq rabbitmqctl await_startup
-
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
-        run: |
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
-          EOF
-
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Create database users
-        run: |
-          mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
-          mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
-
-      - name: Install Python dependencies
-        run: |
-          docker-compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-
-      - name: Bootstrap environment
-        run: |
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker-compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+          retry -t 5 -d 5 -- docker compose exec -T rabbitmq rabbitmqctl await_startup
 
       - name: Run Python tests
         run: |
-          docker-compose exec -T frontend python3 -m pytest --verbose --timeout=20 ./stuff/
+          docker compose exec -T frontend python3 -m pytest --verbose --timeout=20 --ignore=./stuff/teaching_assistant/ ./stuff/
 
       - name: Collect container logs
         if: ${{ always() }}
@@ -539,7 +357,38 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-test-logs
           path: /tmp/container-logs/*.log
+
+  teaching-assistant:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+        with:
+          install_host_python_deps: true
+          extra_python_requirements: stuff/teaching_assistant/requirements.txt
+
+      - name: Run pre setup for course mode
+        run: |
+          pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
+
+      - name: Run the teaching assistant for course mode
+        run: |
+          cd stuff/teaching_assistant
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
+
+      - name: Run post check for course mode
+        run: |
+          pytest stuff/teaching_assistant/test_ta_course_mode_post.py --log-cli-level=INFO -s
+
+      - name: Run check for submission mode
+        run: |
+          pytest stuff/teaching_assistant/test_ta_submission_mode.py --log-cli-level=INFO -s

@@ -41,7 +41,7 @@ define('OMEGAUP_ENVIRONMENT', 'development');
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
 define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
 define('TEMPLATE_CACHE_DIR', '/tmp/templates');
-define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
+define('OMEGAUP_GITSERVER_URL', 'http://omegaup-gitserver-1:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
 define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);

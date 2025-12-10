@@ -294,7 +294,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         );
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(
-            "Teams group {$teamsGroup->alias} updated succesfully."
+            "Teams group {$teamsGroup->alias} updated successfully."
         );
 
         return ['status' => 'ok'];

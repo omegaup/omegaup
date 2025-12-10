@@ -68,7 +68,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertSame(false, $problemSettings->Slow);
         $this->assertSame($r['validator'], $problemSettings->Validator->Name);
-        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame(5000, $r['time_limit']);
         $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
         $this->assertSame(
             $r['memory_limit'] * 1024,
@@ -891,7 +891,7 @@ if __name__ == \'__main__\':
         $problemSettings = json_decode($problemArtifacts->get('settings.json'));
         $this->assertSame(false, $problemSettings->Slow);
         $this->assertSame($r['validator'], $problemSettings->Validator->Name);
-        $this->assertSame(5000.0, $r['time_limit']);
+        $this->assertSame(5000, $r['time_limit']);
         $this->assertSame('5s', $problemSettings->Limits->TimeLimit);
         $this->assertSame(
             $r['memory_limit'] * 1024,
@@ -1159,5 +1159,115 @@ if __name__ == \'__main__\':
             $allowUserAddTagsValue,
             $problem->allow_user_add_tags
         );
+    }
+
+    public function testUsersOnlySeeAllowedProblems(): void {
+        // Define the structure of users, problems and permissions
+        $testScenario = [
+            'users' => [
+                'owner1' => [
+                    'problems' => [
+                        'owner1_private' => [
+                            'visibility' => 'private',
+                            'admins' => ['guest1'],
+                        ],
+                        'owner1_public' => [
+                            'visibility' => 'public',
+                            'admins' => [],
+                        ],
+                    ],
+                ],
+                'owner2' => [
+                    'problems' => [
+                        'owner2_private' => [
+                            'visibility' => 'private',
+                            'admins' => ['guest2'],
+                        ],
+                        'owner2_public' => [
+                            'visibility' => 'public',
+                            'admins' => [],
+                        ],
+                    ],
+                ],
+                'guest1' => [
+                    'problems' => [],
+                ],
+                'guest2' => [
+                    'problems' => [],
+                ],
+            ],
+            'expectedProblemsListByUserBeforeAdmins' => [
+                'guest1' => ['owner1_public', 'owner2_public'],
+                'guest2' => ['owner1_public', 'owner2_public'],
+            ],
+            'expectedProblemsListByUserAfterAdmins' => [
+                'guest1' => ['owner1_private', 'owner1_public', 'owner2_public'],
+                'guest2' => ['owner1_public', 'owner2_private', 'owner2_public'],
+            ],
+        ];
+
+        // Create all users
+        $users = [];
+        foreach (array_keys($testScenario['users']) as $userName) {
+            ['identity' => $users[$userName]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        // Create all problems
+        $problems = [];
+        foreach ($testScenario['users'] as $ownerName => $ownerData) {
+            foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                $problems[$problemAlias] = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                        'author' => $users[$ownerName],
+                        'visibility' => $problemData['visibility'],
+                        'alias' => $problemAlias,
+                    ])
+                );
+            }
+        }
+
+        // Verify that each guest only sees public problems (before adding permissions)
+        $problemsByGuest = $testScenario['expectedProblemsListByUserBeforeAdmins'];
+        foreach ($problemsByGuest as $guestName => $expectedProblemsBeforeAdmins) {
+            $guestLogin = self::login($users[$guestName]);
+            $response = \OmegaUp\Controllers\Problem::apiList(
+                new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
+            );
+            foreach ($expectedProblemsBeforeAdmins as $selectedProblemAlias) {
+                self::assertArrayContainsWithPredicate(
+                    $response['results'],
+                    fn(array $problem) => $problem['alias'] == $selectedProblemAlias,
+                    "{$guestName} should see problem {$selectedProblemAlias}"
+                );
+            }
+        }
+
+        // Add admins to problems according to configuration
+        foreach ($testScenario['users'] as $ownerData) {
+            foreach ($ownerData['problems'] as $problemAlias => $problemData) {
+                foreach ($problemData['admins'] as $adminName) {
+                    \OmegaUp\Test\Factories\Problem::addAdminUser(
+                        $problems[$problemAlias],
+                        $users[$adminName]
+                    );
+                }
+            }
+        }
+
+        // Verify that each guest now sees the problems they were added to as admin
+        $problemsByGuest = $testScenario['expectedProblemsListByUserAfterAdmins'];
+        foreach ($problemsByGuest as $guestName => $expectedProblemsAfterAdmins) {
+            $guestLogin = self::login($users[$guestName]);
+            $response = \OmegaUp\Controllers\Problem::apiList(
+                new \OmegaUp\Request(['auth_token' => $guestLogin->auth_token])
+            );
+            foreach ($expectedProblemsAfterAdmins as $selectedProblemAlias) {
+                self::assertArrayContainsWithPredicate(
+                    $response['results'],
+                    fn(array $problem) => $problem['alias'] == $selectedProblemAlias,
+                    "{$guestName} should see problem {$selectedProblemAlias}"
+                );
+            }
+        }
     }
 }

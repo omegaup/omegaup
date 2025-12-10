@@ -1,5 +1,237 @@
 <template>
-  <div></div>
+  <div>
+    <div class="col-sm-12">
+      <h1 class="title">{{ T.wordsContests }}</h1>
+    </div>
+    <b-card no-body>
+      <b-tabs
+        class="sidebar"
+        pills
+        card
+        vertical
+        nav-wrapper-class="contest-list-nav col-md-2 col-sm-12 test-class"
+      >
+        <b-card class="card-group-menu">
+          <b-container>
+            <b-row class="justify-content-between" align-v="center">
+              <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
+                <form method="GET">
+                  <div class="input-group">
+                    <input type="hidden" name="page" :value="currentPage" />
+                    <input type="hidden" name="tab_name" :value="currentTab" />
+                    <input
+                      type="hidden"
+                      name="sort_order"
+                      :value="currentOrder"
+                    />
+                    <input type="hidden" name="filter" :value="currentFilter" />
+                    <input
+                      v-model.lazy="currentQuery"
+                      class="form-control nav-link"
+                      type="text"
+                      name="query"
+                      autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      spellcheck="false"
+                      :placeholder="T.wordsKeyword"
+                    />
+                    <button class="btn reset-btn nav-link" type="reset">
+                      &times;
+                    </button>
+                    <div class="input-group-append">
+                      <input
+                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
+                        type="submit"
+                        :value="T.wordsSearch"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </b-col>
+              <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
+                <b-dropdown ref="dropdownOrderBy" no-caret>
+                  <template #button-content>
+                    <div>
+                      <font-awesome-icon icon="sort-amount-down" />
+                      {{ T.contestOrderBy }}
+                    </div>
+                  </template>
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.Ends })"
+                    data-order-by-ends
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Ends"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByEnds }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.Title })"
+                    data-order-by-title
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Title"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByTitle }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.Duration })"
+                    data-order-by-duration
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Duration"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByDuration }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.Organizer })"
+                    data-order-by-organizer
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Organizer"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByOrganizer }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.Contestants })"
+                    data-order-by-contestants
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.Contestants"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByContestants }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ sortOrder: ContestOrder.SignedUp })"
+                    data-order-by-signed-up
+                  >
+                    <font-awesome-icon
+                      v-if="currentOrder === ContestOrder.SignedUp"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderBySignedUp }}</b-dropdown-item
+                  >
+                </b-dropdown>
+                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
+                  <template #button-content>
+                    <font-awesome-icon icon="filter" />
+                    {{ T.contestFilterBy }}
+                  </template>
+                  <b-dropdown-item
+                    :href="hrefGen({ filter: ContestFilter.All })"
+                    data-filter-by-all
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.All"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByAll }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ filter: ContestFilter.SignedUp })"
+                    data-filter-by-signed-up
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.SignedUp"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterBySignedUp }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    :href="hrefGen({ filter: ContestFilter.OnlyRecommended })"
+                    data-filter-by-recommended
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilter === ContestFilter.OnlyRecommended"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestFilterByRecommended }}</b-dropdown-item
+                  >
+                </b-dropdown>
+              </b-col>
+            </b-row>
+          </b-container>
+        </b-card>
+        <b-tab
+          v-for="tab in tabsContent"
+          :key="tab.name"
+          :ref="tab.ref"
+          class="scroll-content"
+          :title="tab.title"
+          :title-link-class="titleLinkClass(tab.name)"
+          :active="currentTab === tab.name"
+          :title-link-attributes="{ href: hrefGen({ tab: tab.name }) }"
+          @click="goToPage(tab.name)"
+        >
+          <div v-if="refreshing" :class="{ line: true }"></div>
+          <div v-else-if="contests.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contests"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template
+                v-if="tab.name === ContestTab.Past"
+                #contest-enroll-status
+              >
+                <div></div>
+              </template>
+              <template v-else #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(tab.name, contestItem)">
+                    {{ getTimeLinkDescription(tab.name, contestItem) }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template
+                v-if="tab.name === ContestTab.Future"
+                #contest-button-enter
+              >
+                <div></div>
+              </template>
+              <template
+                v-if="tab.name === ContestTab.Past"
+                #contest-button-see-details
+              >
+                <div></div>
+              </template>
+              <template v-else #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
+          <b-spinner
+            v-if="refreshing"
+            class="spinner mt-4"
+            variant="primary"
+          ></b-spinner>
+        </b-tab>
+      </b-tabs>
+      <b-pagination-nav
+        ref="paginator"
+        v-model="currentPage"
+        first-number
+        last-number
+        size="lg"
+        align="center"
+        :link-gen="linkGen"
+        :number-of-pages="numberOfPages"
+      ></b-pagination-nav>
+    </b-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -53,6 +285,20 @@ export enum ContestFilter {
   All = 'all',
 }
 
+const tabsContent = [
+  {
+    name: ContestTab.Current,
+    ref: 'currentContestTab',
+    title: T.contestListCurrent,
+  },
+  {
+    name: ContestTab.Future,
+    ref: 'futureContestTab',
+    title: T.contestListFuture,
+  },
+  { name: ContestTab.Past, ref: 'pastContestTab', title: T.contestListPast },
+];
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
@@ -69,6 +315,7 @@ export default class ArenaContestList extends Vue {
   @Prop() page!: number;
   T = T;
   ui = ui;
+  tabsContent = tabsContent;
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   ContestFilter = ContestFilter;
@@ -158,8 +405,33 @@ export default class ArenaContestList extends Vue {
     return contest.start_time.toLocaleDateString();
   }
 
-  getTimeLink(time: Date): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+  getTimeLink(tab: ContestTab, contestItem: types.ContestListItem): string {
+    const time =
+      tab !== ContestTab.Current
+        ? contestItem.finish_time
+        : contestItem.start_time;
+    const timeToISO = time.toISOString();
+    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${timeToISO}`;
+  }
+
+  getTimeLinkDescription(
+    tab: ContestTab,
+    contestItem: types.ContestListItem,
+  ): string {
+    switch (tab) {
+      case ContestTab.Future:
+        return ui.formatString(T.contestStartTime, {
+          startDate: this.startContestDate(contestItem),
+        });
+      case ContestTab.Current:
+        return ui.formatString(T.contestEndTime, {
+          endDate: this.finishContestDate(contestItem),
+        });
+      case ContestTab.Past:
+        return ui.formatString(T.contestStartedTime, {
+          startedDate: this.startContestDate(contestItem),
+        });
+    }
   }
 }
 </script>

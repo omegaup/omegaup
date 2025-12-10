@@ -17,7 +17,6 @@
     <script type="text/javascript" src="{% versionHash '/third_party/js/jquery-3.5.1.min.js' %}"></script>
     <script type="text/javascript" src="{% versionHash '/js/jquery_error_handler.js' %}"></script>
     <script type="text/javascript" src="{% versionHash '/third_party/js/highstock.js' %}" defer></script>
-    <script type="text/javascript" src="{% versionHash '/third_party/js/sugar.js' %}"></script>
     {% jsInclude 'omegaup' %}
 
     {% if jsfile %}
@@ -29,8 +28,6 @@
         <script type="text/javascript" src="{{ script }}" defer async></script>
       {% endfor %}
     {% endif %}
-
-    <script type="text/javascript" src="{% versionHash '/js/head.sugar_locale.js' %}" defer></script>
 
     <!-- Bootstrap 4 -->
     <link rel="stylesheet" href="/third_party/bootstrap-4.5.0/css/bootstrap.min.css"/>
@@ -72,6 +69,8 @@
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDCQK1GEQ"></script>
       <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
     {% endif %}
+    {% jsInclude 'common_scroll_to_top' omitRuntime %}
+      <div id="scroll-to-top"></div>
     {% jsInclude 'common_footer' omitRuntime %}
     {% if not headerPayload.inContest and not hideFooterAndHeader %}
       <div id="common-footer"></div>

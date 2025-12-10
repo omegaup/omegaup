@@ -2,24 +2,33 @@
   <div class="card">
     <div class="card-body">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
             v-model.lazy="currentMarkdown"
+            data-problem-creator-editor-markdown
             class="wmd-input"
           ></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <omegaup-markdown
-            :markdown="currentMarkdownUpdated"
+            data-problem-creator-previewer-markdown
+            :markdown="
+              T.problemCreatorMarkdownPreviewInitialRender + currentMarkdown
+            "
             preview="true"
           ></omegaup-markdown>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-primary" type="submit" @click="updateMarkdown">
+          <button
+            data-problem-creator-save-markdown
+            class="btn btn-primary"
+            type="submit"
+            @click="updateMarkdown"
+          >
             {{ T.problemCreatorMarkdownSave }}
           </button>
         </div>
@@ -29,12 +38,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
+import * as ui from '../../../../ui';
 
-import omegaup_Markdown from '../../../Markdown.vue';
+import omegaup_problemMarkdown from '../../Markdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -42,18 +52,32 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
   },
 })
 export default class StatementTab extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
   @Ref() readonly markdownInput!: HTMLTextAreaElement;
 
+  @Prop({ default: T.problemCreatorEmpty }) currentMarkdownProp!: string;
+
   T = T;
+  ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
-  currentMarkdown: string = T.problemCreatorEmpty;
-  currentMarkdownUpdated: string = T.problemCreatorEmpty;
+  currentMarkdownInternal: string = T.problemCreatorEmpty;
+
+  get currentMarkdown(): string {
+    return this.currentMarkdownInternal;
+  }
+  set currentMarkdown(newMarkdown: string) {
+    this.currentMarkdownInternal = newMarkdown;
+  }
+
+  @Watch('currentMarkdownProp')
+  onCurrentMarkdownPropChanged() {
+    this.currentMarkdown = this.currentMarkdownProp;
+  }
 
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
@@ -68,7 +92,7 @@ export default class StatementTab extends Vue {
 
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
-    this.currentMarkdownUpdated = this.$store.state.problemMarkdown;
+    this.$emit('show-update-success-message');
   }
 }
 </script>
@@ -80,5 +104,26 @@ export default class StatementTab extends Vue {
 .wmd-preview,
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
+}
+
+.row {
+  .wmd-button-bar {
+    flex-shrink: 0;
+  }
+
+  .wmd-input {
+    flex: 1;
+    min-height: 400px;
+    height: auto !important;
+    resize: vertical;
+  }
+
+  [data-problem-creator-previewer-markdown] {
+    flex: 1;
+    min-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--markdown-preview-border-color);
+    padding: 10px;
+  }
 }
 </style>

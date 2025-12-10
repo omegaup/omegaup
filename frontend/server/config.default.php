@@ -92,7 +92,7 @@ try_define(
     sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
 );
 try_define('TEMPLATES_URL_PATH', '/templates/');
-try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
+try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', false);
 try_define('OMEGAUP_GRADER_FAKE', false);
 
 # ####################################

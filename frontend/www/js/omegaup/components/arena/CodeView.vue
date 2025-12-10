@@ -117,6 +117,7 @@ export default class CodeView extends Vue {
     this.mode = languageModeMap[newLanguage];
   }
   mounted() {
+    this.refresh();
     const codeAndLanguage = {
       code: this.value,
       language: this.language,

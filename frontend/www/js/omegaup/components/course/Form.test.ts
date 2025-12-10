@@ -22,6 +22,7 @@ const baseCourseFormProps = {
     name: 'Nuevo',
     objective: 'Objetivo de prueba',
     level: '',
+    recommended: false,
     requests_user_information: 'no',
     school_id: 1,
     school_name: 'Escuela curso',
@@ -30,6 +31,7 @@ const baseCourseFormProps = {
     student_count: 3,
     unlimited_duration: false,
     languages: ['py2'],
+    teaching_assistant_enabled: false,
   } as types.CourseDetails,
   update: true,
   searchResultSchools: [

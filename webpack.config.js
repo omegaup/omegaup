@@ -4,9 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const frontendConfig = require('./webpack.config-frontend.js');
 // The following lines of code are required as the current webpack version we are using is producing an error with the openssl library. They have removed a function that webpack is relying on, which is causing this error. These lines of code override the createHash method of the crypto module to avoid the error.
-const crypto = require("crypto");
+const crypto = require('crypto');
 const crypto_orig_createHash = crypto.createHash;
-crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
+crypto.createHash = (algorithm) =>
+  crypto_orig_createHash(algorithm == 'md4' ? 'sha256' : algorithm);
 
 // Generate the JSON dependency objects.
 for (const entryname of Object.keys(frontendConfig.entry)) {
@@ -20,11 +21,7 @@ for (const entryname of Object.keys(frontendConfig.entry)) {
   );
 }
 
-const config = [
-  frontendConfig,
-  require('./webpack.config-style.js'),
-  require('./webpack.config-grader.js'),
-];
+const config = [frontendConfig, require('./webpack.config-style.js')];
 
 module.exports = (env, argv) => {
   const devtool =

@@ -101,7 +101,7 @@
               <span>
                 <a
                   data-toggle="tooltip"
-                  href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+                  :href="UserRankingFeatureGuideURL"
                   rel="tooltip"
                   :title="T.wordsPointsForRank"
                   :data-original-title="T.wordsPointsForRankTooltip"
@@ -234,6 +234,7 @@ import common_SortControls from '../common/SortControls.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import { getBlogUrl } from '../../urlHelper';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -297,6 +298,10 @@ export default class BaseList extends Vue {
     let tags = selectedTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
     return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
+  }
+
+  get UserRankingFeatureGuideURL(): string {
+    return getBlogUrl('UserRankingFeatureGuideURL');
   }
 }
 </script>

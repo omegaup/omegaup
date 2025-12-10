@@ -1,63 +1,58 @@
 <template>
-  <iframe
-    ref="grader"
-    class="mt-2 border border-white"
-    src="/grader/ephemeral/index-light.html?embedded"
-  ></iframe>
+  <ephemeral-ide
+    :accepted-languages="acceptedLanguages"
+    :initial-language="initialLanguage"
+    :problem="problem"
+    :should-show-submit-button="canSubmit"
+    :can-run="canRun"
+    :is-embedded="isEmbedded"
+    :initial-theme="initialTheme"
+    :next-submission-timestamp="nextSubmissionTimestamp"
+    :next-execution-timestamp="nextExecutionTimestamp"
+    @execute-run="() => this.$emit('execute-run')"
+  >
+  </ephemeral-ide>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as Util from '../../grader/util';
+import Ephemeral from '../../grader/Ephemeral.vue';
 
-@Component
+@Component({
+  components: {
+    'ephemeral-ide': Ephemeral,
+  },
+})
 export default class EphemeralGrader extends Vue {
-  @Ref() grader!: HTMLIFrameElement;
-  @Prop() problem!: types.ProblemInfo;
+  @Prop({ default: () => ({ ...Util.DUMMY_PROBLEM }) })
+  problem!: types.ProblemInfo;
   @Prop({ default: false }) canSubmit!: boolean;
-  @Prop({ default: () => [] }) acceptedLanguages!: string[];
+  @Prop({ default: true }) canRun!: boolean;
+  @Prop({
+    default: () =>
+      Object.values(Util.supportedLanguages).map(
+        (languageInfo) => languageInfo.language,
+      ),
+  })
+  acceptedLanguages!: string[];
+  @Prop({ default: 'cpp17-gcc' }) preferredLanguage!: string | null;
+  @Prop({ default: true }) isEmbedded!: boolean;
+  @Prop({ default: Util.MonacoThemes.VSLight })
+  initialTheme!: Util.MonacoThemes;
+  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: null }) nextExecutionTimestamp!: null | Date;
 
-  loaded = false;
-
-  mounted(): void {
-    (this.$refs.grader as HTMLIFrameElement).onload = () => this.iframeLoaded();
-  }
-
-  @Watch('problem')
-  onProblemChanged() {
-    if (!this.loaded) {
-      // This will be updated when the component is mounted.
-      return;
+  // note: initial source is for the IDE is also supported
+  get initialLanguage() {
+    if (
+      !this.preferredLanguage ||
+      !this.acceptedLanguages.includes(this.preferredLanguage)
+    ) {
+      return this.acceptedLanguages[0];
     }
-    this.setSettings();
-  }
-
-  setSettings(): void {
-    ((this.$refs.grader as HTMLIFrameElement)
-      .contentWindow as Window).postMessage(
-      {
-        method: 'setSettings',
-        params: {
-          alias: this.problem.alias,
-          settings: this.problem.settings,
-          languages: this.acceptedLanguages,
-          showSubmitButton: this.canSubmit,
-        },
-      },
-      `${window.location.origin}/grader/ephemeral/embedded/`,
-    );
-  }
-
-  iframeLoaded(): void {
-    this.loaded = true;
-    this.setSettings();
+    return this.preferredLanguage;
   }
 }
 </script>
-
-<style lang="scss" scoped>
-iframe {
-  width: 100%;
-  min-height: 40em;
-}
-</style>

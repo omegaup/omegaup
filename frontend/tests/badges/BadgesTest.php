@@ -248,7 +248,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'contestDirector' => $identityTwo,
-                    'languages' => 'c11-gcc',
+                    'languages' => ['c11-gcc'],
                 ]
             )
         );

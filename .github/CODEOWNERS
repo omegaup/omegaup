@@ -1,0 +1,20 @@
+# CODEOWNERS for the used languages
+
+## Backend files (Shell scripts, Python, PHP, and SQL)
+
+*.sh @heduenas
+*.py @heduenas
+*.php @pabo99
+*.sql @pabo99
+
+## Frontend files (Vue, TypeScript, JavaScript, HTML, and CSS)
+
+*.vue @pabo99
+*.ts @heduenas
+*.js @heduenas
+*.html @pabo99
+*.css @carlosabcs
+
+## Localization files
+
+*.lang @tvanessa
