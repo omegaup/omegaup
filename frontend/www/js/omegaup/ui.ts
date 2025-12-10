@@ -131,23 +131,19 @@ export function displayStatus({
 }
 
 export function error(message: string): void {
-  displayStatus({ message: message, type: MessageType.Danger });
+  displayStatus({ message, type: MessageType.Danger });
 }
 
 export function info(message: string): void {
-  displayStatus({ message: message, type: MessageType.Info });
+  displayStatus({ message, type: MessageType.Info });
 }
 
 export function success(message: string, autoHide: boolean = true): void {
-  displayStatus({
-    message: message,
-    type: MessageType.Success,
-    autoHide: autoHide,
-  });
+  displayStatus({ message, type: MessageType.Success, autoHide });
 }
 
 export function warning(message: string): void {
-  displayStatus({ message: message, type: MessageType.Warning });
+  displayStatus({ message, type: MessageType.Warning });
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
@@ -240,6 +236,20 @@ export function getFlag(country: string): string {
 }
 
 export function copyToClipboard(value: string): void {
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use the Clipboard API if available and in a secure context
+    navigator.clipboard.writeText(value).catch((err) => {
+      console.error('Failed to copy text in a secure context: ', err);
+      fallbackCopyToclipboard(value);
+    });
+    return;
+  }
+
+  fallbackCopyToclipboard(value);
+}
+
+function fallbackCopyToclipboard(value: string): void {
+  // Fallback to the deprecated method for older browsers
   const tempInput = document.createElement('textarea');
 
   tempInput.style.position = 'absolute';

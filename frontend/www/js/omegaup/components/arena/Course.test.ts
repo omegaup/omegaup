@@ -50,13 +50,16 @@ describe('Course.vue', () => {
     finish_time: new Date(),
     is_curator: true,
     is_admin: false,
+    is_teaching_assistant: false,
     name: 'Curso de prueba',
+    recommended: false,
     requests_user_information: 'no',
     school_name: '',
     show_scoreboard: false,
     start_time: new Date(),
     student_count: 1,
     unlimited_duration: false,
+    teaching_assistant_enabled: false,
   };
 
   const scoreboard: types.Scoreboard = {

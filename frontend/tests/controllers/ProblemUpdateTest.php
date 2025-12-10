@@ -1679,7 +1679,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Create a contest in the past with one run.
             $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(
                 new \OmegaUp\Test\Factories\ContestParams([
-                    'startTime' => $originalTime - 60 * 60,
+                    'startTime' => $originalTime - 120 * 60,
                     'finishTime' => $originalTime - 5 * 60,
                     'contestDirector' => $contestDirector,
                 ])
@@ -2136,13 +2136,13 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Asserts default values
             $this->assertSame(
-                $problemData['request']['time_limit'],
+                floatval($problemData['request']['time_limit']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->TimeLimit
                 )
             );
             $this->assertSame(
-                $problemData['request']['extra_wall_time'],
+                floatval($problemData['request']['extra_wall_time']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->ExtraWallTime
                 )
@@ -2156,7 +2156,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemSettings->Limits->OutputLimit
             );
             $this->assertSame(
-                $problemData['request']['overall_wall_time_limit'],
+                floatval($problemData['request']['overall_wall_time_limit']),
                 \Omegaup\Controllers\Problem::parseDuration(
                     $problemSettings->Limits->OverallWallTimeLimit
                 )
@@ -2505,5 +2505,217 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $markdownPT,
             $response['statement']['markdown']
         );
+    }
+
+    public function testCommitModifiedZipExcludesEasyCases(): void {
+        // Get a problem
+        [
+            'problem' => $problem,
+            'author' => $identity,
+        ] = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        //Get the current ZIP file with all the files
+        $artifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
+        $currentZipPath = $artifacts->getZip();
+
+        // Define changes
+        $pathsToExclude = [
+            'cases/sample',
+            'cases/easy.01',
+        ];
+        $filesToAdd = [
+            'cases/easy.001.in'  => "10 5\n",
+            'cases/easy.001.out' => "15\n",
+        ];
+        $pathsToRename = [
+            'cases/medium.'  => 'cases/hard.',
+        ];
+
+        $deployer = new \OmegaUp\ProblemDeployer($problem->alias);
+
+        //  Commit the changes to the ZIP file
+        $deployer->commitModifiedZip(
+            'Test complex edit on cases',
+            $identity,
+            $currentZipPath,
+            $pathsToExclude,
+            $filesToAdd,
+            $pathsToRename,
+        );
+        if (is_file($currentZipPath)) {
+            unlink($currentZipPath);
+        }
+        // Retrieve the modified ZIP file
+        $newArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias
+        );
+        $newZipPath = $newArtifacts->getZip();
+
+        $zip = new \ZipArchive();
+        $this->assertTrue(
+            $zip->open($newZipPath),
+            'The resulting ZIP file could not be opened.'
+        );
+
+        // Excluded: the new ZIP file must not contain any files beginning with these prefixes.
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+
+            foreach ($pathsToExclude as $excludePrefix) {
+                $this->assertStringStartsNotWith(
+                    $excludePrefix,
+                    $name,
+                    "The excluded file {$name} still exists."
+                );
+            }
+        }
+
+        // Aggregates: cases must exist and have the expected content
+        foreach ($filesToAdd as $path => $expectedContent) {
+            $this->assertNotFalse(
+                $zip->locateName($path),
+                "The file {$path} should exist"
+            );
+            $this->assertSame(
+                $expectedContent,
+                $zip->getFromName($path),
+                "Incorrect content in {$path}"
+            );
+        }
+
+        // Renamed: there should be no cases with the previous prefix.
+        foreach ($pathsToRename as $oldPrefix => $newPrefix) {
+            $hasNewPrefix = false;
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = $zip->getNameIndex($i);
+                $this->assertStringStartsNotWith(
+                    $oldPrefix,
+                    $name,
+                    "The file {$name} must not start with the old prefix {$oldPrefix}."
+                );
+                if (str_starts_with($name, $newPrefix)) {
+                    $hasNewPrefix = true;
+                }
+            }
+            $this->assertTrue(
+                $hasNewPrefix,
+                "No file with the new prefix {$newPrefix} was found."
+            );
+        }
+
+        $zip->close();
+
+        if (is_file($newZipPath)) {
+            unlink($newZipPath);
+        }
+    }
+
+    public function testTriangulosZipToCdp() {
+        $zipPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended.zip';
+        $problemName = 'triangulos_extended';
+
+        // Convert ZIP to CDP
+        $cdp = \OmegaUp\ZipToCdpConverter::convert($zipPath, $problemName);
+
+        // Normalize UUIDs for comparison
+        $normalizedCdp = $this->normalizeUuids($cdp);
+
+        // Load expected JSON
+        $expectedJsonPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended_expected_cdp.json';
+        $this->assertFileExists(
+            $expectedJsonPath,
+            'Expected JSON file not found'
+        );
+
+        $expectedJson = file_get_contents($expectedJsonPath);
+        $expected = json_decode($expectedJson, true);
+
+        $this->assertIsArray($expected, 'Expected JSON should be valid');
+
+        // Normalize UUIDs for comparison
+        $normalizedExpected = $this->normalizeUuids($expected);
+
+        $this->assertEquals($normalizedExpected, $normalizedCdp);
+    }
+
+    /**
+     * Recursively replace all UUID values with a deterministic counter
+     */
+    private function normalizeUuids(
+        array $data,
+        array &$uuidMap = [],
+        int &$counter = 1
+    ): array {
+        foreach ($data as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->normalizeUuids($value, $uuidMap, $counter);
+                continue;
+            }
+
+            if (
+                is_string($value) &&
+                in_array($key, ['groupID', 'caseID', 'lineID'], true)
+            ) {
+                if (!isset($uuidMap[$value])) {
+                    $uuidMap[$value] = sprintf(
+                        '%08d-0000-0000-0000-000000000000',
+                        $counter++
+                    );
+                }
+                $value = $uuidMap[$value];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * @dataProvider shouldOverrideMarkdownProvider
+     * @param null|string $current
+     * @param string $candidate
+     * @param string $preference
+     * @param bool $expected
+     */
+    public function testShouldOverrideMarkdown(
+        null|string $current,
+        string $candidate,
+        string $preference,
+        bool $expected
+    ): void {
+        $result = \OmegaUp\CdpBuilder::shouldOverrideMarkdown(
+            $current,
+            $candidate,
+            $preference
+        );
+
+        $this->assertSame(
+            $expected,
+            $result
+        );
+    }
+
+    /**
+     * Data provider for shouldOverrideMarkdown with 5 main flow cases.
+     * Format: [currentLanguage, candidateLanguage, languagePreference, expectedResult]
+     *
+     * @return array<string, array{0: null|string, 1: string, 2: string, 3: bool}>
+     */
+    public function shouldOverrideMarkdownProvider(): array {
+        return [
+            'null_current_overrides' => [
+                null, 'en', 'es', true
+            ],
+            'current_equals_preference' => [
+                'es', 'es', 'es', false
+            ],
+            'candidate_equals_preference' => [
+                'en', 'es', 'es', true
+            ],
+            'candidate_is_default' => [
+                'en', 'es', 'pt', true
+            ],
+            'no_rule_matches' => [
+                'en', 'pt', 'es', false
+            ],
+        ];
     }
 }

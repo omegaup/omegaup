@@ -5,6 +5,7 @@
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
           v-if="canAddNewTags"
+          v-model="newPublicTag"
           data-tags-input
           :data="publicTags"
           :serializer="publicTagsSerializer"
@@ -200,11 +201,13 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   problemLevelTag: string | null = this.problemLevel;
   newPrivateTag = '';
+  newPublicTag = '';
 
   addPublicTag(tag: string): void {
     if (this.canAddNewTags && !this.selectedPublicTags.includes(tag)) {
       this.$emit('emit-add-tag', this.alias, tag, true);
     }
+    this.newPublicTag = '';
   }
 
   addPrivateTag(): void {

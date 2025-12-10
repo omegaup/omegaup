@@ -41,7 +41,9 @@ OmegaUp.on('ready', async () => {
   const [locationHash] = window.location.hash.substring(1).split('/');
 
   const courseAdmin = Boolean(
-    payload.courseDetails.is_admin || payload.courseDetails.is_curator,
+    payload.courseDetails.is_admin ||
+      payload.courseDetails.is_curator ||
+      payload.courseDetails.is_teaching_assistant,
   );
   const activeTab = getSelectedValidTab(
     locationHash,
@@ -87,6 +89,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      problemDetails?.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
@@ -103,6 +112,7 @@ OmegaUp.on('ready', async () => {
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
       feedbackMap,
@@ -114,7 +124,6 @@ OmegaUp.on('ready', async () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
-          isTeachingAssistant: payload.isTeachingAssistant,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -131,6 +140,7 @@ OmegaUp.on('ready', async () => {
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           socketStatus: socketStore.state.socketStatus,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
@@ -220,6 +230,19 @@ OmegaUp.on('ready', async () => {
                   run,
                 });
               });
+          },
+          'execute-run': ({
+            target,
+          }: {
+            target: Vue & { currentNextExecutionTimestamp: Date };
+          }) => {
+            api.Run.execute()
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                target.currentNextExecutionTimestamp =
+                  response.nextExecutionTimestamp;
+              })
+              .catch(ui.apiError);
           },
           'submit-run': ({
             problem,
@@ -389,11 +412,15 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
-          'dismiss-promotion': (
-            solved: boolean,
-            tried: boolean,
-            isDismissed: boolean,
-          ) => {
+          'dismiss-promotion': ({
+            solved,
+            tried,
+            isDismissed,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            isDismissed: boolean;
+          }) => {
             const contents: { before_ac?: boolean } = {};
             if (!solved && tried) {
               contents.before_ac = true;
@@ -431,8 +458,8 @@ OmegaUp.on('ready', async () => {
                 component.currentPopupDisplayed = PopupDisplayed.None;
                 ui.success(
                   isUpdate
-                    ? T.feedbackSuccesfullyUpdated
-                    : T.feedbackSuccesfullyAdded,
+                    ? T.feedbackSuccessfullyUpdated
+                    : T.feedbackSuccessfullyAdded,
                 );
               })
               .catch(ui.error);
@@ -450,45 +477,29 @@ OmegaUp.on('ready', async () => {
             feedbackList: { lineNumber: number; feedback: string }[];
             guid: string;
           }) => {
-            Promise.allSettled(
-              feedbackList.map(
-                (feedback: { lineNumber: number; feedback: string }) =>
-                  api.Submission.setFeedback({
-                    guid,
-                    course_alias: payload.courseDetails.alias,
-                    assignment_alias: payload.currentAssignment.alias,
-                    feedback: feedback.feedback,
-                    range_bytes_start: feedback.lineNumber,
-                  }).catch(() => feedback),
-              ),
-            )
-              .then((results) => {
-                const feedbackWithError: string[] = results
-                  .filter(
-                    (result): result is PromiseRejectedResult =>
-                      result.status === 'rejected',
-                  )
-                  .map((result) => result.reason);
-                if (!feedbackWithError.length) {
-                  ui.success(T.feedbackSuccesfullyAdded);
-                  resetHash('runs', null);
-                  api.Run.getSubmissionFeedback({
-                    run_alias: guid,
-                  }).then((response) => {
-                    component.feedbackMap.forEach((feedback) => {
-                      feedback.submissionFeedbackId = response.find(
-                        (fb) => fb.range_bytes_start == feedback.lineNumber,
-                      )?.submission_feedback_id;
-                      feedback.status = FeedbackStatus.Saved;
-                    });
+            api.Submission.setFeedbackList({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback_list: JSON.stringify(feedbackList),
+            })
+              .then(() => {
+                ui.success(T.feedbackSuccessfullyAdded);
+                resetHash('runs', null);
+                api.Run.getSubmissionFeedback({
+                  run_alias: guid,
+                }).then((response) => {
+                  component.feedbackMap.forEach((feedback) => {
+                    feedback.submissionFeedbackId = response.find(
+                      (fb) => fb.range_bytes_start == feedback.lineNumber,
+                    )?.submission_feedback_id;
+                    feedback.status = FeedbackStatus.Saved;
                   });
+                });
 
-                  component.currentPopupDisplayed = PopupDisplayed.None;
-                } else {
-                  ui.error('There was an error');
-                }
+                component.currentPopupDisplayed = PopupDisplayed.None;
               })
-              .catch(ui.ignoreError);
+              .catch(ui.apiError);
           },
           'submit-feedback-thread': ({
             feedback,
@@ -506,7 +517,7 @@ OmegaUp.on('ready', async () => {
               submission_feedback_id: feedback.submissionFeedbackId,
             })
               .then(({ submissionFeedbackThread }) => {
-                ui.success(T.feedbackSuccesfullyAdded);
+                ui.success(T.feedbackSuccessfullyAdded);
                 resetHash('runs', null);
                 if (
                   submissionFeedbackThread &&

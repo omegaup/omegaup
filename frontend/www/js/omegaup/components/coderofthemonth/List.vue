@@ -1,146 +1,47 @@
 <template>
   <div class="card ranking-width">
     <ul class="nav nav-tabs justify-content-arround" role="tablist">
-      <li class="nav-item">
+      <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
-          href="#"
+          :href="getTabName(tab)"
           class="nav-link"
           data-toggle="tab"
           role="tab"
-          aria-controls="codersOfTheMonth"
-          :class="{ active: selectedTab === 'codersOfTheMonth' }"
-          :aria-selected="selectedTab === 'codersOfTheMonth'"
-          @click="selectedTab = 'codersOfTheMonth'"
+          :aria-controls="tab.id"
+          :class="{ active: currentSelectedTab === tab.id }"
+          :aria-selected="currentSelectedTab === tab.id"
+          @click="getSelectedTab(tab)"
         >
-          {{
-            category == 'all' ? T.codersOfTheMonth : T.codersOfTheMonthFemale
-          }}
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          href="#"
-          class="nav-link"
-          data-toggle="tab"
-          role="tab"
-          aria-controls="codersOfPreviousMonth"
-          :class="{ active: selectedTab === 'codersOfPreviousMonth' }"
-          :aria-selected="selectedTab === 'codersOfPreviousMonth'"
-          @click="selectedTab = 'codersOfPreviousMonth'"
-        >
-          {{
-            category == 'all'
-              ? T.codersOfTheMonthRank
-              : T.codersOfTheMonthFemaleRank
-          }}
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          href="#"
-          class="nav-link"
-          data-toggle="tab"
-          role="tab"
-          aria-controls="candidatesToCoderOfTheMonth"
-          :class="{
-            active: selectedTab === 'candidatesToCoderOfTheMonth',
-          }"
-          :aria-selected="selectedTab === 'candidatesToCoderOfTheMonth'"
-          @click="selectedTab = 'candidatesToCoderOfTheMonth'"
-        >
-          {{
-            category == 'all'
-              ? T.codersOfTheMonthListCandidate
-              : T.codersOfTheMonthFemaleListCandidate
-          }}
+          {{ tab.title }}
         </a>
       </li>
     </ul>
-    <table class="table table-striped table-hover table-responsive-sm">
-      <thead>
-        <tr>
-          <th scope="col" class="text-center"></th>
-          <th scope="col" class="text-center">
-            {{ T.codersOfTheMonthUser }}
-          </th>
-          <th scope="col" class="text-center">
-            {{ T.codersOfTheMonthCountry }}
-          </th>
-          <th
-            v-if="selectedTab == 'codersOfTheMonth'"
-            scope="col"
-            class="text-center"
+    <component
+      :is="currentTabComponent"
+      class="tab"
+      :coders="visibleCoders"
+      :is-mentor="isMentor"
+      :can-choose-coder="canChooseCoder && !coderIsSelected"
+    >
+      <template #button-select-coder="{ coder }">
+        <td
+          v-if="currentSelectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+          class="text-center align-middle"
+        >
+          <button
+            v-if="canChooseCoder && !coderIsSelected"
+            class="btn btn-sm btn-primary"
+            @click="$emit('select-coder', coder.username, category)"
           >
-            {{ T.codersOfTheMonthDate }}
-          </th>
-
-          <template v-if="selectedTab == 'candidatesToCoderOfTheMonth'">
-            <th scope="col" class="text-center">
-              {{ T.profileStatisticsNumberOfSolvedProblems }}
-            </th>
-            <th scope="col" class="text-center">
-              {{ T.rankScore }}
-            </th>
-            <th v-if="isMentor" scope="col" class="text-center">
-              {{ T.wordsActions }}
-            </th>
-          </template>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(coder, index) in visibleCoders" :key="index">
-          <td class="text-center">
-            <img :src="coder.gravatar_32" />
-          </td>
-          <td class="text-center align-middle">
-            <omegaup-user-username
-              :classname="coder.classname"
-              :linkify="true"
-              :username="coder.username"
-            ></omegaup-user-username>
-          </td>
-          <td class="text-center align-middle">
-            <omegaup-countryflag
-              :country="coder.country_id"
-            ></omegaup-countryflag>
-          </td>
-          <td
-            v-if="selectedTab == 'codersOfTheMonth'"
-            class="text-center align-middle"
-          >
-            {{ coder.date }}
-          </td>
-          <td
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-center align-middle"
-          >
-            {{ coder.problems_solved }}
-          </td>
-          <td
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
-            class="text-center align-middle"
-          >
-            {{ coder.score }}
-          </td>
-          <td
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
-            class="text-center align-middle"
-          >
-            <button
-              v-if="canChooseCoder && !coderIsSelected"
-              class="btn btn-sm btn-primary"
-              @click="$emit('select-coder', coder.username, category)"
-            >
-              {{
-                category == 'all'
-                  ? T.coderOfTheMonthChooseAsCoder
-                  : T.coderOfTheMonthFemaleChooseAsCoder
-              }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            {{
+              category == 'all'
+                ? T.coderOfTheMonthChooseAsCoder
+                : T.coderOfTheMonthFemaleChooseAsCoder
+            }}
+          </button>
+        </td>
+      </template>
+    </component>
   </div>
 </template>
 
@@ -148,6 +49,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import user_Username from '../user/Username.vue';
+import coderofthemonth_CodersList from './CodersList.vue';
+import coderofthemonth_TopCodersList from './TopCodersList.vue';
+import coderofthemonth_CandidatesList from './CandidatesList.vue';
 import country_Flag from '../CountryFlag.vue';
 import { types } from '../../api_types';
 
@@ -155,6 +59,9 @@ import { types } from '../../api_types';
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': country_Flag,
+    'omegaup-coders-list': coderofthemonth_CodersList,
+    'omegaup-top-coders-list': coderofthemonth_TopCodersList,
+    'omegaup-candidates-list': coderofthemonth_CandidatesList,
   },
 })
 export default class CoderOfTheMonthList extends Vue {
@@ -165,12 +72,44 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() coderIsSelected!: boolean;
   @Prop() isMentor!: boolean;
   @Prop() category!: string;
+  @Prop() selectedTab!: string;
 
   T = T;
-  selectedTab = 'codersOfTheMonth';
+  currentSelectedTab = this.selectedTab;
+
+  get availableTabs(): { id: string; component: string; title: string }[] {
+    const availableTabs = [
+      {
+        id: 'codersOfTheMonth',
+        component: 'omegaup-coders-list',
+        title:
+          this.category === 'all'
+            ? T.codersOfTheMonth
+            : T.codersOfTheMonthFemale,
+      },
+      {
+        id: 'codersOfPreviousMonth',
+        component: 'omegaup-top-coders-list',
+        title:
+          this.category === 'all'
+            ? T.codersOfTheMonthRank
+            : T.codersOfTheMonthFemaleRank,
+      },
+      {
+        id: 'candidatesToCoderOfTheMonth',
+        component: 'omegaup-candidates-list',
+        title:
+          this.category === 'all'
+            ? T.codersOfTheMonthListCandidate
+            : T.codersOfTheMonthFemaleListCandidate,
+      },
+    ];
+
+    return availableTabs;
+  }
 
   get visibleCoders(): types.CoderOfTheMonthList[] {
-    switch (this.selectedTab) {
+    switch (this.currentSelectedTab) {
       case 'codersOfTheMonth':
       default:
         return this.codersOfCurrentMonth;
@@ -179,6 +118,22 @@ export default class CoderOfTheMonthList extends Vue {
       case 'candidatesToCoderOfTheMonth':
         return this.candidatesToCoderOfTheMonth;
     }
+  }
+
+  get currentTabComponent(): string {
+    return (
+      this.availableTabs.find((tab) => tab.id === this.currentSelectedTab)
+        ?.component ?? 'codersOfTheMonth'
+    );
+  }
+
+  getSelectedTab(tab: { id: string; component: string; title: string }): void {
+    this.currentSelectedTab = tab.id;
+    window.location.hash = tab.id;
+  }
+
+  getTabName(tab: { id: string; component: string; title: string }): string {
+    return `#${tab.id}`;
   }
 }
 </script>

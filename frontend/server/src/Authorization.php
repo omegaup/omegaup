@@ -67,6 +67,9 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
+    // Support.
+    const SUPPORT_ROLE = 6;
+
     // Identity creator.
     const IDENTITY_CREATOR_ROLE = 7;
 
@@ -485,14 +488,24 @@ class Authorization {
         );
     }
 
-    public static function isGroupTeachingAssistantMember(
-        \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Groups $group = null
+    /**
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param list<\OmegaUp\DAO\VO\Groups> $groups
+     */
+    public static function isMemberOfAnyGroup(
+        $identity,
+        $groups = []
     ): bool {
-        if (is_null($group) || is_null($identity->user_id)) {
+        if (self::isSystemAdmin($identity)) {
+            return true;
+        }
+        if (empty($groups) || is_null($identity->user_id)) {
             return false;
         }
-        return self::isGroupMember($identity, $group);
+        return \OmegaUp\DAO\GroupsIdentities::existsByGroupId(
+            $identity,
+            $groups
+        );
     }
 
     public static function isGroupIdentityCreator(\OmegaUp\DAO\VO\Identities $identity): bool {
@@ -526,9 +539,16 @@ class Authorization {
                 return false;
             }
         }
+        if (is_null(self::$_supportGroup->acl_id)) {
+            return false;
+        }
         return self::isGroupMember(
             $identity,
             self::$_supportGroup
+        ) || self::hasRole(
+            $identity,
+            self::$_supportGroup->acl_id,
+            self::SUPPORT_ROLE
         );
     }
 
@@ -583,11 +603,10 @@ class Authorization {
         if (self::isSystemAdmin($identity)) {
             return true;
         }
-        $groupUsers = \OmegaUp\DAO\GroupsIdentities::getByPK(
+        return \OmegaUp\DAO\GroupsIdentities::existsByPK(
             $group->group_id,
             $identity->identity_id
         );
-        return !empty($groupUsers);
     }
 
     public static function isCourseCurator(\OmegaUp\DAO\VO\Identities $identity): bool {

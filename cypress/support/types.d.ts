@@ -8,6 +8,11 @@ export interface Identities {
   passwords: string;
 }
 
+export interface LinkTestCase {
+  url: string;
+  links: string[];
+}
+
 export interface GroupOptions {
   groupTitle: string;
   groupDescription: string;
@@ -48,6 +53,8 @@ export interface ProblemOptions {
   problemLevelIndex: number;
   publicAccess?: boolean;
   firstTimeVisited?: boolean;
+  languagesValue?: string;
+  zipFile?: string;
 }
 
 export interface CourseOptions {
@@ -86,6 +93,8 @@ export interface ContestOptions {
   problems: Array<ProblemOptions>;
   runs: Array<RunOptions>;
   statusCheck?: boolean;
+  contestForTeams?: boolean;
+  teamGroupAlias?: string;
 }
 
 export interface RunOptions {

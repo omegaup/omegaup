@@ -111,9 +111,11 @@ OmegaUp.on('ready', async () => {
 
   let nextSubmissionTimestamp: null | Date = null;
   if (problemDetails?.nextSubmissionTimestamp != null) {
-    nextSubmissionTimestamp = time.remoteTime(
-      problemDetails?.nextSubmissionTimestamp.getTime(),
-    );
+    nextSubmissionTimestamp = problemDetails?.nextSubmissionTimestamp;
+  }
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = problemDetails?.nextExecutionTimestamp;
   }
 
   const contestContestant = new Vue({
@@ -131,6 +133,7 @@ OmegaUp.on('ready', async () => {
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
@@ -164,6 +167,7 @@ OmegaUp.on('ready', async () => {
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
@@ -221,6 +225,19 @@ OmegaUp.on('ready', async () => {
               .finally(() => {
                 this.popupDisplayed = PopupDisplayed.None;
               });
+          },
+          'execute-run': ({
+            target,
+          }: {
+            target: Vue & { currentNextExecutionTimestamp: Date };
+          }) => {
+            api.Run.execute()
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                target.currentNextExecutionTimestamp =
+                  response.nextExecutionTimestamp;
+              })
+              .catch(ui.apiError);
           },
           'submit-run': ({
             problem,

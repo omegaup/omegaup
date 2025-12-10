@@ -1,18 +1,16 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of CreateRun
  */
 
 class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private $contestData;
-    private $contestant;
+    private $courseData;
+    private $course;
+    private $assignment;
     private $contestantIdentity;
-    private $student;
     private $studentIdentity;
-    private $non_student;
-    private $non_student_identity;
+    private $nonStudentIdentity;
 
     /**
      * Prepares the context to submit a run to a problem. Creates the contest,
@@ -41,7 +39,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // If the contest is private, add the user
         if ($contestParams->admissionMode === 'private') {
@@ -95,14 +93,14 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Student user
-        ['user' => $this->student, 'identity' => $this->studentIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $this->studentIdentity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $this->courseData,
             $this->studentIdentity
         );
 
         // Non-student user
-        ['user' => $this->non_student, 'identity' => $this->non_student_identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $this->nonStudentIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get the actual DB entries for later
         $this->course = \OmegaUp\DAO\Courses::getByAlias(
@@ -203,7 +201,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testNewRunValid() {
         $r = $this->setValidRequest();
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -225,7 +223,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Submission should have same school_id than the submitter
      */
     public function testSubmissionSchool() {
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -305,7 +303,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r = $this->setValidRequest(new \OmegaUp\Test\Factories\ContestParams([
             'admissionMode' => 'private'
         ]));
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -324,7 +322,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a second user not regitered to private contest
         [
-            'user' => $contestant2,
             'identity' => $identity2,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -372,7 +369,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testInvalidRunInsideSubmissionsGap() {
         // Set the context
         $r = $this->setValidRequest();
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Set submissions gap of 20 seconds
         $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
@@ -385,13 +382,19 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Validate the run
         $this->assertRun($r, $response);
 
-        // Send a second run. This one should fail
-        try {
-            \OmegaUp\Controllers\Run::apiCreate($r);
-            $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
-            $this->assertSame('runWaitGap', $e->getMessage());
+        // Send 18 new runs, one each second. It should fail
+        foreach (range(0, 18) as $_) {
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 1);
+            try {
+                \OmegaUp\Controllers\Run::apiCreate($r);
+                $this->fail('Should have failed');
+            } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+                $this->assertSame('runWaitGap', $e->getMessage());
+            }
         }
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 1);
+        // Send a new run, it should work
+        \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -402,7 +405,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r = $this->setValidRequest();
 
         // Prepare the Grader mock, validate that grade is called 2 times
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Add a second problem to the contest
         $problemData2 = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -457,7 +460,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testMissingParameters() {
         // Set the context for the first contest
         $original_r = $this->setValidRequest();
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         $needed_keys = [
             'problem_alias',
@@ -492,7 +495,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 ['windowLength' => 20]
             )
         );
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
@@ -532,7 +535,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRunWhenContestNotStartedForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -582,7 +585,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testInvalidRunInsideSubmissionsGapForContestDirector() {
         // Set the context for the first contest
         $r = $this->setValidRequest();
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
         // Log as contest director
         $login = self::login($this->contestData['director']);
@@ -624,20 +627,20 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create an empty request
         $login = self::login($this->contestantIdentity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => '', // Not inside a contest
+            // Not inside a contest
             'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
         ]);
 
         // Call API
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
         // Validate the run
@@ -655,7 +658,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create an empty request
         $login = self::login($identity);
@@ -693,7 +696,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
         \OmegaUp\Test\Factories\Contest::openContest(
@@ -746,14 +749,14 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($this->contestantIdentity);
 
         try {
             \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => '', // Not inside a contest
+                // Not inside a contest
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
@@ -775,7 +778,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
             // Create our contestant
-            ['user' => $this->contestant, 'identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $this->contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
             // Create an empty request
             $r = new \OmegaUp\Request();
@@ -783,14 +786,14 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $login = self::login($this->contestantIdentity);
             $r = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => '', // Not inside a contest
+                // Not inside a contest
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
             ]);
 
             // Call API
-            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            $_detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
             $response = \OmegaUp\Controllers\Run::apiCreate($r);
 
             // Validate the run
@@ -851,7 +854,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call API
-        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+        \OmegaUp\Controllers\Run::apiCreate($r);
     }
 
     /**
@@ -859,7 +862,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testRunInAssignmentFromNonStudent() {
         $r = $this->setUpAssignment();
-        $login = self::login($this->non_student_identity);
+        $login = self::login($this->nonStudentIdentity);
         $r['auth_token'] = $login->auth_token;
 
         try {
@@ -983,7 +986,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($contestantIdentity);
         $waRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -1002,7 +1005,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $waRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertFalse(array_key_exists('details', $response));
+        $this->assertArrayNotHasKey('details', $response);
 
         $acRunData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
@@ -1016,17 +1019,17 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'run_alias' => $acRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertTrue(array_key_exists('details', $response));
+        $this->assertArrayHasKey('details', $response);
         $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $waRunData['response']['guid'],
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertTrue(array_key_exists('details', $response));
+        $this->assertArrayHasKey('details', $response);
 
         // But having solved a problem does not grant permission to view
         // details to runs that the user would otherwise not had permission to
         // view.
-        ['user' => $contestant2, 'identity' => $contestantIdentity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $contestantIdentity2] = \OmegaUp\Test\Factories\User::createUser();
         $login2 = self::login($contestantIdentity2);
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,

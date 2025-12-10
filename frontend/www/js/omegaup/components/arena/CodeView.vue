@@ -78,7 +78,7 @@ export interface EditorOptions {
   },
 })
 export default class CodeView extends Vue {
-  @Prop() language!: string;
+  @Prop({ default: 'cpp17-gcc' }) language!: string;
   @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
   @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
@@ -115,6 +115,20 @@ export default class CodeView extends Vue {
   @Watch('language')
   onLanguageChange(newLanguage: string) {
     this.mode = languageModeMap[newLanguage];
+  }
+  mounted() {
+    this.refresh();
+    const codeAndLanguage = {
+      code: this.value,
+      language: this.language,
+    };
+    window.dispatchEvent(
+      new CustomEvent('code-and-language-set', { detail: codeAndLanguage }),
+    );
+
+    this.onInput(codeAndLanguage.code);
+    this.onChange(codeAndLanguage.code);
+    this.$emit('change-language', codeAndLanguage.language);
   }
 }
 </script>

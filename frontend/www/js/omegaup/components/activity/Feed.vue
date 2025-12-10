@@ -2,8 +2,7 @@
   <div class="post">
     <div class="copy">
       <h1>
-        <a :href="`/${type}/${alias}/`">{{ alias }}</a> —
-        {{ T.activityReport }}
+        <a :href="typeUrl">{{ alias }}</a> — {{ T.activityReport }}
       </h1>
       <p>{{ wordsReportSummary }}</p>
       <!-- Nav tabs -->
@@ -247,6 +246,13 @@ export default class ActivityFeed extends Vue {
     return this.type == 'contest'
       ? T.activityReportSummaryContest
       : T.activityReportSummaryCourse;
+  }
+
+  get typeUrl(): string {
+    if (this.type == 'contest') {
+      return `/arena/${this.alias}/`;
+    }
+    return `/${this.type}/${this.alias}/`;
   }
 
   get classByUser(): { [key: string]: string } {

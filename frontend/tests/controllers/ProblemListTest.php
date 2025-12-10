@@ -113,7 +113,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemListWithTags() {
         // Get 3 problems
-        $n = 3;
+        $problemsCount = 3;
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
@@ -125,28 +125,32 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTagNumberTheory',
         ];
         $problemData = [];
-        for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 'promoted'
-            ]));
-            for ($j = 0; $j <= $i; $j++) {
+        foreach (range(0, $problemsCount - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'visibility' => 'promoted'
+                ])
+            );
+            foreach (range(0, $i) as $j) {
                 \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
                     $tags[$j],
-                    1 /* public */
+                    public: 1
                 );
             }
         }
 
         // Get 1 problem private, should not appear
-        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 'private'
-        ]));
-        for ($j = 0; $j < $n; $j++) {
+        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private'
+            ])
+        );
+        foreach (range(0, $problemsCount - 1) as $j) {
             \OmegaUp\Test\Factories\Problem::addTag(
                 $privateProblemData,
                 $tags[$j],
-                1 /* public */
+                public: 1
             );
         }
 
@@ -154,19 +158,19 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         // Test one tag at a time
-        for ($j = 0; $j < $n; $j++) {
+        foreach (range(0, $problemsCount - 1) as $j) {
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'tag' => $tags[$j],
             ]));
-            // $n public problems but not the private problem that has all tags.
-            // But only problems $j or later have tag $j.
-            $this->assertCount($n - $j, $response['results']);
+            // $problemsCount public problems but not the private problem that has
+            // all tags. But only problems $j or later have tag $j.
+            $this->assertCount($problemsCount - $j, $response['results']);
         }
 
         // Test multiple tags at a time
         $expectedTags = [];
-        for ($j = 0; $j < $n; $j++) {
+        foreach (range(0, $problemsCount - 1) as $j) {
             $expectedTags[] = $tags[$j];
             $plainTags = implode(',', $expectedTags);
 
@@ -174,9 +178,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => $plainTags,
             ]));
-            // $n public problems but not the private problem that has all tags.
-            // But only problems $j or later have tags[0] through tags[$j].
-            $this->assertCount($n - $j, $response['results']);
+            // $problemsCount public problems but not the private problem that has
+            // all tags. But only problems $j or later have tags[0] through tags[$j].
+            $this->assertCount($problemsCount - $j, $response['results']);
         }
     }
 
@@ -825,6 +829,159 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData[2]['request']['problem_alias'],
             $response['problems'][0]['title']
         );
+    }
+
+    /**
+     * A PHPUnit data provider for some problems used in different scenarios.
+     *
+     * @return list<array:{0: string, 1: bool, 2: bool, 3: string, 4: bool}>
+     */
+    public function problemProvider(): array {
+        // Create 6 problems which each one is used in a different way:
+        // 1. Problem with no runs and it doesn't belong to a contest nor an assignment
+        // 2. Problem with no runs and it belongs to a contest
+        // 3. Problem with no runs and it belongs to an assignment
+        // 4. Problem with runs and it doesn't belong to a contest nor an assignment
+        // 5. Problem with runs and it belongs to a contest
+        // 6. Problem with runs and it belongs to an assignment
+        return [
+            ['noRunsNoContestNoAssignment', true,  false, 'none',    true],
+            ['noRunsContest',               true,  false, 'contest', false],
+            ['noRunsAssignment',            true,  false, 'course',  false],
+            ['runsNoContestNoAssignment',   true,  true,  'none',    false],
+            ['runsContest',                 true,  true,  'contest', false],
+            ['runsAssignment',              true,  true,  'course',  false],
+            ['noRunsNoContestNoAssignment', false, false, 'none',    true],
+            ['noRunsContest',               false, false, 'contest', false],
+            ['noRunsAssignment',            false, false, 'course',  false],
+            ['runsNoContestNoAssignment',   false, true,  'none',    false],
+            ['runsContest',                 false, true,  'contest', false],
+            ['runsAssignment',              false, true,  'course',  false],
+        ];
+    }
+
+    /**
+     * Test myList API
+     *
+     * @dataProvider problemProvider
+     */
+    public function testPrepareProblemToRemoveMyList(
+        string $problemAlias,
+        bool $adminedByMe,
+        bool $hasRuns,
+        string $problemType,
+        bool $expectedCanBeRemoved
+    ) {
+        // Create an admin and a student
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $admin,
+                'alias' => $problemAlias,
+            ])
+        );
+
+        if ($problemType === 'contest') {
+            // Create a contest
+            $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+            // Add problem to the contest
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $contestData
+            );
+
+            // Add a student to the contest
+            \OmegaUp\Test\Factories\Contest::addUser($contestData, $student);
+
+            // Student opens the contest
+            $login = self::login($student);
+
+            $response = \OmegaUp\Controllers\Contest::apiOpen(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias']
+                ])
+            );
+
+            if ($hasRuns) {
+                // Student creates a run for problem
+                $runData = \OmegaUp\Test\Factories\Run::createRun(
+                    $problemData,
+                    $contestData,
+                    $student
+                );
+            }
+        } elseif ($problemType === 'course') {
+            // Login as admin
+            $adminLogin = self::login($admin);
+
+            // Create a course with one assignment
+            $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+                $admin,
+                $adminLogin
+            );
+
+            // Add problem to the assignment
+            \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+                $adminLogin,
+                $courseData['course_alias'],
+                $courseData['assignment_alias'],
+                [$problemData]
+            );
+
+            // Add a student to the course
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $student
+            );
+
+            if ($hasRuns) {
+                // Student creates a run for problem
+                $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+                    $courseData['course_alias'],
+                    $courseData['assignment_alias'],
+                    $problemData,
+                    $student
+                );
+            }
+        } elseif ($hasRuns) {
+            // Student creates a run for problem
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $student
+            );
+        }
+
+        if ($hasRuns) {
+            // The run is graded
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        // Login as admin
+        $adminLogin = self::login($admin);
+
+        if ($adminedByMe) {
+            $response = \OmegaUp\Controllers\Problem::apiAdminList(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                ])
+            )['problems'];
+        } else {
+            $response = \OmegaUp\Controllers\Problem::apiMyList(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                ])
+            )['problems'];
+        }
+
+        $canBeRemoved = array_filter(
+            $response,
+            fn($problem) => $problem['alias'] === $problemAlias
+        )[0]['can_be_removed'];
+
+        $this->assertSame($canBeRemoved, $expectedCanBeRemoved);
     }
 
     /**

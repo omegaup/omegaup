@@ -15,14 +15,23 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       searchResultUsers: [] as types.ListItem[],
+      page: 1,
+      username: payload.username,
+      submissions: payload.submissions,
+      loading: false, // Flag to prevent multiple simultaneous requests
+      endOfResults: false, // Flag to indicate if all results have been loaded
     }),
     render: function (createElement) {
       return createElement('omegaup-submissions-list', {
         props: {
           includeUser: payload.includeUser,
-          submissions: payload.submissions,
+          page: this.page,
+          submissions: this.submissions,
           searchResultUsers: this.searchResultUsers,
+          loading: this.loading,
+          endOfResults: this.endOfResults,
         },
+
         on: {
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
@@ -37,6 +46,29 @@ OmegaUp.on('ready', () => {
                 );
               })
               .catch(ui.apiError);
+          },
+          'fetch-more-data': () => {
+            if (this.loading || this.endOfResults) return;
+            this.loading = true;
+            api.Submission.list({
+              username: this.username,
+              page: this.page + 1,
+            })
+              .then(({ submissions }) => {
+                if (submissions === null || submissions.length === 0) {
+                  this.endOfResults = true;
+                } else {
+                  this.page++;
+                  this.submissions = [...this.submissions, ...submissions];
+                }
+              })
+              .catch((error) => {
+                this.endOfResults = true;
+                ui.apiError(error);
+              })
+              .finally(() => {
+                this.loading = false;
+              });
           },
         },
       });

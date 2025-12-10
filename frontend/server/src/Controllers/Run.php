@@ -12,70 +12,20 @@
  * @psalm-type SubmissionFeedbackThread=array{author: string, authorClassname: string, submission_feedback_thread_id: int, text: string, timestamp: \OmegaUp\Timestamp}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: list<SubmissionFeedback>}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
-    // All languages that runs can have.
-    public const SUPPORTED_LANGUAGES = [
-        'kp' => 'Karel (Pascal)',
-        'kj' => 'Karel (Java)',
-        'c11-gcc' => 'C11 (gcc 10.3)',
-        'c11-clang' => 'C11 (clang 10.0)',
-        'cpp11-gcc' => 'C++11 (g++ 10.3)',
-        'cpp11-clang' => 'C++11 (clang++ 10.0)',
-        'cpp17-gcc' => 'C++17 (g++ 10.3)',
-        'cpp17-clang' => 'C++17 (clang++ 10.0)',
-        'cpp20-gcc' => 'C++20 (g++ 10.3)',
-        'cpp20-clang' => 'C++20 (clang++ 10.0)',
-        'java' => 'Java (openjdk 16.0)',
-        'kt' => 'Kotlin (1.6.10)',
-        'py2' => 'Python (2.7)',
-        'py3' => 'Python (3.9)',
-        'rb' => 'Ruby (2.7)',
-        'cs' => 'C# (10, dotnet 6.0)',
-        'pas' => 'Pascal (fpc 3.0)',
-        'cat' => 'Output Only',
-        'hs' => 'Haskell (ghc 8.8)',
-        'lua' => 'Lua (5.3)',
-        'go' => 'Go (1.18.beta2)',
-        'rs' => 'Rust (1.56.1)',
-        'js' => 'JavaScript (Node.js 16)',
-    ];
-
-    // These languages are aliases. They can be shown to the user, but should
-    // not appear as selectable mostly anywhere.
+    // this variable is not used anywhere
     public const LANGUAGE_ALIASES = [
         'c' => 'C11 (gcc 9.3)',
         'cpp' => 'C++03 (gcc 9.3)',
         'cpp11' => 'C++11 (gcc 9.3)',
         'py' => 'Python 2.7',
     ];
-
-    public const DEFAULT_LANGUAGES = [
-        'c11-gcc',
-        'c11-clang',
-        'cpp11-gcc',
-        'cpp11-clang',
-        'cpp17-gcc',
-        'cpp17-clang',
-        'cpp20-gcc',
-        'cpp20-clang',
-        'java',
-        'kt',
-        'py2',
-        'py3',
-        'rb',
-        'cs',
-        'pas',
-        'hs',
-        'lua',
-        'go',
-        'rs',
-        'js',
-    ];
-
     /** @var int */
     public static $defaultSubmissionGap = 60; // seconds.
+    /** @var int */
+    public static $defaultExecutionGap = 30; // initial default execution gap.
 
     public const VERDICTS = [
         'AC',
@@ -101,6 +51,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         'EXECUTION_VALIDATOR_ERROR' => ['VE'],
         'EXECUTION_JUDGE_ERROR' => ['JE'],
     ];
+
     public const OUTPUT = [
         'OUTPUT_INTERRUPTED' => ['JE', 'VE', 'CE', 'FO', 'RFE', 'RE', 'RTE', 'MLE', 'TLE'],
         'OUTPUT_CORRECT' => ['AC'],
@@ -109,6 +60,51 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
+
+    /**
+     *
+     * @return array<string, string>
+     */
+    public static function SUPPORTED_LANGUAGES(): array {
+        static $supportedLanguages = [];
+
+        if (empty($supportedLanguages)) {
+            $languagesFile = __DIR__ . '/../../../data/languages.json';
+            $languagesJsonArray = json_decode(
+                file_get_contents(
+                    $languagesFile
+                ),
+                true
+            );
+            foreach ($languagesJsonArray as $key => $languageInfo) {
+                $supportedLanguages[$key] = $languageInfo['name'];
+            }
+        }
+
+        return $supportedLanguages;
+    }
+
+    /**
+     *
+     * @return list<string>
+     */
+    public static function DEFAULT_LANGUAGES(): array {
+        static $defaultLanguages = [];
+
+        if (empty($defaultLanguages)) {
+            $supportedLanguages = self::SUPPORTED_LANGUAGES();
+            $filterList = ['cat', 'kp', 'kj'];
+
+            $defaultLanguages = array_keys(array_filter($supportedLanguages, function (
+                $languageName,
+                $key
+            ) use ($filterList) {
+                return !in_array($key, $filterList);
+            }, ARRAY_FILTER_USE_BOTH));
+        }
+
+        return $defaultLanguages;
+    }
 
     /**
      * Validates that a run is happening within the submission gap.
@@ -123,36 +119,22 @@ class Run extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
     ): void {
+        $isInsideSubmissionGap = \OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+            $submission,
+            intval($problem->problem_id),
+            intval($identity->identity_id),
+            $contest
+        );
         if (is_null($contest)) {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    null,
-                    null,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isSystemAdmin($identity)
-            ) {
-                    throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                        'runWaitGap'
-                    );
-            }
+            $isAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
         } else {
-            if (
-                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
-                    $submission,
-                    intval($contest->problemset_id),
-                    $contest,
-                    intval($problem->problem_id),
-                    intval($identity->identity_id)
-                ) &&
-                !\OmegaUp\Authorization::isAdmin($identity, $contest)
-            ) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'runWaitGap'
-                );
-            }
+            $isAdmin = \OmegaUp\Authorization::isAdmin($identity, $contest);
+        }
+
+        if (!$isInsideSubmissionGap && !$isAdmin) {
+            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                'runWaitGap'
+            );
         }
     }
 
@@ -166,10 +148,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      *
-     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      */
     private static function validateCreateRequest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -204,7 +186,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         /** @var list<string> $allowedLanguages */
         $allowedLanguages = array_intersect(
-            array_keys(self::SUPPORTED_LANGUAGES),
+            array_keys(self::SUPPORTED_LANGUAGES()),
             explode(',', $problem->languages)
         );
         $language = $r->ensureString('language');
@@ -214,34 +196,32 @@ class Run extends \OmegaUp\Controllers\Controller {
             'language',
             $allowedLanguages
         );
+        $problemsetId = $r->ensureOptionalInt('problemset_id');
+        $contestAlias = $r->ensureOptionalString(
+            'contest_alias',
+            required: false,
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
 
         // Can't set both problemset_id and contest_alias at the same time.
-        if (!empty($r['problemset_id']) && !empty($r['contest_alias'])) {
+        if (!is_null($problemsetId) && !is_null($contestAlias)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'incompatibleArgs',
                 'problemset_id and contest_alias'
             );
         }
 
-        /** @var null|int */
-        $problemsetId = null;
         /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments */
         $problemsetContainer = null;
         /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = null;
-        if (!empty($r['problemset_id'])) {
-            // Got a problemset id directly.
-            $problemsetId = intval($r['problemset_id']);
+        if (!is_null($problemsetId)) {
             $problemsetContainer = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                 $problemsetId
             );
-        } elseif (!empty($r['contest_alias'])) {
+        } elseif (!is_null($contestAlias)) {
             // Got a contest alias, need to fetch the problemset id.
             // Validate contest
-            $contestAlias = $r->ensureString(
-                'contest_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
             $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
             if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -386,6 +366,39 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get the next execution timestamp, no user session required, as the IDE
+     * runs independently.
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecuteForIDE(\OmegaUp\Request $r): array {
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
+     * Get the next execution timestamp for a specific problemset:
+     * - Contest
+     * - Virtual contest
+     * - Practice contest
+     * - Course
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecute(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
      * Create a new run
      *
      * @throws \Exception
@@ -393,10 +406,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      *
-     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $language
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param string $source
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
@@ -404,7 +417,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty($r['source'], 'source');
+        $source = $r->ensureString('source');
         [
             'isPractice' => $isPractice,
             'problem' => $problem,
@@ -530,9 +543,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             'verdict' => 'JE',
         ]);
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
+        // Use TransactionHelper to handle potential deadlocks in submission creation
+        \OmegaUp\TransactionHelper::executeWithRetry(function () use (
+            $submission,
+            $r,
+            $problem,
+            $contest,
+            $run
+        ) {
             // _Now_ that we are in a transaction, we can check whether the run
             // is within the submission gap.
             self::validateWithinSubmissionGap(
@@ -548,15 +566,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Runs::create($run);
             $submission->current_run_id = $run->run_id;
             \OmegaUp\DAO\Submissions::update($submission);
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        });
 
         // Call Grader
         try {
-            \OmegaUp\Grader::getInstance()->grade($run, trim($r['source']));
+            \OmegaUp\Grader::getInstance()->grade($run, trim($source));
         } catch (\Exception $e) {
             // Welp, it failed. We cannot make this a real transaction
             // because the Run row would not be visible from the Grader
@@ -1766,12 +1780,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Check filter by problem, is optional
         /** @var null|\OmegaUp\DAO\VO\Problems */
         $problem = null;
-        if (!is_null($r['problem_alias'])) {
-            $problemAlias = $r->ensureString(
-                'problem_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
-
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            required: false,
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        if (!is_null($problemAlias)) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1781,16 +1795,19 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Get user if we have something in username
+        $username = $r->ensureOptionalString(
+            'username',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
         /** @var null|\OmegaUp\DAO\VO\Identities */
         $identity = null;
-        if (!is_null($r['username'])) {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['username'],
-                'username'
-            );
+        if (!is_null($username)) {
             try {
                 $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                    $r['username']
+                    $username
                 );
             } catch (\OmegaUp\Exceptions\NotFoundException $e) {
                 // If not found, simply ignore it
@@ -1825,7 +1842,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
+        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES());
         [
             'runs' => $runs,
             'totalRuns' => $totalRuns,

@@ -150,7 +150,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        // give a feedback like teaching assistant
+        // give a feedback as teaching assistant
         $feedback = 'Test feedback!';
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
@@ -472,6 +472,8 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedCommentsLines[$index]['submission_feedback_id'] = $feedback['submission_feedback_id'];
         }
 
+        $submissionFeedbackId = $expectedCommentsLines[0]['submission_feedback_id'];
+
         // Adding a feedback thread as admin
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
@@ -480,23 +482,41 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
                 'feedback' => 'First feedback reply',
-                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+                'submission_feedback_id' => $submissionFeedbackId,
             ])
         );
+
+        $studentLogin = self::login($student['identity']);
 
         // Adding a feedback thread as student
         \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
-                'auth_token' => self::login(
-                    $student['identity']
-                )->auth_token,
+                'auth_token' => $studentLogin->auth_token,
                 'guid' => $runData['response']['guid'],
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
                 'feedback' => 'Second feedback reply',
-                'submission_feedback_id' => $expectedCommentsLines[0]['submission_feedback_id'],
+                'submission_feedback_id' => $submissionFeedbackId,
             ])
         );
+
+        // The participants in the thread should be the admin and the student
+        $participants = \OmegaUp\DAO\SubmissionFeedbackThread::getSubmissionFeedbackThreadParticipants(
+            $submissionFeedbackId
+        );
+
+        $expectedParticipants = [
+            ['author_id' => $admin['identity']->user_id],
+            ['author_id' => $student['identity']->user_id],
+        ];
+
+        // Comparing the participants versus expected participants
+        foreach ($participants as $index => $participant) {
+            $this->assertArrayContainsWithPredicate(
+                $expectedParticipants,
+                fn ($expectedParticipant) => $expectedParticipant['author_id'] == $participant['author_id']
+            );
+        }
 
         $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
             new \OmegaUp\Request([
@@ -525,11 +545,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Trying to add a comment with a user who does not belong to the course
         $user = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($user['identity']);
 
         try {
             \OmegaUp\Controllers\Submission::apiSetFeedback(
                 new \OmegaUp\Request([
-                    'auth_token' => self::login($user['identity'])->auth_token,
+                    'auth_token' => $userLogin->auth_token,
                     'guid' => $runData['response']['guid'],
                     'course_alias' => $courseData['course_alias'],
                     'assignment_alias' => $courseData['assignment_alias'],
@@ -540,5 +561,254 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertSame('userNotAllowed', $e->getMessage());
         }
+
+        ['runs' => $runs] = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['problemset_id'],
+                'prevent_problemset_open' => false,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+
+        $this->assertSame(2, $runs[0]['suggestions']);
+    }
+
+    public function testSubmissionFeedbackGeneralAndByLine() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($admin);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin,
+            $login,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($runData['response']['guid']);
+        if (is_null($run)) {
+            return;
+        }
+
+        // student call api to send notifications to all administrators
+        // members in the course
+        $studentLogin = self::login($student);
+        $response = \OmegaUp\Controllers\Course::apiRequestFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'assignment_alias' => $courseData['assignment_alias'],
+                'course_alias' => $courseData['course_alias'],
+                'guid' => $runData['response']['guid']
+            ])
+        );
+
+        $this->assertSame('ok', $response['status']);
+
+        $login = self::login($admin);
+
+        $runs = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment_alias' => $courseData['assignment_alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['currentAssignment']['runs'];
+
+        $this->assertSame(1, $runs[0]['suggestions']);
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertCount(1, $feedbackList);
+        $this->assertNull($feedbackList[0]['range_bytes_start']);
+
+        $feedback = 'Test feedback!';
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => $feedback,
+                'range_bytes_start' => 1,
+            ])
+        );
+
+        // Now the admin should get two feedbacks: The general one and the
+        // feedback in the line 1
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertCount(2, $feedbackList);
+        $this->assertNull($feedbackList[0]['range_bytes_start']);
+        $this->assertSame(1, $feedbackList[1]['range_bytes_start']);
+        $this->assertSame($feedback, $feedbackList[1]['feedback']);
+
+        // This should be reflected in the course details for the admin
+        $runs = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'assignment_alias' => $courseData['assignment_alias'],
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['currentAssignment']['runs'];
+
+        $this->assertSame(2, $runs[0]['suggestions']);
+
+        // Even when the feedback is updated, the feedback in the line 1 should
+        // remain the same as originally set because updating the feedback in
+        // the lines of code is not implemented yet.
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Updated Test feedback!',
+                'range_bytes_start' => 1,
+            ])
+        );
+
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $this->assertCount(2, $feedbackList);
+        $this->assertNull($feedbackList[0]['range_bytes_start']);
+        $this->assertSame(1, $feedbackList[1]['range_bytes_start']);
+        $this->assertSame($feedback, $feedbackList[1]['feedback']);
+    }
+
+    public function testCountNumberOfSubmissionFeedbackSuggestions() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        // Creating and adding a new user as a course student
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Admin creates a feedback in the line number 1, 5 and 9
+        $suggestionsLines = [
+            ['line' => 1, 'feedback' => 'Initial test feedback'],
+            ['line' => 5, 'feedback' => 'Second test feedback'],
+            ['line' => 9, 'feedback' => 'Third test feedback'],
+        ];
+        $adminLogin = self::login($admin['identity'])->auth_token;
+
+        foreach ($suggestionsLines as $suggestionLine) {
+            \OmegaUp\Controllers\Submission::apiSetFeedback(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin,
+                    'guid' => $runData['response']['guid'],
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment_alias'],
+                    'feedback' => $suggestionLine['feedback'],
+                    'range_bytes_start' => $suggestionLine['line'],
+                ])
+            );
+        }
+
+        $studentLogin = self::login($student['identity']);
+        ['runs' => $runs] = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['problemset_id'],
+                'prevent_problemset_open' => false,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+
+        $this->assertSame(3, $runs[0]['suggestions']);
+
+        // Even if the student replies a feedback, the number of suggestions
+        // should remain the same
+        $feedbackList = \OmegaUp\Controllers\Run::apiGetSubmissionFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+
+        $submissionFeedbackId = $feedbackList[0]['submission_feedback_id'];
+
+        // Adding a feedback thread as student
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Feedback reply',
+                'submission_feedback_id' => $submissionFeedbackId,
+            ])
+        );
+
+        ['runs' => $runs] = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['problemset_id'],
+                'prevent_problemset_open' => false,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+
+        $this->assertSame(3, $runs[0]['suggestions']);
     }
 }

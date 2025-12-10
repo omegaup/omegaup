@@ -58,7 +58,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
+                'userNotAllowedToAddPrivateProblem'
             );
         }
     }
@@ -71,10 +71,11 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         float $points,
         int $order_in_contest = 1,
-        bool $validateVisibility = true,
+        ?\OmegaUp\DAO\VO\ProblemsetProblems $oldproblemsetProblem = null,
+        bool $shouldValidateVisibility = true,
         bool $isExtraProblem = false
     ): void {
-        if ($validateVisibility) {
+        if ($shouldValidateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
                 $identity,
@@ -90,7 +91,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             'points' => $points,
             'order' => $order_in_contest,
             'is_extra_problem' => $isExtraProblem,
-        ]));
+        ]), $oldproblemsetProblem);
     }
 
     /**
@@ -98,12 +99,9 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * the contest_score for all the problemset and problem runs
      */
     private static function updateProblemsetProblem(
-        \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem
+        \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem,
+        ?\OmegaUp\DAO\VO\ProblemsetProblems $oldProblemsetProblem = null,
     ): void {
-        $oldProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
-            $updatedProblemsetProblem->problemset_id,
-            $updatedProblemsetProblem->problem_id
-        );
         if (is_null($oldProblemsetProblem)) {
             \OmegaUp\DAO\Base\ProblemsetProblems::create(
                 $updatedProblemsetProblem

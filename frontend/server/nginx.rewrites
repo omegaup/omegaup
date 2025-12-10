@@ -11,7 +11,11 @@ location /preguntas/ {
 		rewrite ^/preguntas/(.+)$ /preguntas/?qa-rewrite=$1&$query_string last;
 	}
 }
-
+#rekarel
+location /rekarel/ {
+    alias /opt/omegaup/frontend/www/rekarel/webapp/;
+    index index.html;
+}
 rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
@@ -63,13 +67,14 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /course/student.
 rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course/studentWithAssignment.php?course=$1&student=$2&assignment_alias=$3 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /course/students.php?course=$1 last;
 rewrite ^/dependents/?$ /profile/dependents.php last;
+rewrite ^/docs/?$ /docs.php last;
+rewrite ^/grader/ephemeral/$ /grader/grader.php last;
 rewrite ^/group/?$ /group/list.php last;
 rewrite ^/group/new/?$ /group/new.php last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /group/scoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
-rewrite ^/img/libropre3.pdf/?$ /docs/assets/libroluisvargas.pdf last;
 rewrite ^/login/?$ /login.php last;
 rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;

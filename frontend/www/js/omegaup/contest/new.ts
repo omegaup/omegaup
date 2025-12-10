@@ -1,7 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
-import contest_NewForm from '../components/contest/NewForm.vue';
+import contest_NewForm from '../components/contest/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -17,6 +17,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       invalidParameterName: null as null | string,
       searchResultTeamsGroups: [] as types.ListItem[],
+      canSetRecommended: payload.canSetRecommended,
     }),
     render: function (createElement) {
       return createElement('omegaup-contest-new', {
@@ -29,6 +30,7 @@ OmegaUp.on('ready', () => {
           invalidParameterName: this.invalidParameterName,
           searchResultTeamsGroups: this.searchResultTeamsGroups,
           hasVisitedSection: payload.hasVisitedSection,
+          canSetRecommended: this.canSetRecommended,
         },
         on: {
           'create-contest': ({
@@ -36,11 +38,11 @@ OmegaUp.on('ready', () => {
             teamsGroupAlias,
           }: {
             contest: types.ContestAdminDetails;
-            teamsGroupAlias?: types.ListItem;
+            teamsGroupAlias?: string;
           }): void => {
             api.Contest.create({
               ...contest,
-              teams_group_alias: teamsGroupAlias?.key,
+              teams_group_alias: teamsGroupAlias,
             })
               .then(() => {
                 this.invalidParameterName = null;

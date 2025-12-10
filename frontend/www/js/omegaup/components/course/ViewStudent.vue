@@ -130,35 +130,15 @@
                 </div>
                 <div class="mt-3">
                   <a
-                    class="text-primary"
+                    class="btn btn-sm btn-primary"
                     role="button"
                     data-show-feedback-form
                     @click="showFeedbackForm = !showFeedbackForm"
-                    >{{
-                      selectedRun.feedback == null
-                        ? T.submissionFeedbackSendButton
-                        : T.submissionFeedbackUpdateButton
-                    }}</a
+                    >{{ T.submissionFeedbackSendButton }}</a
                   >
                   <div v-show="showFeedbackForm" class="form-group">
-                    <textarea
-                      v-model="updatedFeedback"
-                      class="form-control"
-                      rows="3"
-                      maxlength="200"
-                    ></textarea>
-                    <button
-                      class="btn btn-sm btn-primary mt-1"
-                      data-feedback-button
-                      :disabled="!updatedFeedback || updatedFeedback.length < 2"
-                      @click.prevent="sendFeedback"
-                    >
-                      {{
-                        selectedRun.feedback == null
-                          ? T.submissionSendFeedback
-                          : T.submissionUpdateFeedback
-                      }}
-                    </button>
+                    <p>{{ T.submissionFeedbackAnimationButton }}</p>
+                    <img src="/media/submission_feedback_demo.gif" />
                   </div>
                 </div>
               </template>
@@ -205,7 +185,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from '../problem//Markdown.vue';
 import user_Username from '../user/Username.vue';
 
 import T from '../../lang';
@@ -214,7 +194,7 @@ import * as time from '../../time';
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     'omegaup-user-username': user_Username,
   },
 })

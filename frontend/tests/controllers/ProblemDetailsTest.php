@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of DetailsProblem
  */
@@ -11,7 +9,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user to be the author
-        ['user' => $authorUser, 'identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $authorIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -26,7 +24,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Explicitly join contest
         $login = self::login($identity);
@@ -99,6 +97,91 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test identities created via groups in batch can create a run and view
+     * problem details
+     */
+    public function testIdentitiesCanCreateANewRun() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            ])
+        );
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['templateProperties'];
+
+        $this->assertFalse($result['payload']['user']['loggedIn']);
+
+        // Add a new user with identity groups creator privileges, and login
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+
+        // Create a group, where identities will be added
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            name: null,
+            description: null,
+            alias: null,
+            login: $creatorLogin
+        )['group'];
+
+        // Create a group, a set of identities, get one of them
+        $password = \OmegaUp\Test\Utils::createRandomString();
+
+        // Create identities and get one unassociated and other one to be
+        // associated with a user
+        [
+            $identity,
+        ] = \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
+            $group,
+            $creatorLogin,
+            $password
+        );
+
+        $login = self::login($identity);
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue($result['user']['loggedIn']);
+        $this->assertFalse($result['problem']['karel_problem']);
+        $this->assertFalse($result['user']['admin']);
+        $this->assertFalse($result['nominationStatus']['alreadyReviewed']);
+        $this->assertFalse($result['nominationStatus']['dismissed']);
+        $this->assertFalse($result['nominationStatus']['dismissedBeforeAc']);
+        $this->assertFalse($result['nominationStatus']['nominated']);
+        $this->assertFalse($result['nominationStatus']['nominatedBeforeAc']);
+        $this->assertFalse($result['nominationStatus']['canNominateProblem']);
+        $this->assertFalse($result['nominationStatus']['solved']);
+        $this->assertFalse($result['nominationStatus']['tried']);
+
+        // Identity is able to ceate a new run
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias']
+            ])
+        );
+
+        $this->assertSame(100.00, $response['score']);
+    }
+
+    /**
      * Common code for testing the statement's source.
      */
     public function internalViewProblemStatement($type, $expected_text) {
@@ -115,7 +198,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call api
         $login = self::login($identity);
@@ -169,7 +252,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call api
         $login = self::login($identity);
@@ -202,7 +285,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         try {
@@ -243,7 +326,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -280,7 +363,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create 2 runs, 100 and 50.
         $runDataOutsideContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -323,7 +406,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $runDataOutOfContest = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
@@ -367,7 +450,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create an accepted run.
         $runDataInsideContest = \OmegaUp\Test\Factories\Run::createRun(
@@ -442,7 +525,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problems = [];
 
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -492,7 +575,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAuthorizationController() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,

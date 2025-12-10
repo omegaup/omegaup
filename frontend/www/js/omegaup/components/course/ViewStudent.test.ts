@@ -158,25 +158,6 @@ describe('ViewStudent.vue', () => {
     await wrapper.find('tr[data-run-guid="guid-1"]').trigger('click');
     expect(wrapper.text()).toContain(T.feedbackNotSentYet);
 
-    await wrapper.find('a[data-show-feedback-form]').trigger('click');
-    expect(wrapper.find('button[data-feedback-button]').element).toBeDisabled();
-
-    await wrapper.find('textarea').setValue(submissionFeedback.feedback);
-    expect(wrapper.find('button[data-feedback-button]').element).toBeEnabled();
-    wrapper.find('button[data-feedback-button]').trigger('click');
-    expect(wrapper.emitted('set-feedback')).toBeDefined();
-    expect(wrapper.emitted('set-feedback')).toEqual([
-      [
-        {
-          guid: 'guid-1',
-          feedback: submissionFeedback.feedback,
-          isUpdate: false,
-          assignmentAlias: assignment_a.alias,
-          studentUsername: student_b.username,
-        },
-      ],
-    ]);
-
     await wrapper.find('tr[data-run-guid="guid-2"]').trigger('click');
     expect(wrapper.text()).toContain(submissionFeedback.feedback);
     expect(wrapper.text()).toContain(
