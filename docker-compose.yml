@@ -1,4 +1,15 @@
 services:
+  volume-init:
+    image: alpine:latest
+    volumes:
+      - "omegaupdata:/var/lib/omegaup"
+    command: >
+      sh -c "
+        mkdir -p /var/lib/omegaup/problems.git &&
+        mkdir -p /var/lib/omegaup/submissions &&
+        mkdir -p /var/lib/omegaup/templates &&
+        echo 'Volume initialization complete'
+      "
 
   frontend:
     build:
@@ -11,11 +22,16 @@ services:
       - type: bind
         source: .
         target: /opt/omegaup
-      - 'omegaupdata:/var/lib/omegaup'
+      - "omegaupdata:/var/lib/omegaup"
     depends_on:
-      - mysql
-      - gitserver
-      - grader
+      volume-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
+      gitserver:
+        condition: service_started
+      grader:
+        condition: service_started
     ports:
       - target: 8001
         published: 8001
@@ -31,21 +47,25 @@ services:
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
-    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
+    entrypoint:
+      ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
     restart: always
     depends_on:
-      - mysql
+      volume-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/gitserver
         target: /etc/omegaup/gitserver
         read_only: true
-      - 'omegaupdata:/var/lib/omegaup'
+      - "omegaupdata:/var/lib/omegaup"
     expose:
-      - '33861'
-      - '33862'
-      - '6060'
+      - "33861"
+      - "33862"
+      - "6060"
     ports:
       - target: 33861
         published: 33861
@@ -65,9 +85,9 @@ services:
         target: /etc/omegaup/broadcaster
         read_only: true
     expose:
-      - '6060'
-      - '32672'
-      - '22291'
+      - "6060"
+      - "32672"
+      - "22291"
 
   grader:
     image: omegaup/backend:v1.9.35
@@ -75,16 +95,19 @@ services:
     user: "${UID_GID}"
     restart: always
     depends_on:
-      - mysql
+      volume-init:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/grader
         target: /etc/omegaup/grader
         read_only: true
-      - 'omegaupdata:/var/lib/omegaup'
+      - "omegaupdata:/var/lib/omegaup"
     expose:
-      - '6060'
-      - '21680'
+      - "6060"
+      - "21680"
     ports:
       - target: 21680
         published: 21680
@@ -93,7 +116,14 @@ services:
 
   runner:
     image: omegaup/runner:v1.9.35
-    entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
+    entrypoint:
+      [
+        "wait-for-it",
+        "grader:11302",
+        "--",
+        "/usr/bin/omegaup-runner",
+        "-noop-sandbox",
+      ]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -104,25 +134,25 @@ services:
         target: /etc/omegaup/runner
         read_only: true
     expose:
-      - '6060'
+      - "6060"
 
   mysql:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_DATABASE: 'omegaup'
-      MYSQL_USER: 'omegaup'
-      MYSQL_PASSWORD: 'omegaup'
-      MYSQL_ROOT_PASSWORD: 'omegaup'
+      MYSQL_DATABASE: "omegaup"
+      MYSQL_USER: "omegaup"
+      MYSQL_PASSWORD: "omegaup"
+      MYSQL_ROOT_PASSWORD: "omegaup"
       MYSQL_TCP_PORT: 13306
     command:
       - --max_execution_time=30000
       - --lock_wait_timeout=10
       - --wait_timeout=20
     expose:
-      - '13306'
+      - "13306"
     volumes:
-      - 'dbdata:/var/lib/mysql'
+      - "dbdata:/var/lib/mysql"
     ports:
       - target: 13306
         published: 13306
@@ -135,13 +165,13 @@ services:
     image: rabbitmq:3-management-alpine
     restart: always
     environment:
-      RABBITMQ_DEFAULT_USER: 'omegaup'
-      RABBITMQ_DEFAULT_PASS: 'omegaup'
+      RABBITMQ_DEFAULT_USER: "omegaup"
+      RABBITMQ_DEFAULT_PASS: "omegaup"
     expose:
-      - '5672'
-      - '15672'
+      - "5672"
+      - "15672"
     volumes:
-      - 'rabbitmq:/var/lib/rabbitmq'
+      - "rabbitmq:/var/lib/rabbitmq"
     ports:
       - target: 5672
         published: 5672
@@ -155,9 +185,9 @@ services:
   redis:
     image: redis
     restart: always
-    command: ['redis-server', '/etc/redis/redis.conf']
+    command: ["redis-server", "/etc/redis/redis.conf"]
     expose:
-      - '6379'
+      - "6379"
     volumes:
       - type: volume
         source: redis
