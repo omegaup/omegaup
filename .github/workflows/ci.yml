@@ -392,3 +392,4 @@ jobs:
       - name: Run check for submission mode
         run: |
           pytest stuff/teaching_assistant/test_ta_submission_mode.py --log-cli-level=INFO -s
+
