@@ -35,8 +35,8 @@ jobs:
           - 5672:5672
           - 15672:15672
         env:
-          RABBITMQ_DEFAULT_USER: omegaup
-          RABBITMQ_DEFAULT_PASS: omegaup
+          RABBITMQ_DEFAULT_USER: 'omegaup'
+          RABBITMQ_DEFAULT_PASS: 'omegaup'
 
     steps:
       - uses: actions/checkout@v4
