@@ -42,13 +42,12 @@ services:
       MYSQL_TCP_PORT: 13306
       OPENAI_API_KEY: ""
       DEEPSEEK_API_KEY: ""
-      AI_WORKER_ENABLED: 'true'
-      REDIS_PASSWORD: 'redis'
+      AI_WORKER_ENABLED: "true"
+      REDIS_PASSWORD: "redis"
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
-    entrypoint:
-      ['wait-for-it', 'mysql:13306', '--', '/usr/bin/omegaup-gitserver']
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -74,7 +73,7 @@ services:
 
   broadcaster:
     image: omegaup/backend:v1.9.35
-    entrypoint: ['/usr/bin/omegaup-broadcaster']
+    entrypoint: ["/usr/bin/omegaup-broadcaster"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -91,7 +90,7 @@ services:
 
   grader:
     image: omegaup/backend:v1.9.35
-    entrypoint: ['wait-for-it', 'mysql:13306', '--', '/usr/bin/omegaup-grader']
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -116,14 +115,7 @@ services:
 
   runner:
     image: omegaup/runner:v1.9.35
-    entrypoint:
-      [
-        "wait-for-it",
-        "grader:11302",
-        "--",
-        "/usr/bin/omegaup-runner",
-        "-noop-sandbox",
-      ]
+    entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
     user: "${UID_GID}"
     restart: always
     depends_on:
