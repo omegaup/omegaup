@@ -111,5 +111,4 @@ runs:
           python3 -m venv /opt/omegaup/stuff/venv && \
           python3 -m pip install wheel && \
           python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          
         docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
