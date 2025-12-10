@@ -9,6 +9,7 @@ describe('Identities.vue', () => {
     const wrapper = shallowMount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
+        isOrganizer: true,
       },
     });
 
@@ -19,6 +20,7 @@ describe('Identities.vue', () => {
     const wrapper = mount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
+        isOrganizer: true,
       },
     });
 
@@ -37,6 +39,7 @@ describe('Identities.vue', () => {
     const wrapper = mount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
+        isOrganizer: true,
       },
     });
 
@@ -49,5 +52,16 @@ describe('Identities.vue', () => {
     expect(mockReadFileMethod).toHaveBeenCalled();
     expect(wrapper.emitted('read-csv')).toBeDefined();
     mockReadFileMethod.mockRestore();
+  });
+
+  it('Should handle the view for restricted users', () => {
+    const wrapper = mount(group_Identities, {
+      propsData: {
+        groupAlias: 'Hello',
+        isOrganizer: false,
+      },
+    });
+
+    expect(wrapper.text()).toContain('soporte@omegaup.com ');
   });
 });

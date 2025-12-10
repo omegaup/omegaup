@@ -16,14 +16,15 @@ describe('Certificate Test', () => {
     cy.login(loginOptions);
 
     let url: string;
-    cy.url().then(currentUrl => {
+    cy.url().then((currentUrl) => {
       url = currentUrl;
     });
 
     cy.visit('/certificates/mine/');
-    cy.get('button[copy-to-clipboard]')
-      .each(($button) => {
-        cy.wrap($button).click().then(() => {
+    cy.get('button[copy-to-clipboard]').each(($button) => {
+      cy.wrap($button)
+        .click()
+        .then(() => {
           cy.window().then((win) => {
             win.navigator.clipboard.readText().then((text) => {
               const code = $button.attr('data-code');
@@ -31,7 +32,7 @@ describe('Certificate Test', () => {
             });
           });
         });
-      });
+    });
 
     cy.logout();
   });
@@ -45,13 +46,12 @@ describe('Certificate Test', () => {
     cy.login(loginOptions);
 
     cy.visit('/certificates/mine/');
-    cy.get('a[download-file]')
-      .each(($button) => {
-        $button.attr('download', '');
-        cy.wrap($button).click();
-        const code = $button.attr('data-code');
-        cy.readFile(`cypress/downloads/certificate_${code}.pdf`).should('exist');
-      });
+    cy.get('a[download-file]').each(($button) => {
+      $button.attr('download', '');
+      cy.wrap($button).click();
+      const code = $button.attr('data-code');
+      cy.readFile(`cypress/downloads/certificate_${code}.pdf`).should('exist');
+    });
 
     cy.logout();
   });

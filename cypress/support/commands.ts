@@ -36,10 +36,9 @@ Cypress.Commands.add('loginAdmin', () => {
 // Logouts the user
 Cypress.Commands.add('logout', () => {
   cy.get('a[data-nav-user]').click();
-  cy.get('a[data-logout-button]').click();
-  cy.waitUntil(() =>
-    cy.url().should('eq', 'http://127.0.0.1:8001/'),
-  );
+  cy.get('a[data-logout-button]').click({ force: true });
+  cy.get('footer.logout-confirmation-modal>button.btn-primary').click();
+  cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 });
 
 // Logouts the user
@@ -70,11 +69,15 @@ Cypress.Commands.add(
     autoCompleteTextTag,
     problemLevelIndex,
     publicAccess = false,
-    firstTimeVisited = true
+    firstTimeVisited = true,
+    languagesValue,
+    zipFile = 'testproblem.zip',
   }: ProblemOptions) => {
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
+    // Click the dropdown toggle to show options
+    cy.get('[data-nav-problems-create-options]').click();
     cy.get('[data-nav-problems-create]').click();
     if (firstTimeVisited) {
       cy.get('.introjs-skipbutton').click();
@@ -86,18 +89,21 @@ Cypress.Commands.add(
     cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
     cy.get('[name="source"]').type(problemAlias);
-    cy.get('[name="problem_contents"]').attachFile('testproblem.zip');
+    cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
+    if (languagesValue === 'cat') {
+      cy.get('select[name="languages"]').should('exist').select(languagesValue);
+    }
     // Tags panel
     cy.waitUntil(() =>
       cy
         .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
-        .click(),
+        .click({ force: true }),
     );
 
-    if(publicAccess) {
+    if (publicAccess) {
       cy.get('[data-target=".access"]').click();
       cy.get('[data-problem-access-radio-yes]').check();
     }
@@ -178,19 +184,24 @@ declare enum ScoreMode {
 
 Cypress.Commands.add(
   'createContest',
-  ({
-    contestAlias,
-    startDate,
-    endDate,
-    description = 'Default Description',
-    showScoreboard = true,
-    scoreBoardVisibleTime = "100",
-    scoreMode = ScoreMode.Partial,
-    basicInformation = false,
-    requestParticipantInformation = 'no',
-    differentStart = false,
-    differentStartTime = "",
-  },shouldShowIntro: boolean = true) => {
+  (
+    {
+      contestAlias,
+      startDate,
+      endDate,
+      description = 'Default Description',
+      showScoreboard = true,
+      scoreBoardVisibleTime = '100',
+      scoreMode = ScoreMode.Partial,
+      basicInformation = false,
+      requestParticipantInformation = 'no',
+      differentStart = false,
+      differentStartTime = '',
+      contestForTeams = false,
+      teamGroupAlias = '',
+    },
+    shouldShowIntro: boolean = true,
+  ) => {
     cy.visit('contest/new/');
     if (shouldShowIntro) {
       cy.get('.introjs-skipbutton').click();
@@ -200,75 +211,62 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
-    cy.get('[data-score-board-visible-time]').clear().type(scoreBoardVisibleTime);
+    cy.get('[data-target=".logistics"]').click();
+    cy.get('[data-score-board-visible-time]')
+      .clear()
+      .type(scoreBoardVisibleTime);
     if (differentStart) {
       cy.get('[data-different-start-check]').click();
       cy.get('[data-different-start-time-input]').type(differentStartTime);
     }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
+    cy.get('[data-target=".scoring-rules"]').click();
     cy.get('[data-score-mode]').select(`${scoreMode}`);
+    cy.get('[data-target=".privacy"]').click();
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
     cy.get('[data-request-user-information]').select(
       requestParticipantInformation,
     ); // no | optional | required
+    if (contestForTeams) {
+      cy.get('[data-contest-for-teams]').click();
+      cy.get('.tags-input input[type="text"]').first().type(teamGroupAlias);
+      cy.get('.typeahead-dropdown li').first().click();
+    }
     cy.get('button[type="submit"]').click();
   },
 );
 
-Cypress.Commands.add(
-  'addProblemsToContest',
-  ({
-    contestAlias,
-    problems,
-  }) => {
-    cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.problems').click();
+Cypress.Commands.add('addProblemsToContest', ({ contestAlias, problems }) => {
+  cy.visit(`contest/${contestAlias}/edit/`);
+  cy.get('a.nav-link.problems').click();
 
-    for (const idx in problems) {
-      cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias)
-      cy.get('.typeahead-dropdown li').first().click();
-      cy.get('.add-problem').click();
-    }
-  },
-);
+  for (const idx in problems) {
+    cy.get('.tags-input input[type="text"]').type(problems[idx].problemAlias);
+    cy.get('.typeahead-dropdown li').first().click();
+    cy.get('.add-problem').click();
+  }
+});
 
 Cypress.Commands.add(
   'changeAdmissionModeContest',
-  ({
-    contestAlias,
-    admissionMode,
-  }) => {
+  ({ contestAlias, admissionMode }) => {
     cy.visit(`contest/${contestAlias}/edit/`);
-    cy.get('a[data-nav-contest-edit]').click();
-    cy.get('a.dropdown-item.admission-mode').click();
-    cy.get('select[name="admission-mode"]').select(
-      admissionMode,
-    ); // private | registration | public
+    cy.get('a.nav-link.admission-mode').click();
+    cy.get('select[name="admission-mode"]').select(admissionMode); // private | registration | public
     cy.get('.change-admission-mode').click();
   },
 );
 
-Cypress.Commands.add(
-  'enterContest',
-  ({
-    contestAlias,
-  }) => {
-    cy.visit(`arena/${contestAlias}`);
-    cy.get('button[data-start-contest]').click();
-  },
-);
+Cypress.Commands.add('enterContest', ({ contestAlias }) => {
+  cy.visit(`arena/${contestAlias}`);
+  cy.get('button[data-start-contest]').click();
+});
 
 Cypress.Commands.add(
   'createRunsInsideContest',
-  ({
-    contestAlias,
-    problems,
-    runs,
-    statusCheck = false,
-  }) => {
+  ({ contestAlias, problems, runs, statusCheck = false }) => {
     for (const idx in runs) {
       const problem = problems[idx];
       if (!problem) {
@@ -280,7 +278,11 @@ Cypress.Commands.add(
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
-      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Wait for the language selector to be visible before trying to interact with it
+      cy.get('[name="language"]', { timeout: 10000 })
+        .should('be.visible')
+        .select(runs[idx].language);
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
@@ -302,9 +304,9 @@ Cypress.Commands.add(
       const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
-      cy.wait(['@runStatus'], { timeout: 10000 }).its(
-        'response.statusCode',
-      ).should('eq', 200);
+      cy.wait(['@runStatus'], { timeout: 10000 })
+        .its('response.statusCode')
+        .should('eq', 200);
       cy.get('[data-run-status] > span')
         .first()
         .should('have.text', expectedStatus);
@@ -328,7 +330,9 @@ export const getISODate = (date: Date) => {
  * @returns ISO datetime required to type on a date input inside cypress
  */
 export const getISODateTime = (date: Date) => {
-  const isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+  const isoDateTime = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  ).toISOString();
   return isoDateTime.slice(0, 16);
 };
 
@@ -340,12 +344,17 @@ export const getISODateTime = (date: Date) => {
  */
 export const addSubtractDateTime = (
   date: Date,
-  { days = 0, hours = 0, minutes = 0, seconds = 0 }: {
-    days?: number,
-    hours?: number,
-    minutes?: number,
-    seconds?: number
-  }
+  {
+    days = 0,
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+  }: {
+    days?: number;
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+  },
 ): Date => {
   const newDate = new Date(date.getTime());
   newDate.setDate(newDate.getDate() + days);

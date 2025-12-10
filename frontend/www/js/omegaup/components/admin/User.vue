@@ -85,6 +85,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { types } from '../../api_types';
 library.add(fas);
 
 @Component({
@@ -101,7 +102,7 @@ export default class User extends Vue {
   @Prop() experiments!: string[];
   @Prop() systemExperiments!: omegaup.Experiment[];
   @Prop() roles!: string[];
-  @Prop() roleNames!: omegaup.Role[];
+  @Prop() roleNames!: types.UserRole[];
 
   T = T;
 
@@ -127,8 +128,8 @@ export default class User extends Vue {
   @Emit('change-role')
   onChangeRole(
     ev: Event,
-    role: omegaup.Role,
-  ): omegaup.Selectable<omegaup.Role> {
+    role: types.UserRole,
+  ): omegaup.Selectable<types.UserRole> {
     return {
       value: role,
       selected: (ev.target as HTMLInputElement).checked,

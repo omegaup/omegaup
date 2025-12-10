@@ -17,17 +17,9 @@
             </div>
             <div class="card-text course-data">
               <p class="mb-2">
-                {{
-                  ui.formatString(T.publicCourseCardMetrics, {
-                    lessonCount: course.lessonCount,
-                    studentCount:
-                      course.studentCount >= 1000
-                        ? `${(course.studentCount / 1000).toFixed(1)}k`
-                        : course.studentCount,
-                  })
-                }}
+                {{ getFormattedLessonAndStudentCount(course) }}
               </p>
-              <p class="mb-2">{{ courseLevelText(course.level) }}</p>
+              <p class="mb-2">{{ courseLevelText(course) }}</p>
               <div v-if="loggedIn" class="text-center mt-1">
                 <a
                   class="btn btn-primary text-white"
@@ -69,8 +61,11 @@ export default class CourseCardPublic extends Vue {
   T = T;
   ui = ui;
 
-  courseLevelText(level: null | string): string {
-    switch (level) {
+  courseLevelText(course: types.CourseCardPublic): string {
+    if (!course.level) {
+      return '';
+    }
+    switch (course.level) {
       case 'introductory':
         return T.courseCardPublicLevelIntroductory;
       case 'intermediate':
@@ -80,6 +75,29 @@ export default class CourseCardPublic extends Vue {
       default:
         return '';
     }
+  }
+
+  getFormattedLessonAndStudentCount(course: types.CourseCardPublic): string {
+    let response = '';
+    if (course.lessonCount === 1) {
+      response += T.publicCourseCardMetricsOneLesson;
+    } else {
+      response += ui.formatString(T.publicCourseCardMetricsLessons, {
+        lessonCount: course.lessonCount,
+      });
+    }
+    response += ' | ';
+    if (course.studentCount === 1) {
+      response += T.publicCourseCardMetricsOneStudent;
+    } else {
+      response += ui.formatString(T.publicCourseCardMetricsStudents, {
+        studentCount:
+          course.studentCount >= 1000
+            ? `${(course.studentCount / 1000).toFixed(1)}k`
+            : course.studentCount,
+      });
+    }
+    return response;
   }
 }
 </script>

@@ -1,5 +1,10 @@
 <template>
-  <div submissions-problem>
+  <div
+    v-infinite-scroll="() => $emit('fetch-more-data')"
+    submissions-problem
+    infinite-scroll-disabled="isScrollDisabled"
+    infinite-scroll-distance="10"
+  >
     <div class="text-center mb-5 submissions-title">
       <h2>
         {{ T.submissionsListTitle }}
@@ -55,7 +60,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(submission, index) in submissions" :key="index">
+            <tr v-for="submission in submissions" :key="submission.guid">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
@@ -109,6 +114,13 @@
                 }}
               </td>
             </tr>
+            <template v-if="loading">
+              <tr v-for="index in 3" :key="index">
+                <td colspan="16">
+                  <div class="line"></div>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -125,6 +137,7 @@ import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginator.vue';
+import infiniteScroll from 'vue-infinite-scroll';
 
 @Component({
   components: {
@@ -132,16 +145,22 @@ import common_Paginator from '../common/Paginator.vue';
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
 export default class SubmissionsList extends Vue {
+  @Prop() page!: number;
   @Prop() includeUser!: boolean;
   @Prop() submissions!: types.Submission[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() loading!: boolean;
+  @Prop() endOfResults!: boolean;
 
   T = T;
   ui = ui;
   time = time;
-  searchedUsername: null | types.ListItem = null;
+  searchedUsername: types.ListItem | null = null;
 
   get hrefSearchUser(): string {
     if (!this.searchedUsername?.key) {
@@ -149,11 +168,15 @@ export default class SubmissionsList extends Vue {
     }
     return `/submissions/${encodeURIComponent(this.searchedUsername?.key)}/`;
   }
+  get isScrollDisabled() {
+    return this.loading || this.endOfResults;
+  }
 }
 </script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
@@ -162,13 +185,41 @@ table.submissions-table > tbody > tr > td {
   background: var(--arena-submissions-list-verdict-ac-background-color);
 }
 
+.verdict-WA {
+  background: var(--arena-runs-table-status-wa-background-color);
+}
+
+.verdict-MLE {
+  background: var(--arena-runs-table-status-mle-background-color);
+}
+
+.verdict-TLE {
+  background: var(--arena-runs-table-status-tle-background-color);
+}
+
 .verdict-CE {
-  background: --arena-submissions-list-verdict-ce-background-color;
+  background: var(--arena-submissions-list-verdict-ce-background-color);
 }
 
 .verdict-JE,
 .verdict-VE {
   background: var(--arena-submissions-list-verdict-je-ve-background-color);
+}
+
+.verdict-PA {
+  background: var(--arena-runs-table-status-pa-background-color);
+}
+
+.verdict-OLE {
+  background: var(--arena-runs-table-status-ole-background-color);
+}
+
+.verdict-RTE {
+  background: var(--arena-runs-table-status-rte-background-color);
+}
+
+.verdict-RFE {
+  background: var(--arena-runs-table-status-rfe-background-color);
 }
 
 .school-text {
@@ -185,5 +236,30 @@ table.submissions-table > tbody > tr > td {
 
 [submissions-problem] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+}
+.line {
+  height: 49px;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
+}
+@keyframes loading {
+  0% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
+  50% {
+    background: var(
+      --arena-submissions-list-skeletonloader-final-background-color
+    );
+  }
+  100% {
+    background: var(
+      --arena-submissions-list-skeletonloader-initial-background-color
+    );
+  }
 }
 </style>

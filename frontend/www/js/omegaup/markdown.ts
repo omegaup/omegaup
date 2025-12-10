@@ -539,6 +539,18 @@ export class Converter {
         );
       },
     );
+
+    this._converter.hooks.chain('postConversion', (text: string): string => {
+      return text.replace(
+        /<a href="([^"]+?)"/g,
+        (match: string, url: string) => {
+          if (url.startsWith(window.location.origin)) {
+            return match;
+          }
+          return `${match} target="_blank" rel="noopener noreferrer"`;
+        },
+      );
+    });
   }
 
   public get converter(): Markdown.Converter {

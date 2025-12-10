@@ -10,7 +10,48 @@
  */
 class Notification extends \OmegaUp\Controllers\Controller {
     /**
-     * @param list<string> $usersIds
+     * Creates a new notification for an arbitrary request for access from a
+     * contest user
+     */
+    public static function createForCourseAccessRequest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        int $userId,
+        bool $isAccepted
+    ): void {
+        \OmegaUp\DAO\Notifications::create(
+            new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $userId,
+                'contents' =>  json_encode(
+                    [
+                        'type' => (
+                            $isAccepted ?
+                            \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_ACCEPTED :
+                            \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REJECTED
+                        ),
+                        'body' => [
+                            'localizationString' => (
+                                $isAccepted ?
+                                new \OmegaUp\TranslationString(
+                                    'notificationContestRegisterationAccepted'
+                                ) :
+                                new \OmegaUp\TranslationString(
+                                    'notificationContestRegisterationRejected'
+                                )
+                            ),
+                            'localizationParams' => [
+                                'contestTitle' => $contest->title,
+                            ],
+                            'url' => "/arena/{$contest->alias}/",
+                            'iconUrl' => '/media/info.png',
+                        ],
+                    ]
+                ),
+            ])
+        );
+    }
+
+    /**
+     * @param list<int> $usersIds
      * @param string $contestTitle
      * @param list<string> $verificationCodes
      */
@@ -20,25 +61,16 @@ class Notification extends \OmegaUp\Controllers\Controller {
         array $verificationCodes
     ): void {
         foreach ($usersIds as $index => $userId) {
-            \OmegaUp\DAO\Base\Notifications::create(
-                new \OmegaUp\DAO\VO\Notifications([
-                    'user_id' => $userId,
-                    'contents' =>  json_encode(
-                        [
-                            'type' => \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
-                            'body' => [
-                                'localizationString' => new \OmegaUp\TranslationString(
-                                    'notificationNewContestCertificate'
-                                ),
-                                'localizationParams' => [
-                                    'contest_title' => $contestTitle,
-                                ],
-                                'url' => "/certificates/mine/#{$verificationCodes[$index]}",
-                                'iconUrl' => '/media/info.png',
-                            ]
-                        ]
-                    ),
-                ])
+            \OmegaUp\Controllers\Notification::setCommonNotification(
+                [$userId],
+                new \OmegaUp\TranslationString(
+                    'notificationNewContestCertificate'
+                ),
+                \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
+                "/certificates/mine/#{$verificationCodes[$index]}",
+                [
+                    'contest_title' => $contestTitle,
+                ]
             );
         }
     }
@@ -64,6 +96,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
             );
             $notifications[] = $notification;
         }
+        $notifications = array_reverse($notifications);
         return [
             'notifications' => $notifications,
         ];
@@ -113,5 +146,53 @@ class Notification extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
         ];
+    }
+
+    /**
+     * This function creates a new notification
+     *
+     * @param list<int> $userIds
+     */
+    public static function setNotification(
+        array $userIds,
+        string $contents
+    ): void {
+        foreach ($userIds as $userId) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $userId,
+                    'contents' => $contents,
+                ])
+            );
+        }
+    }
+
+    /**
+     * This function helps to create a new notification for the clarifications
+     *
+     * @param list<int> $userIds
+     * @param array{contestAlias?: null|string, courseName?: null|string, problemAlias?: null|string} $localizationParams
+     */
+    public static function setCommonNotification(
+        array $userIds,
+        \OmegaUp\TranslationString $localizationString,
+        string $notificationType,
+        string $url,
+        array $localizationParams
+    ): void {
+        self::setNotification(
+            userIds: $userIds,
+            contents: json_encode(
+                [
+                    'type' => $notificationType,
+                    'body' => [
+                        'localizationString' => $localizationString,
+                        'localizationParams' => $localizationParams,
+                        'url' => $url,
+                        'iconUrl' => '/media/info.png',
+                    ]
+                ]
+            )
+        );
     }
 }

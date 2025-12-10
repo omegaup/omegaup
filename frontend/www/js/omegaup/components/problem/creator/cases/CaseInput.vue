@@ -8,6 +8,7 @@
     >
       <b-form-input
         v-model="caseName"
+        data-problem-creator-case-input="name"
         name="case-name"
         :formatter="formatter"
         required
@@ -19,7 +20,7 @@
     </b-form-group>
 
     <b-form-group
-      v-show="casePoints !== null"
+      v-show="!caseAutoPoints"
       :label="T.problemCreatorPoints"
       label-for="case-points"
     >
@@ -30,7 +31,6 @@
         type="number"
         number
         min="0"
-        max="100"
       />
     </b-form-group>
     <b-form-group
@@ -38,9 +38,9 @@
       :description="T.problemCreatorAutomaticPointsHelperCase"
     >
       <b-form-checkbox
-        :checked="casePoints === null"
+        :checked="caseAutoPoints"
         name="auto-points"
-        @change="casePoints = casePoints === null ? 0 : null"
+        @change="toggleAutoPoints"
       >
       </b-form-checkbox>
     </b-form-group>
@@ -59,7 +59,9 @@ const casesStore = namespace('casesStore');
 export default class CaseInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
-  @Prop({ default: null }) points!: number | null;
+  @Prop({ default: 0 }) points!: number;
+  @Prop({ default: true }) autoPoints!: boolean;
+  @Prop({ default: false }) editMode!: boolean;
 
   // This return the group name, and the group ID of all groups in the store. Matching the required type for the select component./
   @casesStore.Getter('getGroupIdsAndNames') storedGroups!: {
@@ -69,15 +71,29 @@ export default class CaseInput extends Vue {
 
   caseName = this.name;
   caseGroup = this.group;
-  casePoints: number | null = this.points;
+  casePoints: number = this.points;
+  caseAutoPoints: boolean = this.autoPoints;
 
   T = T;
+
+  toggleAutoPoints() {
+    this.caseAutoPoints = !this.caseAutoPoints;
+    if (this.caseAutoPoints) {
+      this.casePoints = 0;
+    }
+  }
 
   // getGroupIdsAndNames getter is not instant, we need to wait for it to be defined otherwise the app will crash
   get options() {
     const noGroup = { value: NIL, text: T.problemCreatorNoGroup };
     if (!this.storedGroups) {
       return [noGroup];
+    }
+    if (
+      this.editMode &&
+      !this.storedGroups.find((group) => group.value === this.group)
+    ) {
+      this.caseGroup = NIL;
     }
     return [noGroup, ...this.storedGroups];
   }
@@ -86,10 +102,7 @@ export default class CaseInput extends Vue {
     return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
-  pointsFormatter(points: number | null) {
-    if (points === null) {
-      return null;
-    }
+  pointsFormatter(points: number) {
     return Math.max(points, 0);
   }
 }

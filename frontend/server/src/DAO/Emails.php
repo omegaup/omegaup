@@ -16,15 +16,16 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
      * @return list<\OmegaUp\DAO\VO\Emails>
      */
     final public static function getByUserId(int $userId): array {
-        $sql = 'SELECT
-                    ' . \OmegaUp\DAO\DAO::getFields(
+        $fields = \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Emails::FIELD_NAMES,
             'Emails'
-        ) . '
+        );
+        $sql = "SELECT
+                    {$fields}
                 FROM
                     Emails
                 WHERE
-                    user_id = ?';
+                    user_id = ?";
 
         /** @var list<array{email: null|string, email_id: int, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
@@ -68,5 +69,26 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
+    }
+
+    /**
+     * @return null|\OmegaUp\DAO\VO\Emails
+     */
+    final public static function getByEmail(string $email) {
+        $fields = \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Emails::FIELD_NAMES,
+            'Emails'
+        );
+        $sql = "SELECT
+                    {$fields}
+                FROM
+                    `Emails`
+                WHERE
+                    `email` = ?
+                LIMIT 1;";
+        $params = [$email];
+        /** @var null|array{email: null|string, email_id: int, user_id: int|null} */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        return new \OmegaUp\DAO\VO\Emails($row);
     }
 }

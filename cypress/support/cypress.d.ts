@@ -19,7 +19,7 @@ declare global {
     interface Chainable {
       login(loginOptions: LoginOptions): void;
       logout(): void;
-      logoutUsingApi(): void,
+      logoutUsingApi(): void;
       loginAdmin(): void;
       register(loginOptions: LoginOptions): void;
       createProblem(problemOptions: ProblemOptions): void;

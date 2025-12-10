@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import 'cypress-iframe';
 import { addSubtractDateTime, getISODate, getISODateTime } from '../commands';
 import { CourseOptions, ProblemOptions, RunOptions, Status } from '../types';
 
@@ -130,6 +131,13 @@ export class CoursePage {
     cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
+  makeCoursePublic(): void {
+    cy.get('[data-course-edit-admission-mode]').click();
+    cy.get('div[data-admission-mode-tab]').should('be.visible');
+    cy.get('[name="admission-mode"]').select('public');
+    cy.get('form[data-course-admission-mode-form]').submit();
+  }
+
   createInvalidSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
@@ -149,7 +157,8 @@ export class CoursePage {
     runOptions: RunOptions,
   ): void {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-    cy.get('[data-new-run]').click();
+    cy.waitUntil(() => cy.get('[data-new-run] a').should('be.visible'));
+    cy.get('[data-new-run] a').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').first().type(fileContent);
@@ -216,29 +225,76 @@ export class CoursePage {
     cy.get('[data-clarification-answer-text]').should('contain', answer);
   }
 
-  leaveFeedbackOnSolution(feedback: string): void {
+  leaveFeedbackOnSolution(feedbacks: { line: number; text: string }[]): void {
     cy.get('[data-course-submisson-button]').click();
     cy.get('[data-runs-actions-button]').click();
     cy.get('[data-runs-show-details-button]').click();
-    cy.get('[data-run-leave-feedback-button]').click();
-    cy.get('textarea[data-run-feedback-text]').type(feedback);
-    cy.get('[data-run-send-feedback-button]').click();
-    cy.get('#alert-close').click();
 
-    cy.get('[data-runs-actions-button]').click();
-    cy.get('[data-runs-show-details-button]').click();
-    cy.get('[data-run-feedback]').should('contain', feedback);
-    cy.get('[data-overlay-popup] button.close')
-      .should('be.visible')
-      .first()
-      .click({ force: true });
+    cy.get('.CodeMirror', { timeout: 20000 })
+      .should('exist')
+      .then((editor) => {
+        cy.wrap(editor).should('be.visible');
+
+        feedbacks.forEach(({ line, text }) => {
+          const gutterLines = editor.find(
+            '.CodeMirror-gutter-wrapper .CodeMirror-linenumber',
+          );
+
+          // Ensure we have enough gutters
+          expect(gutterLines.length).to.be.greaterThan(line);
+
+          const gutter = gutterLines[line];
+          cy.wrap(gutter).scrollIntoView();
+          cy.wrap(gutter).click({ force: true });
+
+          cy.waitUntil(() =>
+            cy.get('.card-body > textarea').should('be.visible'),
+          );
+
+          cy.get('.card-body > textarea').type(text);
+
+          cy.get('[data-button-submit]').click();
+          cy.get('.card-body [data-markdown-statement]').should(
+            'contain',
+            text,
+          );
+        });
+
+        cy.get('[data-button-send-feedback]').click();
+
+        cy.get('[data-runs-actions-button]').click();
+        cy.get('[data-runs-show-details-button]').click();
+
+        feedbacks.forEach(({ text }) => {
+          cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
+            'contain',
+            text,
+          );
+        });
+        cy.get('[data-overlay-popup] button.close')
+          .should('be.visible')
+          .first()
+          .click({ force: true });
+      });
   }
 
-  verifyFeedback(feedback: string): void {
-    cy.get('.notification-toggle').last().click();
-    cy.get('[data-notification-list]').last().click();
-    cy.get('[data-run-feedback]').should('contain', feedback);
-    cy.get('.CodeMirror-lines').should('be.visible');
+  verifyFeedback({
+    feedback,
+    problemAlias,
+    courseAlias,
+  }: {
+    feedback: string;
+    problemAlias: string;
+    courseAlias: string;
+  }): void {
+    coursePage.enterCourse(courseAlias, false);
+    cy.get(`a[data-problem="${problemAlias}"]`).click();
+    cy.get('button[data-run-details]').click();
+    cy.get('.CodeMirror-linewidget [data-markdown-statement]').should(
+      'contain',
+      feedback,
+    );
+    cy.get('.CodeMirror-line', { timeout: 20000 }).should('be.visible');
     cy.get('.CodeMirror-line').then((rawHTMLElements) => {
       const userCode: Array<string> = [];
       Cypress.$.makeArray(rawHTMLElements).forEach((element) => {
@@ -248,7 +304,7 @@ export class CoursePage {
 
       cy.wrap(userCode).as('userCodeLines');
     });
-    cy.get('@userCodeLines').should('have.length', 12);
+    cy.get('@userCodeLines').should('have.length.above', 11);
     cy.get('[data-overlay-popup] button.close')
       .should('be.visible')
       .first()
@@ -420,25 +476,6 @@ export class CoursePage {
       'have.value',
       courseOptions.description,
     );
-  }
-
-  verifyProblem(problemOptions: ProblemOptions): void {
-    cy.location('href').should('include', problemOptions.problemAlias);
-    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
-    cy.get('[name="problem_alias"]').should(
-      'have.value',
-      problemOptions.problemAlias,
-    );
-    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
-  }
-
-  verifyProblemRun(status: string): void {
-    cy.get('[data-run-status] > span').first().should('have.text', 'new');
-
-    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
-    cy.wait(['@runStatus'], { timeout: 10000 });
-
-    cy.get('[data-run-status] > span').first().should('have.text', status);
   }
 }
 

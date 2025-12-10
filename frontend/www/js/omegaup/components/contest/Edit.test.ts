@@ -12,6 +12,8 @@ describe('Edit.vue', () => {
     alias: 'test',
     archived: false,
     available_languages: { py2: 'py2' },
+    canSetRecommended: false,
+    recommended: false,
     contest_for_teams: false,
     default_show_all_contestants_in_scoreboard: false,
     description: 'contest test',
@@ -46,6 +48,7 @@ describe('Edit.vue', () => {
   const propsData: {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
+    initialTab: string;
     groups: types.ContestGroup[];
     groupAdmins: types.ContestGroupAdmin[];
     problems: types.ProblemsetProblemWithVersions[];
@@ -56,6 +59,7 @@ describe('Edit.vue', () => {
   } = {
     admins: [],
     details,
+    initialTab: 'clone',
     groupAdmins: [],
     groups: [],
     problems: [],
@@ -71,11 +75,12 @@ describe('Edit.vue', () => {
 
     expect(wrapper.text()).toContain(T.contestDetailsGoToContest);
 
-    expect(wrapper.vm.showTab).toBe('new_form');
+    expect(wrapper.vm.showTab).toBe('clone');
   });
 
   it('Should handle a virtual contest', () => {
     propsData.details.rerun_id = 2;
+    propsData.initialTab = '';
     const wrapper = shallowMount(contest_Edit, {
       propsData,
     });
@@ -85,6 +90,7 @@ describe('Edit.vue', () => {
 
   it('Should handle a virtual contest from an original private contest', () => {
     propsData.details.rerun_id = 2;
+    propsData.initialTab = '';
     propsData.originalContestAdmissionMode = 'private';
     const wrapper = shallowMount(contest_Edit, {
       propsData,

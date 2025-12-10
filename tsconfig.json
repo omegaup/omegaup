@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "resolveJsonModule": true,
     "outDir": "./built/",
     "sourceMap": true,
     "target": "es6",
@@ -22,5 +23,10 @@
     }
   },
   "include": ["./frontend/www/js/omegaup/**/*.vue", "./frontend/www/**/*.ts"],
-  "exclude": ["./node_modules", "./cypress", "./frontend/www/js/omegaup/components/**/**/*.stories.ts"]
+  "exclude": [
+    "./node_modules",
+    "./cypress",
+    "./frontend/www/js/omegaup/components/**/**/*.stories.ts",
+    "./frontend/www/rekarel"
+  ]
 }

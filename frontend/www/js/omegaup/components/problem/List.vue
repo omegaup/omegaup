@@ -12,7 +12,7 @@
         {{ T.wizardLinkText }}
       </button>
     </div>
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center search-header-sticky-top">
       <omegaup-problem-search-bar
         class="searchbar-width"
         :language="language"
@@ -110,5 +110,11 @@ export default class List extends Vue {
 
 .searchbar-width .tags-input-wrapper-default {
   min-width: 20rem;
+}
+
+.search-header-sticky-top {
+  position: sticky;
+  top: 62px;
+  z-index: 10;
 }
 </style>

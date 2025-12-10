@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="card-body introjs-info">
+    <div v-if="isOrganizer" class="card-body introjs-info">
       <div class="mb-4">
         <omegaup-markdown
           :markdown="T.groupsCsvHelp"
@@ -53,7 +53,13 @@
                 <td class="password" data-identity-password>
                   {{ identity.password }}
                 </td>
-                <td>{{ identity.country_id }}</td>
+                <td>
+                  {{
+                    identity.country_id === 'xx'
+                      ? T.countryNotSet
+                      : identity.country_id
+                  }}
+                </td>
                 <td>{{ identity.state_id }}</td>
                 <td>{{ identity.gender }}</td>
                 <td>{{ identity.school_name }}</td>
@@ -83,6 +89,11 @@
         </div>
       </template>
     </div>
+    <div v-else class="mt-5">
+      <omegaup-markdown
+        :markdown="T.groupIdentitiesNotRequiredPrivileges"
+      ></omegaup-markdown>
+    </div>
   </div>
 </template>
 
@@ -111,12 +122,16 @@ export default class Identities extends Vue {
   @Prop() groupAlias!: string;
   @Prop() userErrorRow!: string | null;
   @Prop() hasVisitedSection!: boolean;
+  @Prop() isOrganizer!: boolean;
 
   T = T;
   identities: types.Identity[] = [];
   humanReadable = false;
 
   mounted() {
+    if (!this.isOrganizer) {
+      return;
+    }
     const title = T.createIdentitiesInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
       introJs()

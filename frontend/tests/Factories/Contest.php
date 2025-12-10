@@ -10,6 +10,12 @@ class ContestParams {
     public $title;
 
     /**
+     * @readonly
+     * @var string
+     */
+    public $description;
+
+    /**
      * @var string
      */
     public $admissionMode;
@@ -46,7 +52,7 @@ class ContestParams {
 
     /**
      * @readonly
-     * @var null|list<string>
+     * @var list<string>
      */
     public $languages;
 
@@ -129,10 +135,23 @@ class ContestParams {
     public $penaltyType;
 
     /**
-     * @param array{alias?: string, admissionMode?: string, basicInformation?: bool, checkPlagiarism?: bool, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, contestForTeams?: bool, feedback?: string, finishTime?: \OmegaUp\Timestamp, languages?: ?list<string>, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, penaltyType?: string, requestsUserInformation?: string, scoreboardPct?: int, scoreMode?: string, showScoreboardAfter?: bool, startTime?: \OmegaUp\Timestamp, teamsGroupAlias?: string, title?: string, windowLength?: ?int} $params
+     * @readonly
+     * @var int
+     */
+    public $submissionsGap;
+
+    /**
+     * @readonly
+     * @var float
+     */
+    public $pointsDecayFactor;
+
+    /**
+     * @param array{alias?: string, admissionMode?: string, basicInformation?: bool, checkPlagiarism?: bool, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, contestForTeams?: bool, feedback?: string, finishTime?: \OmegaUp\Timestamp, languages?: list<string>, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, penaltyType?: string, requestsUserInformation?: string, scoreboardPct?: int, scoreMode?: string, showScoreboardAfter?: bool, startTime?: \OmegaUp\Timestamp, teamsGroupAlias?: string, title?: string, windowLength?: ?int} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
+        $this->description = $params['description'] ?? 'description';
         $this->alias = $params['alias'] ?? substr($this->title, 0, 20);
         $this->admissionMode = $params['admissionMode'] ?? 'public';
         $this->basicInformation = $params['basicInformation'] ?? false;
@@ -174,6 +193,8 @@ class ContestParams {
         $this->checkPlagiarism = $params['checkPlagiarism'] ?? false;
         $this->showScoreboardAfter = $params['showScoreboardAfter'] ?? false;
         $this->scoreboardPct = $params['scoreboardPct'] ?? 100;
+        $this->submissionsGap = $params['submissionsGap'] ?? 60;
+        $this->pointsDecayFactor = $params['pointsDecayFactor'] ?? 0.02;
     }
 }
 
@@ -183,8 +204,8 @@ class ContestParams {
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
- * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type ProblemDetailsForTesting=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  */
 class Contest {
     /**
@@ -200,7 +221,7 @@ class Contest {
         // Set context
         $r = new \OmegaUp\Request([
             'title' => $params->title,
-            'description' => 'description',
+            'description' => $params->description,
             'start_time' => (new \OmegaUp\Timestamp($params->startTime))->time,
             'finish_time' => (new \OmegaUp\Timestamp(
                 $params->finishTime
@@ -211,15 +232,14 @@ class Contest {
             'window_length' => $params->windowLength,
             'admission_mode' => $params->admissionMode,
             'alias' => $params->alias,
-            'points_decay_factor' => '0.02',
+            'points_decay_factor' => $params->pointsDecayFactor,
             'score_mode' => $params->scoreMode,
-            'submissions_gap' => '60',
+            'submissions_gap' => $params->submissionsGap,
             'feedback' => $params->feedback,
             'penalty' => 100,
             'scoreboard' => $params->scoreboardPct,
             'penalty_type' => $params->penaltyType,
-            'languages' => $params->languages,
-            'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
+            'languages' => join(',', $params->languages),
             'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
@@ -373,7 +393,7 @@ class Contest {
      * @param array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $user
      *
-     * @return ProblemDetails
+     * @return ProblemDetailsForTesting
      */
     public static function openProblemInContest(
         $contestData,

@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
 
   frontend:
@@ -25,6 +23,11 @@ services:
         mode: host
     environment:
       CI: "${CI:-false}"
+      MYSQL_TCP_PORT: 13306
+      OPENAI_API_KEY: ""
+      DEEPSEEK_API_KEY: ""
+      AI_WORKER_ENABLED: "true"
+      REDIS_PASSWORD: "redis"
 
   gitserver:
     image: omegaup/gitserver:v1.9.13

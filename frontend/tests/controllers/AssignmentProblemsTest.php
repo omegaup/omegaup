@@ -1,9 +1,7 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddProblemToAssignment() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -94,7 +92,10 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('It should fail because of the privileges');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertSame('userNotAllowed', $e->getMessage());
+            $this->assertSame(
+                'userNotAllowedToAddPrivateProblem',
+                $e->getMessage()
+            );
         }
 
         \OmegaUp\Controllers\Course::apiAddProblem(
@@ -130,7 +131,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testDeleteProblemFromAssignment() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -172,7 +173,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAddRemoveProblems() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -249,7 +250,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to add a problem with a normal user.
      */
     public function testAddProblemForbiddenAccess() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'public',
@@ -265,7 +266,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $assignmentAlias = $courseData['assignment_alias'];
 
         // Add one problem to the assignment with a normal user
-        ['user' => $forbiddenUser, 'identity' => $forbiddenIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $forbiddenIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $forbiddenUserLogin = self::login($forbiddenIdentity);
         try {
             \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -284,7 +285,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to add a problem with a student.
      */
     public function testAddProblemForbiddenAccessStudent() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'public',
@@ -321,7 +322,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to remove a problem with a normal user.
      */
     public function testDeleteProblemForbiddenAccess() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -345,7 +346,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Remove a problem from the assignment with a normal user
-        ['user' => $forbiddenUser, 'identity' => $forbiddenIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $forbiddenIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $forbiddenUserLogin = self::login($forbiddenIdentity);
         try {
             \OmegaUp\Controllers\Course::apiRemoveProblem(new \OmegaUp\Request([
@@ -364,7 +365,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to remove a problem with a student.
      */
     public function testDeleteProblemForbiddenAccessStudent() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -409,7 +410,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
      * Attempts to remove an invalid problem.
      */
     public function testDeleteNonExistingProblem() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // Create a course with an assignment
@@ -455,7 +456,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identities = [];
         [
-            'user' => $user,
             'identity' => $identities[]
         ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -464,7 +464,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         [
-            'user' => $user,
             'identity' => $identities[]
         ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -579,7 +578,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identities = [];
         [
-            'user' => $user,
             'identity' => $identities[]
         ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'user0',
@@ -590,7 +588,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         [
-            'user' => $user,
             'identity' => $identities[]
         ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'user1',
@@ -717,5 +714,74 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
               ],
             ]
         );
+    }
+
+    public function testCreateAssignmentWithPrivateProblems() {
+        [
+            'identity' => $problemAdminIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $problemAdminLogin = self::login($problemAdminIdentity);
+
+        [
+            'identity' => $courseAdminIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $courseAdminLogin = self::login($courseAdminIdentity);
+
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        // Call api
+        $response = \OmegaUp\Controllers\Course::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $courseAdminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $courseAlias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120)
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+
+        // Create problems
+        $mappingProblemsVisibility = [
+            'problem_1' => 'public',
+            'problem_2' => 'private',
+            'problem_3' => 'public',
+        ];
+        $problemsData = [];
+        foreach ($mappingProblemsVisibility as $alias => $problemVisibility) {
+            $problemRequest = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'alias' => $alias,
+                    'visibility' => $problemVisibility,
+                ]),
+                $problemAdminLogin
+            )['request'];
+            $currentProblemData = ['alias' => $problemRequest['problem_alias']];
+            $problemsData[] = $currentProblemData;
+        }
+
+        // Create the assignment
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        try {
+            \OmegaUp\Controllers\Course::apiCreateAssignment(
+                new \OmegaUp\Request([
+                    'auth_token' => $courseAdminLogin->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $assignmentAlias,
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'start_time' => (\OmegaUp\Time::get() + 60),
+                    'finish_time' => (\OmegaUp\Time::get() + 120),
+                    'course_alias' => $courseAlias,
+                    'assignment_type' => 'homework',
+                    'problems' => json_encode($problemsData)
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame(
+                'userNotAllowedToAddPrivateProblem',
+                $e->getMessage()
+            );
+        }
     }
 }

@@ -6,6 +6,17 @@ import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
 
+import * as Sugar from 'sugar';
+import sugarEsLocale from './locales/es';
+import sugarPtLocale from './locales/pt';
+
+Sugar.Date.addLocale('es', sugarEsLocale);
+Sugar.Date.addLocale('pt', sugarPtLocale);
+Sugar.Date.addLocale('pseudo', Sugar.Date.getLocale('en'));
+Sugar.extend({
+  namespaces: [Date],
+});
+
 let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {

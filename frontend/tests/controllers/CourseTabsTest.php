@@ -19,6 +19,12 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             showScoreboard: 'false',
             courseDuration: null,
         );
+
+        $recommendedCourse = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+        $recommendedCourse->recommended = 1;
+        \OmegaUp\DAO\Courses::update($recommendedCourse);
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -88,6 +94,11 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             showScoreboard: 'false',
             courseDuration: null
         );
+        $recommendedCourse = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+        $recommendedCourse->recommended = 1;
+        \OmegaUp\DAO\Courses::update($recommendedCourse);
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -119,6 +130,11 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             showScoreboard: 'false',
             courseDuration: null,
         );
+        $recommendedCourse = \OmegaUp\DAO\Courses::getByAlias(
+            $courseData['course_alias']
+        );
+        $recommendedCourse->recommended = 1;
+        \OmegaUp\DAO\Courses::update($recommendedCourse);
         $coursesAliases['public'][] = $courseData['course_alias'];
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(

@@ -1,5 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
@@ -103,15 +102,74 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testGetCourseDetailsForTeachingAssistant() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $adminLogin = self::login($courseData['admin']);
+
+        ['identity' => $identityTA] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Controllers\Course::apiAddTeachingAssistant(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $identityTA->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $taLogin = self::login($identityTA);
+
+        // Call the details API
+        $response = \OmegaUp\Controllers\Course::getCourseEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $taLogin->auth_token,
+                'course' => $courseData['course_alias']
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue($response['course']['is_teaching_assistant']);
+    }
+
+    public function testGetCourseDetailsForTeachingAssistantAddedByGroup() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $adminLogin = self::login($courseData['admin']);
+
+        ['identity' => $identityTA] = \OmegaUp\Test\Factories\User::createUser();
+
+        $groupDataTA = \OmegaUp\Test\Factories\Groups::createGroup();
+
+        // add user to the groups
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupDataTA,
+            $identityTA
+        );
+
+        \OmegaUp\Controllers\Course::apiAddGroupTeachingAssistant(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'group' => $groupDataTA['request']['alias'],
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $taLogin = self::login($identityTA);
+
+        // Call the details API
+        $response = \OmegaUp\Controllers\Course::getCourseEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $taLogin->auth_token,
+                'course' => $courseData['course_alias']
+            ])
+        )['templateProperties']['payload'];
+
+        $this->assertTrue($response['course']['is_teaching_assistant']);
+    }
+
     /**
      * Get details with user not registered to the Course. Should fail.
      */
     public function testGetCourseDetailsNoCourseMember() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
-        [
-            'user' => $user,
-            'identity' => $identity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         try {
@@ -150,11 +208,11 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
-            null,
-            null,
-            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+            admin: null,
+            adminLogin: null,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $userLogin = self::login($identity);
         $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
@@ -199,19 +257,19 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_type' => 'homework',
         ]));
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         // Try to get details before being added to the course;
         try {
-            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $courseData['assignment_alias'],
             ]));
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            // OK!
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
@@ -228,14 +286,14 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call the detail API for the assignment that has not started.
         try {
-            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+            \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $assignmentAlias,
             ]));
             $this->fail('Exception was expected.');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            // OK!
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 

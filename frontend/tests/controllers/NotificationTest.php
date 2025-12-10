@@ -158,4 +158,216 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
         $notifications = \OmegaUp\DAO\Notifications::getAll();
         $this->assertCount($n, $notifications);
     }
+
+    public function testNotificationsForContestClarification() {
+        // Create a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get one problem into the contest
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $contestant
+        );
+
+        // User creates a clarification
+        $clarification = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        )['response'];
+
+        // Get all unread notifications through API
+        $login = self::login($contestData['director']);
+        $notifications = \OmegaUp\Controllers\Notification::apiMyList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['notifications'];
+
+        $this->assertCount(1, $notifications);
+
+        $this->assertSame(
+            \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_REQUEST,
+            $notifications[0]['contents']['type']
+        );
+        $translation = new \OmegaUp\TranslationString(
+            'notificationContestClarificationRequest'
+        );
+        $this->assertSame(
+            $translation->message,
+            $notifications[0]['contents']['body']['localizationString']
+        );
+        $this->assertSame(
+            "/arena/{$contestData['contest']->alias}/#problems/{$problemData['problem']->alias}/",
+            $notifications[0]['contents']['body']['url']
+        );
+        $this->assertSame(
+            [
+                'problemAlias' => $problemData['problem']->alias,
+                'contestAlias' => $contestData['contest']->alias,
+            ],
+            $notifications[0]['contents']['body']['localizationParams']
+        );
+
+        // Admin replies the clarification
+        \OmegaUp\Controllers\Clarification::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'answer' => 'The response',
+                'clarification_id' => $clarification['clarification_id'],
+                'public' => true,
+            ])
+        );
+
+        // Get all unread notifications through API
+        $login = self::login($contestant);
+
+        $notifications = \OmegaUp\Controllers\Notification::apiMyList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['notifications'];
+
+        $this->assertCount(1, $notifications);
+
+        $this->assertSame(
+            \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_RESPONSE,
+            $notifications[0]['contents']['type']
+        );
+        $translation = new \OmegaUp\TranslationString(
+            'notificationContestClarificationResponse'
+        );
+        $this->assertSame(
+            $translation->message,
+            $notifications[0]['contents']['body']['localizationString']
+        );
+        $this->assertSame(
+            "/arena/{$contestData['contest']->alias}/#problems/{$problemData['problem']->alias}/",
+            $notifications[0]['contents']['body']['url']
+        );
+        $this->assertSame(
+            [
+                'problemAlias' => $problemData['problem']->alias,
+                'contestAlias' => $contestData['contest']->alias,
+            ],
+            $notifications[0]['contents']['body']['localizationParams']
+        );
+    }
+
+    public function testNotificationsForCourseClarification() {
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $login = self::login($courseData['admin']);
+
+        // Get one problem into the course
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [$problemData]
+        )[0];
+
+        $student = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData
+        );
+
+        $studentLogin = self::login($student);
+        [
+            'clarification_id' => $clarificationId,
+        ] = \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'message' => 'Test message',
+            ])
+        );
+
+        // Get all unread notifications through API
+        $login = self::login($courseData['admin']);
+        $notifications = \OmegaUp\Controllers\Notification::apiMyList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['notifications'];
+
+        $this->assertCount(1, $notifications);
+
+        $this->assertSame(
+            \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
+            $notifications[0]['contents']['type']
+        );
+        $translation = new \OmegaUp\TranslationString(
+            'notificationCourseClarificationRequest'
+        );
+        $this->assertSame(
+            $translation->message,
+            $notifications[0]['contents']['body']['localizationString']
+        );
+        $this->assertSame(
+            "/course/{$courseData['course_alias']}/assignment/{$courseData['assignment_alias']}/#problems/{$problemData['problem']->alias}/",
+            $notifications[0]['contents']['body']['url']
+        );
+        $this->assertSame(
+            [
+                'problemAlias' => $problemData['problem']->alias,
+                'courseName' => $courseData['course']->name,
+            ],
+            $notifications[0]['contents']['body']['localizationParams']
+        );
+
+        // Admin replies the clarification
+        \OmegaUp\Controllers\Clarification::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'answer' => 'The response',
+                'clarification_id' => $clarificationId,
+                'public' => true,
+            ])
+        );
+
+        // Get all unread notifications through API
+        //$login = self::login($contestant);
+
+        $notifications = \OmegaUp\Controllers\Notification::apiMyList(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+            ])
+        )['notifications'];
+
+        $this->assertCount(1, $notifications);
+
+        $this->assertSame(
+            \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
+            $notifications[0]['contents']['type']
+        );
+        $translation = new \OmegaUp\TranslationString(
+            'notificationCourseClarificationResponse'
+        );
+        $this->assertSame(
+            $translation->message,
+            $notifications[0]['contents']['body']['localizationString']
+        );
+        $this->assertSame(
+            "/course/{$courseData['course_alias']}/assignment/{$courseData['assignment_alias']}/#problems/{$problemData['problem']->alias}/",
+            $notifications[0]['contents']['body']['url']
+        );
+        $this->assertSame(
+            [
+                'problemAlias' => $problemData['problem']->alias,
+                'courseName' => $courseData['course']->name,
+            ],
+            $notifications[0]['contents']['body']['localizationParams']
+        );
+    }
 }

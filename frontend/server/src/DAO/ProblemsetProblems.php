@@ -223,7 +223,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 INNER JOIN
                     Assignments a
                 ON
-                    a.problemset_id = pp.problemset_id
+                    a.problemset_id = ps.problemset_id
                 INNER JOIN
                     Courses c
                 ON

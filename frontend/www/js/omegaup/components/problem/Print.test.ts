@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
+import T from '../../lang';
+
 import problem_Print from './Print.vue';
 
 describe('Print.vue', () => {
@@ -74,6 +76,11 @@ Here we can add code.
         problem,
       },
     });
+
+    const printIcon = wrapper.find('svg[data-prefix="fas"]');
+    expect(printIcon.text()).toContain(T.contestAndProblemPrintButtonDesc);
+    printIcon.trigger('click');
+    expect(wrapper.emitted('print-page')).toBeDefined();
 
     expect(wrapper.find('h3[data-problem-title]').text()).toBe(problem.title);
   });

@@ -31,6 +31,9 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/frontend/www/$1',
     '\\.(css|less)$':
       '<rootDir>/frontend/www/js/omegaup/__mocks__/styleMock.js',
+    'monaco-editor':
+      '<rootDir>/frontend/www/third_party/js/__mocks__/monacoEditor.js',
+    sugar: '<rootDir>/frontend/www/js/omegaup/__mocks__/sugar.js',
   },
   setupFilesAfterEnv: ['<rootDir>/frontend/www/js/omegaup/test.setup.ts'],
   globals: {
@@ -47,6 +50,8 @@ module.exports = {
     ],
     '.*\\.[jt]sx?$': ['babel-jest', babelConfig],
   },
-  transformIgnorePatterns: ['node_modules/(?!(vue-.*|@voerro/vue-tagsinput)/)'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(vue-.*|@voerro/vue-tagsinput|monaco-editor|monaco-editor-core)/)',
+  ],
   testURL: 'http://localhost:8001/',
 };

@@ -84,7 +84,11 @@ import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-
+import {
+  LanguageInfo,
+  supportedExtensions,
+  supportedLanguages,
+} from '../../grader/util';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -108,6 +112,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
   }
+
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
@@ -118,36 +123,14 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   get allowedLanguages(): omegaup.Languages {
     let allowedLanguages: omegaup.Languages = {};
-    const allLanguages = [
-      { language: '', name: '' },
-      { language: 'kp', name: 'Karel (Pascal)' },
-      { language: 'kj', name: 'Karel (Java)' },
-      { language: 'c', name: 'C11 (gcc 10.3)' },
-      { language: 'c11-gcc', name: 'C11 (gcc 10.3)' },
-      { language: 'c11-clang', name: 'C11 (clang 10.0)' },
-      { language: 'cpp', name: 'C++03 (g++ 10.3)' },
-      { language: 'cpp11', name: 'C++11 (g++ 10.3)' },
-      { language: 'cpp11-gcc', name: 'C++11 (g++ 10.3)' },
-      { language: 'cpp11-clang', name: 'C++11 (clang++ 10.0)' },
-      { language: 'cpp17-gcc', name: 'C++17 (g++ 10.3)' },
-      { language: 'cpp17-clang', name: 'C++17 (clang++ 10.0)' },
-      { language: 'cpp20-gcc', name: 'C++20 (g++ 10.3)' },
-      { language: 'cpp20-clang', name: 'C++20 (clang++ 10.0)' },
-      { language: 'java', name: 'Java (openjdk 16.0)' },
-      { language: 'kt', name: 'Kotlin (1.6.10)' },
-      { language: 'py', name: 'Python (2.7)' },
-      { language: 'py2', name: 'Python (2.7)' },
-      { language: 'py3', name: 'Python (3.9)' },
-      { language: 'rb', name: 'Ruby (2.7)' },
-      { language: 'cs', name: 'C# (10, dotnet 6.0)' },
-      { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: T.outputOnly },
-      { language: 'hs', name: 'Haskell (ghc 8.8)' },
-      { language: 'lua', name: 'Lua (5.3)' },
-      { language: 'go', name: 'Go (1.18.beta2)' },
-      { language: 'rs', name: 'Rust (1.56.1)' },
-      { language: 'js', name: 'JavaScript (Node.js 16)' },
-    ];
+    const allLanguages: { language: string; name: string }[] = Object.values(
+      supportedLanguages,
+    ).map((languageInfo: LanguageInfo) => ({
+      language: languageInfo.language,
+      name: languageInfo.name,
+    }));
+    // dont forget about cat ext
+    allLanguages.push({ language: 'cat', name: T.outputOnly });
 
     allLanguages
       .filter(
@@ -207,22 +190,8 @@ export default class ArenaRunSubmitPopup extends Vue {
         this.$emit('submit-run', result as string, this.selectedLanguage);
       };
 
-      const validExtensions = [
-        'cpp',
-        'c',
-        'cs',
-        'java',
-        'txt',
-        'hs',
-        'kp',
-        'kj',
-        'p',
-        'pas',
-        'py',
-        'rb',
-        'lua',
-      ];
-
+      // add txt, p extensions
+      const validExtensions = [...supportedExtensions, 'p', 'txt'];
       if (
         this.selectedLanguage !== 'cat' ||
         file.type.indexOf('text/') === 0 ||

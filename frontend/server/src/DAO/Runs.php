@@ -12,6 +12,21 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Runs extends \OmegaUp\DAO\Base\Runs {
+    /** @var string */
+    private static $ctesubmissionFeedbackForProblemset = 'WITH ssff AS (
+        SELECT
+            ss.submission_id,
+            COUNT(*) AS suggestions
+        FROM
+            Submission_Feedback sf
+        INNER JOIN
+            Submissions ss
+        ON
+            ss.submission_id = sf.submission_id
+        GROUP BY
+            ss.submission_id
+    )';
+
     /**
      * Gets an array of the best solving runs for a problem.
      * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
@@ -200,7 +215,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
         ?int $problemsetId,
@@ -216,8 +231,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $where = [];
         $val = [];
+        $cteSubmissionsFeedback = '';
+        $suggestionsCountField = '0 AS suggestions';
+        $suggestionsJoin = '';
 
         if (!is_null($problemsetId)) {
+            $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
+
+            $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
+
             $where[] = 's.problemset_id = ?';
             $val[] = $problemsetId;
         }
@@ -264,12 +287,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             }
         }
 
-        $sqlCount = '
+        $sqlCount = "{$cteSubmissionsFeedback}
             SELECT
                 COUNT(*) AS total
             FROM
                 Submissions s
-        ';
+        ";
         if (!empty($where)) {
             $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
@@ -289,7 +312,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
 
         $extraFields = self::getRunExtraFields();
 
-        $sql = '
+        $sql = "{$cteSubmissionsFeedback}
             SELECT
                 `r`.`run_id`,
                 `s`.`guid`,
@@ -300,12 +323,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`penalty`,
                 `r`.`memory`,
                 IF(
-                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
+                    `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
                         0,
                         `r`.`score`
                 ) AS `score`,
                 IF(
-                    `c`.`score_mode` = \'all_or_nothing\' AND `r`.`score` <> 1,
+                    `c`.`score_mode` = 'all_or_nothing' AND `r`.`score` <> 1,
                         0,
                         `r`.`contest_score`
                 ) AS `contest_score`,
@@ -314,15 +337,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `s`.`type`,
                 `i`.`username`,
                 `p`.`alias`,
-                IFNULL(`i`.`country_id`, "xx") `country`,
+                IFNULL(`i`.`country_id`, 'xx') `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(ur.classname, "user-rank-unranked") `classname`,
-                sf.`submission_feedback_id`,
-                ' . $extraFields . '
+                IFNULL(ur.classname, 'user-rank-unranked') `classname`,
+                {$extraFields},
+                {$suggestionsCountField}
             FROM
                 Submissions s
-            LEFT JOIN
-                Submission_Feedback sf ON sf.submission_id = s.submission_id
+            {$suggestionsJoin}
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
@@ -333,7 +355,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 User_Rank ur ON ur.user_id = i.user_id
             LEFT JOIN
                 Contests c ON c.problemset_id = s.problemset_id
-        ';
+        ";
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where);
         }
@@ -344,7 +366,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_feedback_id: int|null, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
         $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
 
         return [
@@ -975,15 +997,29 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
         ?int $problemsetId,
         int $identityId
-    ): array {
+    ) {
         $extraFields = self::getRunExtraFields();
-        $sql = '
+        $cteSubmissionsFeedback = '';
+        $suggestionsCountField = '0 AS suggestions';
+        $suggestionsJoin = '';
+        $whereClause = '';
+        $params = [$problemId, $identityId];
+
+        if (!is_null($problemsetId)) {
+            $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
+            $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
+            $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
+            $whereClause = ' AND s.problemset_id = ?';
+            $params = [$problemId, $identityId, $problemsetId];
+        }
+
+        $sql = "{$cteSubmissionsFeedback}
             SELECT
                 p.alias,
                 s.guid,
@@ -994,31 +1030,33 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.penalty,
                 r.memory,
                 IF(
-                    c.score_mode = "all_or_nothing" AND r.score <> 1,
+                    c.score_mode = 'all_or_nothing' AND r.score <> 1,
                         0,
                         r.score
                 ) AS score,
                 IF(
-                    c.score_mode = "all_or_nothing" AND r.score <> 1,
+                    c.score_mode = 'all_or_nothing' AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
                 s.`time`,
                 s.submit_delay,
-                i.username, IFNULL(i.country_id, "xx") AS country,
-                c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
-                IFNULL(ur.classname, "user-rank-unranked") AS classname,
-                ' . $extraFields . ',
+                i.username, IFNULL(i.country_id, 'xx') AS country,
+                c.alias AS contest_alias, IFNULL(s.`type`, 'normal') AS `type`,
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname,
+                {$extraFields},
                 JSON_OBJECTAGG(
-                    IFNULL(rg.group_name, ""),
+                    IFNULL(rg.group_name, ''),
                     rg.score
-                ) AS score_by_group
+                ) AS score_by_group,
+                {$suggestionsCountField}
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 r.run_id = s.current_run_id
+            {$suggestionsJoin}
             LEFT JOIN
                 Runs_Groups rg ON r.run_id = rg.run_id
             INNER JOIN
@@ -1038,24 +1076,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ON
                 c.problemset_id = s.problemset_id
             WHERE
-                s.problem_id = ? AND s.identity_id = ?
-        ';
-        $params = [$problemId, $identityId];
-        if (!is_null($problemsetId)) {
-            $sql .= ' AND s.problemset_id = ?';
-            $params[] = $problemsetId;
-        }
-        $sql .= '
+                s.problem_id = ? AND s.identity_id = ? {$whereClause}
             GROUP BY
                 c.score_mode,
                 c.alias,
                 s.guid
-            ;';
+        ;";
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: string, guid: string, language: string, memory: int, output: string, penalty: int, runtime: int, score: float, score_by_group: null|string, status: string, status_memory: string, status_runtime: string, submit_delay: int, suggestions: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> $runs */
         $runs = [];
         foreach ($rs as &$record) {
             /** @var array<string, float|null>|null */
@@ -1170,7 +1200,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the time of the next submission to the current problem
+     * Returns the time of the next submission to the current problem.
+     * The calculation logic for the next submission time is delegated to
+     * `getTimeGap`.
      */
     final public static function nextSubmissionTimestamp(
         ?\OmegaUp\DAO\VO\Contests $contest = null,
@@ -1184,14 +1216,36 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 intval($contest->submissions_gap)
             );
         }
+        return self::getTimeGap($submissionGap, $lastSubmissionTime);
+    }
 
-        if (is_null($lastSubmissionTime)) {
+    /**
+     * Returns the time of the next execution to the current problem.
+     * The calculation logic for the next execution time is delegated to
+     * `getTimeGap`.
+     */
+    final public static function nextExecutionTimestamp(
+        ?\OmegaUp\Timestamp $lastExecutionTime = null
+    ): \OmegaUp\Timestamp {
+        return self::getTimeGap(
+            \OmegaUp\Controllers\Run::$defaultExecutionGap,
+            $lastExecutionTime
+        );
+    }
+
+    /**
+     * Calculates the timestamp for the next activity based on a specified
+     * time gap.
+     */
+    public static function getTimeGap(
+        int $initialGap,
+        ?\OmegaUp\Timestamp $lastActivityTime = null
+    ): \OmegaUp\Timestamp {
+        if (is_null($lastActivityTime)) {
             return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
-        return new \OmegaUp\Timestamp(
-            $lastSubmissionTime->time + $submissionGap
-        );
+        return new \OmegaUp\Timestamp($lastActivityTime->time + $initialGap);
     }
 
     /**

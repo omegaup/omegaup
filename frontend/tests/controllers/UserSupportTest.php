@@ -49,7 +49,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiExtraInformation(
             new \OmegaUp\Request([
                 'auth_token' => $supportLogin->auth_token,
-                'email' => $email,
+                'usernameOrEmail' => $email,
             ])
         );
 
@@ -65,7 +65,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiExtraInformation(
             new \OmegaUp\Request([
                 'auth_token' => $supportLogin->auth_token,
-                'email' => $email,
+                'usernameOrEmail' => $email,
             ])
         );
 
@@ -236,7 +236,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support tries to generate token without a request
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
 
         $this->assertFalse($response['within_last_day']);
@@ -249,7 +249,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support can genearate token
         \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
         $response = \OmegaUp\Controllers\Reset::apiGenerateToken(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
@@ -296,9 +296,48 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         // Support can not genearate token because it has expired
         $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
-            'email' => $email
+            'usernameOrEmail' => $email
         ]));
 
         $this->assertFalse($response['within_last_day']);
+    }
+
+    public function testAddRemoveRolesAsSupportTeamMember() {
+        $username = 'testuserroles';
+        ['identity' => $support] = \OmegaUp\Test\Factories\User::createSupportUser();
+        \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
+
+        $login = self::login($support);
+        // Call to API Add Role
+        // Support team member should not be able to add the admin role since this
+        // action should be performed by a sys-admin
+        try {
+            \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+                'role' => 'Admin'
+            ]));
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame($e->getMessage(), 'userNotAllowed');
+        }
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'role' => 'Reviewer'
+        ]));
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'role' => 'Mentor'
+        ]));
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $username,
+            'role' => 'CertificateGenerator'
+        ]));
     }
 }

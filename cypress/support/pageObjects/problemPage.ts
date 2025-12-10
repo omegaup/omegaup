@@ -1,4 +1,5 @@
-import { RunOptions } from '../types';
+import { ProblemOptions, RunOptions } from '../types';
+import { v4 as uuid } from 'uuid';
 
 export class ProblemPage {
   navigateToAllProblemsTab(): void {
@@ -45,7 +46,7 @@ export class ProblemPage {
   }
 
   verifySubmission(username: string): void {
-    cy.get('a[href="#runs"]').click();
+    cy.get('a.nav-link[href="#runs"]').click();
     cy.get(`[data-username=${username}]`).should('be.visible');
     cy.get('[data-run-status]').should('contain', 'AC');
   }
@@ -85,6 +86,50 @@ export class ProblemPage {
     );
     cy.get('[data-filter-submit-button]').click();
     cy.get('[data-problem-title-list]').should('not.exist');
+  }
+
+  generateProblemOptions(noOfProblems: number): ProblemOptions[] {
+    const problems: ProblemOptions[] = [];
+
+    for (let i = 0; i < noOfProblems; i++) {
+      const problemOptions: ProblemOptions = {
+        problemAlias: uuid().slice(0, 10),
+        tag: 'Recursion',
+        autoCompleteTextTag: 'recur',
+        problemLevelIndex: 0,
+      };
+
+      problems.push(problemOptions);
+    }
+
+    return problems;
+  }
+
+  verifyProblem(problemOptions: ProblemOptions): void {
+    cy.location('href').should('include', problemOptions.problemAlias);
+    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
+    cy.get('[name="problem_alias"]').should(
+      'have.value',
+      problemOptions.problemAlias,
+    );
+    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
+  }
+
+  verifyProblemRun(status: string): void {
+    cy.get('[data-run-status] > span').first().should('have.text', 'new');
+
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+    cy.wait(['@runStatus'], { timeout: 10000 });
+
+    cy.get('[data-run-status] > span').first().should('have.text', status);
+  }
+
+  downloadProblem(problemAlias: string): void {
+    cy.visit(`/problem/${problemAlias}/edit/`);
+    cy.get(`[data-tab-download]`).click();
+
+    cy.get('form.form button[type="submit"]').click();
+    cy.readFile(`cypress/downloads/${problemAlias}.zip`).should('exist');
   }
 }
 

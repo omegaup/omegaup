@@ -67,6 +67,9 @@ class Authorization {
     // Mentor.
     const MENTOR_ROLE = 5;
 
+    // Support.
+    const SUPPORT_ROLE = 6;
+
     // Identity creator.
     const IDENTITY_CREATOR_ROLE = 7;
 
@@ -489,7 +492,7 @@ class Authorization {
      * @param \OmegaUp\DAO\VO\Identities $identity
      * @param list<\OmegaUp\DAO\VO\Groups> $groups
      */
-    public static function isGroupTeachingAssistantMember(
+    public static function isMemberOfAnyGroup(
         $identity,
         $groups = []
     ): bool {
@@ -536,9 +539,16 @@ class Authorization {
                 return false;
             }
         }
+        if (is_null(self::$_supportGroup->acl_id)) {
+            return false;
+        }
         return self::isGroupMember(
             $identity,
             self::$_supportGroup
+        ) || self::hasRole(
+            $identity,
+            self::$_supportGroup->acl_id,
+            self::SUPPORT_ROLE
         );
     }
 
