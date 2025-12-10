@@ -1039,8 +1039,6 @@ const translations: { [key: string]: string; } = {
   parameterInvalidCaseName: "The case name is invalid",
   parameterInvalidFile: "The file could not be read or is invalid",
   parameterInvalidGroupAlias: "Invalid parameter: group. That group does not exist, create it at https://omegaup.com/group/new/",
-  parameterInvalidProblemSolutionNotEmpty: "Only one problem solution is allowed",
-  parameterInvalidProblemStatementNotEmpty: "Only one problem statement is allowed",
   parameterInvalidStateDoesNotBelongToCountry: "The selected state does not belong to the country based on ISO 3166-2.",
   parameterInvalidStateNeedsToBelongToCountry: "You need to select a country in order to select a state.",
   parameterInvalidValidZipUpload: "The ZIP file was not uploaded correctly or is invalid",
