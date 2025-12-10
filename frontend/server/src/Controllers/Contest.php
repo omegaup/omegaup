@@ -22,22 +22,23 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, versions: array{log: list<ProblemVersion>, published: string}, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
- * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type ArenaContest=array{alias: string, director: string, finish_time: \OmegaUp\Timestamp|null, start_time: \OmegaUp\Timestamp|null, rerun_id?: int, title: string, window_length?: int}
- * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, canSetRecommended: bool, contest_for_teams: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems?: list<ProblemsetProblem>, problemset_id: int, recommended?: bool, requests_user_information: string, rerun_id?: int, score_mode: string, scoreboard: int, scoreboard_url: null|string, scoreboard_url_admin: null|string, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
- * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
+ * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, extra_note?: string|null, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, score_mode: string, scoreboard: int, show_penalty: bool, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestVirtualDetailsPayload=array{contest: ContestPublicDetails}
  * @psalm-type ContestCertificatesAdminDetails=array{certificateCutoff: int|null, certificatesStatus: string, isCertificateGenerator: bool}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ProblemsetProblemWithVersions>, users: list<ContestUser>, groups: list<ContestGroup>, teams_group: ContestGroup|null, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>, original_contest_admission_mode: null|string, certificatesDetails: ContestCertificatesAdminDetails}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration?: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type UserBasicInformation=array{country: null|string, state: null|string, school: null|int}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowModalToLoginWithRegisteredIdentity: bool, userBasicInformation: UserBasicInformation}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
- * @psalm-type ContestListPayload=array{contests: TimeTypeContests, countContests: array<string, int>, isLogged: bool, query: null|string}
- * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, query: string | null}
- * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool}
- * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
+ * @psalm-type ContestListPayload=array{contests: list<ContestListItem>, countContests: int, query: string | null}
+ * @psalm-type ContestListv2Payload=array{contests: ContestList, countContests: array{current: int, future: int, past: int}, pageSize: int, query: string | null}
+ * @psalm-type ContestNewPayload=array{languages: array<string, string>, hasVisitedSection?: bool, canSetRecommended?: bool}
+ * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -71,9 +72,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, feedback_thread?: list<SubmissionFeedbackThread>}
  * @psalm-type RunDetailsV2=array{admin: bool, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, judged_by?: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type RunWithDetails=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, details: null|RunDetailsV2, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestPrintDetailsPayload=array{contestTitle: string, problems: array<int, null|ProblemDetails>}
  */
+
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
@@ -84,14 +86,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{number_of_results: int, results: list<ContestListItem>}
      *
-     * @omegaup-request-param int|null $active
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param null|string $sort_order
+     * @omegaup-request-param string $tab_name
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Check who is visiting, but a not logged user can still view
@@ -105,67 +108,54 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         /** @var list<ContestListItem> */
         $contests = [];
-        \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['recommended'],
+        $recommended = $r->ensureOptionalInt(
             'recommended'
-        );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['participating'],
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        $participating = $r->ensureOptionalInt(
             'participating'
+        ) ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
         );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
+            fieldName: 'filter',
+            field: $filter,
+            defaultValue: \OmegaUp\DAO\Enum\ContestFilterStatus::ALL
+        );
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        } elseif ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
         $tabName = $r->ensureOptionalEnum(
             'tab_name',
-            [
-                'current',
-                'future',
-                'past',
-            ]
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
         );
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 20;
-        $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(
-            intval($r['active'] ?? \OmegaUp\DAO\Enum\ActiveStatus::ALL)
+        $pageSize = $r->ensureOptionalInt(
+            key: 'page_size',
+            lowerBound: 1,
+            upperBound: 100
+        ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
+        $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
+            fieldName: 'tab_name',
+            field: $tabName,
+            defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
         );
-        if (!is_null($tabName)) {
-            if ($tabName === 'current') {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif ($tabName === 'future') {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } else {
-                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
-            }
-        }
-        // If the parameter was not set, the default should be ALL which is
-        // a number and should pass this check.
-        \OmegaUp\Validators::validateNumber($activeContests, 'active');
         $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::getIntValue(
-            intval(
-                $r['recommended'] ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-            )
-        );
-        // Same as above.
-        \OmegaUp\Validators::validateNumber($recommended, 'recommended');
+            $recommended
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
         $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::getIntValue(
-            intval(
-                $r['participating'] ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO
-            )
+            $participating
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
+        $admissionMode = $r->ensureOptionalEnum(
             'admission_mode',
-            [
-                'public',
-                'private',
-                'registration',
-            ]
+            \OmegaUp\CourseParams::VALID_ADMISSION_MODES
         );
 
         // admission mode status in contest is public
-        $public = (
-            isset($r['admission_mode']) &&
-            self::isPublic(strval($r['admission_mode']))
-        );
+        $public = (!is_null($admissionMode) && self::isPublic($admissionMode));
 
         if (is_null($participating)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -182,6 +172,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 250
             )
         );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt(
+            fieldName: 'order',
+            field: $order,
+            defaultValue: \OmegaUp\DAO\Enum\ContestOrderStatus::NONE
+        );
 
         [
             'contests' => $contests,
@@ -194,7 +195,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $activeContests,
             $recommended,
             $public,
-            $participating
+            $participating,
+            $orderBy
         );
 
         return [
@@ -214,9 +216,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         int $activeContests,
         int $recommended,
         bool $public = false,
-        ?int $participating = null
+        ?int $participating = null,
+        int $orderBy = 0
     ) {
-        $cacheKey = "0-{$activeContests}-{$recommended}-{$page}-{$pageSize}";
+        $identityId = $identity?->identity_id ?? 0;
+        $cacheKey = "01-{$identityId}-{$activeContests}-{$recommended}-{$participating}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback = /** @return array{contests: list<ContestListItem>, count: int} */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
@@ -224,7 +228,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -250,7 +255,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 $activeContests,
-                $query
+                $query,
+                $orderBy
             );
         } elseif ($public) {
             [
@@ -260,7 +266,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity->identity_id,
                 $page,
                 $pageSize,
-                $query
+                $query,
+                $orderBy
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
@@ -269,7 +276,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
             if (empty($query)) {
                 [
@@ -297,12 +305,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $pageSize,
                 $activeContests,
                 $recommended,
-                $query
+                $query,
+                $orderBy
             );
         }
         $addedContests = [];
         foreach ($contests as $contestInfo) {
-            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+            $contestInfo['duration_minutes'] = (is_null(
+                $contestInfo['window_length']
+            ) ?
                 $contestInfo['finish_time']->time - $contestInfo['start_time']->time :
                 ($contestInfo['window_length'] * 60)
             );
@@ -982,10 +993,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
-        $result['templateProperties']['payload']['needsBasicInformation'] = false;
-        $result['templateProperties']['payload']['requestsUserInformation'] = 'no';
+
         if (is_null($r->identity)) {
-            // No session, show the intro if public, so that they can login.
             return $result;
         }
 
@@ -994,13 +1003,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'requestsUserInformation' => $requestsUserInformation,
         ] = \OmegaUp\DAO\Contests::getNeedsInformation($contest->problemset_id);
 
-        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
-        $result['templateProperties']['payload']['needsBasicInformation'] =
-            $needsBasicInformation &&
-            (
-                !$r->identity->country_id || !$r->identity->state_id ||
-                is_null($r->identity->current_identity_school_id)
+        $userBasicInformation = [
+            'country' => $r->identity->country_id,
+            'state' => $r->identity->state_id,
+            'school' => $r->identity->current_identity_school_id,
+        ];
+
+        $needsBasicInformation = $needsBasicInformation && (
+            is_null($userBasicInformation['country']) ||
+            is_null($userBasicInformation['state']) ||
+            is_null($userBasicInformation['school'])
         );
+
+        $result['templateProperties']['payload']['requestsUserInformation'] = $requestsUserInformation;
+        $result['templateProperties']['payload']['needsBasicInformation'] = $needsBasicInformation;
+        $result['templateProperties']['payload']['userBasicInformation'] = $userBasicInformation;
 
         // Privacy Statement Information
         $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
@@ -1163,9 +1180,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{templateProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
+     * @omegaup-request-param 'all'|'recommended'|'signedup'|null $filter
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param int|null $participating
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param int|null $recommended
+     * @omegaup-request-param null|string $sort_order
+     * @omegaup-request-param string $tab_name
      */
     public static function getContestListDetailsv2ForTypeScript(
         \OmegaUp\Request $r
@@ -1177,6 +1199,35 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
+        $recommended = $r->ensureOptionalInt(
+            'recommended'
+        ) ?? \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        $participating = $r->ensureOptionalInt(
+            'participating'
+        ) ?? \OmegaUp\DAO\Enum\ParticipatingStatus::NO;
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
+        );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
+            fieldName: 'filter',
+            field: $filter,
+            defaultValue: \OmegaUp\DAO\Enum\ContestFilterStatus::ALL
+        );
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        } elseif ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
+        $tabName = $r->ensureOptionalEnum(
+            'tab_name',
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+        ) ?? 'current';
+        $activeContests = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
+            fieldName: 'tab_name',
+            field: $tabName,
+            defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
+        );
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt(
             'page_size'
@@ -1191,55 +1242,56 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        [
-            'contests' => $currentContests,
-            'count' => $countCurrentContests,
-        ] = self::getContestList(
-            $r->identity,
-            $query,
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt(
+            fieldName: 'order',
+            field: $order,
+            defaultValue: \OmegaUp\DAO\Enum\ContestOrderStatus::NONE
         );
         [
-            'contests' => $futureContests,
-            'count' => $countFutureContests,
+            'contests' => $contests,
+            'count' => $countContests,
         ] = self::getContestList(
             $r->identity,
             $query,
             $page,
             $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
-            \OmegaUp\DAO\Enum\RecommendedStatus::ALL
-        );
-        [
-            'contests' => $pastContests,
-            'count' => $countPastContests,
-        ] = self::getContestList(
-            $r->identity,
-            $query,
-            $page,
-            $pageSize,
-            \OmegaUp\DAO\Enum\ActiveStatus::PAST,
-            \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            $activeContests,
+            $recommended,
+            false,
+            $participating,
+            $orderBy
         );
 
         $contests = [
-            'current' => $currentContests,
-            'future' => $futureContests,
-            'past' => $pastContests,
+            $tabName => $contests,
         ];
         $countContests = [
-            'current' => $countCurrentContests,
-            'future' => $countFutureContests,
-            'past' => $countPastContests,
+            $tabName => $countContests,
+        ];
+
+        $contests = [
+            'current' => $contests['current'] ?? [],
+            'past' => $contests['past'] ?? [],
+            'future' => $contests['future'] ?? []
+        ];
+
+        $countContests = [
+            'current' => $countContests['current'] ?? 0,
+            'past' => $countContests['past'] ?? 0,
+            'future' => $countContests['future'] ?? 0
         ];
 
         return [
             'templateProperties' => [
                 'payload' => [
                     'contests' => $contests,
+                    'pageSize' => $pageSize,
                     'countContests' => $countContests,
                     'query' => $r->ensureOptionalString('query'),
                 ],
@@ -1324,9 +1376,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => [
-                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES(),
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-create-contest'
+                    ),
+                    'canSetRecommended' => \OmegaUp\Authorization::isSupportTeamMember(
+                        $r->identity
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
@@ -1657,6 +1712,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $registration->accepted
                 );
                 $contest['user_registration_accepted'] = $registration->accepted;
+                $contest['extra_note'] = $registration->extra_note;
             }
         }
 
@@ -1677,12 +1733,36 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateContest($contestAlias);
+        $admins = \OmegaUp\DAO\UserRoles::getContestAdmins($contest);
+        $notificationContents = [
+            'type' => \OmegaUp\DAO\Notifications::CONTEST_REGISTRATION_REQUEST,
+            'body' => [
+                'localizationString' => new \OmegaUp\TranslationString(
+                    'notificationContestRegisterRequest'
+                ),
+                'localizationParams' => [
+                    'username' => $r->identity->username,
+                    'contestTitle' => $contest->title,
+                ],
+                'url' => "/contest/{$contest->alias}/edit/#contestants",
+                'iconUrl' => '/media/info.png',
+            ],
+        ];
 
         \OmegaUp\DAO\ProblemsetIdentityRequest::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
             'identity_id' => $r->identity->identity_id,
             'problemset_id' => $contest->problemset_id,
             'request_time' => \OmegaUp\Time::get(),
         ]));
+
+        foreach ($admins as $admin) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode($notificationContents),
+                ])
+            );
+        }
 
         return ['status' => 'ok'];
     }
@@ -1808,7 +1888,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @return ContestDetails */
             function () use ($contest) {
                 // Initialize response to be the contest information
-                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, score_mode: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
+                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, score_mode: string, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, default_show_all_contestants_in_scoreboard: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
                 $result = $contest->asFilteredArray([
                     'admission_mode',
                     'alias',
@@ -1825,6 +1905,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'penalty_type',
                     'points_decay_factor',
                     'problemset_id',
+                    'recommended',
                     'rerun_id',
                     'scoreboard',
                     'scoreboard_url',
@@ -1995,9 +2076,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        // When user is admin or user joins contest in practice mode, saving
+        // When user is admin, support team member, or user joins contest in practice mode, saving
         // first access time is not necessary
-        if ($isPracticeMode || $contestAdmin) {
+        if (
+            $isPracticeMode || $contestAdmin || \OmegaUp\Authorization::isSupportTeamMember(
+                $identity
+            )
+        ) {
             return $result;
         }
 
@@ -2059,10 +2144,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             intval($adminIdentity->identity_id),
             $contest->problemset_id
         );
-        $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES;
+        $result['available_languages'] = \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES();
         $result['admin'] = true;
         $result['scoreboard_url'] = $problemset->scoreboard_url;
         $result['scoreboard_url_admin'] = $problemset->scoreboard_url_admin;
+        $result['recommended'] = $contest->recommended;
+        $result['canSetRecommended'] = \OmegaUp\Authorization::isSupportTeamMember(
+            $adminIdentity
+        );
         return $result;
     }
 
@@ -2299,6 +2388,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'admission_mode' => 'private', // Cloned contests start in private
                                            // admission_mode
             'check_plagiarism' => $originalContest->check_plagiarism,
+            'languages' => $originalContest->languages, // Cloned contests start with the same languages
         ]);
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -2529,29 +2619,31 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
-     * @omegaup-request-param mixed $points_decay_factor
-     * @omegaup-request-param null|string $problems
-     * @omegaup-request-param mixed $requests_user_information
-     * @omegaup-request-param mixed $scoreboard
-     * @omegaup-request-param null|string $score_mode
-     * @omegaup-request-param mixed $show_scoreboard_after
-     * @omegaup-request-param mixed $start_time
-     * @omegaup-request-param mixed $submissions_gap
-     * @omegaup-request-param bool|null $contest_for_teams
-     * @omegaup-request-param null|string $teams_group_alias
-     * @omegaup-request-param mixed $title
-     * @omegaup-request-param int|null $window_length
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
+     * @omegaup-request-param null|string $alias
      * @omegaup-request-param bool|null $check_plagiarism
+     * @omegaup-request-param bool|null $contest_for_teams
+     * @omegaup-request-param null|string $description
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
+     * @omegaup-request-param int $finish_time
+     * @omegaup-request-param null|string $languages
+     * @omegaup-request-param bool|null $needs_basic_information
+     * @omegaup-request-param int|null $penalty
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
+     * @omegaup-request-param float|null $points_decay_factor
+     * @omegaup-request-param null|string $problems
+     * @omegaup-request-param bool|null $requests_user_information
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
+     * @omegaup-request-param float|null $scoreboard
+     * @omegaup-request-param bool|null $show_scoreboard_after
+     * @omegaup-request-param int $start_time
+     * @omegaup-request-param int $submissions_gap
+     * @omegaup-request-param null|string $teams_group_alias
+     * @omegaup-request-param null|string $title
+     * @omegaup-request-param int $window_length
+     * @omegaup-request-param bool|null $recommended
+
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2580,11 +2672,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         /** @var null|list<string>|scalar $languages */
         $languages = $r['languages'];
-        $languages = (
-            empty($languages) || !is_array($languages) ?
-            null :
-            join(',', $languages)
-        );
+
         $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
         $teamsGroupsAlias = $forTeams ? $r->ensureString(
             'teams_group_alias',
@@ -2598,6 +2686,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ['partial','all_or_nothing','max_per_group'],
         );
         $checkPlagiarism = $r->ensureOptionalBool('check_plagiarism') ?? false;
+
+        // Handle recommended flag - only available for admins and support team
+        $recommendedValue = $r->ensureOptionalBool('recommended');
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2620,6 +2711,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'check_plagiarism' => $checkPlagiarism ? true : false,
         ]);
 
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
+
         self::createContest(
             $problemset,
             $contest,
@@ -2638,27 +2739,27 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param null|string $description
-     * @omegaup-request-param mixed $feedback
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
      * @omegaup-request-param int $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param int $start_time
-     * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param int $submissions_gap
+     * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCommonCreateOrUpdate(
         \OmegaUp\Request $r,
@@ -2666,24 +2767,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Contests $contest = null,
         bool $isRequired = true
     ): void {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['title'],
-            'title',
-            $isRequired
-        );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['description'],
-            'description',
-            $isRequired
-        );
+        $r->ensureOptionalString('title', $isRequired);
+        $r->ensureOptionalString('description', $isRequired);
 
         // Get the actual start and finish time of the contest, considering that
         // in case of update, parameters can be optional
         $startTime = $r->ensureOptionalTimestamp(
             'start_time',
-            null,
-            null,
-            $isRequired
+            required: $isRequired
         ) ?? (
             is_null($contest)
                 ? null
@@ -2693,9 +2784,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $finishTime = $r->ensureOptionalTimestamp(
             'finish_time',
-            null,
-            null,
-            $isRequired
+            required: $isRequired
         ) ?? (
             is_null($contest)
                 ? null
@@ -2705,10 +2794,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         // Calculate the actual contest length
-        $contestLength = null;
+        $contestLength = 0;
         if (!is_null($finishTime) && !is_null($startTime)) {
-            // Validate start & finish time
-            if ($startTime->time > $finishTime->time) {
+            // Validate start & finish time where finish_time must be strictly
+            // greater than start_time
+            if ($startTime->time >= $finishTime->time) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'contestNewInvalidStartTime',
                     'finish_time'
@@ -2729,19 +2819,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (!empty($r['window_length'])) {
             $r->ensureOptionalInt(
                 'window_length',
-                0,
-                is_null($contestLength) ? null : intval($contestLength / 60)
+                lowerBound: 0,
+                upperBound: intval(floor($contestLength / 60)),
+                required: false
             );
         }
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
+        $r->ensureOptionalEnum(
             'admission_mode',
-            [
-                'public',
-                'private',
-                'registration',
-            ]
+            ['public', 'private', 'registration']
         );
         $contestAlias = $r->ensureOptionalString(
             'alias',
@@ -2764,48 +2850,47 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'score_mode',
             ['partial','all_or_nothing','max_per_group'],
         );
-        $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
+        $submissionsGap = $r->ensureOptionalInt(
+            'submissions_gap',
+            0,
+            null,
+            $isRequired
+        );
         $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
             (
-                is_null($r['submissions_gap']) ?
+                is_null($submissionsGap) ?
                 null :
-                floor(intval($r['submissions_gap']) / 60)
+                floor(intval($submissionsGap) / 60)
             ),
             'submissions_gap',
             1,
-            is_null($contestLength) ? null : floor($contestLength / 60),
+            $contestLength === 0 ? null : floor($contestLength / 60),
             $isRequired
         );
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['feedback'],
+        $r->ensureOptionalEnum(
             'feedback',
             ['none', 'summary', 'detailed'],
             $isRequired
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['penalty_type'],
+        $r->ensureOptionalEnum(
             'penalty_type',
             ['contest_start', 'problem_open', 'runtime', 'none'],
             $isRequired
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['penalty_calc_policy'],
+        $r->ensureOptionalEnum(
             'penalty_calc_policy',
             ['sum', 'max']
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['problems'],
-            'problems'
-        );
+        $problems = $r->ensureOptionalString('problems');
 
         // Problems is optional
-        if (!is_null($r['problems'])) {
+        if (!is_null($problems)) {
             /** @var list<array{problem: string, points: int}>|null */
-            $requestProblems = json_decode($r['problems'], associative: true);
+            $requestProblems = json_decode($problems, associative: true);
             if (!is_array($requestProblems)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'invalidParameters',
@@ -2842,37 +2927,33 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Show scoreboard is always optional
         $r->ensureOptionalBool('show_scoreboard_after');
 
-        // languages is required only when a contest is created
-        if ($isRequired && empty($r['languages'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'languages'
-            );
-        }
-
-        if (is_string($r['languages'])) {
-            $r['languages'] = explode(',', $r['languages']);
-        }
-        if (is_array($r['languages'])) {
-            foreach ($r['languages'] as $language) {
-                \OmegaUp\Validators::validateOptionalInEnum(
-                    $language,
-                    'languages',
-                    array_keys(
-                        \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                    )
-                );
-            }
-        }
-
         $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
         if ($forTeams) {
-            \OmegaUp\Validators::validateAlias(
-                $r['teams_group_alias'],
-                'teams_group_alias'
+            $r->ensureString(
+                'teams_group_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
         }
         $r->ensureOptionalBool('check_plagiarism') ?? false;
+
+        // languages is required only when a contest is created
+        $languagesAsString = $r->ensureOptionalString('languages', $isRequired);
+        if (is_null($languagesAsString)) {
+            return;
+        }
+
+        $languages = explode(',', $languagesAsString);
+
+        $supportedLanguages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
+        \OmegaUp\Validators::validateValidSubset(
+            array_values(array_filter($languages, function ($language) {
+                return !empty($language);
+            })),
+            'langauges',
+            $supportedLanguages
+        );
     }
 
     /**
@@ -2881,19 +2962,20 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param null|string $description
-     * @omegaup-request-param mixed $feedback
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
      * @omegaup-request-param int $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param int $start_time
@@ -2901,7 +2983,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateCreate(
         \OmegaUp\Request $r,
@@ -2919,27 +3000,27 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return \OmegaUp\DAO\VO\Contests
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param null|string $description
-     * @omegaup-request-param mixed $feedback
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
      * @omegaup-request-param int $finish_time
-     * @omegaup-request-param mixed $languages
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param OmegaUp\Timestamp|null $start_time
-     * @omegaup-request-param null|string $teams_group_alias
+     * @omegaup-request-param int $start_time
      * @omegaup-request-param int $submissions_gap
+     * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $check_plagiarism
      */
     private static function validateUpdate(
         \OmegaUp\Request $r,
@@ -3121,8 +3202,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
+        // Extract the problem from the problemset if exists
+        $originalProblemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
 
         if (
+            is_null($originalProblemsetProblem)
+            &&
             \OmegaUp\DAO\ProblemsetProblems::countProblemsetProblems(
                 $problemset
             )
@@ -3156,7 +3244,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $currentVersion,
             $r->identity,
             $points,
-            $orderInContest
+            $orderInContest,
+            $originalProblemsetProblem
         );
 
         // Invalidar cache
@@ -4581,7 +4670,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
             . $targetIdentity->username . ', state=' . $resolution
         );
 
-        return ['status' => 'ok'];
+        $response = ['status' => 'ok'];
+
+        if (is_null($targetIdentity->user_id)) {
+            return $response;
+        }
+
+        \OmegaUp\Controllers\Notification::createForCourseAccessRequest(
+            $contest,
+            $targetIdentity->user_id,
+            $request->accepted
+        );
+
+        return $response;
     }
 
     /**
@@ -4699,6 +4800,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
     }
+
     /**
      * Update a Contest
      *
@@ -4706,29 +4808,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
+     * @omegaup-request-param bool|null $check_plagiarism
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param bool|null $contest_for_teams
      * @omegaup-request-param bool|null $default_show_all_contestants_in_scoreboard
      * @omegaup-request-param null|string $description
-     * @omegaup-request-param mixed $feedback
+     * @omegaup-request-param 'detailed'|'none'|'summary'|null $feedback
      * @omegaup-request-param int $finish_time
-     * @omegaup-request-param mixed $languages
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param int|null $penalty
-     * @omegaup-request-param mixed $penalty_calc_policy
-     * @omegaup-request-param mixed $penalty_type
+     * @omegaup-request-param 'max'|'sum'|null $penalty_calc_policy
+     * @omegaup-request-param 'contest_start'|'none'|'problem_open'|'runtime'|null $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
+     * @omegaup-request-param bool|null $recommended
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
+     * @omegaup-request-param 'all_or_nothing'|'max_per_group'|'partial'|null $score_mode
      * @omegaup-request-param float|null $scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
-     * @omegaup-request-param \OmegaUp\Timestamp|null $start_time
+     * @omegaup-request-param int $start_time
      * @omegaup-request-param int $submissions_gap
      * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $check_plagiarism
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -4781,6 +4884,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $updateProblemset = true;
         $updateRequests = false;
+
+        // Handle recommended flag - only available for admins and support team
+        $recommendedValue = $r->ensureOptionalBool('recommended');
+        if (!is_null($recommendedValue)) {
+            if (\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                $contest->recommended = $recommendedValue;
+            } else {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
+
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             \OmegaUp\Validators::validateOptionalInEnum(
@@ -5131,7 +5247,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
+        $languages = array_keys(
+            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES()
+        );
 
         // Get our runs
         return self::getAllRuns(
@@ -5500,6 +5618,108 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{templateProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $sort_order
+     * @omegaup-request-param null|string $filter
+     * @omegaup-request-param null|string $tab_name
+     * @omegaup-request-param null|string $query
+     */
+    public static function getContestListDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+
+        $page = $r->ensureOptionalInt('page') ?? 1; // The default page is 1 always
+        $pageSize = $r->ensureOptionalInt(
+            'page_size'
+        ) ?? \OmegaUp\Controllers\Contest::CONTEST_LIST_PAGE_SIZE;
+        $query = $r->ensureOptionalString(
+            key: 'query',
+            required: false,
+            validator: fn (string $query) => \OmegaUp\Validators::stringOfLengthInRange(
+                $query,
+                0,
+                250
+            )
+        );
+        $order = $r->ensureOptionalEnum(
+            'sort_order',
+            \OmegaUp\DAO\Enum\ContestOrderStatus::NAME_FOR_STATUS,
+            required: false
+        );
+        $orderBy = \OmegaUp\DAO\Enum\ContestOrderStatus::convertToInt(
+            fieldName: 'order',
+            field: $order,
+            defaultValue: \OmegaUp\DAO\Enum\ContestOrderStatus::NONE
+        );
+        $filter = $r->ensureOptionalEnum(
+            'filter',
+            \OmegaUp\DAO\Enum\ContestFilterStatus::NAME_FOR_STATUS
+        );
+        $activeFilter = \OmegaUp\DAO\Enum\ContestFilterStatus::convertToInt(
+            fieldName: 'filter',
+            field: $filter,
+            defaultValue: \OmegaUp\DAO\Enum\ContestFilterStatus::ALL
+        );
+        $tabName = $r->ensureOptionalEnum(
+            'tab_name',
+            \OmegaUp\DAO\Enum\ContestTabStatus::NAME_FOR_STATUS
+        );
+        $activeTab = \OmegaUp\DAO\Enum\ContestTabStatus::convertToInt(
+            fieldName: 'tab_name',
+            field: $tabName,
+            defaultValue: \OmegaUp\DAO\Enum\ContestTabStatus::CURRENT
+        );
+
+        $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL;
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::ONLY_RECOMMENDED) {
+            $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::RECOMMENDED;
+        }
+
+        $participating = null;
+        if ($activeFilter === \OmegaUp\DAO\Enum\ContestFilterStatus::SIGNED_UP) {
+            $participating = \OmegaUp\DAO\Enum\ParticipatingStatus::YES;
+        }
+
+        [
+            'contests' => $contests,
+            'count' => $count,
+        ] = self::getContestList(
+            $r->identity,
+            $query,
+            $page,
+            $pageSize,
+            $activeTab,
+            $recommended,
+            public: false,
+            participating: $participating,
+            orderBy: $orderBy
+        );
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'contests' => $contests,
+                    'countContests' => $count,
+                    'query' => $query,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestList'
+                ),
+            ],
+            'entrypoint' => 'arena_contest_list',
+        ];
+    }
+
+    /**
      * @return array{templateProperties: array{payload: ContestVirtualDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $contest_alias
@@ -5756,7 +5976,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * Given a contest_alias, sets the recommended flag on/off.
-     * Only omegaUp admins can call this API.
+     * Only omegaUp admins and support team members can call this API.
      *
      * @return array{status: string}
      *
@@ -5766,7 +5986,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiSetRecommended(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -5784,6 +6004,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest->recommended = $r->ensureBool('value');
         \OmegaUp\DAO\Contests::update($contest);
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::CONTEST_INFO,
+            $contestAlias
+        );
 
         return ['status' => 'ok'];
     }
@@ -5877,6 +6102,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     public static function isPublic(string $admissionMode): bool {
-        return $admissionMode !== 'private';
+        return $admissionMode !== \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE;
     }
 }

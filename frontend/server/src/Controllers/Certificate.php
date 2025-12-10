@@ -380,7 +380,13 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         self::printCertificateVerificationCode($pdf, $verificationCode);
         self::printCertificateVerificationLink($pdf, $verificationCode);
 
-        return base64_encode($pdf->Output('', 'S'));
+        $output = $pdf->Output('', 'S');
+        if (!is_string($output)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCertificatesError'
+            );
+        }
+        return base64_encode($output);
     }
 
     public static function getPlaceSuffix(int $n): string {

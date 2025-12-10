@@ -1,36 +1,18 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
-import * as api from '../api';
-import * as ui from '../ui';
 import { types } from '../api_types';
 import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
   ContestOrder,
+  ContestFilter,
+  UrlParams,
 } from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
-  const contestIDs = [
-    ...payload.contests.current.map((contest) => contest.contest_id),
-    ...payload.contests.past.map((contest) => contest.contest_id),
-    ...payload.contests.future.map((contest) => contest.contest_id),
-  ];
-  api.Contest.getNumberOfContestants({ contest_ids: contestIDs })
-    .then(({ response }) => {
-      payload.contests.current.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-      payload.contests.past.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-      payload.contests.future.forEach((contest) => {
-        contest.contestants = response[contest.contest_id] ?? 0;
-      });
-    })
-    .catch(ui.apiError);
   contestStore.commit('updateAll', payload.contests);
   contestStore.commit('updateAllCounts', payload.countContests);
   let tab: ContestTab = ContestTab.Current;
@@ -50,8 +32,7 @@ OmegaUp.on('ready', () => {
   }
   let page: number = 1;
   let sortOrder: ContestOrder = ContestOrder.None;
-  let filterBySignedUp: boolean = false;
-  let filterByRecommended: boolean = false;
+  let filter: ContestFilter = ContestFilter.All;
   const queryString = window.location.search;
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -89,16 +70,12 @@ OmegaUp.on('ready', () => {
         page = parseInt(pageParam);
       }
     }
-    if (urlParams.get('participating')) {
-      const participatingParam = urlParams.get('participating');
-      if (participatingParam === 'true') {
-        filterBySignedUp = true;
-      }
-    }
-    if (urlParams.get('recommended')) {
-      const recommendedParam = urlParams.get('recommended');
-      if (recommendedParam === 'true') {
-        filterByRecommended = true;
+    if (urlParams.get('filter')) {
+      const filterParam = urlParams.get('filter');
+      if (filterParam === 'signedup') {
+        filter = ContestFilter.SignedUp;
+      } else if (filterParam === 'recommended') {
+        filter = ContestFilter.OnlyRecommended;
       }
     }
     if (urlParams.get('tab_name')) {
@@ -124,20 +101,41 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contestlist': arena_ContestList },
     data: () => ({
       query: payload.query,
-      contests: contestStore.state.contests,
-      countContests: contestStore.state.countContests,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
-          contests: this.contests,
-          countContests: this.countContests,
+          contests: contestStore.state.contests,
+          countContests: contestStore.state.countContests,
           query: this.query,
           tab,
           page,
           sortOrder,
-          filterBySignedUp,
-          filterByRecommended,
+          filter,
+          pageSize: payload.pageSize,
+          loading: contestStore.state.loading,
+        },
+        on: {
+          'fetch-page': async ({
+            params,
+            urlObj,
+          }: {
+            params: UrlParams;
+            urlObj: URL;
+          }) => {
+            for (const [key, value] of Object.entries(params)) {
+              if (value) {
+                urlObj.searchParams.set(key, value.toString());
+              } else {
+                urlObj.searchParams.delete(key);
+              }
+            }
+            window.history.pushState({}, '', urlObj);
+            await contestStore.dispatch('fetchContestList', {
+              requestParams: params,
+              name: params.tab_name,
+            });
+          },
         },
       });
     },

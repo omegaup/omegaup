@@ -4,7 +4,7 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 module.exports = {
@@ -35,8 +35,11 @@ module.exports = {
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
     certificate_details: './frontend/www/js/omegaup/certificate/details.ts',
     certificate_mine: './frontend/www/js/omegaup/certificate/mine.ts',
-    certificate_validation: './frontend/www/js/omegaup/certificate/validation.ts',
+    certificate_validation:
+      './frontend/www/js/omegaup/certificate/validation.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
+    common_scroll_to_top: './frontend/www/js/omegaup/common/scroll_to_top.ts',
+    common_docs: './frontend/www/js/omegaup/common/docs.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.ts',
     common_index: './frontend/www/js/omegaup/common/index.ts',
     common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
@@ -62,17 +65,20 @@ module.exports = {
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.ts',
     course_statistics: './frontend/www/js/omegaup/course/statistics.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
-    course_student_with_assignment: './frontend/www/js/omegaup/course/studentWithAssignment.ts',
+    course_student_with_assignment:
+      './frontend/www/js/omegaup/course/studentWithAssignment.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
     course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
+    grader_ide: './frontend/www/js/omegaup/grader/ide.ts',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
     group_scoreboard_contests:
       './frontend/www/js/omegaup/group/scoreboard_contests.ts',
-    group_scoreboard_details: './frontend/www/js/omegaup/group/scoreboard_details.ts',
+    group_scoreboard_details:
+      './frontend/www/js/omegaup/group/scoreboard_details.ts',
     libinteractive_gen: './frontend/www/js/omegaup/libinteractive/gen.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
@@ -107,6 +113,8 @@ module.exports = {
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.ts',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
+    user_verification_parental_token:
+      './frontend/www/js/omegaup/user/verification_parental_token.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },
 
@@ -123,6 +131,9 @@ module.exports = {
   },
 
   plugins: [
+    new MonacoWebpackPlugin({
+      filename: 'js/dist/[name].worker.js',
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -245,6 +256,13 @@ module.exports = {
       {
         test: /\.scss$/,
         use: ['vue-style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.ttf$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'js/dist/[name][ext]',
+        },
       },
     ],
   },

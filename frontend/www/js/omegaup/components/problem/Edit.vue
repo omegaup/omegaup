@@ -12,100 +12,96 @@
       </h1>
       <p>
         <a
-          href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup"
+          href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md"
+          target="_blank"
           >{{ T.navHelp }}</a
         >
       </p>
     </div>
-    <ul class="nav nav-pills edit-problem-tabs mb-3">
-      <li class="nav-item dropdown">
+    <ul class="nav nav-pills edit-problem-tabs my-3">
+      <li class="nav-item" role="presentation">
         <a
-          href="#"
-          data-toggle="dropdown"
-          role="button"
-          class="nav-link active dropdown-toggle"
-          aria-haspopup="true"
-          aria-expanded="false"
-          >{{ activeTab }}</a
+          href="#edit"
+          data-tab-edit
+          class="nav-link"
+          :class="{ active: showTab === 'edit' }"
+          @click="showTab = 'edit'"
+          >{{ T.problemEditEditProblem }}</a
         >
-        <div class="dropdown-menu">
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-edit
-            class="dropdown-item"
-            :class="{ active: showTab === 'edit' }"
-            @click="showTab = 'edit'"
-            >{{ T.problemEditEditProblem }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-markdown
-            class="dropdown-item"
-            :class="{ active: showTab === 'markdown' }"
-            @click="showTab = 'markdown'"
-            >{{ T.problemEditEditMarkdown }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-version
-            class="dropdown-item"
-            :class="{ active: showTab === 'version' }"
-            @click="showTab = 'version'"
-            >{{ T.problemEditChooseVersion }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-solution
-            class="dropdown-item"
-            :class="{ active: showTab === 'solution' }"
-            @click="showTab = 'solution'"
-            >{{ T.problemEditSolution }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-admins
-            class="dropdown-item"
-            :class="{ active: showTab === 'admins' }"
-            @click="showTab = 'admins'"
-            >{{ T.problemEditAddAdmin }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-tags
-            class="dropdown-item"
-            :class="{ active: showTab === 'tags' }"
-            @click="showTab = 'tags'"
-            >{{ T.problemEditAddTags }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-download
-            class="dropdown-item"
-            :class="{ active: showTab === 'download' }"
-            @click="showTab = 'download'"
-            >{{ T.wordsDownload }}</a
-          >
-          <a
-            href="#"
-            data-toggle="tab"
-            data-tab-delete
-            class="dropdown-item"
-            :class="{ active: showTab === 'delete' }"
-            @click="showTab = 'delete'"
-            >{{ T.wordsDelete }}</a
-          >
-        </div>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#markdown"
+          data-tab-markdown
+          class="nav-link"
+          :class="{ active: showTab === 'markdown' }"
+          @click="showTab = 'markdown'"
+          >{{ T.problemEditEditMarkdown }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#version"
+          data-tab-version
+          class="nav-link"
+          :class="{ active: showTab === 'version' }"
+          @click="showTab = 'version'"
+          >{{ T.problemEditChooseVersion }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#solution"
+          data-tab-solution
+          class="nav-link"
+          :class="{ active: showTab === 'solution' }"
+          @click="showTab = 'solution'"
+          >{{ T.problemEditSolution }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#admins"
+          data-tab-admins
+          class="nav-link"
+          :class="{ active: showTab === 'admins' }"
+          @click="showTab = 'admins'"
+          >{{ T.problemEditAddAdmin }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#tags"
+          data-tab-tags
+          class="nav-link"
+          :class="{ active: showTab === 'tags' }"
+          @click="showTab = 'tags'"
+          >{{ T.problemEditAddTags }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#download"
+          data-tab-download
+          class="nav-link"
+          :class="{ active: showTab === 'download' }"
+          @click="showTab = 'download'"
+          >{{ T.wordsDownload }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#delete"
+          data-tab-delete
+          class="nav-link"
+          :class="{ active: showTab === 'delete' }"
+          @click="showTab = 'delete'"
+          >{{ T.wordsDelete }}</a
+        >
       </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content mt-2">
       <div v-if="showTab === 'edit'" class="tab-pane active">
         <omegaup-problem-form
           :data="data"
@@ -231,11 +227,18 @@
           <div class="card-body">
             <form class="form" @submit.prevent="onDownload">
               <div class="form-group">
+                {{ T.problemDownloadZip }}:
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
                 </button>
               </div>
             </form>
+            <div class="form-group">
+              {{ T.problemPrintableVersion }}:
+              <button class="btn btn-primary" @click="onGotoPrintableVersion">
+                {{ T.contestPrintableVersion }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -306,6 +309,7 @@ Vue.use(ModalPlugin);
 export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
   @Prop() admins!: types.ProblemAdmin[];
+  @Prop() initialTab!: string;
   @Prop() groups!: types.ProblemGroupAdmin[];
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() statement!: types.ProblemStatement;
@@ -314,7 +318,7 @@ export default class ProblemEdit extends Vue {
 
   T = T;
   alias = this.data.alias;
-  showTab = 'edit';
+  showTab = this.initialTab;
   currentStatement: types.ProblemStatement = this.statement;
   showConfirmationModal = false;
 
@@ -348,6 +352,10 @@ export default class ProblemEdit extends Vue {
   @Watch('statement')
   onStatementChange(newStatement: types.ProblemStatement): void {
     this.currentStatement = newStatement;
+  }
+
+  onGotoPrintableVersion(): void {
+    window.location.href = `/arena/problem/${this.alias}/print/`;
   }
 }
 </script>

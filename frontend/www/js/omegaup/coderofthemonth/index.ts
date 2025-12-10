@@ -8,6 +8,11 @@ import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CoderOfTheMonthPayload();
+  const locationHash = window.location.hash.substring(1).split('/')[0];
+  const selectedTab = getSelectedValidTab(locationHash);
+  if (selectedTab !== locationHash) {
+    window.location.hash = selectedTab;
+  }
   const coderOfTheMonthList = new Vue({
     el: '#main-container',
     components: {
@@ -24,20 +29,18 @@ OmegaUp.on('ready', () => {
           codersOfPreviousMonth: payload.codersOfPreviousMonth,
           candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
           isMentor: payload.isMentor,
-          canChooseCoder:
-            payload.isMentor &&
-            payload.options &&
-            payload.options.canChooseCoder,
+          selectedTab,
+          canChooseCoder: payload.isMentor && payload.options?.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
           category: payload.category,
         },
         on: {
-          'select-coder': function (coderUsername: string, category: string) {
+          'select-coder': (coderUsername: string, category: string) => {
             api.User.selectCoderOfTheMonth({
               username: coderUsername,
               category: category,
             })
-              .then(function () {
+              .then(() => {
                 ui.success(
                   payload.category == 'all'
                     ? T.coderOfTheMonthSelectedSuccessfully
@@ -51,4 +54,15 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function getSelectedValidTab(tab: string): string {
+    const validTabs = [
+      'codersOfTheMonth',
+      'codersOfPreviousMonth',
+      'candidatesToCoderOfTheMonth',
+    ];
+    const defaultTab = 'codersOfTheMonth';
+    const isValidTab = validTabs.includes(tab);
+    return isValidTab ? tab : defaultTab;
+  }
 });

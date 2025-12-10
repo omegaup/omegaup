@@ -3,6 +3,8 @@ import { CasesState } from './modules/cases';
 export type CaseID = string;
 export type GroupID = string;
 export type LineID = string;
+export type LineInfoID = string;
+export type LayoutID = string;
 
 /**
  * StoreState
@@ -10,10 +12,18 @@ export type LineID = string;
  * @alias StoreState
  * @typedef {object}
  * @property {string} problemName Name of the problem
+ * @property {string} problemMarkdown Markdown of the problem
+ * @property {string} problemCodeContent Content of the code file
+ * @property {string} problemCodeExtension Extebsion of the code file
+ * @property {string} problemSolutionMarkdown Markdown of the solution to the problem
  * @property {CasesState} casesStore Module containing all the cases tab logic
  */
 export interface StoreState {
   problemName: string;
+  problemMarkdown: string;
+  problemCodeContent: string;
+  problemCodeExtension: string;
+  problemSolutionMarkdown: string;
   casesStore: CasesState;
 }
 
@@ -26,6 +36,23 @@ export interface StoreState {
  */
 export interface RootState {
   problemName: string;
+}
+
+/**
+ * CaseLineKind
+ * Contains the possible values of Caseline kind
+ */
+export type CaseLineKind = 'line' | 'multiline' | 'array' | 'matrix';
+
+/**
+ * MatrixDistinctType
+ * Defines the different ways matrix can be distinct
+ */
+export enum MatrixDistinctType {
+  None = 'none',
+  Rows = 'rows',
+  Cols = 'cols',
+  Both = 'both',
 }
 
 /**
@@ -47,7 +74,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: boolean;
-      value: number[];
+      value: string;
     }
   | {
       kind: 'matrix';
@@ -55,26 +82,38 @@ export type CaseLineData =
       cols: number;
       min: number;
       max: number;
-      distinct: 'none' | 'rows' | 'cols' | 'both';
-      value: number[][];
+      distinct: MatrixDistinctType;
+      value: string;
     };
 
 /**
- * InLine
+ * CaseLine
  * Line in the editor
  * @alias CaseLine
  * @typedef {object}
  * @property {LineID} lineID UUID of the line
+ * @property {CaseID | null} caseID UUID referencing to the parent case
  * @property {string} label Label of the line
- * @property {string} value Value of the line
- * @property {LineType} lineType Type of line
- * @property {ArrayData} arrayData Object containig all the logic for the Array Generator
- * @property {object} matrixData Object containig all the logic for the Matrix Generator
+ * @property {CaseLineData} data data of the line
  */
 export interface CaseLine {
   lineID: LineID;
+  caseID: CaseID | null;
   label: string;
   data: CaseLineData;
+}
+
+/**
+ * CaseLifeInfo
+ * Info of a CaseLine
+ * @alias CaseLineInfo
+ * @typedef {object}
+ * @property {LineInfoID} lineInfoID UUID of the lineInfo
+ * @property {string} label Label of the line
+ * @property {CaseLineData} content content of the line
+ */
+export interface CaseLineInfo extends Omit<CaseLine, 'lineID' | 'caseID'> {
+  lineInfoID: LineInfoID;
 }
 
 /**
@@ -86,20 +125,24 @@ export interface CaseLine {
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number | null} points Points of the case
- * @property {Array<InLine>} lines Lines containing .IN information of the cases
+ * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
+ * @property {string} output output of the case
+ * @property {boolean} autoPoints Whether the points are gonna be calculated automatically
  */
 export interface Case {
   caseID: string;
   groupID: string;
   name: string;
   lines: CaseLine[];
-  points: number | null;
+  output: string;
+  points: number;
+  autoPoints: boolean;
 }
 
 /**
  * Group
  * Contains all the information of a group
- * @alis Group
+ * @alias Group
  * @typedef {object}
  * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
@@ -111,10 +154,25 @@ export interface Case {
 export interface Group {
   groupID: GroupID;
   name: string;
-  points: number | null;
+  points: number;
   autoPoints: boolean;
   ungroupedCase: boolean;
   cases: Case[];
+}
+
+/**
+ * Layout
+ * Contains all the information of a Layout
+ * @alias Group
+ * @typedef {object}
+ * @property {LayoutID} layoutID UUID of the layout
+ * @property {string} name Name of the Layout
+ * @property {Array<CaseLineInfo>} caseLineInfos Line infos of the Layout
+ */
+export interface Layout {
+  layoutID: LayoutID;
+  name: string;
+  caseLineInfos: CaseLineInfo[];
 }
 
 /**
@@ -152,7 +210,7 @@ export interface CaseRequest {
   caseID: CaseID;
   name: string;
   autoPoints: boolean;
-  points: number | null;
+  points: number;
   lines?: CaseLine[];
 }
 

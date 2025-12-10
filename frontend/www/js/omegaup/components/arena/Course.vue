@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="currentAssignment.name"
-    :should-show-runs="isAdmin || isTeachingAssistant"
+    :should-show-runs="isAdmin"
     :should-show-ranking="showRanking"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -67,6 +67,7 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :next-execution-timestamp="currentNextExecutionTimestamp"
               :problem="problemInfo"
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
@@ -88,6 +89,7 @@
                   $emit('reset-hash', { selectedTab, problemAlias })
               "
               @submit-run="onRunSubmitted"
+              @execute-run="onRunExecuted"
               @show-run="onRunDetails"
               @submit-promotion="
                 (request) => $emit('submit-promotion', request)
@@ -292,12 +294,12 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: null }) nextExecutionTimestamp!: Date | null;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
   @Prop({ default: false }) showRanking!: boolean;
   @Prop() totalRuns!: number;
   @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: false }) isTeachingAssistant!: boolean;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
@@ -308,12 +310,16 @@ export default class ArenaCourse extends Vue {
   T = T;
   omegaup = omegaup;
   PopupDisplayed = PopupDisplayed;
-  isAdmin = this.course.is_admin || this.course.is_curator;
+  isAdmin =
+    this.course.is_admin ||
+    this.course.is_curator ||
+    this.course.is_teaching_assistant;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentNextExecutionTimestamp = this.nextExecutionTimestamp;
   now = new Date();
   INF = '∞';
 
@@ -433,6 +439,10 @@ export default class ArenaCourse extends Vue {
     });
   }
 
+  onRunExecuted(): void {
+    this.$emit('execute-run', { target: this });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     const currentProblem = this.currentAssignment.problems?.find(
@@ -453,6 +463,8 @@ export default class ArenaCourse extends Vue {
     }
     this.currentNextSubmissionTimestamp =
       newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextExecutionTimestamp =
+      newValue.nextExecutionTimestamp ?? null;
   }
 
   @Watch('runDetailsData')

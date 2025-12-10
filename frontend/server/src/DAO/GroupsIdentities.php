@@ -169,4 +169,27 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         }
         return $identities;
     }
+
+    /**
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param list<\OmegaUp\DAO\VO\Groups> $groups
+     */
+    public static function existsByGroupId($identity, $groups): bool {
+        $placeholders = array_fill(0, count($groups), '?');
+        $placeholders = join(',', $placeholders);
+        $sql = "SELECT
+                    COUNT(*)
+                FROM
+                    `Groups_Identities`
+                WHERE
+                    (
+                        `group_id` IN ({$placeholders}) AND
+                        `identity_id` = ?
+                    );";
+        $params = array_map(fn ($group) => $group->group_id, $groups);
+        $params[] = $identity->identity_id;
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
 }

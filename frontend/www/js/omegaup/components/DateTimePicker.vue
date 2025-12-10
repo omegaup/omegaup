@@ -8,7 +8,7 @@
     type="datetime-local"
     :disabled="!enabled"
     :max="finish ? time.formatDateTimeLocal(finish) : null"
-    :min="start ? time.formatDateTimeLocal(start) : null"
+    :min="start ? time.formatDateTimeLocal(addDelay(start)) : null"
     :readonly="readonly || usedFallback"
   />
 </template>
@@ -65,6 +65,16 @@ export default class DateTimePicker extends Vue {
     if (this.finish !== null) {
       $(this.$el).data('datetimepicker').setEndDate(this.finish);
     }
+  }
+
+  private addDelay(date: Date) {
+    // Since test field population is slow, it's necessary to add a delay
+    // of a few minutes to prevent the test from failing due to
+    // the next minute starting.
+    let delayedDate = new Date(date);
+    const delay = 5;
+    delayedDate.setMinutes(delayedDate.getMinutes() - delay);
+    return delayedDate;
   }
 
   @Watch('stringValue')

@@ -11,7 +11,7 @@ import os.path
 import re
 import subprocess
 import sys
-from typing import Optional
+from typing import Optional, Set
 
 from omegaup_hook_tools import git_tools
 
@@ -28,32 +28,7 @@ def _check_mutually_exclusive_schema_modifications(
         root: str,
 ) -> bool:
     '''Ensures that schema.sql and dao_schema.sql are not modified together.'''
-    merge_base = subprocess.run(
-        [
-            '/usr/bin/git',
-            'rev-parse',
-            '--abbrev-ref',
-            '--symbolic-full-name',
-            '@{u}',
-        ],
-        check=False,
-        universal_newlines=True,
-        stdout=subprocess.PIPE,
-        cwd=root,
-    ).stdout.strip() or 'origin/main'
-    modified_files = set(
-        filename.decode('utf-8') for filename in subprocess.run(
-            [
-                '/usr/bin/git',
-                '--no-pager',
-                'diff',
-                '-z',
-                '--name-only',
-                merge_base,
-            ],
-            check=True,
-            stdout=subprocess.PIPE,
-            cwd=root).stdout.strip(b'\x00').split(b'\x00'))
+    modified_files = get_modified_files(root)
     schema_sql_filename = 'frontend/database/schema.sql'
     dao_schema_sql_filename = 'frontend/database/dao_schema.sql'
     schema_sql_modified = schema_sql_filename in modified_files
@@ -84,6 +59,36 @@ def _check_mutually_exclusive_schema_modifications(
         return False
 
     return True
+
+
+def get_modified_files(root: str) -> Set[str]:
+    '''Get the list of modified files in the current commit.'''
+    merge_base = subprocess.run(
+        [
+            '/usr/bin/git',
+            'rev-parse',
+            '--abbrev-ref',
+            '--symbolic-full-name',
+            '@{u}',
+        ],
+        check=False,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        cwd=root,
+    ).stdout.strip() or 'origin/main'
+    return set(
+        filename.decode('utf-8') for filename in subprocess.run(
+            [
+                '/usr/bin/git',
+                '--no-pager',
+                'diff',
+                '-z',
+                '--name-only',
+                merge_base,
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            cwd=root).stdout.strip(b'\x00').split(b'\x00'))
 
 
 def _expected_database_schema(*,
@@ -122,6 +127,42 @@ def strip_mysql_extensions(sql: bytes) -> bytes:
                   flags=re.MULTILINE | re.DOTALL)
 
 
+def file_exists_in_remote_repo(file: str) -> bool:
+    '''Check if a file exists in the repository.'''
+    result = subprocess.run(
+        ['git', 'ls-tree', '-r', 'origin/main', '--name-only'],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return file in result.stdout.strip().split('\n')
+
+
+def contains_drop_table_statement(filename: str) -> bool:
+    '''Check if the migration script file contains "DROP TABLE" statement.'''
+    with open(filename, 'r', encoding='utf-8') as file:
+        content = file.read()
+    return 'DROP TABLE' in content
+
+
+def check_extra_validations(filename: str) -> None:
+    '''Run extra validations for migration script files.'''
+    pattern = r'^frontend/database/\d{5}_[a-zA-Z0-9_-]+\.sql$'
+    if re.match(pattern, filename):
+        if file_exists_in_remote_repo(filename):
+            print((f'{git_tools.COLORS.FAIL}{filename!r} already exists in the'
+                   f' remote repository and cannot be modified.'
+                   f'{git_tools.COLORS.NORMAL}'),
+                  file=sys.stderr)
+            sys.exit(1)
+        elif contains_drop_table_statement(filename):
+            print((f'{git_tools.COLORS.FAIL}{filename!r} contains "DROP TABLE"'
+                   f' statement and cannot be pushed.'
+                   f'{git_tools.COLORS.NORMAL}'),
+                  file=sys.stderr)
+            sys.exit(1)
+
+
 def main() -> None:
     '''Runs the linters against the chosen files.'''
 
@@ -149,6 +190,17 @@ def main() -> None:
             git_tools.Argument(
                 '--password', default='omegaup', help='MySQL password')])
 
+    root = git_tools.root_dir()
+    modified_files = get_modified_files(root)
+
+    for line in modified_files:
+        if not line.strip():
+            continue
+
+        [filename] = line.split(maxsplit=1)
+
+        check_extra_validations(filename)
+
     if not args.skip_container_check:
         database_utils.check_inside_container()
 
@@ -157,7 +209,6 @@ def main() -> None:
     filtered_files = list(filename for filename in args.files if
                           filename.endswith('.sql'))
 
-    root = git_tools.root_dir()
     if not _check_mutually_exclusive_schema_modifications(
             args=args,
             root=root,

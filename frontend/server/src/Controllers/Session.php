@@ -26,7 +26,7 @@ class ScopedFacebook {
  * @psalm-type ApiToken=array{last_used: \OmegaUp\Timestamp, name: string, rate_limit: array{limit: int, remaining: int, reset: \OmegaUp\Timestamp}, timestamp: \OmegaUp\Timestamp}
  * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
  * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
- * @psalm-type CurrentSession=array{apiTokenId: int|null, api_tokens: list<ApiToken>, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, is_under_13_user: bool, user_verification_deadline: \OmegaUp\Timestamp|null, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, api_tokens: list<ApiToken>, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, mentor_can_choose_coder: bool,  is_under_13_user: bool, user_verification_deadline: \OmegaUp\Timestamp|null, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -243,6 +243,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'auth_token' => null,
                 'cacheKey' => null,
                 'is_admin' => false,
+                'mentor_can_choose_coder' => false,
                 'associated_identities' => [],
                 'api_tokens' => [],
                 'is_under_13_user' => false,
@@ -357,6 +358,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity
+            ),
+            'mentor_can_choose_coder' => \OmegaUp\Authorization::isMentor(
+                $currentIdentity
+            ) && \OmegaUp\Authorization::canChooseCoderOrSchool(
+                \OmegaUp\Time::get()
             ),
             'associated_identities' => $associatedIdentities,
             'api_tokens' => $apiTokens,
@@ -521,7 +527,8 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     public static function loginViaGoogle(
         string $idToken,
-        string $gCsrfToken
+        string $gCsrfToken,
+        ?string $redirect = null
     ): void {
         // Verify the Google ID token on the server side:
         // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token?hl=en
@@ -567,17 +574,20 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::loginViaGoogleEmail(
             $payload['email'],
-            (isset($payload['name']) ? $payload['name'] : null)
+            (isset($payload['name']) ? $payload['name'] : null),
+            $redirect
         );
     }
 
     public static function loginViaGoogleEmail(
         string $email,
-        ?string $name = null
+        ?string $name = null,
+        ?string $redirect = null
     ): void {
-        self::thirdPartyLogin('Google', $email, $name);
+        $result = self::thirdPartyLogin('Google', $email, $name);
+        $isAccountCreation = $result['isAccountCreation'];
 
-        self::redirect();
+        self::redirect($redirect, $isAccountCreation);
     }
 
     /**
@@ -628,7 +638,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     private static function getRedirectUrl(?string $url = null): string {
-        $defaultRedirectUrl = '/profile/';
+        $defaultRedirectUrl = '/?fromLogin';
         if (is_null($url)) {
             return $defaultRedirectUrl;
         }
@@ -643,7 +653,12 @@ class Session extends \OmegaUp\Controllers\Controller {
             empty($redirectParsedUrl['host'])
         ) {
             $path = $redirectParsedUrl['path'] ?? '';
-            return $path !== '/logout/' ? $url : $defaultRedirectUrl;
+            if ($path === '/logout/') {
+                return $defaultRedirectUrl;
+            }
+
+            $separator = str_contains($url, '?') ? '&' : '?';
+            return "{$url}{$separator}fromLogin";
         }
         $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
         if (isset($redirectParsedUrl['port'])) {
@@ -652,8 +667,14 @@ class Session extends \OmegaUp\Controllers\Controller {
         return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
     }
 
-    private static function redirect(?string $redirect = null): void {
-        $redirectUrl = self::getRedirectUrl($redirect);
+    private static function redirect(
+        ?string $redirect = null,
+        ?bool $isAccountCreation = false
+    ): void {
+        $redirectUrl = $isAccountCreation
+        ? '/profile?fromLogin'
+        : self::getRedirectUrl($redirect);
+
         header("Location: {$redirectUrl}");
         throw new \OmegaUp\Exceptions\ExitException();
     }

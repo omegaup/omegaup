@@ -58,16 +58,16 @@ if [ $GIT_PUSH -eq 1 ]; then
 	fi
 fi
 
-if ! which docker-compose >/dev/null; then
-	echo -e "\033[0;31mERROR\033[0m: \`docker-compose\` not found. Please run \`git push\` outside the container."
+if ! command -v docker compose &> /dev/null; then
+	echo -e "\033[0;31mERROR\033[0m: \`docker compose\` not found. Please run \`git push\` outside the container."
 	exit 1
 fi
 
-if ! docker-compose exec -T frontend true 2>/dev/null ; then
-	echo -e "\033[0;31mERROR\033[0m: The container is not running. Please run \`docker-compose up\` and try again."
+if ! docker compose exec -T frontend true 2>/dev/null ; then
+	echo -e "\033[0;31mERROR\033[0m: The container is not running. Please run \`docker compose up\` and try again."
 	exit 1
 fi
 
-docker-compose exec -T frontend python3 /opt/omegaup/stuff/database_schema.py validate $ARGS
-docker-compose exec -T frontend python3 /opt/omegaup/stuff/policy-tool.py validate
+docker compose exec -T frontend python3 /opt/omegaup/stuff/database_schema.py validate $ARGS
+docker compose exec -T frontend python3 /opt/omegaup/stuff/policy-tool.py validate
 exec "${OMEGAUP_ROOT}/stuff/lint.sh" $PRE_UPLOAD_ARGS validate $ARGS

@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
@@ -32,9 +32,10 @@
             class="wmd-input"
           ></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
+            data-statement-edit-markdown
             :markdown="currentMarkdown"
             :source-mapping="statement.sources"
             :image-mapping="statement.images"
@@ -107,7 +108,7 @@ import * as ui from '../../ui';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../markdown';
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from './Markdown.vue';
 import user_Username from '../user/Username.vue';
 
 const markdownConverter = new markdown.Converter({
@@ -117,7 +118,7 @@ const markdownConverter = new markdown.Converter({
 @Component({
   components: {
     'omegaup-user-username': user_Username,
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
   },
 })
 export default class ProblemStatementEdit extends Vue {
@@ -212,5 +213,36 @@ export default class ProblemStatementEdit extends Vue {
 .wmd-preview,
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
+}
+
+.row {
+  .wmd-button-bar {
+    flex-shrink: 0;
+  }
+
+  .wmd-input {
+    flex: 1;
+    min-height: 400px;
+    height: auto !important;
+    resize: vertical;
+  }
+
+  .title {
+    flex-shrink: 0;
+  }
+
+  [data-statement-edit-markdown] {
+    flex: 1;
+    min-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--markdown-preview-border-color);
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  hr,
+  div {
+    flex-shrink: 0;
+  }
 }
 </style>

@@ -283,7 +283,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue(
             !array_diff(
                 $course['languages'],
-                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES())
             )
         );
 
@@ -990,7 +990,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Course can't be updated to Public by non-curator user
+     * Course can't be updated to Public and recommended by non-curator user
      */
     public function testUpdatePublicCourseFailForNonCurator() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -1016,7 +1016,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $course = \OmegaUp\DAO\Courses::getByAlias($alias);
 
-        // Should not update to public the admission mode
+        // Should not update to public the admission mode and recommended
         try {
             \OmegaUp\Controllers\Course::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -1024,6 +1024,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => $course->name,
                 'description' => $course->description,
                 'alias' => $course->alias,
+                'recommended' => true,
                 'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
             ]));
             $this->fail(

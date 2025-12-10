@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
           groups: payload.userSystemGroups,
         },
         on: {
-          'change-role': (selectedRole: omegaup.Selectable<omegaup.Role>) => {
+          'change-role': (selectedRole: omegaup.Selectable<types.UserRole>) => {
             if (selectedRole.selected) {
               api.User.addRole({
                 username: payload.username,

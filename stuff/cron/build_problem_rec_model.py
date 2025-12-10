@@ -2,7 +2,7 @@
 '''Builds the user recommendation model.
 
 This script reads user submissions and builds a recommendation model for
-which problems to attempt after a user has just sucessfully solved a problem.
+which problems to attempt after a user has just successfully solved a problem.
 
 The model is a probability distribution of which problems a random user would
 attempt to solve next, based solely on the sequence of recently solved problems
@@ -355,7 +355,7 @@ def build_parser() -> argparse.ArgumentParser:
                                type=float,
                                default=0.3,
                                help='Minimum MAP score to consider the '
-                               'training sucessful. Use to ensure we '
+                               'training successful. Use to ensure we '
                                'don\'t push bad models to prod.')
     # Input/Output
     io_args = parser.add_argument_group('Input/Output')

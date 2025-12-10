@@ -12,7 +12,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
-    <div v-if="course.is_admin" class="my-5">
+    <div v-if="isAdminOrTeachingAssistant" class="my-5">
       <div class="my-4 markdown">
         <omegaup-markdown
           :markdown="course.description"
@@ -25,7 +25,7 @@
         })
       }}</span>
       <div class="mt-2 row float-sm-right">
-        <div class="col">
+        <div v-if="course.is_admin" class="col">
           <div class="dropdown">
             <a
               data-button-statistics
@@ -60,7 +60,7 @@
             </div>
           </div>
         </div>
-        <div class="col d-flex justify-content-center">
+        <div v-if="course.is_admin" class="col d-flex justify-content-center">
           <div class="dropdown">
             <a
               data-button-manage-course
@@ -114,11 +114,19 @@
                   {{ T.wordsContentType }}
                 </th>
                 <th class="align-middle" scope="col">{{ T.wordsName }}</th>
-                <th v-if="!course.is_admin" class="align-middle" scope="col">
+                <th
+                  v-if="!isAdminOrTeachingAssistant"
+                  class="align-middle"
+                  scope="col"
+                >
                   {{ T.wordsCompletedPercentage }}
                 </th>
                 <th class="align-middle" scope="col">{{ T.wordsDueDate }}</th>
-                <th v-if="course.is_admin" class="align-middle" scope="col">
+                <th
+                  v-if="isAdminOrTeachingAssistant"
+                  class="align-middle"
+                  scope="col"
+                >
                   {{ T.wordsActions }}
                 </th>
               </tr>
@@ -159,13 +167,13 @@
                     {{ assignment.name }}
                   </a>
                 </td>
-                <td v-if="!course.is_admin" class="align-middle">
+                <td v-if="!isAdminOrTeachingAssistant" class="align-middle">
                   {{ getAssignmentProgress(progress[assignment.alias]) }}
                 </td>
                 <td class="align-middle">
                   {{ getFormattedTime(assignment.finish_time) }}
                 </td>
-                <td v-if="course.is_admin" class="align-middle">
+                <td v-if="isAdminOrTeachingAssistant" class="align-middle">
                   <a
                     data-course-scoreboard-button
                     class="mr-2"
@@ -390,6 +398,10 @@ export default class CourseDetails extends Vue {
       completed_points: score,
       total_points: maxScore,
     });
+  }
+
+  get isAdminOrTeachingAssistant(): boolean {
+    return this.course.is_admin || this.course.is_teaching_assistant;
   }
 
   getAssignmentProgress(progress: types.Progress): number {

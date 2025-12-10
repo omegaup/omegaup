@@ -2,6 +2,7 @@
   <input
     v-model="stringValue"
     :name="name"
+    :min="minDateStr"
     :max="maxDateStr"
     class="form-control"
     :class="{ 'is-invalid': isInvalid }"
@@ -28,10 +29,15 @@ export default class DatePicker extends Vue {
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.datePickerFormat }) format!: string;
   @Prop({ default: false }) isInvalid!: boolean;
+  @Prop({ default: null }) min!: Date | null;
   @Prop({ default: null }) max!: Date | null;
 
   private usedFallback: boolean = false;
   private stringValue: string = time.formatDateLocal(this.value);
+
+  get minDateStr() {
+    return this.min?.toISOString()?.split('T')?.[0];
+  }
 
   get maxDateStr() {
     return this.max?.toISOString()?.split('T')?.[0];

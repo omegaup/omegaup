@@ -1,0 +1,123 @@
+endpoints:
+  user_create: "/user/create/"
+  identity_create: "/identity/create/"
+  identity_bulk_create: "/identity/bulkCreate/"
+  school_create: "/school/create/"
+  problem_create: "/problem/create/"
+  contest_create: "/contest/create/"
+  run_create: "/run/create/"
+  course_create: "/course/create/"
+  course_add_admin: "/course/addAdmin/"
+  course_add_student: "/course/addStudent/"
+  group_create: "/group/create/"
+
+generic_group:
+  name: "Grupo Genérico"
+  description: "Grupo para identidades sintéticas"
+  alias: "grupo_1_generico"
+
+workers:
+  user_create: 32
+  identity_bulk_create: 1
+  school_create: 16
+  problem_create: 16
+  contest_create: 16
+  run_create: 4
+  course_create: 16
+  default: 16
+
+environtment:
+  development:
+    counts:
+      users: 1000
+      identities: 100
+      identities_bulk: 200
+      schools: 1000
+      problems_public: 500
+      problems_private: 500
+      contests_past: 1000
+      contests_future: 1000
+      contests_active: 100
+      contests_public: 1000
+      contests_private: 1000
+      run: 2000
+      notifications: 2000
+      courses: 1000
+  testing:
+    counts:
+      users: 10
+      identities: 10
+      identities_bulk: 2
+      schools: 10
+      problems_public: 10
+      problems_private: 10
+      contests_past: 10
+      contests_future: 10
+      contests_active: 10
+      contests_public: 10
+      contests_private: 10
+      run: 10
+      notifications: 10
+      courses: 10
+
+langs:
+  - c11-gcc
+  - c11-clang
+  - cpp11-gcc
+  - cpp11-clang
+  - cpp17-gcc
+  - cpp17-clang
+  - cpp20-gcc
+  - cpp20-clang
+  - java
+  - kt
+  - py2
+  - py3
+  - rb
+  - cs
+  - pas
+  - hs
+  - lua
+  - go
+  - rs
+  - js
+
+selected_tags:
+  - tagname: "problemTagBinarySearchTree"
+    public: true
+
+paths:
+  - test_zip: "frontend/tests/resources/testproblem.zip"
+  - identities_csv: "frontend/tests/resources/identities.csv"
+
+resource_checks:
+  - create: user_create
+    check_api: "/user/profile/"
+    params_map:
+      username: username
+
+  - create: identity_create
+    check_api: "/user/profile/"
+    params_map:
+      username: username
+
+  - create: problem_create
+    check_api: "/problem/details/"
+    params_map:
+      problem_alias: problem_alias
+
+  - create: contest_create
+    check_api: "/contest/adminDetails/"
+    params_map:
+      contest_alias: alias
+
+  - create: course_create
+    check_api: "/course/adminDetails/"
+    params_map:
+      alias: alias
+
+  - create: course_createassignment
+    check_api: "/course/assignmentDetails/"
+    params_map:
+      course: course_alias
+      assignment: alias

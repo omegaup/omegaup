@@ -19,27 +19,36 @@ describe('markdown', () => {
 
     it('Should handle path-style links', () => {
       expect(converter.makeHtml('[foo](/foo)')).toEqual(
-        '<p><a href="/foo">foo</a></p>',
+        '<p><a href="/foo" target="_blank" rel="noopener noreferrer">foo</a></p>',
       );
     });
 
     it('Should handle path-style links with titles', () => {
       expect(converter.makeHtml('[foo](/foo "foo")')).toEqual(
-        '<p><a href="/foo" title="foo">foo</a></p>',
+        '<p><a href="/foo" target="_blank" rel="noopener noreferrer" title="foo">foo</a></p>',
+      );
+    });
+
+    it('Should handle OmegaUp domain links', () => {
+      const url = window.location.origin;
+      expect(converter.makeHtml(`[OmegaUp](${url})`)).toEqual(
+        `<p><a href="${url}">OmegaUp</a></p>`,
       );
     });
 
     it('Should handle mailto links', () => {
       expect(
         converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo)'),
-      ).toEqual('<p><a href="mailto:foo@foo.com?subject=foo">foo</a></p>');
+      ).toEqual(
+        '<p><a href="mailto:foo@foo.com?subject=foo" target="_blank" rel="noopener noreferrer">foo</a></p>',
+      );
     });
 
     it('Should handle mailto links with titles', () => {
       expect(
         converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo "foo")'),
       ).toEqual(
-        '<p><a href="mailto:foo@foo.com?subject=foo" title="foo">foo</a></p>',
+        '<p><a href="mailto:foo@foo.com?subject=foo" target="_blank" rel="noopener noreferrer" title="foo">foo</a></p>',
       );
     });
 

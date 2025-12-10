@@ -135,3 +135,9 @@ pre > code {
   padding: 10px;
   border: 1px solid gray;
 }
+
+.typeahead-badges {
+  max-height: 25vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

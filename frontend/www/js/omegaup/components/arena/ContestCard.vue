@@ -16,9 +16,9 @@
           </b-card-text>
         </b-col>
         <b-col class="col-md-3 col-sm-12 p-1 text-center">
-          <b-card-text>
+          <b-card-text class="d-flex justify-content-center align-items-center">
             <font-awesome-icon class="mr-1" icon="clipboard-list" />
-            {{ contest.organizer }}
+            <p class="m-0">{{ contest.organizer }}</p>
           </b-card-text>
         </b-col>
 
@@ -28,21 +28,21 @@
               ref="contestButtonScoreboard"
               :href="getContestScoreboardURL(contest.alias)"
               variant="success"
+              class="d-flex justify-content-center align-items-center mb-2"
             >
               <font-awesome-icon class="mr-1" icon="table" />
               {{ T.contestButtonScoreboard }}
             </b-button>
           </slot>
-
           <div class="d-flex align-items-center justify-content-center">
             <slot name="contest-enroll-status">
               <b-card-text
                 v-if="contest.participating"
                 ref="contestEnrollStatus"
-                class="contest-enroll-status"
+                class="contest-enroll-status d-flex justify-content-center align-items-center"
               >
                 <font-awesome-icon class="mr-1" icon="clipboard-check" />
-                {{ T.contestEnrollStatus }}
+                <p class="m-0">{{ T.contestEnrollStatus }}</p>
               </b-card-text>
             </slot>
           </div>
@@ -53,13 +53,15 @@
           <slot name="text-contest-date"></slot>
         </b-col>
         <b-col class="col-md-3 col-sm-12 p-1 text-center">
-          <b-card-text>
+          <b-card-text class="d-flex justify-content-center align-items-center">
             <font-awesome-icon class="mr-1" icon="stopwatch" />
-            {{
-              ui.formatString(T.contestDuration, {
-                duration: contestDuration,
-              })
-            }}
+            <p class="m-0">
+              {{
+                ui.formatString(T.contestDuration, {
+                  duration: contestDuration,
+                })
+              }}
+            </p>
           </b-card-text>
         </b-col>
         <b-col
@@ -67,9 +69,11 @@
         >
           <div class="d-flex align-items-center justify-content-center">
             <slot>
-              <b-card-text class="mr-3 m-0">
-                <font-awesome-icon icon="users" />
-                {{ contest.contestants }}
+              <b-card-text
+                class="mr-3 m-0 d-flex justify-content-center align-items-center"
+              >
+                <font-awesome-icon icon="users" class="m-1" />
+                <p class="m-0">{{ contest.contestants }}</p>
               </b-card-text>
             </slot>
             <slot name="contest-button-enter">
@@ -78,7 +82,7 @@
                 ref="contestButtonEnter"
                 :href="getContestURL(contest.alias)"
                 variant="primary"
-                class="button-style"
+                class="button-style d-flex justify-content-center align-items-center"
               >
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonEnter }}
@@ -90,7 +94,7 @@
                 ref="contestButtonSeeDetails"
                 :href="getContestURL(contest.alias)"
                 variant="primary"
-                class="text-center"
+                class="d-flex align-items-center justify-content-center"
               >
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonSeeDetails }}
@@ -98,17 +102,17 @@
             </slot>
           </div>
           <slot name="contest-dropdown">
-            <b-dropdown variant="primary">
+            <b-dropdown variant="primary" class="d-inline-block">
               <template #button-content>
                 <font-awesome-icon class="mr-1" icon="sign-in-alt" />
                 {{ T.contestButtonEnter }}
               </template>
-              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
-                T.contestVirtualMode
-              }}</b-dropdown-item>
-              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
-                T.contestPracticeMode
-              }}</b-dropdown-item>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">
+                {{ T.contestVirtualMode }}
+              </b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
+                {{ T.contestPracticeMode }}
+              </b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
@@ -184,5 +188,11 @@ export default class ContestCard extends Vue {
 }
 .btn {
   color: $omegaup-white;
+  &.btn-success:hover {
+    color: $omegaup-white !important;
+  }
+  min-width: 120px;
+  width: 100%;
+  max-width: 200px;
 }
 </style>

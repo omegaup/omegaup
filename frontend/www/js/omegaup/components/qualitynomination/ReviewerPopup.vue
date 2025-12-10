@@ -59,7 +59,7 @@
                 data-review-submit-button
                 class="btn btn-primary mr-3"
                 type="submit"
-                :disabled="qualitySeal && !tag"
+                :disabled="publicTagsList.length === 0"
                 @click="onSubmit"
               >
                 {{ T.wordsSend }}
@@ -132,7 +132,6 @@ export default class ReviewerPopup extends Vue {
   T = T;
   currentView: AvailableViews = AvailableViews.Content;
   qualitySeal = true;
-  tag = '';
   publicTagsList = this.selectedPublicTags ?? [];
 
   get sortedProblemTags(): ProblemTag[] {
@@ -177,7 +176,10 @@ export default class ReviewerPopup extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this.tag, this.qualitySeal);
+    this.$emit('rate-problem-as-reviewer', {
+      tags: this.publicTagsList,
+      qualitySeal: this.qualitySeal,
+    });
     this.currentView = AvailableViews.Thanks;
     setTimeout(() => this.onHide(), 2000);
   }

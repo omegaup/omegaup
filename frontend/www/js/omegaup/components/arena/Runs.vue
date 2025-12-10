@@ -238,6 +238,7 @@
                   :username="run.username"
                   :country="run.country_id"
                   :linkify="true"
+                  :href="'#runs'"
                   :emit-click-event="true"
                   @click="
                     (username) =>
@@ -268,12 +269,14 @@
                 </a>
               </td>
               <td v-if="showProblem" class="text-break-all">
+                <a href="#runs" @click="setFilterProblem(run.alias)">{{
+                  run.alias
+                }}</a>
                 <a
-                  href="#runs"
-                  @click.prevent="filterProblem.key = run.alias"
-                  >{{ run.alias }}</a
+                  problem-navigation-button
+                  :href="`/arena/problem/${run.alias}/`"
+                  class="ml-2"
                 >
-                <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
                   <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                 </a>
               </td>
@@ -294,11 +297,6 @@
                 >
                   <font-awesome-icon :icon="['fas', 'question-circle']" />
                 </button>
-                <span
-                  v-if="run.submission_feedback_id !== null && showDisqualify"
-                  class="position-absolute top-0 end-0 badge badge-pill badge-danger"
-                  >1
-                </span>
               </td>
               <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
               <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
@@ -694,6 +692,15 @@ export default class Runs extends Vue {
     if (run.verdict == 'AC') {
       return 'status-ac';
     }
+    if (run.verdict == 'TLE') {
+      return 'status-tle';
+    }
+    if (run.verdict == 'MLE') {
+      return 'status-mle';
+    }
+    if (run.verdict == 'WA') {
+      return 'status-wa';
+    }
     if (run.verdict == 'CE') {
       return 'status-ce';
     }
@@ -874,6 +881,10 @@ export default class Runs extends Vue {
     }
     this.$emit('update-search-result-users', { query });
   }
+
+  setFilterProblem(problemAlias: string): void {
+    this.filterProblem = { key: problemAlias, value: problemAlias };
+  }
 }
 </script>
 
@@ -931,8 +942,36 @@ export default class Runs extends Vue {
   background: var(--arena-runs-table-status-ac-background-color);
   color: var(--arena-runs-table-status-ac-font-color);
 }
+.status-wa {
+  background: var(--arena-runs-table-status-wa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-mle {
+  background: var(--arena-runs-table-status-mle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-tle {
+  background: var(--arena-runs-table-status-tle-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
+}
+.status-pa {
+  background: var(--arena-runs-table-status-pa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-ole {
+  background: var(--arena-runs-table-status-ole-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-rte {
+  background: var(--arena-runs-table-status-rte-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-rfe {
+  background: var(--arena-runs-table-status-rfe-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
 }
 </style>

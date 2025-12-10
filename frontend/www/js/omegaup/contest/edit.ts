@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       admins: payload.admins,
       details: payload.details,
+      initialTab: window.location.hash?.substring(1) || '',
       groupAdmins: payload.group_admins,
       groups: payload.groups,
       problems: payload.problems,
@@ -38,8 +39,14 @@ OmegaUp.on('ready', () => {
       certificatesDetails: payload.certificatesDetails,
     }),
     methods: {
-      arbitrateRequest: (username: string, resolution: boolean): void => {
-        const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+      arbitrateRequest: (
+        username: string,
+        resolution: boolean,
+        resolutionText: null | string = null,
+      ): void => {
+        if (!resolutionText) {
+          resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+        }
         api.Contest.arbitrateRequest({
           contest_alias: payload.details.alias,
           username,
@@ -152,6 +159,7 @@ OmegaUp.on('ready', () => {
         props: {
           admins: this.admins,
           details: this.details,
+          initialTab: this.initialTab,
           groupAdmins: this.groupAdmins,
           groups: this.groups,
           problems: this.problems,
@@ -465,8 +473,14 @@ OmegaUp.on('ready', () => {
           'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': ({ username }: { username: string }) => {
-            this.arbitrateRequest(username, false);
+          'deny-request': ({
+            username,
+            resolutionText,
+          }: {
+            username: string;
+            resolutionText: null | string;
+          }) => {
+            this.arbitrateRequest(username, false, resolutionText);
           },
           'add-admin': (username: string) => {
             api.Contest.addAdmin({

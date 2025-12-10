@@ -267,10 +267,14 @@ def migrate(args: argparse.Namespace,
     latest_revision = 0
     if update_metadata:
         latest_revision = _revision(args, auth)
+    logging.info('Latest revision is %d', latest_revision)
+    logging.info('Reading scripts... Update metadata: %r', update_metadata)
     scripts = _scripts()
+    logging.info('Found %d scripts', len(scripts))
     if not scripts:
         # If there are no scripts that need to be run, there is no need to even
         # touch the connection timeout.
+        logging.info('No scripts to run, exiting...')
         return
 
     databases = args.databases.split(',')
@@ -295,12 +299,43 @@ def migrate(args: argparse.Namespace,
                 comment = "skipped"
             else:
                 for dbname in databases:
-                    database_utils.mysql(
-                        'source %s;' % database_utils.quote(path),
-                        dbname=dbname,
-                        auth=auth,
-                        container_check=not args.skip_container_check,
-                    )
+                    try:
+                        # Start the transaction
+                        database_utils.mysql(
+                            'START TRANSACTION;',
+                            dbname=dbname,
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
+                        # Run the script
+                        database_utils.mysql(
+                            'source %s;' % database_utils.quote(path),
+                            dbname=dbname,
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
+                        # Commit the transaction
+                        database_utils.mysql(
+                            'COMMIT;',
+                            dbname=dbname,
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
+                        logging.info('Transaction committed successfully for '
+                                     'database: %s', dbname)
+
+                    except subprocess.CalledProcessError as e:
+                        # Rollback the transaction in case of error
+                        database_utils.mysql(
+                            'ROLLBACK;',
+                            dbname=dbname,
+                            auth=auth,
+                            container_check=not args.skip_container_check,
+                        )
+                        logging.error('Transaction rolled back due to error '
+                                      'in script %r: %s', path, e.stderr)
+                        raise
+
             if update_metadata:
                 database_utils.mysql(
                     ('INSERT INTO `Revision` '

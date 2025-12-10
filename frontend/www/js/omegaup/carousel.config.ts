@@ -21,102 +21,77 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/carousel_slide_1.svg',
+    image: '/media/homepage/egoi25.png',
     title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
+      en: 'Mexico present at EGOI 2025',
+      es: 'México presente en la EGOI 2025',
+      pt: 'México presente na EGOI 2025',
     },
     description: {
       en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
       pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
+        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
     },
     button: {
       text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
+        en: 'EGOI',
+        es: 'EGOI',
+        pt: 'EGOI',
       },
-      href: 'https://blog.omegaup.com/introduccion-a-omegaup-parte-0/',
+      href: 'https://egoi.org/',
       target: '_blank',
     },
   },
   {
-    image: '/media/homepage/carousel_slide_2.svg',
+    image: '/media/homepage/copa.png',
     title: {
-      en: 'Would you like to learn to program?',
-      es: '¿Te gustaría aprender a programar?',
-      pt: 'Deseja aprender a programar?',
+      en: 'Copa de Comunidades de Programación',
+      es: 'Copa de Comunidades de Programación',
+      pt: 'Copa de Comunidades de Programação',
     },
     description: {
       en:
-        'Join the free Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
       es:
-        'Apúntate al curso gratuito de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
       pt:
-        'Participe do curso gratuito de Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
     },
     button: {
       text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
+        en: 'Final Ranklist',
+        es: 'Ranklist final',
+        pt: 'Ranklist final',
       },
-      href: '/course/introduccion_a_cpp/',
-      target: '_self',
+      href: 'https://omegaup.github.io/CCP/',
+      target: '_blank',
     },
   },
   {
-    image: '/media/homepage/carousel_slide_4.svg',
+    image: '/media/homepage/Instagram.png',
     title: {
-      en: 'Solve a new problem every week',
-      es: 'Resuelve un problema nuevo cada semana',
-      pt: 'Resolva um novo problema a cada semana',
+      en: 'Do you already follow us on Instagram?',
+      es: '¿Ya nos sigues en Instagram?',
+      pt: 'Você já nos segue no Instagram?',
     },
     description: {
       en:
-        'Enroll in the "Solving problems in omegaUp 2022" course, learn tips about programming contests and earn prizes.',
+        'Stay up to date with news, events, and much more. Follow us and be part of the community!',
       es:
-        'Únete al curso "Resolviendo problemas en omegaUp 2022", aprende tips sobre concursos de programación y gana premios.',
+        'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
       pt:
-        'Inscreva-se no curso "Resolvendo problemas no omegaUp 2022", aprenda dicas sobre concursos de programação e ganhe prêmios.',
+        'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
     },
     button: {
       text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
+        en: 'Follow us',
+        es: 'Síguenos',
+        pt: 'Siga-nos',
       },
-      href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
-      target: '_self',
-    },
-  },
-  {
-    image: '/media/homepage/discord_logo.svg',
-    title: {
-      en: 'Join our coders community',
-      es: 'Únete a nuestra comunidad de coders',
-      pt: 'Junte-se à nossa comunidade de coders',
-    },
-    description: {
-      en:
-        'Join omegaUp´s Discord server and hang out with your community, get help and learn about new projects.',
-      es:
-        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
-      pt:
-        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
-    },
-    button: {
-      text: {
-        en: 'Join here',
-        es: 'Únete aquí',
-        pt: 'Junte-se aqui',
-      },
-      href: 'https://discord.com/invite/K3JFd9d3wk',
+      href: 'https://www.instagram.com/omegaup_org/',
       target: '_blank',
     },
   },

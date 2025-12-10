@@ -1,11 +1,12 @@
-![omegaUp](frontend/www/media/omegaup.png)](https://omegaup.com)
+[![omegaUp](frontend/www/media/omegaup.png)](https://omegaup.com)
 [![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors) [![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen) [![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
 
 [![Forks](https://img.shields.io/github/forks/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/network/members) [![Stars](https://img.shields.io/github/stars/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/stargazers) [![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
 
 Ver el contenido en Español: [Español](#Español)  
 View the content in English: [English](#English)  
-Veja o conteúdo em Português: [Português](#Português)
+Veja o conteúdo em Português: [Português](#Português)  
+Vedi il contenuto in Italiano: [Italiano](#Italiano)
 
 # Español
 [omegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica.
@@ -127,5 +128,46 @@ Os navegadores oficialmente suportados são aqueles que suportam [ECMAScript 201
 Isso também inclui todos os navegadores baseados em Blink/WebKit cujas versões são compatíveis com Chrome/Safari.
 
 ## Licença
+
+BSD
+
+# Italiano
+[omegaUp](https://omegaup.com) è una piattaforma educativa gratuita che aiuta a migliorare le abilità nella programmazione, usata da decine di migliaia di studenti ed insegnanti in America Latina.
+
+## Cartelle
+
+Le cartelle che sono attivamente utilizzate nello sviluppo.
+
+| Cartella | Descrizione |
+|------------|-------------|
+| [frontend/server/src/Controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/Controllers) | Logica di business che implementa le API di omegaUp. |
+| [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs) | Librerie e utility. |
+| [frontend/server/src/DAO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO) | I Data Access Objects [DAO] e Value Objects [VO]. Classi utilizzate per rappresentare gli schemi del database e facilitare il loro utilizzo da parte dei controller. |
+| [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates) | Modelli utilizzati per generare l'HTML visualizzato agli utenti. Sono anche presenti i file di internazionalizzazione per inglese, spagnolo e portoghese. |
+| [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www) |  L'intero contenuto del sito web. |
+
+Il resto del codice si trova in altre repository.
+
+| Repository| Descrizione |
+|------------|-------------|
+| [quark](https://github.com/omegaup/quark) | Include il codice del grader per la valutazione dei problemi e l'esecuzione dei codici sotto minijail, così come il servizio utilizzato nei server cloud per gestire la coda delle sottomissioni. |
+| [karel.js](https://github.com/omegaup/karel.js) | La versione ufficiale di Karel utilizzata dall'Olimpiade Messicana di Informatica. |
+| [omegajail](https://github.com/omegaup/omegajail) | Un meccanismo di esecuzione sicura basato su container Linux e seccomp-bpf. Utilizza [minijail](https://android.googlesource.com/platform/external/minijail/+/master), sviluppato dal progetto [Chromium](https://www.chromium.org). |
+| [libinteractive](https://github.com/omegaup/libinteractive) | Una libreria per creare facilmente problemi interattivi.
+
+## Browser supportati
+
+I browser ufficialmente supportati sono quelli che supportano [ECMAScript 2015 (ES6)](https://caniuse.com/#feat=es6), e comprendono i seguenti:
+
+| Browser | Versione |
+|-----------|---------|
+| [Chrome](https://www.google.com/chrome/) | 51 |
+|[Firefox](http://mozilla.org/firefox/releases/) | 68 |
+| [Edge](https://www.microsoft.com/edge) | 12 |
+| [Safari](https://www.apple.com/safari/) | 12 |
+
+Questo include anche tutti i browser basati su Blink/WebKit le cui versioni sono compatibili con quelle di Chrome/Safari.
+
+## Licenza
 
 BSD
