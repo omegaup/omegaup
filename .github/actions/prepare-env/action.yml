@@ -1,17 +1,17 @@
-name: 'Prepare Environment'
-description: 'Sets up Docker, Configs, and Database for CI jobs'
+name: Prepare Environment
+description: Sets up Docker, Configs, and Database for CI jobs
 inputs:
   install_host_python_deps:
-    description: 'Whether to install python dependencies on the host runner'
+    description: Whether to install python dependencies on the host runner
     required: false
-    default: 'false'
+    default: false
   extra_python_requirements:
-    description: 'Path to additional requirements file to install on host'
+    description: Path to additional requirements file to install on host
     required: false
     default: ''
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Install system tools
       shell: bash

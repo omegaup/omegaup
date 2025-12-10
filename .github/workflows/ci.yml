@@ -35,8 +35,8 @@ jobs:
           - 5672:5672
           - 15672:15672
         env:
-          RABBITMQ_DEFAULT_USER: 'omegaup'
-          RABBITMQ_DEFAULT_PASS: 'omegaup'
+          RABBITMQ_DEFAULT_USER: omegaup
+          RABBITMQ_DEFAULT_PASS: omegaup
 
     steps:
       - uses: actions/checkout@v4
@@ -287,7 +287,7 @@ jobs:
       - name: Prepare Environment
         uses: ./.github/actions/prepare-env
         with:
-          install_host_python_deps: 'true'
+          install_host_python_deps: true
 
       - name: Install yarn dependencies
         run: yarn install
@@ -373,8 +373,8 @@ jobs:
       - name: Prepare Environment
         uses: ./.github/actions/prepare-env
         with:
-          install_host_python_deps: 'true'
-          extra_python_requirements: 'stuff/teaching_assistant/requirements.txt'
+          install_host_python_deps: true
+          extra_python_requirements: stuff/teaching_assistant/requirements.txt
 
       - name: Run pre setup for course mode
         run: |
@@ -392,4 +392,3 @@ jobs:
       - name: Run check for submission mode
         run: |
           pytest stuff/teaching_assistant/test_ta_submission_mode.py --log-cli-level=INFO -s
-
