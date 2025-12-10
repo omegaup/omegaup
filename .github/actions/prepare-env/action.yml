@@ -1,0 +1,115 @@
+name: 'Prepare Environment'
+description: 'Sets up Docker, Configs, and Database for CI jobs'
+inputs:
+  install_host_python_deps:
+    description: 'Whether to install python dependencies on the host runner'
+    required: false
+    default: 'false'
+  extra_python_requirements:
+    description: 'Path to additional requirements file to install on host'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install system tools
+      shell: bash
+      run: |
+        sudo apt-get update -y && sudo apt-get install -y wait-for-it retry
+
+    - name: Download the Docker containers
+      shell: bash
+      run: docker compose pull
+
+    - name: Clean up existing Docker volumes
+      shell: bash
+      run: |
+        docker compose down -v || true
+        docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+
+    - name: Start the Docker containers
+      shell: bash
+      run: |
+        docker compose up --no-build --detach
+
+        # Add aliases
+        cat << EOF | sudo tee --append /etc/hosts
+        127.0.0.1 mysql grader runner gitserver broadcaster redis rabbitmq
+        EOF
+
+        # Wait for common services
+        wait-for-it -t 60 mysql:13306
+        wait-for-it -t 60 gitserver:33861
+        wait-for-it -t 60 redis:6379
+
+        # Wait for mysql to be fully ready
+        for i in $(seq 30); do
+          if [[ "$(mysql -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch -e 'SELECT 1;' || echo 0)" == "1" ]]; then
+            break
+          fi
+          sleep 1
+        done
+
+    - name: Create default configuration files
+      shell: bash
+      run: |
+        cat > frontend/server/config.php <<EOF
+        <?php
+        define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+        define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
+        define('OMEGAUP_DB_HOST', 'mysql:13306');
+        define('OMEGAUP_DB_NAME', 'omegaup');
+        define('OMEGAUP_DB_PASS', 'omegaup');
+        define('OMEGAUP_DB_USER', 'omegaup');
+        define('OMEGAUP_ENVIRONMENT', 'development');
+        define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
+        define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
+        define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
+        define('OMEGAUP_GRADER_URL', 'https://grader:21680');
+        define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+        define('REDIS_HOST', 'redis');
+        define('REDIS_PASS', '');
+        define('TEMPLATE_CACHE_DIR', '/tmp');
+        define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
+        EOF
+
+        cat > ~/.my.cnf << EOF
+        [client]
+        port=13306
+        host=mysql
+        protocol=tcp
+        user=root
+        password=omegaup
+        EOF
+
+    - name: Install composer dependencies
+      shell: bash
+      run: composer install --prefer-dist --no-progress
+
+    - name: Install Host Python dependencies
+      if: inputs.install_host_python_deps == 'true'
+      shell: bash
+      run: |
+        python3 -m pip install --user setuptools wheel
+        python3 -m pip install --user -r stuff/requirements.txt
+        if [ -n "${{ inputs.extra_python_requirements }}" ]; then
+          python3 -m pip install --user -r "${{ inputs.extra_python_requirements }}"
+        fi
+
+    - name: Initialize database
+      shell: bash
+      run: |
+        mysql -e 'CREATE USER IF NOT EXISTS "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+        mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
+        mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
+
+        sudo mkdir -p /var/lib/omegaup
+        sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
+
+        docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
+          python3 -m venv /opt/omegaup/stuff/venv && \
+          python3 -m pip install wheel && \
+          python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
+          
+        docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
