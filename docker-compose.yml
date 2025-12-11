@@ -5,10 +5,13 @@ services:
       - 'omegaupdata:/var/lib/omegaup'
     command: >
       sh -c "
+        echo 'Starting volume initialization...' &&
         mkdir -p /var/lib/omegaup/problems.git &&
         mkdir -p /var/lib/omegaup/submissions &&
         mkdir -p /var/lib/omegaup/templates &&
-        echo 'Volume initialization complete'
+        touch /var/lib/omegaup/.init-complete &&
+        echo 'Volume initialization complete' &&
+        ls -la /var/lib/omegaup/
       "
 
   frontend:
@@ -97,6 +100,8 @@ services:
       volume-init:
         condition: service_completed_successfully
       mysql:
+        condition: service_started
+      gitserver:
         condition: service_started
     volumes:
       - type: bind

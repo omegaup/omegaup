@@ -298,9 +298,14 @@ jobs:
           docker compose down -v || true
           # Make sure any orphaned volumes are cleaned up
           docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+          # Give Docker time to fully clean up volume state
+          sleep 2
+          # Verify volumes are gone
+          docker volume ls | grep omegaup || echo "All omegaup volumes cleaned successfully"
 
       - name: Start the Docker containers
         run: |
+          # Start containers with explicit dependencies enforced
           docker compose up --no-build --detach
 
           # Add the container names as aliases to localhost
@@ -440,9 +445,14 @@ jobs:
           docker compose down -v || true
           # Make sure any orphaned volumes are cleaned up
           docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+          # Give Docker time to fully clean up volume state
+          sleep 2
+          # Verify volumes are gone
+          docker volume ls | grep omegaup || echo "All omegaup volumes cleaned successfully"
 
       - name: Start the Docker containers
         run: |
+          # Start containers with explicit dependencies enforced
           docker compose up --no-build --detach
 
           # Add the container names as aliases to localhost
@@ -558,9 +568,14 @@ jobs:
           docker compose down -v || true
           # Make sure any orphaned volumes are cleaned up
           docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
+          # Give Docker time to fully clean up volume state
+          sleep 2
+          # Verify volumes are gone
+          docker volume ls | grep omegaup || echo "All omegaup volumes cleaned successfully"
 
       - name: Start the Docker containers
         run: |
+          # Start containers with explicit dependencies enforced
           docker compose up --no-build --detach
 
           # Add the container names as aliases to localhost
