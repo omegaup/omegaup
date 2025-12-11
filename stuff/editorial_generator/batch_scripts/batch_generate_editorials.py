@@ -6,10 +6,9 @@ batch_generate_editorials.py - Batch editorial generation using AI Editorial
 API
 
 This script processes a list of problems through the new asynchronous AI
-Editorial API. It manages authentication, rate limiting, status polling, and
-comprehensive logging for large-scale editorial generation tasks with
-validation verdict tracking.
-for large-scale editorial generation tasks with validation verdict tracking.
+Editorial API. It manages authentication, status polling, and comprehensive
+logging for large-scale editorial generation tasks with validation verdict
+tracking.
 
 INTEGRATION WORKFLOW:
     1. get_user_problems.py writes problems → {PROBLEMS_LIST_FILE}
@@ -22,7 +21,7 @@ Features:
 - Automatic problem file discovery and creation
 - Asynchronous API integration with status polling
 - Validation verdict tracking and analysis (AC, WA, TLE, etc.)
-- Intelligent rate limiting (5 jobs/hour, cooldowns)
+- API-side rate limit detection and error handling
 - Comprehensive logging with performance metrics
 - Enhanced reporting with multiple output files
 - Resume functionality for interrupted sessions
@@ -61,7 +60,7 @@ import time
 import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 import requests
@@ -209,9 +208,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 "Either OMEGAUP_OUAT_TOKEN or both OMEGAUP_USERNAME and "
                 "OMEGAUP_PASSWORD must be set in .env file")
 
-        # Rate limiting configuration (from API documentation)
-        self.max_jobs_per_hour = 5  # Updated to match actual API limits
-        self.problem_cooldown_minutes = 5
+        # API polling configuration
         self.status_poll_interval = 30  # seconds
         self.max_poll_duration = 3600   # 1 hour max per job
 
@@ -225,8 +222,6 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
 
         # Job tracking
         self.jobs: Dict[str, EditorialJob] = {}
-        self.submitted_times: List[datetime] = []
-        self.problem_last_submitted: Dict[str, datetime] = {}
 
         # Statistics
         self.stats = SessionStats(start_time=datetime.now())
@@ -434,67 +429,10 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
         self.main_logger.error("Error logged: %s", error_message)
         # Note: problem_alias and category are logged for future use
 
-    def _check_rate_limits(self) -> Tuple[bool, Optional[int]]:
-        """Check if we can submit a new job based on rate limiting rules."""
-        now = datetime.now()
-
-        # Check hourly rate limit
-        one_hour_ago = now - timedelta(hours=1)
-        recent_submissions = [
-            t for t in self.submitted_times if t > one_hour_ago]
-
-        if len(recent_submissions) >= self.max_jobs_per_hour:
-            oldest_submission = min(recent_submissions)
-            wait_time = int(
-                (oldest_submission +
-                 timedelta(
-                     hours=1) -
-                    now).total_seconds())
-            self.main_logger.warning(
-                "⏳ Hourly rate limit reached (%s/hour). Wait %ss",
-                self.max_jobs_per_hour, wait_time)
-            return False, wait_time
-
-        return True, None
-
-    def _check_problem_cooldown(
-        self, problem_alias: str) -> Tuple[bool, Optional[int]]:
-        """Check if enough time has passed since last submission for
-        this problem."""
-        if problem_alias not in self.problem_last_submitted:
-            return True, None
-
-        last_submitted = self.problem_last_submitted[problem_alias]
-        cooldown_end = last_submitted + \
-            timedelta(minutes=self.problem_cooldown_minutes)
-        now = datetime.now()
-
-        if now < cooldown_end:
-            wait_time = int((cooldown_end - now).total_seconds())
-            self.main_logger.warning(
-                "⏳ Problem %s in cooldown. Wait %ss", problem_alias, wait_time)
-            return False, wait_time
-
-        return True, None
-
     def submit_editorial_job(self, problem_alias: str) -> bool:
         """Submit a single editorial generation job."""
         self.main_logger.info(
             "📝 Submitting editorial job for: %s", problem_alias)
-
-        # Check rate limits
-        can_submit, wait_time = self._check_rate_limits()
-        if not can_submit:
-            self.main_logger.warning(
-                "⏳ Rate limit: waiting %ss before retry", wait_time)
-            return False
-
-        # Check problem-specific cooldown
-        can_submit, wait_time = self._check_problem_cooldown(problem_alias)
-        if not can_submit:
-            self.main_logger.warning(
-                "⏳ Problem cooldown: waiting %ss before retry", wait_time)
-            return False
 
         try:
             # Submit job via AI Editorial API
@@ -515,10 +453,6 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                     )
 
                     self.jobs[job_id] = job
-                    if job.submitted_at:
-                        self.submitted_times.append(job.submitted_at)
-                        self.problem_last_submitted[problem_alias] = (
-                            job.submitted_at)
                     self.stats.jobs_submitted += 1
 
                     self.main_logger.info("✅ Job submitted successfully")
@@ -818,13 +752,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 'timestamp': datetime.now().isoformat(),
                 'username': self.username,
                 'stats': stats_dict,
-                'jobs': jobs_dict,
-                'submitted_times': [
-                    t.isoformat() for t in self.submitted_times],
-                'problem_last_submitted': {
-                    problem: time.isoformat()
-                    for problem, time in self.problem_last_submitted.items()
-                }
+                'jobs': jobs_dict
             }
 
             with open(self.state_file, 'w', encoding='utf-8') as f:
@@ -870,18 +798,6 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         0),
                     editorial_content=job_data.get('editorial_content'))
                 self.jobs[job_id] = job
-
-            # Restore timestamps
-            self.submitted_times = [
-                datetime.fromisoformat(t)
-                for t in state_data.get('submitted_times', [])
-            ]
-
-            self.problem_last_submitted = {
-                problem: datetime.fromisoformat(time_str)
-                for problem, time_str in state_data.get(
-                    'problem_last_submitted', {}).items()
-            }
 
             # Restore stats
             stats_data = state_data.get('stats', {})
@@ -1312,14 +1228,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 success = self.submit_editorial_job(problem)
 
                 if not success:
-                    # Handle rate limiting or other issues
-                    can_submit, wait_time = self._check_rate_limits()
-                    if not can_submit and wait_time:
-                        self.main_logger.info(
-                            "⏳ Waiting %ds for rate limit...", wait_time)
-                        time.sleep(wait_time)
-                        # Retry submission
-                        success = self.submit_editorial_job(problem)
+                    self.main_logger.warning(
+                        "⚠️  Failed to submit job for %s", problem)
 
                 # Save state periodically
                 if i % 10 == 0:

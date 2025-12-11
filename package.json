@@ -138,14 +138,14 @@
     "vue-typeahead-bootstrap": "^2.1.2",
     "vuex": "^3.0.1",
     "vuex-class": "^0.3.2",
-    "webpack": "^5.8",
+    "webpack": "^5.94",
     "webpack-cli": "^4.2",
     "wrapper-webpack-plugin": "^2.1"
   },
   "scripts": {
-    "test": "jest 'frontend/www/js/.*test\\.ts$'",
-    "test:watch": "jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
-    "test:coverage": "jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
+    "test": "cross-env TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
+    "test:watch": "cross-env TZ=UTC jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
+    "test:coverage": "cross-env TZ=UTC jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
     "dev": "cross-env webpack --config-name=frontend --mode=development --stats=minimal --color",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --stats=minimal --color",
     "dev-all": "cross-env webpack --mode=development --stats=minimal --color",
