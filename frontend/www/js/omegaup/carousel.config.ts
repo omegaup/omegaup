@@ -71,28 +71,27 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/voces_tech_intro.png',
+    image: '/media/homepage/Instagram.png',
     title: {
-      en: 'Voces Tech: Inspiring Stories',
-      es: 'Voces Tech: Historias que inspiran',
-      pt: 'Voces Tech: Histórias inspiradoras',
+      en: 'Do you already follow us on Instagram?',
+      es: '¿Ya nos sigues en Instagram?',
+      pt: 'Você já nos segue no Instagram?',
     },
     description: {
       en:
-        'Discover Voces Tech, our new YouTube series where leaders and innovators in technology share their experiences and insights to inspire your journey.',
+        'Stay up to date with news, events, and much more. Follow us and be part of the community!',
       es:
-        'Descubre Voces Tech, nuestra nueva serie de YouTube donde líderes e innovadores en tecnología comparten sus experiencias e ideas para inspirarte en tu camino.',
+        'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
       pt:
-        'Descubra o Voces Tech, nossa nova série do YouTube onde líderes e inovadores em tecnologia compartilham suas experiências e percepções para inspirar sua jornada.',
+        'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
     },
     button: {
       text: {
-        en: 'Watch playlist',
-        es: 'Ver playlist',
-        pt: 'Ver playlist',
+        en: 'Follow us',
+        es: 'Síguenos',
+        pt: 'Siga-nos',
       },
-      href:
-        'https://www.youtube.com/playlist?list=PLdSCJwXErQ8HDWYi63f9IMg_czC-zbM8L',
+      href: 'https://www.instagram.com/omegaup_org/',
       target: '_blank',
     },
   },
