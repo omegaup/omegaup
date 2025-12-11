@@ -2609,4 +2609,113 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             unlink($newZipPath);
         }
     }
+
+    public function testTriangulosZipToCdp() {
+        $zipPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended.zip';
+        $problemName = 'triangulos_extended';
+
+        // Convert ZIP to CDP
+        $cdp = \OmegaUp\ZipToCdpConverter::convert($zipPath, $problemName);
+
+        // Normalize UUIDs for comparison
+        $normalizedCdp = $this->normalizeUuids($cdp);
+
+        // Load expected JSON
+        $expectedJsonPath = OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_extended_expected_cdp.json';
+        $this->assertFileExists(
+            $expectedJsonPath,
+            'Expected JSON file not found'
+        );
+
+        $expectedJson = file_get_contents($expectedJsonPath);
+        $expected = json_decode($expectedJson, true);
+
+        $this->assertIsArray($expected, 'Expected JSON should be valid');
+
+        // Normalize UUIDs for comparison
+        $normalizedExpected = $this->normalizeUuids($expected);
+
+        $this->assertEquals($normalizedExpected, $normalizedCdp);
+    }
+
+    /**
+     * Recursively replace all UUID values with a deterministic counter
+     */
+    private function normalizeUuids(
+        array $data,
+        array &$uuidMap = [],
+        int &$counter = 1
+    ): array {
+        foreach ($data as $key => &$value) {
+            if (is_array($value)) {
+                $value = $this->normalizeUuids($value, $uuidMap, $counter);
+                continue;
+            }
+
+            if (
+                is_string($value) &&
+                in_array($key, ['groupID', 'caseID', 'lineID'], true)
+            ) {
+                if (!isset($uuidMap[$value])) {
+                    $uuidMap[$value] = sprintf(
+                        '%08d-0000-0000-0000-000000000000',
+                        $counter++
+                    );
+                }
+                $value = $uuidMap[$value];
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * @dataProvider shouldOverrideMarkdownProvider
+     * @param null|string $current
+     * @param string $candidate
+     * @param string $preference
+     * @param bool $expected
+     */
+    public function testShouldOverrideMarkdown(
+        null|string $current,
+        string $candidate,
+        string $preference,
+        bool $expected
+    ): void {
+        $result = \OmegaUp\CdpBuilder::shouldOverrideMarkdown(
+            $current,
+            $candidate,
+            $preference
+        );
+
+        $this->assertSame(
+            $expected,
+            $result
+        );
+    }
+
+    /**
+     * Data provider for shouldOverrideMarkdown with 5 main flow cases.
+     * Format: [currentLanguage, candidateLanguage, languagePreference, expectedResult]
+     *
+     * @return array<string, array{0: null|string, 1: string, 2: string, 3: bool}>
+     */
+    public function shouldOverrideMarkdownProvider(): array {
+        return [
+            'null_current_overrides' => [
+                null, 'en', 'es', true
+            ],
+            'current_equals_preference' => [
+                'es', 'es', 'es', false
+            ],
+            'candidate_equals_preference' => [
+                'en', 'es', 'es', true
+            ],
+            'candidate_is_default' => [
+                'en', 'es', 'pt', true
+            ],
+            'no_rule_matches' => [
+                'en', 'pt', 'es', false
+            ],
+        ];
+    }
 }
