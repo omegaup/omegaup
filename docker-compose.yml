@@ -93,7 +93,7 @@ services:
 
   grader:
     image: omegaup/backend:v1.9.35
-    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
+    entrypoint: ["wait-for-it", "mysql:13306", "--", "wait-for-it", "gitserver:33861", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
     restart: always
     depends_on:
