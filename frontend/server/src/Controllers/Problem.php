@@ -6852,7 +6852,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemCDP(
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit
-    ): ?array {
+    ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_CDP_DATA,
             "{$problem->alias}-{$commit}",
@@ -6873,7 +6873,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return null|CDP
      */
-    private static function getProblemCDPImpl(array $params): ?array {
+    private static function getProblemCDPImpl(array $params) {
         if ($params['alias'] === '') {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -6996,7 +6996,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array $cdp,
         string $message,
         string $updatePublished
-    ): array {
+    ) {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7064,7 +7064,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\ProblemArtifacts $problemArtifacts
     ): array {
         $caseID = $newCaseData['caseID'];
-        //Search for original case in CDP
+        // Search for original case in CDP
         $caseInfo = self::findCaseInCDP($cdp, $caseID);
         if (is_null($caseInfo)) {
             throw new \OmegaUp\Exceptions\NotFoundException('missingCase');
@@ -7086,22 +7086,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $caseIndex = $caseInfo['caseIndex'];
         $groupIndex = $caseInfo['groupIndex'];
 
-        //Old data (from the CDP)
+        // Old data (from the request)
         $oldGroupID = $oldCase['groupID'];
         $oldCaseName = $oldCase['name'];
         $oldInput = self::getLineValues($oldCase);
         $oldOutput = $oldCase['output'] ?? '';
+        $oldPoints = $oldCase['points'];
 
-        //New data (from the CDP)
+        // New data (from the CDP)
         $newGroupID = $newCaseData['groupID'];
         $newCaseName = $newCaseData['name'];
-        $newInput = !is_null($uploadedInput)
-            ? $uploadedInput['truncated']
-            : self::getLineValues($newCaseData);
-
-        $newOutput = !is_null($uploadedOutput)
-            ? $uploadedOutput['truncated']
-            : ($newCaseData['output'] ?? '');
+        $newInput = $uploadedInput['truncated'] ?? self::getLineValues(
+            $newCaseData
+        );
+        $newOutput = $uploadedOutput['truncated'] ?? ($newCaseData['output'] ?? '');
+        $newPoints = $newCaseData['points'];
 
         // Detect if it is ungrouped
         $oldGroupName = $oldGroup['name'];
@@ -7111,8 +7110,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Detect changes
         $nameChanged = ($newCaseName !== $oldCaseName);
         $groupChanged = ($newGroupID !== $oldGroupID);
-        $inputChanged = ($newInput !== $oldInput);
-        $outputChanged = ($newOutput !== $oldOutput);
+        $inputChanged = !is_null($uploadedInput) || ($newInput !== $oldInput);
+        $outputChanged = !is_null(
+            $uploadedOutput
+        ) || ($newOutput !== $oldOutput);
+        $pointsChanged = ($newPoints !== $oldPoints);
+
+        if (!$nameChanged && !$groupChanged && !$inputChanged && !$outputChanged && !$pointsChanged) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'noChangesDetected'
+            );
+        }
 
         $oldPathBase = $isOldUngrouped
         ? $oldCaseName
@@ -7157,12 +7165,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            $blobUpdate[$newInputPath]  = !is_null(
-                $uploadedInput
-            ) ? $uploadedInput['full']  : $newInput;
-            $blobUpdate[$newOutputPath] = !is_null(
-                $uploadedOutput
-            ) ? $uploadedOutput['full'] : $newOutput;
+            $blobUpdate[$newInputPath] = $uploadedInput['full'] ?? $newInput;
+            $blobUpdate[$newOutputPath] = $uploadedOutput['full'] ?? $newOutput;
 
             $pathsToExclude[] = $oldInputPath;
             $pathsToExclude[] = $oldOutputPath;
@@ -7371,7 +7375,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $blobUpdate[$newInputPath] = $newInput;
         $blobUpdate[$newOutputPath] = $newOutput;
 
-        // Agregar caso al CDP
+        // Add case to the CDP
         $cdp['casesStore']['groups'][$targetGroupIndex]['cases'][] = [
             'caseID' => $newCaseData['caseID'],
             'groupID' => $newGroupID,
@@ -7418,7 +7422,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array $cdp,
         string $message,
         string $updatePublished
-    ): array {
+    ) {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7537,7 +7541,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array $cdp,
         string $message,
         string $updatePublished
-    ): array {
+    ) {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -7605,7 +7609,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ? $caseName
             : "{$groupName}.{$caseName}";
 
-        $pathsToExclude = ['cases/' . $pathBase];
+        $pathsToExclude = [
+            "cases/{$pathBase}.in",
+            "cases/{$pathBase}.out",
+        ];
         // Remove case from the CDP
         array_splice(
             $cdp['casesStore']['groups'][$groupIndex]['cases'],
@@ -7748,7 +7755,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         array $fileInfo,
         int $limitBytes = \OmegaUp\Validators::ZIP_CASE_SIZE_LIMIT_BYTES
     ): ?array {
-        // Verificar si hay error o no hay archivo
         if (
             !isset(
                 $fileInfo['error']
