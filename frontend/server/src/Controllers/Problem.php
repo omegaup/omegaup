@@ -77,6 +77,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'problemRestrictedTagInteractive',
         'problemRestrictedTagNoSubmissions',
     ];
+    const DEFAULT_LANGUAGE = 'es';
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
     const VALID_SORTING_COLUMNS = [
