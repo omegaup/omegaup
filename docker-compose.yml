@@ -30,11 +30,13 @@ services:
       volume-init:
         condition: service_completed_successfully
       mysql:
-        condition: service_started
+        condition: service_healthy
       gitserver:
-        condition: service_started
+        condition: service_healthy
       grader:
-        condition: service_started
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - target: 8001
         published: 8001
@@ -57,7 +59,12 @@ services:
       volume-init:
         condition: service_completed_successfully
       mysql:
-        condition: service_started
+        condition: service_healthy
+      healthcheck:
+        test: ["CMD", "nc", "-z", "localhost", "33861"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/gitserver
@@ -80,7 +87,13 @@ services:
     user: "${UID_GID}"
     restart: always
     depends_on:
-      - mysql
+      - mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "32672"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/broadcaster
@@ -100,9 +113,14 @@ services:
       volume-init:
         condition: service_completed_successfully
       mysql:
-        condition: service_started
+        condition: service_healthy
       gitserver:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "21680"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/grader
@@ -146,6 +164,11 @@ services:
       - --max_execution_time=30000
       - --lock_wait_timeout=10
       - --wait_timeout=20
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "13306"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     expose:
       - '13306'
     volumes:
@@ -164,6 +187,11 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
       RABBITMQ_DEFAULT_PASS: 'omegaup'
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     expose:
       - '5672'
       - '15672'
@@ -183,6 +211,11 @@ services:
     image: redis
     restart: always
     command: ['redis-server', '/etc/redis/redis.conf']
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     expose:
       - '6379'
     volumes:
