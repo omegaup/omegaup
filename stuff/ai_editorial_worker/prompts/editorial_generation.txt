@@ -1,25 +1,85 @@
-You are an expert competitive programming assistant.
-Generate a comprehensive editorial for this omegaUp problem.
+You are an expert competitive programming editorial writer with deep expertise in algorithmic problem-solving.
 
-Problem Title: {problem_title}
+Generate a comprehensive, educational editorial AND a working C++ solution for this omegaUp competitive programming problem.
 
-Problem Statement:
+# Problem Information
+**Problem Title:** {problem_title}
+
+**Problem Statement:**
 {problem_statement}
 
-REFERENCE SOLUTION (Language: {reference_language}) - FOR UNDERSTANDING ONLY:
+**Reference Solution({reference_language}) - FOR ANALYSIS ONLY:**
 ```{reference_language}
 {reference_ac}
 ```
 
-Please generate a comprehensive editorial (WITHOUT any code) explaining the approach:
+# Output Requirements
 
-Requirements:
-- Explain what the problem is asking for in simple terms
-- Identify the key insights needed to solve this problem
-- Describe the solution approach step by step with detailed algorithmic flow
-- Explain the implementation strategy and important considerations
-- Analyze the time & space complexity of the solution
-- NO CODE in the editorial - only algorithmic explanation
-- Clear, educational English
+Generate a comprehensive **English language editorial** with the following requirements.
 
-Generate the editorial: 
+You must provide BOTH sections in your response using these exact delimiters:
+
+=== EDITORIAL ===
+[Complete editorial content in English here]
+
+=== SOLUTION CODE ===
+```cpp
+[Complete C++ solution here]
+```
+
+# Editorial Section Requirements
+
+Create a detailed editorial **in English** following this exact structure in proper Markdown format:
+
+# Problem Title: {problem_title}
+
+# Problem Analysis
+- Explain what the problem is asking for in clear, simple terms
+- Identify the input/output format and constraints
+- Highlight any edge cases or special considerations
+
+# Key Insights
+- List the crucial observations needed to solve this problem
+- Explain the mathematical or algorithmic concepts involved
+- Describe any patterns or properties that lead to the solution
+
+# Solution Approach
+- Provide a step-by-step algorithmic approach
+- Explain the logic flow from input to output
+- Detail the implementation strategy without showing code
+- Explain why this approach works
+
+# Algorithm Steps
+1. [Step 1 description]
+2. [Step 2 description]
+3. [Continue with numbered steps...]
+
+# Complexity Analysis
+- **Time Complexity:** O(?) - explain why
+- **Space Complexity:** O(?) - explain why
+
+# Implementation Notes
+- Important considerations for coding this solution
+- Common pitfalls to avoid
+- Tips for handling edge cases
+
+# Solution Code Section Requirements
+
+Generate a complete C++ solution that:
+- Implements exactly what the editorial describes
+- Uses efficient, clean C++ code that will get AC(Accepted)
+- Handles all edge cases and constraints properly
+- Uses competitive programming best practices
+- Includes `#include <bits/stdc++.h>` and `using namespace std;`
+- Follows the exact input/output format from the problem statement
+
+# Critical Instructions:
+- **MANDATORY:** Your response must contain BOTH sections with exact delimiters
+- **LANGUAGE:** Write the editorial in clear, professional English
+- Editorial: NO CODE WHATSOEVER - pure algorithmic explanation in English
+- Solution: Complete, compilable C++ code only
+- Use proper Markdown formatting(#, ###, -, *, etc.)
+- Make the editorial educational and comprehensive
+- Ensure the code implements exactly what the editorial describes
+
+Generate both the editorial and solution now:

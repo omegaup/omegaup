@@ -18,7 +18,7 @@ Before starting, if you are not confident using Git, we recommend you read [this
 ### Prerequisites:
 * Install the [docker engine](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
-* Install [docker compose 2](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually) or if you have already installed `docker compose 1`  you can migrate using the following [instructions](https://docs.docker.com/compose/install/linux/#install-using-the-repository).
+* Install [docker compose 2](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually) or if you have already installed `docker compose 1`  you can migrate using the following [instructions](https://docs.docker.com/compose/install/linux/#install-using-the-repository). If you are using WSL, please follow the official setup guide for Docker Desktop and WSL integration available [here](https://docs.docker.com/desktop/features/wsl)
 
 If you are running linux, after installing [`docker-compose`](https://docs.docker.com/compose/install/) run 
 ```bash

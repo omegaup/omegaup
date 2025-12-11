@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: extract_branch
 
       - name: Build docker containers
@@ -29,14 +29,15 @@ jobs:
             frontend \
             frontend-sidecar \
             nginx \
-            php
+            php \
+            ai-editorial-worker
 
       - name: Push containers to GitHub registry
         run: |
           echo "${{ github.token }}" | \
             docker login https://docker.pkg.github.com "--username=${{ github.actor }}" --password-stdin
 
-          for container in frontend frontend-sidecar nginx php; do
+          for container in frontend frontend-sidecar nginx php ai-editorial-worker; do
             for tag in "latest-${{ steps.extract_branch.outputs.branch }}" "${{ github.sha }}"; do
               container_name="docker.pkg.github.com/${{ github.repository }}/${container}:${tag}"
               docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
@@ -49,7 +50,7 @@ jobs:
           echo "${{ secrets.DOCKER_PASSWORD }}" | \
             docker login "--username=${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-          for container in frontend frontend-sidecar nginx php; do
+          for container in frontend frontend-sidecar nginx php ai-editorial-worker; do
             docker push "omegaup/${container}:${{ github.sha }}"
 
             container_name="omegaup/${container}:latest-${{ steps.extract_branch.outputs.branch }}"
@@ -72,7 +73,8 @@ jobs:
              omegaup/php:${TAG} \
              omegaup/nginx:${TAG} \
              omegaup/frontend:${TAG} \
-             omegaup/frontend-sidecar:${TAG} &&
+             omegaup/frontend-sidecar:${TAG} \
+             omegaup/ai-editorial-worker:${TAG} &&
            sed -i "s/app.kubernetes.io\/version: .*/app.kubernetes.io\/version: ${TAG}/" frontend-deployment.yaml &&
            git commit -am "omegaUp sandbox release ${TAG}" &&
            git push)
@@ -93,7 +95,8 @@ jobs:
              omegaup/php:${TAG} \
              omegaup/nginx:${TAG} \
              omegaup/frontend:${TAG} \
-             omegaup/frontend-sidecar:${TAG} &&
+             omegaup/frontend-sidecar:${TAG} \
+             omegaup/ai-editorial-worker:${TAG} &&
            sed -i "s/app.kubernetes.io\/version: .*/app.kubernetes.io\/version: ${TAG}/" frontend-deployment.yaml &&
            git commit -am "omegaUp production release ${TAG}" &&
            git push)

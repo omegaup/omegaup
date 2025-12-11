@@ -2618,6 +2618,7 @@ export namespace types {
     md_pt?: string;
     problem_alias: string;
     status: string;
+    validation_verdict?: string;
   }
 
   export interface ApiToken {
@@ -2817,6 +2818,48 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CDP {
+    casesStore: types.CDPCasesStore;
+    problemCodeContent: string;
+    problemCodeExtension: string;
+    problemMarkdown: string;
+    problemName: string;
+    problemSolutionMarkdown: string;
+  }
+
+  export interface CDPCase {
+    autoPoints: boolean;
+    caseID: string;
+    groupID: string;
+    lines: types.CDPLine[];
+    name: string;
+    output: string;
+    points: number;
+  }
+
+  export interface CDPCasesStore {
+    groups: types.CDPGroup[];
+    hide: boolean;
+    layouts: { [key: string]: string }[];
+    selected: { caseID?: string; groupID?: string };
+  }
+
+  export interface CDPGroup {
+    autoPoints: boolean;
+    cases: types.CDPCase[];
+    groupID: string;
+    name: string;
+    points: number;
+    ungroupedCase: boolean;
+  }
+
+  export interface CDPLine {
+    caseID: string;
+    data: { kind: string | string | string | string; value: string };
+    label: string;
+    lineID: string;
   }
 
   export interface CachedExtraProfileDetails {
@@ -3428,6 +3471,7 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    teaching_assistant_enabled: boolean;
     unlimited_duration: boolean;
   }
 
@@ -4209,6 +4253,14 @@ export namespace types {
     problemAlias: string;
     solved: boolean;
     tried: boolean;
+  }
+
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
   }
 
   export interface ProblemSettings {
@@ -5082,6 +5134,8 @@ export namespace messages {
   export type AiEditorialStatusRequest = { [key: string]: any };
   export type _AiEditorialStatusServerResponse = any;
   export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+  export type AiEditorialUpdateJobRequest = { [key: string]: any };
+  export type AiEditorialUpdateJobResponse = {};
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5463,6 +5517,10 @@ export namespace messages {
     nextPage?: number;
     progress: types.StudentProgressInCourse[];
   };
+  export type CourseToggleTeachingAssistantRequest = { [key: string]: any };
+  export type CourseToggleTeachingAssistantResponse = {
+    teaching_assistant_enabled: boolean;
+  };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
   export type CourseUpdateAssignmentRequest = { [key: string]: any };
@@ -5581,6 +5639,8 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: types.Clarification[];
   };
+  export type ProblemConvertZipToCdpRequest = { [key: string]: any };
+  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP };
   export type ProblemCreateRequest = { [key: string]: any };
   export type ProblemCreateResponse = {};
   export type ProblemDeleteRequest = { [key: string]: any };
@@ -6021,6 +6081,9 @@ export namespace controllers {
     status: (
       params?: messages.AiEditorialStatusRequest,
     ) => Promise<messages.AiEditorialStatusResponse>;
+    updateJob: (
+      params?: messages.AiEditorialUpdateJobRequest,
+    ) => Promise<messages.AiEditorialUpdateJobResponse>;
   }
 
   export interface Authorization {
@@ -6342,6 +6405,9 @@ export namespace controllers {
     studentsProgress: (
       params?: messages.CourseStudentsProgressRequest,
     ) => Promise<messages.CourseStudentsProgressResponse>;
+    toggleTeachingAssistant: (
+      params?: messages.CourseToggleTeachingAssistantRequest,
+    ) => Promise<messages.CourseToggleTeachingAssistantResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
@@ -6462,6 +6528,9 @@ export namespace controllers {
     clarifications: (
       params?: messages.ProblemClarificationsRequest,
     ) => Promise<messages.ProblemClarificationsResponse>;
+    convertZipToCdp: (
+      params?: messages.ProblemConvertZipToCdpRequest,
+    ) => Promise<messages.ProblemConvertZipToCdpResponse>;
     create: (
       params?: messages.ProblemCreateRequest,
     ) => Promise<messages.ProblemCreateResponse>;

@@ -4,6 +4,7 @@
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
   - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
+  - [`/api/aiEditorial/updateJob/`](#apiaieditorialupdatejob)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -111,6 +112,7 @@
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
+  - [`/api/course/toggleTeachingAssistant/`](#apicoursetoggleteachingassistant)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -151,6 +153,7 @@
   - [`/api/problem/admins/`](#apiproblemadmins)
   - [`/api/problem/bestScore/`](#apiproblembestscore)
   - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](#apiproblemcreate)
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
@@ -304,10 +307,11 @@ Generate AI editorial for a problem
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `language`      | `string` |             |
-| `problem_alias` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `auth_token`    | `null\|string` |             |
 
 ### Returns
 
@@ -352,6 +356,31 @@ Get status of an AI editorial job
 | Name  | Type                          |
 | ----- | ----------------------------- |
 | `job` | `types.AiEditorialJobDetails` |
+
+## `/api/aiEditorial/updateJob/`
+
+### Description
+
+Update job status and content from AI worker
+
+This endpoint is called by the Python AI worker to update job status
+and content in the database after processing completion.
+
+### Parameters
+
+| Name                 | Type           | Description |
+| -------------------- | -------------- | ----------- |
+| `job_id`             | `string`       |             |
+| `status`             | `string`       |             |
+| `error_message`      | `null\|string` |             |
+| `md_en`              | `null\|string` |             |
+| `md_es`              | `null\|string` |             |
+| `md_pt`              | `null\|string` |             |
+| `validation_verdict` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Authorization
 
@@ -2364,6 +2393,24 @@ Search users in course assignment
 | `nextPage` | `number`                          |
 | `progress` | `types.StudentProgressInCourse[]` |
 
+## `/api/course/toggleTeachingAssistant/`
+
+### Description
+
+Toggles the AI Teaching Assistant feature for a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+
+### Returns
+
+| Name                         | Type      |
+| ---------------------------- | --------- |
+| `teaching_assistant_enabled` | `boolean` |
+
 ## `/api/course/update/`
 
 ### Description
@@ -3025,6 +3072,18 @@ Entry point for Problem clarifications API
 | Name             | Type                    |
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
+
+## `/api/problem/convertZipToCdp/`
+
+### Description
+
+Convert an uploaded ZIP file to CDP.
+
+### Returns
+
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
 
 ## `/api/problem/create/`
 
@@ -4335,10 +4394,10 @@ Gets a list of tags
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 

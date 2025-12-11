@@ -68,16 +68,22 @@ class WebsiteUploader:
             # Prepare content for upload
             prepared_content = self.prepare_editorial_for_upload(content)
 
-            # Upload via API
-            success = self.api_client.update_problem_solution(
-                problem_alias, prepared_content, language)
+            # Upload via API with authentication
+            try:
+                success = self.api_client.update_problem_solution(
+                    problem_alias, prepared_content, language)
 
-            if success:
-                logging.info(
-                    "Successfully uploaded %s editorial for %s",
-                    language,
-                    problem_alias)
-                return True
+                if success:
+                    logging.info(
+                        "Successfully uploaded %s editorial for %s",
+                        language,
+                        problem_alias)
+                    return True
+            except ConnectionError as e:
+                logging.error(
+                    "Authentication failed for editorial upload %s/%s: %s",
+                    problem_alias, language, str(e))
+                return False
 
             logging.error(
                 "API call failed for %s editorial of %s",
@@ -104,9 +110,18 @@ class WebsiteUploader:
             return False
 
         # Check for required sections (basic validation)
+        # Support English, Spanish, and Portuguese keywords
         content_lower = content.lower()
         has_approach = any(keyword in content_lower for keyword in [
-            'approach', 'solution', 'algorithm', 'strategy'
+            # English keywords
+            'approach', 'solution', 'algorithm', 'strategy', 'method',
+            'solve', 'problem', 'explanation',
+            # Spanish keywords
+            'enfoque', 'solución', 'algoritmo', 'estrategia', 'método',
+            'resolver', 'problema', 'explicación',
+            # Portuguese keywords
+            'abordagem', 'solução', 'algoritmo', 'estratégia', 'método',
+            'resolver', 'problema', 'explicação'
         ])
 
         if not has_approach:

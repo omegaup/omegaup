@@ -54,7 +54,7 @@ COURSE_ALIAS: str | None = None
 ASSIGNMENT_ALIAS: str | None = None
 SKIP_CONFIRM = False
 LLM_PROVIDER: str | None = None
-SUBMISSION_ID_MODE = False
+SUBMISSION_ID_MODE: str | None = None
 SUBMISSION_ID = None
 STUDENT_NAME = None
 
@@ -216,23 +216,47 @@ def get_contents_from_url(  # pylint: disable=R0912
         raise APIError("Unexpected error during API request") from e
 
 
-def extract_show_run_ids() -> list[tuple[str, str, str]]:
+def extract_show_run_ids() -> list[tuple[str, str, str, str]]:
     # pylint: disable=R1702
     """
-    Extracts show-run IDs, usernames, and assignment aliases from the course.
-    Extracts show-run IDs, usernames, and assignment aliases from the course.
+    Extracts show-run IDs, usernames, assignment aliases,
+    and verdicts from the course.
 
     Returns:
-        list: List of tuples containing (run_id, username, assignment_alias)
-              for all the latest (at most 30 days old) runs from the course
-        list: List of tuples containing (run_id, username, assignment_alias)
-              for all the latest (at most 30 days old) runs from the course
+        list: List of tuples containing
+        (run_id, username, assignment_alias, verdict)
+        for all the latest (at most 30 days old) runs from the course
     """
     try:
-        if SUBMISSION_ID_MODE:
+        if SUBMISSION_ID_MODE == "true":
             if (isinstance(SUBMISSION_ID, str) and
                     isinstance(STUDENT_NAME, str)):
-                return [(SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS)]
+                try:
+                    run_details = get_contents_from_url(
+                        get_runs_endpoint, {"run_alias": SUBMISSION_ID}
+                    )
+                    verdict = ""
+                    if (
+                        "details" in run_details
+                        and "verdict" in run_details["details"]
+                    ):
+                        verdict = run_details["details"]["verdict"]
+                    return [
+                        (
+                            SUBMISSION_ID,
+                            STUDENT_NAME,
+                            ASSIGNMENT_ALIAS, verdict
+                        )
+                    ]
+                except Exception as e:  # pylint: disable=broad-except
+                    LOG.warning(
+                        "Could not fetch verdict for submission %s: %s",
+                        SUBMISSION_ID,
+                        e
+                    )
+                    return [
+                        (SUBMISSION_ID, STUDENT_NAME, ASSIGNMENT_ALIAS, "")
+                    ]
 
         assignments_to_process = []
         if ASSIGNMENT_ALIAS:
@@ -272,10 +296,21 @@ def extract_show_run_ids() -> list[tuple[str, str, str]]:
             runs = runs_data["runs"]
 
             assignment_runs = [
-                (item["guid"], item["username"], assignment_alias)
+                (
+                    item["guid"],
+                    item["username"],
+                    assignment_alias,
+                    item.get("verdict", "")
+                )
                 for item in runs
-                if "time" in item and "guid" in item and "username" in item
-                and item["time"] >= a_month_ago
+                if (
+                    "time" in item and
+                    "guid" in item and
+                    "username" in item and
+                    "suggestions" in item and
+                    item["time"] >= a_month_ago and
+                    item["suggestions"] > 0
+                )
             ]
             run_ids_and_usernames.extend(assignment_runs)
 
@@ -359,6 +394,7 @@ def conjure_query(  # pylint: disable=R0913
     user_name: str,
     line_number: int,
     is_conversation: bool,
+    verdict: str = "",
 ) -> str:
     """
     Conjures a string that can be used as a prompt to the LLM.
@@ -366,12 +402,72 @@ def conjure_query(  # pylint: disable=R0913
     Returns:
     string: Conjured query
     """
+    verdict_guidance = {
+        "WA": (
+            "The submission got Wrong Answer (WA). Extract the logic "
+            "from the code and see what's wrong. "
+            "Focus on algorithmic correctness and edge cases."
+        ),
+        "PA": (
+            "The submission got Partial Acceptance (PA). "
+            "The algorithm might be partially correct. What's the issue? "
+            "What optimizations can be done to pass all the test cases? "
+            "Look for efficiency improvements."
+        ),
+        "AC": (
+            "The submission was Accepted (AC). "
+            "Congratulate the student! Comment on "
+            "alternative approaches if relevant."
+        ),
+        "TLE": (
+            "The submission got Time Limit Exceeded (TLE). "
+            "What's causing the time limit to exceed? "
+            "Focus on algorithmic complexity and optimization."
+        ),
+        "MLE": (
+            "The submission got Memory Limit Exceeded (MLE). "
+            "Where can the memory "
+            "be optimized? Look for unnecessary memory usage."
+        ),
+        "OLE": (
+            "The submission got Output Limit Exceeded (OLE). "
+            "Is there an infinite "
+            "loop or extra print statements? Check output format."
+        ),
+        "RTE": (
+            "The submission got Runtime Error (RTE). "
+            "Is there a division by zero or "
+            "an array out of bounds? Look for runtime exceptions."
+        ),
+        "CE": (
+            "The submission got Compilation Error (CE). "
+            "Where is the compilation "
+            "error? Check syntax and language-specific issues."
+        ),
+        "JE": (
+            "The submission got Judge Error (JE). "
+            "This is a system issue, not a student error."
+        ),
+        "VE": (
+            "The submission got Validator Error (VE). "
+            "This is a system issue, not a student error."
+        ),
+    }
+
+    verdict_context = verdict_guidance.get(verdict, "")
+    if verdict and verdict_context:
+        verdict_info = f"\nSubmission Verdict: {verdict}\n"
+        verdict_info += f"Guidance: {verdict_context}\n"
+    else:
+        verdict_info = ""
+
     conjured_query = ""
     if is_conversation:
         conjured_query = (
             f"The problem statement is: {problem_statement}\n"
             f"The solution is: {solution_statement}\n"
-            f"The Source code is: {source_code}\n\n"
+            f"The Source code is: {source_code}\n"
+            f"{verdict_info}"
             f"Note the line number: {line_number}\n"
             f"Remember that you are {USERNAME} "
             f"and the student is {user_name}\n"
@@ -383,7 +479,8 @@ def conjure_query(  # pylint: disable=R0913
         conjured_query = (
             f"The problem statement is: {problem_statement}\n"
             f"The solution is: {solution_statement}\n"
-            f"The Source code is: {source_code}\n\n"
+            f"The Source code is: {source_code}\n"
+            f"{verdict_info}"
             f"Please give feedback on the source code "
             f"using the above chain of thoughts.\n"
             f"Just return the json, don't use markdown to include ```.\n"
@@ -541,6 +638,7 @@ def handle_feedbacks(  # pylint: disable=R0913,R0912,R0915
         problem_content: str,
         problem_solution: str,
         feedbacks: list[list[dict[str, Any]]],
+        verdict: str = "",
 ) -> None:
     """
     Handles feedbacks for a single run
@@ -573,6 +671,7 @@ def handle_feedbacks(  # pylint: disable=R0913,R0912,R0915
                 user_name,
                 line_number if line_number is not None else 0,
                 line_number is not None,
+                verdict,
             )
 
             if line_number is not None:
@@ -725,12 +824,13 @@ def handle_feedbacks(  # pylint: disable=R0913,R0912,R0915
             continue
 
 
-def process_single_run(
+def process_single_run(  # pylint: disable=R0913
     index: int,
     run_id: str,
     username: str,
     assignment_alias: str,
-    total_runs: int
+    total_runs: int,
+    verdict: str = ""
 ) -> None:
     """
     Processes a single feedback
@@ -796,7 +896,8 @@ def process_single_run(
             source_content,
             problem_content,
             problem_solution,
-            feedbacks
+            feedbacks,
+            verdict
         )
     except KeyError as e:
         LOG.error("Missing required data in run details for %s: %s", run_id, e)
@@ -835,12 +936,21 @@ def process_feedbacks() -> None:
         failed_runs = 0
 
         with logging_redirect_tqdm():
-            for index, (run_id, user_name, assignment_alias) in enumerate(
+            for index, (run_id,
+                        user_name,
+                        assignment_alias,
+                        verdict
+                        ) in enumerate(
                 tqdm(run_ids_and_usernames)
             ):
                 try:
                     process_single_run(
-                        index, run_id, user_name, assignment_alias, total_runs
+                        index,
+                        run_id,
+                        user_name,
+                        assignment_alias,
+                        total_runs,
+                        verdict
                     )
                     successful_runs += 1
                 except KeyboardInterrupt:
@@ -884,7 +994,7 @@ def process_feedbacks() -> None:
                         "unexpected error.") from e
 
 
-def handle_input() -> None:  # pylint: disable=R0915
+def handle_input() -> None:  # pylint: disable=R0915, R0912
     """
     Handles input from the user
     """
@@ -902,8 +1012,13 @@ def handle_input() -> None:  # pylint: disable=R0915
         parser.add_argument("--password", type=str, help="Your password")
         parser.add_argument(
             "--submission_id_mode",
+            type=str,
+            help="true if you want to process a single submission."
+        )
+        parser.add_argument(
+            "--test_mode",
             action="store_true",
-            help="Yes if you want to process a single submission."
+            help="Run in local server."
         )
         parser.add_argument(
             "--submission_id",
@@ -939,7 +1054,7 @@ def handle_input() -> None:  # pylint: disable=R0915
             "--llm",
             type=str,
             default="deepseek",
-            choices=["claude", "gpt", "deepseek", "gemini"],
+            choices=["claude", "gpt", "deepseek", "gemini", "omegaup"],
             help="LLM provider to use (default: deepseek)"
         )
         parser.add_argument(
@@ -948,14 +1063,19 @@ def handle_input() -> None:  # pylint: disable=R0915
             help="Skip confirmation prompts"
         )
         args = parser.parse_args()
+        if args.test_mode:
+            global BASE_URL  # pylint: disable=W0603
+            BASE_URL = "http://localhost:8001"
 
         try:
             USERNAME = args.username or input("Enter your username: ")
             PASSWORD = args.password or getpass("Enter your password: ")
-            SUBMISSION_ID_MODE = args.submission_id_mode or input(
-                "Are you working in submission id mode: "
-            ) == "true"
-            if SUBMISSION_ID_MODE:
+            SUBMISSION_ID_MODE = args.submission_id_mode
+            if SUBMISSION_ID_MODE not in ["true", "false"]:
+                SUBMISSION_ID_MODE = input(
+                    "Are you working in submission id mode: "
+                )
+            if SUBMISSION_ID_MODE == "true":
                 SUBMISSION_ID = args.submission_id or input(
                     "Enter the submission id: "
                 )
@@ -998,7 +1118,8 @@ def handle_input() -> None:  # pylint: disable=R0915
             raise ConfigurationError("Language is required")
         if not KEY:
             raise ConfigurationError("API key is required")
-        if SUBMISSION_ID_MODE and (not SUBMISSION_ID or not STUDENT_NAME):
+        if (SUBMISSION_ID_MODE == "true" and
+                (not SUBMISSION_ID or not STUDENT_NAME)):
             raise ConfigurationError(
                 "Submission ID and student name are required in "
                 "submission ID mode"
