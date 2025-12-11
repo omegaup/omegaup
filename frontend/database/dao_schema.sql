@@ -238,7 +238,6 @@ CREATE TABLE `Contests` (
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
-  `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
   `submissions_gap` int NOT NULL DEFAULT '60' COMMENT 'Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro',
   `feedback` enum('none','summary','detailed') NOT NULL DEFAULT 'none' COMMENT 'Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.',
   `penalty` int NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
