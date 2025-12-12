@@ -87,8 +87,12 @@ describe('StatementTab.vue', () => {
         type: 'image/png',
       });
 
-      const pasteEvent = {
-        clipboardData: {
+      const pasteEvent = new Event('paste', {
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(pasteEvent, 'clipboardData', {
+        value: {
           items: [
             {
               type: 'image/png',
@@ -96,10 +100,10 @@ describe('StatementTab.vue', () => {
             },
           ],
         },
-        preventDefault: jest.fn(),
-      };
+      });
+      jest.spyOn(pasteEvent, 'preventDefault');
 
-      await textArea.trigger('paste', pasteEvent);
+      textArea.element.dispatchEvent(pasteEvent);
 
       expect(pasteEvent.preventDefault).toHaveBeenCalled();
       expect(errorSpy).toHaveBeenCalled();
@@ -121,14 +125,15 @@ describe('StatementTab.vue', () => {
         type: 'image/png',
       });
 
-      const dropEvent = {
-        dataTransfer: {
+      const dropEvent = new Event('drop', { bubbles: true, cancelable: true });
+      Object.defineProperty(dropEvent, 'dataTransfer', {
+        value: {
           files: [largeFile],
         },
-        preventDefault: jest.fn(),
-      };
+      });
+      jest.spyOn(dropEvent, 'preventDefault');
 
-      await textArea.trigger('drop', dropEvent);
+      textArea.element.dispatchEvent(dropEvent);
 
       expect(dropEvent.preventDefault).toHaveBeenCalled();
       expect(errorSpy).toHaveBeenCalled();

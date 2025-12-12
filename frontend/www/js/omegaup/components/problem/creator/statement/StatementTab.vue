@@ -108,9 +108,13 @@ export default class StatementTab extends Vue {
   private validateImageSize(file: File): boolean {
     if (file.size > this.MAX_IMAGE_SIZE) {
       ui.error(
-        ui.formatString(T.problemCreatorMarkdownImageTooLarge, {
-          limit: '256 KB',
-        }),
+        ui.formatString(
+          T.problemCreatorMarkdownImageTooLarge ??
+            'The image is too large. The maximum allowed size is %(limit). Please use a smaller image.',
+          {
+            limit: '256 KB',
+          },
+        ),
       );
       return false;
     }
