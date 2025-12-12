@@ -9,6 +9,8 @@
             v-model.lazy="currentMarkdown"
             data-problem-creator-editor-markdown
             class="wmd-input"
+            @paste="handlePaste"
+            @drop="handleDrop"
           ></textarea>
         </div>
         <div class="col-md-6 d-flex flex-column">
@@ -65,6 +67,9 @@ export default class StatementTab extends Vue {
   ui = ui;
   markdownEditor: Markdown.Editor | null = null;
 
+  // 256 KB limit for images
+  readonly MAX_IMAGE_SIZE = 256 * 1024;
+
   currentMarkdownInternal: string = T.problemCreatorEmpty;
 
   get currentMarkdown(): string {
@@ -93,6 +98,58 @@ export default class StatementTab extends Vue {
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
     this.$emit('show-update-success-message');
+  }
+
+  /**
+   * Validates image file size and shows error if too large.
+   * @param file The file to validate
+   * @returns true if valid, false if too large
+   */
+  private validateImageSize(file: File): boolean {
+    if (file.size > this.MAX_IMAGE_SIZE) {
+      ui.error(
+        ui.formatString(T.problemCreatorMarkdownImageTooLarge, {
+          limit: '256 KB',
+        }),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Handles paste events to validate image sizes before insertion.
+   */
+  handlePaste(event: ClipboardEvent): void {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file && !this.validateImageSize(file)) {
+          event.preventDefault();
+          return;
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles drop events to validate image sizes before insertion.
+   */
+  handleDrop(event: DragEvent): void {
+    const files = event.dataTransfer?.files;
+    if (!files) return;
+
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        if (!this.validateImageSize(file)) {
+          event.preventDefault();
+          return;
+        }
+      }
+    }
   }
 }
 </script>
