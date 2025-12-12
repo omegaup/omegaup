@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check Linked Issue and Assignee
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -40,7 +40,7 @@ jobs:
 
             const result = await github.graphql(query, variables);
             const linkedIssues = result.repository.pullRequest.closingIssuesReferences.nodes;
-            const prAuthor = context.payload.pull_request.user.login;
+            const prAuthor = context.payload.pull_request.user.login.toLowerCase();
 
             console.log(`PR Author: ${prAuthor}`);
 
@@ -54,7 +54,7 @@ jobs:
 
             for (const issue of linkedIssues) {
               linkedIssueNumbers.push("#" + issue.number);
-              const assignees = issue.assignees.nodes.map(node => node.login);
+              const assignees = issue.assignees.nodes.map(node => node.login.toLowerCase());
               console.log(`Issue #${issue.number} assignees: ${JSON.stringify(assignees)}`);
               
               if (assignees.includes(prAuthor)) {
