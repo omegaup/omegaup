@@ -10,6 +10,7 @@ on:
 jobs:
   php:
     runs-on: ubuntu-22.04
+    timeout-minutes: 20
 
     services:
       mysql:
@@ -173,6 +174,7 @@ jobs:
 
   javascript:
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -278,6 +280,7 @@ jobs:
 
   cypress:
     runs-on: ubuntu-22.04
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
