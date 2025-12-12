@@ -1,12 +1,4 @@
 # Language labels based on file extensions
-javascript:
-  - changed-files:
-      - any-glob-to-any-file:
-          - '**/*.js'
-          - '**/*.jsx'
-          - '**/*.ts'
-          - '**/*.tsx'
-
 php:
   - changed-files:
       - any-glob-to-any-file:
@@ -22,12 +14,34 @@ database:
   - changed-files:
       - any-glob-to-any-file:
           - 'frontend/database/**'
+          - '**/*.sql'
 
 backend:
   - changed-files:
       - any-glob-to-any-file: 'frontend/server/**'
       - all-globs-to-all-files: '!frontend/server/src/Controllers/**'
       - all-globs-to-all-files: '!frontend/server/src/RabbitMQConnection.php'
+
+'UI Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.js'
+          - '**/*.jsx'
+          - '**/*.ts'
+          - '**/*.tsx'
+          - '**/*.vue'
+
+'UX Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.css'
+
+'ci/cd':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/actions/**'
+          - 'stuff/pipelines/**'
 
 'API Task':
   - changed-files:
@@ -48,10 +62,9 @@ backend:
           - 'frontend/server/src/RabbitMQConnection.php'
 
 documentation:
-  - all:
-      - changed-files:
-          - any-glob-to-any-file: '**/*.md'
-          - all-globs-to-all-files: '!frontend/database/**'
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+      - all-globs-to-all-files: '!frontend/database/**'
 
 dependencies:
   - changed-files:
