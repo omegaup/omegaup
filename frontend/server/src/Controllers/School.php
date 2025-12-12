@@ -175,7 +175,16 @@ class School extends \OmegaUp\Controllers\Controller {
             'state_id' => !is_null($state) ? $state->state_id : null,
         ]);
 
-        $existing = \OmegaUp\DAO\Schools::findByName($name);
+        // Use exact matching for duplicate detection to:
+        // 1. Avoid false positives from prefix matching (e.g., "Test" vs "TestSchool")
+        // 2. Respect the UNIQUE constraint on (name, country_id, state_id)
+        //    - Same name can exist with different country/state combinations
+        //    - Must match all three fields exactly (including NULL values)
+        $existing = \OmegaUp\DAO\Schools::findByExactName(
+            $name,
+            $school->country_id,
+            $school->state_id
+        );
         if (!empty($existing)) {
             /** @var int $existing[0]->school_id */
             return $existing[0]->school_id;
