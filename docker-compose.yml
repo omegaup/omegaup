@@ -61,7 +61,7 @@ services:
       mysql:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "33861"]
+      test: ["CMD-SHELL", "ss -ln | grep -q ':33861 ' || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 10
