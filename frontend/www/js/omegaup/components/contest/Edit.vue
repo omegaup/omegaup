@@ -123,186 +123,232 @@
       </li>
     </ul>
 
-    <div class="tab-content mt-2">
-      <div v-if="showTab === 'new_form'" class="tab-pane active">
-        <omegaup-contest-new-form
-          :admission-mode="details.admission_mode"
-          :default-show-all-contestants-in-scoreboard="
-            details.default_show_all_contestants_in_scoreboard
-          "
-          :initial-alias="details.alias"
-          :initial-title="details.title"
-          :initial-description="details.description"
-          :initial-start-time="details.start_time"
-          :initial-finish-time="details.finish_time"
-          :initial-window-length="details.window_length"
-          :initial-points-decay-factor="details.points_decay_factor"
-          :initial-submissions-gap="details.submissions_gap"
-          :initial-languages="details.languages"
-          :initial-feedback="details.feedback"
-          :initial-penalty="details.penalty"
-          :initial-scoreboard="details.scoreboard"
-          :initial-penalty-type="details.penalty_type"
-          :initial-show-scoreboard-after="details.show_scoreboard_after"
-          :score-mode="details.score_mode"
-          :initial-needs-basic-information="details.needs_basic_information"
-          :initial-requests-user-information="details.requests_user_information"
-          :all-languages="details.available_languages"
-          :teams-group-alias="teamsGroupAlias"
-          :contest-for-teams="details.contest_for_teams"
-          :has-submissions="details.has_submissions"
-          :update="true"
-          :search-result-teams-groups="searchResultTeamsGroups"
-          :problems="problems"
-          :can-set-recommended="details.canSetRecommended"
-          :initial-recommended="details.recommended"
-          @update-search-result-teams-groups="
-            (query) => $emit('update-search-result-teams-groups', query)
-          "
-          @update-contest="(contest) => $emit('update-contest', contest)"
-          @language-remove-blocked="
-            (language) => $emit('language-remove-blocked', language)
-          "
-        ></omegaup-contest-new-form>
-      </div>
-      <div v-if="showTab === 'problems'" class="tab-pane active">
-        <omegaup-contest-add-problem
-          :contest-alias="details.alias"
-          :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
-          :initial-problems="problems"
-          :search-result-problems="searchResultProblems"
-          @add-problem="(request) => $emit('add-problem', request)"
-          @update-search-result-problems="
-            (request) => $emit('update-search-result-problems', request)
-          "
-          @get-versions="(request) => $emit('get-versions', request)"
-          @remove-problem="
-            (problemAlias) => $emit('remove-problem', problemAlias)
-          "
-          @runs-diff="
-            (problemAlias, versions, selectedCommit) =>
-              $emit('runs-diff', problemAlias, versions, selectedCommit)
-          "
+    <keep-alive>
+      <div class="tab-content mt-2">
+        <div
+          v-show="showTab === 'new_form'"
+          class="tab-pane"
+          :class="{ active: showTab === 'new_form' }"
         >
-        </omegaup-contest-add-problem>
+          <omegaup-contest-new-form
+            :admission-mode="details.admission_mode"
+            :default-show-all-contestants-in-scoreboard="
+              details.default_show_all_contestants_in_scoreboard
+            "
+            :initial-alias="details.alias"
+            :initial-title="details.title"
+            :initial-description="details.description"
+            :initial-start-time="details.start_time"
+            :initial-finish-time="details.finish_time"
+            :initial-window-length="details.window_length"
+            :initial-points-decay-factor="details.points_decay_factor"
+            :initial-submissions-gap="details.submissions_gap"
+            :initial-languages="details.languages"
+            :initial-feedback="details.feedback"
+            :initial-penalty="details.penalty"
+            :initial-scoreboard="details.scoreboard"
+            :initial-penalty-type="details.penalty_type"
+            :initial-show-scoreboard-after="details.show_scoreboard_after"
+            :score-mode="details.score_mode"
+            :initial-needs-basic-information="details.needs_basic_information"
+            :initial-requests-user-information="
+              details.requests_user_information
+            "
+            :all-languages="details.available_languages"
+            :teams-group-alias="teamsGroupAlias"
+            :contest-for-teams="details.contest_for_teams"
+            :has-submissions="details.has_submissions"
+            :update="true"
+            :search-result-teams-groups="searchResultTeamsGroups"
+            :problems="problems"
+            :can-set-recommended="details.canSetRecommended"
+            :initial-recommended="details.recommended"
+            @update-search-result-teams-groups="
+              (query) => $emit('update-search-result-teams-groups', query)
+            "
+            @update-contest="(contest) => $emit('update-contest', contest)"
+            @language-remove-blocked="
+              (language) => $emit('language-remove-blocked', language)
+            "
+          ></omegaup-contest-new-form>
+        </div>
+        <div
+          v-show="showTab === 'problems'"
+          class="tab-pane"
+          :class="{ active: showTab === 'problems' }"
+        >
+          <omegaup-contest-add-problem
+            :contest-alias="details.alias"
+            :initial-points="details.score_mode !== 'all_or_nothing' ? 100 : 1"
+            :initial-problems="problems"
+            :search-result-problems="searchResultProblems"
+            @add-problem="(request) => $emit('add-problem', request)"
+            @update-search-result-problems="
+              (request) => $emit('update-search-result-problems', request)
+            "
+            @get-versions="(request) => $emit('get-versions', request)"
+            @remove-problem="
+              (problemAlias) => $emit('remove-problem', problemAlias)
+            "
+            @runs-diff="
+              (problemAlias, versions, selectedCommit) =>
+                $emit('runs-diff', problemAlias, versions, selectedCommit)
+            "
+          >
+          </omegaup-contest-add-problem>
+        </div>
+        <div
+          v-show="showTab === 'publish'"
+          class="tab-pane"
+          :class="{ active: showTab === 'publish' }"
+        >
+          <omegaup-common-publish
+            :default-show-all-contestants-in-scoreboard="
+              details.default_show_all_contestants_in_scoreboard
+            "
+            :admission-mode="details.admission_mode"
+            :should-show-public-option="true"
+            :admission-mode-description="T.contestAdmissionModeDescription"
+            :alias="details.alias"
+            @show-copy-message="() => $emit('show-copy-message')"
+            @update-admission-mode="
+              (request) => $emit('update-admission-mode', request)
+            "
+          ></omegaup-common-publish>
+        </div>
+        <div
+          v-show="showTab === 'contestants'"
+          class="tab-pane contestants"
+          :class="{ active: showTab === 'contestants' }"
+        >
+          <omegaup-contest-add-contestant
+            :contest="details"
+            :users="users"
+            :search-result-users="searchResultUsers"
+            @add-user="(contestants) => $emit('add-user', contestants)"
+            @update-search-result-users="
+              (query) => $emit('update-search-result-users', query)
+            "
+            @remove-user="(contestant) => $emit('remove-user', contestant)"
+            @save-end-time="(user) => $emit('save-end-time', user)"
+          ></omegaup-contest-add-contestant>
+          <omegaup-common-requests
+            :data="requests"
+            :text-add-participant="T.contestAdduserAddContestant"
+            @accept-request="(request) => $emit('accept-request', request)"
+            @deny-request="(request) => $emit('deny-request', request)"
+          ></omegaup-common-requests>
+          <omegaup-contest-groups
+            :groups="groups"
+            :search-result-groups="searchResultGroups"
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
+            "
+            @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
+            @emit-remove-group="
+              (groupAlias) => $emit('remove-group', groupAlias)
+            "
+          ></omegaup-contest-groups>
+        </div>
+        <div
+          v-show="showTab === 'groups'"
+          class="tab-pane groups"
+          :class="{ active: showTab === 'groups' }"
+        >
+          <omegaup-contest-teams-groups
+            :teams-group="teamsGroup"
+            :search-result-teams-groups="searchResultTeamsGroups"
+            :has-submissions="details.has_submissions"
+            @update-search-result-teams-groups="
+              (query) => $emit('update-search-result-teams-groups', query)
+            "
+            @replace-teams-group="
+              (request) => $emit('replace-teams-group', request)
+            "
+          ></omegaup-contest-teams-groups>
+        </div>
+        <div
+          v-show="showTab === 'admins'"
+          class="tab-pane"
+          :class="{ active: showTab === 'admins' }"
+        >
+          <omegaup-common-admins
+            :admins="admins"
+            :search-result-users="searchResultUsers"
+            @add-admin="(username) => $emit('add-admin', username)"
+            @remove-admin="(username) => $emit('remove-admin', username)"
+            @update-search-result-users="
+              (query) => $emit('update-search-result-users', query)
+            "
+          ></omegaup-common-admins>
+          <div class="mt-2"></div>
+          <omegaup-common-group-admins
+            :group-admins="groupAdmins"
+            :search-result-groups="searchResultGroups"
+            @add-group-admin="
+              (groupAlias) => $emit('add-group-admin', groupAlias)
+            "
+            @remove-group-admin="
+              (groupAlias) => $emit('remove-group-admin', groupAlias)
+            "
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
+            "
+          ></omegaup-common-group-admins>
+        </div>
+        <div
+          v-show="showTab === 'links'"
+          class="tab-pane"
+          :class="{ active: showTab === 'links' }"
+        >
+          <omegaup-contest-links
+            :data="details"
+            @download-csv-scoreboard="
+              (contestAlias) => $emit('download-csv-scoreboard', contestAlias)
+            "
+          ></omegaup-contest-links>
+        </div>
+        <div
+          v-show="showTab === 'clone'"
+          class="tab-pane"
+          :class="{ active: showTab === 'clone' }"
+        >
+          <omegaup-contest-clone
+            @clone="
+              ({ title, alias, description, startTime }) =>
+                $emit('clone-contest', title, alias, description, startTime)
+            "
+          ></omegaup-contest-clone>
+        </div>
+        <div
+          v-show="showTab === 'archive'"
+          class="tab-pane"
+          :class="{ active: showTab === 'archive' }"
+        >
+          <omegaup-common-archive
+            :already-archived="alreadyArchived"
+            :archive-button-description="archiveButtonDescription"
+            :archive-confirm-text="T.contestEditArchiveConfirmText"
+            :archive-header-title="T.contestEditArchiveContest"
+            :archive-help-text="archiveUnarchiveDescription"
+            @archive="onArchiveContest"
+          ></omegaup-common-archive>
+        </div>
+        <div
+          v-show="showTab === 'certificates'"
+          class="tab-pane"
+          :class="{ active: showTab === 'certificates' }"
+        >
+          <omegaup-contest-certificates
+            :certificates-details="certificatesDetails"
+            @generate="
+              (certificateCutoff) =>
+                $emit('generate-certificates', certificateCutoff)
+            "
+          ></omegaup-contest-certificates>
+        </div>
       </div>
-      <div v-if="showTab === 'publish'" class="tab-pane active">
-        <omegaup-common-publish
-          :default-show-all-contestants-in-scoreboard="
-            details.default_show_all_contestants_in_scoreboard
-          "
-          :admission-mode="details.admission_mode"
-          :should-show-public-option="true"
-          :admission-mode-description="T.contestAdmissionModeDescription"
-          :alias="details.alias"
-          @show-copy-message="() => $emit('show-copy-message')"
-          @update-admission-mode="
-            (request) => $emit('update-admission-mode', request)
-          "
-        ></omegaup-common-publish>
-      </div>
-      <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
-        <omegaup-contest-add-contestant
-          :contest="details"
-          :users="users"
-          :search-result-users="searchResultUsers"
-          @add-user="(contestants) => $emit('add-user', contestants)"
-          @update-search-result-users="
-            (query) => $emit('update-search-result-users', query)
-          "
-          @remove-user="(contestant) => $emit('remove-user', contestant)"
-          @save-end-time="(user) => $emit('save-end-time', user)"
-        ></omegaup-contest-add-contestant>
-        <omegaup-common-requests
-          :data="requests"
-          :text-add-participant="T.contestAdduserAddContestant"
-          @accept-request="(request) => $emit('accept-request', request)"
-          @deny-request="(request) => $emit('deny-request', request)"
-        ></omegaup-common-requests>
-        <omegaup-contest-groups
-          :groups="groups"
-          :search-result-groups="searchResultGroups"
-          @update-search-result-groups="
-            (query) => $emit('update-search-result-groups', query)
-          "
-          @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
-          @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
-        ></omegaup-contest-groups>
-      </div>
-      <div v-if="showTab === 'groups'" class="tab-pane active groups">
-        <omegaup-contest-teams-groups
-          :teams-group="teamsGroup"
-          :search-result-teams-groups="searchResultTeamsGroups"
-          :has-submissions="details.has_submissions"
-          @update-search-result-teams-groups="
-            (query) => $emit('update-search-result-teams-groups', query)
-          "
-          @replace-teams-group="
-            (request) => $emit('replace-teams-group', request)
-          "
-        ></omegaup-contest-teams-groups>
-      </div>
-      <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-common-admins
-          :admins="admins"
-          :search-result-users="searchResultUsers"
-          @add-admin="(username) => $emit('add-admin', username)"
-          @remove-admin="(username) => $emit('remove-admin', username)"
-          @update-search-result-users="
-            (query) => $emit('update-search-result-users', query)
-          "
-        ></omegaup-common-admins>
-        <div class="mt-2"></div>
-        <omegaup-common-group-admins
-          :group-admins="groupAdmins"
-          :search-result-groups="searchResultGroups"
-          @add-group-admin="
-            (groupAlias) => $emit('add-group-admin', groupAlias)
-          "
-          @remove-group-admin="
-            (groupAlias) => $emit('remove-group-admin', groupAlias)
-          "
-          @update-search-result-groups="
-            (query) => $emit('update-search-result-groups', query)
-          "
-        ></omegaup-common-group-admins>
-      </div>
-      <div v-if="showTab === 'links'" class="tab-pane active">
-        <omegaup-contest-links
-          :data="details"
-          @download-csv-scoreboard="
-            (contestAlias) => $emit('download-csv-scoreboard', contestAlias)
-          "
-        ></omegaup-contest-links>
-      </div>
-      <div v-if="showTab === 'clone'" class="tab-pane active">
-        <omegaup-contest-clone
-          @clone="
-            ({ title, alias, description, startTime }) =>
-              $emit('clone-contest', title, alias, description, startTime)
-          "
-        ></omegaup-contest-clone>
-      </div>
-      <div v-if="showTab === 'archive'" class="tab-pane active">
-        <omegaup-common-archive
-          :already-archived="alreadyArchived"
-          :archive-button-description="archiveButtonDescription"
-          :archive-confirm-text="T.contestEditArchiveConfirmText"
-          :archive-header-title="T.contestEditArchiveContest"
-          :archive-help-text="archiveUnarchiveDescription"
-          @archive="onArchiveContest"
-        ></omegaup-common-archive>
-      </div>
-      <div v-if="showTab === 'certificates'" class="tab-pane active">
-        <omegaup-contest-certificates
-          :certificates-details="certificatesDetails"
-          @generate="
-            (certificateCutoff) =>
-              $emit('generate-certificates', certificateCutoff)
-          "
-        ></omegaup-contest-certificates>
-      </div>
-    </div>
+    </keep-alive>
   </div>
 </template>
 
