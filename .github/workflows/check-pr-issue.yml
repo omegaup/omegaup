@@ -37,6 +37,7 @@ jobs:
 
             const variables = {
               owner: context.repo.owner,
+              // Note: context.repo.repo is the repository name (not a typo); this is the correct way to access it in GitHub Actions.
               repo: context.repo.repo,
               prNumber: context.issue.number
             };
