@@ -1183,6 +1183,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorLinesDelete: "Delete lines",
   problemCreatorLinesReorder: "Reorder",
   problemCreatorLoadProblem: "Load Problem",
+  problemCreatorMarkdownImageTooLarge: "The image is too large. The maximum allowed size is %(limit). Please use a smaller image.",
   problemCreatorMarkdownPreviewInitialRender: "# Preview\n",
   problemCreatorMarkdownSave: "Save",
   problemCreatorMultipleCases: "Multiple cases",
