@@ -17,10 +17,13 @@ database:
           - '**/*.sql'
 
 backend:
-  - changed-files:
-      - any-glob-to-any-file: 'frontend/server/**'
-      - all-globs-to-all-files: '!frontend/server/src/Controllers/**'
-      - all-globs-to-all-files: '!frontend/server/src/RabbitMQConnection.php'
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - 'frontend/server/**'
+          - all-globs-to-all-files:
+              - '!frontend/server/src/Controllers/**'
+              - '!frontend/server/src/RabbitMQConnection.php'
 
 'UI Task':
   - changed-files:
@@ -36,7 +39,7 @@ backend:
       - any-glob-to-any-file:
           - '**/*.css'
 
-'ci/cd':
+'CI/CD':
   - changed-files:
       - any-glob-to-any-file:
           - '.github/workflows/**'
@@ -62,9 +65,12 @@ backend:
           - 'frontend/server/src/RabbitMQConnection.php'
 
 documentation:
-  - changed-files:
-      - any-glob-to-any-file: '**/*.md'
-      - all-globs-to-all-files: '!frontend/database/**'
+  - all:
+      - changed-files:
+          - any-glob-to-any-file:
+              - '**/*.md'
+          - all-globs-to-all-files:
+              - '!frontend/database/**'
 
 dependencies:
   - changed-files:
