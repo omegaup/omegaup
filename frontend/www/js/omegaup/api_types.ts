@@ -4103,6 +4103,7 @@ export namespace types {
     admins: types.ProblemAdmin[];
     alias: string;
     allowUserAddTags: boolean;
+    cdp?: types.CDP;
     emailClarifications: boolean;
     extraWallTime: number;
     groupAdmins: types.ProblemGroupAdmin[];
