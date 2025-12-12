@@ -59,11 +59,10 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertSame($courseAlias, $courseClonedData['alias']);
-        $this->assertSame(
-            1,
-            \OmegaUp\DAO\CourseCloneLog::countByCourseId(
-                $courseData['course_id']
-            )
+        $this->assertArrayContainsWithPredicateExactlyOnce(
+            \OmegaUp\DAO\CourseCloneLog::getAll(),
+            fn (\OmegaUp\DAO\VO\CourseCloneLog $courseLog) =>
+                $courseLog->course_id === $courseData['course_id']
         );
 
         $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([

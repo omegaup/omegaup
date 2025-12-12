@@ -28,6 +28,6 @@ class CourseCloneLog extends \OmegaUp\DAO\Base\CourseCloneLog {
             $sql,
             [$courseId]
         );
-        return intval($count);
+        return $count;
     }
 }
