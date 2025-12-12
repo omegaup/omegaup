@@ -1182,6 +1182,7 @@
 	"problemCreatorLinesDelete": "Eliminar l\u00edneas",
 	"problemCreatorLinesReorder": "Reordenar",
 	"problemCreatorLoadProblem": "Cargar Problema",
+	"problemCreatorMarkdownImageTooLarge": "La imagen es demasiado grande. El tama\u00f1o m\u00e1ximo permitido es %(limit). Por favor, usa una imagen m\u00e1s peque\u00f1a.",
 	"problemCreatorMarkdownPreviewInitialRender": "# Previsualizaci\u00f3n\n",
 	"problemCreatorMarkdownSave": "Salvar",
 	"problemCreatorMultipleCases": "M\u00faltiples casos",

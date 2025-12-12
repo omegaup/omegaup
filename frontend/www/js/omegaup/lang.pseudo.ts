@@ -1183,6 +1183,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorLinesDelete: "(D31373 1in35)",
   problemCreatorLinesReorder: "(R30rd3r)",
   problemCreatorLoadProblem: "(L0ad Pr0b13m)",
+  problemCreatorMarkdownImageTooLarge: "(Th3 imag3 i5 700 1arg3. Th3 maximum a110w3d 5iz3 i5 %(limit). P13a53 u53 a 5ma113r imag3.)",
   problemCreatorMarkdownPreviewInitialRender: "(# Pr3vi3w\n)",
   problemCreatorMarkdownSave: "(Sav3)",
   problemCreatorMultipleCases: "(Mu17ip13 ca535)",
