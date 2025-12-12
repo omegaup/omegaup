@@ -87,7 +87,7 @@ services:
     user: "${UID_GID}"
     restart: always
     depends_on:
-      - mysql:
+      mysql:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "32672"]
