@@ -177,6 +177,11 @@
   - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
+- [ProblemBookmark](#problembookmark)
+  - [`/api/problemBookmark/create/`](#apiproblembookmarkcreate)
+  - [`/api/problemBookmark/delete/`](#apiproblembookmarkdelete)
+  - [`/api/problemBookmark/exists/`](#apiproblembookmarkexists)
+  - [`/api/problemBookmark/list/`](#apiproblembookmarklist)
 - [ProblemForfeited](#problemforfeited)
   - [`/api/problemForfeited/getCounts/`](#apiproblemforfeitedgetcounts)
 - [Problemset](#problemset)
@@ -3604,6 +3609,77 @@ Entry point for Problem Versions API
 | ----------- | ------------------------ |
 | `log`       | `types.ProblemVersion[]` |
 | `published` | `string`                 |
+
+# ProblemBookmark
+
+ProblemBookmarkController
+
+## `/api/problemBookmark/create/`
+
+### Description
+
+Bookmark a problem for the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name      | Type      |
+| --------- | --------- |
+| `success` | `boolean` |
+
+## `/api/problemBookmark/delete/`
+
+### Description
+
+Remove a bookmark for the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name      | Type      |
+| --------- | --------- |
+| `success` | `boolean` |
+
+## `/api/problemBookmark/exists/`
+
+### Description
+
+Check if a problem is bookmarked by the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type      |
+| ------------ | --------- |
+| `bookmarked` | `boolean` |
+
+## `/api/problemBookmark/list/`
+
+### Description
+
+Get list of bookmarked problems for the current user
+
+### Returns
+
+| Name       | Type                      |
+| ---------- | ------------------------- |
+| `problems` | `types.ProblemListItem[]` |
+| `total`    | `number`                  |
 
 # ProblemForfeited
 
