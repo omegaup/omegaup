@@ -513,34 +513,44 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'status' => 'open',
         ]);
 
-        if ($nominationType === 'quality_tag' && !is_null($qualityNomination)) {
-            $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
-            \OmegaUp\DAO\QualityNominations::update($nomination);
-        } else {
-            \OmegaUp\DAO\QualityNominations::create($nomination);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            if ($nominationType === 'quality_tag' && !is_null($qualityNomination)) {
+                $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
+                \OmegaUp\DAO\QualityNominations::update($nomination);
+            } else {
+                \OmegaUp\DAO\QualityNominations::create($nomination);
+            }
+
+            if ($nomination->nomination == 'promotion') {
+                $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
+                    \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+                );
+                if (is_null($qualityReviewerGroup)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'groupNotFound'
+                    );
+                }
+                foreach (
+                    \OmegaUp\DAO\Groups::sampleMembers(
+                        $qualityReviewerGroup,
+                        self::REVIEWERS_PER_NOMINATION
+                    ) as $reviewer
+                ) {
+                    \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
+                        'qualitynomination_id' => $nomination->qualitynomination_id,
+                        'user_id' => $reviewer->user_id,
+                    ]));
+                }
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
-        if ($nomination->nomination == 'promotion') {
-            $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
-                \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-            );
-            if (is_null($qualityReviewerGroup)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'groupNotFound'
-                );
-            }
-            foreach (
-                \OmegaUp\DAO\Groups::sampleMembers(
-                    $qualityReviewerGroup,
-                    self::REVIEWERS_PER_NOMINATION
-                ) as $reviewer
-            ) {
-                \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
-                    'qualitynomination_id' => $nomination->qualitynomination_id,
-                    'user_id' => $reviewer->user_id,
-                ]));
-            }
-        }
         return $nomination;
     }
 

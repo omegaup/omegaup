@@ -1754,19 +1754,28 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
         ];
 
-        \OmegaUp\DAO\ProblemsetIdentityRequest::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
-            'identity_id' => $r->identity->identity_id,
-            'problemset_id' => $contest->problemset_id,
-            'request_time' => \OmegaUp\Time::get(),
-        ]));
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        foreach ($admins as $admin) {
-            \OmegaUp\DAO\Notifications::create(
-                new \OmegaUp\DAO\VO\Notifications([
-                    'user_id' => $admin['user_id'],
-                    'contents' =>  json_encode($notificationContents),
-                ])
-            );
+            \OmegaUp\DAO\ProblemsetIdentityRequest::create(new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
+                'identity_id' => $r->identity->identity_id,
+                'problemset_id' => $contest->problemset_id,
+                'request_time' => \OmegaUp\Time::get(),
+            ]));
+
+            foreach ($admins as $admin) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $admin['user_id'],
+                        'contents' =>  json_encode($notificationContents),
+                    ])
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return ['status' => 'ok'];
