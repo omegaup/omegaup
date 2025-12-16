@@ -603,6 +603,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             return [];
         }
 
+        // Deduplicate aliases to avoid redundant parameter binding and DB work
+        $aliases = array_values(array_unique($aliases));
         $placeholders = join(',', array_fill(0, count($aliases), '?'));
         $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
