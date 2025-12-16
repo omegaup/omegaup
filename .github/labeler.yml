@@ -1,0 +1,77 @@
+# Language labels based on file extensions
+php:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.php'
+
+python:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.py'
+
+# Component labels based on file paths
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/database/**'
+          - '**/*.sql'
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/server/**'
+          - 'frontend/www/**/*.php'
+          - 'frontend/tests/**/*.php'
+
+'UI Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.js'
+          - '**/*.jsx'
+          - '**/*.ts'
+          - '**/*.tsx'
+          - '**/*.vue'
+
+'UX Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.css'
+
+'CI/CD':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/actions/**'
+
+'API Task':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'frontend/server/src/Controllers/**'
+          - 'frontend/www/api/**'
+          - 'frontend/server/src/ApiCaller.php'
+          - 'frontend/server/src/ApiUtils.php'
+          - 'frontend/server/src/Request.php'
+          - 'frontend/server/src/Exceptions/ApiException.php'
+          - 'frontend/server/cmd/APITool.php'
+
+'Cronjobs/RabbitMQ':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'stuff/cron/**'
+          - 'stuff/pipelines/**'
+          - 'frontend/server/src/RabbitMQConnection.php'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'composer.json'
+          - 'yarn.lock'
+          - 'composer.lock'
+          - 'requirements.txt'
+          - 'package-lock.json'
