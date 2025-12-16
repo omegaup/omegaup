@@ -2200,6 +2200,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $filteredProblems = [];
         foreach ($bookmarkedProblemsList as $problem) {
             // Problems are filtered by visibility in the DAO query.
+            /** @var BookmarkProblem */
             $filteredProblems[] = $problem->asFilteredArray(
                 $relevantColumns
             );
