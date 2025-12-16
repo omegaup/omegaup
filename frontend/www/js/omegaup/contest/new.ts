@@ -1,7 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
-import contest_NewForm from '../components/contest/NewForm.vue';
+import contest_NewForm from '../components/contest/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 

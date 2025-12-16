@@ -530,6 +530,7 @@ class Cache {
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SOLUTION = 'solution-';
+    const PROBLEM_CDP_DATA = 'problem-cdp-data-';
     const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
     const PROBLEM_STATS = 'problem-stats-';
     const PROBLEMS_LIST = 'problems-list-';
