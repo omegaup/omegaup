@@ -1471,14 +1471,6 @@ export const Problem = {
 };
 
 export const ProblemBookmark = {
-  create: apiCall<
-    messages.ProblemBookmarkCreateRequest,
-    messages.ProblemBookmarkCreateResponse
-  >('/api/problemBookmark/create/'),
-  delete: apiCall<
-    messages.ProblemBookmarkDeleteRequest,
-    messages.ProblemBookmarkDeleteResponse
-  >('/api/problemBookmark/delete/'),
   exists: apiCall<
     messages.ProblemBookmarkExistsRequest,
     messages.ProblemBookmarkExistsResponse
@@ -1487,6 +1479,10 @@ export const ProblemBookmark = {
     messages.ProblemBookmarkListRequest,
     messages.ProblemBookmarkListResponse
   >('/api/problemBookmark/list/'),
+  toggle: apiCall<
+    messages.ProblemBookmarkToggleRequest,
+    messages.ProblemBookmarkToggleResponse
+  >('/api/problemBookmark/toggle/'),
 };
 
 export const ProblemForfeited = {

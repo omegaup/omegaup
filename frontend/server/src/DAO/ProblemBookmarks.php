@@ -30,6 +30,7 @@ class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
                 Problems.problem_id = pb.problem_id
             WHERE
                 pb.identity_id = ?
+                AND Problems.visibility > 0
             ORDER BY
                 pb.created_at DESC;';
         $queryParams = [$userIdentityId];
@@ -43,38 +44,5 @@ class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
             $bookmarkedProblems[] = new \OmegaUp\DAO\VO\Problems($rowData);
         }
         return $bookmarkedProblems;
-    }
-
-    /**
-     * Get count of bookmarked problems for a specific identity
-     *
-     * @return int
-     */
-    public static function getBookmarkedProblemsCount(int $userIdentityId): int {
-        $countQuery = '
-            SELECT
-                COUNT(*)
-            FROM
-                Problem_Bookmarks
-            WHERE
-                identity_id = ?;';
-        $queryParams = [$userIdentityId];
-        /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->getOne(
-            $countQuery,
-            $queryParams
-        );
-    }
-
-    /**
-     * Check if a problem is bookmarked by an identity
-     *
-     * @return bool
-     */
-    public static function isProblemBookmarked(
-        int $userIdentityId,
-        int $targetProblemId
-    ): bool {
-        return self::existsByPK($userIdentityId, $targetProblemId);
     }
 }

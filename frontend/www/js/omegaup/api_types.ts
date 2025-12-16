@@ -2820,21 +2820,14 @@ export namespace types {
     username: string;
   }
 
-  export interface BookmarkCreateResponse {
-    success: boolean;
+  export interface BookmarkListItem {
+    alias: string;
+    title: string;
   }
 
-  export interface BookmarkDeleteResponse {
-    success: boolean;
-  }
-
-  export interface BookmarkExistsResponse {
-    bookmarked: boolean;
-  }
-
-  export interface BookmarkListResponse {
-    problems: types.ProblemListItem[];
-    total: number;
+  export interface BookmarkProblem {
+    alias: string;
+    title: string;
   }
 
   export interface CDP {
@@ -2881,7 +2874,7 @@ export namespace types {
 
   export interface CachedExtraProfileDetails {
     badges: string[];
-    bookmarkedProblems: types.Problem[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -3689,7 +3682,7 @@ export namespace types {
 
   export interface ExtraProfileDetails {
     badges: string[];
-    bookmarkedProblems: types.Problem[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -5727,17 +5720,15 @@ export namespace messages {
   };
 
   // ProblemBookmark
-  export type ProblemBookmarkCreateRequest = { [key: string]: any };
-  export type ProblemBookmarkCreateResponse = { success: boolean };
-  export type ProblemBookmarkDeleteRequest = { [key: string]: any };
-  export type ProblemBookmarkDeleteResponse = { success: boolean };
   export type ProblemBookmarkExistsRequest = { [key: string]: any };
   export type ProblemBookmarkExistsResponse = { bookmarked: boolean };
   export type ProblemBookmarkListRequest = { [key: string]: any };
   export type ProblemBookmarkListResponse = {
-    problems: types.ProblemListItem[];
+    problems: types.BookmarkListItem[];
     total: number;
   };
+  export type ProblemBookmarkToggleRequest = { [key: string]: any };
+  export type ProblemBookmarkToggleResponse = { bookmarked: boolean };
 
   // ProblemForfeited
   export type ProblemForfeitedGetCountsRequest = { [key: string]: any };
@@ -6635,18 +6626,15 @@ export namespace controllers {
   }
 
   export interface ProblemBookmark {
-    create: (
-      params?: messages.ProblemBookmarkCreateRequest,
-    ) => Promise<messages.ProblemBookmarkCreateResponse>;
-    delete: (
-      params?: messages.ProblemBookmarkDeleteRequest,
-    ) => Promise<messages.ProblemBookmarkDeleteResponse>;
     exists: (
       params?: messages.ProblemBookmarkExistsRequest,
     ) => Promise<messages.ProblemBookmarkExistsResponse>;
     list: (
       params?: messages.ProblemBookmarkListRequest,
     ) => Promise<messages.ProblemBookmarkListResponse>;
+    toggle: (
+      params?: messages.ProblemBookmarkToggleRequest,
+    ) => Promise<messages.ProblemBookmarkToggleResponse>;
   }
 
   export interface ProblemForfeited {

@@ -178,10 +178,9 @@
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
 - [ProblemBookmark](#problembookmark)
-  - [`/api/problemBookmark/create/`](#apiproblembookmarkcreate)
-  - [`/api/problemBookmark/delete/`](#apiproblembookmarkdelete)
   - [`/api/problemBookmark/exists/`](#apiproblembookmarkexists)
   - [`/api/problemBookmark/list/`](#apiproblembookmarklist)
+  - [`/api/problemBookmark/toggle/`](#apiproblembookmarktoggle)
 - [ProblemForfeited](#problemforfeited)
   - [`/api/problemForfeited/getCounts/`](#apiproblemforfeitedgetcounts)
 - [Problemset](#problemset)
@@ -3614,42 +3613,6 @@ Entry point for Problem Versions API
 
 ProblemBookmarkController
 
-## `/api/problemBookmark/create/`
-
-### Description
-
-Bookmark a problem for the current user
-
-### Parameters
-
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-
-### Returns
-
-| Name      | Type      |
-| --------- | --------- |
-| `success` | `boolean` |
-
-## `/api/problemBookmark/delete/`
-
-### Description
-
-Remove a bookmark for the current user
-
-### Parameters
-
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `problem_alias` | `string` |             |
-
-### Returns
-
-| Name      | Type      |
-| --------- | --------- |
-| `success` | `boolean` |
-
 ## `/api/problemBookmark/exists/`
 
 ### Description
@@ -3676,10 +3639,28 @@ Get list of bookmarked problems for the current user
 
 ### Returns
 
-| Name       | Type                      |
-| ---------- | ------------------------- |
-| `problems` | `types.ProblemListItem[]` |
-| `total`    | `number`                  |
+| Name       | Type                       |
+| ---------- | -------------------------- |
+| `problems` | `types.BookmarkListItem[]` |
+| `total`    | `number`                   |
+
+## `/api/problemBookmark/toggle/`
+
+### Description
+
+Toggle a bookmark for the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type      |
+| ------------ | --------- |
+| `bookmarked` | `boolean` |
 
 # ProblemForfeited
 
