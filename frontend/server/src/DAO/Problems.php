@@ -615,6 +615,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $problems = [];
         foreach ($rs as $row) {
             $problem = new \OmegaUp\DAO\VO\Problems($row);
+            if (is_null($problem->alias)) {
+                continue;
+            }
             $problems[$problem->alias] = $problem;
         }
 
