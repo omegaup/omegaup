@@ -35,6 +35,7 @@
     "monolog/monolog": "^2.3",
     "newrelic/monolog-enricher": "^2.0",
     "paragonie/paseto": "^v1.1.0",
+    "phpoffice/phpspreadsheet": "^5.2",
     "php-amqplib/php-amqplib": ">=3.0",
     "phpmailer/phpmailer": "^v6.5.0",
     "promphp/prometheus_client_php": "^v2.4.0",
