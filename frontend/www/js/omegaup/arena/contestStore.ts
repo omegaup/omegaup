@@ -2,9 +2,17 @@ import Vue from 'vue';
 import Vuex, { Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
-import { UrlParams } from '../components/arena/ContestList.vue';
+import { ContestTab, ContestOrder, ContestFilter } from '../components/arena/ContestList.vue';
 
 Vue.use(Vuex);
+
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+}
 
 export interface ContestState {
   // The map of contest lists.

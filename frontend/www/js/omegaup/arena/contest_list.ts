@@ -6,9 +6,8 @@ import arena_ContestList, {
   ContestTab,
   ContestOrder,
   ContestFilter,
-  UrlParams,
 } from '../components/arena/ContestList.vue';
-import contestStore from './contestStore';
+import contestStore, { UrlParams } from './contestStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
