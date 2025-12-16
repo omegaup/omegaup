@@ -769,11 +769,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
+        // Bulk fetch all problems in a single query to avoid N+1
+        $aliases = array_map(
+            fn ($problem) => $problem['alias'],
+            $details['problems']
+        );
+        $problemsMap = \OmegaUp\DAO\Problems::getByAliases($aliases);
+
         $problems = [];
         foreach ($details['problems'] as $index => $problem) {
-            $problemDetails = \OmegaUp\DAO\Problems::getByAlias(
-                $problem['alias']
-            );
+            $problemDetails = $problemsMap[$problem['alias']] ?? null;
             if (is_null($problemDetails)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
