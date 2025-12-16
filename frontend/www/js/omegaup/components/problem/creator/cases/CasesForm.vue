@@ -1,5 +1,5 @@
 <template>
-  <div class="card-body">
+  <div class="card-body py-3 px-4">
     <hr class="my-3" />
     <form enctype="multipart/form-data" method="post" @submit="onSubmit">
       <div class="form-group col-md-12">
@@ -38,7 +38,7 @@
           ref="submitButton"
           class="btn btn-primary"
           type="submit"
-          :disabled="commitMessage === ''"
+          :disabled="!commitMessage.trim()"
         >
           {{ T.problemEditSaveCase }}
         </button>
@@ -109,16 +109,10 @@ export default class CasesForm extends Vue {
   }
 
   onSubmit(e: Event) {
-    if (!this.commitMessage) {
+    if (!this.commitMessage.trim()) {
       ui.error(T.editFieldRequired);
       e.preventDefault();
     }
   }
 }
 </script>
-
-<style scoped>
-.card-body {
-  padding: 1rem 1.5rem;
-}
-</style>

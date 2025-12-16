@@ -16,7 +16,7 @@
           <button
             class="btn btn-danger"
             type="submit"
-            :disabled="commitMessage === ''"
+            :disabled="!commitMessage.trim()"
           >
             {{ T.problemEditConfirmDeletion }}
           </button>
@@ -37,10 +37,10 @@ import * as ui from '@/js/omegaup/ui';
 @Component
 export default class DeleteConfirmationForm extends Vue {
   @Inject('problemAlias') readonly alias!: string;
-  @Prop({ required: true, type: Boolean }) visible!: boolean;
-  @Prop({ required: true, type: String }) itemName!: string;
-  @Prop({ required: false, type: String }) itemId!: string;
-  @Prop({ required: true, type: Function }) onCancel!: () => void;
+  @Prop({ required: true }) visible!: boolean;
+  @Prop({ required: true }) itemName!: string;
+  @Prop({ required: false }) itemId!: string;
+  @Prop({ required: true }) onCancel!: () => void;
   T = T;
   commitMessage: string = '';
   @Watch('visible')
@@ -60,7 +60,6 @@ export default class DeleteConfirmationForm extends Vue {
     if (!this.commitMessage.trim()) {
       ui.error(T.editFieldRequired);
       e.preventDefault();
-      return;
     }
   }
   handleCancel() {
@@ -70,20 +69,20 @@ export default class DeleteConfirmationForm extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .item-active-for-delete {
-  border-left: 3px solid #dc3545 !important;
+  border-left: 3px solid var(--bs-danger) !important;
 }
 
 .button-container {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
 
-.button-container .btn {
-  flex: 1 1 140px;
-  margin: 0 !important;
-  white-space: normal;
+  .btn {
+    flex: 1 1 140px;
+    margin: 0 !important;
+    white-space: normal;
+  }
 }
 </style>
