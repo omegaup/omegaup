@@ -516,7 +516,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            if ($nominationType === 'quality_tag' && !is_null($qualityNomination)) {
+            if (
+                $nominationType === 'quality_tag' && !is_null(
+                    $qualityNomination
+                )
+            ) {
                 $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
                 \OmegaUp\DAO\QualityNominations::update($nomination);
             } else {
