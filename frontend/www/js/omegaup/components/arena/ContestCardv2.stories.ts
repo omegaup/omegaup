@@ -1,16 +1,16 @@
 import { Meta, Story } from '@storybook/vue';
-import ContestCard from './ContestCard.vue';
+import ContestCardv2 from './ContestCardv2.vue';
 import { types } from '../../api_types';
 
 export default {
   title: 'Arena/ContestCard',
-  component: ContestCard,
+  component: ContestCardv2,
 } as Meta;
 
 const Template: Story = (args, { argTypes }) => ({
-  components: { ContestCard },
+  components: { ContestCardv2 },
   props: Object.keys(argTypes),
-  template: '<contest-card v-bind="$props" />',
+  template: '<contest-cardv2 v-bind="$props" />',
 });
 
 export const Default = Template.bind({});

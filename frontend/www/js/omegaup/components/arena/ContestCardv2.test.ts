@@ -3,10 +3,10 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 import T from '../../lang';
-import arena_ContestCard from './ContestCard.vue';
-import { ContestTab } from './ContestListv2.vue';
+import ContestCardv2 from './ContestCardv2.vue';
+import { ContestTab } from './ContestList.vue';
 
-describe('ContestCard.vue', () => {
+describe('ContestCardv2.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
   const today = new Date();
   const yesterday = new Date(today.getTime() - daySeconds);
@@ -74,7 +74,7 @@ describe('ContestCard.vue', () => {
   };
 
   it('Should show the current contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(ContestCardv2, {
       propsData: {
         contest: currentContest,
         contestTab: currentTab,
@@ -94,7 +94,7 @@ describe('ContestCard.vue', () => {
   });
 
   it('Should show the future contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(ContestCardv2, {
       propsData: {
         contest: futureContest,
         contestTab: futureTab,
@@ -121,7 +121,7 @@ describe('ContestCard.vue', () => {
   });
 
   it('Should show the past contest card', async () => {
-    const wrapper = mount(arena_ContestCard, {
+    const wrapper = mount(ContestCardv2, {
       propsData: {
         contest: pastContest,
         contestTab: pastTab,
