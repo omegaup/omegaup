@@ -33,9 +33,11 @@ OmegaUp.on('ready', () => {
     rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
     const startTimestamp = payload.contest.start_time.getTime();
+    // Create a consistent time reference
+    const now = new Date();
     const finishTimestamp = Math.min(
       payload.contest.finish_time?.getTime() || Infinity,
-      Date.now(),
+      now.getTime(),
     );
     const { series, navigatorData } = onRankingEvents({
       events: payload.scoreboardEvents,
