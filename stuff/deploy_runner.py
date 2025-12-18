@@ -81,8 +81,6 @@ class RemoteRunner:
         if capture:
             std = subprocess.PIPE
         logging.debug('Running %s', ' '.join(shlex.quote(arg) for arg in args))
-        # Travis uses Python <3.5, which does not yet have subprocess.run.
-        # pylint: disable=no-member
         return subprocess.run(['/usr/bin/ssh', self._hostname] + args,
                               input=stdin,
                               stdout=std,
@@ -114,11 +112,11 @@ class RemoteRunner:
             group: Optional[str] = None
             ) -> subprocess.CompletedProcess:  # type: ignore
         '''Copies a file to the remote machine.'''
-        # pylint: disable=too-many-arguments
 
         subprocess.check_call(
             ['/usr/bin/scp', src,
-             '%s:.tmp' % self._hostname])
+             f'{self._hostname}:.tmp']
+        )
         if mode is not None:
             self.sudo(['/bin/chmod', '0%o' % mode, '.tmp'])
         if owner is not None:
@@ -136,23 +134,15 @@ class RemoteRunner:
             group: Optional[str] = None
             ) -> subprocess.CompletedProcess:  # type: ignore
         '''Puts the provided file contents onto the remote machine.'''
-        # pylint: disable=too-many-arguments
 
-        # If there is no need to change the owner, we can run as the current
-        # user.
-        if owner is not None:
-            run = self.sudo
-        else:
-            run = self.run
-
-        tmpfile = '/tmp/.%f.tmp' % (time.time())
+        run = self.sudo if owner is not None else self.run
+        tmpfile = f'/tmp/.{time.time()}.tmp'
         run(['/bin/cp', '/dev/stdin', tmpfile],
             stdin=contents,
             capture=False,
             check=True)
         if owner is not None:
             run(['/bin/chown', owner, tmpfile])
-
         if mode is not None:
             run(['/bin/chmod', '0%o' % mode, tmpfile])
         if group is not None:
@@ -163,149 +153,13 @@ class RemoteRunner:
 def hash_for(filename: str) -> str:
     '''Returns the hash for the specified file.'''
 
-    sha1sum_filename = '%s.SHA1SUM' % filename
+    sha1sum_filename = f'{filename}.SHA1SUM'
     if not os.path.exists(sha1sum_filename):
         logging.info('%s not found, returning null hash for %s',
                      sha1sum_filename, filename)
         return NULL_HASH
     with open(sha1sum_filename, encoding='utf-8') as f:
         return f.read().strip()
-
-
-def _create_users(runner: RemoteRunner) -> None:
-    if runner.run(['/usr/bin/id', 'omegaup']).returncode != 0:
-        runner.sudo(['/usr/sbin/useradd', '--home-dir', '/var/lib/omegaup',
-                     '--create-home', '--shell', '/usr/sbin/nologin',
-                     'omegaup'],
-                    capture=False)
-
-
-def _create_directories(runner: RemoteRunner) -> None:
-    if runner.run(['[', '-d', '/var/log/omegaup', ']']).returncode != 0:
-        runner.sudo(['/bin/mkdir', '-p', '/var/log/omegaup'], check=True)
-        runner.sudo(['/bin/chown', 'omegaup.omegaup', '/var/log/omegaup'],
-                    check=True)
-    if runner.run(['[', '-d', '/etc/omegaup/runner', ']']).returncode != 0:
-        runner.sudo(['/bin/mkdir', '-p', '/etc/omegaup/runner'], check=True)
-    if runner.run(['[', '-d', '/etc/omegaup/logslurp', ']']).returncode != 0:
-        runner.sudo(['/bin/mkdir', '-p', '/etc/omegaup/logslurp'], check=True)
-
-
-def _download_files(runner: RemoteRunner) -> None:
-    refresh_omegajail_rootfs = False
-
-    for url in DOWNLOAD_FILES:
-        filename = os.path.basename(url)
-        url_filename = f'.{filename}.url'
-        quoted_filename = shlex.quote(filename)
-        quoted_url_filename = shlex.quote(url_filename)
-        if runner.run([
-                (f'[[ '
-                 f'-f {quoted_url_filename} && '
-                 f'"`cat {quoted_url_filename}`" == "{shlex.quote(url)}" '
-                 f']]'),
-        ]).returncode == 0:
-            logging.info('URLs matched, skipping')
-            continue
-        logging.info('Downloading %s...', url)
-        runner.run([
-            f'[ -f {quoted_filename} ] && rm {quoted_filename}'
-        ])
-        runner.run([
-            '/usr/bin/curl', '--location', '--remote-time', '--output',
-            filename, '--url', url
-        ], check=True)
-        if 'rootfs' in filename:
-            refresh_omegajail_rootfs = True
-            continue
-        if 'omegajail' in filename and refresh_omegajail_rootfs:
-            # If we are going to refresh the rootfs anyways, might as well
-            # delay this until when the rootfs is refreshed.
-            continue
-        logging.info('Extracting %s...', url)
-        runner.sudo(['/bin/tar', '-xf', filename, '-C', '/'], check=True)
-        runner.put(url, url_filename)
-
-    if refresh_omegajail_rootfs:
-        logging.info('Refreshing omegajail rootfs...')
-        runner.sudo(['/bin/rm', '-rf', '/var/lib/omegajail'], check=True)
-        for url in DOWNLOAD_FILES:
-            filename = os.path.basename(url)
-            url_filename = f'.{filename}.url'
-            if 'omegajail' not in filename:
-                continue
-            logging.info('Extracting %s...', url)
-            runner.sudo(['/bin/tar', '-xf', filename, '-C', '/'], check=True)
-            runner.put(url, url_filename)
-
-
-def _create_ssl_keys(runner: RemoteRunner, certroot: str) -> None:
-    if runner.run(['[', '-f', '/etc/omegaup/runner/key.pem', ']'
-                   ]).returncode == 0:
-        return
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        subprocess.check_call([
-            '/usr/bin/certmanager', 'cert', '--root', certroot,
-            '--hostname', runner.hostname, '--output',
-            os.path.join(tmpdirname, 'key.pem'), '--cert-output',
-            os.path.join(tmpdirname, 'certificate.pem')
-        ])
-        runner.scp(os.path.join(tmpdirname, 'key.pem'),
-                   '/etc/omegaup/runner/key.pem',
-                   mode=int('0600', 8),
-                   owner='omegaup',
-                   group='omegaup')
-        runner.scp(os.path.join(tmpdirname, 'certificate.pem'),
-                   '/etc/omegaup/runner/certificate.pem',
-                   owner='omegaup',
-                   group='omegaup')
-
-
-def _install_runner_service(runner: RemoteRunner) -> None:
-    if runner.run([
-            '[', '-h',
-            ('/etc/systemd/system/multi-user.target.wants/'
-             'omegaup-runner.service'),
-            ']'
-    ]).returncode == 0:
-        return
-    runner.sudo(['/bin/systemctl', 'enable', 'omegaup-runner'], check=True)
-
-
-def _install_logslurp_service(runner: RemoteRunner) -> None:
-    if runner.run([
-            '[',
-            '-f',
-            '/etc/omegaup/logslurp/config.json',
-            ']',
-    ]).returncode != 0:
-        runner.put(LOGSLURP_TEMPLATE.format(hostname=runner.hostname),
-                   '/etc/omegaup/logslurp/config.json',
-                   mode=int('0600', 8),
-                   owner='omegaup',
-                   group='omegaup')
-
-    if runner.run([
-            '[',
-            '-f',
-            '/etc/systemd/system/omegaup-logslurp.service',
-            ']',
-    ]).returncode != 0:
-        runner.put(LOGSLURP_SERVICE,
-                   '/etc/systemd/system/omegaup-logslurp.service',
-                   owner='root',
-                   group='root')
-
-    if runner.run([
-            '[', '-h',
-            ('/etc/systemd/system/multi-user.target.wants/'
-             'omegaup-logslurp.service'),
-            ']'
-    ]).returncode != 0:
-        runner.sudo(['/bin/systemctl', 'enable', 'omegaup-logslurp'],
-                    check=True)
-        runner.sudo(['/bin/systemctl', 'start', 'omegaup-logslurp'],
-                    check=True)
 
 
 def main() -> None:
@@ -318,10 +172,7 @@ def main() -> None:
     parser.add_argument('runner', help='Runner name')
     args = parser.parse_args()
 
-    if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
     runner = RemoteRunner(args.runner)
 
@@ -330,13 +181,6 @@ def main() -> None:
     if args.upgrade:
         runner.sudo(['/usr/bin/apt', 'update', '-y'], check=True)
         runner.sudo(['/usr/bin/apt', 'upgrade', '-y'], check=True)
-
-    _download_files(runner)
-    _create_users(runner)
-    _create_directories(runner)
-    _create_ssl_keys(runner, args.certroot)
-    _install_runner_service(runner)
-    _install_logslurp_service(runner)
 
     runner.sudo(['/bin/systemctl', 'daemon-reload'], check=True)
     runner.sudo(['/bin/systemctl', 'start', 'omegaup-runner'], check=True)
