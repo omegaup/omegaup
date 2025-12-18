@@ -106,6 +106,7 @@ rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolofthemonth/?$ /schools/schoolofthemonth.php last;
 rewrite ^/schools/?$ /course/ permanent;
 rewrite ^/schoolsrank/?$ /rank/schools/ permanent;
+rewrite ^/compare/?$ /rank/compare/ permanent;
 rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
 rewrite ^/submissions/?$ /submissions/list.php last;

@@ -177,6 +177,7 @@
           <a class="dropdown-item" href="/rank/schools/">{{
             T.navSchoolRanking
           }}</a>
+          <a class="dropdown-item" href="/compare/">{{ T.navCompareUsers }}</a>
           <a class="dropdown-item" href="/coderofthemonth/">{{
             T.navCoderOfTheMonth
           }}</a>
@@ -232,7 +233,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component

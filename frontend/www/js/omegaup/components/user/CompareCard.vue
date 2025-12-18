@@ -1,0 +1,140 @@
+<template>
+  <div class="card h-100" :class="comparisonClass">
+    <div class="card-body">
+      <!-- User Header -->
+      <div class="text-center mb-3">
+        <a :href="profileUrl">
+          <img
+            v-if="profile.gravatar_92"
+            :src="profile.gravatar_92"
+            :alt="profile.username || ''"
+            class="rounded-circle mb-2"
+            width="92"
+            height="92"
+          />
+        </a>
+        <h5 class="card-title mb-1">
+          <a :href="profileUrl" :class="profile.classname">
+            {{ profile.username }}
+          </a>
+        </h5>
+        <p v-if="profile.name" class="text-muted small mb-0">
+          {{ profile.name }}
+        </p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <!-- Rank -->
+        <div class="stat-item">
+          <div class="stat-label">{{ T.profileRank }}</div>
+          <div class="stat-value" :class="profile.classname">
+            {{ rankDisplay }}
+          </div>
+        </div>
+
+        <!-- Problems Solved -->
+        <div class="stat-item">
+          <div class="stat-label">{{ T.profileSolvedProblems }}</div>
+          <div class="stat-value">
+            <strong>{{ solvedProblemsCount }}</strong>
+          </div>
+        </div>
+
+        <!-- Contests -->
+        <div class="stat-item">
+          <div class="stat-label">{{ T.profileContests }}</div>
+          <div class="stat-value">
+            <strong>{{ contestsCount }}</strong>
+          </div>
+        </div>
+
+        <!-- Author Ranking -->
+        <div v-if="profile.rankinfo.author_ranking" class="stat-item">
+          <div class="stat-label">{{ T.authorRank }}</div>
+          <div class="stat-value">
+            <strong>#{{ profile.rankinfo.author_ranking }}</strong>
+          </div>
+        </div>
+
+        <!-- Country -->
+        <div v-if="profile.country" class="stat-item">
+          <div class="stat-label">{{ T.profileCountry }}</div>
+          <div class="stat-value">
+            {{ profile.country }}
+          </div>
+        </div>
+
+        <!-- School -->
+        <div v-if="profile.school" class="stat-item">
+          <div class="stat-label">{{ T.profileSchool }}</div>
+          <div class="stat-value small">
+            {{ profile.school }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Private Profile Notice -->
+      <div v-if="profile.is_private" class="alert alert-info mt-3 mb-0">
+        <small>{{ T.profileIsPrivate }}</small>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { types } from '../../api_types';
+
+@Component
+export default class CompareCard extends Vue {
+  @Prop() profile!: types.UserProfileInfo;
+  @Prop({ default: 0 }) solvedProblemsCount!: number;
+  @Prop({ default: 0 }) contestsCount!: number;
+  @Prop({ default: '' }) comparisonClass!: string;
+
+  T = T;
+
+  get profileUrl(): string {
+    return `/profile/${this.profile.username}/`;
+  }
+
+  get rankDisplay(): string {
+    const rank = this.profile.rankinfo.rank;
+    if (!rank) return T.profileRankUnrated;
+    return `#${rank}`;
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.5rem;
+  background-color: var(--compare-stat-bg, #f8f9fa);
+  border-radius: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+.card {
+  transition: border-color 0.3s ease;
+}
+</style>
