@@ -1,5 +1,5 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import Vue from 'vue';
 import DeleteConfirmationForm from './DeleteConfirmationForm.vue';
 import T from '../../../../lang';
@@ -10,7 +10,6 @@ localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
 describe('DeleteConfirmationForm.vue', () => {
-
   it('Should set commitMessage when visible changes', async () => {
     const wrapper = shallowMount(DeleteConfirmationForm, {
       localVue,
@@ -74,15 +73,23 @@ describe('DeleteConfirmationForm.vue', () => {
 
     const requestHidden = wrapper.find('input[type="hidden"][name="request"]');
     expect(requestHidden.exists()).toBeTruthy();
-    expect((requestHidden.element as HTMLInputElement).value).toBe('deleteGroupCase');
+    expect((requestHidden.element as HTMLInputElement).value).toBe(
+      'deleteGroupCase',
+    );
 
-    const aliasHidden = wrapper.find('input[type="hidden"][name="problem_alias"]');
+    const aliasHidden = wrapper.find(
+      'input[type="hidden"][name="problem_alias"]',
+    );
     expect(aliasHidden.exists()).toBeTruthy();
     expect((aliasHidden.element as HTMLInputElement).value).toBe('the-alias');
 
-    const contentsHidden = wrapper.find('input[type="hidden"][name="contents"]');
+    const contentsHidden = wrapper.find(
+      'input[type="hidden"][name="contents"]',
+    );
     expect(contentsHidden.exists()).toBeTruthy();
-    const parsed = JSON.parse((contentsHidden.element as HTMLInputElement).value);
+    const parsed = JSON.parse(
+      (contentsHidden.element as HTMLInputElement).value,
+    );
     expect(parsed.id).toBe('1234');
   });
 
@@ -112,7 +119,7 @@ describe('DeleteConfirmationForm.vue', () => {
 
   it('Should call onCancel and clear commitMessage when cancel clicked', async () => {
     const onCancel = jest.fn();
-    
+
     const wrapper = mount(DeleteConfirmationForm, {
       localVue,
       propsData: {
@@ -126,7 +133,7 @@ describe('DeleteConfirmationForm.vue', () => {
 
     wrapper.setProps({ visible: true });
     await Vue.nextTick();
-    
+
     expect((wrapper.vm as any).commitMessage).toBe(
       `${T.problemEditDeletingPrefix} to delete`,
     );
@@ -155,10 +162,10 @@ describe('DeleteConfirmationForm.vue', () => {
 
     const submitBtn = wrapper.find('button.btn-danger');
     expect(submitBtn.attributes('disabled')).toBe('disabled');
-    
+
     wrapper.setData({ commitMessage: 'Delete message' });
     await Vue.nextTick();
-    
+
     expect(submitBtn.attributes('disabled')).toBeUndefined();
   });
 });

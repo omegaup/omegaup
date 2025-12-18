@@ -1,11 +1,14 @@
 import { createLocalVue, shallowMount, mount } from '@vue/test-utils';
 
 import CasesForm from './CasesForm.vue';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import store from '@/js/omegaup/problem/creator/store';
 import Vue from 'vue';
 import T from '../../../../lang';
-import { generateCase, generateGroup } from '@/js/omegaup/problem/creator/modules/cases';
+import {
+  generateCase,
+  generateGroup,
+} from '@/js/omegaup/problem/creator/modules/cases';
 import * as ui from '@/js/omegaup/ui';
 
 const localVue = createLocalVue();
@@ -37,9 +40,13 @@ describe('CasesForm.vue', () => {
     expect(requestHidden.exists()).toBeTruthy();
     expect((requestHidden.element as HTMLInputElement).value).toBe('cases');
 
-    const aliasHidden = wrapper.find('input[type="hidden"][name="problem_alias"]');
+    const aliasHidden = wrapper.find(
+      'input[type="hidden"][name="problem_alias"]',
+    );
     expect(aliasHidden.exists()).toBeTruthy();
-    expect((aliasHidden.element as HTMLInputElement).value).toBe('problem-alias');
+    expect((aliasHidden.element as HTMLInputElement).value).toBe(
+      'problem-alias',
+    );
 
     const messageHidden = wrapper.find('input[type="hidden"][name="message"]');
     expect(messageHidden.exists()).toBeTruthy();
@@ -64,7 +71,6 @@ describe('CasesForm.vue', () => {
     expect(outputFile.exists()).toBeTruthy();
   });
 
-
   it('Should compute contentsPayload for case edit', async () => {
     const group = generateGroup({ name: 'group', ungroupedCase: false });
     const caze = generateCase({ name: 'case', groupID: group.groupID });
@@ -84,16 +90,22 @@ describe('CasesForm.vue', () => {
     });
     await Vue.nextTick();
 
-    const contentsHidden = wrapper.find('input[type="hidden"][name="contents"]');
-    const parsed = JSON.parse((contentsHidden.element as HTMLInputElement).value);
-    
+    const contentsHidden = wrapper.find(
+      'input[type="hidden"][name="contents"]',
+    );
+    const parsed = JSON.parse(
+      (contentsHidden.element as HTMLInputElement).value,
+    );
+
     expect(parsed.group.groupID).toBe(group.groupID);
     expect(parsed.case.caseID).toBe(caze.caseID);
   });
 
   it('Should compute contentsPayload for group edit', async () => {
-
-    const editGroup = generateGroup({ name: 'editGroup', ungroupedCase: false });
+    const editGroup = generateGroup({
+      name: 'editGroup',
+      ungroupedCase: false,
+    });
 
     const wrapper = shallowMount(CasesForm, {
       localVue,
@@ -103,12 +115,16 @@ describe('CasesForm.vue', () => {
     });
     await Vue.nextTick();
 
-    const contentsHidden = wrapper.find('input[type="hidden"][name="contents"]');
-    const parsed = JSON.parse((contentsHidden.element as HTMLInputElement).value);
-    
+    const contentsHidden = wrapper.find(
+      'input[type="hidden"][name="contents"]',
+    );
+    const parsed = JSON.parse(
+      (contentsHidden.element as HTMLInputElement).value,
+    );
+
     expect(parsed.group.groupID).toBe(editGroup.groupID);
 
-    expect(parsed.case).toBeUndefined(); 
+    expect(parsed.case).toBeUndefined();
   });
 
   it('Should disable button, show error and prevent submission when commitMessage empty', async () => {
@@ -137,10 +153,10 @@ describe('CasesForm.vue', () => {
 
   it('Should hide submit button when isEmbedded is true', async () => {
     const wrapper = mount(CasesForm, {
-        localVue,
-        store: store,
-        provide: { problemAlias: 'alias' },
-        propsData: { isEmbedded: true },
+      localVue,
+      store: store,
+      provide: { problemAlias: 'alias' },
+      propsData: { isEmbedded: true },
     });
 
     const submitBtn = wrapper.find('button[type="submit"]');
