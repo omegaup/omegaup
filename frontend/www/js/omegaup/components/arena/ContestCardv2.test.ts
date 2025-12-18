@@ -91,6 +91,16 @@ describe('ContestCardv2.vue', () => {
 
     expect(contestEnrollStatus.exists()).toBe(true);
     expect(contestButtonEnter.text()).toBe(T.contestButtonEnter);
+
+    const contestButtonVirtual = wrapper.findComponent({
+      ref: 'contestButtonVirtual',
+    });
+    const contestButtonPractice = wrapper.findComponent({
+      ref: 'contestButtonPractice',
+    });
+
+    expect(contestButtonVirtual.exists()).toBe(true);
+    expect(contestButtonPractice.exists()).toBe(true);
   });
 
   it('Should show the future contest card', async () => {

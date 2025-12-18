@@ -99,26 +99,31 @@
             {{ T.contestButtonScoreboard }}
           </b-button>
         </slot>
-        <slot name="contest-dropdown">
-          <b-dropdown
+        <slot name="contest-button-virtual">
+          <b-button
+            ref="contestButtonVirtual"
+            :href="getVirtualContestURL(contest.alias)"
             variant="primary"
             block
             size="sm"
-            class="w-100"
-            menu-class="w-100"
-            no-flip
+            class="mb-2 d-flex align-items-center justify-content-center"
           >
-            <template #button-content>
-              <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-              {{ T.contestButtonEnter }}
-            </template>
-            <b-dropdown-item :href="getVirtualContestURL(contest.alias)">
-              {{ T.contestVirtualMode }}
-            </b-dropdown-item>
-            <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
-              {{ T.contestPracticeMode }}
-            </b-dropdown-item>
-          </b-dropdown>
+            <font-awesome-icon class="mr-1" icon="gamepad" />
+            {{ T.contestVirtualMode }}
+          </b-button>
+        </slot>
+        <slot name="contest-button-practice">
+          <b-button
+            ref="contestButtonPractice"
+            :href="getPracticeContestURL(contest.alias)"
+            variant="primary"
+            block
+            size="sm"
+            class="mb-2 d-flex align-items-center justify-content-center"
+          >
+            <font-awesome-icon class="mr-1" icon="flask" />
+            {{ T.contestPracticeMode }}
+          </b-button>
         </slot>
       </div>
     </div>

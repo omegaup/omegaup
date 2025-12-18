@@ -44,11 +44,35 @@ Recommended.args = {
   } as types.ContestListItem,
 };
 
-export const Participating = Template.bind({});
-Participating.args = {
+export const Current = Template.bind({});
+Current.args = {
   contest: {
     ...Default.args.contest,
-    participating: true,
-    title: 'Participating Contest',
+    title: 'Current Contest',
+    start_time: new Date(Date.now() - 3600000), // 1 hour ago
+    finish_time: new Date(Date.now() + 3600000), // 1 hour from now
+    active: true,
+  } as types.ContestListItem,
+};
+
+export const Future = Template.bind({});
+Future.args = {
+  contest: {
+    ...Default.args.contest,
+    title: 'Future Contest',
+    start_time: new Date(Date.now() + 86400000), // 1 day from now
+    finish_time: new Date(Date.now() + 172800000), // 2 days from now
+    active: false,
+  } as types.ContestListItem,
+};
+
+export const Past = Template.bind({});
+Past.args = {
+  contest: {
+    ...Default.args.contest,
+    title: 'Past Contest',
+    start_time: new Date(Date.now() - 172800000), // 2 days ago
+    finish_time: new Date(Date.now() - 86400000), // 1 day ago
+    active: false,
   } as types.ContestListItem,
 };
