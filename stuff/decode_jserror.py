@@ -162,7 +162,8 @@ def _main() -> None:
             for regex in (_BLINK_STACK_FRAME_RE, _GECKO_STACK_FRAME_RE):
                 match = regex.match(line)
                 if match:
-                    print(f'{match.group(1)} ({_map_source(*match.groups()[1:])})')
+                    source_map = _map_source(*match.groups()[1:])
+                    print(f'{match.group(1)} ({source_map})')
                     break
             else:
                 print(line.rstrip('\n'))
