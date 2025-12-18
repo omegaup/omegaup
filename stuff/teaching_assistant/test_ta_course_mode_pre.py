@@ -68,6 +68,11 @@ def get_assignment_details_endpoint() -> str:
     return "api/course/assignmentDetails/"
 
 
+def get_course_admin_details_endpoint() -> str:
+    """endpoint for getting course admin details"""
+    return "api/course/adminDetails/"
+
+
 @pytest.fixture
 def create_test_course() -> None:
     """test creating a course"""
@@ -113,15 +118,43 @@ def create_test_assignment() -> None:
     response.raise_for_status()
     COOKIES = response.cookies
 
-    create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
+    # Fetch course details to get valid time bounds
+    course_details_url = f"{BASE_URL}/{get_course_admin_details_endpoint()}"
+    course_response = requests.get(
+        course_details_url,
+        params={"alias": COURSE_ALIAS},
+        cookies=COOKIES,
+        timeout=30
+    )
+    course_response.raise_for_status()
+    course_data = course_response.json()
+
+    # Validate required fields are present in course data
+    if 'start_time' not in course_data:
+        raise AssertionError(
+            f"Course API response missing 'start_time'. "
+            f"Response: {course_data}"
+        )
+
+    course_start = course_data.get('start_time')
+    course_finish = course_data.get('finish_time')
+
+    # Ensure assignment times fall within course time bounds
     now = int(time.time())
+    start_time = max(now, course_start)
+    if course_finish:
+        finish_time = min(start_time + 18000, course_finish)
+    else:
+        finish_time = start_time + 18000
+
+    create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
     data = {
         "course_alias": COURSE_ALIAS,
         "name": ASSIGNMENT_NAME,
         "alias": ASSIGNMENT_ALIAS,
         "description": ASSIGNMENT_DESCRIPTION,
-        "start_time": now,
-        "finish_time": now + 18000,
+        "start_time": start_time,
+        "finish_time": finish_time,
         "assignment_type": "homework",
         "max_points": 0,
         "order": 1,
