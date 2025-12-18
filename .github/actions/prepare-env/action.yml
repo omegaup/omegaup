@@ -34,8 +34,8 @@ runs:
         # Create the volume and initialize the problems.git directory to prevent race conditions
         # when multiple containers try to create it simultaneously
         docker volume create omegaup_omegaupdata
-        # First set ownership of volume root, then create problems.git with correct owner
-        docker run --rm -v omegaup_omegaupdata:/var/lib/omegaup alpine sh -c "chown $(id -u):$(id -g) /var/lib/omegaup && mkdir -p /var/lib/omegaup/problems.git && chown $(id -u):$(id -g) /var/lib/omegaup/problems.git"
+        # Set ownership to UID/GID used by containers (matches UID_GID env var, typically 1000:1000 on Linux CI)
+        docker run --rm -v omegaup_omegaupdata:/var/lib/omegaup alpine sh -c "mkdir -p /var/lib/omegaup/problems.git && chown -R 1000:1000 /var/lib/omegaup"
 
     - name: Start the Docker containers
       shell: bash
