@@ -27,15 +27,15 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $currentUserId = $r->identity->identity_id;
+        $currentIdentityId = $r->identity->identity_id;
         $alreadyBookmarked = \OmegaUp\DAO\ProblemBookmarks::existsByPK(
-            $currentUserId,
+            $currentIdentityId,
             $targetProblem->problem_id
         );
 
         if ($alreadyBookmarked) {
             $existingBookmark = \OmegaUp\DAO\ProblemBookmarks::getByPK(
-                $currentUserId,
+                $currentIdentityId,
                 $targetProblem->problem_id
             );
             if (!is_null($existingBookmark)) {
@@ -52,7 +52,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         }
 
         self::createBookmark(
-            $currentUserId,
+            $currentIdentityId,
             $targetProblem->problem_id,
             $r->identity->username
         );
@@ -83,9 +83,9 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $currentUserId = $r->identity->identity_id;
+        $currentIdentityId = $r->identity->identity_id;
         $isBookmarked = \OmegaUp\DAO\ProblemBookmarks::existsByPK(
-            $currentUserId,
+            $currentIdentityId,
             $targetProblem->problem_id
         );
 
@@ -101,16 +101,18 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Get all bookmarked problems
-        $currentUserId = $r->identity->identity_id;
-        $bookmarkedProblems = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
-            $currentUserId
+        $currentIdentityId = $r->identity->identity_id;
+        $bookmarkedProblemsList = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
+            $currentIdentityId
         );
 
         $relevantColumns = ['alias', 'title'];
         $problemList = [];
-        foreach ($bookmarkedProblems as $problemItem) {
-            /** @var BookmarkListItem */
-            $problemList[] = $problemItem->asFilteredArray($relevantColumns);
+        foreach ($bookmarkedProblemsList as $problem) {
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+                /** @var BookmarkListItem */
+                $problemList[] = $problem->asFilteredArray($relevantColumns);
+            }
         }
 
         return [

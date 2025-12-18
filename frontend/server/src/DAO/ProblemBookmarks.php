@@ -30,7 +30,6 @@ class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
                 Problems.problem_id = pb.problem_id
             WHERE
                 pb.identity_id = ?
-                AND Problems.visibility > 0
             ORDER BY
                 pb.created_at DESC;';
         $queryParams = [$userIdentityId];

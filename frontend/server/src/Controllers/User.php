@@ -2199,11 +2199,12 @@ class User extends \OmegaUp\Controllers\Controller {
         /** @var list<BookmarkProblem> */
         $filteredProblems = [];
         foreach ($bookmarkedProblemsList as $problem) {
-            // Problems are filtered by visibility in the DAO query.
-            /** @var BookmarkProblem */
-            $filteredProblems[] = $problem->asFilteredArray(
-                $relevantColumns
-            );
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+                /** @var BookmarkProblem */
+                $filteredProblems[] = $problem->asFilteredArray(
+                    $relevantColumns
+                );
+            }
         }
         return $filteredProblems;
     }
