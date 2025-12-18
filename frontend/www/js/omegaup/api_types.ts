@@ -6041,6 +6041,19 @@ export namespace messages {
     heatmap: { count: number; date: string }[];
     runs: { date?: string; runs: number; verdict: string }[];
   };
+  export type UserCompareRequest = { [key: string]: any };
+  export type UserCompareResponse = {
+    user1: {
+      profile: types.UserProfileInfo;
+      solvedProblemsCount: number;
+      contestsCount: number;
+    } | null;
+    user2: {
+      profile: types.UserProfileInfo;
+      solvedProblemsCount: number;
+      contestsCount: number;
+    } | null;
+  };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
     username: string;

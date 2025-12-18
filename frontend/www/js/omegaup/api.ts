@@ -2127,26 +2127,9 @@ export const User = {
   stats: apiCall<messages.UserStatsRequest, messages.UserStatsResponse>(
     '/api/user/stats/',
   ),
-  compare: (params: {
-    username1?: string;
-    username2?: string;
-  }): Promise<{
-    user1: {
-      profile: messages.UserProfileResponse;
-      solvedProblemsCount: number;
-      contestsCount: number;
-    } | null;
-    user2: {
-      profile: messages.UserProfileResponse;
-      solvedProblemsCount: number;
-      contestsCount: number;
-    } | null;
-  }> =>
-    fetch('/api/user/compare/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    }).then((response) => response.json()),
+  compare: apiCall<messages.UserCompareRequest, messages.UserCompareResponse>(
+    '/api/user/compare/',
+  ),
   statusVerified: apiCall<
     messages.UserStatusVerifiedRequest,
     messages.UserStatusVerifiedResponse

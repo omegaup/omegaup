@@ -16,6 +16,10 @@
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
+      <a v-if="!isIndex" href="/compare/" class="btn btn-outline-primary btn-sm ml-2">
+        <font-awesome-icon :icon="['fas', 'exchange-alt']" />
+        {{ T.compareUsersTitle }}
+      </a>
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
       <omegaup-common-typeahead
@@ -141,27 +145,27 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 import * as time from '../../time';
+import * as ui from '../../ui';
+import common_Paginator from '../common/Paginator.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
-import common_Paginator from '../common/Paginator.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { faExchangeAlt, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
-library.add(faQuestionCircle);
+library.add(faExchangeAlt, faQuestionCircle);
 
 import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
