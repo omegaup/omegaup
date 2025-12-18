@@ -28,6 +28,14 @@ runs:
         docker compose down -v || true
         docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
 
+    - name: Pre-create shared volume directories
+      shell: bash
+      run: |
+        # Create the volume and initialize the problems.git directory to prevent race conditions
+        # when multiple containers try to create it simultaneously
+        docker volume create omegaup_omegaupdata
+        docker run --rm -v omegaup_omegaupdata:/var/lib/omegaup alpine mkdir -p /var/lib/omegaup/problems.git
+
     - name: Start the Docker containers
       shell: bash
       run: |
