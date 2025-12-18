@@ -1763,14 +1763,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'request_time' => \OmegaUp\Time::get(),
             ]));
 
-            foreach ($admins as $admin) {
-                \OmegaUp\DAO\Notifications::create(
-                    new \OmegaUp\DAO\VO\Notifications([
-                        'user_id' => $admin['user_id'],
-                        'contents' =>  json_encode($notificationContents),
-                    ])
-                );
-            }
+            $notifications = array_map(
+                fn($admin) => new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' => json_encode($notificationContents),
+                ]),
+                $admins
+            );
+            \OmegaUp\DAO\Notifications::createBulk($notifications);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
