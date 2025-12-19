@@ -177,7 +177,7 @@
           <a class="dropdown-item" href="/rank/schools/">{{
             T.navSchoolRanking
           }}</a>
-          <a class="dropdown-item" href="/compare/">{{ T.navCompareUsers }}</a>
+          <!-- <a class="dropdown-item" href="/compare/">{{ T.navCompareUsers }}</a> -->
           <a class="dropdown-item" href="/coderofthemonth/">{{
             T.navCoderOfTheMonth
           }}</a>
