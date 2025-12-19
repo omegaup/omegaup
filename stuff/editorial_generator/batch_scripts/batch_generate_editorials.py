@@ -302,7 +302,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         self.main_logger.info("   API URL: %s", self.api_url)
                     else:
                         raise Exception(
-                            f"Login failed: {result.get('error', 'Unknown error')}")
+                            f"Login failed: "
+                            f"{result.get('error', 'Unknown error')}")
                 else:
                     raise Exception(
                         f"HTTP {response.status_code}: Login request failed")
@@ -537,7 +538,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         # Log validation verdict if available
                         verdict_msg = ""
                         if job.validation_verdict:
-                            verdict_msg = f" (Validation: {job.validation_verdict})"
+                            verdict_msg = (
+                                f" (Validation: {job.validation_verdict})")
                         self.main_logger.info(
                             "🎉 Completed: %s%s",
                             job.problem_alias, verdict_msg)
@@ -1013,7 +1015,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 f.write(f"API Errors: {api_stats['api_errors']}\n")
                 f.write(f"Rate Limit Hits: {api_stats['rate_limit_hits']}\n")
                 f.write(
-                    f"API Success Rate: {api_stats['api_success_rate_percent']} %\n\n")
+                    f"API Success Rate: "
+                    f"{api_stats['api_success_rate_percent']} %\n\n")
 
                 # Validation Statistics
                 f.write("VALIDATION STATISTICS:\n")
@@ -1042,7 +1045,9 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 f.write("-" * 40 + "\n")
                 perf = report['performance_metrics']
                 avg_time = perf['average_job_completion_time_seconds']
-                f.write(f"Avg Completion Time: {f'{avg_time:.2f}' if avg_time else 'N/A'}s\n")
+                f.write(
+                    f"Avg Completion Time: "
+                    f"{f'{avg_time:.2f}' if avg_time else 'N/A'}s\n")
                 f.write(f"Jobs/Hour: {perf['jobs_per_hour']:.1f}\n")
                 f.write(
                     f"API Calls/Min: {perf['api_calls_per_minute']:.2f}\n\n")
@@ -1057,9 +1062,12 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                     f.write("  Status: completed\n")
                     f.write(f"  Job ID: {job_data['job_id']}\n")
                     if job_data.get('validation_verdict'):
-                        f.write(f"  Validation: {job_data['validation_verdict']}\n")
+                        f.write(
+                            f"  Validation: "
+                            f"{job_data['validation_verdict']}\n")
                     if job_data.get('completion_time'):
-                        f.write(f"  Completed: {job_data['completion_time']}\n")
+                        f.write(
+                            f"  Completed: {job_data['completion_time']}\n")
                     f.write("\n")
 
                 # Failed jobs
@@ -1287,7 +1295,8 @@ Examples:
       # Test single problem
 
 Environment Variables:
-  PROBLEMS_LIST_FILE: Default problems file (currently: {default_problems_file})
+  PROBLEMS_LIST_FILE: Default problems file
+                      (currently: {default_problems_file})
   OMEGAUP_OUAT_TOKEN: Authentication token (preferred)
   OMEGAUP_USERNAME: Username for login authentication
   OMEGAUP_PASSWORD: Password for login authentication
