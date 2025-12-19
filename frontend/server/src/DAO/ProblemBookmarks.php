@@ -5,7 +5,6 @@ namespace OmegaUp\DAO;
 /**
  * ProblemBookmarks Data Access Object (DAO).
  *
- * {@link \OmegaUp\DAO\VO\ProblemBookmarks}.
  * @access public
  * @package docs
  */
@@ -13,7 +12,7 @@ class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
     /**
      * Get all bookmarked problems for a specific identity
      *
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @return list<array{alias: string, title: string}>
      */
     public static function getAllBookmarkedProblems(int $userIdentityId): array {
         $query = '
@@ -38,9 +37,17 @@ class ProblemBookmarks extends \OmegaUp\DAO\Base\ProblemBookmarks {
             $query,
             $queryParams
         );
+
+        $relevantColumns = ['alias', 'title'];
         $bookmarkedProblems = [];
         foreach ($resultRows as $rowData) {
-            $bookmarkedProblems[] = new \OmegaUp\DAO\VO\Problems($rowData);
+            $problem = new \OmegaUp\DAO\VO\Problems($rowData);
+            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
+                /** @var array{alias: string, title: string} */
+                $bookmarkedProblems[] = $problem->asFilteredArray(
+                    $relevantColumns
+                );
+            }
         }
         return $bookmarkedProblems;
     }

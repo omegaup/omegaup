@@ -2188,28 +2188,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return list<BookmarkProblem>
-     */
-    private static function getBookmarkedProblems(int $identityId): array {
-        $bookmarkedProblemsList = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
-            $identityId
-        );
-
-        $relevantColumns = ['alias', 'title'];
-        /** @var list<BookmarkProblem> */
-        $filteredProblems = [];
-        foreach ($bookmarkedProblemsList as $problem) {
-            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                /** @var BookmarkProblem */
-                $filteredProblems[] = $problem->asFilteredArray(
-                    $relevantColumns
-                );
-            }
-        }
-        return $filteredProblems;
-    }
-
-    /**
      * Gets a list of users.
      *
      * @omegaup-request-param null|string $query
@@ -4492,7 +4470,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'createdProblems' => self::getCreatedProblems(
                         $targetIdentityId
                     ),
-                    'bookmarkedProblems' => self::getBookmarkedProblems(
+                    'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
                         $targetIdentityId
                     ),
                     'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(

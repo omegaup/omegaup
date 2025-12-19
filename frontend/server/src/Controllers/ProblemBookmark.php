@@ -102,22 +102,13 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
 
         // Get all bookmarked problems
         $currentIdentityId = $r->identity->identity_id;
-        $bookmarkedProblemsList = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
+        $bookmarkedProblems = \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
             $currentIdentityId
         );
 
-        $relevantColumns = ['alias', 'title'];
-        $problemList = [];
-        foreach ($bookmarkedProblemsList as $problem) {
-            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                /** @var BookmarkListItem */
-                $problemList[] = $problem->asFilteredArray($relevantColumns);
-            }
-        }
-
         return [
-            'problems' => $problemList,
-            'total' => count($problemList),
+            'problems' => $bookmarkedProblems,
+            'total' => count($bookmarkedProblems),
         ];
     }
 
