@@ -33,7 +33,7 @@
         </div>
         <div class="text-center mb-4">
           <button
-            class="btn btn-primary"
+            class="btn btn-primary px-4 py-2"
             :disabled="!canCompare"
             @click="fetchComparison"
           >
@@ -92,11 +92,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { types } from '../../api_types';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import * as api from '../../api';
-import * as ui from '../../ui';
+import { types } from '../../api_types';
+import T from '../../lang';
 import user_CompareCard from './CompareCard.vue';
 
 interface UserCompareData {
