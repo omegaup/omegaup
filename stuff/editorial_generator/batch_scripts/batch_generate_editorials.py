@@ -137,7 +137,7 @@ def setup_logging() -> logging.Logger:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Single main log file
-    main_log_file = log_dir / ("batch_editorials_%s.log" % timestamp)
+    main_log_file = log_dir / f"batch_editorials_{timestamp}.log"
 
     # Main logger configuration
     main_logger = logging.getLogger("batch_editorials")
@@ -266,14 +266,14 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 else:
                     error_msg = test_result.get('error', 'Unknown error')
                     raise Exception(
-                        "ouat token authentication failed: %s" % error_msg)
+                        f"ouat token authentication failed: {error_msg}")
 
             else:  # credentials method
                 self.main_logger.info(
                     "🔐 Authenticating as %s...", self.username)
 
                 # Login endpoint
-                login_url = "%s/user/login" % self.api_url
+                login_url = f"{self.api_url}/user/login"
                 login_data = {
                     'usernameOrEmail': self.username,
                     'password': self.password
@@ -302,11 +302,10 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         self.main_logger.info("   API URL: %s", self.api_url)
                     else:
                         raise Exception(
-                            "Login failed: %s" %
-                            result.get('error', 'Unknown error'))
+                            f"Login failed: {result.get('error', 'Unknown error')}")
                 else:
                     raise Exception(
-                        "HTTP %d: Login request failed" % response.status_code)
+                        f"HTTP {response.status_code}: Login request failed")
 
         except Exception as e:  # pylint: disable=broad-except
             # Broad except needed to catch any authentication failures
@@ -320,7 +319,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                        method: str = 'POST') -> Dict[str, Any]:
         """Make an API call with comprehensive error handling and logging."""
         try:
-            url = "%s/%s" % (self.api_url, endpoint)
+            url = f"{self.api_url}/{endpoint}"
             self.stats.api_calls_made += 1
 
             self.main_logger.debug("🌐 API Call: %s %s", method, endpoint)
@@ -346,7 +345,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 self.stats.rate_limit_hits += 1
                 self._log_error(
                     None,
-                    "Rate limit hit: %s" % endpoint,
+                    f"Rate limit hit: {endpoint}",
                     ErrorCategory.RATE_LIMIT)
                 return {
                     'status': 'error',
@@ -359,11 +358,11 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 self.stats.api_errors += 1
                 self._log_error(
                     None,
-                    "HTTP %d: %s" % (response.status_code, endpoint),
+                    f"HTTP {response.status_code}: {endpoint}",
                     ErrorCategory.API_ERROR)
                 return {
                     'status': 'error',
-                    'error': 'HTTP %d' % response.status_code}
+                    'error': f'HTTP {response.status_code}'}
 
             result = response.json()
 
@@ -374,7 +373,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 self.stats.api_errors += 1
                 self._log_error(
                     None,
-                    "API error %s: %s" % (endpoint, error_msg),
+                    f"API error {endpoint}: {error_msg}",
                     ErrorCategory.API_ERROR)
 
             return dict(result)  # Explicit conversion to satisfy mypy
@@ -384,7 +383,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
             self.stats.api_errors += 1
             self._log_error(
                 None,
-                "Timeout: %s" % endpoint,
+                f"Timeout: {endpoint}",
                 ErrorCategory.TIMEOUT)
             return {'status': 'error', 'error': 'timeout'}
         except requests.exceptions.ConnectionError:
@@ -392,7 +391,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
             self.stats.api_errors += 1
             self._log_error(
                 None,
-                "Connection error: %s" % endpoint,
+                f"Connection error: {endpoint}",
                 ErrorCategory.NETWORK)
             return {'status': 'error', 'error': 'connection_error'}
         except Exception as e:  # pylint: disable=broad-except
@@ -402,7 +401,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 "❌ Unexpected API error for %s: %s", endpoint, str(e))
             self.stats.api_errors += 1
             self._log_error(
-                None, "Unexpected error %s: %s" % (endpoint, str(e)),
+                None, f"Unexpected error {endpoint}: {e}",
                 ErrorCategory.UNKNOWN)
             return {'status': 'error', 'error': str(e)}
 
@@ -529,7 +528,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         job.completed_at = datetime.now()
                         # Extract editorial content and validation verdict
                         job.editorial_content = (
-                            "EN: %s..." % job_data.get('md_en', '')[:100]
+                            f"EN: {job_data.get('md_en', '')[:100]}..."
                             if job_data.get('md_en') else None)
                         job.validation_verdict = job_data.get(
                             'validation_verdict')
@@ -538,8 +537,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                         # Log validation verdict if available
                         verdict_msg = ""
                         if job.validation_verdict:
-                            verdict_msg = (" (Validation: "
-                                           "%s)" % job.validation_verdict)
+                            verdict_msg = f" (Validation: {job.validation_verdict})"
                         self.main_logger.info(
                             "🎉 Completed: %s%s",
                             job.problem_alias, verdict_msg)
@@ -642,9 +640,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 100) if total_jobs > 0 else 0
 
             progress_msg = (
-                "📊 Progress: %d/%d "
-                "(%.1f%%) - ⏱️  %.0fs elapsed" %
-                (completed_jobs, total_jobs, progress, elapsed_time))
+                f"📊 Progress: {completed_jobs}/{total_jobs} "
+                f"({progress:.1f}%) - ⏱️  {elapsed_time:.0f}s elapsed")
             self.main_logger.info(progress_msg)
 
             # Wait before next poll cycle
@@ -688,7 +685,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                     self.main_logger.error(
                         "❌ No problems found during auto-discovery")
                     raise FileNotFoundError(
-                        "Could not create %s: no problems found" % filename)
+                        f"Could not create {filename}: no problems found")
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except needed for any file creation failures
@@ -698,8 +695,8 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                     "💡 Please run 'python get_user_problems.py' "
                     "manually first")
                 raise FileNotFoundError(
-                    "Problem list file not found and auto-creation "
-                    "failed: %s" % file_path) from e
+                    f"Problem list file not found and auto-creation "
+                    f"failed: {file_path}") from e
 
         self.main_logger.info("📂 Loading problems from: %s", filename)
 
@@ -978,7 +975,7 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
         try:
             # Create a single text report file
             report_file = self.results_dir / (
-                "batch_results_%s.txt" % self.run_timestamp)
+                f"batch_results_{self.run_timestamp}.txt")
 
             with open(report_file, 'w', encoding='utf-8') as f:
                 f.write("=" * 80 + "\n")
@@ -988,45 +985,42 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 # Session Summary
                 f.write("SESSION INFORMATION:\n")
                 f.write("-" * 40 + "\n")
-                f.write("Timestamp: %s\n" % self.run_timestamp)
-                f.write("User: %s (%s)\n" % (self.username, self.auth_method))
+                f.write(f"Timestamp: {self.run_timestamp}\n")
+                f.write(f"User: {self.username} ({self.auth_method})\n")
                 runtime_formatted = (
                     report['session_summary']['total_runtime_formatted'])
-                f.write("Duration: %s\n" % runtime_formatted)
-                f.write("Test Mode: %s\n" % self.test_mode)
-                f.write("Resume Mode: %s\n\n" % self.resume_mode)
+                f.write(f"Duration: {runtime_formatted}\n")
+                f.write(f"Test Mode: {self.test_mode}\n")
+                f.write(f"Resume Mode: {self.resume_mode}\n\n")
 
                 # Job Statistics
                 f.write("JOB STATISTICS:\n")
                 f.write("-" * 40 + "\n")
                 stats = report['job_statistics']
-                f.write("Total Problems: %s\n" % stats['total_problems'])
-                f.write("Jobs Submitted: %s\n" % stats['jobs_submitted'])
-                f.write("✅ Completed: %s\n" % stats['jobs_completed'])
-                f.write("❌ Failed: %s\n" % stats['jobs_failed'])
-                f.write("⏳ Pending: %s\n" % stats['jobs_pending'])
+                f.write(f"Total Problems: {stats['total_problems']}\n")
+                f.write(f"Jobs Submitted: {stats['jobs_submitted']}\n")
+                f.write(f"✅ Completed: {stats['jobs_completed']}\n")
+                f.write(f"❌ Failed: {stats['jobs_failed']}\n")
+                f.write(f"⏳ Pending: {stats['jobs_pending']}\n")
                 f.write(
-                    "📈 Success Rate: %s %%\n\n" %
-                    stats['success_rate_percent'])
+                    f"📈 Success Rate: {stats['success_rate_percent']} %\n\n")
 
                 # API Statistics
                 f.write("API STATISTICS:\n")
                 f.write("-" * 40 + "\n")
                 api_stats = report['api_statistics']
-                f.write("Total API Calls: %s\n" % api_stats['total_api_calls'])
-                f.write("API Errors: %s\n" % api_stats['api_errors'])
-                f.write("Rate Limit Hits: %s\n" % api_stats['rate_limit_hits'])
+                f.write(f"Total API Calls: {api_stats['total_api_calls']}\n")
+                f.write(f"API Errors: {api_stats['api_errors']}\n")
+                f.write(f"Rate Limit Hits: {api_stats['rate_limit_hits']}\n")
                 f.write(
-                    "API Success Rate: %s %%\n\n" %
-                    api_stats['api_success_rate_percent'])
+                    f"API Success Rate: {api_stats['api_success_rate_percent']} %\n\n")
 
                 # Validation Statistics
                 f.write("VALIDATION STATISTICS:\n")
                 f.write("-" * 40 + "\n")
                 val_stats = report['validation_statistics']
                 f.write(
-                    "Jobs with Validation: %s\n" %
-                    val_stats['total_validated'])
+                    f"Jobs with Validation: {val_stats['total_validated']}\n")
                 if val_stats['verdict_breakdown']:
                     f.write("Verdict Breakdown:\n")
                     for verdict, count in val_stats['verdict_breakdown'].items(
@@ -1036,11 +1030,9 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                             val_stats['total_validated'] *
                             100) if val_stats['total_validated'] > 0 else 0
                         f.write(
-                            "  %s: %s (%.1f%%)\n" %
-                            (verdict, count, percentage))
+                            f"  {verdict}: {count} ({percentage:.1f}%)\n")
                     f.write(
-                        "Most Common: %s\n" %
-                        val_stats['most_common_verdict'])
+                        f"Most Common: {val_stats['most_common_verdict']}\n")
                 else:
                     f.write("No validation data available\n")
                 f.write("\n")
@@ -1050,11 +1042,10 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
                 f.write("-" * 40 + "\n")
                 perf = report['performance_metrics']
                 avg_time = perf['average_job_completion_time_seconds']
-                f.write("Avg Completion Time: %ss\n" % (
-                    "%.2f" % avg_time if avg_time else "N/A"))
-                f.write("Jobs/Hour: %.1f\n" % perf['jobs_per_hour'])
+                f.write(f"Avg Completion Time: {f'{avg_time:.2f}' if avg_time else 'N/A'}s\n")
+                f.write(f"Jobs/Hour: {perf['jobs_per_hour']:.1f}\n")
                 f.write(
-                    "API Calls/Min: %.2f\n\n" % perf['api_calls_per_minute'])
+                    f"API Calls/Min: {perf['api_calls_per_minute']:.2f}\n\n")
 
                 # Individual Job Results
                 f.write("INDIVIDUAL JOB RESULTS:\n")
@@ -1062,24 +1053,22 @@ class BatchEditorialGenerator:  # pylint: disable=too-many-instance-attributes
 
                 # Completed jobs
                 for job_data in report['completed_editorials']:
-                    f.write("Problem: %s\n" % job_data['problem_alias'])
+                    f.write(f"Problem: {job_data['problem_alias']}\n")
                     f.write("  Status: completed\n")
-                    f.write("  Job ID: %s\n" % job_data['job_id'])
+                    f.write(f"  Job ID: {job_data['job_id']}\n")
                     if job_data.get('validation_verdict'):
-                        f.write("  Validation: %s\n" %
-                                job_data['validation_verdict'])
+                        f.write(f"  Validation: {job_data['validation_verdict']}\n")
                     if job_data.get('completion_time'):
-                        f.write("  Completed: %s\n" %
-                                job_data['completion_time'])
+                        f.write(f"  Completed: {job_data['completion_time']}\n")
                     f.write("\n")
 
                 # Failed jobs
                 for job_data in report['failed_jobs']:
-                    f.write("Problem: %s\n" % job_data['problem_alias'])
+                    f.write(f"Problem: {job_data['problem_alias']}\n")
                     f.write("  Status: failed\n")
-                    f.write("  Job ID: %s\n" % job_data['job_id'])
+                    f.write(f"  Job ID: {job_data['job_id']}\n")
                     if job_data.get('error_message'):
-                        f.write("  Error: %s\n" % job_data['error_message'])
+                        f.write(f"  Error: {job_data['error_message']}\n")
                     f.write("\n")
                     f.write("\n")
 
@@ -1286,10 +1275,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Batch generate editorials using AI Editorial API",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+        epilog=f"""
 Examples:
   python batch_generate_editorials.py
-      # Use %s (from env)
+      # Use {default_problems_file} (from env)
   python batch_generate_editorials.py --problems-file custom.txt
       # Use custom file
   python batch_generate_editorials.py --resume
@@ -1298,18 +1287,18 @@ Examples:
       # Test single problem
 
 Environment Variables:
-  PROBLEMS_LIST_FILE: Default problems file (currently: %s)
+  PROBLEMS_LIST_FILE: Default problems file (currently: {default_problems_file})
   OMEGAUP_OUAT_TOKEN: Authentication token (preferred)
   OMEGAUP_USERNAME: Username for login authentication
   OMEGAUP_PASSWORD: Password for login authentication
-        """ % (default_problems_file, default_problems_file)
+        """
     )
 
     parser.add_argument(
         '--problems-file',
         default=default_problems_file,
-        help=('Text file containing problem aliases '
-              '(default: %s)' % default_problems_file)
+        help=(f'Text file containing problem aliases '
+              f'(default: {default_problems_file})')
     )
 
     parser.add_argument(
@@ -1336,8 +1325,7 @@ Environment Variables:
         args.test_mode = True
         problems = [args.problem_alias]
         print(
-            "🧪 Test mode: Processing single problem '%s'" %
-            args.problem_alias)
+            f"🧪 Test mode: Processing single problem '{args.problem_alias}'")
     else:
         # Load problems from file (uses environment-configured file by default)
         try:
@@ -1347,16 +1335,16 @@ Environment Variables:
                 args.problems_file if args.problems_file !=
                 default_problems_file else None)
         except FileNotFoundError:
-            print("❌ Error: Problem file '%s' not found" % args.problems_file)
+            print(f"❌ Error: Problem file '{args.problems_file}' not found")
             print("💡 Run 'python get_user_problems.py' first to "
                   "generate problem list")
             print(
-                "📁 Expected file: "
-                "%s" % (Path(__file__).parent / args.problems_file))
+                f"📁 Expected file: "
+                f"{Path(__file__).parent / args.problems_file}")
             return 1
         except Exception as e:  # pylint: disable=broad-except
             # Broad except needed for any problem loading failures
-            print("❌ Error loading problems: %s" % str(e))
+            print(f"❌ Error loading problems: {e}")
             return 1
 
     if not problems:
@@ -1382,8 +1370,8 @@ Environment Variables:
 
         print("\n🎉 SUCCESS! Batch editorial generation completed.")
         print(
-            "📊 Check results/overview_%s.json "
-            "for detailed statistics." % generator.run_timestamp)
+            f"📊 Check results/overview_{generator.run_timestamp}.json "
+            "for detailed statistics.")
         print("📝 Check logs/ directory for detailed execution logs.")
 
         return 0
@@ -1392,7 +1380,7 @@ Environment Variables:
         print("\n⏹️  Process interrupted by user")
         return 0
     except (ValueError, FileNotFoundError, ConnectionError) as e:
-        print("💥 Unexpected error: %s" % str(e))
+        print(f"💥 Unexpected error: {e}")
         return 1
 
 
