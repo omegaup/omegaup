@@ -105,7 +105,7 @@
     "sass-loader": "^12.3.0",
     "sortablejs": "^1.7.0",
     "source-map-support": "^0.5.19",
-    "storybook": "^7.4.6",
+    "storybook": "^7.6.21",
     "stream-browserify": "^3.0.0",
     "style-loader": "^2.0",
     "stylelint": "^13.13",
