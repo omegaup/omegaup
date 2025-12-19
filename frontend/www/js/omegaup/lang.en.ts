@@ -1686,6 +1686,7 @@ const translations: { [key: string]: string; } = {
   scoreboardShowOnlyInvitedIdentities: "Show official contestants only",
   scoreboardShowParticipantsNames: "Show participants' names",
   searchUser: "Search coder",
+  searchSchool: "Search school",
   selectProblemLevelDesc: "In order to add the problem, you must to choose its corresponding level",
   serviceUnavailableError: "Oops. The service is currently unavailable. Please try again.",
   settingsExtraWallTime: "Extra Wall Time",
@@ -2187,4 +2188,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };

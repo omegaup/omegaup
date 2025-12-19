@@ -1686,6 +1686,7 @@ const translations: { [key: string]: string; } = {
   scoreboardShowOnlyInvitedIdentities: "(Sh0w 0fficia1 c0n7357an75 0n1y)",
   scoreboardShowParticipantsNames: "(Sh0w par7icipan75' nam35)",
   searchUser: "(S3arch c0d3r)",
+  searchSchool: "(S3arch sch001)",
   selectProblemLevelDesc: "(In 0rd3r 70 add 7h3 pr0b13m, y0u mu57 70 ch0053 i75 c0rr35p0nding 13v31)",
   serviceUnavailableError: "(O0p5. Th3 53rvic3 i5 curr3n71y unavai1ab13. P13a53 7ry again.)",
   settingsExtraWallTime: "(Ex7ra Wa11 Tim3)",
@@ -2187,4 +2188,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export {translations as default};
+export { translations as default };
