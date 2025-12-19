@@ -29,14 +29,14 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'update-search-result-schools': (query: string) => {
-            api.School.list({ query })
+            const trimmedQuery = query.trim();
+            if (!trimmedQuery) {
+              this.searchResultSchools = [];
+              return;
+            }
+            api.School.list({ query: trimmedQuery })
               .then(({ results }) => {
-                this.searchResultSchools = results.map(
-                  ({ key, value }: types.SchoolListItem) => ({
-                    key,
-                    value,
-                  }),
-                );
+                this.searchResultSchools = results;
               })
               .catch(ui.apiError);
           },

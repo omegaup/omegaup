@@ -27,7 +27,7 @@ describe('SchoolRank.vue', () => {
         });
 
         expect(wrapper.find('table').exists()).toBe(true);
-        expect(wrapper.find('tbody').text()).toBe('');
+        expect(wrapper.findAll('tbody tr').length).toBe(0);
     });
 
     it('Should handle a rank with data', () => {
