@@ -74,6 +74,14 @@ class UITools {
         $twig->addTokenParser(new \OmegaUp\Template\VersionHashParser());
         $twig->addTokenParser(new \OmegaUp\Template\JsIncludeParser());
 
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Controllers\Session::getCurrentSession();
+
+        $userLanguage = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $identity
+        );
+
         /** @var array<string, mixed> */
         $twigContext = [
             'GOOGLECLIENTID' => OMEGAUP_GOOGLE_CLIENTID,
@@ -86,18 +94,11 @@ class UITools {
             'OMEGAUP_LOCKDOWN' => (defined(
                 'OMEGAUP_LOCKDOWN'
             )  && OMEGAUP_LOCKDOWN),
-            'OMEGAUP_MAINTENANCE' => (defined(
-                'OMEGAUP_MAINTENANCE'
-            )  && OMEGAUP_MAINTENANCE),
+            'OMEGAUP_MAINTENANCE' => \OmegaUp\Controllers\Admin::getMaintenanceMessage(
+                $userLanguage
+            ),
+            'LOCALE' => $userLanguage,
         ] + \OmegaUp\UITools::getNavbarHeaderContext();
-
-        [
-            'identity' => $identity,
-        ] = \OmegaUp\Controllers\Session::getCurrentSession();
-
-        $twigContext['LOCALE'] = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $identity
-        );
 
         self::$twig = $twig;
         self::$twigContext = $twigContext;

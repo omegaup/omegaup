@@ -46,6 +46,10 @@ OmegaUp.on('ready', () => {
           contestTitle: this.contestTitle,
           contestFound: this.contestFound,
           isContestRecommended: this.isContestRecommended,
+          maintenanceEnabled: payload.maintenanceMode.enabled,
+          maintenanceMessageEs: payload.maintenanceMode.message_es || '',
+          maintenanceMessageEn: payload.maintenanceMode.message_en || '',
+          maintenanceMessagePt: payload.maintenanceMode.message_pt || '',
         },
         on: {
           'search-username-or-email': (usernameOrEmail: string): void => {
@@ -159,6 +163,38 @@ OmegaUp.on('ready', () => {
             adminSupport.contestTitle = null;
             adminSupport.contestFound = false;
             adminSupport.isContestRecommended = false;
+          },
+          'toggle-maintenance': (enabled: boolean): void => {
+            if (!enabled) {
+              // If disabling, save immediately
+              api.Admin.setMaintenanceMode({
+                enabled: false,
+                message_es: '',
+                message_en: '',
+                message_pt: '',
+              })
+                .then(() => {
+                  ui.success(T.maintenanceModeInactive);
+                })
+                .catch(ui.apiError);
+            }
+          },
+          'save-maintenance': (data: {
+            enabled: boolean;
+            message_es: string;
+            message_en: string;
+            message_pt: string;
+          }): void => {
+            api.Admin.setMaintenanceMode({
+              enabled: data.enabled,
+              message_es: data.message_es,
+              message_en: data.message_en,
+              message_pt: data.message_pt,
+            })
+              .then(() => {
+                ui.success(T.maintenanceModeActive);
+              })
+              .catch(ui.apiError);
           },
         },
       });

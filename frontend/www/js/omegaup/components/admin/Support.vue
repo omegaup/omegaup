@@ -10,6 +10,79 @@
       </div>
     </div>
     <div class="card-body">
+      <!-- Maintenance Mode Section -->
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header bg-warning text-dark">
+              <h5 class="mb-0">
+                <font-awesome-icon icon="wrench" />
+                {{ T.maintenanceModeTitle }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <omegaup-toggle-switch
+                  :checked-value="currentMaintenanceEnabled"
+                  @update:value="onToggleMaintenance"
+                >
+                  <template #switch-text>
+                    <span class="switch-text">
+                      <strong>{{
+                        currentMaintenanceEnabled
+                          ? T.maintenanceModeActive
+                          : T.maintenanceModeInactive
+                      }}</strong>
+                    </span>
+                  </template>
+                </omegaup-toggle-switch>
+              </div>
+              <div v-if="currentMaintenanceEnabled" class="form-group">
+                <label
+                  >{{ T.maintenanceModeMessage }} ({{ T.wordsSpanish }})</label
+                >
+                <textarea
+                  v-model="currentMaintenanceMessageEs"
+                  class="form-control"
+                  rows="3"
+                  :placeholder="T.maintenanceModeMessagePlaceholder"
+                ></textarea>
+
+                <label class="mt-3"
+                  >{{ T.maintenanceModeMessage }} ({{ T.wordsEnglish }})</label
+                >
+                <textarea
+                  v-model="currentMaintenanceMessageEn"
+                  class="form-control"
+                  rows="3"
+                  :placeholder="T.maintenanceModeMessagePlaceholder"
+                ></textarea>
+
+                <label class="mt-3"
+                  >{{ T.maintenanceModeMessage }} ({{
+                    T.wordsPortuguese
+                  }})</label
+                >
+                <textarea
+                  v-model="currentMaintenanceMessagePt"
+                  class="form-control"
+                  rows="3"
+                  :placeholder="T.maintenanceModeMessagePlaceholder"
+                ></textarea>
+              </div>
+              <button
+                v-if="currentMaintenanceEnabled"
+                class="btn btn-primary"
+                type="button"
+                @click="onSaveMaintenance"
+              >
+                {{ T.wordsSaveChanges }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row mb-3">
         <div class="col-md-6">
           <form class="form w-100" @submit.prevent="onSearchEmail">
@@ -244,6 +317,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
+import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
 import {
   FontAwesomeIcon,
@@ -265,6 +339,7 @@ export interface UpdateEmailRequest {
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
 export default class AdminSupport extends Vue {
@@ -281,9 +356,17 @@ export default class AdminSupport extends Vue {
   @Prop() contestTitle!: string;
   @Prop() contestFound!: boolean;
   @Prop() isContestRecommended!: boolean;
+  @Prop() maintenanceEnabled!: boolean;
+  @Prop() maintenanceMessageEs!: string;
+  @Prop() maintenanceMessageEn!: string;
+  @Prop() maintenanceMessagePt!: string;
 
   currentContestAlias = this.contestAlias;
   currentIsContestRecommended = this.isContestRecommended;
+  currentMaintenanceEnabled = this.maintenanceEnabled;
+  currentMaintenanceMessageEs = this.maintenanceMessageEs;
+  currentMaintenanceMessageEn = this.maintenanceMessageEn;
+  currentMaintenanceMessagePt = this.maintenanceMessagePt;
 
   T = T;
   ui = ui;
@@ -360,6 +443,52 @@ export default class AdminSupport extends Vue {
   @Watch('contestAlias')
   onContestAliasChange(newValue: string) {
     this.currentContestAlias = newValue;
+  }
+
+  @Watch('maintenanceEnabled')
+  onMaintenanceEnabledChange(newValue: boolean) {
+    this.currentMaintenanceEnabled = newValue;
+  }
+
+  @Watch('maintenanceMessageEs')
+  onMaintenanceMessageEsChange(newValue: string) {
+    this.currentMaintenanceMessageEs = newValue;
+  }
+
+  @Watch('maintenanceMessageEn')
+  onMaintenanceMessageEnChange(newValue: string) {
+    this.currentMaintenanceMessageEn = newValue;
+  }
+
+  @Watch('maintenanceMessagePt')
+  onMaintenanceMessagePtChange(newValue: string) {
+    this.currentMaintenanceMessagePt = newValue;
+  }
+
+  @Emit('toggle-maintenance')
+  onToggleMaintenance(newValue: boolean): boolean {
+    this.currentMaintenanceEnabled = newValue;
+    if (!newValue) {
+      this.currentMaintenanceMessageEs = '';
+      this.currentMaintenanceMessageEn = '';
+      this.currentMaintenanceMessagePt = '';
+    }
+    return newValue;
+  }
+
+  @Emit('save-maintenance')
+  onSaveMaintenance(): {
+    enabled: boolean;
+    message_es: string;
+    message_en: string;
+    message_pt: string;
+  } {
+    return {
+      enabled: this.currentMaintenanceEnabled,
+      message_es: this.currentMaintenanceMessageEs,
+      message_en: this.currentMaintenanceMessageEn,
+      message_pt: this.currentMaintenanceMessagePt,
+    };
   }
 }
 </script>

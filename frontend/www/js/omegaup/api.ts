@@ -91,10 +91,18 @@ export function apiCall<
 }
 
 export const Admin = {
+  getMaintenanceMode: apiCall<
+    messages.AdminGetMaintenanceModeRequest,
+    messages.AdminGetMaintenanceModeResponse
+  >('/api/admin/getMaintenanceMode/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  setMaintenanceMode: apiCall<
+    messages.AdminSetMaintenanceModeRequest,
+    messages.AdminSetMaintenanceModeResponse
+  >('/api/admin/setMaintenanceMode/'),
 };
 
 export const AiEditorial = {

@@ -4870,6 +4870,12 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: {
+      enabled: boolean;
+      message_en?: string;
+      message_es?: string;
+      message_pt?: string;
+    };
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -5112,6 +5118,11 @@ export namespace types {
 // API messages
 export namespace messages {
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = {
+    enabled: boolean;
+    message?: string;
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5126,6 +5137,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6067,9 +6080,15 @@ export namespace messages {
 // Controller interfaces
 export namespace controllers {
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
   }
 
   export interface AiEditorial {

@@ -79,4 +79,149 @@ class Admin extends \OmegaUp\Controllers\Controller {
             ],
         ];
     }
+
+    const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
+    const MAINTENANCE_MESSAGE_EN_KEY = 'system:maintenance_message_en';
+    const MAINTENANCE_MESSAGE_PT_KEY = 'system:maintenance_message_pt';
+    const MAINTENANCE_ENABLED_KEY = 'system:maintenance_enabled';
+
+    /**
+     * Set maintenance mode
+     *
+     * @omegaup-request-param null|string $message_es
+     * @omegaup-request-param null|string $message_en
+     * @omegaup-request-param null|string $message_pt
+     * @omegaup-request-param null|bool $enabled
+     *
+     * @return array{status: string}
+     */
+    public static function apiSetMaintenanceMode(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $enabled = $r->ensureOptionalBool('enabled') ?? false;
+        $messageEs = $r->ensureOptionalString('message_es') ?? '';
+        $messageEn = $r->ensureOptionalString('message_en') ?? '';
+        $messagePt = $r->ensureOptionalString('message_pt') ?? '';
+
+        if ($enabled) {
+            $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
+            $cacheEnabled->set(true, 0); // No expiration
+
+            $cacheMessageEs = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_ES_KEY
+            );
+            $cacheMessageEs->set($messageEs, 0);
+
+            $cacheMessageEn = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_EN_KEY
+            );
+            $cacheMessageEn->set($messageEn, 0);
+
+            $cacheMessagePt = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_PT_KEY
+            );
+            $cacheMessagePt->set($messagePt, 0);
+        } else {
+            $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
+            $cacheEnabled->delete();
+
+            $cacheMessageEs = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_ES_KEY
+            );
+            $cacheMessageEs->delete();
+
+            $cacheMessageEn = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_EN_KEY
+            );
+            $cacheMessageEn->delete();
+
+            $cacheMessagePt = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_PT_KEY
+            );
+            $cacheMessagePt->delete();
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Get maintenance mode status
+     *
+     * @return array{enabled: bool, message: null|string}
+     */
+    public static function apiGetMaintenanceMode(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return self::getMaintenanceModeStatus();
+    }
+
+    /**
+     * Get maintenance mode status
+     *
+     * @return array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string}
+     */
+    public static function getMaintenanceModeStatus(): array {
+        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
+        $enabled = boolval($cacheEnabled->get());
+
+        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
+        $messageEs = $cacheMessageEs->get();
+
+        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
+        $messageEn = $cacheMessageEn->get();
+
+        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
+        $messagePt = $cacheMessagePt->get();
+
+        return [
+            'enabled' => $enabled,
+            'message_es' => $messageEs,
+            'message_en' => $messageEn,
+            'message_pt' => $messagePt,
+        ];
+    }
+
+    /**
+     * Get maintenance message for public display in specific language
+     *
+     * @param null|string $lang Language code (es, en, pt). If null, defaults to Spanish.
+     * @return null|string
+     */
+    public static function getMaintenanceMessage(?string $lang = null): ?string {
+        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
+        $enabled = $cacheEnabled->get();
+
+        if (!$enabled) {
+            return null;
+        }
+
+        // Default to Spanish if no language specified
+        if (is_null($lang) || $lang === 'es') {
+            $cacheMessage = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_ES_KEY
+            );
+        } elseif ($lang === 'en' || $lang === 'pseudo') {
+            $cacheMessage = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_EN_KEY
+            );
+        } elseif ($lang === 'pt') {
+            $cacheMessage = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_PT_KEY
+            );
+        } else {
+            $cacheMessage = new \OmegaUp\Cache(
+                self::MAINTENANCE_MESSAGE_ES_KEY
+            );
+        }
+
+        return $cacheMessage->get();
+    }
 }

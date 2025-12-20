@@ -45,7 +45,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string, description: null|string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
- * @psalm-type SupportDetailsPayload=array{roleNamesWithDescription: list<UserRole>}
+ * @psalm-type SupportDetailsPayload=array{roleNamesWithDescription: list<UserRole>, maintenanceMode: array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string}}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
@@ -4631,6 +4631,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
                 'payload' => [
                     'roleNamesWithDescription' => $rolesList,
+                    'maintenanceMode' => \OmegaUp\Controllers\Admin::getMaintenanceModeStatus(),
                 ],
             ],
             'entrypoint' => 'admin_support',
