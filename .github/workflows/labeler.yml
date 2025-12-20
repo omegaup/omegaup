@@ -95,6 +95,12 @@ jobs:
             const pr = context.payload.pull_request;
             const issueNumber = pr.number;
             
+            // Skip labeling for closed PRs
+            if (context.payload.action === 'closed') {
+              core.info('PR is closed, skipping size labeling');
+              return;
+            }
+            
             // Get all PR files using pagination (handles PRs with >100 files)
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
@@ -146,12 +152,16 @@ jobs:
             // Remove old size label if present
             if (currentSizeLabel) {
               core.info(`Removing old size label: ${currentSizeLabel.name}`);
-              await github.rest.issues.removeLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-                name: currentSizeLabel.name
-              });
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  name: currentSizeLabel.name
+                });
+              } catch (error) {
+                core.warning(`Failed to remove label ${currentSizeLabel.name}: ${error.message}`);
+              }
             }
             
             // Add new size label
@@ -167,9 +177,9 @@ jobs:
             if (newSizeLabel === 'size/XL') {
               const warningMessage = `⚠️ This PR exceeds the recommended size of 200 lines.
 
-            Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
+Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
 
-            Note: This PR might require additional review time due to its size.`;
+Note: This PR might require additional review time due to its size.`;
               
               // Check if warning comment already exists
               const { data: comments } = await github.rest.issues.listComments({
