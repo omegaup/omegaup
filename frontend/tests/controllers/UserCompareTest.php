@@ -10,7 +10,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser1'])
         );
-        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser2'])
         );
 
@@ -50,7 +50,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing with an invalid username
      */
     public function testCompareWithInvalidUsername() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'validuser'])
         );
 
@@ -81,7 +81,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing user with themselves
      */
     public function testCompareUserWithSelf() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'selfcompare']
             )
@@ -110,10 +110,10 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing with a private profile
      */
     public function testCompareWithPrivateProfile() {
-        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'publicuser'])
         );
-        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'username' => 'privateuser',
                 'isPrivate' => true,
@@ -138,7 +138,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test getCompareDetailsForTypeScript returns correct payload structure
      */
     public function testGetCompareDetailsForTypeScript() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser'])
         );
 
