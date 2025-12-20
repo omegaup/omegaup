@@ -275,12 +275,6 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthUser: "(C0d3r)",
   collecionOtherTags: "(O7h3r 7ag5)",
   collectionTitle: "(Pr0b13m C0113c7i0n5)",
-  compareButton: "(C0mpar3)",
-  compareDescription: "(C0mpar3 57a7i57ic5 b37w33n 7w0 u53r5)",
-  compareUser1Label: "(U53r 1)",
-  compareUser2Label: "(U53r 2)",
-  compareUserNotFound: "(U53r n07 f0und)",
-  compareUsersTitle: "(C0mpar3 u53r5)",
   contentCreator: "(C0n7ribu70r)",
   contentOrderUpdated: "(C0n73n7'5 0rd3r ha5 b33n upda73d)",
   contestAddUserContestant: "(C0n7357an7)",
@@ -915,7 +909,6 @@ const translations: { [key: string]: string; } = {
   navBlog: "(B10g)",
   navCoderOfTheMonth: "(C0d3r 0f 7h3 m0n7h 0v3ra11)",
   navCoderOfTheMonthFemale: "(C0d3r 0f 7h3 m0n7h f0r h3r)",
-  navCompareUsers: "(C0mpar3 u53r5)",
   navContests: "(C0n73575)",
   navContestsEnrolled: "(C0n73575 3nr0113d)",
   navCourses: "(C0ur535)",
@@ -2194,4 +2187,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export { translations as default };
+export {translations as default};

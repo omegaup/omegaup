@@ -1,8 +1,8 @@
 <template>
   <div class="container mt-4">
     <div class="card">
-      <div class="card-header">
-        <h1 class="h4 mb-0">{{ T.compareUsersTitle }}</h1>
+      <div class="card-header d-flex justify-content-center">
+        <h1 class="h4 mb-0 font-weight-bold">{{ T.compareUsersTitle }}</h1>
       </div>
       <div class="card-body">
         <!-- User Input Section -->

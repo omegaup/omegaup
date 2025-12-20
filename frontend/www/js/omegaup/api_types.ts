@@ -2340,6 +2340,54 @@ export namespace types {
       );
     }
 
+    export function UserComparePayload(
+      elementId: string = 'payload',
+    ): types.UserComparePayload {
+      return ((x) => {
+        if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+          x.user1 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user1);
+        if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+          x.user2 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user2);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
@@ -4931,6 +4979,19 @@ export namespace types {
     state?: string;
   }
 
+  export interface UserCompareData {
+    contestsCount: number;
+    profile: types.UserProfileInfo;
+    solvedProblemsCount: number;
+  }
+
+  export interface UserComparePayload {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+    username1?: string;
+    username2?: string;
+  }
+
   export interface UserDependent {
     classname: string;
     name?: string;
@@ -5972,6 +6033,12 @@ export namespace messages {
   export type UserCoderOfTheMonthListResponse = {
     coders: types.CoderOfTheMonthList;
   };
+  export type UserCompareRequest = { [key: string]: any };
+  export type _UserCompareServerResponse = any;
+  export type UserCompareResponse = {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+  };
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
@@ -6040,19 +6107,6 @@ export namespace messages {
   export type UserStatsResponse = {
     heatmap: { count: number; date: string }[];
     runs: { date?: string; runs: number; verdict: string }[];
-  };
-  export type UserCompareRequest = { [key: string]: any };
-  export type UserCompareResponse = {
-    user1: {
-      profile: types.UserProfileInfo;
-      solvedProblemsCount: number;
-      contestsCount: number;
-    } | null;
-    user2: {
-      profile: types.UserProfileInfo;
-      solvedProblemsCount: number;
-      contestsCount: number;
-    } | null;
   };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
@@ -6812,6 +6866,9 @@ export namespace controllers {
     coderOfTheMonthList: (
       params?: messages.UserCoderOfTheMonthListRequest,
     ) => Promise<messages.UserCoderOfTheMonthListResponse>;
+    compare: (
+      params?: messages.UserCompareRequest,
+    ) => Promise<messages.UserCompareResponse>;
     contestStats: (
       params?: messages.UserContestStatsRequest,
     ) => Promise<messages.UserContestStatsResponse>;

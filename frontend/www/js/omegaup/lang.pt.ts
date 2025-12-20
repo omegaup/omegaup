@@ -275,12 +275,6 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthUser: "Coder",
   collecionOtherTags: "Outras etiquetas",
   collectionTitle: "Cole\u00e7\u00f5es de problemas",
-  compareButton: "Comparar",
-  compareDescription: "Compare estat\u00edsticas entre dois usu\u00e1rios",
-  compareUser1Label: "Usu\u00e1rio 1",
-  compareUser2Label: "Usu\u00e1rio 2",
-  compareUserNotFound: "Usu\u00e1rio n\u00e3o encontrado",
-  compareUsersTitle: "Comparar usu\u00e1rios",
   contentCreator: "Contribuinte",
   contentOrderUpdated: "A ordem do conte\u00fado foi atualizada",
   contestAddUserContestant: "Concorrente",
@@ -915,7 +909,6 @@ const translations: { [key: string]: string; } = {
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder do m\u00eas geral",
   navCoderOfTheMonthFemale: "Coder do m\u00eas para eles",
-  navCompareUsers: "Comparar usuários",
   navContests: "Concursos",
   navContestsEnrolled: "Concursos inscrito",
   navCourses: "Cursos",
@@ -2194,4 +2187,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar arquivo zip",
 };
 
-export { translations as default };
+export {translations as default};

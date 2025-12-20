@@ -275,12 +275,6 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthUser: "Coder",
   collecionOtherTags: "Otras etiquetas",
   collectionTitle: "Colecciones de Problemas",
-  compareButton: "Comparar",
-  compareDescription: "Compara estadísticas entre dos usuarios",
-  compareUser1Label: "Usuario 1",
-  compareUser2Label: "Usuario 2",
-  compareUserNotFound: "Usuario no encontrado",
-  compareUsersTitle: "Comparar usuarios",
   contentCreator: "Contribuidor",
   contentOrderUpdated: "El orden del contenido se ha actualizado",
   contestAddUserContestant: "Concursante",
@@ -915,7 +909,6 @@ const translations: { [key: string]: string; } = {
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder del mes general",
   navCoderOfTheMonthFemale: "Coder del mes para ellas",
-  navCompareUsers: "Comparar usuarios",
   navContests: "Concursos",
   navContestsEnrolled: "Concursos inscrito",
   navCourses: "Cursos",
@@ -2194,4 +2187,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export { translations as default };
+export {translations as default};
