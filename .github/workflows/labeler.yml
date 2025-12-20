@@ -31,7 +31,6 @@ jobs:
             Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
 
             Note: This PR might require additional review time due to its size.
-            Adding a small change to test whether the size/S will actually be added or not.
           github_api_url: "https://api.github.com"
           files_to_ignore: |
             composer.lock
