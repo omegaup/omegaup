@@ -133,6 +133,7 @@ export function ignoreError(response: { error?: string; payload?: any }): void {
   return;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function dismissNotifications(_originalStatusCounter?: number): void {
   // Dispatch to Vuex store to hide notification
   notificationsStore.dispatch('dismissNotifications');
