@@ -171,7 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
-          <a class="dropdown-item" href="/rank/compare/">{{ T.navCompareUsers }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>

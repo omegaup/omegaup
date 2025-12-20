@@ -34,8 +34,14 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertNotNull($response['user1']);
         $this->assertNotNull($response['user2']);
-        $this->assertSame('testuser1', $response['user1']['profile']['username']);
-        $this->assertSame('testuser2', $response['user2']['profile']['username']);
+        $this->assertSame(
+            'testuser1',
+            $response['user1']['profile']['username']
+        );
+        $this->assertSame(
+            'testuser2',
+            $response['user2']['profile']['username']
+        );
         $this->assertSame(1, $response['user1']['solvedProblemsCount']);
         $this->assertSame(0, $response['user2']['solvedProblemsCount']);
     }
@@ -76,7 +82,9 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCompareUserWithSelf() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
-            new \OmegaUp\Test\Factories\UserParams(['username' => 'selfcompare'])
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'selfcompare']
+            )
         );
 
         $response = \OmegaUp\Controllers\User::apiCompare(
@@ -88,8 +96,14 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertNotNull($response['user1']);
         $this->assertNotNull($response['user2']);
-        $this->assertSame('selfcompare', $response['user1']['profile']['username']);
-        $this->assertSame('selfcompare', $response['user2']['profile']['username']);
+        $this->assertSame(
+            'selfcompare',
+            $response['user1']['profile']['username']
+        );
+        $this->assertSame(
+            'selfcompare',
+            $response['user2']['profile']['username']
+        );
     }
 
     /**
@@ -136,9 +150,21 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('user_compare', $response['entrypoint']);
         $this->assertArrayHasKey('payload', $response['templateProperties']);
-        $this->assertArrayHasKey('user1', $response['templateProperties']['payload']);
-        $this->assertArrayHasKey('user2', $response['templateProperties']['payload']);
-        $this->assertArrayHasKey('username1', $response['templateProperties']['payload']);
-        $this->assertArrayHasKey('username2', $response['templateProperties']['payload']);
+        $this->assertArrayHasKey(
+            'user1',
+            $response['templateProperties']['payload']
+        );
+        $this->assertArrayHasKey(
+            'user2',
+            $response['templateProperties']['payload']
+        );
+        $this->assertArrayHasKey(
+            'username1',
+            $response['templateProperties']['payload']
+        );
+        $this->assertArrayHasKey(
+            'username2',
+            $response['templateProperties']['payload']
+        );
     }
 }

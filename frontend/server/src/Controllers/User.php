@@ -5185,8 +5185,14 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'templateProperties' => [
                 'payload' => [
-                    'user1' => self::getUserCompareData($r->identity, $username1),
-                    'user2' => self::getUserCompareData($r->identity, $username2),
+                    'user1' => self::getUserCompareData(
+                        $r->identity,
+                        $username1
+                    ),
+                    'user2' => self::getUserCompareData(
+                        $r->identity,
+                        $username2
+                    ),
                     'username1' => $username1,
                     'username2' => $username2,
                 ],

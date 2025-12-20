@@ -16,7 +16,11 @@
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
-      <a v-if="!isIndex" href="/compare/" class="btn btn-outline-primary btn-sm ml-2">
+      <a
+        v-if="!isIndex"
+        href="/compare/"
+        class="btn btn-outline-primary btn-sm ml-2"
+      >
         <font-awesome-icon :icon="['fas', 'exchange-alt']" />
         {{ T.compareUsersTitle }}
       </a>
@@ -157,7 +161,10 @@ import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faExchangeAlt, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faExchangeAlt,
+  faQuestionCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faExchangeAlt, faQuestionCircle);
 
