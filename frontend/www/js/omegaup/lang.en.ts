@@ -275,6 +275,12 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthUser: "Coder",
   collecionOtherTags: "Other tags",
   collectionTitle: "Problem Collections",
+  compareButton: "Compare",
+  compareDescription: "Compare statistics between two users",
+  compareUser1Label: "User 1",
+  compareUser2Label: "User 2",
+  compareUserNotFound: "User not found",
+  compareUsersTitle: "Compare users",
   contentCreator: "Contributor",
   contentOrderUpdated: "Content's order has been updated",
   contestAddUserContestant: "Contestant",
@@ -2188,4 +2194,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };
