@@ -50,6 +50,7 @@ OmegaUp.on('ready', () => {
           maintenanceMessageEs: payload.maintenanceMode.message_es || '',
           maintenanceMessageEn: payload.maintenanceMode.message_en || '',
           maintenanceMessagePt: payload.maintenanceMode.message_pt || '',
+          maintenanceType: payload.maintenanceMode.type || 'info',
         },
         on: {
           'search-username-or-email': (usernameOrEmail: string): void => {
@@ -172,6 +173,7 @@ OmegaUp.on('ready', () => {
                 message_es: '',
                 message_en: '',
                 message_pt: '',
+                type: 'info',
               })
                 .then(() => {
                   ui.success(T.maintenanceModeInactive);
@@ -184,12 +186,14 @@ OmegaUp.on('ready', () => {
             message_es: string;
             message_en: string;
             message_pt: string;
+            type: string;
           }): void => {
             api.Admin.setMaintenanceMode({
               enabled: data.enabled,
               message_es: data.message_es,
               message_en: data.message_en,
               message_pt: data.message_pt,
+              type: data.type,
             })
               .then(() => {
                 ui.success(T.maintenanceModeActive);

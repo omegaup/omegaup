@@ -69,6 +69,17 @@
                   rows="3"
                   :placeholder="T.maintenanceModeMessagePlaceholder"
                 ></textarea>
+
+                <label class="mt-3">{{ T.maintenanceModeType }}</label>
+                <select v-model="currentMaintenanceType" class="form-control">
+                  <option value="info">{{ T.maintenanceModeTypeInfo }}</option>
+                  <option value="warning">
+                    {{ T.maintenanceModeTypeWarning }}
+                  </option>
+                  <option value="error">
+                    {{ T.maintenanceModeTypeError }}
+                  </option>
+                </select>
               </div>
               <button
                 v-if="currentMaintenanceEnabled"
@@ -360,6 +371,7 @@ export default class AdminSupport extends Vue {
   @Prop() maintenanceMessageEs!: string;
   @Prop() maintenanceMessageEn!: string;
   @Prop() maintenanceMessagePt!: string;
+  @Prop() maintenanceType!: string;
 
   currentContestAlias = this.contestAlias;
   currentIsContestRecommended = this.isContestRecommended;
@@ -367,6 +379,7 @@ export default class AdminSupport extends Vue {
   currentMaintenanceMessageEs = this.maintenanceMessageEs;
   currentMaintenanceMessageEn = this.maintenanceMessageEn;
   currentMaintenanceMessagePt = this.maintenanceMessagePt;
+  currentMaintenanceType = this.maintenanceType || 'info';
 
   T = T;
   ui = ui;
@@ -465,6 +478,11 @@ export default class AdminSupport extends Vue {
     this.currentMaintenanceMessagePt = newValue;
   }
 
+  @Watch('maintenanceType')
+  onMaintenanceTypeChange(newValue: string) {
+    this.currentMaintenanceType = newValue;
+  }
+
   @Emit('toggle-maintenance')
   onToggleMaintenance(newValue: boolean): boolean {
     this.currentMaintenanceEnabled = newValue;
@@ -482,12 +500,14 @@ export default class AdminSupport extends Vue {
     message_es: string;
     message_en: string;
     message_pt: string;
+    type: string;
   } {
     return {
       enabled: this.currentMaintenanceEnabled,
       message_es: this.currentMaintenanceMessageEs,
       message_en: this.currentMaintenanceMessageEn,
       message_pt: this.currentMaintenanceMessagePt,
+      type: this.currentMaintenanceType,
     };
   }
 }
