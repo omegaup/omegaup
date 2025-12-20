@@ -5127,6 +5127,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{user1: UserCompareData|null, user2: UserCompareData|null}
      *
+     * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $username1
      * @omegaup-request-param null|string $username2
      */
@@ -5159,6 +5160,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, templateProperties: array{payload: UserComparePayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $username1
      * @omegaup-request-param null|string $username2
      */
