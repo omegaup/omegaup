@@ -17,7 +17,7 @@ Implementing a badge is quite simple, just follow these steps:
    - `"testType": "apicall"` Consists of using the controller APIs to create relevant data (problems, users, contests, runs, etc). To do this, create an "actions" field with an array of all actions to be executed, which can be:
 
         - `changeTime`: allows modifying the system date.
-        - `apicalls`: allows calling a specific API, also setting the username and password of the calling user and the parameters to be passed. The APIs are all those public static functions with the api prefix within each of the controllers located in [this folder](https://github.com/omegaup/omegaup/tree/master/frontend/server/controllers).
+        - `apicalls`: allows calling a specific API, also setting the username and password of the calling user and the parameters to be passed. The APIs are all those public static functions with the api prefix within each of the controllers located in [this folder](https://github.com/omegaup/omegaup/tree/master/frontend/server/src/controllers).
         - `scripts`: allows executing an omegaUp cron script (`aggregate_feedback.py`, `assign_badges.py`, `update_ranks.py`). These scripts are located in [this folder](https://github.com/omegaup/omegaup/tree/master/stuff/cron).
 
         In this type of test, you must add an `expectedResults` field at the end, which should contain the usernames of those users who will receive the badge.
