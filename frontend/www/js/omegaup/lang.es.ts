@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder del mes general",
   navCoderOfTheMonthFemale: "Coder del mes para ellas",
+  navCompareUsers: "Comparar usuarios",
   navContests: "Concursos",
   navContestsEnrolled: "Concursos inscrito",
   navCourses: "Cursos",
@@ -2187,4 +2188,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };

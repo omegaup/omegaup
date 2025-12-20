@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   navBlog: "(B10g)",
   navCoderOfTheMonth: "(C0d3r 0f 7h3 m0n7h 0v3ra11)",
   navCoderOfTheMonthFemale: "(C0d3r 0f 7h3 m0n7h f0r h3r)",
+  navCompareUsers: "(C0mpar3 u53r5)",
   navContests: "(C0n73575)",
   navContestsEnrolled: "(C0n73575 3nr0113d)",
   navCourses: "(C0ur535)",
@@ -2187,4 +2188,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export {translations as default};
+export { translations as default };
