@@ -20,7 +20,7 @@ OmegaUp.on('ready', () => {
 
   // Listen for ui-ready event emitted by GlobalNotifications component
   // This handles the legacy loading/root element visibility in a Vue-native way
-  vm.$root.$on('ui-ready', () => {
+  vm.$on('ui-ready', () => {
     const loadingEl = document.getElementById('loading');
     const rootEl = document.getElementById('root');
     if (loadingEl) loadingEl.style.display = 'none';
