@@ -17,9 +17,19 @@ interface UserComparePayload {
 }
 
 OmegaUp.on('ready', () => {
-  const payload = JSON.parse(
-    (document.getElementById('payload') as HTMLElement).innerText,
-  ) as UserComparePayload;
+  const payloadElement = document.getElementById('payload');
+  if (!payloadElement) {
+    console.error('Payload element not found');
+    return;
+  }
+
+  let payload: UserComparePayload;
+  try {
+    payload = JSON.parse(payloadElement.innerText) as UserComparePayload;
+  } catch (e) {
+    console.error('Failed to parse payload JSON:', e);
+    return;
+  }
 
   new Vue({
     el: '#main-container',

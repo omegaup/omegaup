@@ -7,7 +7,7 @@
           <img
             v-if="profile.gravatar_92"
             :src="profile.gravatar_92"
-            :alt="profile.username || ''"
+            :alt="profileImageAlt"
             class="rounded-circle mb-2"
             width="92"
             height="92"
@@ -50,7 +50,10 @@
         </div>
 
         <!-- Author Ranking -->
-        <div v-if="profile.rankinfo.author_ranking" class="stat-item">
+        <div
+          v-if="profile.rankinfo && profile.rankinfo.author_ranking"
+          class="stat-item"
+        >
           <div class="stat-label">{{ T.authorRank }}</div>
           <div class="stat-value">
             <strong>#{{ profile.rankinfo.author_ranking }}</strong>
@@ -100,7 +103,15 @@ export default class CompareCard extends Vue {
     return `/profile/${this.profile.username}/`;
   }
 
+  get profileImageAlt(): string {
+    if (this.profile.username) {
+      return `Profile picture of ${this.profile.username}`;
+    }
+    return 'User profile picture';
+  }
+
   get rankDisplay(): string {
+    if (!this.profile.rankinfo) return T.profileRankUnrated;
     const rank = this.profile.rankinfo.rank;
     if (!rank) return T.profileRankUnrated;
     return `#${rank}`;

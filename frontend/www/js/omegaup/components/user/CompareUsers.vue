@@ -41,6 +41,11 @@
           </button>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="alert alert-danger mb-4" role="alert">
+          {{ errorMessage }}
+        </div>
+
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-5">
           <div class="spinner-border text-primary" role="status">
@@ -121,6 +126,7 @@ export default class CompareUsers extends Vue {
   inputUsername1: string = this.initialUsername1 || '';
   inputUsername2: string = this.initialUsername2 || '';
   isLoading = false;
+  errorMessage: string | null = null;
 
   get canCompare(): boolean {
     return (
@@ -131,32 +137,40 @@ export default class CompareUsers extends Vue {
   fetchComparison(): void {
     if (!this.canCompare) return;
 
+    // Trim usernames
+    const trimmedUsername1 = this.inputUsername1.trim();
+    const trimmedUsername2 = this.inputUsername2.trim();
+
     this.isLoading = true;
+    this.errorMessage = null;
 
     // Update URL
     const url = new URL(window.location.href);
-    if (this.inputUsername1) {
-      url.searchParams.set('username1', this.inputUsername1);
+    if (trimmedUsername1) {
+      url.searchParams.set('username1', trimmedUsername1);
     } else {
       url.searchParams.delete('username1');
     }
-    if (this.inputUsername2) {
-      url.searchParams.set('username2', this.inputUsername2);
+    if (trimmedUsername2) {
+      url.searchParams.set('username2', trimmedUsername2);
     } else {
       url.searchParams.delete('username2');
     }
     window.history.pushState({}, '', url.toString());
 
     api.User.compare({
-      username1: this.inputUsername1 || undefined,
-      username2: this.inputUsername2 || undefined,
+      username1: trimmedUsername1 || undefined,
+      username2: trimmedUsername2 || undefined,
     })
       .then((response) => {
         this.user1 = response.user1 as UserCompareData | null;
         this.user2 = response.user2 as UserCompareData | null;
+        this.errorMessage = null;
       })
-      .catch((error: unknown) => {
+      .catch((error: { message?: string }) => {
         console.error('Compare error:', error);
+        this.errorMessage =
+          error.message || 'An error occurred while comparing users.';
       })
       .finally(() => {
         this.isLoading = false;
