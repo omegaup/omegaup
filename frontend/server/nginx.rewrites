@@ -100,12 +100,15 @@ rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problems/stats.php?problem_alias=$
 rewrite ^/profile/?$ /profile/index.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
+rewrite ^/rank/users/?$ /rank/users.php last;
 rewrite ^/rank/authors/?$ /rank/authors.php last;
 rewrite ^/rank/schools/?$ /rank/schools.php last;
+rewrite ^/rank/compare/?$ /compare.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolofthemonth/?$ /schools/schoolofthemonth.php last;
 rewrite ^/schools/?$ /course/ permanent;
 rewrite ^/schoolsrank/?$ /rank/schools/ permanent;
+rewrite ^/compare/?$ /compare.php last;
 rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
 rewrite ^/submissions/?$ /submissions/list.php last;

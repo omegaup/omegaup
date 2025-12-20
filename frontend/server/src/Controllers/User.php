@@ -52,6 +52,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  * @psalm-type UserDocument=array{name: string, url: string}
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
+ * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int, contestsCount: int}
+ * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -5065,6 +5067,140 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
             ],
             'entrypoint' => 'common_docs',
+        ];
+    }
+
+    /**
+     * Get comparison data for two users
+     *
+     * @return UserCompareData|null
+     */
+    private static function getUserCompareData(
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        ?string $username
+    ): ?array {
+        if (is_null($username) || $username === '') {
+            return null;
+        }
+
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            return null;
+        }
+
+        $targetUser = null;
+        if (!is_null($identity->user_id)) {
+            $targetUser = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        // Check if profile should be hidden
+        if (
+            self::shouldUserInformationBeHidden(
+                $loggedIdentity,
+                $identity,
+                $targetUser
+            )
+        ) {
+            // Return limited profile for private users
+            return [
+                'profile' => self::getPrivateUserProfile($identity),
+                'solvedProblemsCount' => 0,
+                'contestsCount' => 0,
+            ];
+        }
+
+        $profile = self::getUserProfile($loggedIdentity, $identity);
+        $solvedProblemsCount = count(
+            self::getSolvedProblems($identity->identity_id)
+        );
+        $contestsCount = count(self::getContestStats($identity));
+
+        return [
+            'profile' => $profile,
+            'solvedProblemsCount' => $solvedProblemsCount,
+            'contestsCount' => $contestsCount,
+        ];
+    }
+
+    /**
+     * Compare two users' profiles and stats
+     *
+     * @return array{user1: UserCompareData|null, user2: UserCompareData|null}
+     *
+     * @omegaup-request-param null|string $username1
+     * @omegaup-request-param null|string $username2
+     */
+    public static function apiCompare(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        $username1 = $r->ensureOptionalString(
+            'username1',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        $username2 = $r->ensureOptionalString(
+            'username2',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+
+        return [
+            'user1' => self::getUserCompareData($r->identity, $username1),
+            'user2' => self::getUserCompareData($r->identity, $username2),
+        ];
+    }
+
+    /**
+     * Get compare page details for TypeScript frontend
+     *
+     * @return array{entrypoint: string, templateProperties: array{payload: UserComparePayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param null|string $username1
+     * @omegaup-request-param null|string $username2
+     */
+    public static function getCompareDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+
+        $username1 = $r->ensureOptionalString(
+            'username1',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        $username2 = $r->ensureOptionalString(
+            'username2',
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'user1' => self::getUserCompareData(
+                        $r->identity,
+                        $username1
+                    ),
+                    'user2' => self::getUserCompareData(
+                        $r->identity,
+                        $username2
+                    ),
+                    'username1' => $username1,
+                    'username2' => $username2,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCompareUsers'
+                ),
+            ],
+            'entrypoint' => 'user_compare',
         ];
     }
 }

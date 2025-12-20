@@ -243,6 +243,7 @@
   - [`/api/user/changePassword/`](#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
+  - [`/api/user/compare/`](#apiusercompare)
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
@@ -4743,6 +4744,26 @@ Returns the list of coders of the month
 | Name     | Type                        |
 | -------- | --------------------------- |
 | `coders` | `types.CoderOfTheMonthList` |
+
+## `/api/user/compare/`
+
+### Description
+
+Compare two users' profiles and stats
+
+### Parameters
+
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `username1` | `null\|string` |             |
+| `username2` | `null\|string` |             |
+
+### Returns
+
+| Name    | Type                    |
+| ------- | ----------------------- |
+| `user1` | `types.UserCompareData` |
+| `user2` | `types.UserCompareData` |
 
 ## `/api/user/contestStats/`
 
