@@ -1,0 +1,20 @@
+import GlobalNotifications from '../components/common/GlobalNotifications.vue';
+import { OmegaUp } from '../omegaup';
+import Vue from 'vue';
+
+OmegaUp.on('ready', () => {
+    const mountPoint = document.getElementById('global-notifications');
+    if (!mountPoint) {
+        return;
+    }
+
+    new Vue({
+        el: '#global-notifications',
+        components: {
+            'omegaup-global-notifications': GlobalNotifications,
+        },
+        render: function (createElement) {
+            return createElement('omegaup-global-notifications');
+        },
+    });
+});

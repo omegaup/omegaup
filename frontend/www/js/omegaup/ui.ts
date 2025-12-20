@@ -2,13 +2,10 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 import { types } from './api_types';
+import notificationsStore, { MessageType } from './notificationsStore';
 
-export enum MessageType {
-  Danger = 'alert-danger',
-  Info = 'alert-info',
-  Success = 'alert-success',
-  Warning = 'alert-warning',
-}
+// Re-export MessageType for backward compatibility
+export { MessageType };
 
 export function navigateTo(href: string): void {
   const [pathname, hash] = href.split('#');
@@ -97,37 +94,13 @@ export function displayStatus({
   type: MessageType;
   autoHide?: boolean;
 }): void {
-  if ($('#status .message').length == 0) {
-    console.error('Showing warning but there is no status div');
-  }
-
-  // Just in case this needs to be displayed but the UI wasn't set up yet.
-  $('#loading').hide();
-  $('#root').show();
-
-  $('#status .message').html(message);
-  const statusElement = $('#status');
-  let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
-  if (statusCounter % 2 == 1) {
-    statusCounter++;
-  }
-  statusElement
-    .removeClass('alert-success alert-info alert-warning alert-danger')
-    .addClass(type)
-    .addClass('animating')
-    .attr('data-counter', statusCounter + 1)
-    .slideDown({
-      complete: () => {
-        statusElement
-          .removeClass('animating')
-          .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success' && autoHide) {
-          setTimeout(() => {
-            dismissNotifications(statusCounter + 2);
-          }, 5000);
-        }
-      },
-    });
+  // Dispatch to Vuex store - the store action handles all visibility logic
+  notificationsStore.dispatch('displayStatus', {
+    message,
+    type,
+    autoHide,
+    ensureVisible: true, // Signal to ensure UI is ready
+  });
 }
 
 export function error(message: string): void {
@@ -160,29 +133,9 @@ export function ignoreError(response: { error?: string; payload?: any }): void {
   return;
 }
 
-export function dismissNotifications(originalStatusCounter?: number): void {
-  const statusElement = $('#status');
-  let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
-  if (
-    typeof originalStatusCounter == 'number' &&
-    statusCounter > originalStatusCounter
-  ) {
-    // This status has already been dismissed.
-    return;
-  }
-  if (statusCounter % 2 == 1) {
-    statusCounter++;
-  }
-  statusElement
-    .addClass('animating')
-    .attr('data-counter', statusCounter + 1)
-    .slideUp({
-      complete: () => {
-        statusElement
-          .removeClass('animating')
-          .attr('data-counter', statusCounter + 2);
-      },
-    });
+export function dismissNotifications(_originalStatusCounter?: number): void {
+  // Dispatch to Vuex store to hide notification
+  notificationsStore.dispatch('dismissNotifications');
 }
 
 type JSONType = any;
