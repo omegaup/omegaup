@@ -12,7 +12,7 @@ Developers will only need to invoke this like:
 
     stuff/policy-tool.py update
 
-every time a policy file has been updated. Travis can also use the 'validate',
+every time a policy file has been updated. Travis can also use the 'validate'
 command to validate that the latest policy is present in the database.
 '''
 
@@ -22,7 +22,6 @@ import argparse
 import os.path
 import subprocess
 import sys
-
 from typing import Generator, Sequence, Tuple
 
 import database_utils
@@ -37,31 +36,48 @@ def _latest() -> Generator[Tuple[str, str], None, None]:
     privacy_path = os.path.join(OMEGAUP_ROOT, git_privacy_path)
     if not os.path.isdir(privacy_path):
         return
+
     for statement_type in os.listdir(privacy_path):
         statement_path = os.path.join(git_privacy_path, statement_type)
         git_object_id = subprocess.check_output(
-            ['/usr/bin/git', 'ls-tree', '-d', 'HEAD^{tree}', statement_path],
+            [
+                '/usr/bin/git',
+                'ls-tree',
+                '-d',
+                'HEAD^{tree}',
+                statement_path,
+            ],
             cwd=OMEGAUP_ROOT,
-            universal_newlines=True).strip().split()[2]
+            universal_newlines=True,
+        ).strip().split()[2]
         yield (statement_type, git_object_id)
 
 
 def _missing(
-        args: argparse.Namespace,
-        auth: Sequence[str],
+    args: argparse.Namespace,
+    auth: Sequence[str],
 ) -> Generator[Tuple[str, str], None, None]:
     '''Gets all the missing privacy statements.'''
 
     for statement_type, git_object_id in _latest():
-        if int(
-                database_utils.mysql(
-                    f'SELECT COUNT(*) FROM `PrivacyStatements` WHERE '
-                    f'`type` = "{statement_type}" AND `git_object_id` = "{git_object_id}";',
-                    dbname=args.database,
-                    auth=auth,
-                    container_check=not args.skip_container_check,
-                )) != 0:
+        query = (
+            f"SELECT COUNT(*) FROM `PrivacyStatements` "
+            f"WHERE `type` = \"{statement_type}\" "
+            f"AND `git_object_id` = \"{git_object_id}\";"
+        )
+
+        count = int(
+            database_utils.mysql(
+                query,
+                dbname=args.database,
+                auth=auth,
+                container_check=not args.skip_container_check,
+            )
+        )
+
+        if count != 0:
             continue
+
         yield (statement_type, git_object_id)
 
 
@@ -70,11 +86,17 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
 
     valid = True
     for statement_type, git_object_id in _missing(args, auth):
-        print(f'Missing database entry for type {statement_type} and object id {git_object_id}')
+        print(
+            'Missing database entry for type %s and object id %s'
+            % (statement_type, git_object_id)
+        )
         valid = False
+
     if not valid:
-        print('Run `./stuff/policy-tool.py upgrade` to generate '
-              'the upgrade script.')
+        print(
+            'Run `./stuff/policy-tool.py upgrade` to generate '
+            'the upgrade script.'
+        )
         sys.exit(1)
 
 
@@ -86,43 +108,70 @@ def upgrade(args: argparse.Namespace, auth: Sequence[str]) -> None:
         return
 
     print('-- PrivacyStatements')
-    print('INSERT INTO `PrivacyStatements` (`type`, `git_object_id`) VALUES ')
-    print(','.join(f"  ('{entry[0]}', '{entry[1]}')" for entry in missing) + ';')
+    print(
+        'INSERT INTO `PrivacyStatements` '
+        '(`type`, `git_object_id`) VALUES '
+    )
+    print(','.join(
+        "  ('%s', '%s')" % entry for entry in missing
+    ) + ';')
 
 
 def _main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--skip-container-check',
-                        action='store_true',
-                        help='Skip the container check')
-    parser.add_argument('--mysql-config-file',
-                        default=database_utils.default_config_file(),
-                        help='.my.cnf file that stores credentials')
-    parser.add_argument('--database', default='omegaup', help='MySQL database')
-    parser.add_argument('--hostname',
-                        default=None,
-                        type=str,
-                        help='Hostname of the MySQL server')
-    parser.add_argument('--port',
-                        default=13306,
-                        type=int,
-                        help='Port of the MySQL server')
-    parser.add_argument('--username',
-                        default='root',
-                        help='MySQL root username')
-    parser.add_argument('--password', default='omegaup', help='MySQL password')
+    parser.add_argument(
+        '--skip-container-check',
+        action='store_true',
+        help='Skip the container check',
+    )
+    parser.add_argument(
+        '--mysql-config-file',
+        default=database_utils.default_config_file(),
+        help='.my.cnf file that stores credentials',
+    )
+    parser.add_argument(
+        '--database',
+        default='omegaup',
+        help='MySQL database',
+    )
+    parser.add_argument(
+        '--hostname',
+        default=None,
+        type=str,
+        help='Hostname of the MySQL server',
+    )
+    parser.add_argument(
+        '--port',
+        default=13306,
+        type=int,
+        help='Port of the MySQL server',
+    )
+    parser.add_argument(
+        '--username',
+        default='root',
+        help='MySQL root username',
+    )
+    parser.add_argument(
+        '--password',
+        default='omegaup',
+        help='MySQL password',
+    )
+
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
-    # Commands for development.
     parser_validate = subparsers.add_parser(
-        'validate', help='Validates that the versioning is sane')
+        'validate',
+        help='Validates that the versioning is sane',
+    )
     parser_validate.set_defaults(func=validate)
 
-    parser_upgrade = subparsers.add_parser('upgrade',
-                                           help='Generates the upgrade script')
+    parser_upgrade = subparsers.add_parser(
+        'upgrade',
+        help='Generates the upgrade script',
+    )
     parser_upgrade.set_defaults(func=upgrade)
 
     args = parser.parse_args()
@@ -130,11 +179,14 @@ def _main() -> None:
     if not args.skip_container_check:
         database_utils.check_inside_container()
 
-    auth = database_utils.authentication(config_file=args.mysql_config_file,
-                                         username=args.username,
-                                         password=args.password,
-                                         hostname=args.hostname,
-                                         port=args.port)
+    auth = database_utils.authentication(
+        config_file=args.mysql_config_file,
+        username=args.username,
+        password=args.password,
+        hostname=args.hostname,
+        port=args.port,
+    )
+
     args.func(args, auth)
 
 
