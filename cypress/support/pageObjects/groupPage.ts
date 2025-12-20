@@ -37,7 +37,7 @@ export class GroupPage {
 
     cy.get('[name="create-identities"]').click();
     cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
+      return cy.get('[data-alert-close]').should('not.be.visible');
     });
 
     cy.get('[href="#members"]').click();
@@ -80,9 +80,9 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.get('#alert-close').click();
+    cy.get('[data-alert-close]').click();
     cy.waitUntil(() => {
-      return cy.get('#alert-close').should('not.be.visible');
+      return cy.get('[data-alert-close]').should('not.be.visible');
     });
 
     cy.get('[href="#teams"]').click();

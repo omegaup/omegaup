@@ -9,7 +9,7 @@
   >
     <div v-if="visible" class="alert mt-0" :class="alertClass" role="alert">
       <button
-        id="alert-close"
+        data-alert-close
         type="button"
         class="close"
         aria-label="Close"

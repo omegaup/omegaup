@@ -12,7 +12,7 @@ export class ProfilePage {
     cy.get('a[href="/profile/#edit-basic-information"]').click();
     cy.get('[data-name]').type(userName);
     cy.get('[data-save-profile-changes-button]').click();
-    cy.get('#alert-close').click();
+    cy.get('[data-alert-close]').click();
   }
   updatePreferredLanguage(preferredLanguage: string): void {
     cy.get('[data-nav-user]').click();
