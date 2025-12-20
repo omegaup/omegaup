@@ -50,18 +50,24 @@ export default class GlobalNotifications extends Vue {
     // Handle case where isUiReady is already true when component mounts
     // (watcher only fires on changes, not initial state)
     if (this.isUiReady) {
-      this.$root.$emit('ui-ready');
+      this.emitUiReady();
     }
   }
 
   @Watch('isUiReady')
   onUiReadyChange(ready: boolean): void {
     if (ready) {
-      // Emit event for parent/root to handle DOM manipulation
-      // The root Vue instance or parent component should listen for this
-      // event and handle legacy loading/root element visibility
-      this.$root.$emit('ui-ready');
+      this.emitUiReady();
     }
+  }
+
+  /**
+   * Emits the 'ui-ready' event to the parent component.
+   * Called from mounted() and the isUiReady watcher to notify
+   * that the UI is ready for DOM manipulation.
+   */
+  private emitUiReady(): void {
+    this.$emit('ui-ready');
   }
 
   dismiss(): void {
@@ -109,6 +115,12 @@ export default class GlobalNotifications extends Vue {
   transition: transform 0.3s ease, opacity 0.3s ease;
   transform-origin: top;
   overflow: hidden;
+
+  // Override transform-origin for bottom-positioned notifications
+  &.notification-bottom,
+  &.notification-bottom-right {
+    transform-origin: bottom;
+  }
 }
 
 .notification-slide-enter,

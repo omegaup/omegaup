@@ -105,6 +105,7 @@ describe('notificationsStore', () => {
 
       expect(store.state.message).toBeNull();
       expect(store.state.type).toBeNull();
+      expect(store.state.position).toBe(NotificationPosition.Top);
       expect(store.state.visible).toBe(false);
       expect(store.state.counter).toBe(0);
       expect(store.state.uiReady).toBe(false);
