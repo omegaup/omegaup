@@ -7,18 +7,8 @@
     @before-leave="beforeLeave"
     @leave="leave"
   >
-    <div
-      v-if="visible"
-      class="alert mt-0"
-      :class="alertClass"
-      role="alert"
-    >
-      <button
-        type="button"
-        class="close"
-        aria-label="Close"
-        @click="dismiss"
-      >
+    <div v-if="visible" class="alert mt-0" :class="alertClass" role="alert">
+      <button type="button" class="close" aria-label="Close" @click="dismiss">
         &times;
       </button>
       <span class="message">{{ message }}</span>
