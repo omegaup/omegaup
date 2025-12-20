@@ -151,7 +151,7 @@ omegaUp code can be found at `/opt/omegaup` inside the contianer. The dev instal
 
 These are the directories that we are actively using in the development:
 
-- [frontend/server/src/controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/controllers): The controllers do the business logic and expose the server API.
+- [frontend/server/src/Controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/Controllers): The controllers do the business logic and expose the server API.
 - [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs): Libraries and utilities.
 - [frontend/server/libs/dao](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs/dao): Data Access Objects [DAO] and Value Objects [VO]. Classes used to represent database schemes and facilitate their use by the controllers.
 - [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates): Smarty templates used to generate the HTML that is displayed to users. Also here are the internationalization files for English, Spanish and Portuguese.
