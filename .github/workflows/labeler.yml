@@ -142,14 +142,15 @@ Please make sure you are NOT addressing multiple issues with one PR. If it's pos
 
 Note: This PR might require additional review time due to its size.`;
               
-              // Check if warning comment already exists
-              const { data: comments } = await github.rest.issues.listComments({
+              // Check if warning comment already exists (use pagination to handle PRs with many comments)
+              const comments = await github.paginate(github.rest.issues.listComments, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: issueNumber
+                issue_number: issueNumber,
+                per_page: 100
               });
               
-              const hasWarning = comments.some(c => c.body.includes('exceeds the recommended size'));
+              const hasWarning = comments.some(c => c.body && c.body.includes('exceeds the recommended size'));
               
               if (!hasWarning) {
                 core.info('Adding XL size warning comment');
