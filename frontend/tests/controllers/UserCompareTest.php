@@ -10,7 +10,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser1'])
         );
-        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser2'])
         );
 
@@ -24,9 +24,13 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
+        // Login as user2 to call compare API
+        $login2 = self::login($identity2);
+
         // Call compare API
         $response = \OmegaUp\Controllers\User::apiCompare(
             new \OmegaUp\Request([
+                'auth_token' => $login2->auth_token,
                 'username1' => 'testuser1',
                 'username2' => 'testuser2',
             ])
@@ -50,12 +54,15 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing with an invalid username
      */
     public function testCompareWithInvalidUsername() {
-        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'validuser'])
         );
 
+        $login = self::login($identity);
+
         $response = \OmegaUp\Controllers\User::apiCompare(
             new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'username1' => 'validuser',
                 'username2' => 'nonexistentuser123',
             ])
@@ -69,8 +76,14 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing with empty usernames
      */
     public function testCompareWithEmptyUsernames() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
         $response = \OmegaUp\Controllers\User::apiCompare(
-            new \OmegaUp\Request([])
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
         );
 
         $this->assertNull($response['user1']);
@@ -81,14 +94,17 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing user with themselves
      */
     public function testCompareUserWithSelf() {
-        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'selfcompare']
             )
         );
 
+        $login = self::login($identity);
+
         $response = \OmegaUp\Controllers\User::apiCompare(
             new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'username1' => 'selfcompare',
                 'username2' => 'selfcompare',
             ])
@@ -110,7 +126,7 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test comparing with a private profile
      */
     public function testCompareWithPrivateProfile() {
-        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $publicIdentity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'publicuser'])
         );
         ['identity' => $privateIdentity] = \OmegaUp\Test\Factories\User::createUser(
@@ -130,8 +146,12 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
+        // Login as public user to call compare API
+        $publicLogin = self::login($publicIdentity);
+
         $response = \OmegaUp\Controllers\User::apiCompare(
             new \OmegaUp\Request([
+                'auth_token' => $publicLogin->auth_token,
                 'username1' => 'publicuser',
                 'username2' => 'privateuser',
             ])
@@ -153,12 +173,15 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
      * Test getCompareDetailsForTypeScript returns correct payload structure
      */
     public function testGetCompareDetailsForTypeScript() {
-        ['identity' => $_] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['username' => 'testuser'])
         );
 
+        $login = self::login($identity);
+
         $response = \OmegaUp\Controllers\User::getCompareDetailsForTypeScript(
             new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
                 'username1' => 'testuser',
             ])
         );
