@@ -134,6 +134,36 @@ jobs:
             
             core.info(`Calculated size label: ${newSizeLabel}`);
             
+            // Add warning comment for XL PRs (check before label idempotency to ensure comment is posted)
+            if (newSizeLabel === 'size/XL') {
+              const warningMessage = `⚠️ This PR exceeds the recommended size of 200 lines.
+
+Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
+
+Note: This PR might require additional review time due to its size.`;
+              
+              // Check if warning comment already exists
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              });
+              
+              const hasWarning = comments.some(c => c.body.includes('exceeds the recommended size'));
+              
+              if (!hasWarning) {
+                core.info('Adding XL size warning comment');
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: warningMessage
+                });
+              } else {
+                core.info('XL size warning comment already exists');
+              }
+            }
+            
             // Get current labels on the PR
             const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
               owner: context.repo.owner,
@@ -143,7 +173,7 @@ jobs:
             
             const currentSizeLabel = currentLabels.find(l => sizeLabels.includes(l.name));
             
-            // Only update if the size category has changed (idempotent)
+            // Only update label if the size category has changed (idempotent)
             if (currentSizeLabel?.name === newSizeLabel) {
               core.info(`Size label ${newSizeLabel} already applied, no change needed`);
               return;
@@ -172,30 +202,3 @@ jobs:
               issue_number: issueNumber,
               labels: [newSizeLabel]
             });
-            
-            // Add warning comment for XL PRs
-            if (newSizeLabel === 'size/XL') {
-              const warningMessage = `⚠️ This PR exceeds the recommended size of 200 lines.
-
-Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
-
-Note: This PR might require additional review time due to its size.`;
-              
-              // Check if warning comment already exists
-              const { data: comments } = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber
-              });
-              
-              const hasWarning = comments.some(c => c.body.includes('exceeds the recommended size'));
-              
-              if (!hasWarning) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issueNumber,
-                  body: warningMessage
-                });
-              }
-            }
