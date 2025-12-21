@@ -278,6 +278,8 @@
 
 # Admin
 
+Admin Controller
+
 ## `/api/admin/getMaintenanceMode/`
 
 ### Description
@@ -286,10 +288,9 @@ Get maintenance mode status
 
 ### Returns
 
-| Name      | Type      |
-| --------- | --------- |
-| `enabled` | `boolean` |
-| `message` | `string`  |
+```typescript
+types.MaintenanceModeStatus;
+```
 
 ## `/api/admin/platformReportStats/`
 

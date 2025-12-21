@@ -2,7 +2,28 @@
 
  namespace OmegaUp\Controllers;
 
+ /**
+  * Admin Controller
+  *
+  * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
+  */
 class Admin extends \OmegaUp\Controllers\Controller {
+    const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
+    const MAINTENANCE_MESSAGE_EN_KEY = 'system:maintenance_message_en';
+    const MAINTENANCE_MESSAGE_PT_KEY = 'system:maintenance_message_pt';
+    const MAINTENANCE_ENABLED_KEY = 'system:maintenance_enabled';
+    const MAINTENANCE_MESSAGE_TYPE_KEY = 'system:maintenance_message_type';
+
+    const INFO = 0;
+    const WARNING = 1;
+    const ERROR = 2;
+
+    const MAINTENANCE_MESSAGE_TYPES = [
+        'info',
+        'warning',
+        'danger',
+    ];
+
     /**
      * Get stats for an overall platform report.
      *
@@ -80,12 +101,6 @@ class Admin extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    const MAINTENANCE_MESSAGE_ES_KEY = 'system:maintenance_message_es';
-    const MAINTENANCE_MESSAGE_EN_KEY = 'system:maintenance_message_en';
-    const MAINTENANCE_MESSAGE_PT_KEY = 'system:maintenance_message_pt';
-    const MAINTENANCE_ENABLED_KEY = 'system:maintenance_enabled';
-    const MAINTENANCE_MESSAGE_TYPE_KEY = 'system:maintenance_message_type';
-
     /**
      * Set maintenance mode
      *
@@ -108,7 +123,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
         $messageEs = $r->ensureOptionalString('message_es') ?? '';
         $messageEn = $r->ensureOptionalString('message_en') ?? '';
         $messagePt = $r->ensureOptionalString('message_pt') ?? '';
-        $type = $r->ensureOptionalString('type') ?? 'info';
+        $type = $r->ensureOptionalEnum(
+            'type',
+            self::MAINTENANCE_MESSAGE_TYPES
+        ) ?? self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
 
         if ($enabled) {
             $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
@@ -117,12 +135,12 @@ class Admin extends \OmegaUp\Controllers\Controller {
             $cacheMessageEs = new \OmegaUp\Cache(
                 self::MAINTENANCE_MESSAGE_ES_KEY
             );
-            $cacheMessageEs->set($messageEs, 0);
+            $cacheMessageEs->set($messageEs, timeout: 0);
 
             $cacheMessageEn = new \OmegaUp\Cache(
                 self::MAINTENANCE_MESSAGE_EN_KEY
             );
-            $cacheMessageEn->set($messageEn, 0);
+            $cacheMessageEn->set($messageEn, timeout: 0);
 
             $cacheMessagePt = new \OmegaUp\Cache(
                 self::MAINTENANCE_MESSAGE_PT_KEY
@@ -132,7 +150,16 @@ class Admin extends \OmegaUp\Controllers\Controller {
             $cacheMessageType = new \OmegaUp\Cache(
                 self::MAINTENANCE_MESSAGE_TYPE_KEY
             );
-            $cacheMessageType->set($type, 0);
+            // Store the index, not the string value
+            $typeIndex = array_search(
+                $type,
+                self::MAINTENANCE_MESSAGE_TYPES,
+                true
+            );
+            $cacheMessageType->set(
+                $typeIndex !== false ? $typeIndex : self::INFO,
+                0
+            );
         } else {
             $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
             $cacheEnabled->delete();
@@ -164,9 +191,9 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * Get maintenance mode status
      *
-     * @return array{enabled: bool, message: null|string}
+     * @return MaintenanceModeStatus
      */
-    public static function apiGetMaintenanceMode(\OmegaUp\Request $r): array {
+    public static function apiGetMaintenanceMode(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
@@ -177,27 +204,55 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get the message type from cache
+     *
+     * @return string
+     */
+    private static function getMessageTypeFromCache(): string {
+        $cacheMessageType = new \OmegaUp\Cache(
+            self::MAINTENANCE_MESSAGE_TYPE_KEY
+        );
+        $messageTypeIndex = $cacheMessageType->get();
+        return (is_int(
+            $messageTypeIndex
+        ) && isset(
+            self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
+        ))
+            ? self::MAINTENANCE_MESSAGE_TYPES[$messageTypeIndex]
+            : self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
+    }
+
+    /**
      * Get maintenance mode status
      *
-     * @return array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
+     * @return MaintenanceModeStatus
      */
     public static function getMaintenanceModeStatus(): array {
         $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
         $enabled = boolval($cacheEnabled->get());
 
         $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $messageEs = $cacheMessageEs->get();
+        $messageEs = is_null(
+            $cacheMessageEs->get()
+        ) ? null : strval(
+            $cacheMessageEs->get()
+        );
 
         $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $messageEn = $cacheMessageEn->get();
+        $messageEn = is_null(
+            $cacheMessageEn->get()
+        ) ? null : strval(
+            $cacheMessageEn->get()
+        );
 
         $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $messagePt = $cacheMessagePt->get();
-
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
+        $messagePt = is_null(
+            $cacheMessagePt->get()
+        ) ? null : strval(
+            $cacheMessagePt->get()
         );
-        $type = $cacheMessageType->get() ?? 'info';
+
+        $type = self::getMessageTypeFromCache();
 
         return [
             'enabled' => $enabled,
@@ -215,48 +270,26 @@ class Admin extends \OmegaUp\Controllers\Controller {
      * @return null|array{message: string, type: string}
      */
     public static function getMaintenanceMessage(?string $lang = null): ?array {
-        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
-        $enabled = $cacheEnabled->get();
+        $status = self::getMaintenanceModeStatus();
 
-        if (!$enabled) {
+        if (!$status['enabled']) {
             return null;
         }
 
-        // Default to Spanish if no language specified
-        if (is_null($lang) || $lang === 'es') {
-            $cacheMessage = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_ES_KEY
-            );
-        } elseif ($lang === 'en' || $lang === 'pseudo') {
-            $cacheMessage = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_EN_KEY
-            );
+        // Select message based on language
+        $message = '';
+        if ($lang === 'en' || $lang === 'pseudo') {
+            $message = $status['message_en'] ?? '';
         } elseif ($lang === 'pt') {
-            $cacheMessage = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_PT_KEY
-            );
+            $message = $status['message_pt'] ?? '';
         } else {
-            $cacheMessage = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_ES_KEY
-            );
+            // Default to Spanish
+            $message = $status['message_es'] ?? '';
         }
 
-        $cacheMessageType = new \OmegaUp\Cache(
-            self::MAINTENANCE_MESSAGE_TYPE_KEY
-        );
-        $type = $cacheMessageType->get() ?? 'info';
-
-        // Map type to Bootstrap alert classes
-        $alertClass = match ($type) {
-            'error' => 'danger',
-            'warning' => 'warning',
-            'info', 'anuncio' => 'info',
-            default => 'info',
-        };
-
         return [
-            'message' => $cacheMessage->get() ?? '',
-            'type' => $alertClass,
+            'message' => $message,
+            'type' => $status['type'],
         ];
     }
 }

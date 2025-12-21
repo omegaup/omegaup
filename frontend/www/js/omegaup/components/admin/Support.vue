@@ -72,11 +72,13 @@
 
                 <label class="mt-3">{{ T.maintenanceModeType }}</label>
                 <select v-model="currentMaintenanceType" class="form-control">
-                  <option value="info">{{ T.maintenanceModeTypeInfo }}</option>
-                  <option value="warning">
+                  <option :value="MaintenanceType.Info">
+                    {{ T.maintenanceModeTypeInfo }}
+                  </option>
+                  <option :value="MaintenanceType.Warning">
                     {{ T.maintenanceModeTypeWarning }}
                   </option>
-                  <option value="error">
+                  <option :value="MaintenanceType.Error">
                     {{ T.maintenanceModeTypeError }}
                   </option>
                 </select>
@@ -345,6 +347,12 @@ export interface UpdateEmailRequest {
   newEmail: string;
 }
 
+export enum MaintenanceType {
+  Info = 'info',
+  Warning = 'warning',
+  Error = 'danger',
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -384,6 +392,7 @@ export default class AdminSupport extends Vue {
   T = T;
   ui = ui;
   time = time;
+  MaintenanceType = MaintenanceType;
   usernameOrEmail: null | string = null;
   newEmail: null | string = null;
 
