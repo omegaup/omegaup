@@ -1,6 +1,10 @@
 <template>
   <div data-user-profile-edit class="mx-auto">
+    <omegaup-user-profile-skeleton
+        v-if="loading"
+    ></omegaup-user-profile-skeleton>
     <omegaup-user-profile-wrapper
+      v-else
       :profile="profile"
       :data="data"
       :selected-tab.sync="currentSelectedTab"
@@ -116,6 +120,7 @@ import user_ManageSchools from './ManageSchools.vue';
 import user_ManageIdentities from './ManageIdentities.vue';
 import user_ManageApiTokens from './ManageApiTokens.vue';
 import userDeleteAccount from './DeleteAccount.vue';
+import user_ProfileSkeleton from './Skeleton.vue';
 
 @Component({
   components: {
@@ -129,6 +134,7 @@ import userDeleteAccount from './DeleteAccount.vue';
     'omegaup-user-manage-api-tokens': user_ManageApiTokens,
     'omegaup-user-manage-schools': user_ManageSchools,
     'omegaup-user-delete-account': userDeleteAccount,
+    'omegaup-user-profile-skeleton': user_ProfileSkeleton,
   },
 })
 export default class Profile extends Vue {
@@ -144,6 +150,7 @@ export default class Profile extends Vue {
   @Prop() programmingLanguages!: { [key: string]: string };
   @Prop() hasPassword!: boolean;
   @Prop() searchResultSchools!: types.SchoolListItem[];
+  @Prop({ default: false }) loading!: boolean;
   @Prop({ default: () => [] }) heatmapData!: Array<{
     date: string;
     count: number;
