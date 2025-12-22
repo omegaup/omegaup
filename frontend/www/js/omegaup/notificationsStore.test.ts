@@ -1,15 +1,16 @@
 import {
   createNotificationsStore,
-  notificationsStoreConfig,
+  createNotificationsStoreConfig,
   MessageType,
   NotificationsState,
 } from './notificationsStore';
 
 describe('notificationsStore', () => {
   let state: NotificationsState;
+  let storeConfig: ReturnType<typeof createNotificationsStoreConfig>;
 
   beforeEach(() => {
-    // Create fresh state for each test
+    // Create fresh state and config for each test to avoid shared state
     state = {
       message: null,
       type: null,
@@ -18,6 +19,7 @@ describe('notificationsStore', () => {
       uiReady: false,
       autoHideTimeout: null,
     };
+    storeConfig = createNotificationsStoreConfig();
   });
 
   describe('mutations', () => {
@@ -28,7 +30,7 @@ describe('notificationsStore', () => {
           type: MessageType.Danger,
         };
 
-        notificationsStoreConfig.mutations.showNotification(state, payload);
+        storeConfig.mutations.showNotification(state, payload);
 
         expect(state.message).toBe('Test error message');
         expect(state.type).toBe(MessageType.Danger);
@@ -42,10 +44,10 @@ describe('notificationsStore', () => {
           type: MessageType.Success,
         };
 
-        notificationsStoreConfig.mutations.showNotification(state, payload);
+        storeConfig.mutations.showNotification(state, payload);
         expect(state.counter).toBe(1);
 
-        notificationsStoreConfig.mutations.showNotification(state, payload);
+        storeConfig.mutations.showNotification(state, payload);
         expect(state.counter).toBe(2);
       });
     });
@@ -57,7 +59,7 @@ describe('notificationsStore', () => {
         state.type = MessageType.Info;
         state.visible = true;
 
-        notificationsStoreConfig.mutations.hideNotification(state);
+        storeConfig.mutations.hideNotification(state);
 
         expect(state.message).toBeNull();
         expect(state.type).toBeNull();
@@ -69,10 +71,10 @@ describe('notificationsStore', () => {
       it('should set uiReady state', () => {
         expect(state.uiReady).toBe(false);
 
-        notificationsStoreConfig.mutations.setUiReady(state, true);
+        storeConfig.mutations.setUiReady(state, true);
         expect(state.uiReady).toBe(true);
 
-        notificationsStoreConfig.mutations.setUiReady(state, false);
+        storeConfig.mutations.setUiReady(state, false);
         expect(state.uiReady).toBe(false);
       });
     });
@@ -114,6 +116,53 @@ describe('notificationsStore', () => {
       expect(MessageType.Info).toBe('alert-info');
       expect(MessageType.Success).toBe('alert-success');
       expect(MessageType.Warning).toBe('alert-warning');
+    });
+  });
+
+  describe('displayStatus action', () => {
+    it('should commit setUiReady when ensureVisible is true and uiReady is false', () => {
+      const store = createNotificationsStore();
+
+      expect(store.state.uiReady).toBe(false);
+
+      store.dispatch('displayStatus', {
+        message: 'Test message',
+        type: MessageType.Info,
+        ensureVisible: true,
+      });
+
+      expect(store.state.uiReady).toBe(true);
+      expect(store.state.visible).toBe(true);
+      expect(store.state.message).toBe('Test message');
+    });
+
+    it('should not change uiReady if ensureVisible is false', () => {
+      const store = createNotificationsStore();
+
+      store.dispatch('displayStatus', {
+        message: 'Test message',
+        type: MessageType.Info,
+        ensureVisible: false,
+      });
+
+      expect(store.state.uiReady).toBe(false);
+      expect(store.state.visible).toBe(true);
+    });
+
+    it('should not change uiReady if already true', () => {
+      const store = createNotificationsStore();
+
+      // First, set uiReady to true
+      store.commit('setUiReady', true);
+
+      store.dispatch('displayStatus', {
+        message: 'Test message',
+        type: MessageType.Info,
+        ensureVisible: true,
+      });
+
+      // Should still be true, no DOM operations involved
+      expect(store.state.uiReady).toBe(true);
     });
   });
 });
