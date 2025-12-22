@@ -1,5 +1,6 @@
 <template>
-  <div class="card">
+  <omegaup-school-rank-skeleton v-if="loading" :show-header="showHeader"></omegaup-school-rank-skeleton>
+  <div v-else class="card">
     <h5
       class="card-header d-flex justify-content-between align-items-center school-rank-title"
     >
@@ -66,6 +67,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
+import RankSkeleton from './RankSkeleton.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getBlogUrl } from '../../urlHelper';
 
@@ -74,6 +76,7 @@ import { getBlogUrl } from '../../urlHelper';
     FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-school-rank-skeleton': RankSkeleton,
   },
 })
 export default class SchoolRank extends Vue {
@@ -83,6 +86,7 @@ export default class SchoolRank extends Vue {
   @Prop() totalRows!: number;
   @Prop() rank!: omegaup.SchoolsRank[];
   @Prop() pagerItems!: types.PageItem[];
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   ui = ui;

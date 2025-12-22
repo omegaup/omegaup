@@ -1,5 +1,6 @@
 <template>
-  <div class="card h-100">
+  <omegaup-school-of-the-month-skeleton v-if="loading"></omegaup-school-of-the-month-skeleton>
+  <div v-else class="card h-100">
     <div class="d-flex justify-content-center card-header">
       <h5 class="m-0 mr-1">
         {{ T.schoolOfTheMonth }}
@@ -41,6 +42,7 @@ import { omegaup } from '../../omegaup';
 import CountryFlag from '../CountryFlag.vue';
 import T from '../../lang';
 import { getBlogUrl } from '../../urlHelper';
+import SchoolOfTheMonthSkeleton from './SchoolOfTheMonthSkeleton.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -51,10 +53,12 @@ library.add(faInfoCircle);
   components: {
     FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
+    'omegaup-school-of-the-month-skeleton': SchoolOfTheMonthSkeleton,
   },
 })
 export default class SchoolOfTheMonth extends Vue {
   @Prop() schoolOfTheMonth!: omegaup.SchoolOfTheMonth;
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
 

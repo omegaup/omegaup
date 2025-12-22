@@ -1,5 +1,6 @@
 <template>
-  <div class="card h-100">
+  <omegaup-coder-of-the-month-skeleton v-if="loading" :category="category"></omegaup-coder-of-the-month-skeleton>
+  <div v-else class="card h-100">
     <div
       class="d-flex justify-content-between card-header"
       :class="`card-header-${category}`"
@@ -66,6 +67,7 @@ import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import { getBlogUrl } from '../../urlHelper';
+import CoderOfTheMonthSkeleton from './CoderOfTheMonthSkeleton.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -76,11 +78,13 @@ library.add(faInfoCircle);
   components: {
     FontAwesomeIcon,
     'omegaup-user-username': user_Username,
+    'omegaup-coder-of-the-month-skeleton': CoderOfTheMonthSkeleton,
   },
 })
 export default class CoderOfTheMonth extends Vue {
   @Prop({ default: 'all' }) category!: string;
   @Prop() coderOfTheMonth!: types.UserProfile;
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   get CoderOfTheMonthPolicyURL(): string {
