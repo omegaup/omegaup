@@ -1,50 +1,53 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import Vuex from 'vuex';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import Vuex, { Store } from 'vuex';
+import {
+  createNotificationsStore,
+  MessageType,
+  NotificationsState,
+} from '../../notificationsStore';
 import GlobalNotifications from './GlobalNotifications.vue';
-import { MessageType } from '../../notificationsStore';
-
-// Mock the notificationsStore module
-jest.mock('../../notificationsStore', () => {
-  const mockStore = {
-    getters: {
-      isVisible: false,
-      message: null,
-      type: null,
-      alertClass: '',
-    },
-    dispatch: jest.fn(),
-  };
-  return {
-    __esModule: true,
-    default: mockStore,
-    MessageType: {
-      Danger: 'alert-danger',
-      Info: 'alert-info',
-      Success: 'alert-success',
-      Warning: 'alert-warning',
-    },
-  };
-});
-
-// Import after mocking
-import notificationsStore from '../../notificationsStore';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+// Variable to hold the mock store that will be injected
+let mockStore: Store<NotificationsState>;
+
+// Shared dispatch mock that persists across getter accesses
+const mockDispatch = jest.fn((action: string, payload?: any) => {
+  return mockStore?.dispatch(action, payload);
+});
+
+// Mock the notificationsStore module to return our controlled store instance
+jest.mock('../../notificationsStore', () => {
+  const actual = jest.requireActual('../../notificationsStore');
+  return {
+    __esModule: true,
+    ...actual,
+    // Override default export to return getters/dispatch that delegate to mockStore
+    get default() {
+      return {
+        get getters() {
+          return mockStore?.getters ?? {};
+        },
+        dispatch: mockDispatch,
+      };
+    },
+  };
+});
+
+// Import after mocking to get the mocked version
+import notificationsStore from '../../notificationsStore';
+
 describe('GlobalNotifications.vue', () => {
   beforeEach(() => {
-    // Reset mock state before each test
-    (notificationsStore.getters as any).isVisible = false;
-    (notificationsStore.getters as any).message = null;
-    (notificationsStore.getters as any).type = null;
-    (notificationsStore.getters as any).alertClass = '';
-    (notificationsStore.dispatch as jest.Mock).mockClear();
+    // Create a fresh store instance for each test
+    mockStore = createNotificationsStore();
+    mockDispatch.mockClear();
   });
 
   it('should not render alert when not visible', () => {
-    (notificationsStore.getters as any).isVisible = false;
-
+    // Store starts with visible: false by default
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
     });
@@ -52,12 +55,12 @@ describe('GlobalNotifications.vue', () => {
     expect(wrapper.find('.alert').exists()).toBe(false);
   });
 
-  it('should render alert with correct message and danger styling when visible', () => {
-    // Set mock store state to visible with danger type
-    (notificationsStore.getters as any).isVisible = true;
-    (notificationsStore.getters as any).message = 'Test error message';
-    (notificationsStore.getters as any).type = MessageType.Danger;
-    (notificationsStore.getters as any).alertClass = MessageType.Danger;
+  it('should render alert with correct message and danger styling when visible', async () => {
+    // Dispatch to show a danger notification
+    mockStore.dispatch('displayStatus', {
+      message: 'Test error message',
+      type: MessageType.Danger,
+    });
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
@@ -77,10 +80,10 @@ describe('GlobalNotifications.vue', () => {
   });
 
   it('should render alert with success styling', () => {
-    (notificationsStore.getters as any).isVisible = true;
-    (notificationsStore.getters as any).message = 'Success!';
-    (notificationsStore.getters as any).type = MessageType.Success;
-    (notificationsStore.getters as any).alertClass = MessageType.Success;
+    mockStore.dispatch('displayStatus', {
+      message: 'Success!',
+      type: MessageType.Success,
+    });
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
@@ -93,9 +96,10 @@ describe('GlobalNotifications.vue', () => {
   });
 
   it('should call dismissNotifications when close button is clicked', async () => {
-    (notificationsStore.getters as any).isVisible = true;
-    (notificationsStore.getters as any).message = 'Test message';
-    (notificationsStore.getters as any).alertClass = MessageType.Info;
+    mockStore.dispatch('displayStatus', {
+      message: 'Test message',
+      type: MessageType.Info,
+    });
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
@@ -106,7 +110,7 @@ describe('GlobalNotifications.vue', () => {
 
     await closeButton.trigger('click');
 
-    expect(notificationsStore.dispatch).toHaveBeenCalledWith(
+    expect(mockDispatch).toHaveBeenCalledWith(
       'dismissNotifications',
     );
   });
@@ -119,7 +123,7 @@ describe('GlobalNotifications.vue', () => {
     // Call dismiss method directly
     (wrapper.vm as any).dismiss();
 
-    expect(notificationsStore.dispatch).toHaveBeenCalledWith(
+    expect(mockDispatch).toHaveBeenCalledWith(
       'dismissNotifications',
     );
   });

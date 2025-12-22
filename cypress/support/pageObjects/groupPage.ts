@@ -36,9 +36,13 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.waitUntil(() => {
-      return cy.get('[data-alert-close]').should('not.be.visible');
-    });
+    // Wait for alert to appear, then close it and wait for it to disappear
+    cy.get('#global-notifications .alert:visible')
+      .should('exist')
+      .find('[data-alert-close]')
+      .click()
+      .closest('.alert')
+      .should('not.exist');
 
     cy.get('[href="#members"]').click();
     cy.get('@userNamesList').then((textArray) => {
@@ -80,10 +84,13 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    cy.get('[data-alert-close]').click();
-    cy.waitUntil(() => {
-      return cy.get('[data-alert-close]').should('not.be.visible');
-    });
+    // Wait for alert to appear, then close it and wait for it to disappear
+    cy.get('#global-notifications .alert:visible')
+      .should('exist')
+      .find('[data-alert-close]')
+      .click()
+      .closest('.alert')
+      .should('not.exist');
 
     cy.get('[href="#teams"]').click();
     cy.get('@teamNamesList').then((textArray) => {

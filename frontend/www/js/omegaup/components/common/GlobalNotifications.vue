@@ -75,13 +75,14 @@ export default class GlobalNotifications extends Vue {
 // Vue transition classes for slide animation
 .notification-slide-enter-active,
 .notification-slide-leave-active {
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  max-height: 100px; // Reasonable max for notifications
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: top;
+  overflow: hidden;
 }
 
 .notification-slide-enter,
 .notification-slide-leave-to {
-  max-height: 0;
+  transform: scaleY(0);
   opacity: 0;
 }
 </style>
