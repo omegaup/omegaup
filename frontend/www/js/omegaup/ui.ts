@@ -1,8 +1,8 @@
-import T from './lang';
-import { formatDate, formatDateTime } from './time';
-import { omegaup } from './omegaup';
 import { types } from './api_types';
+import T from './lang';
 import notificationsStore, { MessageType } from './notificationsStore';
+import { omegaup } from './omegaup';
+import { formatDate, formatDateTime } from './time';
 
 // Re-export MessageType for backward compatibility
 export { MessageType };
@@ -133,8 +133,7 @@ export function ignoreError(response: { error?: string; payload?: any }): void {
   return;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function dismissNotifications(_originalStatusCounter?: number): void {
+export function dismissNotifications(): void {
   // Dispatch to Vuex store to hide notification
   notificationsStore.dispatch('dismissNotifications');
 }
