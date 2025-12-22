@@ -1,5 +1,6 @@
 <template>
-  <div class="container-fluid p-5 max-width mx-auto">
+  <omegaup-collection-list-skeleton v-if="loading"></omegaup-collection-list-skeleton>
+  <div v-else class="container-fluid p-5 max-width mx-auto">
     <div class="row">
       <div class="col col-md-3 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{
@@ -106,6 +107,7 @@ import problem_FilterTags from './FilterTags.vue';
 import problem_BaseList from './BaseList.vue';
 import problem_FilterDifficulty from './FilterDifficulty.vue';
 import problem_FilterQuality from './FilterQuality.vue';
+import CollectionListSkeleton from './CollectionListSkeleton.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
@@ -115,6 +117,7 @@ import { types } from '../../api_types';
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
     'omegaup-problem-filter-quality': problem_FilterQuality,
+    'omegaup-collection-list-skeleton': CollectionListSkeleton,
   },
 })
 export default class CollectionList extends Vue {
@@ -136,6 +139,7 @@ export default class CollectionList extends Vue {
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
   @Prop() quality!: string;
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   level = this.data.level;
