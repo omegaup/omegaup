@@ -2,6 +2,7 @@ import {
   createNotificationsStore,
   createNotificationsStoreConfig,
   MessageType,
+  NotificationPosition,
   NotificationsState,
 } from './notificationsStore';
 
@@ -14,6 +15,7 @@ describe('notificationsStore', () => {
     state = {
       message: null,
       type: null,
+      position: NotificationPosition.Top,
       visible: false,
       counter: 0,
       uiReady: false,
