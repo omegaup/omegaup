@@ -1,6 +1,19 @@
 import { GroupOptions, TeamGroupOptions } from '../types';
 
 export class GroupPage {
+  /**
+   * Dismisses the global notification alert by clicking its close button.
+   * Asserts the alert is visible before clicking and verifies it disappears after.
+   */
+  private dismissAlert(): void {
+    cy.get('#global-notifications .alert:visible')
+      .should('exist')
+      .find('[data-alert-close]')
+      .click()
+      .closest('.alert')
+      .should('not.exist');
+  }
+
   createGroup(groupOptions: GroupOptions): void {
     cy.get('[data-nav-user]').click();
     cy.get('[data-nav-user-groups]').click();
@@ -36,13 +49,7 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    // Wait for alert to appear, then close it and wait for it to disappear
-    cy.get('#global-notifications .alert:visible')
-      .should('exist')
-      .find('[data-alert-close]')
-      .click()
-      .closest('.alert')
-      .should('not.exist');
+    this.dismissAlert();
 
     cy.get('[href="#members"]').click();
     cy.get('@userNamesList').then((textArray) => {
@@ -84,13 +91,7 @@ export class GroupPage {
     });
 
     cy.get('[name="create-identities"]').click();
-    // Wait for alert to appear, then close it and wait for it to disappear
-    cy.get('#global-notifications .alert:visible')
-      .should('exist')
-      .find('[data-alert-close]')
-      .click()
-      .closest('.alert')
-      .should('not.exist');
+    this.dismissAlert();
 
     cy.get('[href="#teams"]').click();
     cy.get('@teamNamesList').then((textArray) => {

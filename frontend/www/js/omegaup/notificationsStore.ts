@@ -134,11 +134,11 @@ function createStoreConfig() {
 
 /**
  * Export factory function for testing purposes.
-/**
- * Export factory function for testing purposes.
  * Creates fresh config on each call to avoid shared state.
  */
 export const createNotificationsStoreConfig = createStoreConfig;
+
+/**
  * Factory function to create a fresh notifications store instance.
  * Use this for SSR or when you need isolated store instances (e.g., tests).
  */
