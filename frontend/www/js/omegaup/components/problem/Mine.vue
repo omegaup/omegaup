@@ -1,7 +1,8 @@
 <template>
   <div>
+    <omegaup-mine-skeleton v-if="loading"></omegaup-mine-skeleton>
     <div
-      v-if="privateProblemsAlert"
+      v-else-if="privateProblemsAlert"
       class="alert alert-info alert-dismissible fade show"
       role="alert"
     >
@@ -15,7 +16,7 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="card">
+    <div v-else class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
       <div class="card-body px-2 px-sm-4">
         <div class="row align-items-center mb-3">
@@ -249,6 +250,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
+import MineSkeleton from './MineSkeleton.vue';
 import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -276,6 +278,7 @@ Vue.use(ModalPlugin);
   components: {
     FontAwesomeIcon,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-mine-skeleton': MineSkeleton,
   },
 })
 export default class ProblemMine extends Vue {
@@ -285,6 +288,7 @@ export default class ProblemMine extends Vue {
   @Prop() isSysadmin!: boolean;
   @Prop() visibilityStatuses!: Record<string, number>;
   @Prop() query!: string | null;
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   ui = ui;

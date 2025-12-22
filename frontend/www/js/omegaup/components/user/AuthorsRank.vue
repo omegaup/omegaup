@@ -1,5 +1,6 @@
 <template>
-  <div class="card" data-authors-rank>
+  <omegaup-authors-rank-skeleton v-if="loading"></omegaup-authors-rank-skeleton>
+  <div v-else class="card" data-authors-rank>
     <h5
       class="card-header d-flex justify-content-between align-items-center rank-title"
     >
@@ -79,6 +80,7 @@ import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
+import AuthorsRankSkeleton from './AuthorsRankSkeleton.vue';
 
 @Component({
   components: {
@@ -86,6 +88,7 @@ import user_Username from '../user/Username.vue';
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-authors-rank-skeleton': AuthorsRankSkeleton,
   },
 })
 export default class AuthorsRank extends Vue {
@@ -94,6 +97,7 @@ export default class AuthorsRank extends Vue {
   @Prop() rankingData!: types.AuthorsRank;
   @Prop() pagerItems!: types.PageItem[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   ui = ui;

@@ -1,5 +1,6 @@
 <template>
-  <div class="card" data-user-rank>
+  <omegaup-user-rank-skeleton v-if="loading" :is-index="isIndex"></omegaup-user-rank-skeleton>
+  <div v-else class="card" data-user-rank>
     <h5 class="card-header d-flex justify-content-between align-items-center">
       {{
         isIndex
@@ -150,7 +151,9 @@ import * as time from '../../time';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
+import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginator.vue';
+import RankSkeleton from './RankSkeleton.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -182,6 +185,7 @@ interface Rank {
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-user-rank-skeleton': RankSkeleton,
   },
 })
 export default class UserRank extends Vue {
@@ -196,6 +200,7 @@ export default class UserRank extends Vue {
   @Prop() resultTotal!: number;
   @Prop() pagerItems!: types.PageItem[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   ui = ui;

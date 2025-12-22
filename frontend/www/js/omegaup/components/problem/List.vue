@@ -33,7 +33,9 @@
       @close="showFinderWizard = false"
       @search-problems="wizardSearch"
     ></omegaup-problem-finder>
+    <omegaup-problem-skeleton v-if="loading"></omegaup-problem-skeleton>
     <omegaup-problem-base-list
+      v-else
       :problems="problems"
       :logged-in="loggedIn"
       :selected-tags="selectedTags"
@@ -66,12 +68,14 @@ import { types } from '../../api_types';
 import problem_FinderWizard from './FinderWizard.vue';
 import problem_SearchBar from './SearchBar.vue';
 import problem_BaseList from './BaseList.vue';
+import problem_ListSkeleton from './Skeleton.vue';
 
 @Component({
   components: {
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-problem-search-bar': problem_SearchBar,
+    'omegaup-problem-skeleton': problem_ListSkeleton,
   },
 })
 export default class List extends Vue {
@@ -92,6 +96,7 @@ export default class List extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   omegaup = omegaup;

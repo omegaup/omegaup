@@ -1,5 +1,6 @@
 <template>
-  <footer class="common-footer text-center mt-5">
+  <omegaup-footer-skeleton v-if="loading"></omegaup-footer-skeleton>
+  <footer v-else class="common-footer text-center mt-5">
     <div class="container-xl">
       <div class="footer-navigation d-lg-flex align-items-start py-5 m-auto">
         <div class="footer-brand mb-4 mb-lg-0 max-width-logo">
@@ -175,16 +176,19 @@ import {
   faGithub,
   faDiscord,
 } from '@fortawesome/free-brands-svg-icons';
+import FooterSkeleton from './FooterSkeleton.vue';
 library.add(faFacebook, faGithub, faDiscord);
 
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-footer-skeleton': FooterSkeleton,
   },
 })
 export default class Footer extends Vue {
   @Prop() isLoggedIn!: boolean;
   @Prop() omegaUpLockDown!: boolean;
+  @Prop({ default: false }) loading!: boolean;
 
   T = T;
   ui = ui;
