@@ -1,4 +1,4 @@
-import GlobalNotifications from '../components/common/GlobalNotifications.vue';
+import common_GlobalNotifications from '../components/common/GlobalNotifications.vue';
 import { OmegaUp } from '../omegaup';
 import Vue from 'vue';
 
