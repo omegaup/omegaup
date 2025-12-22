@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   const vm = new Vue({
     el: '#global-notifications',
     components: {
-      'omegaup-global-notifications': common_GlobalNotifications,
+      'omegaup-global-notifications': GlobalNotifications,
     },
     render: function (createElement) {
       return createElement('omegaup-global-notifications');
