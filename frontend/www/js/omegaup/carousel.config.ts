@@ -21,7 +21,7 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/CursoOfmi.png',
+    image: '/media/homepage/cursoofmi.png',
     title: {
       en: 'OFMI on YouTube',
       es: 'OFMI en YouTube',
