@@ -10,7 +10,7 @@
       >
         &times;
       </button>
-      <span class="message">{{ message }}</span>
+      <span v-if="message" class="message">{{ message }}</span>
     </div>
   </transition>
 </template>
@@ -35,6 +35,14 @@ export default class GlobalNotifications extends Vue {
 
   get isUiReady(): boolean {
     return notificationsStore.getters.isUiReady;
+  }
+
+  mounted(): void {
+    // Handle case where isUiReady is already true when component mounts
+    // (watcher only fires on changes, not initial state)
+    if (this.isUiReady) {
+      this.$root.$emit('ui-ready');
+    }
   }
 
   @Watch('isUiReady')
