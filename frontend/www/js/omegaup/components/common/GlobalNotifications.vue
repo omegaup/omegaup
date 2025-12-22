@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
 
 @Component
@@ -31,6 +31,24 @@ export default class GlobalNotifications extends Vue {
 
   get alertClass(): string {
     return notificationsStore.getters.alertClass;
+  }
+
+  get isUiReady(): boolean {
+    return notificationsStore.getters.isUiReady;
+  }
+
+  @Watch('isUiReady')
+  onUiReadyChange(ready: boolean): void {
+    // SSR guard: skip if document is not available
+    if (typeof document === 'undefined') return;
+
+    if (ready) {
+      // Handle legacy loading/root element visibility
+      const loadingEl = document.getElementById('loading');
+      const rootEl = document.getElementById('root');
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (rootEl) rootEl.style.display = 'block';
+    }
   }
 
   dismiss(): void {
