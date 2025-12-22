@@ -153,6 +153,7 @@
   - [`/api/problem/admins/`](#apiproblemadmins)
   - [`/api/problem/bestScore/`](#apiproblembestscore)
   - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](#apiproblemcreate)
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
@@ -2901,7 +2902,7 @@ _Nothing_
 
 # Notification
 
-BadgesController
+NotificationController
 
 ## `/api/notification/myList/`
 
@@ -3071,6 +3072,18 @@ Entry point for Problem clarifications API
 | Name             | Type                    |
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
+
+## `/api/problem/convertZipToCdp/`
+
+### Description
+
+Convert an uploaded ZIP file to CDP.
+
+### Returns
+
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
 
 ## `/api/problem/create/`
 

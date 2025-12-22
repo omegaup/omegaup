@@ -15,12 +15,16 @@ import os
 import shutil
 import subprocess
 import time
+import sys
 
 from typing import Any, BinaryIO, Dict, Mapping, ItemsView, Optional
+
+from dataset_generator.generate_synthetic_dataset import seed_synthetic
 
 import requests
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
+sys.path.insert(0, os.path.join(OMEGAUP_ROOT, "stuff"))
 OMEGAUP_RUNTIME_ROOT = '/var/lib/omegaup'
 
 
@@ -275,6 +279,22 @@ def _main() -> None:
         default=[os.path.join(OMEGAUP_ROOT, 'stuff/bootstrap.json')],
         help=('The JSON script with requests to '
               'pre-populate the database'))
+    parser.add_argument("--seed-mode",
+                        choices=["none", "static", "synthetic"],
+                        default=os.getenv("SEED_MODE", "none"),
+                        help="Data seeding mode.")
+    parser.add_argument("--seed-config",
+                        default=os.getenv(
+                            "SEEDER_CONFIG",
+                            "stuff/dataset_generator/settings.yml"),
+                        help="Path to synthetic seeder YAML config.")
+    parser.add_argument("--seed-env",
+                        choices=["development", "testing"],
+                        default=os.getenv("SEEDER_ENV", "testing"),
+                        help="Synthetic seeder environment for counts.")
+    parser.add_argument("--ou-username", default=os.getenv("OMEGAUP_USERNAME"))
+    parser.add_argument("--ou-password", default=os.getenv("OMEGAUP_PASSWORD"))
+    parser.add_argument("--ou-token", default=os.getenv("OMEGAUP_TOKEN"))
     args = parser.parse_args()
     now = time.time()
 
@@ -301,6 +321,19 @@ def _main() -> None:
         logging.info('Migrating database...')
         subprocess.check_call(db_migrate_args +
                               ['migrate', '--development-environment'])
+
+    if args.seed_mode == "synthetic":
+        seed_synthetic(
+            Session,
+            root=OMEGAUP_ROOT,
+            config_path=args.seed_config,
+            seeder_env=args.seed_env,
+            session_args=args,
+            ou_username=args.ou_username,
+            ou_password=args.ou_password,
+            ou_token=args.ou_token,
+        )
+        return
 
     for path in args.scripts:
         logging.info('Running script %s...', path)
