@@ -1,6 +1,7 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
+    <omegaup-navbar-skeleton v-if="loading"></omegaup-navbar-skeleton>
+    <nav v-else class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
@@ -344,7 +345,9 @@ import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 import user_next_registered_contest from '../user/NextRegisteredContest.vue';
+import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
+import NavbarSkeleton from './NavbarSkeleton.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -364,9 +367,11 @@ library.add(faSignOutAlt, faUser);
     'omegaup-navbar-items': navbar_items,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-logout-confirmation': LogoutConfirmation,
+    'omegaup-navbar-skeleton': NavbarSkeleton,
   },
 })
 export default class Navbar extends Vue {
+  @Prop({ default: false }) loading!: boolean;
   @Prop() omegaUpLockDown!: boolean;
   @Prop() inContest!: boolean;
   @Prop() isLoggedIn!: boolean;
