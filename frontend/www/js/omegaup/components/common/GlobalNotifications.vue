@@ -1,12 +1,5 @@
 <template>
-  <transition
-    name="notification-slide"
-    @before-enter="beforeEnter"
-    @enter="enter"
-    @after-enter="afterEnter"
-    @before-leave="beforeLeave"
-    @leave="leave"
-  >
+  <transition name="notification-slide">
     <div v-if="visible" class="alert mt-0" :class="alertClass" role="alert">
       <button
         data-alert-close
@@ -23,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
 
 @Component
@@ -43,56 +36,6 @@ export default class GlobalNotifications extends Vue {
   dismiss(): void {
     notificationsStore.dispatch('dismissNotifications');
   }
-
-  // Transition hooks for dynamic height animation
-  beforeEnter(el: HTMLElement): void {
-    el.style.height = '0';
-    el.style.opacity = '0';
-    el.style.overflow = 'hidden';
-  }
-
-  enter(el: HTMLElement, done: () => void): void {
-    // Force reflow to ensure transition starts from initial state
-    void el.offsetHeight;
-
-    // Measure the natural height
-    el.style.height = 'auto';
-    const height = el.scrollHeight;
-    el.style.height = '0';
-
-    // Force reflow again
-    void el.offsetHeight;
-
-    // Animate to natural height
-    el.style.transition = 'height 0.3s ease, opacity 0.3s ease';
-    el.style.height = `${height}px`;
-    el.style.opacity = '1';
-
-    setTimeout(done, 300);
-  }
-
-  afterEnter(el: HTMLElement): void {
-    // Reset to auto height so content can adjust if needed
-    el.style.height = 'auto';
-    el.style.overflow = '';
-    el.style.transition = '';
-  }
-
-  beforeLeave(el: HTMLElement): void {
-    // Set explicit height before animating out
-    el.style.height = `${el.scrollHeight}px`;
-    el.style.overflow = 'hidden';
-    // Force reflow
-    void el.offsetHeight;
-  }
-
-  leave(el: HTMLElement, done: () => void): void {
-    el.style.transition = 'height 0.3s ease, opacity 0.3s ease';
-    el.style.height = '0';
-    el.style.opacity = '0';
-
-    setTimeout(done, 300);
-  }
 }
 </script>
 
@@ -101,6 +44,7 @@ export default class GlobalNotifications extends Vue {
   position: relative;
   margin-bottom: 0;
   border-radius: 0;
+  overflow: hidden;
 
   .close {
     position: absolute;
@@ -127,4 +71,18 @@ export default class GlobalNotifications extends Vue {
     padding-right: 2rem;
   }
 }
+
+// Vue transition classes for slide animation
+.notification-slide-enter-active,
+.notification-slide-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 100px; // Reasonable max for notifications
+}
+
+.notification-slide-enter,
+.notification-slide-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
 </style>
+
