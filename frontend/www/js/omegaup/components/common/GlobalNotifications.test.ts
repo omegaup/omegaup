@@ -13,10 +13,10 @@ localVue.use(Vuex);
 // Variable to hold the mock store that will be injected
 let mockStore: Store<NotificationsState>;
 
-// Shared dispatch mock that persists across getter accesses
-const mockDispatch = jest.fn((action: string, payload?: any) => {
-  return mockStore?.dispatch(action, payload);
-});
+// Shared object to hold dispatch mock - accessible from both mock factory and tests
+const mockState = {
+  dispatch: jest.fn(),
+};
 
 // Mock the notificationsStore module to return our controlled store instance
 jest.mock('../../notificationsStore', () => {
@@ -28,22 +28,29 @@ jest.mock('../../notificationsStore', () => {
     get default() {
       return {
         get getters() {
+          // Access mockStore via closure from outer scope
+          const { createNotificationsStore } = jest.requireActual(
+            '../../notificationsStore',
+          );
+          if (!mockStore) {
+            mockStore = createNotificationsStore();
+          }
           return mockStore?.getters ?? {};
         },
-        dispatch: mockDispatch,
+        dispatch: (...args: any[]) => {
+          mockState.dispatch(...args);
+          return mockStore?.dispatch(...args);
+        },
       };
     },
   };
 });
 
-// Import after mocking to get the mocked version
-import notificationsStore from '../../notificationsStore';
-
 describe('GlobalNotifications.vue', () => {
   beforeEach(() => {
     // Create a fresh store instance for each test
     mockStore = createNotificationsStore();
-    mockDispatch.mockClear();
+    mockState.dispatch.mockClear();
   });
 
   it('should not render alert when not visible', () => {
@@ -110,9 +117,7 @@ describe('GlobalNotifications.vue', () => {
 
     await closeButton.trigger('click');
 
-    expect(mockDispatch).toHaveBeenCalledWith(
-      'dismissNotifications',
-    );
+    expect(mockState.dispatch).toHaveBeenCalledWith('dismissNotifications');
   });
 
   it('should have dismiss method that dispatches to store', () => {
@@ -123,8 +128,6 @@ describe('GlobalNotifications.vue', () => {
     // Call dismiss method directly
     (wrapper.vm as any).dismiss();
 
-    expect(mockDispatch).toHaveBeenCalledWith(
-      'dismissNotifications',
-    );
+    expect(mockState.dispatch).toHaveBeenCalledWith('dismissNotifications');
   });
 });
