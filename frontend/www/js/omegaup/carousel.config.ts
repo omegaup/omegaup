@@ -21,27 +21,27 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/egoi25.png',
+    image: '/media/homepage/CursoOfmi.png',
     title: {
-      en: 'Mexico present at EGOI 2025',
-      es: 'México presente en la EGOI 2025',
-      pt: 'México presente na EGOI 2025',
+      en: 'OFMI on YouTube',
+      es: 'OFMI en YouTube',
+      pt: 'OFMI no YouTube',
     },
     description: {
       en:
-        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
+        'Holidays can also be a great time to learn at your own pace. If you want to keep training your mind and reinforce concepts, we invite you to check out our course. Learn, explore, and enjoy the process. Knowledge doesn’t take a vacation.',
       es:
-        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
+        'Las vacaciones también pueden ser un buen momento para aprender a tu ritmo. Si quieres seguir entrenando tu mente y reforzar conceptos, te invitamos a ver nuestro curso. Aprende, explora y disfruta el proceso. El conocimiento no se toma vacaciones.',
       pt:
-        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
+        'As férias também podem ser um bom momento para aprender no seu próprio ritmo. Se você quer continuar treinando sua mente e reforçando conceitos, convidamos você a assistir ao nosso curso. Aprenda, explore e aproveite o processo. O conhecimento não tira férias.',
     },
     button: {
       text: {
-        en: 'EGOI',
-        es: 'EGOI',
-        pt: 'EGOI',
+        en: 'OFMI Course',
+        es: 'Curso OFMI',
+        pt: 'Curso OFMI',
       },
-      href: 'https://egoi.org/',
+      href: 'https://www.youtube.com/watch?v=eJThxTLg8QM&list=PLdSCJwXErQ8E2us6mFvv6rV_HLaowbqbC',
       target: '_blank',
     },
   },
