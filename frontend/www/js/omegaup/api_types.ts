@@ -2820,6 +2820,48 @@ export namespace types {
     username: string;
   }
 
+  export interface CDP {
+    casesStore: types.CDPCasesStore;
+    problemCodeContent: string;
+    problemCodeExtension: string;
+    problemMarkdown: string;
+    problemName: string;
+    problemSolutionMarkdown: string;
+  }
+
+  export interface CDPCase {
+    autoPoints: boolean;
+    caseID: string;
+    groupID: string;
+    lines: types.CDPLine[];
+    name: string;
+    output: string;
+    points: number;
+  }
+
+  export interface CDPCasesStore {
+    groups: types.CDPGroup[];
+    hide: boolean;
+    layouts: { [key: string]: string }[];
+    selected: { caseID?: string; groupID?: string };
+  }
+
+  export interface CDPGroup {
+    autoPoints: boolean;
+    cases: types.CDPCase[];
+    groupID: string;
+    name: string;
+    points: number;
+    ungroupedCase: boolean;
+  }
+
+  export interface CDPLine {
+    caseID: string;
+    data: { kind: string | string | string | string; value: string };
+    label: string;
+    lineID: string;
+  }
+
   export interface CachedExtraProfileDetails {
     badges: string[];
     contests: types.UserProfileContests;
@@ -4061,6 +4103,7 @@ export namespace types {
     admins: types.ProblemAdmin[];
     alias: string;
     allowUserAddTags: boolean;
+    cdp?: types.CDP;
     emailClarifications: boolean;
     extraWallTime: number;
     groupAdmins: types.ProblemGroupAdmin[];
@@ -5597,6 +5640,8 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: types.Clarification[];
   };
+  export type ProblemConvertZipToCdpRequest = { [key: string]: any };
+  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP };
   export type ProblemCreateRequest = { [key: string]: any };
   export type ProblemCreateResponse = {};
   export type ProblemDeleteRequest = { [key: string]: any };
@@ -6484,6 +6529,9 @@ export namespace controllers {
     clarifications: (
       params?: messages.ProblemClarificationsRequest,
     ) => Promise<messages.ProblemClarificationsResponse>;
+    convertZipToCdp: (
+      params?: messages.ProblemConvertZipToCdpRequest,
+    ) => Promise<messages.ProblemConvertZipToCdpResponse>;
     create: (
       params?: messages.ProblemCreateRequest,
     ) => Promise<messages.ProblemCreateResponse>;

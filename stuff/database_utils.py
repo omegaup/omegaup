@@ -79,18 +79,18 @@ def authentication(*,
                    port: Optional[int] = None) -> Sequence[str]:
     '''Computes the authentication arguments for mysql binaries.'''
     if config_file and os.path.isfile(config_file):
-        return ['--defaults-file=%s' % quote(config_file)]
+        return [f'--defaults-file={quote(config_file)}']
     assert username
-    args = ['--user=%s' % quote(username)]
+    args = [f'--user={quote(username)}']
     if password is not None:
         if password:
-            args.append('--password=%s' % quote(password))
+            args.append(f'--password={quote(password)}')
         else:
             args.append('--skip-password')
     if hostname is not None:
-        args.extend(['--protocol=TCP', '--host=%s' % quote(hostname)])
+        args.extend(['--protocol=TCP', f'--host={quote(hostname)}'])
         if port is not None:
-            args.extend(['--port=%d' % port])
+            args.extend([f'--port={port}'])
     return args
 
 
