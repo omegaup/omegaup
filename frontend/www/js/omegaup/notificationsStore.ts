@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 
+// Vuex plugin registration is required before creating store instances.
+// Vue.use() is idempotent, so multiple registrations are safe.
 Vue.use(Vuex);
 
 /**
