@@ -15,9 +15,21 @@ export enum MessageType {
   Warning = 'alert-warning',
 }
 
+/**
+ * Positions for notifications.
+ * 'top' is the default full-width banner at the top of the page.
+ */
+export enum NotificationPosition {
+  Top = 'top',
+  Bottom = 'bottom',
+  TopRight = 'top-right',
+  BottomRight = 'bottom-right',
+}
+
 export interface NotificationsState {
   message: string | null;
   type: MessageType | null;
+  position: NotificationPosition;
   visible: boolean;
   counter: number;
   uiReady: boolean;
@@ -33,6 +45,7 @@ function createStoreConfig() {
     state: {
       message: null,
       type: null,
+      position: NotificationPosition.Top,
       visible: false,
       counter: 0,
       uiReady: false,
@@ -60,6 +73,10 @@ function createStoreConfig() {
         Vue.set(state, 'uiReady', ready);
       },
 
+      setPosition(state: NotificationsState, position: NotificationPosition) {
+        Vue.set(state, 'position', position);
+      },
+
       setAutoHideTimeout(
         state: NotificationsState,
         timeout: ReturnType<typeof setTimeout> | null,
@@ -83,6 +100,7 @@ function createStoreConfig() {
           type: MessageType;
           autoHide?: boolean;
           ensureVisible?: boolean;
+          position?: NotificationPosition;
         },
       ) {
         // Clear any existing auto-hide timeout
@@ -92,6 +110,11 @@ function createStoreConfig() {
         // DOM manipulation (hide loading, show root) is handled by GlobalNotifications.vue
         if (payload.ensureVisible && !state.uiReady) {
           commit('setUiReady', true);
+        }
+
+        // Set position if provided
+        if (payload.position) {
+          commit('setPosition', payload.position);
         }
 
         // Show the notification
@@ -128,6 +151,9 @@ function createStoreConfig() {
       type: (state: NotificationsState) => state.type,
       alertClass: (state: NotificationsState) => state.type || '',
       isUiReady: (state: NotificationsState) => state.uiReady,
+      position: (state: NotificationsState) => state.position,
+      positionClass: (state: NotificationsState) =>
+        `notification-${state.position}`,
     },
   };
 }

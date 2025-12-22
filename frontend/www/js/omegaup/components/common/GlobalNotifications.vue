@@ -1,6 +1,11 @@
 <template>
   <transition name="notification-slide">
-    <div v-if="visible" class="alert mt-0" :class="alertClass" role="alert">
+    <div
+      v-if="visible"
+      class="alert mt-0"
+      :class="[alertClass, positionClass]"
+      role="alert"
+    >
       <button
         data-alert-close
         type="button"
@@ -35,6 +40,10 @@ export default class GlobalNotifications extends Vue {
 
   get isUiReady(): boolean {
     return notificationsStore.getters.isUiReady;
+  }
+
+  get positionClass(): string {
+    return notificationsStore.getters.positionClass;
   }
 
   mounted(): void {
@@ -106,6 +115,39 @@ export default class GlobalNotifications extends Vue {
 .notification-slide-leave-to {
   transform: scaleY(0);
   opacity: 0;
+}
+
+// Position variations
+// .notification-top is the default (full-width banner at top), no additional styles needed
+
+.notification-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+}
+
+.notification-top-right {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  left: auto;
+  max-width: 400px;
+  border-radius: 0.375rem;
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification-bottom-right {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  left: auto;
+  max-width: 400px;
+  border-radius: 0.375rem;
+  z-index: 1050;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 </style>
 

@@ -1,11 +1,14 @@
 import { types } from './api_types';
 import T from './lang';
-import notificationsStore, { MessageType } from './notificationsStore';
+import notificationsStore, {
+  MessageType,
+  NotificationPosition,
+} from './notificationsStore';
 import { omegaup } from './omegaup';
 import { formatDate, formatDateTime } from './time';
 
-// Re-export MessageType for backward compatibility
-export { MessageType };
+// Re-export MessageType and NotificationPosition for backward compatibility and convenience
+export { MessageType, NotificationPosition };
 
 export function navigateTo(href: string): void {
   const [pathname, hash] = href.split('#');
@@ -89,16 +92,19 @@ export function displayStatus({
   message,
   type,
   autoHide,
+  position,
 }: {
   message: string;
   type: MessageType;
   autoHide?: boolean;
+  position?: NotificationPosition;
 }): void {
   // Dispatch to Vuex store - the store action handles all visibility logic
   notificationsStore.dispatch('displayStatus', {
     message,
     type,
     autoHide,
+    position,
     ensureVisible: true, // Signal to ensure UI is ready
   });
 }
