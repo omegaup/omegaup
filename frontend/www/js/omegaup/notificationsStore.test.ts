@@ -163,6 +163,11 @@ describe('notificationsStore', () => {
 
       // Should still be true, no DOM operations involved
       expect(store.state.uiReady).toBe(true);
+
+      // Verify notification content and visibility were properly set
+      expect(store.state.message).toBe('Test message');
+      expect(store.state.type).toBe(MessageType.Info);
+      expect(store.state.visible).toBe(true);
     });
   });
 });

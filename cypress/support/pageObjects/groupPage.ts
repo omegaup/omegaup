@@ -4,14 +4,17 @@ export class GroupPage {
   /**
    * Dismisses the global notification alert by clicking its close button.
    * Asserts the alert is visible before clicking and verifies it disappears after.
+   * Uses a fresh DOM query after click to avoid flakiness from detached elements.
    */
   private dismissAlert(): void {
+    // First, locate and assert the alert is visible, then click its close button
     cy.get('#global-notifications .alert:visible')
       .should('exist')
       .find('[data-alert-close]')
-      .click()
-      .closest('.alert')
-      .should('not.exist');
+      .click();
+
+    // Perform a fresh root query to verify the alert was dismissed
+    cy.get('#global-notifications .alert').should('not.exist');
   }
 
   createGroup(groupOptions: GroupOptions): void {
