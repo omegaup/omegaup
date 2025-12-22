@@ -39,15 +39,11 @@ export default class GlobalNotifications extends Vue {
 
   @Watch('isUiReady')
   onUiReadyChange(ready: boolean): void {
-    // SSR guard: skip if document is not available
-    if (typeof document === 'undefined') return;
-
     if (ready) {
-      // Handle legacy loading/root element visibility
-      const loadingEl = document.getElementById('loading');
-      const rootEl = document.getElementById('root');
-      if (loadingEl) loadingEl.style.display = 'none';
-      if (rootEl) rootEl.style.display = 'block';
+      // Emit event for parent/root to handle DOM manipulation
+      // The root Vue instance or parent component should listen for this
+      // event and handle legacy loading/root element visibility
+      this.$root.$emit('ui-ready');
     }
   }
 
