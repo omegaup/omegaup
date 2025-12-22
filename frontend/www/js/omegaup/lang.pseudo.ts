@@ -1685,6 +1685,7 @@ const translations: { [key: string]: string; } = {
   scoreboardNameAndAccountName: "(Nam3 and acc0un7 nam3)",
   scoreboardShowOnlyInvitedIdentities: "(Sh0w 0fficia1 c0n7357an75 0n1y)",
   scoreboardShowParticipantsNames: "(Sh0w par7icipan75' nam35)",
+  searchSchool: "(S3arch 5ch001)",
   searchUser: "(S3arch c0d3r)",
   selectProblemLevelDesc: "(In 0rd3r 70 add 7h3 pr0b13m, y0u mu57 70 ch0053 i75 c0rr35p0nding 13v31)",
   serviceUnavailableError: "(O0p5. Th3 53rvic3 i5 curr3n71y unavai1ab13. P13a53 7ry again.)",

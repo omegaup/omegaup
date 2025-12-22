@@ -1685,6 +1685,7 @@ const translations: { [key: string]: string; } = {
   scoreboardNameAndAccountName: "Nombre y nombre de la cuenta",
   scoreboardShowOnlyInvitedIdentities: "Mostrar s\u00f3lo concursantes oficiales",
   scoreboardShowParticipantsNames: "Mostrar nombres de participantes",
+  searchSchool: "Buscar escuela",
   searchUser: "Buscar coder",
   selectProblemLevelDesc: "Para agregar el problema, debes elegir su nivel correspondiente",
   serviceUnavailableError: "Oops. El servicio est\u00e1 actualmente no disponible. Por favor intenta de nuevo m\u00e1s tarde.",
