@@ -31,6 +31,8 @@ jobs:
                   reminder_comment: >
                       Quick reminder: please open a pull request within 2.5 days
                       or this issue will be unassigned so others can pick it up.
+                  assigned_label: ""
+                  pin_label: ""
                   max_assignments: 3
                   max_assignments_message: >
                       You already have the maximum number of assigned issues (3).
