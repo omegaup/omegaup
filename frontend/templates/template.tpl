@@ -52,7 +52,7 @@
       <div id="common-navbar"></div>
     {% endif %}
     <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
-      <div id="global-notifications"></div>
+      <div id="global-notifications" aria-live="polite" aria-atomic="true"></div>
       {% if OMEGAUP_MAINTENANCE %}
         <div id="announcement" class="alert alert-info mt-0">
           {{ OMEGAUP_MAINTENANCE|raw }}
