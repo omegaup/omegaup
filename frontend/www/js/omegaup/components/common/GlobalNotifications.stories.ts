@@ -1,9 +1,9 @@
-import { StoryObj, Meta } from '@storybook/vue';
-import GlobalNotifications from './GlobalNotifications.vue';
+import { Meta, StoryObj } from '@storybook/vue';
 import notificationsStore, {
   MessageType,
   NotificationPosition,
 } from '../../notificationsStore';
+import GlobalNotifications from './GlobalNotifications.vue';
 
 /**
  * GlobalNotifications displays platform-wide notification banners.
