@@ -8,8 +8,8 @@ export class GroupPage {
    */
   private dismissAlert(): void {
     // First, locate and assert the alert is visible, then click its close button
-    cy.get('#global-notifications .alert:visible')
-      .should('exist')
+    cy.get('#global-notifications .alert')
+      .should('be.visible')
       .find('[data-alert-close]')
       .click();
 
