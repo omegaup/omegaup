@@ -1,8 +1,3 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 /** @type { import('@storybook/vue-webpack5').StorybookConfig } */
 const config = {
   stories: [
@@ -26,7 +21,7 @@ const config = {
       config.resolve.extensions = ['.js', '.ts', '.vue', '.json'];
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': path.resolve(__dirname, '../frontend/www/'),
+        '@': require('path').resolve(__dirname, '../frontend/www/'),
       };
     }
 
