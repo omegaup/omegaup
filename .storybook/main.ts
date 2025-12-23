@@ -1,6 +1,13 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type { import('@storybook/vue-webpack5').StorybookConfig } */
 const config = {
-  stories: ['../frontend/www/js/omegaup/components/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: [
+    '../frontend/www/js/omegaup/components/**/*.stories.@(js|jsx|ts|tsx)',
+  ],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
@@ -19,7 +26,7 @@ const config = {
       config.resolve.extensions = ['.js', '.ts', '.vue', '.json'];
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': require('path').resolve(__dirname, '../frontend/www/'),
+        '@': path.resolve(__dirname, '../frontend/www/'),
       };
     }
 
@@ -41,11 +48,11 @@ const config = {
           },
           {
             test: /\.scss$/,
-            use: ['vue-style-loader', 'css-loader', 'sass-loader']
+            use: ['vue-style-loader', 'css-loader', 'sass-loader'],
           },
         ],
       },
-    }
+    };
   },
 };
 export default config;
