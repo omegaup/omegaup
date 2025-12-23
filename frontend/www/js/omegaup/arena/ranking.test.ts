@@ -73,8 +73,10 @@ describe('ranking', () => {
         },
       },
     ],
-    start_time: new Date(),
-    time: new Date(),
+    // start_time must be relative to 'now' so that currentDelta is predictable
+    // when mergeRankings() computes: (new Date().getTime() - start_time) / (1000 * 60)
+    start_time: new Date(now - 30 * 1000),
+    time: new Date(now),
     title: 'contest',
   };
   const scoreboardEvents: types.ScoreboardEvent[] = [
