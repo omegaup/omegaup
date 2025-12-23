@@ -41,6 +41,10 @@ jobs:
                   stale-issue-label: "Stale"
                   stale-pr-label: "Stale"
 
+                  # Labels exempted from stale automation
+                  exempt-issue-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
+                  exempt-pr-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
+
                   # Maximum operations per run to avoid rate limits
                   operations-per-run: 100
 
