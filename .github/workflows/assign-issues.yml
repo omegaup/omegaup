@@ -23,7 +23,7 @@ jobs:
                   self_assign_cmd: /assign
                   self_unassign_cmd: /unassign
                   # Unassign after 5 days if no PR is opened
-                  days_until_unassign: 5
+                  days_until_unassign: 7
                   enable_auto_suggestion: true
                   allow_self_assign_author: true
                   enable_reminder: true
