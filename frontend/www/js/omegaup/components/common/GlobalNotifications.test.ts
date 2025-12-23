@@ -37,9 +37,9 @@ jest.mock('../../notificationsStore', () => {
           }
           return mockStore?.getters ?? {};
         },
-        dispatch: (...args: any[]) => {
+        dispatch: (...args: [string, any?]) => {
           mockState.dispatch(...args);
-          return mockStore?.dispatch(...args);
+          return mockStore?.dispatch(args[0], args[1]);
         },
       };
     },
