@@ -15,7 +15,8 @@ namespace OmegaUp\DAO;
  * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, score_mode: string, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  */
-class Contests extends \OmegaUp\DAO\Base\Contests {
+class Contests extends \OmegaUp\DAO\Base\Contests
+{
     /** @var string */
     private static $getContestsColumns = '
                                 Contests.contest_id,
@@ -49,7 +50,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             pp.contest_id
     )';
 
-    final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
+    final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests
+    {
         $sql = 'SELECT ' .
             join(
                 ', ',
@@ -74,7 +76,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @param list<int> $contestIds
      * @return array<int, \OmegaUp\DAO\VO\Contests> Map of contest_id => Contests
      */
-    final public static function getByPKs(array $contestIds): array {
+    final public static function getByPKs(array $contestIds): array
+    {
         if (empty($contestIds)) {
             return [];
         }
@@ -96,7 +99,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $contests = [];
         foreach ($rs as $row) {
             $contest = new \OmegaUp\DAO\VO\Contests($row);
-            $contests[$contest->contest_id] = $contest;
+            if (!is_null($contest->contest_id)) {
+                $contests[$contest->contest_id] = $contest;
+            }
         }
 
         return $contests;
@@ -105,7 +110,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, last_updated: \OmegaUp\Timestamp, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, default_show_all_contestants_in_scoreboard: bool, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
      */
-    final public static function getByAliasWithDirector(string $alias) {
+    final public static function getByAliasWithDirector(string $alias)
+    {
         $sql = 'SELECT
                     i.username AS director,
                     c.contest_id,
@@ -169,7 +175,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * @return list<\OmegaUp\DAO\VO\Contests>
      */
-    final public static function getByTitle(string $title) {
+    final public static function getByTitle(string $title)
+    {
         $sql = 'SELECT ' .
             join(
                 ', ',
@@ -192,7 +199,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode: string, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, default_show_all_contestants_in_scoreboard: bool|null, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
      */
-    final public static function getByAliasWithExtraInformation(string $alias): ?array {
+    final public static function getByAliasWithExtraInformation(string $alias): ?array
+    {
         $fields = join(
             '',
             array_map(
@@ -277,18 +285,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return intval($rs['total']);
     }
 
-    public static function hasStarted(\OmegaUp\DAO\VO\Contests $contest): bool {
+    public static function hasStarted(\OmegaUp\DAO\VO\Contests $contest): bool
+    {
         return \OmegaUp\Time::get() >= $contest->start_time->time;
     }
 
-    public static function hasFinished(\OmegaUp\DAO\VO\Contests $contest): bool {
+    public static function hasFinished(\OmegaUp\DAO\VO\Contests $contest): bool
+    {
         return \OmegaUp\Time::get() >= $contest->finish_time->time;
     }
 
     /**
      * @return list<array{contest: \OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}>
      */
-    public static function getContestsParticipated(int $identityId) {
+    public static function getContestsParticipated(int $identityId)
+    {
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
@@ -1365,7 +1376,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ];
     }
 
-    public static function getContestForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Contests {
+    public static function getContestForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Contests
+    {
         if (is_null($problemsetId)) {
             return null;
         }
@@ -1373,7 +1385,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         return \OmegaUp\DAO\Contests::getByProblemset($problemsetId);
     }
 
-    public static function getNumberOfContestants(int $contestId): int {
+    public static function getNumberOfContestants(int $contestId): int
+    {
         $sql = 'SELECT
                     COUNT(*) AS contestants
                 FROM
@@ -1398,7 +1411,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * @return array{needsBasicInformation: bool, requestsUserInformation: string}
      */
-    public static function getNeedsInformation(int $problemsetId): array {
+    public static function getNeedsInformation(int $problemsetId): array
+    {
         $sql = '
                 SELECT
                     needs_basic_information,
@@ -1432,7 +1446,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @param \OmegaUp\DAO\VO\Users $user
      * @return string of unique virtual contest alias
      */
-    public static function generateAlias(\OmegaUp\DAO\VO\Contests $contest): string {
+    public static function generateAlias(\OmegaUp\DAO\VO\Contests $contest): string
+    {
         // Virtual contest alias format (alias-virtual-random)
         return (
             substr(strval($contest->alias), 0, 20) .
@@ -1444,7 +1459,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Check if contest is virtual contest
      */
-    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest): bool {
+    public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest): bool
+    {
         return !is_null($contest->rerun_id);
     }
 
@@ -1452,7 +1468,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @param null|string $query
      * @return array{type: int, query: string}
      */
-    private static function formatSearch(?string $query) {
+    private static function formatSearch(?string $query)
+    {
         if (empty($query)) {
             return ['type' => \OmegaUp\DAO\Enum\FilteredStatus::ALL, 'query' => ''];
         }
@@ -1515,7 +1532,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         );
     }
 
-    public static function requestsUserInformation(int $contestId): bool {
+    public static function requestsUserInformation(int $contestId): bool
+    {
         $sql = '
             SELECT
                 requests_user_information
