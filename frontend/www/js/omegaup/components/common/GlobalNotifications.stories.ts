@@ -37,6 +37,8 @@ const meta: Meta<typeof GlobalNotifications> = {
   // Decorator to dispatch notifications before each story renders
   decorators: [
     (story, context) => {
+      // Clear any previous notifications first to prevent accumulation
+      notificationsStore.dispatch('dismissNotifications');
       // Dispatch the notification to the store before rendering
       notificationsStore.dispatch('displayStatus', {
         message: context.args.message,
