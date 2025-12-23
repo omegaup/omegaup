@@ -75,6 +75,7 @@ export default class UserHeatmap extends Vue {
   totalSubmissions = 0;
   activeDays = 0;
   maxStreak = 0;
+  hasRendered: boolean = false;
   T = T;
   ui = ui;
   COLORS = COLORS;
@@ -98,6 +99,7 @@ export default class UserHeatmap extends Vue {
     if (!newValue?.length) return;
 
     this.selectedYear = newValue[0];
+    this.hasRendered = false;
 
     this.$nextTick(() => {
       if (this.data && this.data.length > 0) {
@@ -110,6 +112,8 @@ export default class UserHeatmap extends Vue {
   onDataChange(): void {
     if (!this.data?.length) return;
 
+    this.hasRendered = false;
+
     this.$nextTick(() => {
       this.renderHeatmap();
     });
@@ -118,6 +122,7 @@ export default class UserHeatmap extends Vue {
   @Watch('isLoading')
   onLoadingChange(newValue: boolean): void {
     if (!newValue && this.data?.length) {
+      this.hasRendered = false;
       this.$nextTick(() => {
         this.renderHeatmap();
       });
@@ -129,6 +134,8 @@ export default class UserHeatmap extends Vue {
   }
 
   renderHeatmap(): void {
+    if (this.hasRendered) return;
+
     if (!this.heatmapContainer) {
       return;
     }
@@ -213,6 +220,7 @@ export default class UserHeatmap extends Vue {
     }
 
     this.chart = new Highcharts.Chart(options);
+    this.hasRendered = true;
   }
 
   formatDateToString(date: Date): string {
