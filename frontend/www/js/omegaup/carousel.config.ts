@@ -41,7 +41,8 @@ const carouselConfig: {
         es: 'Curso OFMI',
         pt: 'Curso OFMI',
       },
-      href: 'https://www.youtube.com/watch?v=eJThxTLg8QM&list=PLdSCJwXErQ8E2us6mFvv6rV_HLaowbqbC',
+      href:
+        'https://www.youtube.com/watch?v=eJThxTLg8QM&list=PLdSCJwXErQ8E2us6mFvv6rV_HLaowbqbC',
       target: '_blank',
     },
   },
