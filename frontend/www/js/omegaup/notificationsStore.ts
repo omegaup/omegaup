@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import Vuex, { ActionContext, Store } from 'vuex';
 
 // Vuex plugin registration is required before creating store instances.
 // Vue.use() is idempotent, so multiple registrations are safe.
@@ -94,7 +94,10 @@ function createStoreConfig() {
 
     actions: {
       displayStatus(
-        { commit, state }: { commit: any; state: NotificationsState },
+        {
+          commit,
+          state,
+        }: ActionContext<NotificationsState, NotificationsState>,
         payload: {
           message: string;
           type: MessageType;
@@ -139,7 +142,9 @@ function createStoreConfig() {
         }
       },
 
-      dismissNotifications({ commit }: { commit: any }) {
+      dismissNotifications({
+        commit,
+      }: ActionContext<NotificationsState, NotificationsState>) {
         commit('clearAutoHideTimeout');
         commit('hideNotification');
       },
