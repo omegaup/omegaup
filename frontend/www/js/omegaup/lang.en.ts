@@ -1685,6 +1685,7 @@ const translations: { [key: string]: string; } = {
   scoreboardNameAndAccountName: "Name and account name",
   scoreboardShowOnlyInvitedIdentities: "Show official contestants only",
   scoreboardShowParticipantsNames: "Show participants' names",
+  searchSchool: "Search school",
   searchUser: "Search coder",
   selectProblemLevelDesc: "In order to add the problem, you must to choose its corresponding level",
   serviceUnavailableError: "Oops. The service is currently unavailable. Please try again.",
