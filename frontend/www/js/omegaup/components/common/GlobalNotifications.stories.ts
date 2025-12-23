@@ -34,36 +34,37 @@ const meta: Meta<typeof GlobalNotifications> = {
   parameters: {
     layout: 'fullscreen',
   },
+  // Decorator to dispatch notifications before each story renders
+  decorators: [
+    (story, context) => {
+      // Dispatch the notification to the store before rendering
+      notificationsStore.dispatch('displayStatus', {
+        message: context.args.message,
+        type: context.args.type,
+        position: context.args.position,
+        autoHide: false, // Disable auto-hide in stories
+      });
+      return story();
+    },
+  ],
 };
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// Helper render function that dispatches to the store before rendering
-const createStoryRender = (minHeight = '200px') => {
-  return (args: Record<string, unknown>) => ({
-    components: { GlobalNotifications },
-    setup() {
-      // Dispatch the notification to the store
-      notificationsStore.dispatch('displayStatus', {
-        message: args.message,
-        type: args.type,
-        position: args.position,
-        autoHide: false, // Disable auto-hide in stories
-      });
-      return {};
-    },
-    template: `
-      <div style="min-height: ${minHeight}; position: relative; background: #f5f5f5;">
-        <global-notifications />
-        <div style="padding: 20px; color: #666;">
-          <p>Page content goes here...</p>
-        </div>
+// Template for all stories
+const Template = (minHeight = '200px') => ({
+  components: { GlobalNotifications },
+  template: `
+    <div style="min-height: ${minHeight}; position: relative; background: #f5f5f5;">
+      <global-notifications />
+      <div style="padding: 20px; color: #666;">
+        <p>Page content goes here...</p>
       </div>
-    `,
-  });
-};
+    </div>
+  `,
+});
 
 export const DangerNotification: Story = {
   args: {
@@ -71,7 +72,7 @@ export const DangerNotification: Story = {
     type: MessageType.Danger,
     position: NotificationPosition.Top,
   },
-  render: createStoryRender(),
+  render: () => Template(),
 };
 DangerNotification.storyName = 'Danger (Error)';
 
@@ -81,7 +82,7 @@ export const SuccessNotification: Story = {
     type: MessageType.Success,
     position: NotificationPosition.Top,
   },
-  render: createStoryRender(),
+  render: () => Template(),
 };
 SuccessNotification.storyName = 'Success';
 
@@ -91,7 +92,7 @@ export const WarningNotification: Story = {
     type: MessageType.Warning,
     position: NotificationPosition.Top,
   },
-  render: createStoryRender(),
+  render: () => Template(),
 };
 WarningNotification.storyName = 'Warning';
 
@@ -101,7 +102,7 @@ export const InfoNotification: Story = {
     type: MessageType.Info,
     position: NotificationPosition.Top,
   },
-  render: createStoryRender(),
+  render: () => Template(),
 };
 InfoNotification.storyName = 'Info';
 
@@ -111,7 +112,7 @@ export const BottomPosition: Story = {
     type: MessageType.Info,
     position: NotificationPosition.Bottom,
   },
-  render: createStoryRender('400px'),
+  render: () => Template('400px'),
 };
 BottomPosition.storyName = 'Bottom Position';
 
@@ -121,7 +122,7 @@ export const TopRightToast: Story = {
     type: MessageType.Success,
     position: NotificationPosition.TopRight,
   },
-  render: createStoryRender(),
+  render: () => Template(),
 };
 TopRightToast.storyName = 'Top-Right Toast';
 
@@ -131,6 +132,6 @@ export const BottomRightToast: Story = {
     type: MessageType.Warning,
     position: NotificationPosition.BottomRight,
   },
-  render: createStoryRender('400px'),
+  render: () => Template('400px'),
 };
 BottomRightToast.storyName = 'Bottom-Right Toast';
