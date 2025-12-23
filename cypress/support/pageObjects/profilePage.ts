@@ -152,6 +152,12 @@ export class ProfilePage {
     cy.get('[data-identity-password]').type(identityLogin.password);
     cy.get('[data-add-identity-button]').click();
 
+    // Wait for success notification and dismiss it
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
+
     cy.get('[data-added-identity-username]').should('have.length', 2);
     cy.get('[data-added-identity-username]')
       .first()
