@@ -1,23 +1,23 @@
-name: 'Pull Request Labeler'
+name: "Pull Request Labeler"
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, closed]
+    pull_request_target:
+        types: [opened, synchronize, closed]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  labeler:
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/labeler@v6
-        with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
-          sync-labels: true
-          dot: true
+    labeler:
+        permissions:
+            contents: read
+            pull-requests: write
+            issues: write
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/labeler@v6
+              with:
+                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+                  sync-labels: true
+                  dot: true

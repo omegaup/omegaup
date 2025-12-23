@@ -84,23 +84,23 @@ jobs:
 
       - uses: codelytv/pr-size-labeler@v1
         with:
-          xs_label: 'size/XS'
-          xs_max_size: '10'
-          s_label: 'size/S'
-          s_max_size: '50'
-          m_label: 'size/M'
-          m_max_size: '100'
-          l_label: 'size/L'
-          l_max_size: '200'
-          xl_label: 'size/XL'
-          fail_if_xl: 'false'
+          xs_label: "size/XS"
+          xs_max_size: "10"
+          s_label: "size/S"
+          s_max_size: "50"
+          m_label: "size/M"
+          m_max_size: "100"
+          l_label: "size/L"
+          l_max_size: "200"
+          xl_label: "size/XL"
+          fail_if_xl: "false"
           message_if_xl: >
             ⚠️ This PR exceeds the recommended size of 200 lines.
 
             Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
 
             Note: This PR might require additional review time due to its size.
-          github_api_url: 'https://api.github.com'
+          github_api_url: "https://api.github.com"
           files_to_ignore: |
             composer.lock
             yarn.lock
@@ -112,5 +112,5 @@ jobs:
             coverage.xml
             frontend/www/grader/ephemeral/index-light.html
             frontend/www/grader/ephemeral/index.html
-          ignore_line_deletions: 'false'
-          ignore_file_deletions: 'false'
+          ignore_line_deletions: "false"
+          ignore_file_deletions: "false"
