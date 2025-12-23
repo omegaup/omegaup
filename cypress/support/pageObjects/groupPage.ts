@@ -8,13 +8,14 @@ export class GroupPage {
    */
   private dismissAlert(): void {
     // First, locate and assert the alert is visible, then click its close button
-    cy.get('#global-notifications .alert')
+    // Uses role="alert" selector which works with both old jQuery and new Vue notifications
+    cy.get('.alert[role="alert"]')
       .should('be.visible')
       .find('[data-alert-close]')
       .click();
 
     // Perform a fresh root query to verify the alert was dismissed
-    cy.get('#global-notifications .alert').should('not.exist');
+    cy.get('.alert[role="alert"]').should('not.exist');
   }
 
   createGroup(groupOptions: GroupOptions): void {
