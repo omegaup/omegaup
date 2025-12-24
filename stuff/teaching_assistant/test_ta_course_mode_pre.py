@@ -129,23 +129,58 @@ def create_test_assignment() -> None:
     course_response.raise_for_status()
     course_data = course_response.json()
 
-    # Validate required fields are present in course data
-    if 'start_time' not in course_data:
-        raise AssertionError(
-            f"Course API response missing 'start_time'. "
-            f"Response: {course_data}"
-        )
+    # Minimum assignment duration in seconds (1 hour)
+    MIN_ASSIGNMENT_DURATION = 3600
 
-    course_start = course_data.get('start_time')
-    course_finish = course_data.get('finish_time')
+    # Validate and convert course_start
+    raw_course_start = course_data.get('start_time')
+    if raw_course_start is None:
+        raise AssertionError(
+            f"Course API response missing 'start_time'. Response: {course_data}"
+        )
+    try:
+        course_start = int(raw_course_start)
+    except (ValueError, TypeError) as exc:
+        raise AssertionError(
+            f"Invalid 'start_time' value: {raw_course_start!r} "
+            f"(expected integer or numeric string). Response: {course_data}"
+        ) from exc
+
+    # Validate and convert course_finish (optional field)
+    raw_course_finish = course_data.get('finish_time')
+    course_finish: int | None = None
+    if raw_course_finish is not None:
+        try:
+            course_finish = int(raw_course_finish)
+        except (ValueError, TypeError) as exc:
+            raise AssertionError(
+                f"Invalid 'finish_time' value: {raw_course_finish!r} "
+                f"(expected integer or numeric string). Response: {course_data}"
+            ) from exc
+
+    # Validate course time ordering
+    if course_finish is not None and course_finish <= course_start:
+        raise AssertionError(
+            f"Course finish_time ({course_finish}) must be greater than "
+            f"start_time ({course_start}). Response: {course_data}"
+        )
 
     # Ensure assignment times fall within course time bounds
     now = int(time.time())
     start_time = max(now, course_start)
-    if course_finish:
+
+    if course_finish is not None:
         finish_time = min(start_time + 18000, course_finish)
     else:
         finish_time = start_time + 18000
+
+    # Ensure finish_time > start_time with minimum duration
+    if finish_time <= start_time:
+        finish_time = start_time + MIN_ASSIGNMENT_DURATION
+        print(
+            f"Warning: Adjusted finish_time to {finish_time} to ensure "
+            f"minimum duration of {MIN_ASSIGNMENT_DURATION} seconds"
+        )
 
     create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
     data = {
