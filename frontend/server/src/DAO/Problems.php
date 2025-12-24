@@ -591,6 +591,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Gets multiple problems based on a list of aliases in a single query.
+     *
+     * @param list<string> $aliases
+     * @return array<string, \OmegaUp\DAO\VO\Problems> Map of alias => Problems
+     */
+    final public static function getByAliases(
+        array $aliases
+    ): array {
+        if (empty($aliases)) {
+            return [];
+        }
+
+        // Deduplicate aliases to avoid redundant parameter binding and DB work
+        $aliases = array_values(array_unique($aliases));
+        $placeholders = join(',', array_fill(0, count($aliases), '?'));
+        $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . " FROM Problems WHERE alias IN ({$placeholders});";
+
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aliases);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            $problem = new \OmegaUp\DAO\VO\Problems($row);
+            if (is_null($problem->alias)) {
+                continue;
+            }
+            $problems[$problem->alias] = $problem;
+        }
+
+        return $problems;
+    }
+
+    /**
      * Gets a certain problem based on its alias and the problemset
      * it is supposed to be part of.
      *

@@ -124,7 +124,7 @@ def _map_source(url: str, lineno: str, colno: str) -> str:
     path: Optional[str] = None
     try:
         parsed = urllib.parse.urlparse(url)
-        path = 'frontend/www%s' % parsed.path
+        path = f'frontend/www{parsed.path}'
     except ValueError:
         path = source_filename
     with open(source_filename, 'r', encoding='utf-8') as f:
@@ -147,9 +147,9 @@ def _map_source(url: str, lineno: str, colno: str) -> str:
             bisect.bisect_left(mapping['mappings'], (pos, ))]
         if generated_pos != pos:
             print(generated_pos, pos)
-        return '%s:%d:%d' % (mapping['sources'][original_mapping[0]],
-                             original_mapping[1], original_mapping[2])
-    return '%s:%s:%s' % (path, lineno, colno)
+        source = mapping['sources'][original_mapping[0]]
+        return f'{source}:{original_mapping[1]}:{original_mapping[2]}'
+    return f'{path}:{lineno}:{colno}'
 
 
 def _main() -> None:
@@ -162,8 +162,8 @@ def _main() -> None:
             for regex in (_BLINK_STACK_FRAME_RE, _GECKO_STACK_FRAME_RE):
                 match = regex.match(line)
                 if match:
-                    print('%s (%s)' %
-                          (match.group(1), _map_source(*match.groups()[1:])))
+                    source_map = _map_source(*match.groups()[1:])
+                    print(f'{match.group(1)} ({source_map})')
                     break
             else:
                 print(line.rstrip('\n'))
