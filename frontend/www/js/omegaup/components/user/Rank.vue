@@ -34,7 +34,7 @@
       </button>
       <template v-if="!isIndex && isSelectionMode">
         <button
-          class="btn btn-outline-secondary btn-sm ml-2"
+          class="btn btn-outline-secondary btn-sm ml-2 d-flex align-items-center"
           @click="cancelSelection"
         >
           {{ T.wordsCancel }}
