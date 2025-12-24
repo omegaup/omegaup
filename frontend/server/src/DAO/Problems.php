@@ -11,7 +11,8 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  */
-class Problems extends \OmegaUp\DAO\Base\Problems {
+class Problems extends \OmegaUp\DAO\Base\Problems
+{
     /**
      * @param list<string> $tags
      */
@@ -119,7 +120,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $usernames
      * @return list<int>
      */
-    private static function getUserIdsByUsername(array $usernames): array {
+    private static function getUserIdsByUsername(array $usernames): array
+    {
         if (empty($usernames)) {
             return [];
         }
@@ -194,7 +196,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Tags t ON t.tag_id = pt.tag_id
             ';
             $clauses[] = [
-                't.name = ?', [$level]
+                't.name = ?',
+                [$level]
             ];
         }
 
@@ -339,8 +342,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
             $userKey = is_null($userId) ? 'null' : $userId;
-            $callback = /** @return list<int> */ fn (): array =>
-                self::getAccessibleAclIds($identityId, $userId);
+            $callback =
+            /** @return list<int> */
+            fn(): array =>
+            self::getAccessibleAclIds($identityId, $userId);
             $cacheKey = "{$identityId}-{$userKey}";
 
             $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
@@ -457,7 +462,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         if ($onlyQualitySeal) {
             $clauses[] = [
-                'p.quality_seal = ?', [1]
+                'p.quality_seal = ?',
+                [1]
             ];
         }
 
@@ -467,7 +473,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ' AND ',
                 array_map(
                     /** @param array{0: string, 1: list<string>} $clause */
-                    fn (array $clause) => $clause[0],
+                    fn(array $clause) => $clause[0],
                     $clauses
                 )
             );
@@ -509,8 +515,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
-            'accepted', 'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
-            'quality_histogram', 'difficulty_histogram', 'submissions', 'quality_seal',
+            'accepted',
+            'title',
+            'quality',
+            'difficulty',
+            'alias',
+            'visibility',
+            'problem_id',
+            'quality_histogram',
+            'difficulty_histogram',
+            'submissions',
+            'quality_seal',
         ];
         $problems = [];
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? \OmegaUp\DAO\Users::getHideTags(
@@ -584,7 +599,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
-                return null;
+            return null;
         }
 
         return new \OmegaUp\DAO\VO\Problems($rs);
@@ -658,7 +673,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (is_null($rs)) {
-                return null;
+            return null;
         }
         return new \OmegaUp\DAO\VO\Problems($rs);
     }
@@ -695,7 +710,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         );
     }
 
-    final public static function getPracticeDeadline(int $problemId): ?\OmegaUp\Timestamp {
+    final public static function getPracticeDeadline(int $problemId): ?\OmegaUp\Timestamp
+    {
         $sql = '
             SELECT
                 MAX(finish_time)
@@ -713,7 +729,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         );
     }
 
-    public static function getProblemsSolvedCount(\OmegaUp\DAO\VO\Identities $identity): int {
+    public static function getProblemsSolvedCount(\OmegaUp\DAO\VO\Identities $identity): int
+    {
         $sql = 'SELECT
             COUNT(*)
         FROM
@@ -734,7 +751,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
-    final public static function getProblemsSolved(int $identityId): array {
+    final public static function getProblemsSolved(int $identityId): array
+    {
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
@@ -830,6 +848,95 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Get count of solved problems grouped by difficulty level for a user.
+     * Difficulty mapping: Easy(0-0.5), Medium(0.5-2.5), Hard(2.5-4), Unlabelled(NULL)
+     *
+     * @return array{easy: int, medium: int, hard: int, unlabelled: int}
+     */
+    public static function getSolvedCountByDifficulty(int $identityId): array
+    {
+        $sql = "
+            SELECT
+                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 0.5 THEN 1 ELSE 0 END) AS easy,
+                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0.5 AND p.difficulty < 2.5 THEN 1 ELSE 0 END) AS medium,
+                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN 1 ELSE 0 END) AS hard,
+                SUM(CASE WHEN p.difficulty IS NULL THEN 1 ELSE 0 END) AS unlabelled
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Problems_Forfeited pf
+                    WHERE pf.problem_id = p.problem_id
+                        AND pf.user_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM ACLs a
+                    WHERE a.acl_id = p.acl_id
+                        AND a.owner_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+            GROUP BY
+                s.identity_id;
+        ";
+
+        /** @var array{easy: int|null, medium: int|null, hard: int|null, unlabelled: int|null}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId]
+        );
+
+        return [
+            'easy' => intval($row['easy'] ?? 0),
+            'medium' => intval($row['medium'] ?? 0),
+            'hard' => intval($row['hard'] ?? 0),
+            'unlabelled' => intval($row['unlabelled'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get count of problems where the user has submissions but no AC verdict.
+     * These are problems the user is "attempting" but hasn't solved yet.
+     *
+     * @return int
+     */
+    public static function getAttemptingCount(int $identityId): int
+    {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT p.problem_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            WHERE
+                s.identity_id = ?
+                AND s.type = 'normal'
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Submissions s2
+                    WHERE s2.problem_id = p.problem_id
+                        AND s2.identity_id = s.identity_id
+                        AND s2.verdict = 'AC'
+                );
+        ";
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId]
+        );
+    }
+
+
+    /**
      * Returns the list of problems created by a certain identity
      *
      * @return list<\OmegaUp\DAO\VO\Problems>
@@ -877,7 +984,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<array{alias: string, solved: bool, title: string, username: string}>
      */
-    public static function getProblemsByUsersInACourse(string $courseAlias) {
+    public static function getProblemsByUsersInACourse(string $courseAlias)
+    {
         $sql  = '
            SELECT
                 ANY_VALUE(p.alias) AS alias,
@@ -963,7 +1071,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ) > 0;
     }
 
-    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user): ?int {
+    public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user): ?int
+    {
         if (is_null($user->user_id)) {
             return 0;
         }
@@ -1034,7 +1143,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return null|array{name: string, email: string, user_id: int}
      */
-    public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem): ?array {
+    public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem): ?array
+    {
         $sql = '
             SELECT DISTINCT
                 e.email,
@@ -1380,7 +1490,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return $identities;
     }
 
-    final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem): bool {
+    final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem): bool
+    {
         return (intval(
             $problem->visibility
         ) >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  || intval(
@@ -1388,7 +1499,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ) == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED);
     }
 
-    public static function deleteProblem(int $problemId): int {
+    public static function deleteProblem(int $problemId): int
+    {
         $sql = 'UPDATE
                     `Problems`
                 SET
@@ -1462,7 +1574,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
-    final public static function getByContest(int $contestId): array {
+    final public static function getByContest(int $contestId): array
+    {
         $sql = 'SELECT
                     ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -1496,7 +1609,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<\OmegaUp\DAO\VO\Problems>
      */
-    final public static function getByTitle(string $title): array {
+    final public static function getByTitle(string $title): array
+    {
         $sql = 'SELECT
                     ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
@@ -1520,7 +1634,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<array{name: string, problems_per_tag: int}>
      */
-    final public static function getQualityProblemsPerTagCount(): array {
+    final public static function getQualityProblemsPerTagCount(): array
+    {
         $sql = "SELECT
                     t.name,
                     SUM(IF(p.quality_seal = 1, 1, 0)) AS problems_per_tag
@@ -1551,7 +1666,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return $problems;
     }
 
-    final public static function getRandomLanguageProblemAlias(): string {
+    final public static function getRandomLanguageProblemAlias(): string
+    {
         $sql = "SELECT
                     alias
                 FROM
@@ -1574,7 +1690,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
     }
 
-    final public static function getRandomKarelProblemAlias(): string {
+    final public static function getRandomKarelProblemAlias(): string
+    {
         $sql = "SELECT
                     alias
                 FROM
