@@ -47,6 +47,14 @@
           <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
           {{ T.compareUsersTitle }}
         </button>
+        <button
+          v-if="selectedUsers.length === 1 && currentUsername"
+          class="btn btn-outline-primary btn-sm ml-2 d-flex align-items-center"
+          @click="compareVsMe"
+        >
+          <font-awesome-icon :icon="['fas', 'user']" class="mr-1" />
+          {{ T.compareVsMe }}
+        </button>
       </template>
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
@@ -207,9 +215,10 @@ import {
   faCheckSquare,
   faExchangeAlt,
   faQuestionCircle,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faCheckSquare, faExchangeAlt, faQuestionCircle);
+library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faUser);
 
 import { getBlogUrl } from '../../urlHelper';
 
@@ -250,6 +259,7 @@ export default class UserRank extends Vue {
   @Prop() resultTotal!: number;
   @Prop() pagerItems!: types.PageItem[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: '' }) currentUsername!: string;
 
   T = T;
   ui = ui;
@@ -324,6 +334,14 @@ export default class UserRank extends Vue {
       window.location.href = `/compare/?username1=${encodeURIComponent(
         this.selectedUsers[0],
       )}&username2=${encodeURIComponent(this.selectedUsers[1])}`;
+    }
+  }
+
+  compareVsMe(): void {
+    if (this.selectedUsers.length === 1 && this.currentUsername) {
+      window.location.href = `/compare/?username1=${encodeURIComponent(
+        this.selectedUsers[0],
+      )}&username2=${encodeURIComponent(this.currentUsername)}`;
     }
   }
 

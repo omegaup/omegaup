@@ -361,6 +361,7 @@ const translations: { [key: string]: string } = {
   compareUserNotFound: 'User not found',
   compareUsersError: 'An error occurred while comparing users',
   compareUsersTitle: 'Compare Users',
+  compareVsMe: 'Compare vs me',
   contentCreator: 'Contributor',
   contentOrderUpdated: "Content's order has been updated",
   contestAddUserContestant: 'Contestant',

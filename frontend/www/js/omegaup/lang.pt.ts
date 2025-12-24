@@ -386,6 +386,7 @@ const translations: { [key: string]: string } = {
   compareUserNotFound: 'Usu\u00e1rio n\u00e3o encontrado',
   compareUsersError: 'Ocorreu um erro ao comparar usuários',
   compareUsersTitle: 'Comparar Usu\u00e1rios',
+  compareVsMe: 'Comparar comigo',
   contentCreator: 'Contribuinte',
   contentOrderUpdated: 'A ordem do conte\u00fado foi atualizada',
   contestAddUserContestant: 'Concorrente',
