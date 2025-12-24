@@ -171,6 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>
@@ -232,7 +235,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
