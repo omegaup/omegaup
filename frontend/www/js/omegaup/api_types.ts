@@ -2820,6 +2820,11 @@ export namespace types {
     username: string;
   }
 
+  export interface BookmarkProblem {
+    alias: string;
+    title: string;
+  }
+
   export interface CDP {
     casesStore: types.CDPCasesStore;
     problemCodeContent: string;
@@ -2864,6 +2869,7 @@ export namespace types {
 
   export interface CachedExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -3671,6 +3677,7 @@ export namespace types {
 
   export interface ExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -5708,6 +5715,17 @@ export namespace messages {
     published: string;
   };
 
+  // ProblemBookmark
+  export type ProblemBookmarkExistsRequest = { [key: string]: any };
+  export type ProblemBookmarkExistsResponse = { bookmarked: boolean };
+  export type ProblemBookmarkListRequest = { [key: string]: any };
+  export type ProblemBookmarkListResponse = {
+    problems: types.BookmarkProblem[];
+    total: number;
+  };
+  export type ProblemBookmarkToggleRequest = { [key: string]: any };
+  export type ProblemBookmarkToggleResponse = { bookmarked: boolean };
+
   // ProblemForfeited
   export type ProblemForfeitedGetCountsRequest = { [key: string]: any };
   export type ProblemForfeitedGetCountsResponse = {
@@ -6601,6 +6619,18 @@ export namespace controllers {
     versions: (
       params?: messages.ProblemVersionsRequest,
     ) => Promise<messages.ProblemVersionsResponse>;
+  }
+
+  export interface ProblemBookmark {
+    exists: (
+      params?: messages.ProblemBookmarkExistsRequest,
+    ) => Promise<messages.ProblemBookmarkExistsResponse>;
+    list: (
+      params?: messages.ProblemBookmarkListRequest,
+    ) => Promise<messages.ProblemBookmarkListResponse>;
+    toggle: (
+      params?: messages.ProblemBookmarkToggleRequest,
+    ) => Promise<messages.ProblemBookmarkToggleResponse>;
   }
 
   export interface ProblemForfeited {
