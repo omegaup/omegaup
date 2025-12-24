@@ -1,0 +1,277 @@
+name: Discord Issue Thread Notification
+
+on:
+  issues:
+    types: [labeled, opened]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check Label Conditions
+        id: check-label
+        run: |
+          ALLOWED_LABELS=("GSoC" "good first issue")
+          CURRENT_LABEL="${{ github.event.label.name }}"
+
+          # For 'opened' events, check all labels
+          if [ "${{ github.event.action }}" == "opened" ]; then
+            ISSUE_LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
+            for label in "${ALLOWED_LABELS[@]}"; do
+              if echo "$ISSUE_LABELS" | grep -q "\"$label\""; then
+                echo "should_notify=true" >> $GITHUB_OUTPUT
+                echo "matched_label=$label" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            done
+          fi
+
+          # For 'labeled' events, check the specific label
+          if [ "${{ github.event.action }}" == "labeled" ]; then
+            for label in "${ALLOWED_LABELS[@]}"; do
+              if [ "$CURRENT_LABEL" == "$label" ]; then
+                echo "should_notify=true" >> $GITHUB_OUTPUT
+                echo "matched_label=$label" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+            done
+          fi
+
+          echo "should_notify=false" >> $GITHUB_OUTPUT
+
+      - name: Send Discord Notification
+        if: steps.check-label.outputs.should_notify == 'true'
+        uses: actions/github-script@v7
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          script: |
+            const https = require('https');
+
+
+            const issue = context.payload.issue;
+            const label = '${{ steps.check-label.outputs.matched_label }}';
+
+            // Label emoji mapping for omegaUp labels
+            const labelEmojis = {
+              // Programs & Events
+              'GSoC': '☀️',
+              'hacktoberfest-accepted': '🎃',
+              
+              // Difficulty / Onboarding
+              'Good first issue': '👋',
+              'good first issue': '👋',
+              'Good second issue': '✌️',
+              'help wanted': '🆘',
+              
+              // Issue Types
+              'bug': '🐛',
+              'feature-request': '💡',
+              'enhancement': '✨',
+              'documentation': '📚',
+              'refactor': '🔧',
+              'regression': '⏪',
+              'security': '🔒',
+              'privacy': '🛡️',
+              
+              // Priority
+              'P0': '🚨',
+              'P1': '🔴',
+              'P2': '🟠',
+              'P3': '🟡',
+              
+              // Status
+              'assigned': '👤',
+              'blocked → not yet ready': '⏳',
+              'blocked → waiting input': '💬',
+              'blocked → waiting parent': '⛓️',
+              'waiting-review': '👀',
+              'final-review': '✅',
+              'Stale': '🧊',
+              
+              // Tech Stack
+              'javascript': '🟨',
+              'php': '🐘',
+              'python': '🐍',
+              'database': '🗄️',
+              'backend': '⚙️',
+              'sandbox': '📦',
+              'dependencies': '📦',
+              
+              // Task Types
+              'Admin Task': '🔑',
+              'API Task': '🔌',
+              'UI Task': '🎨',
+              'UX Task': '🖌️',
+              
+              // omegaUp Features
+              'omegaUp Courses': '📖',
+              'omegaUp for Contests': '🏆',
+              'omegaUp for Work': '💼',
+              'omegaUp Judge': '⚖️',
+              'omegaUp Problems': '🧩',
+              'Karel': '🤖',
+              
+              // Community & Feedback
+              'omi-buzon': '📬',
+              'ofmi-buzon': '📬',
+              'profesores-buzon': '👨‍🏫',
+              'soporte': '🛠️',
+              'badge proposal': '🏅',
+              'developer happiness': '😊',
+              'Quality Assurance': '🔍',
+              'PeerReview': '👥',
+              'Reconocimiento y Motivación': '🌟',
+              'Content-classification': '📋',
+              'Cronjobs/RabbitMQ': '🐰',
+              
+              // Time Estimates (hours)
+              '1 hour': '⏱️',
+              '2 hours': '⏱️',
+              '3 hours': '⏱️',
+              '4 hours': '⏱️',
+              '5 hours': '⏱️',
+              '6 hours': '⏱️',
+              '7 hours': '⏱️',
+              '8 hours': '⏱️',
+              '9 hours': '⏱️',
+              '10 hours': '⏱️',
+              '11 hours': '⏱️',
+              '12 hours': '⏱️',
+              '13 hours': '⏱️',
+              '21 hours': '⏱️',
+              '> 21 hours': '⏱️',
+              
+              // Generic fallbacks
+              'question': '❓',
+              'invalid': '⛔',
+              'duplicate': '♻️',
+              'wontfix': '🚫'
+            };
+            const labelEmoji = labelEmojis[label] || '🏷️';
+
+            // Get all labels with their emojis
+            const allLabels = issue.labels
+              .map(l => `${labelEmojis[l.name] || '🏷️'} ${l.name}`)
+              .join(' • ');
+            const labelsDisplay = allLabels || 'No labels';
+
+            // Sanitize and truncate description
+            let description = issue.body || 'No description provided';
+
+            // Remove images: ![alt](url) or <img> tags
+            description = description.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
+            description = description.replace(/<img[^>]*>/gi, '');
+
+            // Remove code blocks (``` ... ```)
+            description = description.replace(/```[\s\S]*?```/g, '[code block removed]');
+
+            // Remove inline code (`code`)
+            description = description.replace(/`[^`]+`/g, '');
+
+            // Convert links [text](url) to just text
+            description = description.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
+            // Remove raw URLs (http:// or https://)
+            description = description.replace(/https?:\/\/[^\s]+/g, '[link]');
+
+            // Remove HTML tags
+            description = description.replace(/<[^>]+>/g, '');
+
+            // Remove excessive whitespace and newlines
+            description = description.replace(/\n{3,}/g, '\n\n');
+            description = description.replace(/[ \t]+/g, ' ');
+            description = description.trim();
+
+            // Truncate after sanitization
+            if (description.length > 200) {
+              description = description.substring(0, 200).replace(/[\uD800-\uDBFF]$/, '') + '...';
+            }
+
+            // Fallback if sanitization removed everything
+            if (!description || description.trim() === '') {
+              description = 'No text description available (contains only images/code/links)';
+            }
+
+            // Create thread name (max 100 chars) - include label emoji
+            let threadName = `${labelEmoji} Issue #${issue.number}: ${issue.title}`;
+            if (threadName.length > 100) {
+              threadName = threadName.substring(0, 97).replace(/[\uD800-\uDBFF]$/, '') + '...';
+            }
+
+            const payload = {
+              thread_name: threadName,
+              embeds: [{
+                title: `${labelEmoji} Issue #${issue.number}: ${issue.title}`,
+                url: issue.html_url,
+                color: 0x58ACFF,
+                fields: [
+                  {
+                    name: '📝 Description',
+                    value: description,
+                    inline: false
+                  },
+                  {
+                    name: '🏷️ Labels',
+                    value: labelsDisplay,
+                    inline: false
+                  },
+                  {
+                    name: '👤 Author',
+                    value: issue.user.login,
+                    inline: true
+                  }
+                ],
+                footer: {
+                  text: 'omegaUp Issues'
+                },
+                timestamp: new Date().toISOString()
+              }]
+            };
+
+            const webhookUrlString = process.env.DISCORD_WEBHOOK_URL;
+            if (!webhookUrlString) {
+              throw new Error('DISCORD_WEBHOOK_URL environment variable is not set');
+            }
+
+            // Validate Discord webhook URL format
+            const DISCORD_WEBHOOK_PREFIX = 'https://discord.com/api/webhooks/';
+            if (!webhookUrlString.startsWith(DISCORD_WEBHOOK_PREFIX)) {
+              throw new Error(
+                `Invalid Discord webhook URL format. URL must start with "${DISCORD_WEBHOOK_PREFIX}"`
+              );
+            }
+
+            const webhookUrl = new URL(webhookUrlString + '?wait=true');
+
+            const options = {
+              hostname: webhookUrl.hostname,
+              path: webhookUrl.pathname + webhookUrl.search,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            };
+
+            return new Promise((resolve, reject) => {
+              const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                  if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log('✅ Discord notification sent successfully');
+                    console.log('Response:', data);
+                    resolve(data);
+                  } else {
+                    console.log('❌ Discord API error:', res.statusCode, data);
+                    reject(new Error(`Discord API returned ${res.statusCode}: ${data}`));
+                  }
+                });
+              });
+              
+              req.on('error', reject);
+              req.write(JSON.stringify(payload));
+              req.end();
+            });
+
