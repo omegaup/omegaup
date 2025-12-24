@@ -37,6 +37,7 @@
           class="btn btn-outline-secondary btn-sm ml-2 d-flex align-items-center"
           @click="cancelSelection"
         >
+          <font-awesome-icon :icon="['fas', 'times']" class="mr-1" />
           {{ T.wordsCancel }}
         </button>
         <button
@@ -116,7 +117,7 @@
               v-if="isSelectionMode"
               scope="col"
               class="text-center align-middle"
-              style="width: 40px;"
+              style="width: 40px"
             >
               {{ T.wordsSelect }}
             </th>
@@ -215,10 +216,11 @@ import {
   faCheckSquare,
   faExchangeAlt,
   faQuestionCircle,
+  faTimes,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faUser);
+library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 
 import { getBlogUrl } from '../../urlHelper';
 

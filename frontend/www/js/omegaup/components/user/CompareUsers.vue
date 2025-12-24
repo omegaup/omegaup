@@ -169,8 +169,7 @@ export default class CompareUsers extends Vue {
       })
       .catch((error: { message?: string }) => {
         console.error('Compare error:', error);
-        this.errorMessage =
-          error.message || T.compareUsersError;
+        this.errorMessage = error.message || T.compareUsersError;
       })
       .finally(() => {
         this.isLoading = false;
