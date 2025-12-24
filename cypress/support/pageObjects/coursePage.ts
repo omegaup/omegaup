@@ -171,7 +171,6 @@ export class CoursePage {
     cy.get('@submitRun.all').should('have.length', 0);
   }
 
-
   createSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
