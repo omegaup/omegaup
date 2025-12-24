@@ -4753,11 +4753,13 @@ Compare two users' profiles and stats
 
 ### Parameters
 
-| Name        | Type           | Description |
-| ----------- | -------------- | ----------- |
-| `username`  | `null\|string` |             |
-| `username1` | `null\|string` |             |
-| `username2` | `null\|string` |             |
+| Name        | Type           | Description                                                                             |
+| ----------- | -------------- | --------------------------------------------------------------------------------------- |
+| `username1` | `null\|string` | The username of the first user to compare. Required for comparison.                     |
+| `username2` | `null\|string` | The username of the second user to compare. Required for comparison.                    |
+| `username`  | `null\|string` | **Deprecated/unused.** Use `username1` and `username2` instead for pairwise comparison. |
+
+> **Note:** The API compares two users specified by `username1` and `username2`. Both parameters should be provided to perform a meaningful comparison. The `username` parameter is declared but not used in the current implementation.
 
 ### Returns
 

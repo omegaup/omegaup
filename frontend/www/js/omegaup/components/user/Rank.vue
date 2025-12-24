@@ -19,17 +19,17 @@
       <a
         v-if="!isIndex && !isSelectionMode"
         href="/compare/"
-        class="btn btn-outline-primary btn-sm ml-2"
+        class="btn btn-outline-primary btn-sm ml-2 d-flex align-items-center"
       >
-        <font-awesome-icon :icon="['fas', 'exchange-alt']" />
+        <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
         {{ T.compareUsersTitle }}
       </a>
       <button
         v-if="!isIndex && !isSelectionMode"
-        class="btn btn-outline-secondary btn-sm ml-2"
+        class="btn btn-outline-secondary btn-sm ml-2 d-flex align-items-center"
         @click="isSelectionMode = true"
       >
-        <font-awesome-icon :icon="['fas', 'check-square']" />
+        <font-awesome-icon :icon="['fas', 'check-square']" class="mr-1" />
         {{ T.selectTwoUsersToCompare }}
       </button>
       <template v-if="!isIndex && isSelectionMode">
@@ -40,11 +40,11 @@
           {{ T.wordsCancel }}
         </button>
         <button
-          class="btn btn-primary btn-sm ml-2"
+          class="btn btn-primary btn-sm ml-2 d-flex align-items-center"
           :disabled="selectedUsers.length !== 2"
           @click="compareSelectedUsers"
         >
-          <font-awesome-icon :icon="['fas', 'exchange-alt']" />
+          <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
           {{ T.compareUsersTitle }}
         </button>
       </template>
@@ -204,16 +204,16 @@ import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-    faCheckSquare,
-    faExchangeAlt,
-    faQuestionCircle,
+  faCheckSquare,
+  faExchangeAlt,
+  faQuestionCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faCheckSquare, faExchangeAlt, faQuestionCircle);
 
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap and BootstrapVue CSS files (order is important)
+// Import Bootstrap and BootstrapVue CSS files (order is important: base before overrides)
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins

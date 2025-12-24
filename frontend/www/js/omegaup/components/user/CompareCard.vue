@@ -86,9 +86,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 
 @Component
 export default class CompareCard extends Vue {
@@ -113,7 +113,7 @@ export default class CompareCard extends Vue {
   get rankDisplay(): string {
     if (!this.profile.rankinfo) return T.profileRankUnrated;
     const rank = this.profile.rankinfo.rank;
-    if (!rank) return T.profileRankUnrated;
+    if (rank == null) return T.profileRankUnrated;
     return `#${rank}`;
   }
 }

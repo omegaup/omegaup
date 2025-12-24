@@ -49,7 +49,7 @@
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-5">
           <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ export default class CompareUsers extends Vue {
       .catch((error: { message?: string }) => {
         console.error('Compare error:', error);
         this.errorMessage =
-          error.message || 'An error occurred while comparing users.';
+          error.message || T.compareUsersError;
       })
       .finally(() => {
         this.isLoading = false;
