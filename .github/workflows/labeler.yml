@@ -46,13 +46,13 @@ jobs:
           s_label: "size/S"
           s_max_size: "50"
           m_label: "size/M"
-          m_max_size: "100"
+          m_max_size: "200"
           l_label: "size/L"
-          l_max_size: "200"
+          l_max_size: "300"
           xl_label: "size/XL"
           fail_if_xl: "true"
           message_if_xl: >
-            ⚠️ This PR exceeds the recommended size of 200 lines.
+            ⚠️ This PR exceeds the recommended size of 300 lines.
 
             Please make sure you are NOT addressing multiple issues with one PR. If it's possible to split this work into smaller, focused changes, that would be great and will help with review.
 
