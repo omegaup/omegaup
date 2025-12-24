@@ -130,13 +130,14 @@ def create_test_assignment() -> None:
     course_data = course_response.json()
 
     # Minimum assignment duration in seconds (1 hour)
-    MIN_ASSIGNMENT_DURATION = 3600
+    min_assignment_duration = 3600
 
     # Validate and convert course_start
     raw_course_start = course_data.get('start_time')
     if raw_course_start is None:
         raise AssertionError(
-            f"Course API response missing 'start_time'. Response: {course_data}"
+            f"Course API response missing 'start_time'. "
+            f"Response: {course_data}"
         )
     try:
         course_start = int(raw_course_start)
@@ -155,7 +156,8 @@ def create_test_assignment() -> None:
         except (ValueError, TypeError) as exc:
             raise AssertionError(
                 f"Invalid 'finish_time' value: {raw_course_finish!r} "
-                f"(expected integer or numeric string). Response: {course_data}"
+                "(expected integer or numeric string). "
+                f"Response: {course_data}"
             ) from exc
 
     # Validate course time ordering
@@ -176,10 +178,10 @@ def create_test_assignment() -> None:
 
     # Ensure finish_time > start_time with minimum duration
     if finish_time <= start_time:
-        finish_time = start_time + MIN_ASSIGNMENT_DURATION
+        finish_time = start_time + min_assignment_duration
         print(
             f"Warning: Adjusted finish_time to {finish_time} to ensure "
-            f"minimum duration of {MIN_ASSIGNMENT_DURATION} seconds"
+            f"minimum duration of {min_assignment_duration} seconds"
         )
 
     create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
