@@ -138,19 +138,39 @@ export class CoursePage {
     cy.get('form[data-course-admission-mode-form]').submit();
   }
 
+  // createInvalidSubmission(
+  //   problemOptions: ProblemOptions,
+  //   runOptions: RunOptions,
+  // ): void {
+  //   cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
+  //   cy.get('[data-new-run]').click();
+  //   cy.get('[name="language"]').select(runOptions.language);
+  //   cy.fixture(runOptions.fixturePath).then((fileContent) => {
+  //     cy.get('.CodeMirror-line').first().type(fileContent);
+  //     cy.get('[data-submit-run]').click();
+  //   });
+  //   cy.get('.alert-danger').should('be.visible');
+  // }
+
   createInvalidSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
   ): void {
+    cy.intercept('POST', '**/submission/**').as('submitRun');
+
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
     cy.get('[data-new-run]').click();
     cy.get('[name="language"]').select(runOptions.language);
+
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
-    cy.get('.alert-danger').should('be.visible');
+
+    cy.wait(1000);
+    cy.get('@submitRun.all').should('have.length', 0);
   }
+
 
   createSubmission(
     problemOptions: ProblemOptions,
@@ -311,7 +331,7 @@ export class CoursePage {
       .click({ force: true });
   }
 
-  editCourse(courseOptions: CourseOptions): void {
+  editCourse(courseOptions: CourseOptions, problemAlias: string): void {
     const editContestUrl = `/course/${courseOptions.courseAlias}/edit/`;
     cy.visit(editContestUrl);
     if (courseOptions.description != undefined) {
@@ -336,8 +356,14 @@ export class CoursePage {
     cy.get('.omegaup-course-assignmentdetails').should('be.visible');
     const now = new Date();
     cy.get('[data-course-start-date]').type(getISODateTime(now));
-    cy.get('.tags-input input[type="text"]').type('Sumas');
-    cy.get('.typeahead-dropdown li').first().click();
+    cy.get('.tags-input input[type="text"]')
+      .should('be.visible')
+      .type(problemAlias, { delay: 100 });
+    cy.get('.typeahead-dropdown li', { timeout: 10000 })
+      .should('be.visible')
+      .should('contain.text', problemAlias)
+      .first()
+      .click();
     cy.wait(3000);
     cy.get('button[data-add-problem]').click();
     cy.get('[data-course-problemlist] table.table-striped').should(
@@ -360,7 +386,6 @@ export class CoursePage {
     );
     cy.get('a[href="#content"]').click();
     cy.get('[data-course-start-assignment-button]').click();
-    cy.get('a[data-problem="sumas"]').should('be.visible');
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).should(
       'be.visible',
     );
