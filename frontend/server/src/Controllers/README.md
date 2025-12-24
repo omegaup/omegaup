@@ -2906,7 +2906,7 @@ _Nothing_
 
 # Notification
 
-BadgesController
+NotificationController
 
 ## `/api/notification/myList/`
 
