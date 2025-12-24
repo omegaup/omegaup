@@ -2150,60 +2150,67 @@ class Course extends \OmegaUp\Controllers\Controller {
         $request->accepted = $r->ensureBool('resolution');
         $request->last_update = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
-        \OmegaUp\DAO\CourseIdentityRequest::update($request);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        // Save this action in the history
-        \OmegaUp\DAO\CourseIdentityRequestHistory::create(
-            new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
-                'identity_id' => $request->identity_id,
-                'course_id' => $course->course_id,
-                'time' => $request->last_update,
-                'admin_id' => intval($r->user->user_id),
-                'accepted' => $request->accepted,
-            ])
-        );
+            \OmegaUp\DAO\CourseIdentityRequest::update($request);
 
-        if (!is_null($targetIdentity->user_id)) {
-            if ($request->accepted) {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationAccepted'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
-            } else {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationRejected'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
-            }
-            \OmegaUp\Controllers\Notification::setCommonNotification(
-                [$targetIdentity->user_id],
-                $localizationString,
-                $notificationType,
-                "/course/{$course->alias}/",
-                [
-                    'courseName' => $course->name,
-                ]
+            // Save this action in the history
+            \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+                new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                    'identity_id' => $request->identity_id,
+                    'course_id' => $course->course_id,
+                    'time' => $request->last_update,
+                    'admin_id' => intval($r->user->user_id),
+                    'accepted' => $request->accepted,
+                ])
             );
-        }
 
-        self::$log->info(
-            "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
-        );
+            if (!is_null($targetIdentity->user_id)) {
+                if ($request->accepted) {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationAccepted'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
+                } else {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationRejected'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
+                }
+                \OmegaUp\Controllers\Notification::setCommonNotification(
+                    [$targetIdentity->user_id],
+                    $localizationString,
+                    $notificationType,
+                    "/course/{$course->alias}/",
+                    [
+                        'courseName' => $course->name,
+                    ]
+                );
+            }
 
-        // If the request was accepted, we need to automatically add the student to the course
-        if (!$request->accepted) {
-            return ['status' => 'ok'];
-        }
+            self::$log->info(
+                "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
+            );
 
-        $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $targetIdentity->identity_id,
-            'share_user_information' => $request->share_user_information,
-        ]);
-        if (!is_null($request->accept_teacher)) {
-            $groupIdentity->accept_teacher = $request->accept_teacher;
+            // If the request was accepted, we need to automatically add the student to the course
+            if ($request->accepted) {
+                $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => $course->group_id,
+                    'identity_id' => $targetIdentity->identity_id,
+                    'share_user_information' => $request->share_user_information,
+                ]);
+                if (!is_null($request->accept_teacher)) {
+                    $groupIdentity->accept_teacher = $request->accept_teacher;
+                }
+                \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-        \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
 
         return ['status' => 'ok'];
     }
