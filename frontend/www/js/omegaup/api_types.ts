@@ -2820,11 +2820,6 @@ export namespace types {
     username: string;
   }
 
-  export interface BookmarkListItem {
-    alias: string;
-    title: string;
-  }
-
   export interface BookmarkProblem {
     alias: string;
     title: string;
@@ -5725,7 +5720,7 @@ export namespace messages {
   export type ProblemBookmarkExistsResponse = { bookmarked: boolean };
   export type ProblemBookmarkListRequest = { [key: string]: any };
   export type ProblemBookmarkListResponse = {
-    problems: types.BookmarkListItem[];
+    problems: types.BookmarkProblem[];
     total: number;
   };
   export type ProblemBookmarkToggleRequest = { [key: string]: any };

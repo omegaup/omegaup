@@ -3639,10 +3639,10 @@ Get list of bookmarked problems for the current user
 
 ### Returns
 
-| Name       | Type                       |
-| ---------- | -------------------------- |
-| `problems` | `types.BookmarkListItem[]` |
-| `total`    | `number`                   |
+| Name       | Type                      |
+| ---------- | ------------------------- |
+| `problems` | `types.BookmarkProblem[]` |
+| `total`    | `number`                  |
 
 ## `/api/problemBookmark/toggle/`
 

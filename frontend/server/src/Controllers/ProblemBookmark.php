@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * ProblemBookmarkController
  *
- * @psalm-type BookmarkListItem=array{alias: string, title: string}
+ * @psalm-type BookmarkProblem=array{alias: string, title: string}
  */
 class ProblemBookmark extends \OmegaUp\Controllers\Controller {
     /**
@@ -95,7 +95,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
     /**
      * Get list of bookmarked problems for the current user
      *
-     * @return array{problems: list<BookmarkListItem>, total: int}
+     * @return array{problems: list<BookmarkProblem>, total: int}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
