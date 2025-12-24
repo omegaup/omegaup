@@ -17,13 +17,37 @@
         {{ T.wordsRankingMeasurement }}</a
       >
       <a
-        v-if="!isIndex"
+        v-if="!isIndex && !isSelectionMode"
         href="/compare/"
         class="btn btn-outline-primary btn-sm ml-2"
       >
         <font-awesome-icon :icon="['fas', 'exchange-alt']" />
         {{ T.compareUsersTitle }}
       </a>
+      <button
+        v-if="!isIndex && !isSelectionMode"
+        class="btn btn-outline-secondary btn-sm ml-2"
+        @click="isSelectionMode = true"
+      >
+        <font-awesome-icon :icon="['fas', 'check-square']" />
+        {{ T.selectTwoUsersToCompare }}
+      </button>
+      <template v-if="!isIndex && isSelectionMode">
+        <button
+          class="btn btn-outline-secondary btn-sm ml-2"
+          @click="cancelSelection"
+        >
+          {{ T.wordsCancel }}
+        </button>
+        <button
+          class="btn btn-primary btn-sm ml-2"
+          :disabled="selectedUsers.length !== 2"
+          @click="compareSelectedUsers"
+        >
+          <font-awesome-icon :icon="['fas', 'exchange-alt']" />
+          {{ T.compareUsersTitle }}
+        </button>
+      </template>
     </h5>
     <div v-if="!isIndex" class="card-body form-row">
       <omegaup-common-typeahead
@@ -80,6 +104,14 @@
       <table class="table mb-0 table-responsive-sm">
         <thead>
           <tr>
+            <th
+              v-if="isSelectionMode"
+              scope="col"
+              class="text-center align-middle"
+              style="width: 40px;"
+            >
+              {{ T.wordsSelect }}
+            </th>
             <th scope="col" class="pl-4 column-width align-middle">#</th>
             <th scope="col" class="align-middle">{{ T.contestParticipant }}</th>
             <th scope="col" class="text-right align-middle">
@@ -114,6 +146,16 @@
         </thead>
         <tbody>
           <tr v-for="(user, index) in ranking" :key="index">
+            <td v-if="isSelectionMode" class="text-center">
+              <input
+                type="checkbox"
+                :checked="isUserSelected(user.username)"
+                :disabled="
+                  !isUserSelected(user.username) && selectedUsers.length >= 2
+                "
+                @change="toggleUserSelection(user.username)"
+              />
+            </td>
             <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
             <td>
               <omegaup-countryflag
@@ -162,17 +204,18 @@ import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faExchangeAlt,
-  faQuestionCircle,
+    faCheckSquare,
+    faExchangeAlt,
+    faQuestionCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faExchangeAlt, faQuestionCircle);
+library.add(faCheckSquare, faExchangeAlt, faQuestionCircle);
 
 import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
@@ -213,6 +256,8 @@ export default class UserRank extends Vue {
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
   currentFilter = this.filter;
+  isSelectionMode: boolean = false;
+  selectedUsers: string[] = [];
 
   get UserRankingFeatureGuideURL(): string {
     // Use the key defined in blog.json
@@ -254,6 +299,32 @@ export default class UserRank extends Vue {
       delete queryParameters['filter'];
     }
     window.location.search = ui.buildURLQuery(queryParameters);
+  }
+
+  toggleUserSelection(username: string): void {
+    const index = this.selectedUsers.indexOf(username);
+    if (index > -1) {
+      this.selectedUsers.splice(index, 1);
+    } else if (this.selectedUsers.length < 2) {
+      this.selectedUsers.push(username);
+    }
+  }
+
+  isUserSelected(username: string): boolean {
+    return this.selectedUsers.includes(username);
+  }
+
+  cancelSelection(): void {
+    this.isSelectionMode = false;
+    this.selectedUsers = [];
+  }
+
+  compareSelectedUsers(): void {
+    if (this.selectedUsers.length === 2) {
+      window.location.href = `/compare/?username1=${encodeURIComponent(
+        this.selectedUsers[0],
+      )}&username2=${encodeURIComponent(this.selectedUsers[1])}`;
+    }
   }
 
   get nextPageFilter(): string {
