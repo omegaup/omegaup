@@ -30,6 +30,8 @@
             :stroke-dasharray="easyDash"
             :stroke-dashoffset="0"
             transform="rotate(-90 60 60)"
+            @mouseenter="hoveredSegment = 'easy'"
+            @mouseleave="hoveredSegment = null"
           >
             <title>{{ T.profileEasy }}: {{ difficulty.easy }}/{{ total }}</title>
           </circle>
@@ -45,6 +47,8 @@
             :stroke-dasharray="mediumDash"
             :stroke-dashoffset="mediumOffset"
             transform="rotate(-90 60 60)"
+            @mouseenter="hoveredSegment = 'medium'"
+            @mouseleave="hoveredSegment = null"
           >
             <title>{{ T.profileMedium }}: {{ difficulty.medium }}/{{ total }}</title>
           </circle>
@@ -60,6 +64,8 @@
             :stroke-dasharray="hardDash"
             :stroke-dashoffset="hardOffset"
             transform="rotate(-90 60 60)"
+            @mouseenter="hoveredSegment = 'hard'"
+            @mouseleave="hoveredSegment = null"
           >
             <title>{{ T.profileHard }}: {{ difficulty.hard }}/{{ total }}</title>
           </circle>
@@ -75,17 +81,19 @@
             :stroke-dasharray="unlabelledDash"
             :stroke-dashoffset="unlabelledOffset"
             transform="rotate(-90 60 60)"
+            @mouseenter="hoveredSegment = 'unlabelled'"
+            @mouseleave="hoveredSegment = null"
           >
             <title>{{ T.profileUnlabelled }}: {{ difficulty.unlabelled }}/{{ total }}</title>
           </circle>
         </svg>
         <div class="center-text">
           <div class="solved-count-container">
-            <span class="solved-count">{{ solved }}</span>
+            <span class="solved-count" :style="hoveredCountStyle">{{ displayCount }}</span>
             <span class="total-count">/{{ total }}</span>
           </div>
-          <span v-if="attempting > 0" class="attempting-label">
-            {{ attempting }} {{ T.profileAttempting }}
+          <span v-if="hoveredSegment" class="hover-label" :style="hoveredLabelStyle">
+            {{ hoveredLabel }}
           </span>
         </div>
       </div>
@@ -132,7 +140,42 @@ export default class ProblemSolvingProgress extends Vue {
 
   T = T;
 
+  hoveredSegment: 'easy' | 'medium' | 'hard' | 'unlabelled' | null = null;
+
   private readonly circumference = 2 * Math.PI * 50; // r=50
+
+  private readonly segmentColors: Record<string, string> = {
+    easy: '#00b8a3',
+    medium: '#ffc01e',
+    hard: '#ef4743',
+    unlabelled: '#999999',
+  };
+
+  get displayCount(): number {
+    if (!this.hoveredSegment) return this.solved;
+    return this.difficulty[this.hoveredSegment];
+  }
+
+  get hoveredLabel(): string {
+    if (!this.hoveredSegment) return '';
+    const labels: Record<string, string> = {
+      easy: this.T.profileEasy,
+      medium: this.T.profileMedium,
+      hard: this.T.profileHard,
+      unlabelled: this.T.profileUnlabelled,
+    };
+    return labels[this.hoveredSegment];
+  }
+
+  get hoveredCountStyle(): Record<string, string> {
+    if (!this.hoveredSegment) return {};
+    return { color: this.segmentColors[this.hoveredSegment] };
+  }
+
+  get hoveredLabelStyle(): Record<string, string> {
+    if (!this.hoveredSegment) return {};
+    return { color: this.segmentColors[this.hoveredSegment] };
+  }
 
   get total(): number {
     return (
@@ -220,7 +263,12 @@ export default class ProblemSolvingProgress extends Vue {
 }
 
 .circle-segment {
-  transition: stroke-dasharray 0.3s ease;
+  transition: stroke-dasharray 0.1s ease;
+  cursor: pointer;
+}
+
+.circle-segment:hover {
+  filter: brightness(1.1);
 }
 
 .center-text {
@@ -243,6 +291,7 @@ export default class ProblemSolvingProgress extends Vue {
   font-size: 2.8rem;
   font-weight: 700;
   color: #333;
+  transition: color 0.1s ease;
 }
 
 .total-count {
@@ -268,6 +317,13 @@ export default class ProblemSolvingProgress extends Vue {
   font-size: 0.8rem;
   color: #666;
   margin-top: 6px;
+}
+
+.hover-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 4px;
+  transition: color 0.1s ease;
 }
 
 .difficulty-cards {
