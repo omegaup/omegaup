@@ -1598,6 +1598,10 @@ const translations: { [key: string]: string; } = {
   profileSolvedProblems: "Problemas resolvidos",
   profileState: "Estado",
   profileStatistics: "Estat\u00edsticas",
+  profileEasy: "F\u00e1cil",
+  profileMedium: "M\u00e9dio",
+  profileHard: "Dif\u00edcil",
+  profileUnlabelled: "Outro",
   profileStatisticsCumulative: "Cumulativo",
   profileStatisticsDay: "Dia",
   profileStatisticsDelta: "Delta",
@@ -2247,4 +2251,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar arquivo zip",
 };
 
-export {translations as default};
+export { translations as default };
