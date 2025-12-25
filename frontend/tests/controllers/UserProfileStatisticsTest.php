@@ -17,31 +17,34 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
                 'title' => 'Easy Problem',
             ])
         );
-        // Set difficulty manually
-        \OmegaUp\DAO\Problems::update(new \OmegaUp\DAO\VO\Problems([
-            'problem_id' => $easyProblem['problem']->problem_id,
-            'difficulty' => 0.3, // Easy
-        ]));
+        // Set difficulty manually by fetching and updating existing problem
+        $easyProblemVO = \OmegaUp\DAO\Problems::getByPK(
+            $easyProblem['problem']->problem_id
+        );
+        $easyProblemVO->difficulty = 0.3; // Easy
+        \OmegaUp\DAO\Problems::update($easyProblemVO);
 
         $mediumProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Medium Problem',
             ])
         );
-        \OmegaUp\DAO\Problems::update(new \OmegaUp\DAO\VO\Problems([
-            'problem_id' => $mediumProblem['problem']->problem_id,
-            'difficulty' => 1.5, // Medium
-        ]));
+        $mediumProblemVO = \OmegaUp\DAO\Problems::getByPK(
+            $mediumProblem['problem']->problem_id
+        );
+        $mediumProblemVO->difficulty = 1.5; // Medium
+        \OmegaUp\DAO\Problems::update($mediumProblemVO);
 
         $hardProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Hard Problem',
             ])
         );
-        \OmegaUp\DAO\Problems::update(new \OmegaUp\DAO\VO\Problems([
-            'problem_id' => $hardProblem['problem']->problem_id,
-            'difficulty' => 3.0, // Hard
-        ]));
+        $hardProblemVO = \OmegaUp\DAO\Problems::getByPK(
+            $hardProblem['problem']->problem_id
+        );
+        $hardProblemVO->difficulty = 3.0; // Hard
+        \OmegaUp\DAO\Problems::update($hardProblemVO);
 
         $login = self::login($identity);
 
@@ -222,7 +225,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $authorLogin->auth_token,
                 'problem_alias' => $problem['problem']->alias,
                 'name' => 'dp',
-                'public' => true,
+                'public' => false,
             ])
         );
         \OmegaUp\Controllers\Problem::apiAddTag(
@@ -230,7 +233,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $authorLogin->auth_token,
                 'problem_alias' => $problem['problem']->alias,
                 'name' => 'greedy',
-                'public' => true,
+                'public' => false,
             ])
         );
 
