@@ -84,9 +84,7 @@
             <span class="solved-count">{{ solved }}</span>
             <span class="total-count">/{{ total }}</span>
           </div>
-          <span class="solved-label">
-            <span class="checkmark">✓</span> {{ T.profileSolved }}
-          </span>
+          <span class="solved-label">{{ T.profileSolved }}</span>
           <span v-if="attempting > 0" class="attempting-label">
             {{ attempting }} {{ T.profileAttempting }}
           </span>
