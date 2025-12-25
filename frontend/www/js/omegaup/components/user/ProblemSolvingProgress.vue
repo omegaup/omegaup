@@ -135,7 +135,6 @@ interface DifficultyStats {
 @Component
 export default class ProblemSolvingProgress extends Vue {
   @Prop({ required: true }) solved!: number;
-  @Prop({ required: true }) attempting!: number;
   @Prop({ required: true }) difficulty!: DifficultyStats;
 
   T = T;
