@@ -1592,6 +1592,7 @@ const translations: { [key: string]: string; } = {
   profilePrivateRankMessage: "Ao ativar esta op\u00e7\u00e3o, a classifica\u00e7\u00e3o da sua conta n\u00e3o ficar\u00e1 vis\u00edvel.",
   profilePrivateRankMessageTitle: "Aviso",
   profileProblemProgress: "Progresso de Problemas",
+  profileProblemsCount: "problemas",
   profileRank: "Classifica\u00e7\u00e3o do coder",
   profileRankBeginner: "\u03bf",
   profileRankExpert: "\u0398",

@@ -1592,6 +1592,7 @@ const translations: { [key: string]: string; } = {
   profilePrivateRankMessage: "When you enable this option, your account ranking will not be visible.",
   profilePrivateRankMessageTitle: "Warning",
   profileProblemProgress: "Problem Progress",
+  profileProblemsCount: "problems",
   profileRank: "Coder rank",
   profileRankBeginner: "\u03bf",
   profileRankExpert: "\u0398",
