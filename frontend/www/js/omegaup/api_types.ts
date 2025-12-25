@@ -101,2453 +101,6808 @@ export namespace dao {
     verification_id?: string;
     verified?: boolean;
   }
-
 }
 
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
-   export function ActivityFeedPayload(elementId: string = 'payload'): types.ActivityFeedPayload {
-     return ((x) => { x.events = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.events); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ArenaCoursePayload(elementId: string = 'payload'): types.ArenaCoursePayload {
-     return ((x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); return x; })(x.course); if (typeof x.currentProblem !== 'undefined' &&  x.currentProblem !== null) x.currentProblem = ((x) => { x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); if (typeof x.nextExecutionTimestamp !== 'undefined' &&  x.nextExecutionTimestamp !== null) x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); if (typeof x.nextSubmissionTimestamp !== 'undefined' &&  x.nextSubmissionTimestamp !== null) x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); if (typeof x.runs !== 'undefined' &&  x.runs !== null) x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.details !== 'undefined' &&  x.details !== null) x.details = ((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; })(x.feedback); return x; })(x.details); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); if (typeof x.solvers !== 'undefined' &&  x.solvers !== null) x.solvers = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.solvers); return x; })(x.currentProblem); x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); if (typeof x.scoreboard !== 'undefined' &&  x.scoreboard !== null) x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function AssignmentDetailsPayload(elementId: string = 'payload'): types.AssignmentDetailsPayload {
-     return ((x) => { x.courseDetails = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.courseDetails); x.currentAssignment = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.currentAssignment); if (typeof x.scoreboard !== 'undefined' &&  x.scoreboard !== null) x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function AuthorRankTablePayload(elementId: string = 'payload'): types.AuthorRankTablePayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function BadgeDetailsPayload(elementId: string = 'payload'): types.BadgeDetailsPayload {
-     return ((x) => { x.badge = ((x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; })(x.badge); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function BadgeListPayload(elementId: string = 'payload'): types.BadgeListPayload {
-     return ((x) => { x.ownedBadges = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; }); })(x.ownedBadges); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CertificateDetailsPayload(elementId: string = 'payload'): types.CertificateDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CertificateListMinePayload(elementId: string = 'payload'): types.CertificateListMinePayload {
-     return ((x) => { x.certificates = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); return x; }); })(x.certificates); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CertificateValidationPayload(elementId: string = 'payload'): types.CertificateValidationPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CoderOfTheMonthPayload(elementId: string = 'payload'): types.CoderOfTheMonthPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CollectionDetailsByAuthorPayload(elementId: string = 'payload'): types.CollectionDetailsByAuthorPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CollectionDetailsByLevelPayload(elementId: string = 'payload'): types.CollectionDetailsByLevelPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CommonPayload(elementId: string = 'payload'): types.CommonPayload {
-     return ((x) => { x.apiTokens = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.last_used = ((x: number) => new Date(x * 1000))(x.last_used); x.rate_limit = ((x) => { x.reset = ((x: number) => new Date(x * 1000))(x.reset); return x; })(x.rate_limit); x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.apiTokens); if (typeof x.nextRegisteredContestForUser !== 'undefined' &&  x.nextRegisteredContestForUser !== null) x.nextRegisteredContestForUser = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.nextRegisteredContestForUser); if (typeof x.userVerificationDeadline !== 'undefined' &&  x.userVerificationDeadline !== null) x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(x.userVerificationDeadline); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestDetailsPayload(elementId: string = 'payload'): types.ContestDetailsPayload {
-     return ((x) => { if (typeof x.adminPayload !== 'undefined' &&  x.adminPayload !== null) x.adminPayload = ((x) => { x.allRuns = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.allRuns); x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.access_time !== 'undefined' &&  x.access_time !== null) x.access_time = ((x: number) => new Date(x * 1000))(x.access_time); if (typeof x.end_time !== 'undefined' &&  x.end_time !== null) x.end_time = ((x: number) => new Date(x * 1000))(x.end_time); return x; }); })(x.users); return x; })(x.adminPayload); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); x.contest = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.contest); if (typeof x.original !== 'undefined' &&  x.original !== null) x.original = ((x) => { if (typeof x.scoreboard !== 'undefined' &&  x.scoreboard !== null) x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(x.original); x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); if (typeof x.submissionDeadline !== 'undefined' &&  x.submissionDeadline !== null) x.submissionDeadline = ((x: number) => new Date(x * 1000))(x.submissionDeadline); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestEditPayload(elementId: string = 'payload'): types.ContestEditPayload {
-     return ((x) => { x.details = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); if (typeof x.submission_deadline !== 'undefined' &&  x.submission_deadline !== null) x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); return x; })(x.details); x.problems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.versions = ((x) => { x.log = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.author = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.author); x.committer = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.committer); return x; }); })(x.log); return x; })(x.versions); return x; }); })(x.problems); x.requests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.last_update !== 'undefined' &&  x.last_update !== null) x.last_update = ((x: number) => new Date(x * 1000))(x.last_update); x.request_time = ((x: number) => new Date(x * 1000))(x.request_time); return x; }); })(x.requests); x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.access_time !== 'undefined' &&  x.access_time !== null) x.access_time = ((x: number) => new Date(x * 1000))(x.access_time); if (typeof x.end_time !== 'undefined' &&  x.end_time !== null) x.end_time = ((x: number) => new Date(x * 1000))(x.end_time); return x; }); })(x.users); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestIntroPayload(elementId: string = 'payload'): types.ContestIntroPayload {
-     return ((x) => { x.contest = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.contest); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestListMinePayload(elementId: string = 'payload'): types.ContestListMinePayload {
-     return ((x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); if (typeof x.original_finish_time !== 'undefined' &&  x.original_finish_time !== null) x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestListPayload(elementId: string = 'payload'): types.ContestListPayload {
-     return ((x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestListv2Payload(elementId: string = 'payload'): types.ContestListv2Payload {
-     return ((x) => { x.contests = ((x) => { x.current = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.current); x.future = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.future); x.past = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.past); return x; })(x.contests); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestNewPayload(elementId: string = 'payload'): types.ContestNewPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ContestPracticeDetailsPayload(elementId: string = 'payload'): types.ContestPracticeDetailsPayload {
-     return ((x) => { if (typeof x.adminPayload !== 'undefined' &&  x.adminPayload !== null) x.adminPayload = ((x) => { x.allRuns = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.allRuns); x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.access_time !== 'undefined' &&  x.access_time !== null) x.access_time = ((x: number) => new Date(x * 1000))(x.access_time); if (typeof x.end_time !== 'undefined' &&  x.end_time !== null) x.end_time = ((x: number) => new Date(x * 1000))(x.end_time); return x; }); })(x.users); return x; })(x.adminPayload); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); x.contest = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.contest); if (typeof x.original !== 'undefined' &&  x.original !== null) x.original = ((x) => { if (typeof x.scoreboard !== 'undefined' &&  x.scoreboard !== null) x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(x.original); if (typeof x.submissionDeadline !== 'undefined' &&  x.submissionDeadline !== null) x.submissionDeadline = ((x: number) => new Date(x * 1000))(x.submissionDeadline); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestPrintDetailsPayload(elementId: string = 'payload'): types.ContestPrintDetailsPayload {
-     return ((x) => { x.problems = ((x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ((x) => { x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); if (typeof x.nextExecutionTimestamp !== 'undefined' &&  x.nextExecutionTimestamp !== null) x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); if (typeof x.nextSubmissionTimestamp !== 'undefined' &&  x.nextSubmissionTimestamp !== null) x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); if (typeof x.runs !== 'undefined' &&  x.runs !== null) x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.details !== 'undefined' &&  x.details !== null) x.details = ((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; })(x.feedback); return x; })(x.details); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); if (typeof x.solvers !== 'undefined' &&  x.solvers !== null) x.solvers = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.solvers); return x; })(x[y])); } return x; })(x.problems); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestReportDetailsPayload(elementId: string = 'payload'): types.ContestReportDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ContestScoreboardPayload(elementId: string = 'payload'): types.ContestScoreboardPayload {
-     return ((x) => { x.contest = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); if (typeof x.submission_deadline !== 'undefined' &&  x.submission_deadline !== null) x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); return x; })(x.contest); x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ContestVirtualDetailsPayload(elementId: string = 'payload'): types.ContestVirtualDetailsPayload {
-     return ((x) => { x.contest = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.contest); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseClarificationsPayload(elementId: string = 'payload'): types.CourseClarificationsPayload {
-     return ((x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseCloneDetailsPayload(elementId: string = 'payload'): types.CourseCloneDetailsPayload {
-     return ((x) => { x.details = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.details); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseDetailsPayload(elementId: string = 'payload'): types.CourseDetailsPayload {
-     return ((x) => { x.details = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.details); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseEditPayload(elementId: string = 'payload'): types.CourseEditPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); x.identityRequests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.last_update !== 'undefined' &&  x.last_update !== null) x.last_update = ((x: number) => new Date(x * 1000))(x.last_update); x.request_time = ((x: number) => new Date(x * 1000))(x.request_time); return x; }); })(x.identityRequests); if (typeof x.selectedAssignment !== 'undefined' &&  x.selectedAssignment !== null) x.selectedAssignment = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.selectedAssignment); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseListMinePayload(elementId: string = 'payload'): types.CourseListMinePayload {
-     return ((x) => { x.courses = ((x) => { x.admin = ((x) => { x.filteredCourses = ((x) => { x.archived = ((x) => { x.courses = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courses); return x; })(x.archived); x.current = ((x) => { x.courses = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courses); return x; })(x.current); x.past = ((x) => { x.courses = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courses); return x; })(x.past); x.teachingAssistant = ((x) => { x.courses = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courses); return x; })(x.teachingAssistant); return x; })(x.filteredCourses); return x; })(x.admin); return x; })(x.courses); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseNewPayload(elementId: string = 'payload'): types.CourseNewPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CourseScoreboardPayload(elementId: string = 'payload'): types.CourseScoreboardPayload {
-     return ((x) => { x.assignment = ((x) => { x.courseAssignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courseAssignments); if (typeof x.finishTime !== 'undefined' &&  x.finishTime !== null) x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime); x.startTime = ((x: number) => new Date(x * 1000))(x.startTime); return x; })(x.assignment); x.scoreboard = ((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.scoreboard); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseStatisticsPayload(elementId: string = 'payload'): types.CourseStatisticsPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function CourseSubmissionsListPayload(elementId: string = 'payload'): types.CourseSubmissionsListPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function CourseTabsPayload(elementId: string = 'payload'): types.CourseTabsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function EmailEditDetailsPayload(elementId: string = 'payload'): types.EmailEditDetailsPayload {
-     return ((x) => { if (typeof x.profile !== 'undefined' &&  x.profile !== null) x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function FullIDEPayload(elementId: string = 'payload'): types.FullIDEPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function GroupEditPayload(elementId: string = 'payload'): types.GroupEditPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function GroupListPayload(elementId: string = 'payload'): types.GroupListPayload {
-     return ((x) => { x.groups = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.create_time = ((x: number) => new Date(x * 1000))(x.create_time); return x; }); })(x.groups); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function GroupScoreboardContestsPayload(elementId: string = 'payload'): types.GroupScoreboardContestsPayload {
-     return ((x) => { x.availableContests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.availableContests); x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function GroupScoreboardDetailsPayload(elementId: string = 'payload'): types.GroupScoreboardDetailsPayload {
-     return ((x) => { x.details = ((x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; })(x.details); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function IndexPayload(elementId: string = 'payload'): types.IndexPayload {
-     return ((x) => { x.coderOfTheMonthData = ((x) => { if (typeof x.all !== 'undefined' &&  x.all !== null) x.all = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.all); if (typeof x.female !== 'undefined' &&  x.female !== null) x.female = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.female); return x; })(x.coderOfTheMonthData); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function IntroDetailsPayload(elementId: string = 'payload'): types.IntroDetailsPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function LibinteractiveGenPayload(elementId: string = 'payload'): types.LibinteractiveGenPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function LoginDetailsPayload(elementId: string = 'payload'): types.LoginDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function PrivacyPolicyDetailsPayload(elementId: string = 'payload'): types.PrivacyPolicyDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ProblemDetailsPayload(elementId: string = 'payload'): types.ProblemDetailsPayload {
-     return ((x) => { if (typeof x.allRuns !== 'undefined' &&  x.allRuns !== null) x.allRuns = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.allRuns); if (typeof x.clarifications !== 'undefined' &&  x.clarifications !== null) x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); x.problem = ((x) => { if (typeof x.nextExecutionTimestamp !== 'undefined' &&  x.nextExecutionTimestamp !== null) x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); if (typeof x.nextSubmissionTimestamp !== 'undefined' &&  x.nextSubmissionTimestamp !== null) x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); return x; })(x.problem); if (typeof x.runs !== 'undefined' &&  x.runs !== null) x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); x.solvers = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.solvers); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ProblemEditPayload(elementId: string = 'payload'): types.ProblemEditPayload {
-     return ((x) => { x.log = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.author = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.author); x.committer = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.committer); return x; }); })(x.log); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); if (typeof x.publishedRevision !== 'undefined' &&  x.publishedRevision !== null) x.publishedRevision = ((x) => { x.author = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.author); x.committer = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.committer); return x; })(x.publishedRevision); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ProblemFormPayload(elementId: string = 'payload'): types.ProblemFormPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ProblemListCollectionPayload(elementId: string = 'payload'): types.ProblemListCollectionPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ProblemListPayload(elementId: string = 'payload'): types.ProblemListPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ProblemPrintDetailsPayload(elementId: string = 'payload'): types.ProblemPrintDetailsPayload {
-     return ((x) => { x.details = ((x) => { x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); if (typeof x.nextExecutionTimestamp !== 'undefined' &&  x.nextExecutionTimestamp !== null) x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); if (typeof x.nextSubmissionTimestamp !== 'undefined' &&  x.nextSubmissionTimestamp !== null) x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); if (typeof x.runs !== 'undefined' &&  x.runs !== null) x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.details !== 'undefined' &&  x.details !== null) x.details = ((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; })(x.feedback); return x; })(x.details); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); if (typeof x.solvers !== 'undefined' &&  x.solvers !== null) x.solvers = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.solvers); return x; })(x.details); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function ProblemQualityPayload(elementId: string = 'payload'): types.ProblemQualityPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ProblemsMineInfoPayload(elementId: string = 'payload'): types.ProblemsMineInfoPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function SchoolOfTheMonthPayload(elementId: string = 'payload'): types.SchoolOfTheMonthPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function SchoolProfileDetailsPayload(elementId: string = 'payload'): types.SchoolProfileDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function SchoolRankPayload(elementId: string = 'payload'): types.SchoolRankPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function ScoreboardMergePayload(elementId: string = 'payload'): types.ScoreboardMergePayload {
-     return ((x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function StatsPayload(elementId: string = 'payload'): types.StatsPayload {
-     return ((x) => { if (typeof x.max_wait_time !== 'undefined' &&  x.max_wait_time !== null) x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function StudentProgressByAssignmentPayload(elementId: string = 'payload'): types.StudentProgressByAssignmentPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); x.problems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); return x; })(x.feedback); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }); })(x.problems); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function StudentProgressPayload(elementId: string = 'payload'): types.StudentProgressPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function StudentsProgressPayload(elementId: string = 'payload'): types.StudentsProgressPayload {
-     return ((x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function SubmissionsListPayload(elementId: string = 'payload'): types.SubmissionsListPayload {
-     return ((x) => { x.submissions = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.submissions); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function SupportDetailsPayload(elementId: string = 'payload'): types.SupportDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function TeamGroupEditPayload(elementId: string = 'payload'): types.TeamGroupEditPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function TeamGroupNewPayload(elementId: string = 'payload'): types.TeamGroupNewPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function TeamsGroupListPayload(elementId: string = 'payload'): types.TeamsGroupListPayload {
-     return ((x) => { x.teamsGroups = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.create_time = ((x: number) => new Date(x * 1000))(x.create_time); return x; }); })(x.teamsGroups); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function UserDependentsPayload(elementId: string = 'payload'): types.UserDependentsPayload {
-     return ((x) => { x.dependents = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.parent_email_verification_deadline !== 'undefined' &&  x.parent_email_verification_deadline !== null) x.parent_email_verification_deadline = ((x: number) => new Date(x * 1000))(x.parent_email_verification_deadline); return x; }); })(x.dependents); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function UserDetailsPayload(elementId: string = 'payload'): types.UserDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function UserDocsPayload(elementId: string = 'payload'): types.UserDocsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function UserProfileDetailsPayload(elementId: string = 'payload'): types.UserProfileDetailsPayload {
-     return ((x) => { if (typeof x.extraProfileDetails !== 'undefined' &&  x.extraProfileDetails !== null) x.extraProfileDetails = ((x) => { x.contests = ((x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ((x) => { x.data = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.data); return x; })(x[y])); } return x; })(x.contests); x.createdContests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); if (typeof x.original_finish_time !== 'undefined' &&  x.original_finish_time !== null) x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.createdContests); x.createdCourses = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.createdCourses); x.ownedBadges = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; }); })(x.ownedBadges); return x; })(x.extraProfileDetails); x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function UserRankTableLoggedOutPayload(elementId: string = 'payload'): types.UserRankTableLoggedOutPayload {
-     return ((x) => { if (typeof x.lastUpdated !== 'undefined' &&  x.lastUpdated !== null) x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated); x.ranking = ((x) => { x.rank = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.timestamp !== 'undefined' &&  x.timestamp !== null) x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.rank); return x; })(x.ranking); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function UserRankTablePayload(elementId: string = 'payload'): types.UserRankTablePayload {
-     return ((x) => { if (typeof x.lastUpdated !== 'undefined' &&  x.lastUpdated !== null) x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated); x.ranking = ((x) => { x.rank = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.timestamp !== 'undefined' &&  x.timestamp !== null) x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.rank); return x; })(x.ranking); return x; })(
-       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),
-     );
-
-   }
-
-   export function UserRolesPayload(elementId: string = 'payload'): types.UserRolesPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
-   export function VerificationParentalTokenDetailsPayload(elementId: string = 'payload'): types.VerificationParentalTokenDetailsPayload {
-     return JSON.parse(
-       (document.getElementById(elementId) as HTMLElement).innerText,
-     );
-
-   }
-
+    export function ActivityFeedPayload(
+      elementId: string = 'payload',
+    ): types.ActivityFeedPayload {
+      return ((x) => {
+        x.events = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.events);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ArenaCoursePayload(
+      elementId: string = 'payload',
+    ): types.ArenaCoursePayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          return x;
+        })(x.course);
+        if (
+          typeof x.currentProblem !== 'undefined' &&
+          x.currentProblem !== null
+        )
+          x.currentProblem = ((x) => {
+            x.creation_date = ((x: number) => new Date(x * 1000))(
+              x.creation_date,
+            );
+            if (
+              typeof x.nextExecutionTimestamp !== 'undefined' &&
+              x.nextExecutionTimestamp !== null
+            )
+              x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextExecutionTimestamp,
+              );
+            if (
+              typeof x.nextSubmissionTimestamp !== 'undefined' &&
+              x.nextSubmissionTimestamp !== null
+            )
+              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextSubmissionTimestamp,
+              );
+            if (
+              typeof x.problemsetter !== 'undefined' &&
+              x.problemsetter !== null
+            )
+              x.problemsetter = ((x) => {
+                if (
+                  typeof x.creation_date !== 'undefined' &&
+                  x.creation_date !== null
+                )
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                return x;
+              })(x.problemsetter);
+            if (typeof x.runs !== 'undefined' && x.runs !== null)
+              x.runs = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  if (typeof x.details !== 'undefined' && x.details !== null)
+                    x.details = ((x) => {
+                      if (
+                        typeof x.feedback !== 'undefined' &&
+                        x.feedback !== null
+                      )
+                        x.feedback = ((x) => {
+                          x.date = ((x: number) => new Date(x * 1000))(x.date);
+                          if (
+                            typeof x.feedback_thread !== 'undefined' &&
+                            x.feedback_thread !== null
+                          )
+                            x.feedback_thread = ((x) => {
+                              if (!Array.isArray(x)) {
+                                return x;
+                              }
+                              return x.map((x) => {
+                                x.timestamp = ((x: number) =>
+                                  new Date(x * 1000))(x.timestamp);
+                                return x;
+                              });
+                            })(x.feedback_thread);
+                          return x;
+                        })(x.feedback);
+                      return x;
+                    })(x.details);
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.runs);
+            if (typeof x.solvers !== 'undefined' && x.solvers !== null)
+              x.solvers = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.solvers);
+            return x;
+          })(x.currentProblem);
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.runs);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+          x.scoreboard = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function AssignmentDetailsPayload(
+      elementId: string = 'payload',
+    ): types.AssignmentDetailsPayload {
+      return ((x) => {
+        x.courseDetails = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.courseDetails);
+        x.currentAssignment = ((x) => {
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.currentAssignment);
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+          x.scoreboard = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function AuthorRankTablePayload(
+      elementId: string = 'payload',
+    ): types.AuthorRankTablePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function BadgeDetailsPayload(
+      elementId: string = 'payload',
+    ): types.BadgeDetailsPayload {
+      return ((x) => {
+        x.badge = ((x) => {
+          if (
+            typeof x.assignation_time !== 'undefined' &&
+            x.assignation_time !== null
+          )
+            x.assignation_time = ((x: number) => new Date(x * 1000))(
+              x.assignation_time,
+            );
+          if (
+            typeof x.first_assignation !== 'undefined' &&
+            x.first_assignation !== null
+          )
+            x.first_assignation = ((x: number) => new Date(x * 1000))(
+              x.first_assignation,
+            );
+          return x;
+        })(x.badge);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function BadgeListPayload(
+      elementId: string = 'payload',
+    ): types.BadgeListPayload {
+      return ((x) => {
+        x.ownedBadges = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.assignation_time !== 'undefined' &&
+              x.assignation_time !== null
+            )
+              x.assignation_time = ((x: number) => new Date(x * 1000))(
+                x.assignation_time,
+              );
+            if (
+              typeof x.first_assignation !== 'undefined' &&
+              x.first_assignation !== null
+            )
+              x.first_assignation = ((x: number) => new Date(x * 1000))(
+                x.first_assignation,
+              );
+            return x;
+          });
+        })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CertificateDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CertificateDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CertificateListMinePayload(
+      elementId: string = 'payload',
+    ): types.CertificateListMinePayload {
+      return ((x) => {
+        x.certificates = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.date = ((x: number) => new Date(x * 1000))(x.date);
+            return x;
+          });
+        })(x.certificates);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CertificateValidationPayload(
+      elementId: string = 'payload',
+    ): types.CertificateValidationPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CoderOfTheMonthPayload(
+      elementId: string = 'payload',
+    ): types.CoderOfTheMonthPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CollectionDetailsByAuthorPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CollectionDetailsByLevelPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByLevelPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CommonPayload(
+      elementId: string = 'payload',
+    ): types.CommonPayload {
+      return ((x) => {
+        x.apiTokens = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+            x.rate_limit = ((x) => {
+              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+              return x;
+            })(x.rate_limit);
+            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+            return x;
+          });
+        })(x.apiTokens);
+        if (
+          typeof x.nextRegisteredContestForUser !== 'undefined' &&
+          x.nextRegisteredContestForUser !== null
+        )
+          x.nextRegisteredContestForUser = ((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.nextRegisteredContestForUser);
+        if (
+          typeof x.userVerificationDeadline !== 'undefined' &&
+          x.userVerificationDeadline !== null
+        )
+          x.userVerificationDeadline = ((x: number) => new Date(x * 1000))(
+            x.userVerificationDeadline,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestDetailsPayload {
+      return ((x) => {
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        if (typeof x.original !== 'undefined' && x.original !== null)
+          x.original = ((x) => {
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+              x.scoreboard = ((x) => {
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
+            return x;
+          })(x.original);
+        x.scoreboard = ((x) => {
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestEditPayload(
+      elementId: string = 'payload',
+    ): types.ContestEditPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
+          return x;
+        })(x.details);
+        x.problems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.versions = ((x) => {
+              x.log = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.author = ((x) => {
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+                    return x;
+                  })(x.author);
+                  x.committer = ((x) => {
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+                    return x;
+                  })(x.committer);
+                  return x;
+                });
+              })(x.log);
+              return x;
+            })(x.versions);
+            return x;
+          });
+        })(x.problems);
+        x.requests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.requests);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.access_time !== 'undefined' && x.access_time !== null)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestIntroPayload(
+      elementId: string = 'payload',
+    ): types.ContestIntroPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestListMinePayload(
+      elementId: string = 'payload',
+    ): types.ContestListMinePayload {
+      return ((x) => {
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            if (
+              typeof x.original_finish_time !== 'undefined' &&
+              x.original_finish_time !== null
+            )
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestListPayload(
+      elementId: string = 'payload',
+    ): types.ContestListPayload {
+      return ((x) => {
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestListv2Payload(
+      elementId: string = 'payload',
+    ): types.ContestListv2Payload {
+      return ((x) => {
+        x.contests = ((x) => {
+          x.current = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.current);
+          x.future = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.future);
+          x.past = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
+              );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.past);
+          return x;
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestNewPayload(
+      elementId: string = 'payload',
+    ): types.ContestNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ContestPracticeDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestPracticeDetailsPayload {
+      return ((x) => {
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        if (typeof x.original !== 'undefined' && x.original !== null)
+          x.original = ((x) => {
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
+              x.scoreboard = ((x) => {
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
+            return x;
+          })(x.original);
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestPrintDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestPrintDetailsPayload {
+      return ((x) => {
+        x.problems = ((x) => {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              (y) =>
+                (x[y] = ((x) => {
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                  if (
+                    typeof x.nextExecutionTimestamp !== 'undefined' &&
+                    x.nextExecutionTimestamp !== null
+                  )
+                    x.nextExecutionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextExecutionTimestamp);
+                  if (
+                    typeof x.nextSubmissionTimestamp !== 'undefined' &&
+                    x.nextSubmissionTimestamp !== null
+                  )
+                    x.nextSubmissionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextSubmissionTimestamp);
+                  if (
+                    typeof x.problemsetter !== 'undefined' &&
+                    x.problemsetter !== null
+                  )
+                    x.problemsetter = ((x) => {
+                      if (
+                        typeof x.creation_date !== 'undefined' &&
+                        x.creation_date !== null
+                      )
+                        x.creation_date = ((x: number) => new Date(x * 1000))(
+                          x.creation_date,
+                        );
+                      return x;
+                    })(x.problemsetter);
+                  if (typeof x.runs !== 'undefined' && x.runs !== null)
+                    x.runs = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.details !== 'undefined' &&
+                          x.details !== null
+                        )
+                          x.details = ((x) => {
+                            if (
+                              typeof x.feedback !== 'undefined' &&
+                              x.feedback !== null
+                            )
+                              x.feedback = ((x) => {
+                                x.date = ((x: number) => new Date(x * 1000))(
+                                  x.date,
+                                );
+                                if (
+                                  typeof x.feedback_thread !== 'undefined' &&
+                                  x.feedback_thread !== null
+                                )
+                                  x.feedback_thread = ((x) => {
+                                    if (!Array.isArray(x)) {
+                                      return x;
+                                    }
+                                    return x.map((x) => {
+                                      x.timestamp = ((x: number) =>
+                                        new Date(x * 1000))(x.timestamp);
+                                      return x;
+                                    });
+                                  })(x.feedback_thread);
+                                return x;
+                              })(x.feedback);
+                            return x;
+                          })(x.details);
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.runs);
+                  if (typeof x.solvers !== 'undefined' && x.solvers !== null)
+                    x.solvers = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.solvers);
+                  return x;
+                })(x[y])),
+            );
+          }
+          return x;
+        })(x.problems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestReportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestReportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ContestScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.ContestScoreboardPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
+          return x;
+        })(x.contest);
+        x.scoreboard = ((x) => {
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestVirtualDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestVirtualDetailsPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseClarificationsPayload(
+      elementId: string = 'payload',
+    ): types.CourseClarificationsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseCloneDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseCloneDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseEditPayload(
+      elementId: string = 'payload',
+    ): types.CourseEditPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        x.identityRequests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.identityRequests);
+        if (
+          typeof x.selectedAssignment !== 'undefined' &&
+          x.selectedAssignment !== null
+        )
+          x.selectedAssignment = ((x) => {
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.selectedAssignment);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseListMinePayload(
+      elementId: string = 'payload',
+    ): types.CourseListMinePayload {
+      return ((x) => {
+        x.courses = ((x) => {
+          x.admin = ((x) => {
+            x.filteredCourses = ((x) => {
+              x.archived = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.archived);
+              x.current = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.current);
+              x.past = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.past);
+              x.teachingAssistant = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.teachingAssistant);
+              return x;
+            })(x.filteredCourses);
+            return x;
+          })(x.admin);
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseNewPayload(
+      elementId: string = 'payload',
+    ): types.CourseNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CourseScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.CourseScoreboardPayload {
+      return ((x) => {
+        x.assignment = ((x) => {
+          x.courseAssignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.courseAssignments);
+          if (typeof x.finishTime !== 'undefined' && x.finishTime !== null)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
+          return x;
+        })(x.assignment);
+        x.scoreboard = ((x) => {
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseStatisticsPayload(
+      elementId: string = 'payload',
+    ): types.CourseStatisticsPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseSubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CourseTabsPayload(
+      elementId: string = 'payload',
+    ): types.CourseTabsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function EmailEditDetailsPayload(
+      elementId: string = 'payload',
+    ): types.EmailEditDetailsPayload {
+      return ((x) => {
+        if (typeof x.profile !== 'undefined' && x.profile !== null)
+          x.profile = ((x) => {
+            if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+              x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+            if (
+              typeof x.graduation_date !== 'undefined' &&
+              x.graduation_date !== null
+            )
+              x.graduation_date = ((x: number) => new Date(x * 1000))(
+                x.graduation_date,
+              );
+            return x;
+          })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function FullIDEPayload(
+      elementId: string = 'payload',
+    ): types.FullIDEPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function GroupEditPayload(
+      elementId: string = 'payload',
+    ): types.GroupEditPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function GroupListPayload(
+      elementId: string = 'payload',
+    ): types.GroupListPayload {
+      return ((x) => {
+        x.groups = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+            return x;
+          });
+        })(x.groups);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function GroupScoreboardContestsPayload(
+      elementId: string = 'payload',
+    ): types.GroupScoreboardContestsPayload {
+      return ((x) => {
+        x.availableContests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.availableContests);
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function GroupScoreboardDetailsPayload(
+      elementId: string = 'payload',
+    ): types.GroupScoreboardDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.contests = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.contests);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function IndexPayload(
+      elementId: string = 'payload',
+    ): types.IndexPayload {
+      return ((x) => {
+        x.coderOfTheMonthData = ((x) => {
+          if (typeof x.all !== 'undefined' && x.all !== null)
+            x.all = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.all);
+          if (typeof x.female !== 'undefined' && x.female !== null)
+            x.female = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.female);
+          return x;
+        })(x.coderOfTheMonthData);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function IntroDetailsPayload(
+      elementId: string = 'payload',
+    ): types.IntroDetailsPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function LibinteractiveGenPayload(
+      elementId: string = 'payload',
+    ): types.LibinteractiveGenPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function LoginDetailsPayload(
+      elementId: string = 'payload',
+    ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function PrivacyPolicyDetailsPayload(
+      elementId: string = 'payload',
+    ): types.PrivacyPolicyDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ProblemDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemDetailsPayload {
+      return ((x) => {
+        if (typeof x.allRuns !== 'undefined' && x.allRuns !== null)
+          x.allRuns = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.allRuns);
+        if (
+          typeof x.clarifications !== 'undefined' &&
+          x.clarifications !== null
+        )
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+        x.problem = ((x) => {
+          if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
+            x.problemsetter = ((x) => {
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          return x;
+        })(x.problem);
+        if (typeof x.runs !== 'undefined' && x.runs !== null)
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+        x.solvers = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.solvers);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ProblemEditPayload(
+      elementId: string = 'payload',
+    ): types.ProblemEditPayload {
+      return ((x) => {
+        x.log = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.author = ((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.author);
+            x.committer = ((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.committer);
+            return x;
+          });
+        })(x.log);
+        if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
+          x.problemsetter = ((x) => {
+            if (
+              typeof x.creation_date !== 'undefined' &&
+              x.creation_date !== null
+            )
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        if (
+          typeof x.publishedRevision !== 'undefined' &&
+          x.publishedRevision !== null
+        )
+          x.publishedRevision = ((x) => {
+            x.author = ((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.author);
+            x.committer = ((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.committer);
+            return x;
+          })(x.publishedRevision);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ProblemFormPayload(
+      elementId: string = 'payload',
+    ): types.ProblemFormPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ProblemListCollectionPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListCollectionPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ProblemListPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ProblemPrintDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemPrintDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.creation_date = ((x: number) => new Date(x * 1000))(
+            x.creation_date,
+          );
+          if (
+            typeof x.nextExecutionTimestamp !== 'undefined' &&
+            x.nextExecutionTimestamp !== null
+          )
+            x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextExecutionTimestamp,
+            );
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
+            x.problemsetter = ((x) => {
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          if (typeof x.runs !== 'undefined' && x.runs !== null)
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (typeof x.details !== 'undefined' && x.details !== null)
+                  x.details = ((x) => {
+                    if (
+                      typeof x.feedback !== 'undefined' &&
+                      x.feedback !== null
+                    )
+                      x.feedback = ((x) => {
+                        x.date = ((x: number) => new Date(x * 1000))(x.date);
+                        if (
+                          typeof x.feedback_thread !== 'undefined' &&
+                          x.feedback_thread !== null
+                        )
+                          x.feedback_thread = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              x.timestamp = ((x: number) => new Date(x * 1000))(
+                                x.timestamp,
+                              );
+                              return x;
+                            });
+                          })(x.feedback_thread);
+                        return x;
+                      })(x.feedback);
+                    return x;
+                  })(x.details);
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+          if (typeof x.solvers !== 'undefined' && x.solvers !== null)
+            x.solvers = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.solvers);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ProblemQualityPayload(
+      elementId: string = 'payload',
+    ): types.ProblemQualityPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ProblemsMineInfoPayload(
+      elementId: string = 'payload',
+    ): types.ProblemsMineInfoPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function SchoolOfTheMonthPayload(
+      elementId: string = 'payload',
+    ): types.SchoolOfTheMonthPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function SchoolProfileDetailsPayload(
+      elementId: string = 'payload',
+    ): types.SchoolProfileDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function SchoolRankPayload(
+      elementId: string = 'payload',
+    ): types.SchoolRankPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ScoreboardMergePayload(
+      elementId: string = 'payload',
+    ): types.ScoreboardMergePayload {
+      return ((x) => {
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function StatsPayload(
+      elementId: string = 'payload',
+    ): types.StatsPayload {
+      return ((x) => {
+        if (typeof x.max_wait_time !== 'undefined' && x.max_wait_time !== null)
+          x.max_wait_time = ((x: number) => new Date(x * 1000))(
+            x.max_wait_time,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function StudentProgressByAssignmentPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressByAssignmentPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        x.problems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (typeof x.feedback !== 'undefined' && x.feedback !== null)
+                  x.feedback = ((x) => {
+                    x.date = ((x: number) => new Date(x * 1000))(x.date);
+                    return x;
+                  })(x.feedback);
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+            return x;
+          });
+        })(x.problems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function StudentProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function StudentsProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentsProgressPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function SubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.SubmissionsListPayload {
+      return ((x) => {
+        x.submissions = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.submissions);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function SupportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.SupportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function TeamGroupEditPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupEditPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function TeamGroupNewPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function TeamsGroupListPayload(
+      elementId: string = 'payload',
+    ): types.TeamsGroupListPayload {
+      return ((x) => {
+        x.teamsGroups = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+            return x;
+          });
+        })(x.teamsGroups);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserDependentsPayload(
+      elementId: string = 'payload',
+    ): types.UserDependentsPayload {
+      return ((x) => {
+        x.dependents = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.parent_email_verification_deadline !== 'undefined' &&
+              x.parent_email_verification_deadline !== null
+            )
+              x.parent_email_verification_deadline = ((x: number) =>
+                new Date(x * 1000))(x.parent_email_verification_deadline);
+            return x;
+          });
+        })(x.dependents);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function UserDocsPayload(
+      elementId: string = 'payload',
+    ): types.UserDocsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function UserProfileDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserProfileDetailsPayload {
+      return ((x) => {
+        if (
+          typeof x.extraProfileDetails !== 'undefined' &&
+          x.extraProfileDetails !== null
+        )
+          x.extraProfileDetails = ((x) => {
+            x.contests = ((x) => {
+              if (x instanceof Object) {
+                Object.keys(x).forEach(
+                  (y) =>
+                    (x[y] = ((x) => {
+                      x.data = ((x) => {
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      })(x.data);
+                      return x;
+                    })(x[y])),
+                );
+              }
+              return x;
+            })(x.contests);
+            x.createdContests = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                if (
+                  typeof x.original_finish_time !== 'undefined' &&
+                  x.original_finish_time !== null
+                )
+                  x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                    x.original_finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdContests);
+            x.createdCourses = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdCourses);
+            x.ownedBadges = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (
+                  typeof x.assignation_time !== 'undefined' &&
+                  x.assignation_time !== null
+                )
+                  x.assignation_time = ((x: number) => new Date(x * 1000))(
+                    x.assignation_time,
+                  );
+                if (
+                  typeof x.first_assignation !== 'undefined' &&
+                  x.first_assignation !== null
+                )
+                  x.first_assignation = ((x: number) => new Date(x * 1000))(
+                    x.first_assignation,
+                  );
+                return x;
+              });
+            })(x.ownedBadges);
+            return x;
+          })(x.extraProfileDetails);
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserRankTableLoggedOutPayload(
+      elementId: string = 'payload',
+    ): types.UserRankTableLoggedOutPayload {
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserRankTablePayload(
+      elementId: string = 'payload',
+    ): types.UserRankTablePayload {
+      return ((x) => {
+        if (typeof x.lastUpdated !== 'undefined' && x.lastUpdated !== null)
+          x.lastUpdated = ((x: number) => new Date(x * 1000))(x.lastUpdated);
+        x.ranking = ((x) => {
+          x.rank = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (typeof x.timestamp !== 'undefined' && x.timestamp !== null)
+                x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+              return x;
+            });
+          })(x.rank);
+          return x;
+        })(x.ranking);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function UserRolesPayload(
+      elementId: string = 'payload',
+    ): types.UserRolesPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function VerificationParentalTokenDetailsPayload(
+      elementId: string = 'payload',
+    ): types.VerificationParentalTokenDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
-  export interface ActivityEvent { classname: string; event: types.Event; ip?: number; time: Date; username: string; };
-
-  export interface ActivityFeedPayload { alias: string; events: types.ActivityEvent[]; length: number; page: number; pagerItems: types.PageItem[]; type: string; };
-
-  export interface AddedProblem { alias: string; commit?: string; is_extra_problem?: boolean; points: number; };
-
-  export interface AdminCourses { admin: { accessMode: string; activeTab: string; filteredCourses: { archived: types.CoursesByTimeType; current: types.CoursesByTimeType; past: types.CoursesByTimeType; teachingAssistant: types.CoursesByTimeType; }; }; };
-
-  export interface AiEditorialJobDetails { created_at: Date; error_message?: string; is_retriable: boolean; job_id: string; md_en?: string; md_es?: string; md_pt?: string; problem_alias: string; status: string; validation_verdict?: string; };
-
-  export interface ApiToken { last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; };
-
-  export interface ArenaAssignment { alias?: string; assignment_type: string; description?: string; director: string; finish_time?: Date; name?: string; problems: types.NavbarProblemsetProblem[]; problemset_id: number; runs: types.Run[]; start_time: Date; totalRuns?: number; };
-
-  export interface ArenaContest { alias: string; director: string; finish_time?: Date; rerun_id?: number; start_time?: Date; title: string; window_length?: number; };
-
-  export interface ArenaCourseAssignment { alias: string; description: string; name: string; problemset_id: number; };
-
-  export interface ArenaCourseDetails { alias: string; assignments: types.CourseAssignment[]; languages?: string[]; name: string; };
-
-  export interface ArenaCoursePayload { assignment: types.ArenaCourseAssignment; clarifications: types.Clarification[]; course: types.ArenaCourseDetails; currentProblem?: types.ProblemDetails; problems: types.ArenaCourseProblem[]; runs: types.Run[]; scoreboard?: types.Scoreboard; };
-
-  export interface ArenaCourseProblem { alias: string; letter: string; title: string; };
-
-  export interface ArenaProblemDetails { accepts_submissions: boolean; alias: string; commit: string; input_limit: number; languages: string[]; letter?: string; points: number; problem_id?: number; problemsetter?: types.ProblemsetterInfo; quality_seal: boolean; runs?: types.Run[]; settings?: types.ProblemSettingsDistrib; source?: string; statement?: types.ProblemStatement; title: string; visibility: number; };
-
-  export interface ArenaProblemset { admin?: boolean; admission_mode?: string; alias?: string; courseAssignments?: types.CourseAssignment[]; director?: string; feedback?: string; finish_time?: Date; name?: string; opened?: boolean; original_contest_alias?: string; original_problemset_id?: number; problems?: types.ProblemsetProblem[]; problemset_id?: number; requests_user_information?: string; show_penalty?: boolean; start_time?: Date; submission_deadline?: Date; submissions_gap?: number; title?: string; };
-
-  export interface AssignmentDetails { admin: boolean; alias: string; assignmentType: string; courseAssignments: types.CourseAssignment[]; description: string; director: string; finishTime?: Date; name: string; problems: types.ProblemsetProblem[]; problemsetId: number; startTime: Date; };
-
-  export interface AssignmentDetailsPayload { courseDetails: types.CourseDetails; currentAssignment: types.ArenaAssignment; isTeachingAssistant: boolean; scoreboard?: types.Scoreboard; shouldShowFirstAssociatedIdentityRunWarning: boolean; showRanking: boolean; };
-
-  export interface AssignmentProgress { [key: string]: types.Progress; };
-
-  export interface AssignmentsProblemsPoints { alias: string; extraPoints: number; name: string; order: number; points: number; problems: { alias: string; isExtraProblem: boolean; order: number; points: number; title: string; }[]; };
-
-  export interface AssociatedIdentity { default: boolean; username: string; };
-
-  export interface AuthIdentityExt { currentIdentity: types.IdentityExt; loginIdentity: types.IdentityExt; };
-
-  export interface AuthorRankTablePayload { length: number; page: number; pagerItems: types.PageItem[]; ranking: types.AuthorsRank; };
-
-  export interface AuthorsRank { ranking: { author_ranking?: number; author_score: number; classname: string; country_id?: string; name?: string; username: string; }[]; total: number; };
-
-  export interface Badge { assignation_time?: Date; badge_alias: string; first_assignation?: Date; owners_count: number; total_users: number; };
-
-  export interface BadgeDetailsPayload { badge: types.Badge; };
-
-  export interface BadgeListPayload { badges: string[]; ownedBadges: types.Badge[]; };
-
-  export interface BestSolvers { classname: string; language: string; memory: number; runtime: number; time: Date; username: string; };
-
-  export interface CDP { casesStore: types.CDPCasesStore; problemCodeContent: string; problemCodeExtension: string; problemMarkdown: string; problemName: string; problemSolutionMarkdown: string; };
-
-  export interface CDPCase { autoPoints: boolean; caseID: string; groupID: string; lines: types.CDPLine[]; name: string; output: string; points: number; };
-
-  export interface CDPCasesStore { groups: types.CDPGroup[]; hide: boolean; layouts: { [key: string]: string; }[]; selected: { caseID?: string; groupID?: string; }; };
-
-  export interface CDPGroup { autoPoints: boolean; cases: types.CDPCase[]; groupID: string; name: string; points: number; ungroupedCase: boolean; };
-
-  export interface CDPLine { caseID: string; data: { kind: string|string|string|string; value: string; }; label: string; lineID: string; };
-
-  export interface CachedExtraProfileDetails { badges: string[]; contests: types.UserProfileContests; createdContests: types.Contest[]; createdCourses: types.Course[]; createdProblems: types.Problem[]; solvedProblems: types.Problem[]; stats: types.UserProfileStats[]; unsolvedProblems: types.Problem[]; };
-
-  export interface CaseResult { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; out_diff?: string; score: number; verdict: string; };
-
-  export interface CertificateDetailsPayload { uuid: string; };
-
-  export interface CertificateListItem { certificate_type: string; date: Date; name?: string; verification_code: string; };
-
-  export interface CertificateListMinePayload { certificates: types.CertificateListItem[]; };
-
-  export interface CertificateValidationPayload { certificate?: string; valid: boolean; verification_code: string; };
-
-  export interface Clarification { answer?: string; assignment_alias?: string; author: string; clarification_id: number; contest_alias?: string; message: string; problem_alias: string; public: boolean; receiver?: string; time: Date; };
-
-  export interface CoderOfTheMonth { category: string; classname: string; coder_of_the_month_id: number; country_id: string; description?: string; problems_solved: number; ranking: number; school_id?: number; score: number; selected_by?: number; time: string; user_id: number; username: string; };
-
-  export interface CoderOfTheMonthList { classname: string; country_id: string; date: string; gravatar_32: string; problems_solved?: number; score?: number; username: string; }[];
-
-  export interface CoderOfTheMonthPayload { candidatesToCoderOfTheMonth: types.CoderOfTheMonthList; category: string; codersOfCurrentMonth: types.CoderOfTheMonthList; codersOfPreviousMonth: types.CoderOfTheMonthList; isMentor: boolean; options?: { canChooseCoder: boolean; coderIsSelected: boolean; }; };
-
-  export interface CollectionDetailsByAuthorPayload { authors: string[]; authorsRanking: types.AuthorsRank; column: string; columns: string[]; keyword: string; language: string; languages: string[]; loggedIn: boolean; mode: string; modes: string[]; pagerItems: types.PageItem[]; problems: types.ProblemListItem[]; selectedTags: string[]; tagData: { name?: string; }[]; tags: string[]; };
-
-  export interface CollectionDetailsByLevelPayload { column: string; columns: string[]; difficulty: string; frequentTags: types.TagWithProblemCount[]; keyword: string; language: string; languages: string[]; level: string; loggedIn: boolean; mode: string; modes: string[]; pagerItems: types.PageItem[]; problems: types.ProblemListItem[]; publicTags: types.TagWithProblemCount[]; selectedTags: string[]; tagData: { name?: string; }[]; tagsList: string[]; };
-
-  export interface CommitRunsDiff { [key: string]: types.RunsDiff[]; };
-
-  export interface CommonPayload { apiTokens: types.ApiToken[]; associatedIdentities: types.AssociatedIdentity[]; currentEmail: string; currentName?: string; currentUsername: string; gravatarURL128: string; gravatarURL51: string; inContest: boolean; isAdmin: boolean; isLoggedIn: boolean; isMainUserIdentity: boolean; isReviewer: boolean; isUnder13User: boolean; lockDownImage: string; mentorCanChooseCoder: boolean; navbarSection: string; nextRegisteredContestForUser?: types.ContestListItem; omegaUpLockDown: boolean; profileProgress: number; userClassname: string; userCountry: string; userTypes: string[]; userVerificationDeadline?: Date; };
-
-  export interface ConsentStatement { contest_alias: string; privacy_git_object_id?: string; share_user_information?: boolean; statement_type?: string; };
-
-  export interface Contest { acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id?: number; score_mode: string; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length?: number; };
-
-  export interface ContestAdmin { role: string; username: string; };
-
-  export interface ContestAdminDetails { admin: boolean; admission_mode: string; alias: string; archived: boolean; available_languages: { [key: string]: string; }; canSetRecommended: boolean; contest_for_teams: boolean; default_show_all_contestants_in_scoreboard: boolean; description: string; director: string; feedback: string; finish_time: Date; has_submissions: boolean; languages: string[]; needs_basic_information: boolean; opened: boolean; original_contest_alias?: string; original_problemset_id?: number; penalty: number; penalty_calc_policy: string; penalty_type: string; points_decay_factor: number; problems?: types.ProblemsetProblem[]; problemset_id: number; recommended?: boolean; requests_user_information: string; rerun_id?: number; score_mode: string; scoreboard: number; scoreboard_url?: string; scoreboard_url_admin?: string; show_penalty: boolean; show_scoreboard_after: boolean; start_time: Date; submission_deadline?: Date; submissions_gap: number; title: string; window_length?: number; };
-
-  export interface ContestCertificatesAdminDetails { certificateCutoff?: number; certificatesStatus: string; isCertificateGenerator: boolean; };
-
-  export interface ContestDetails { admin: boolean; admission_mode: string; alias: string; archived: boolean; contest_for_teams: boolean; default_show_all_contestants_in_scoreboard: boolean; description: string; director: string; feedback: string; finish_time: Date; has_submissions: boolean; languages: string[]; needs_basic_information: boolean; opened: boolean; original_contest_alias?: string; original_problemset_id?: number; penalty: number; penalty_calc_policy: string; penalty_type: string; points_decay_factor: number; problems: types.ProblemsetProblem[]; problemset_id: number; recommended: boolean; requests_user_information: string; rerun_id?: number; score_mode: string; scoreboard: number; scoreboard_url?: string; scoreboard_url_admin?: string; show_penalty: boolean; show_scoreboard_after: boolean; start_time: Date; submission_deadline?: Date; submissions_gap: number; title: string; window_length?: number; };
-
-  export interface ContestDetailsPayload { adminPayload?: { allRuns: types.Run[]; totalRuns: number; users: types.ContestUser[]; }; clarifications: types.Clarification[]; contest: types.ContestPublicDetails; original?: { contest: dao.Contests; scoreboard?: types.Scoreboard; scoreboardEvents?: types.ScoreboardEvent[]; }; problems: types.NavbarProblemsetProblem[]; scoreboard: types.Scoreboard; scoreboardEvents: types.ScoreboardEvent[]; shouldShowFirstAssociatedIdentityRunWarning: boolean; submissionDeadline?: Date; };
-
-  export interface ContestEditPayload { admins: types.ContestAdmin[]; certificatesDetails: types.ContestCertificatesAdminDetails; details: types.ContestAdminDetails; group_admins: types.ContestGroupAdmin[]; groups: types.ContestGroup[]; original_contest_admission_mode?: string; problems: types.ProblemsetProblemWithVersions[]; requests: types.ContestRequest[]; teams_group?: types.ContestGroup; users: types.ContestUser[]; };
-
-  export interface ContestGroup { alias: string; name: string; };
-
-  export interface ContestGroupAdmin { alias: string; name: string; role: string; };
-
-  export interface ContestIntroPayload { contest: types.ContestPublicDetails; needsBasicInformation: boolean; privacyStatement: types.PrivacyStatement; requestsUserInformation: string; shouldShowModalToLoginWithRegisteredIdentity: boolean; userBasicInformation: types.UserBasicInformation; };
-
-  export interface ContestList { current: types.ContestListItem[]; future: types.ContestListItem[]; past: types.ContestListItem[]; };
-
-  export interface ContestListItem { admission_mode: string; alias: string; contest_id: number; contestants: number; description: string; duration_minutes?: number; finish_time: Date; last_updated: Date; organizer: string; original_finish_time: Date; participating: boolean; problemset_id: number; recommended: boolean; rerun_id?: number; score_mode?: string; scoreboard_url?: string; scoreboard_url_admin?: string; start_time: Date; title: string; window_length?: number; };
-
-  export interface ContestListMinePayload { contests: types.Contest[]; privateContestsAlert: boolean; };
-
-  export interface ContestListPayload { contests: types.ContestListItem[]; countContests: number; query?: string; };
-
-  export interface ContestListv2Payload { contests: types.ContestList; countContests: { current: number; future: number; past: number; }; pageSize: number; query?: string; };
-
-  export interface ContestNewPayload { canSetRecommended?: boolean; hasVisitedSection?: boolean; languages: { [key: string]: string; }; };
-
-  export interface ContestParticipated { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; };
-
-  export interface ContestPracticeDetailsPayload { adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[]; }; clarifications: types.Clarification[]; contest: types.ContestPublicDetails; contestAdmin: boolean; original?: { contest: dao.Contests; scoreboard?: types.Scoreboard; scoreboardEvents?: types.ScoreboardEvent[]; }; problems: types.NavbarProblemsetProblem[]; shouldShowFirstAssociatedIdentityRunWarning: boolean; submissionDeadline?: Date; };
-
-  export interface ContestPrintDetailsPayload { contestTitle: string; problems: { [key: number]: null|types.ProblemDetails; }; };
-
-  export interface ContestPublicDetails { admission_mode: string; alias: string; default_show_all_contestants_in_scoreboard: boolean; description: string; director: string; extra_note?: string; feedback: string; finish_time: Date; languages: string; penalty: number; penalty_calc_policy: string; penalty_type: string; points_decay_factor: number; problemset_id: number; rerun_id?: number; score_mode: string; scoreboard: number; show_penalty: boolean; show_scoreboard_after: boolean; start_time: Date; submissions_gap: number; title: string; user_registration_accepted?: boolean; user_registration_answered?: boolean; user_registration_requested?: boolean; window_length?: number; };
-
-  export interface ContestReport { country?: string; is_invited: boolean; name?: string; place?: number; problems: types.ScoreboardRankingProblem[]; total: { penalty: number; points: number; }; username: string; };
-
-  export interface ContestReportDetailsPayload { contestAlias: string; contestReport: types.ContestReport[]; };
-
-  export interface ContestRequest { accepted?: boolean; admin?: { username?: string; }; country?: string; last_update?: Date; request_time: Date; username: string; };
-
-  export interface ContestScoreboardPayload { contest: types.ContestDetails; contestAdmin: boolean; problems: types.NavbarProblemsetProblem[]; scoreboard: types.Scoreboard; scoreboardEvents: types.ScoreboardEvent[]; scoreboardToken?: string; };
-
-  export interface ContestUser { access_time?: Date; country_id?: string; end_time?: Date; is_owner?: number; username: string; };
-
-  export interface ContestVirtualDetailsPayload { contest: types.ContestPublicDetails; };
-
-  export interface Contestant { country?: string; email?: string; gender?: string; name?: string; school?: string; state?: string; username: string; };
-
-  export interface Course { acl_id?: number; admission_mode: string; alias: string; archived: boolean; course_id: number; description: string; finish_time?: Date; group_id?: number; languages?: string; level?: string; minimum_progress_for_certificate?: number; name: string; needs_basic_information: boolean; objective?: string; requests_user_information: string; school_id?: number; show_scoreboard: boolean; start_time: Date; };
-
-  export interface CourseAdmin { role: string; username: string; };
-
-  export interface CourseAssignment { alias: string; assignment_type: string; description: string; finish_time?: Date; has_runs: boolean; max_points: number; name: string; opened: boolean; order: number; problemCount: number; problemset_id: number; publish_time_delay?: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; };
-
-  export interface CourseCardEnrolled { alias: string; name: string; progress: number; school_name?: string; };
-
-  export interface CourseCardFinished { alias: string; name: string; };
-
-  export interface CourseCardPublic { alias: string; alreadyStarted: boolean; lessonCount: number; level?: string; name: string; school_name?: string; studentCount: number; };
-
-  export interface CourseClarificationsPayload { clarifications: types.Clarification[]; is_admin: boolean; is_teaching_assistant: boolean; length: number; page: number; pagerItems: types.PageItem[]; };
-
-  export interface CourseCloneDetailsPayload { creator: { classname: string; username: string; }; details: types.CourseDetails; token?: string; };
-
-  export interface CourseDetails { admission_mode: string; alias: string; archived: boolean; assignments: types.CourseAssignment[]; clarifications: types.Clarification[]; description: string; finish_time?: Date; is_admin: boolean; is_curator: boolean; is_teaching_assistant: boolean; languages?: string[]; level?: string; name: string; needs_basic_information: boolean; objective?: string; recommended: boolean; requests_user_information: string; school_id?: number; school_name?: string; show_scoreboard: boolean; start_time: Date; student_count?: number; teaching_assistant_enabled: boolean; unlimited_duration: boolean; };
-
-  export interface CourseDetailsPayload { details: types.CourseDetails; progress?: types.AssignmentProgress; };
-
-  export interface CourseEditPayload { admins: types.CourseAdmin[]; allLanguages: { [key: string]: string; }; assignmentProblems: types.ProblemsetProblem[]; course: types.CourseDetails; groupsAdmins: types.CourseGroupAdmin[]; groupsTeachingAssistants: types.CourseGroupAdmin[]; identityRequests: types.IdentityRequest[]; selectedAssignment?: types.CourseAssignment; students: types.CourseStudent[]; tags: string[]; teachingAssistants: types.CourseAdmin[]; };
-
-  export interface CourseGroupAdmin { alias: string; name: string; role: string; };
-
-  export interface CourseListMinePayload { courses: types.AdminCourses; };
-
-  export interface CourseNewPayload { hasVisitedSection: boolean; is_admin: boolean; is_curator: boolean; languages: { [key: string]: string; }; };
-
-  export interface CourseProblem { accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; runs: types.CourseRun[]; submissions: number; title: string; version: string; visibility: number; visits: number; };
-
-  export interface CourseProblemStatistics { assignment_alias: string; average: number; avg_runs: number; completed_score_percentage: number; high_score_percentage: number; low_score_percentage: number; max_points: number; maximum: number; minimum: number; problem_alias: string; variance: number; };
-
-  export interface CourseProblemTried { alias: string; title: string; username: string; };
-
-  export interface CourseProblemVerdict { assignment_alias: string; problem_alias: string; problem_id: number; runs: number; verdict?: string; };
-
-  export interface CourseRun { contest_score?: number; feedback?: { author: string; author_classname: string; date: Date; feedback: string; range_bytes_end?: number; range_bytes_start?: number; }; guid: string; language: string; memory: number; penalty: number; runtime: number; score: number; source?: string; status: string; submit_delay: number; time: Date; verdict: string; };
-
-  export interface CourseScoreboardPayload { assignment: types.AssignmentDetails; problems: types.NavbarProblemsetProblem[]; scoreboard: types.Scoreboard; scoreboardToken?: string; };
-
-  export interface CourseStatisticsPayload { course: types.CourseDetails; problemStats: types.CourseProblemStatistics[]; verdicts: types.CourseProblemVerdict[]; };
-
-  export interface CourseStudent { name?: string; username: string; };
-
-  export interface CourseSubmissionsListPayload { solvedProblems: { [key: string]: types.CourseProblemTried[]; }; unsolvedProblems: { [key: string]: types.CourseProblemTried[]; }; };
-
-  export interface CourseTabsPayload { courses: { enrolled: types.CourseCardEnrolled[]; finished: types.CourseCardFinished[]; public: types.CourseCardPublic[]; }; hasVisitedSection: boolean; };
-
-  export interface CoursesByAccessMode { accessMode: string; activeTab: string; filteredCourses: { current: types.CoursesByTimeType; past: types.CoursesByTimeType; }; };
-
-  export interface CoursesByTimeType { courses: types.FilteredCourse[]; timeType: string; };
-
-  export interface CoursesList { admin: types.FilteredCourse[]; archived: types.FilteredCourse[]; public: types.FilteredCourse[]; student: types.FilteredCourse[]; teachingAssistant: types.FilteredCourse[]; };
-
-  export interface CurrentSession { apiTokenId?: number; api_tokens: types.ApiToken[]; associated_identities: types.AssociatedIdentity[]; auth_token?: string; cacheKey?: string; classname: string; email?: string; identity?: dao.Identities; is_admin: boolean; is_under_13_user: boolean; loginIdentity?: dao.Identities; mentor_can_choose_coder: boolean; user?: dao.Users; user_verification_deadline?: Date; valid: boolean; };
-
-  export interface EmailEditDetailsPayload { email?: string; profile?: types.UserProfileInfo; };
-
-  export interface Event { courseAlias?: string; courseName?: string; name: string; problem?: string; };
-
-  export interface Experiment { config: boolean; hash: string; name: string; };
-
-  export interface ExtraProfileDetails { badges: string[]; contests: types.UserProfileContests; createdContests: types.Contest[]; createdCourses: types.Course[]; createdProblems: types.Problem[]; hasPassword: boolean; ownedBadges: types.Badge[]; solvedProblems: types.Problem[]; stats: types.UserProfileStats[]; unsolvedProblems: types.Problem[]; };
-
-  export interface FilteredCourse { accept_teacher?: boolean; admission_mode: string; alias: string; assignments: types.CourseAssignment[]; counts: { [key: string]: number; }; description: string; finish_time?: Date; is_open: boolean; name: string; progress?: number; school_name?: string; start_time: Date; };
-
-  export interface FullIDEPayload { acceptedLanguages: string[]; preferredLanguage?: string; };
-
-  export interface GraderStatus { broadcaster_sockets: number; embedded_runner: boolean; queue: { run_queue_length: number; runner_queue_length: number; runners: string[]; running: { id: number; name: string; }[]; }; status: string; };
-
-  export interface Group { alias: string; create_time: Date; description?: string; name: string; };
-
-  export interface GroupEditPayload { countries: dao.Countries[]; groupAlias: string; groupDescription?: string; groupName?: string; hasVisitedSection?: boolean; identities: types.Identity[]; isOrganizer: boolean; scoreboards: types.GroupScoreboard[]; };
-
-  export interface GroupListItem { label: string; value: string; };
-
-  export interface GroupListPayload { groups: types.Group[]; };
-
-  export interface GroupScoreboard { alias: string; create_time: string; description?: string; name: string; };
-
-  export interface GroupScoreboardContestsPayload { availableContests: types.ContestListItem[]; contests: types.ScoreboardContest[]; groupAlias: string; scoreboardAlias: string; };
-
-  export interface GroupScoreboardDetails { contests: types.ScoreboardContest[]; ranking: types.ScoreboardRanking[]; scoreboard: types.ScoreboardDetails; };
-
-  export interface GroupScoreboardDetailsPayload { details: types.GroupScoreboardDetails; groupAlias: string; scoreboardAlias: string; };
-
-  export interface Histogram { difficulty: number; difficultyHistogram?: string; quality: number; qualityHistogram?: string; };
-
-  export interface Identity { classname?: string; country?: string; country_id?: string; gender?: string; name?: string; password?: string; school?: string; school_id?: number; school_name?: string; state?: string; state_id?: string; username: string; };
-
-  export interface IdentityExt { classname: string; country_id?: string; current_identity_school_id?: number; gender?: string; identity_id: number; language_id?: number; name?: string; password?: string; state_id?: string; user_id?: number; username: string; };
-
-  export interface IdentityRequest { accepted?: boolean; admin?: { name?: string; username: string; }; classname: string; country?: string; country_id?: string; last_update?: Date; name?: string; request_time: Date; username: string; };
-
-  export interface IndexPayload { coderOfTheMonthData: { all?: types.UserProfile; female?: types.UserProfile; }; currentUserInfo: { username?: string; }; schoolOfTheMonthData?: { country?: string; country_id?: string; name: string; school_id: number; state?: string; }; schoolRank: { name: string; ranking: number; school_id: number; school_of_the_month_id: number; score: number; }[]; userRank: types.CoderOfTheMonth[]; };
-
-  export interface InteractiveInterface { ExecutableDescription: { Args: string[]; Env: { [key: string]: string; }; }; Files: { [key: string]: string; }; MakefileRules: { Compiler: string; Debug: boolean; Params: string; Requisites: string[]; Targets: string[]; }[]; };
-
-  export interface InteractiveSettingsDistrib { idl: string; language: string; main_source: string; module_name: string; templates: { [key: string]: string; }; };
-
-  export interface IntroCourseDetails { details: types.CourseDetails; progress: { [key: string]: { [key: string]: number; }; }; };
-
-  export interface IntroDetailsPayload { course: types.CourseDetails; isFirstTimeAccess: boolean; needsBasicInformation: boolean; shouldShowAcceptTeacher: boolean; shouldShowResults: boolean; statements: { acceptTeacher?: types.PrivacyStatement; privacy?: types.PrivacyStatement; }; userRegistrationAccepted?: boolean; userRegistrationAnswered?: boolean; userRegistrationRequested?: boolean; };
-
-  export interface LibinteractiveError { description: string; field: string; };
-
-  export interface LibinteractiveGenPayload { error?: types.LibinteractiveError; idl?: string; language?: string; name?: string; os?: string; };
-
-  export interface LimitsSettings { ExtraWallTime: string; MemoryLimit: number|string; OutputLimit: number|string; OverallWallTimeLimit: string; TimeLimit: string; };
-
-  export interface ListItem { key: string; value: string; };
-
-  export interface LoginDetailsPayload { facebookUrl?: string; hasVisitedSection?: boolean; statusError?: string; validateRecaptcha: boolean; verifyEmailSuccessfully?: string; };
-
-  export interface MergedScoreboardEntry { contests: { [key: string]: { penalty: number; points: number; }; }; name?: string; place?: number; total: { penalty: number; points: number; }; username: string; };
-
-  export interface NavbarProblemsetProblem { acceptsSubmissions: boolean; alias: string; bestScore: number; hasMyRuns?: boolean; hasRuns: boolean; maxScore: number|number; myBestScore?: number; text: string; };
-
-  export interface NominationListItem { author: { name?: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name?: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time?: Date; user: { name?: string; username: string; }; vote: number; }[]; };
-
-  export interface NominationStatus { alreadyReviewed: boolean; canNominateProblem: boolean; dismissed: boolean; dismissedBeforeAc: boolean; language: string; nominated: boolean; nominatedBeforeAc: boolean; solved: boolean; tried: boolean; };
-
-  export interface Notification { contents: types.NotificationContents; notification_id: number; timestamp: Date; };
-
-  export interface NotificationContents { badge?: string; body?: { iconUrl: string; localizationParams: string[]; localizationString: string; url: string; }; message?: string; status?: string; type: string; url?: string; };
-
-  export interface PageItem { class: string; label: string; page: number; url?: string; };
-
-  export interface Participant { country_id?: string; gender?: string; name?: string; participant_password?: string; participant_username: string; password?: string; school_name?: string; state_id?: string; username: string; };
-
-  export interface PrivacyPolicyDetailsPayload { git_object_id: string; has_accepted: boolean; policy_markdown: string; statement_type: string; };
-
-  export interface PrivacyStatement { gitObjectId?: string; markdown: string; statementType: string; };
-
-  export interface Problem { accepted: number; alias: string; difficulty: number; quality_seal: boolean; submissions: number; title: string; };
-
-  export interface ProblemAdmin { role: string; username: string; };
-
-  export interface ProblemCasesContents { [key: string]: { contestantOutput?: string; in: string; out: string; }; };
-
-  export interface ProblemDetails { accepted: number; accepts_submissions: boolean; admin?: boolean; alias: string; allow_user_add_tags: boolean; commit: string; creation_date: Date; difficulty?: number; email_clarifications: boolean; input_limit: number; karel_problem: boolean; languages: string[]; letter?: string; limits: types.SettingLimits; nextExecutionTimestamp?: Date; nextSubmissionTimestamp?: Date; nominationStatus: types.NominationStatus; order: string; points: number; preferred_language?: string; problem_id: number; problemsetter?: types.ProblemsetterInfo; quality_seal: boolean; runs?: types.RunWithDetails[]; score: number; settings: types.ProblemSettingsDistrib; show_diff: string; solvers?: types.BestSolvers[]; source?: string; statement: types.ProblemStatement; submissions: number; title: string; version: string; visibility: number; visits: number; };
-
-  export interface ProblemDetailsPayload { allRuns?: types.Run[]; allowUserAddTags?: boolean; allowedSolutionsToSee: number; clarifications?: types.Clarification[]; hasVisitedSection?: boolean; histogram: types.Histogram; levelTags?: string[]; nominationStatus?: types.NominationStatus; problem: types.ProblemInfo; problemLevel?: string; publicTags?: string[]; reviewedProblemLevel?: string; reviewedPublicTags?: string[]; reviewedQualitySeal?: boolean; runs?: types.Run[]; selectedPrivateTags?: string[]; selectedPublicTags?: string[]; solutionStatus: string; solvers: types.BestSolvers[]; totalRuns?: number; user: types.UserInfoForProblem; };
-
-  export interface ProblemEditPayload { admins: types.ProblemAdmin[]; alias: string; allowUserAddTags: boolean; cdp?: types.CDP; emailClarifications: boolean; extraWallTime: number; groupAdmins: types.ProblemGroupAdmin[]; groupScorePolicy?: string; inputLimit: number; languages: string; levelTags: string[]; log: types.ProblemVersion[]; memoryLimit: number; outputLimit: number; overallWallTimeLimit: number; problemLevel?: string; problemsetter?: types.ProblemsetterInfo; publicTags: string[]; publishedRevision?: types.ProblemVersion; selectedPrivateTags: string[]; selectedPublicTags: string[]; showDiff: string; solution?: types.ProblemStatement; source: string; statement: types.ProblemStatement; statusError?: string; statusSuccess: boolean; timeLimit: number; title: string; validLanguages: { [key: string]: string; }; validator: string; validatorTimeLimit: number|number; validatorTypes: { [key: string]: null|string; }; visibility: number; visibilityStatuses: { [key: string]: number; }; };
-
-  export interface ProblemFormPayload { alias: string; allowUserAddTags: boolean; emailClarifications: boolean; extraWallTime: number|string; groupScorePolicy?: string; hasVisitedSection?: boolean; inputLimit: number|string; languages: string; levelTags: string[]; memoryLimit: number|string; message?: string; outputLimit: number|string; overallWallTimeLimit: number|string; parameter?: string; problem_level: string; publicTags: string[]; selectedTags?: types.SelectedTag[]; showDiff: string; source: string; statusError: string; tags: { name?: string; }[]; timeLimit: number|string; title: string; validLanguages: { [key: string]: string; }; validator: string; validatorTimeLimit: number|string; validatorTypes: { [key: string]: null|string; }; visibility: number; visibilityStatuses: { [key: string]: number; }; };
-
-  export interface ProblemGroupAdmin { alias: string; name: string; role: string; };
-
-  export interface ProblemInfo { accepts_submissions: boolean; alias: string; commit: string; input_limit: number; karel_problem: boolean; languages: string[]; letter?: string; limits: types.SettingLimits; nextExecutionTimestamp?: Date; nextSubmissionTimestamp?: Date; points: number; preferred_language?: string; problem_id: number; problemsetter?: types.ProblemsetterInfo; quality_seal: boolean; sample_input?: string; settings: types.ProblemSettingsDistrib; source?: string; statement: types.ProblemStatement; title: string; visibility: number; };
-
-  export interface ProblemListCollectionPayload { allTags: types.Tag[]; levelTags: string[]; problemCount: { name: string; problems_per_tag: number; }[]; };
-
-  export interface ProblemListItem { accepted: number; alias: string; can_be_removed?: boolean; difficulty?: number; difficulty_histogram: number[]; points: number; problem_id: number; quality?: number; quality_histogram: number[]; quality_seal: boolean; ratio: number; score: number; submissions: number; tags: { name: string; source: string; }[]; title: string; visibility: number; };
-
-  export interface ProblemListPayload { column: string; columns: string[]; keyword: string; language: string; languages: string[]; loggedIn: boolean; mode: string; modes: string[]; pagerItems: types.PageItem[]; problems: types.ProblemListItem[]; selectedTags: string[]; tagData: { name?: string; }[]; tags: string[]; };
-
-  export interface ProblemPrintDetailsPayload { details: types.ProblemDetails; };
-
-  export interface ProblemQualityPayload { canNominateProblem: boolean; dismissed: boolean; dismissedBeforeAc: boolean; language?: string; nominated: boolean; nominatedBeforeAc: boolean; problemAlias: string; solved: boolean; tried: boolean; };
-
-  export interface ProblemRequestData { contestAlias?: string; preventProblemsetOpen: boolean; problemAlias: string; problemsetId?: number; statementType: string; };
-
-  export interface ProblemSettings { Cases: { Cases: { Name: string; Weight: number; }[]; Name: string; }[]; Interactive?: { Interfaces: { [key: string]: { [key: string]: types.InteractiveInterface; }; }; LibinteractiveVersion: string; Main: string; ModuleName: string; ParentLang: string; Templates: { [key: string]: string; }; }; Limits: types.LimitsSettings; Slow: boolean; Validator: { GroupScorePolicy?: string; Lang?: string; Limits?: types.LimitsSettings; Name: string; Tolerance: number; }; };
-
-  export interface ProblemSettingsDistrib { cases: { [key: string]: { in: string; out: string; weight?: number; }; }; interactive?: types.InteractiveSettingsDistrib; limits: types.LimitsSettings; validator: { custom_validator?: { language: string; limits?: types.LimitsSettings; source: string; }; group_score_policy?: string; name: string; tolerance?: number; }; };
-
-  export interface ProblemStatement { images: { [key: string]: string; }; language: string; markdown: string; sources: { [key: string]: string; }; };
-
-  export interface ProblemVersion { author: types.Signature; commit: string; committer: types.Signature; message: string; parents: string[]; tree: { [key: string]: string; }; version: string; };
-
-  export interface ProblemsMineInfoPayload { isSysadmin: boolean; privateProblemsAlert: boolean; query?: string; visibilityStatuses: { [key: string]: number; }; };
-
-  export interface Problemset { admin?: boolean; admission_mode?: string; alias?: string; archived?: boolean; assignment_type?: string; contest_alias?: string; courseAssignments?: types.CourseAssignment[]; description?: string; director?: string; feedback?: string; finish_time?: Date; has_submissions?: boolean; languages?: string[]; name?: string; needs_basic_information?: boolean; opened?: boolean; original_contest_alias?: string; original_problemset_id?: number; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problems?: types.ProblemsetProblem[]; problemset_id?: number; requests_user_information?: string; rerun_id?: number; score_mode?: string; scoreboard?: number; scoreboard_url?: string; scoreboard_url_admin?: string; show_penalty?: boolean; show_scoreboard_after?: boolean; start_time?: Date; submission_deadline?: Date; submissions_gap?: number; title?: string; users?: { access_time?: Date; country?: string; email?: string; user_id?: number; username: string; }[]; window_length?: number; };
-
-  export interface ProblemsetProblem { accepted: number; accepts_submissions: boolean; alias: string; commit: string; difficulty: number; has_submissions: boolean; input_limit: number; is_extra_problem: boolean; languages: string; letter?: string; order: number; points: number; problem_id?: number; quality_payload?: types.ProblemQualityPayload; quality_seal: boolean; submissions: number; title: string; version: string; visibility: number; visits: number; };
-
-  export interface ProblemsetProblemWithVersions { accepted: number; accepts_submissions: boolean; alias: string; commit: string; difficulty: number; has_submissions: boolean; input_limit: number; languages: string; letter?: string; order: number; points: number; quality_payload?: types.ProblemQualityPayload; quality_seal: boolean; submissions: number; title: string; version: string; versions: { log: types.ProblemVersion[]; published: string; }; visibility: number; visits: number; };
-
-  export interface ProblemsetterInfo { classname: string; creation_date?: Date; name: string; username: string; };
-
-  export interface Progress { max_score: number; score: number; };
-
-  export interface Run { alias: string; classname: string; contest_alias?: string; contest_score?: number; country: string; execution?: string; guid: string; language: string; memory: number; output?: string; penalty: number; runtime: number; score: number; score_by_group?: { [key: string]: null|number; }; status: string; status_memory?: string; status_runtime?: string; submit_delay: number; suggestions?: number; time: Date; type?: string; username: string; verdict: string; };
-
-  export interface RunDetails { admin: boolean; alias: string; cases: types.ProblemCasesContents; compile_error?: string; details?: { compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: types.RunDetailsGroup[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }; feedback: types.SubmissionFeedback[]; guid: string; judged_by?: string; language: string; logs?: string; show_diff: string; source?: string; source_link?: boolean; source_name?: string; source_url?: string; };
-
-  export interface RunDetailsGroup { cases: types.CaseResult[]; contest_score: number; group: string; max_score: number; score: number; verdict?: string; };
-
-  export interface RunDetailsV2 { admin: boolean; cases: types.ProblemCasesContents; compile_error?: string; details?: { compile_meta?: { [key: string]: types.RunMetadata; }; groups?: types.RunDetailsGroup[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }; feedback?: types.SubmissionFeedback; judged_by?: string; logs?: string; show_diff: string; source?: string; source_link?: boolean; source_name?: string; source_url?: string; };
-
-  export interface RunMetadata { memory: number; sys_time: number; time: number; verdict: string; wall_time: number; };
-
-  export interface RunWithDetails { alias: string; classname: string; contest_alias?: string; contest_score?: number; country: string; details?: types.RunDetailsV2; execution?: string; guid: string; language: string; memory: number; output?: string; penalty: number; runtime: number; score: number; score_by_group?: { [key: string]: null|number; }; status: string; status_memory?: string; status_runtime?: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; };
-
-  export interface RunsDiff { guid: string; new_score?: number; new_status?: string; new_verdict?: string; old_score?: number; old_status?: string; old_verdict?: string; problemset_id?: number; username: string; };
-
-  export interface School { country_id?: string; name: string; ranking?: number; school_id: number; score: number; };
-
-  export interface SchoolCoderOfTheMonth { classname: string; time: string; username: string; };
-
-  export interface SchoolListItem { key: number; value: string; };
-
-  export interface SchoolOfTheMonthPayload { candidatesToSchoolOfTheMonth: { country_id: string; name: string; ranking: number; school_id: number; school_of_the_month_id: number; score: number; }[]; isMentor: boolean; options?: { canChooseSchool: boolean; schoolIsSelected: boolean; }; schoolsOfPreviousMonth: { country_id: string; name: string; ranking: number; school_id: number; }[]; schoolsOfPreviousMonths: { country_id: string; name: string; school_id: number; time: string; }[]; };
-
-  export interface SchoolProblemsSolved { month: number; problems_solved: number; year: number; };
-
-  export interface SchoolProfileDetailsPayload { coders_of_the_month: types.SchoolCoderOfTheMonth[]; country?: { id: string; name: string; }; monthly_solved_problems: types.SchoolProblemsSolved[]; ranking: number; school_id: number; school_name: string; school_users: types.SchoolUser[]; state_name?: string; };
-
-  export interface SchoolRankPayload { length: number; page: number; pagerItems: types.PageItem[]; rank: types.School[]; showHeader: boolean; totalRows: number; };
-
-  export interface SchoolUser { classname: string; created_problems: number; organized_contests: number; solved_problems: number; username: string; };
-
-  export interface Scoreboard { finish_time?: Date; problems: { alias: string; order: number; }[]; ranking: types.ScoreboardRankingEntry[]; start_time: Date; time: Date; title: string; };
-
-  export interface ScoreboardContest { acl_id: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback: string; finish_time: Date; languages: string; last_updated: number; only_ac?: boolean; penalty: string; penalty_calc_policy: string; points_decay_factor: number; problemset_id: number; recommended: boolean; rerun_id: number; score_mode: string; scoreboard: number; show_scoreboard_after: boolean; start_time: Date; submissions_gap: number; title: string; urgent: boolean; weight?: number; window_length?: number; };
-
-  export interface ScoreboardDetails { alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; };
-
-  export interface ScoreboardEvent { classname: string; country: string; delta: number; is_invited: boolean; name?: string; problem: { alias: string; penalty: number; points: number; }; total: { penalty: number; points: number; }; username: string; };
-
-  export interface ScoreboardMergePayload { contests: types.ContestListItem[]; };
-
-  export interface ScoreboardRanking { contests: { [key: string]: { penalty: number; points: number; }; }; name?: string; total: { penalty: number; points: number; }; username: string; };
-
-  export interface ScoreboardRankingEntry { classname: string; country: string; is_invited: boolean; name?: string; place?: number; problems: types.ScoreboardRankingProblem[]; total: { penalty: number; points: number; }; username: string; };
-
-  export interface ScoreboardRankingProblem { alias: string; penalty: number; pending?: number; percent: number; place?: number; points: number; run_details?: { cases?: types.CaseResult[]; details: { groups: types.ScoreboardRankingProblemDetailsGroup[]; }; }; runs: number; };
-
-  export interface ScoreboardRankingProblemDetailsGroup { cases: { meta: types.RunMetadata; }[]; };
-
-  export interface SelectedTag { public: boolean; tagname: string; };
-
-  export interface SettingLimits { input_limit: string; memory_limit: string; overall_wall_time_limit: string; time_limit: string; };
-
-  export interface Signature { email: string; name: string; time: Date; };
-
-  export interface Statements { [key: string]: string; };
-
-  export interface StatsPayload { alias: string; cases_stats?: { [key: string]: number; }; distribution?: { [key: number]: number; }; entity_type: string; max_wait_time?: Date; max_wait_time_guid?: string; pending_runs: string[]; size_of_bucket?: number; total_points?: number; total_runs: number; verdict_counts: { [key: string]: number; }; };
-
-  export interface StudentCourses { [key: string]: types.CoursesByAccessMode; };
-
-  export interface StudentProgress { classname: string; country_id?: string; name?: string; points: { [key: string]: { [key: string]: number; }; }; progress: { [key: string]: { [key: string]: number; }; }; score: { [key: string]: { [key: string]: number; }; }; username: string; };
-
-  export interface StudentProgressByAssignmentPayload { assignment: string; course: types.CourseDetails; problems: types.CourseProblem[]; student: string; students: types.StudentProgress[]; };
-
-  export interface StudentProgressInCourse { assignments: { [key: string]: { problems: { [key: string]: { progress: number; score: number; }; }; progress: number; score: number; }; }; classname: string; country_id?: string; courseProgress: number; courseScore: number; name?: string; username: string; };
-
-  export interface StudentProgressPayload { course: types.CourseDetails; student: string; students: types.StudentProgress[]; };
-
-  export interface StudentsProgressPayload { assignmentsProblems: types.AssignmentsProblemsPoints[]; course: types.CourseDetails; length: number; page: number; pagerItems: types.PageItem[]; students: types.StudentProgressInCourse[]; totalRows: number; };
-
-  export interface Submission { alias: string; language: string; memory: number; runtime: number; school_id?: number; school_name?: string; time: Date; title: string; username: string; verdict: string; };
-
-  export interface SubmissionFeedback { author: string; author_classname: string; date: Date; feedback: string; feedback_thread?: types.SubmissionFeedbackThread[]; range_bytes_end?: number; range_bytes_start?: number; submission_feedback_id: number; };
-
-  export interface SubmissionFeedbackThread { author: string; authorClassname: string; submission_feedback_thread_id: number; text: string; timestamp: Date; };
-
-  export interface SubmissionsListPayload { includeUser: boolean; submissions: types.Submission[]; username?: string; };
-
-  export interface SupportDetailsPayload { roleNamesWithDescription: types.UserRole[]; };
-
-  export interface Tag { name: string; };
-
-  export interface TagWithProblemCount { name: string; problemCount: number; };
-
-  export interface TeamGroupEditPayload { countries: dao.Countries[]; identities: types.Identity[]; isOrganizer: boolean; maxNumberOfContestants: number; teamGroup: { alias: string; description?: string; name?: string; numberOfContestants: number; }; teamsMembers: types.TeamMember[]; };
-
-  export interface TeamGroupNewPayload { maxNumberOfContestants: number; numberOfContestants: number; };
-
-  export interface TeamMember { classname: string; isMainUserIdentity: boolean; name?: string; team_alias: string; team_name?: string; username: string; };
-
-  export interface TeamsGroup { alias: string; create_time: Date; description?: string; name: string; };
-
-  export interface TeamsGroupListPayload { teamsGroups: types.TeamsGroup[]; };
-
-  export interface TimeTypeContests { [key: string]: types.ContestListItem[]; };
-
-  export interface UserBasicInformation { country?: string; school?: number; state?: string; };
-
-  export interface UserDependent { classname: string; name?: string; parent_email_verification_deadline?: Date; parent_verified?: boolean; username: string; };
-
-  export interface UserDependentsPayload { dependents: types.UserDependent[]; };
-
-  export interface UserDetailsPayload { emails: string[]; experiments: string[]; roleNames: types.UserRole[]; systemExperiments: types.Experiment[]; systemRoles: string[]; username: string; verified: boolean; };
-
-  export interface UserDocsPayload { docs: { [key: string]: types.UserDocument[]; }; };
-
-  export interface UserDocument { name: string; url: string; };
-
-  export interface UserInfoForProblem { admin: boolean; loggedIn: boolean; reviewer: boolean; };
-
-  export interface UserProfile { birth_date?: Date; classname: string; country: string; country_id?: string; email?: string; gender?: string; graduation_date?: Date; gravatar_92: string; has_competitive_objective?: boolean; has_learning_objective?: boolean; has_scholar_objective?: boolean; has_teaching_objective?: boolean; hide_problem_tags: boolean; is_own_profile: boolean; is_private: boolean; locale: string; name?: string; preferred_language?: string; scholar_degree?: string; school?: string; school_id?: number; state?: string; state_id?: string; username?: string; verified: boolean; };
-
-  export interface UserProfileContests { [key: string]: { data: types.ContestParticipated; place: number; }; };
-
-  export interface UserProfileDetailsPayload { countries: dao.Countries[]; extraProfileDetails?: types.ExtraProfileDetails; identities: types.AssociatedIdentity[]; profile: types.UserProfileInfo; programmingLanguages: { [key: string]: string; }; };
-
-  export interface UserProfileInfo { birth_date?: Date; classname: string; country?: string; country_id?: string; email?: string; gender?: string; graduation_date?: Date; gravatar_92?: string; has_competitive_objective?: boolean; has_learning_objective?: boolean; has_scholar_objective?: boolean; has_teaching_objective?: boolean; hide_problem_tags: boolean; is_own_profile: boolean; is_private: boolean; locale?: string; name?: string; preferred_language?: string; programming_languages: { [key: string]: string; }; rankinfo: { author_ranking?: number; name?: string; problems_solved?: number; rank?: number; }; scholar_degree?: string; school?: string; school_id?: number; state?: string; state_id?: string; username?: string; verified?: boolean; };
-
-  export interface UserProfileStats { date?: string; runs: number; verdict: string; };
-
-  export interface UserRank { rank: { classname: string; country_id?: string; name?: string; problems_solved: number; ranking?: number; score: number; timestamp?: Date; user_id: number; username: string; }[]; total: number; };
-
-  export interface UserRankInfo { author_ranking?: number; name: string; problems_solved: number; rank: number; };
-
-  export interface UserRankTableLoggedOutPayload { isLogged: boolean; lastUpdated?: Date; length: number; page: number; pagerItems: types.PageItem[]; ranking: types.UserRank; };
-
-  export interface UserRankTablePayload { availableFilters: { country?: string; school?: string; state?: string; }; filter: string; isIndex: boolean; isLogged: boolean; lastUpdated?: Date; length: number; page: number; pagerItems: types.PageItem[]; ranking: types.UserRank; };
-
-  export interface UserRole { description?: string; name: string; };
-
-  export interface UserRolesPayload { userSystemGroups: { [key: number]: { name: string; value: boolean; }; }; userSystemRoles: { [key: number]: { name: string; value: boolean; }; }; username: string; };
-
-  export interface VerificationParentalTokenDetailsPayload { hasParentalVerificationToken: boolean; message: string; };
-
+  export interface ActivityEvent {
+    classname: string;
+    event: types.Event;
+    ip?: number;
+    time: Date;
+    username: string;
+  }
+
+  export interface ActivityFeedPayload {
+    alias: string;
+    events: types.ActivityEvent[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    type: string;
+  }
+
+  export interface AddedProblem {
+    alias: string;
+    commit?: string;
+    is_extra_problem?: boolean;
+    points: number;
+  }
+
+  export interface AdminCourses {
+    admin: {
+      accessMode: string;
+      activeTab: string;
+      filteredCourses: {
+        archived: types.CoursesByTimeType;
+        current: types.CoursesByTimeType;
+        past: types.CoursesByTimeType;
+        teachingAssistant: types.CoursesByTimeType;
+      };
+    };
+  }
+
+  export interface AiEditorialJobDetails {
+    created_at: Date;
+    error_message?: string;
+    is_retriable: boolean;
+    job_id: string;
+    md_en?: string;
+    md_es?: string;
+    md_pt?: string;
+    problem_alias: string;
+    status: string;
+    validation_verdict?: string;
+  }
+
+  export interface ApiToken {
+    last_used: Date;
+    name: string;
+    rate_limit: { limit: number; remaining: number; reset: Date };
+    timestamp: Date;
+  }
+
+  export interface ArenaAssignment {
+    alias?: string;
+    assignment_type: string;
+    description?: string;
+    director: string;
+    finish_time?: Date;
+    name?: string;
+    problems: types.NavbarProblemsetProblem[];
+    problemset_id: number;
+    runs: types.Run[];
+    start_time: Date;
+    totalRuns?: number;
+  }
+
+  export interface ArenaContest {
+    alias: string;
+    director: string;
+    finish_time?: Date;
+    rerun_id?: number;
+    start_time?: Date;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ArenaCourseAssignment {
+    alias: string;
+    description: string;
+    name: string;
+    problemset_id: number;
+  }
+
+  export interface ArenaCourseDetails {
+    alias: string;
+    assignments: types.CourseAssignment[];
+    languages?: string[];
+    name: string;
+  }
+
+  export interface ArenaCoursePayload {
+    assignment: types.ArenaCourseAssignment;
+    clarifications: types.Clarification[];
+    course: types.ArenaCourseDetails;
+    currentProblem?: types.ProblemDetails;
+    problems: types.ArenaCourseProblem[];
+    runs: types.Run[];
+    scoreboard?: types.Scoreboard;
+  }
+
+  export interface ArenaCourseProblem {
+    alias: string;
+    letter: string;
+    title: string;
+  }
+
+  export interface ArenaProblemDetails {
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    input_limit: number;
+    languages: string[];
+    letter?: string;
+    points: number;
+    problem_id?: number;
+    problemsetter?: types.ProblemsetterInfo;
+    quality_seal: boolean;
+    runs?: types.Run[];
+    settings?: types.ProblemSettingsDistrib;
+    source?: string;
+    statement?: types.ProblemStatement;
+    title: string;
+    visibility: number;
+  }
+
+  export interface ArenaProblemset {
+    admin?: boolean;
+    admission_mode?: string;
+    alias?: string;
+    courseAssignments?: types.CourseAssignment[];
+    director?: string;
+    feedback?: string;
+    finish_time?: Date;
+    name?: string;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    show_penalty?: boolean;
+    start_time?: Date;
+    submission_deadline?: Date;
+    submissions_gap?: number;
+    title?: string;
+  }
+
+  export interface AssignmentDetails {
+    admin: boolean;
+    alias: string;
+    assignmentType: string;
+    courseAssignments: types.CourseAssignment[];
+    description: string;
+    director: string;
+    finishTime?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemsetId: number;
+    startTime: Date;
+  }
+
+  export interface AssignmentDetailsPayload {
+    courseDetails: types.CourseDetails;
+    currentAssignment: types.ArenaAssignment;
+    isTeachingAssistant: boolean;
+    scoreboard?: types.Scoreboard;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    showRanking: boolean;
+  }
+
+  export interface AssignmentProgress {
+    [key: string]: types.Progress;
+  }
+
+  export interface AssignmentsProblemsPoints {
+    alias: string;
+    extraPoints: number;
+    name: string;
+    order: number;
+    points: number;
+    problems: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    }[];
+  }
+
+  export interface AssociatedIdentity {
+    default: boolean;
+    username: string;
+  }
+
+  export interface AuthIdentityExt {
+    currentIdentity: types.IdentityExt;
+    loginIdentity: types.IdentityExt;
+  }
+
+  export interface AuthorRankTablePayload {
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.AuthorsRank;
+  }
+
+  export interface AuthorsRank {
+    ranking: {
+      author_ranking?: number;
+      author_score: number;
+      classname: string;
+      country_id?: string;
+      name?: string;
+      username: string;
+    }[];
+    total: number;
+  }
+
+  export interface Badge {
+    assignation_time?: Date;
+    badge_alias: string;
+    first_assignation?: Date;
+    owners_count: number;
+    total_users: number;
+  }
+
+  export interface BadgeDetailsPayload {
+    badge: types.Badge;
+  }
+
+  export interface BadgeListPayload {
+    badges: string[];
+    ownedBadges: types.Badge[];
+  }
+
+  export interface BestSolvers {
+    classname: string;
+    language: string;
+    memory: number;
+    runtime: number;
+    time: Date;
+    username: string;
+  }
+
+  export interface CDP {
+    casesStore: types.CDPCasesStore;
+    problemCodeContent: string;
+    problemCodeExtension: string;
+    problemMarkdown: string;
+    problemName: string;
+    problemSolutionMarkdown: string;
+  }
+
+  export interface CDPCase {
+    autoPoints: boolean;
+    caseID: string;
+    groupID: string;
+    lines: types.CDPLine[];
+    name: string;
+    output: string;
+    points: number;
+  }
+
+  export interface CDPCasesStore {
+    groups: types.CDPGroup[];
+    hide: boolean;
+    layouts: { [key: string]: string }[];
+    selected: { caseID?: string; groupID?: string };
+  }
+
+  export interface CDPGroup {
+    autoPoints: boolean;
+    cases: types.CDPCase[];
+    groupID: string;
+    name: string;
+    points: number;
+    ungroupedCase: boolean;
+  }
+
+  export interface CDPLine {
+    caseID: string;
+    data: { kind: string | string | string | string; value: string };
+    label: string;
+    lineID: string;
+  }
+
+  export interface CachedExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
+    createdProblems: types.Problem[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
+  }
+
+  export interface CaseResult {
+    contest_score: number;
+    max_score: number;
+    meta: types.RunMetadata;
+    name: string;
+    out_diff?: string;
+    score: number;
+    verdict: string;
+  }
+
+  export interface CertificateDetailsPayload {
+    uuid: string;
+  }
+
+  export interface CertificateListItem {
+    certificate_type: string;
+    date: Date;
+    name?: string;
+    verification_code: string;
+  }
+
+  export interface CertificateListMinePayload {
+    certificates: types.CertificateListItem[];
+  }
+
+  export interface CertificateValidationPayload {
+    certificate?: string;
+    valid: boolean;
+    verification_code: string;
+  }
+
+  export interface Clarification {
+    answer?: string;
+    assignment_alias?: string;
+    author: string;
+    clarification_id: number;
+    contest_alias?: string;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
+  export interface CoderOfTheMonth {
+    category: string;
+    classname: string;
+    coder_of_the_month_id: number;
+    country_id: string;
+    description?: string;
+    problems_solved: number;
+    ranking: number;
+    school_id?: number;
+    score: number;
+    selected_by?: number;
+    time: string;
+    user_id: number;
+    username: string;
+  }
+
+  export interface CoderOfTheMonthList {
+    classname: string;
+    country_id: string;
+    date: string;
+    gravatar_32: string;
+    problems_solved?: number;
+    score?: number;
+    username: string;
+  }
+  [];
+
+  export interface CoderOfTheMonthPayload {
+    candidatesToCoderOfTheMonth: types.CoderOfTheMonthList;
+    category: string;
+    codersOfCurrentMonth: types.CoderOfTheMonthList;
+    codersOfPreviousMonth: types.CoderOfTheMonthList;
+    isMentor: boolean;
+    options?: { canChooseCoder: boolean; coderIsSelected: boolean };
+  }
+
+  export interface CollectionDetailsByAuthorPayload {
+    authors: string[];
+    authorsRanking: types.AuthorsRank;
+    column: string;
+    columns: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    selectedTags: string[];
+    tagData: { name?: string }[];
+    tags: string[];
+  }
+
+  export interface CollectionDetailsByLevelPayload {
+    column: string;
+    columns: string[];
+    difficulty: string;
+    frequentTags: types.TagWithProblemCount[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    level: string;
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    publicTags: types.TagWithProblemCount[];
+    selectedTags: string[];
+    tagData: { name?: string }[];
+    tagsList: string[];
+  }
+
+  export interface CommitRunsDiff {
+    [key: string]: types.RunsDiff[];
+  }
+
+  export interface CommonPayload {
+    apiTokens: types.ApiToken[];
+    associatedIdentities: types.AssociatedIdentity[];
+    currentEmail: string;
+    currentName?: string;
+    currentUsername: string;
+    gravatarURL128: string;
+    gravatarURL51: string;
+    inContest: boolean;
+    isAdmin: boolean;
+    isLoggedIn: boolean;
+    isMainUserIdentity: boolean;
+    isReviewer: boolean;
+    isUnder13User: boolean;
+    lockDownImage: string;
+    mentorCanChooseCoder: boolean;
+    navbarSection: string;
+    nextRegisteredContestForUser?: types.ContestListItem;
+    omegaUpLockDown: boolean;
+    profileProgress: number;
+    userClassname: string;
+    userCountry: string;
+    userTypes: string[];
+    userVerificationDeadline?: Date;
+  }
+
+  export interface ConsentStatement {
+    contest_alias: string;
+    privacy_git_object_id?: string;
+    share_user_information?: boolean;
+    statement_type?: string;
+  }
+
+  export interface Contest {
+    acl_id?: number;
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    description: string;
+    feedback?: string;
+    finish_time: Date;
+    languages?: string;
+    last_updated: Date;
+    original_finish_time?: Date;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id?: number;
+    score_mode: string;
+    scoreboard?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_scoreboard_after?: number;
+    start_time: Date;
+    submissions_gap?: number;
+    title: string;
+    urgent?: number;
+    window_length?: number;
+  }
+
+  export interface ContestAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ContestAdminDetails {
+    admin: boolean;
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    available_languages: { [key: string]: string };
+    canSetRecommended: boolean;
+    contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
+    description: string;
+    director: string;
+    feedback: string;
+    finish_time: Date;
+    has_submissions: boolean;
+    languages: string[];
+    needs_basic_information: boolean;
+    opened: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id: number;
+    recommended?: boolean;
+    requests_user_information: string;
+    rerun_id?: number;
+    score_mode: string;
+    scoreboard: number;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submission_deadline?: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestCertificatesAdminDetails {
+    certificateCutoff?: number;
+    certificatesStatus: string;
+    isCertificateGenerator: boolean;
+  }
+
+  export interface ContestDetails {
+    admin: boolean;
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
+    description: string;
+    director: string;
+    feedback: string;
+    finish_time: Date;
+    has_submissions: boolean;
+    languages: string[];
+    needs_basic_information: boolean;
+    opened: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: types.ProblemsetProblem[];
+    problemset_id: number;
+    recommended: boolean;
+    requests_user_information: string;
+    rerun_id?: number;
+    score_mode: string;
+    scoreboard: number;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submission_deadline?: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestDetailsPayload {
+    adminPayload?: {
+      allRuns: types.Run[];
+      totalRuns: number;
+      users: types.ContestUser[];
+    };
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    original?: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
+  }
+
+  export interface ContestEditPayload {
+    admins: types.ContestAdmin[];
+    certificatesDetails: types.ContestCertificatesAdminDetails;
+    details: types.ContestAdminDetails;
+    group_admins: types.ContestGroupAdmin[];
+    groups: types.ContestGroup[];
+    original_contest_admission_mode?: string;
+    problems: types.ProblemsetProblemWithVersions[];
+    requests: types.ContestRequest[];
+    teams_group?: types.ContestGroup;
+    users: types.ContestUser[];
+  }
+
+  export interface ContestGroup {
+    alias: string;
+    name: string;
+  }
+
+  export interface ContestGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
+  }
+
+  export interface ContestIntroPayload {
+    contest: types.ContestPublicDetails;
+    needsBasicInformation: boolean;
+    privacyStatement: types.PrivacyStatement;
+    requestsUserInformation: string;
+    shouldShowModalToLoginWithRegisteredIdentity: boolean;
+    userBasicInformation: types.UserBasicInformation;
+  }
+
+  export interface ContestList {
+    current: types.ContestListItem[];
+    future: types.ContestListItem[];
+    past: types.ContestListItem[];
+  }
+
+  export interface ContestListItem {
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    contestants: number;
+    description: string;
+    duration_minutes?: number;
+    finish_time: Date;
+    last_updated: Date;
+    organizer: string;
+    original_finish_time: Date;
+    participating: boolean;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id?: number;
+    score_mode?: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    start_time: Date;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestListMinePayload {
+    contests: types.Contest[];
+    privateContestsAlert: boolean;
+  }
+
+  export interface ContestListPayload {
+    contests: types.ContestListItem[];
+    countContests: number;
+    query?: string;
+  }
+
+  export interface ContestListv2Payload {
+    contests: types.ContestList;
+    countContests: { current: number; future: number; past: number };
+    pageSize: number;
+    query?: string;
+  }
+
+  export interface ContestNewPayload {
+    canSetRecommended?: boolean;
+    hasVisitedSection?: boolean;
+    languages: { [key: string]: string };
+  }
+
+  export interface ContestParticipated {
+    alias: string;
+    finish_time: Date;
+    last_updated: Date;
+    start_time: Date;
+    title: string;
+  }
+
+  export interface ContestPracticeDetailsPayload {
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
+    original?: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
+    problems: types.NavbarProblemsetProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
+  }
+
+  export interface ContestPrintDetailsPayload {
+    contestTitle: string;
+    problems: { [key: number]: null | types.ProblemDetails };
+  }
+
+  export interface ContestPublicDetails {
+    admission_mode: string;
+    alias: string;
+    default_show_all_contestants_in_scoreboard: boolean;
+    description: string;
+    director: string;
+    extra_note?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problemset_id: number;
+    rerun_id?: number;
+    score_mode: string;
+    scoreboard: number;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    user_registration_accepted?: boolean;
+    user_registration_answered?: boolean;
+    user_registration_requested?: boolean;
+    window_length?: number;
+  }
+
+  export interface ContestReport {
+    country?: string;
+    is_invited: boolean;
+    name?: string;
+    place?: number;
+    problems: types.ScoreboardRankingProblem[];
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ContestReportDetailsPayload {
+    contestAlias: string;
+    contestReport: types.ContestReport[];
+  }
+
+  export interface ContestRequest {
+    accepted?: boolean;
+    admin?: { username?: string };
+    country?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
+  }
+
+  export interface ContestScoreboardPayload {
+    contest: types.ContestDetails;
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
+    scoreboardToken?: string;
+  }
+
+  export interface ContestUser {
+    access_time?: Date;
+    country_id?: string;
+    end_time?: Date;
+    is_owner?: number;
+    username: string;
+  }
+
+  export interface ContestVirtualDetailsPayload {
+    contest: types.ContestPublicDetails;
+  }
+
+  export interface Contestant {
+    country?: string;
+    email?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    state?: string;
+    username: string;
+  }
+
+  export interface Course {
+    acl_id?: number;
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    course_id: number;
+    description: string;
+    finish_time?: Date;
+    group_id?: number;
+    languages?: string;
+    level?: string;
+    minimum_progress_for_certificate?: number;
+    name: string;
+    needs_basic_information: boolean;
+    objective?: string;
+    requests_user_information: string;
+    school_id?: number;
+    show_scoreboard: boolean;
+    start_time: Date;
+  }
+
+  export interface CourseAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface CourseAssignment {
+    alias: string;
+    assignment_type: string;
+    description: string;
+    finish_time?: Date;
+    has_runs: boolean;
+    max_points: number;
+    name: string;
+    opened: boolean;
+    order: number;
+    problemCount: number;
+    problemset_id: number;
+    publish_time_delay?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    start_time: Date;
+  }
+
+  export interface CourseCardEnrolled {
+    alias: string;
+    name: string;
+    progress: number;
+    school_name?: string;
+  }
+
+  export interface CourseCardFinished {
+    alias: string;
+    name: string;
+  }
+
+  export interface CourseCardPublic {
+    alias: string;
+    alreadyStarted: boolean;
+    lessonCount: number;
+    level?: string;
+    name: string;
+    school_name?: string;
+    studentCount: number;
+  }
+
+  export interface CourseClarificationsPayload {
+    clarifications: types.Clarification[];
+    is_admin: boolean;
+    is_teaching_assistant: boolean;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+  }
+
+  export interface CourseCloneDetailsPayload {
+    creator: { classname: string; username: string };
+    details: types.CourseDetails;
+    token?: string;
+  }
+
+  export interface CourseDetails {
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    assignments: types.CourseAssignment[];
+    clarifications: types.Clarification[];
+    description: string;
+    finish_time?: Date;
+    is_admin: boolean;
+    is_curator: boolean;
+    is_teaching_assistant: boolean;
+    languages?: string[];
+    level?: string;
+    name: string;
+    needs_basic_information: boolean;
+    objective?: string;
+    recommended: boolean;
+    requests_user_information: string;
+    school_id?: number;
+    school_name?: string;
+    show_scoreboard: boolean;
+    start_time: Date;
+    student_count?: number;
+    teaching_assistant_enabled: boolean;
+    unlimited_duration: boolean;
+  }
+
+  export interface CourseDetailsPayload {
+    details: types.CourseDetails;
+    progress?: types.AssignmentProgress;
+  }
+
+  export interface CourseEditPayload {
+    admins: types.CourseAdmin[];
+    allLanguages: { [key: string]: string };
+    assignmentProblems: types.ProblemsetProblem[];
+    course: types.CourseDetails;
+    groupsAdmins: types.CourseGroupAdmin[];
+    groupsTeachingAssistants: types.CourseGroupAdmin[];
+    identityRequests: types.IdentityRequest[];
+    selectedAssignment?: types.CourseAssignment;
+    students: types.CourseStudent[];
+    tags: string[];
+    teachingAssistants: types.CourseAdmin[];
+  }
+
+  export interface CourseGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
+  }
+
+  export interface CourseListMinePayload {
+    courses: types.AdminCourses;
+  }
+
+  export interface CourseNewPayload {
+    hasVisitedSection: boolean;
+    is_admin: boolean;
+    is_curator: boolean;
+    languages: { [key: string]: string };
+  }
+
+  export interface CourseProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    runs: types.CourseRun[];
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
+  export interface CourseProblemStatistics {
+    assignment_alias: string;
+    average: number;
+    avg_runs: number;
+    completed_score_percentage: number;
+    high_score_percentage: number;
+    low_score_percentage: number;
+    max_points: number;
+    maximum: number;
+    minimum: number;
+    problem_alias: string;
+    variance: number;
+  }
+
+  export interface CourseProblemTried {
+    alias: string;
+    title: string;
+    username: string;
+  }
+
+  export interface CourseProblemVerdict {
+    assignment_alias: string;
+    problem_alias: string;
+    problem_id: number;
+    runs: number;
+    verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+      range_bytes_end?: number;
+      range_bytes_start?: number;
+    };
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
+  }
+
+  export interface CourseScoreboardPayload {
+    assignment: types.AssignmentDetails;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardToken?: string;
+  }
+
+  export interface CourseStatisticsPayload {
+    course: types.CourseDetails;
+    problemStats: types.CourseProblemStatistics[];
+    verdicts: types.CourseProblemVerdict[];
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    username: string;
+  }
+
+  export interface CourseSubmissionsListPayload {
+    solvedProblems: { [key: string]: types.CourseProblemTried[] };
+    unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CourseTabsPayload {
+    courses: {
+      enrolled: types.CourseCardEnrolled[];
+      finished: types.CourseCardFinished[];
+      public: types.CourseCardPublic[];
+    };
+    hasVisitedSection: boolean;
+  }
+
+  export interface CoursesByAccessMode {
+    accessMode: string;
+    activeTab: string;
+    filteredCourses: {
+      current: types.CoursesByTimeType;
+      past: types.CoursesByTimeType;
+    };
+  }
+
+  export interface CoursesByTimeType {
+    courses: types.FilteredCourse[];
+    timeType: string;
+  }
+
+  export interface CoursesList {
+    admin: types.FilteredCourse[];
+    archived: types.FilteredCourse[];
+    public: types.FilteredCourse[];
+    student: types.FilteredCourse[];
+    teachingAssistant: types.FilteredCourse[];
+  }
+
+  export interface CurrentSession {
+    apiTokenId?: number;
+    api_tokens: types.ApiToken[];
+    associated_identities: types.AssociatedIdentity[];
+    auth_token?: string;
+    cacheKey?: string;
+    classname: string;
+    email?: string;
+    identity?: dao.Identities;
+    is_admin: boolean;
+    is_under_13_user: boolean;
+    loginIdentity?: dao.Identities;
+    mentor_can_choose_coder: boolean;
+    user?: dao.Users;
+    user_verification_deadline?: Date;
+    valid: boolean;
+  }
+
+  export interface EmailEditDetailsPayload {
+    email?: string;
+    profile?: types.UserProfileInfo;
+  }
+
+  export interface Event {
+    courseAlias?: string;
+    courseName?: string;
+    name: string;
+    problem?: string;
+  }
+
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
+  }
+
+  export interface ExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
+    createdProblems: types.Problem[];
+    hasPassword: boolean;
+    ownedBadges: types.Badge[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
+  }
+
+  export interface FilteredCourse {
+    accept_teacher?: boolean;
+    admission_mode: string;
+    alias: string;
+    assignments: types.CourseAssignment[];
+    counts: { [key: string]: number };
+    description: string;
+    finish_time?: Date;
+    is_open: boolean;
+    name: string;
+    progress?: number;
+    school_name?: string;
+    start_time: Date;
+  }
+
+  export interface FullIDEPayload {
+    acceptedLanguages: string[];
+    preferredLanguage?: string;
+  }
+
+  export interface GraderStatus {
+    broadcaster_sockets: number;
+    embedded_runner: boolean;
+    queue: {
+      run_queue_length: number;
+      runner_queue_length: number;
+      runners: string[];
+      running: { id: number; name: string }[];
+    };
+    status: string;
+  }
+
+  export interface Group {
+    alias: string;
+    create_time: Date;
+    description?: string;
+    name: string;
+  }
+
+  export interface GroupEditPayload {
+    countries: dao.Countries[];
+    groupAlias: string;
+    groupDescription?: string;
+    groupName?: string;
+    hasVisitedSection?: boolean;
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupListItem {
+    label: string;
+    value: string;
+  }
+
+  export interface GroupListPayload {
+    groups: types.Group[];
+  }
+
+  export interface GroupScoreboard {
+    alias: string;
+    create_time: string;
+    description?: string;
+    name: string;
+  }
+
+  export interface GroupScoreboardContestsPayload {
+    availableContests: types.ContestListItem[];
+    contests: types.ScoreboardContest[];
+    groupAlias: string;
+    scoreboardAlias: string;
+  }
+
+  export interface GroupScoreboardDetails {
+    contests: types.ScoreboardContest[];
+    ranking: types.ScoreboardRanking[];
+    scoreboard: types.ScoreboardDetails;
+  }
+
+  export interface GroupScoreboardDetailsPayload {
+    details: types.GroupScoreboardDetails;
+    groupAlias: string;
+    scoreboardAlias: string;
+  }
+
+  export interface Histogram {
+    difficulty: number;
+    difficultyHistogram?: string;
+    quality: number;
+    qualityHistogram?: string;
+  }
+
+  export interface Identity {
+    classname?: string;
+    country?: string;
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    password?: string;
+    school?: string;
+    school_id?: number;
+    school_name?: string;
+    state?: string;
+    state_id?: string;
+    username: string;
+  }
+
+  export interface IdentityExt {
+    classname: string;
+    country_id?: string;
+    current_identity_school_id?: number;
+    gender?: string;
+    identity_id: number;
+    language_id?: number;
+    name?: string;
+    password?: string;
+    state_id?: string;
+    user_id?: number;
+    username: string;
+  }
+
+  export interface IdentityRequest {
+    accepted?: boolean;
+    admin?: { name?: string; username: string };
+    classname: string;
+    country?: string;
+    country_id?: string;
+    last_update?: Date;
+    name?: string;
+    request_time: Date;
+    username: string;
+  }
+
+  export interface IndexPayload {
+    coderOfTheMonthData: {
+      all?: types.UserProfile;
+      female?: types.UserProfile;
+    };
+    currentUserInfo: { username?: string };
+    schoolOfTheMonthData?: {
+      country?: string;
+      country_id?: string;
+      name: string;
+      school_id: number;
+      state?: string;
+    };
+    schoolRank: {
+      name: string;
+      ranking: number;
+      school_id: number;
+      school_of_the_month_id: number;
+      score: number;
+    }[];
+    userRank: types.CoderOfTheMonth[];
+  }
+
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
+  }
+
+  export interface InteractiveSettingsDistrib {
+    idl: string;
+    language: string;
+    main_source: string;
+    module_name: string;
+    templates: { [key: string]: string };
+  }
+
+  export interface IntroCourseDetails {
+    details: types.CourseDetails;
+    progress: { [key: string]: { [key: string]: number } };
+  }
+
+  export interface IntroDetailsPayload {
+    course: types.CourseDetails;
+    isFirstTimeAccess: boolean;
+    needsBasicInformation: boolean;
+    shouldShowAcceptTeacher: boolean;
+    shouldShowResults: boolean;
+    statements: {
+      acceptTeacher?: types.PrivacyStatement;
+      privacy?: types.PrivacyStatement;
+    };
+    userRegistrationAccepted?: boolean;
+    userRegistrationAnswered?: boolean;
+    userRegistrationRequested?: boolean;
+  }
+
+  export interface LibinteractiveError {
+    description: string;
+    field: string;
+  }
+
+  export interface LibinteractiveGenPayload {
+    error?: types.LibinteractiveError;
+    idl?: string;
+    language?: string;
+    name?: string;
+    os?: string;
+  }
+
+  export interface LimitsSettings {
+    ExtraWallTime: string;
+    MemoryLimit: number | string;
+    OutputLimit: number | string;
+    OverallWallTimeLimit: string;
+    TimeLimit: string;
+  }
+
+  export interface ListItem {
+    key: string;
+    value: string;
+  }
+
+  export interface LoginDetailsPayload {
+    facebookUrl?: string;
+    hasVisitedSection?: boolean;
+    statusError?: string;
+    validateRecaptcha: boolean;
+    verifyEmailSuccessfully?: string;
+  }
+
+  export interface MergedScoreboardEntry {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
+    place?: number;
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface NavbarProblemsetProblem {
+    acceptsSubmissions: boolean;
+    alias: string;
+    bestScore: number;
+    hasMyRuns?: boolean;
+    hasRuns: boolean;
+    maxScore: number | number;
+    myBestScore?: number;
+    text: string;
+  }
+
+  export interface NominationListItem {
+    author: { name?: string; username: string };
+    contents?: {
+      before_ac?: boolean;
+      difficulty?: number;
+      quality?: number;
+      rationale?: string;
+      reason?: string;
+      statements?: { [key: string]: string };
+      tags?: string[];
+    };
+    nomination: string;
+    nominator: { name?: string; username: string };
+    problem: { alias: string; title: string };
+    qualitynomination_id: number;
+    status: string;
+    time: Date;
+    votes: {
+      time?: Date;
+      user: { name?: string; username: string };
+      vote: number;
+    }[];
+  }
+
+  export interface NominationStatus {
+    alreadyReviewed: boolean;
+    canNominateProblem: boolean;
+    dismissed: boolean;
+    dismissedBeforeAc: boolean;
+    language: string;
+    nominated: boolean;
+    nominatedBeforeAc: boolean;
+    solved: boolean;
+    tried: boolean;
+  }
+
+  export interface Notification {
+    contents: types.NotificationContents;
+    notification_id: number;
+    timestamp: Date;
+  }
+
+  export interface NotificationContents {
+    badge?: string;
+    body?: {
+      iconUrl: string;
+      localizationParams: string[];
+      localizationString: string;
+      url: string;
+    };
+    message?: string;
+    status?: string;
+    type: string;
+    url?: string;
+  }
+
+  export interface PageItem {
+    class: string;
+    label: string;
+    page: number;
+    url?: string;
+  }
+
+  export interface Participant {
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    participant_password?: string;
+    participant_username: string;
+    password?: string;
+    school_name?: string;
+    state_id?: string;
+    username: string;
+  }
+
+  export interface PrivacyPolicyDetailsPayload {
+    git_object_id: string;
+    has_accepted: boolean;
+    policy_markdown: string;
+    statement_type: string;
+  }
+
+  export interface PrivacyStatement {
+    gitObjectId?: string;
+    markdown: string;
+    statementType: string;
+  }
+
+  export interface Problem {
+    accepted: number;
+    alias: string;
+    difficulty: number;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+  }
+
+  export interface ProblemAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ProblemCasesContents {
+    [key: string]: { contestantOutput?: string; in: string; out: string };
+  }
+
+  export interface ProblemDetails {
+    accepted: number;
+    accepts_submissions: boolean;
+    admin?: boolean;
+    alias: string;
+    allow_user_add_tags: boolean;
+    commit: string;
+    creation_date: Date;
+    difficulty?: number;
+    email_clarifications: boolean;
+    input_limit: number;
+    karel_problem: boolean;
+    languages: string[];
+    letter?: string;
+    limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
+    nextSubmissionTimestamp?: Date;
+    nominationStatus: types.NominationStatus;
+    order: string;
+    points: number;
+    preferred_language?: string;
+    problem_id: number;
+    problemsetter?: types.ProblemsetterInfo;
+    quality_seal: boolean;
+    runs?: types.RunWithDetails[];
+    score: number;
+    settings: types.ProblemSettingsDistrib;
+    show_diff: string;
+    solvers?: types.BestSolvers[];
+    source?: string;
+    statement: types.ProblemStatement;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
+  export interface ProblemDetailsPayload {
+    allRuns?: types.Run[];
+    allowUserAddTags?: boolean;
+    allowedSolutionsToSee: number;
+    clarifications?: types.Clarification[];
+    hasVisitedSection?: boolean;
+    histogram: types.Histogram;
+    levelTags?: string[];
+    nominationStatus?: types.NominationStatus;
+    problem: types.ProblemInfo;
+    problemLevel?: string;
+    publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
+    runs?: types.Run[];
+    selectedPrivateTags?: string[];
+    selectedPublicTags?: string[];
+    solutionStatus: string;
+    solvers: types.BestSolvers[];
+    totalRuns?: number;
+    user: types.UserInfoForProblem;
+  }
+
+  export interface ProblemEditPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    allowUserAddTags: boolean;
+    cdp?: types.CDP;
+    emailClarifications: boolean;
+    extraWallTime: number;
+    groupAdmins: types.ProblemGroupAdmin[];
+    groupScorePolicy?: string;
+    inputLimit: number;
+    languages: string;
+    levelTags: string[];
+    log: types.ProblemVersion[];
+    memoryLimit: number;
+    outputLimit: number;
+    overallWallTimeLimit: number;
+    problemLevel?: string;
+    problemsetter?: types.ProblemsetterInfo;
+    publicTags: string[];
+    publishedRevision?: types.ProblemVersion;
+    selectedPrivateTags: string[];
+    selectedPublicTags: string[];
+    showDiff: string;
+    solution?: types.ProblemStatement;
+    source: string;
+    statement: types.ProblemStatement;
+    statusError?: string;
+    statusSuccess: boolean;
+    timeLimit: number;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | number;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+    visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemFormPayload {
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number | string;
+    groupScorePolicy?: string;
+    hasVisitedSection?: boolean;
+    inputLimit: number | string;
+    languages: string;
+    levelTags: string[];
+    memoryLimit: number | string;
+    message?: string;
+    outputLimit: number | string;
+    overallWallTimeLimit: number | string;
+    parameter?: string;
+    problem_level: string;
+    publicTags: string[];
+    selectedTags?: types.SelectedTag[];
+    showDiff: string;
+    source: string;
+    statusError: string;
+    tags: { name?: string }[];
+    timeLimit: number | string;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | string;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+    visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
+  }
+
+  export interface ProblemInfo {
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    input_limit: number;
+    karel_problem: boolean;
+    languages: string[];
+    letter?: string;
+    limits: types.SettingLimits;
+    nextExecutionTimestamp?: Date;
+    nextSubmissionTimestamp?: Date;
+    points: number;
+    preferred_language?: string;
+    problem_id: number;
+    problemsetter?: types.ProblemsetterInfo;
+    quality_seal: boolean;
+    sample_input?: string;
+    settings: types.ProblemSettingsDistrib;
+    source?: string;
+    statement: types.ProblemStatement;
+    title: string;
+    visibility: number;
+  }
+
+  export interface ProblemListCollectionPayload {
+    allTags: types.Tag[];
+    levelTags: string[];
+    problemCount: { name: string; problems_per_tag: number }[];
+  }
+
+  export interface ProblemListItem {
+    accepted: number;
+    alias: string;
+    can_be_removed?: boolean;
+    difficulty?: number;
+    difficulty_histogram: number[];
+    points: number;
+    problem_id: number;
+    quality?: number;
+    quality_histogram: number[];
+    quality_seal: boolean;
+    ratio: number;
+    score: number;
+    submissions: number;
+    tags: { name: string; source: string }[];
+    title: string;
+    visibility: number;
+  }
+
+  export interface ProblemListPayload {
+    column: string;
+    columns: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    selectedTags: string[];
+    tagData: { name?: string }[];
+    tags: string[];
+  }
+
+  export interface ProblemPrintDetailsPayload {
+    details: types.ProblemDetails;
+  }
+
+  export interface ProblemQualityPayload {
+    canNominateProblem: boolean;
+    dismissed: boolean;
+    dismissedBeforeAc: boolean;
+    language?: string;
+    nominated: boolean;
+    nominatedBeforeAc: boolean;
+    problemAlias: string;
+    solved: boolean;
+    tried: boolean;
+  }
+
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
+  }
+
+  export interface ProblemSettings {
+    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
+    Limits: types.LimitsSettings;
+    Slow: boolean;
+    Validator: {
+      GroupScorePolicy?: string;
+      Lang?: string;
+      Limits?: types.LimitsSettings;
+      Name: string;
+      Tolerance: number;
+    };
+  }
+
+  export interface ProblemSettingsDistrib {
+    cases: { [key: string]: { in: string; out: string; weight?: number } };
+    interactive?: types.InteractiveSettingsDistrib;
+    limits: types.LimitsSettings;
+    validator: {
+      custom_validator?: {
+        language: string;
+        limits?: types.LimitsSettings;
+        source: string;
+      };
+      group_score_policy?: string;
+      name: string;
+      tolerance?: number;
+    };
+  }
+
+  export interface ProblemStatement {
+    images: { [key: string]: string };
+    language: string;
+    markdown: string;
+    sources: { [key: string]: string };
+  }
+
+  export interface ProblemVersion {
+    author: types.Signature;
+    commit: string;
+    committer: types.Signature;
+    message: string;
+    parents: string[];
+    tree: { [key: string]: string };
+    version: string;
+  }
+
+  export interface ProblemsMineInfoPayload {
+    isSysadmin: boolean;
+    privateProblemsAlert: boolean;
+    query?: string;
+    visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface Problemset {
+    admin?: boolean;
+    admission_mode?: string;
+    alias?: string;
+    archived?: boolean;
+    assignment_type?: string;
+    contest_alias?: string;
+    courseAssignments?: types.CourseAssignment[];
+    description?: string;
+    director?: string;
+    feedback?: string;
+    finish_time?: Date;
+    has_submissions?: boolean;
+    languages?: string[];
+    name?: string;
+    needs_basic_information?: boolean;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    rerun_id?: number;
+    score_mode?: string;
+    scoreboard?: number;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    show_penalty?: boolean;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submission_deadline?: Date;
+    submissions_gap?: number;
+    title?: string;
+    users?: {
+      access_time?: Date;
+      country?: string;
+      email?: string;
+      user_id?: number;
+      username: string;
+    }[];
+    window_length?: number;
+  }
+
+  export interface ProblemsetProblem {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    has_submissions: boolean;
+    input_limit: number;
+    is_extra_problem: boolean;
+    languages: string;
+    letter?: string;
+    order: number;
+    points: number;
+    problem_id?: number;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
+  export interface ProblemsetProblemWithVersions {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    has_submissions: boolean;
+    input_limit: number;
+    languages: string;
+    letter?: string;
+    order: number;
+    points: number;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    versions: { log: types.ProblemVersion[]; published: string };
+    visibility: number;
+    visits: number;
+  }
+
+  export interface ProblemsetterInfo {
+    classname: string;
+    creation_date?: Date;
+    name: string;
+    username: string;
+  }
+
+  export interface Progress {
+    max_score: number;
+    score: number;
+  }
+
+  export interface Run {
+    alias: string;
+    classname: string;
+    contest_alias?: string;
+    contest_score?: number;
+    country: string;
+    execution?: string;
+    guid: string;
+    language: string;
+    memory: number;
+    output?: string;
+    penalty: number;
+    runtime: number;
+    score: number;
+    score_by_group?: { [key: string]: null | number };
+    status: string;
+    status_memory?: string;
+    status_runtime?: string;
+    submit_delay: number;
+    suggestions?: number;
+    time: Date;
+    type?: string;
+    username: string;
+    verdict: string;
+  }
+
+  export interface RunDetails {
+    admin: boolean;
+    alias: string;
+    cases: types.ProblemCasesContents;
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      contest_score: number;
+      groups?: types.RunDetailsGroup[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    feedback: types.SubmissionFeedback[];
+    guid: string;
+    judged_by?: string;
+    language: string;
+    logs?: string;
+    show_diff: string;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
+  }
+
+  export interface RunDetailsGroup {
+    cases: types.CaseResult[];
+    contest_score: number;
+    group: string;
+    max_score: number;
+    score: number;
+    verdict?: string;
+  }
+
+  export interface RunDetailsV2 {
+    admin: boolean;
+    cases: types.ProblemCasesContents;
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      groups?: types.RunDetailsGroup[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    feedback?: types.SubmissionFeedback;
+    judged_by?: string;
+    logs?: string;
+    show_diff: string;
+    source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
+  }
+
+  export interface RunMetadata {
+    memory: number;
+    sys_time: number;
+    time: number;
+    verdict: string;
+    wall_time: number;
+  }
+
+  export interface RunWithDetails {
+    alias: string;
+    classname: string;
+    contest_alias?: string;
+    contest_score?: number;
+    country: string;
+    details?: types.RunDetailsV2;
+    execution?: string;
+    guid: string;
+    language: string;
+    memory: number;
+    output?: string;
+    penalty: number;
+    runtime: number;
+    score: number;
+    score_by_group?: { [key: string]: null | number };
+    status: string;
+    status_memory?: string;
+    status_runtime?: string;
+    submit_delay: number;
+    time: Date;
+    type?: string;
+    username: string;
+    verdict: string;
+  }
+
+  export interface RunsDiff {
+    guid: string;
+    new_score?: number;
+    new_status?: string;
+    new_verdict?: string;
+    old_score?: number;
+    old_status?: string;
+    old_verdict?: string;
+    problemset_id?: number;
+    username: string;
+  }
+
+  export interface School {
+    country_id?: string;
+    name: string;
+    ranking?: number;
+    school_id: number;
+    score: number;
+  }
+
+  export interface SchoolCoderOfTheMonth {
+    classname: string;
+    time: string;
+    username: string;
+  }
+
+  export interface SchoolListItem {
+    key: number;
+    value: string;
+  }
+
+  export interface SchoolOfTheMonthPayload {
+    candidatesToSchoolOfTheMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+      school_of_the_month_id: number;
+      score: number;
+    }[];
+    isMentor: boolean;
+    options?: { canChooseSchool: boolean; schoolIsSelected: boolean };
+    schoolsOfPreviousMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+    }[];
+    schoolsOfPreviousMonths: {
+      country_id: string;
+      name: string;
+      school_id: number;
+      time: string;
+    }[];
+  }
+
+  export interface SchoolProblemsSolved {
+    month: number;
+    problems_solved: number;
+    year: number;
+  }
+
+  export interface SchoolProfileDetailsPayload {
+    coders_of_the_month: types.SchoolCoderOfTheMonth[];
+    country?: { id: string; name: string };
+    monthly_solved_problems: types.SchoolProblemsSolved[];
+    ranking: number;
+    school_id: number;
+    school_name: string;
+    school_users: types.SchoolUser[];
+    state_name?: string;
+  }
+
+  export interface SchoolRankPayload {
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    rank: types.School[];
+    showHeader: boolean;
+    totalRows: number;
+  }
+
+  export interface SchoolUser {
+    classname: string;
+    created_problems: number;
+    organized_contests: number;
+    solved_problems: number;
+    username: string;
+  }
+
+  export interface Scoreboard {
+    finish_time?: Date;
+    problems: { alias: string; order: number }[];
+    ranking: types.ScoreboardRankingEntry[];
+    start_time: Date;
+    time: Date;
+    title: string;
+  }
+
+  export interface ScoreboardContest {
+    acl_id: number;
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    description: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string;
+    last_updated: number;
+    only_ac?: boolean;
+    penalty: string;
+    penalty_calc_policy: string;
+    points_decay_factor: number;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id: number;
+    score_mode: string;
+    scoreboard: number;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    urgent: boolean;
+    weight?: number;
+    window_length?: number;
+  }
+
+  export interface ScoreboardDetails {
+    alias: string;
+    create_time: number;
+    description: string;
+    group_id: number;
+    group_scoreboard_id: number;
+    name: string;
+  }
+
+  export interface ScoreboardEvent {
+    classname: string;
+    country: string;
+    delta: number;
+    is_invited: boolean;
+    name?: string;
+    problem: { alias: string; penalty: number; points: number };
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ScoreboardMergePayload {
+    contests: types.ContestListItem[];
+  }
+
+  export interface ScoreboardRanking {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ScoreboardRankingEntry {
+    classname: string;
+    country: string;
+    is_invited: boolean;
+    name?: string;
+    place?: number;
+    problems: types.ScoreboardRankingProblem[];
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ScoreboardRankingProblem {
+    alias: string;
+    penalty: number;
+    pending?: number;
+    percent: number;
+    place?: number;
+    points: number;
+    run_details?: {
+      cases?: types.CaseResult[];
+      details: { groups: types.ScoreboardRankingProblemDetailsGroup[] };
+    };
+    runs: number;
+  }
+
+  export interface ScoreboardRankingProblemDetailsGroup {
+    cases: { meta: types.RunMetadata }[];
+  }
+
+  export interface SelectedTag {
+    public: boolean;
+    tagname: string;
+  }
+
+  export interface SettingLimits {
+    input_limit: string;
+    memory_limit: string;
+    overall_wall_time_limit: string;
+    time_limit: string;
+  }
+
+  export interface Signature {
+    email: string;
+    name: string;
+    time: Date;
+  }
+
+  export interface Statements {
+    [key: string]: string;
+  }
+
+  export interface StatsPayload {
+    alias: string;
+    cases_stats?: { [key: string]: number };
+    distribution?: { [key: number]: number };
+    entity_type: string;
+    max_wait_time?: Date;
+    max_wait_time_guid?: string;
+    pending_runs: string[];
+    size_of_bucket?: number;
+    total_points?: number;
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+  }
+
+  export interface StudentCourses {
+    [key: string]: types.CoursesByAccessMode;
+  }
+
+  export interface StudentProgress {
+    classname: string;
+    country_id?: string;
+    name?: string;
+    points: { [key: string]: { [key: string]: number } };
+    progress: { [key: string]: { [key: string]: number } };
+    score: { [key: string]: { [key: string]: number } };
+    username: string;
+  }
+
+  export interface StudentProgressByAssignmentPayload {
+    assignment: string;
+    course: types.CourseDetails;
+    problems: types.CourseProblem[];
+    student: string;
+    students: types.StudentProgress[];
+  }
+
+  export interface StudentProgressInCourse {
+    assignments: {
+      [key: string]: {
+        problems: { [key: string]: { progress: number; score: number } };
+        progress: number;
+        score: number;
+      };
+    };
+    classname: string;
+    country_id?: string;
+    courseProgress: number;
+    courseScore: number;
+    name?: string;
+    username: string;
+  }
+
+  export interface StudentProgressPayload {
+    course: types.CourseDetails;
+    student: string;
+    students: types.StudentProgress[];
+  }
+
+  export interface StudentsProgressPayload {
+    assignmentsProblems: types.AssignmentsProblemsPoints[];
+    course: types.CourseDetails;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    students: types.StudentProgressInCourse[];
+    totalRows: number;
+  }
+
+  export interface Submission {
+    alias: string;
+    language: string;
+    memory: number;
+    runtime: number;
+    school_id?: number;
+    school_name?: string;
+    time: Date;
+    title: string;
+    username: string;
+    verdict: string;
+  }
+
+  export interface SubmissionFeedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
+    feedback_thread?: types.SubmissionFeedbackThread[];
+    range_bytes_end?: number;
+    range_bytes_start?: number;
+    submission_feedback_id: number;
+  }
+
+  export interface SubmissionFeedbackThread {
+    author: string;
+    authorClassname: string;
+    submission_feedback_thread_id: number;
+    text: string;
+    timestamp: Date;
+  }
+
+  export interface SubmissionsListPayload {
+    includeUser: boolean;
+    submissions: types.Submission[];
+    username?: string;
+  }
+
+  export interface SupportDetailsPayload {
+    roleNamesWithDescription: types.UserRole[];
+  }
+
+  export interface Tag {
+    name: string;
+  }
+
+  export interface TagWithProblemCount {
+    name: string;
+    problemCount: number;
+  }
+
+  export interface TeamGroupEditPayload {
+    countries: dao.Countries[];
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    maxNumberOfContestants: number;
+    teamGroup: {
+      alias: string;
+      description?: string;
+      name?: string;
+      numberOfContestants: number;
+    };
+    teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamGroupNewPayload {
+    maxNumberOfContestants: number;
+    numberOfContestants: number;
+  }
+
+  export interface TeamMember {
+    classname: string;
+    isMainUserIdentity: boolean;
+    name?: string;
+    team_alias: string;
+    team_name?: string;
+    username: string;
+  }
+
+  export interface TeamsGroup {
+    alias: string;
+    create_time: Date;
+    description?: string;
+    name: string;
+  }
+
+  export interface TeamsGroupListPayload {
+    teamsGroups: types.TeamsGroup[];
+  }
+
+  export interface TimeTypeContests {
+    [key: string]: types.ContestListItem[];
+  }
+
+  export interface UserBasicInformation {
+    country?: string;
+    school?: number;
+    state?: string;
+  }
+
+  export interface UserDependent {
+    classname: string;
+    name?: string;
+    parent_email_verification_deadline?: Date;
+    parent_verified?: boolean;
+    username: string;
+  }
+
+  export interface UserDependentsPayload {
+    dependents: types.UserDependent[];
+  }
+
+  export interface UserDetailsPayload {
+    emails: string[];
+    experiments: string[];
+    roleNames: types.UserRole[];
+    systemExperiments: types.Experiment[];
+    systemRoles: string[];
+    username: string;
+    verified: boolean;
+  }
+
+  export interface UserDocsPayload {
+    docs: { [key: string]: types.UserDocument[] };
+  }
+
+  export interface UserDocument {
+    name: string;
+    url: string;
+  }
+
+  export interface UserInfoForProblem {
+    admin: boolean;
+    loggedIn: boolean;
+    reviewer: boolean;
+  }
+
+  export interface UserProfile {
+    birth_date?: Date;
+    classname: string;
+    country: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: Date;
+    gravatar_92: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
+    hide_problem_tags: boolean;
+    is_own_profile: boolean;
+    is_private: boolean;
+    locale: string;
+    name?: string;
+    preferred_language?: string;
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified: boolean;
+  }
+
+  export interface UserProfileContests {
+    [key: string]: { data: types.ContestParticipated; place: number };
+  }
+
+  export interface UserProfileDetailsPayload {
+    countries: dao.Countries[];
+    extraProfileDetails?: types.ExtraProfileDetails;
+    identities: types.AssociatedIdentity[];
+    profile: types.UserProfileInfo;
+    programmingLanguages: { [key: string]: string };
+  }
+
+  export interface UserProfileInfo {
+    birth_date?: Date;
+    classname: string;
+    country?: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: Date;
+    gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
+    hide_problem_tags: boolean;
+    is_own_profile: boolean;
+    is_private: boolean;
+    locale?: string;
+    name?: string;
+    preferred_language?: string;
+    programming_languages: { [key: string]: string };
+    rankinfo: {
+      author_ranking?: number;
+      name?: string;
+      problems_solved?: number;
+      rank?: number;
+    };
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified?: boolean;
+  }
+
+  export interface UserProfileStats {
+    date?: string;
+    runs: number;
+    verdict: string;
+  }
+
+  export interface UserRank {
+    rank: {
+      classname: string;
+      country_id?: string;
+      name?: string;
+      problems_solved: number;
+      ranking?: number;
+      score: number;
+      timestamp?: Date;
+      user_id: number;
+      username: string;
+    }[];
+    total: number;
+  }
+
+  export interface UserRankInfo {
+    author_ranking?: number;
+    name: string;
+    problems_solved: number;
+    rank: number;
+  }
+
+  export interface UserRankTableLoggedOutPayload {
+    isLogged: boolean;
+    lastUpdated?: Date;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.UserRank;
+  }
+
+  export interface UserRankTablePayload {
+    availableFilters: { country?: string; school?: string; state?: string };
+    filter: string;
+    isIndex: boolean;
+    isLogged: boolean;
+    lastUpdated?: Date;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    ranking: types.UserRank;
+  }
+
+  export interface UserRole {
+    description?: string;
+    name: string;
+  }
+
+  export interface UserRolesPayload {
+    userSystemGroups: { [key: number]: { name: string; value: boolean } };
+    userSystemRoles: { [key: number]: { name: string; value: boolean } };
+    username: string;
+  }
+
+  export interface VerificationParentalTokenDetailsPayload {
+    hasParentalVerificationToken: boolean;
+    message: string;
+  }
 }
 
 // API messages
 export namespace messages {
   // Admin
-  export type AdminPlatformReportStatsRequest = { [key: string]: any;};
-  export type AdminPlatformReportStatsResponse = { report: { acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }; };
+  export type AdminPlatformReportStatsRequest = { [key: string]: any };
+  export type AdminPlatformReportStatsResponse = {
+    report: {
+      acceptedSubmissions: number;
+      activeSchools: number;
+      activeUsers: { [key: string]: number };
+      courses: number;
+      omiCourse: {
+        attemptedUsers: number;
+        completedUsers: number;
+        passedUsers: number;
+      };
+    };
+  };
 
   // AiEditorial
-  export type AiEditorialGenerateRequest = { [key: string]: any;};
-  export type AiEditorialGenerateResponse = { job_id?: string; };
-  export type AiEditorialReviewRequest = { [key: string]: any;};
-  export type AiEditorialReviewResponse = {  };
-  export type AiEditorialStatusRequest = { [key: string]: any;};
-  export type _AiEditorialStatusServerResponse = any
-  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails; };
-  export type AiEditorialUpdateJobRequest = { [key: string]: any;};
-  export type AiEditorialUpdateJobResponse = {  };
+  export type AiEditorialGenerateRequest = { [key: string]: any };
+  export type AiEditorialGenerateResponse = { job_id?: string };
+  export type AiEditorialReviewRequest = { [key: string]: any };
+  export type AiEditorialReviewResponse = {};
+  export type AiEditorialStatusRequest = { [key: string]: any };
+  export type _AiEditorialStatusServerResponse = any;
+  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+  export type AiEditorialUpdateJobRequest = { [key: string]: any };
+  export type AiEditorialUpdateJobResponse = {};
 
   // Authorization
-  export type AuthorizationProblemRequest = { [key: string]: any;};
-  export type AuthorizationProblemResponse = { can_edit: boolean; can_view: boolean; has_solved: boolean; is_admin: boolean; };
+  export type AuthorizationProblemRequest = { [key: string]: any };
+  export type AuthorizationProblemResponse = {
+    can_edit: boolean;
+    can_view: boolean;
+    has_solved: boolean;
+    is_admin: boolean;
+  };
 
   // Badge
-  export type BadgeBadgeDetailsRequest = { [key: string]: any;};
-  export type _BadgeBadgeDetailsServerResponse = any
+  export type BadgeBadgeDetailsRequest = { [key: string]: any };
+  export type _BadgeBadgeDetailsServerResponse = any;
   export type BadgeBadgeDetailsResponse = types.Badge;
-  export type BadgeListRequest = { [key: string]: any;};
+  export type BadgeListRequest = { [key: string]: any };
   export type BadgeListResponse = string[];
-  export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any;};
-  export type _BadgeMyBadgeAssignationTimeServerResponse = any
-  export type BadgeMyBadgeAssignationTimeResponse = { assignation_time?: Date; };
-  export type BadgeMyListRequest = { [key: string]: any;};
-  export type _BadgeMyListServerResponse = any
-  export type BadgeMyListResponse = { badges: types.Badge[]; };
-  export type BadgeUserListRequest = { [key: string]: any;};
-  export type _BadgeUserListServerResponse = any
-  export type BadgeUserListResponse = { badges: types.Badge[]; };
+  export type BadgeMyBadgeAssignationTimeRequest = { [key: string]: any };
+  export type _BadgeMyBadgeAssignationTimeServerResponse = any;
+  export type BadgeMyBadgeAssignationTimeResponse = { assignation_time?: Date };
+  export type BadgeMyListRequest = { [key: string]: any };
+  export type _BadgeMyListServerResponse = any;
+  export type BadgeMyListResponse = { badges: types.Badge[] };
+  export type BadgeUserListRequest = { [key: string]: any };
+  export type _BadgeUserListServerResponse = any;
+  export type BadgeUserListResponse = { badges: types.Badge[] };
 
   // Certificate
-  export type CertificateGenerateContestCertificatesRequest = { [key: string]: any;};
-  export type CertificateGenerateContestCertificatesResponse = {  };
-  export type CertificateGetCertificatePdfRequest = { [key: string]: any;};
-  export type CertificateGetCertificatePdfResponse = { certificate?: string; };
-  export type CertificateGetUserCertificatesRequest = { [key: string]: any;};
-  export type _CertificateGetUserCertificatesServerResponse = any
-  export type CertificateGetUserCertificatesResponse = { certificates: types.CertificateListItem[]; };
-  export type CertificateValidateCertificateRequest = { [key: string]: any;};
-  export type CertificateValidateCertificateResponse = { valid: boolean; };
+  export type CertificateGenerateContestCertificatesRequest = {
+    [key: string]: any;
+  };
+  export type CertificateGenerateContestCertificatesResponse = {};
+  export type CertificateGetCertificatePdfRequest = { [key: string]: any };
+  export type CertificateGetCertificatePdfResponse = { certificate?: string };
+  export type CertificateGetUserCertificatesRequest = { [key: string]: any };
+  export type _CertificateGetUserCertificatesServerResponse = any;
+  export type CertificateGetUserCertificatesResponse = {
+    certificates: types.CertificateListItem[];
+  };
+  export type CertificateValidateCertificateRequest = { [key: string]: any };
+  export type CertificateValidateCertificateResponse = { valid: boolean };
 
   // Clarification
-  export type ClarificationCreateRequest = { [key: string]: any;};
-  export type _ClarificationCreateServerResponse = any
+  export type ClarificationCreateRequest = { [key: string]: any };
+  export type _ClarificationCreateServerResponse = any;
   export type ClarificationCreateResponse = types.Clarification;
-  export type ClarificationDetailsRequest = { [key: string]: any;};
-  export type _ClarificationDetailsServerResponse = any
-  export type ClarificationDetailsResponse = { answer?: string; message: string; problem_id: number; problemset_id?: number; time: Date; };
-  export type ClarificationUpdateRequest = { [key: string]: any;};
-  export type ClarificationUpdateResponse = {  };
+  export type ClarificationDetailsRequest = { [key: string]: any };
+  export type _ClarificationDetailsServerResponse = any;
+  export type ClarificationDetailsResponse = {
+    answer?: string;
+    message: string;
+    problem_id: number;
+    problemset_id?: number;
+    time: Date;
+  };
+  export type ClarificationUpdateRequest = { [key: string]: any };
+  export type ClarificationUpdateResponse = {};
 
   // Contest
-  export type ContestActivityReportRequest = { [key: string]: any;};
-  export type _ContestActivityReportServerResponse = any
-  export type ContestActivityReportResponse = { events: types.ActivityEvent[]; pagerItems: types.PageItem[]; };
-  export type ContestAddAdminRequest = { [key: string]: any;};
-  export type ContestAddAdminResponse = {  };
-  export type ContestAddGroupRequest = { [key: string]: any;};
-  export type ContestAddGroupResponse = {  };
-  export type ContestAddGroupAdminRequest = { [key: string]: any;};
-  export type ContestAddGroupAdminResponse = {  };
-  export type ContestAddProblemRequest = { [key: string]: any;};
-  export type ContestAddProblemResponse = { solutionStatus: string; };
-  export type ContestAddUserRequest = { [key: string]: any;};
-  export type ContestAddUserResponse = {  };
-  export type ContestAdminDetailsRequest = { [key: string]: any;};
-  export type _ContestAdminDetailsServerResponse = any
+  export type ContestActivityReportRequest = { [key: string]: any };
+  export type _ContestActivityReportServerResponse = any;
+  export type ContestActivityReportResponse = {
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
+  };
+  export type ContestAddAdminRequest = { [key: string]: any };
+  export type ContestAddAdminResponse = {};
+  export type ContestAddGroupRequest = { [key: string]: any };
+  export type ContestAddGroupResponse = {};
+  export type ContestAddGroupAdminRequest = { [key: string]: any };
+  export type ContestAddGroupAdminResponse = {};
+  export type ContestAddProblemRequest = { [key: string]: any };
+  export type ContestAddProblemResponse = { solutionStatus: string };
+  export type ContestAddUserRequest = { [key: string]: any };
+  export type ContestAddUserResponse = {};
+  export type ContestAdminDetailsRequest = { [key: string]: any };
+  export type _ContestAdminDetailsServerResponse = any;
   export type ContestAdminDetailsResponse = types.ContestAdminDetails;
-  export type ContestAdminListRequest = { [key: string]: any;};
-  export type _ContestAdminListServerResponse = any
-  export type ContestAdminListResponse = { contests: types.Contest[]; };
-  export type ContestAdminsRequest = { [key: string]: any;};
-  export type ContestAdminsResponse = { admins: { role: string; username: string; }[]; group_admins: { alias: string; name: string; role: string; }[]; };
-  export type ContestArbitrateRequestRequest = { [key: string]: any;};
-  export type ContestArbitrateRequestResponse = {  };
-  export type ContestArchiveRequest = { [key: string]: any;};
-  export type ContestArchiveResponse = {  };
-  export type ContestClarificationsRequest = { [key: string]: any;};
-  export type _ContestClarificationsServerResponse = any
-  export type ContestClarificationsResponse = { clarifications: types.Clarification[]; };
-  export type ContestCloneRequest = { [key: string]: any;};
-  export type ContestCloneResponse = { alias: string; };
-  export type ContestContestantsRequest = { [key: string]: any;};
-  export type ContestContestantsResponse = { contestants: types.Contestant[]; };
-  export type ContestCreateRequest = { [key: string]: any;};
-  export type ContestCreateResponse = {  };
-  export type ContestCreateVirtualRequest = { [key: string]: any;};
-  export type ContestCreateVirtualResponse = { alias: string; };
-  export type ContestDetailsRequest = { [key: string]: any;};
-  export type _ContestDetailsServerResponse = any
+  export type ContestAdminListRequest = { [key: string]: any };
+  export type _ContestAdminListServerResponse = any;
+  export type ContestAdminListResponse = { contests: types.Contest[] };
+  export type ContestAdminsRequest = { [key: string]: any };
+  export type ContestAdminsResponse = {
+    admins: { role: string; username: string }[];
+    group_admins: { alias: string; name: string; role: string }[];
+  };
+  export type ContestArbitrateRequestRequest = { [key: string]: any };
+  export type ContestArbitrateRequestResponse = {};
+  export type ContestArchiveRequest = { [key: string]: any };
+  export type ContestArchiveResponse = {};
+  export type ContestClarificationsRequest = { [key: string]: any };
+  export type _ContestClarificationsServerResponse = any;
+  export type ContestClarificationsResponse = {
+    clarifications: types.Clarification[];
+  };
+  export type ContestCloneRequest = { [key: string]: any };
+  export type ContestCloneResponse = { alias: string };
+  export type ContestContestantsRequest = { [key: string]: any };
+  export type ContestContestantsResponse = { contestants: types.Contestant[] };
+  export type ContestCreateRequest = { [key: string]: any };
+  export type ContestCreateResponse = {};
+  export type ContestCreateVirtualRequest = { [key: string]: any };
+  export type ContestCreateVirtualResponse = { alias: string };
+  export type ContestDetailsRequest = { [key: string]: any };
+  export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
-  export type ContestGetNumberOfContestantsRequest = { [key: string]: any;};
-  export type ContestGetNumberOfContestantsResponse = { response: { [key: number]: number; }; };
-  export type ContestListRequest = { [key: string]: any;};
-  export type _ContestListServerResponse = any
-  export type ContestListResponse = { number_of_results: number; results: types.ContestListItem[]; };
-  export type ContestListParticipatingRequest = { [key: string]: any;};
-  export type _ContestListParticipatingServerResponse = any
-  export type ContestListParticipatingResponse = { contests: types.Contest[]; count: number; };
-  export type ContestMyListRequest = { [key: string]: any;};
-  export type _ContestMyListServerResponse = any
-  export type ContestMyListResponse = { contests: types.Contest[]; count: number; };
-  export type ContestOpenRequest = { [key: string]: any;};
-  export type ContestOpenResponse = {  };
-  export type ContestProblemClarificationsRequest = { [key: string]: any;};
-  export type _ContestProblemClarificationsServerResponse = any
-  export type ContestProblemClarificationsResponse = { clarifications: types.Clarification[]; };
-  export type ContestProblemsRequest = { [key: string]: any;};
-  export type _ContestProblemsServerResponse = any
-  export type ContestProblemsResponse = { problems: types.ProblemsetProblemWithVersions[]; };
-  export type ContestPublicDetailsRequest = { [key: string]: any;};
-  export type _ContestPublicDetailsServerResponse = any
+  export type ContestGetNumberOfContestantsRequest = { [key: string]: any };
+  export type ContestGetNumberOfContestantsResponse = {
+    response: { [key: number]: number };
+  };
+  export type ContestListRequest = { [key: string]: any };
+  export type _ContestListServerResponse = any;
+  export type ContestListResponse = {
+    number_of_results: number;
+    results: types.ContestListItem[];
+  };
+  export type ContestListParticipatingRequest = { [key: string]: any };
+  export type _ContestListParticipatingServerResponse = any;
+  export type ContestListParticipatingResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
+  export type ContestMyListRequest = { [key: string]: any };
+  export type _ContestMyListServerResponse = any;
+  export type ContestMyListResponse = {
+    contests: types.Contest[];
+    count: number;
+  };
+  export type ContestOpenRequest = { [key: string]: any };
+  export type ContestOpenResponse = {};
+  export type ContestProblemClarificationsRequest = { [key: string]: any };
+  export type _ContestProblemClarificationsServerResponse = any;
+  export type ContestProblemClarificationsResponse = {
+    clarifications: types.Clarification[];
+  };
+  export type ContestProblemsRequest = { [key: string]: any };
+  export type _ContestProblemsServerResponse = any;
+  export type ContestProblemsResponse = {
+    problems: types.ProblemsetProblemWithVersions[];
+  };
+  export type ContestPublicDetailsRequest = { [key: string]: any };
+  export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
-  export type ContestRegisterForContestRequest = { [key: string]: any;};
-  export type ContestRegisterForContestResponse = {  };
-  export type ContestRemoveAdminRequest = { [key: string]: any;};
-  export type ContestRemoveAdminResponse = {  };
-  export type ContestRemoveGroupRequest = { [key: string]: any;};
-  export type ContestRemoveGroupResponse = {  };
-  export type ContestRemoveGroupAdminRequest = { [key: string]: any;};
-  export type ContestRemoveGroupAdminResponse = {  };
-  export type ContestRemoveProblemRequest = { [key: string]: any;};
-  export type ContestRemoveProblemResponse = {  };
-  export type ContestRemoveUserRequest = { [key: string]: any;};
-  export type ContestRemoveUserResponse = {  };
-  export type ContestReplaceTeamsGroupRequest = { [key: string]: any;};
-  export type ContestReplaceTeamsGroupResponse = {  };
-  export type ContestReportRequest = { [key: string]: any;};
-  export type _ContestReportServerResponse = any
-  export type ContestReportResponse = { finish_time?: Date; problems: { alias: string; order: number; }[]; ranking: types.ContestReport[]; start_time: Date; time: Date; title: string; };
-  export type ContestRequestsRequest = { [key: string]: any;};
-  export type _ContestRequestsServerResponse = any
-  export type ContestRequestsResponse = { contest_alias: string; users: { accepted?: boolean; admin?: { username?: string; }; country?: string; last_update?: Date; request_time: Date; username: string; }[]; };
-  export type ContestRoleRequest = { [key: string]: any;};
-  export type ContestRoleResponse = { admin: boolean; };
-  export type ContestRunsRequest = { [key: string]: any;};
-  export type _ContestRunsServerResponse = any
-  export type ContestRunsResponse = { runs: types.Run[]; totalRuns: number; };
-  export type ContestRunsDiffRequest = { [key: string]: any;};
-  export type ContestRunsDiffResponse = { diff: { guid: string; new_score?: number; new_status?: string; new_verdict?: string; old_score?: number; old_status?: string; old_verdict?: string; problemset_id?: number; username: string; }[]; };
-  export type ContestScoreboardRequest = { [key: string]: any;};
-  export type _ContestScoreboardServerResponse = any
+  export type ContestRegisterForContestRequest = { [key: string]: any };
+  export type ContestRegisterForContestResponse = {};
+  export type ContestRemoveAdminRequest = { [key: string]: any };
+  export type ContestRemoveAdminResponse = {};
+  export type ContestRemoveGroupRequest = { [key: string]: any };
+  export type ContestRemoveGroupResponse = {};
+  export type ContestRemoveGroupAdminRequest = { [key: string]: any };
+  export type ContestRemoveGroupAdminResponse = {};
+  export type ContestRemoveProblemRequest = { [key: string]: any };
+  export type ContestRemoveProblemResponse = {};
+  export type ContestRemoveUserRequest = { [key: string]: any };
+  export type ContestRemoveUserResponse = {};
+  export type ContestReplaceTeamsGroupRequest = { [key: string]: any };
+  export type ContestReplaceTeamsGroupResponse = {};
+  export type ContestReportRequest = { [key: string]: any };
+  export type _ContestReportServerResponse = any;
+  export type ContestReportResponse = {
+    finish_time?: Date;
+    problems: { alias: string; order: number }[];
+    ranking: types.ContestReport[];
+    start_time: Date;
+    time: Date;
+    title: string;
+  };
+  export type ContestRequestsRequest = { [key: string]: any };
+  export type _ContestRequestsServerResponse = any;
+  export type ContestRequestsResponse = {
+    contest_alias: string;
+    users: {
+      accepted?: boolean;
+      admin?: { username?: string };
+      country?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+  };
+  export type ContestRoleRequest = { [key: string]: any };
+  export type ContestRoleResponse = { admin: boolean };
+  export type ContestRunsRequest = { [key: string]: any };
+  export type _ContestRunsServerResponse = any;
+  export type ContestRunsResponse = { runs: types.Run[]; totalRuns: number };
+  export type ContestRunsDiffRequest = { [key: string]: any };
+  export type ContestRunsDiffResponse = {
+    diff: {
+      guid: string;
+      new_score?: number;
+      new_status?: string;
+      new_verdict?: string;
+      old_score?: number;
+      old_status?: string;
+      old_verdict?: string;
+      problemset_id?: number;
+      username: string;
+    }[];
+  };
+  export type ContestScoreboardRequest = { [key: string]: any };
+  export type _ContestScoreboardServerResponse = any;
   export type ContestScoreboardResponse = types.Scoreboard;
-  export type ContestScoreboardEventsRequest = { [key: string]: any;};
-  export type ContestScoreboardEventsResponse = { events: types.ScoreboardEvent[]; };
-  export type ContestScoreboardMergeRequest = { [key: string]: any;};
-  export type ContestScoreboardMergeResponse = { ranking: types.MergedScoreboardEntry[]; };
-  export type ContestSearchUsersRequest = { [key: string]: any;};
-  export type ContestSearchUsersResponse = { results: types.ListItem[]; };
-  export type ContestSetRecommendedRequest = { [key: string]: any;};
-  export type ContestSetRecommendedResponse = {  };
-  export type ContestStatsRequest = { [key: string]: any;};
-  export type _ContestStatsServerResponse = any
-  export type ContestStatsResponse = { distribution: { [key: number]: number; }; max_wait_time?: Date; max_wait_time_guid?: string; pending_runs: string[]; size_of_bucket: number; total_points: number; total_runs: number; verdict_counts: { [key: string]: number; }; };
-  export type ContestUpdateRequest = { [key: string]: any;};
-  export type ContestUpdateResponse = { teamsGroupName?: string; title: string; };
-  export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any;};
-  export type ContestUpdateEndTimeForIdentityResponse = {  };
-  export type ContestUsersRequest = { [key: string]: any;};
-  export type _ContestUsersServerResponse = any
-  export type ContestUsersResponse = { groups: { alias: string; name: string; }[]; users: types.ContestUser[]; };
+  export type ContestScoreboardEventsRequest = { [key: string]: any };
+  export type ContestScoreboardEventsResponse = {
+    events: types.ScoreboardEvent[];
+  };
+  export type ContestScoreboardMergeRequest = { [key: string]: any };
+  export type ContestScoreboardMergeResponse = {
+    ranking: types.MergedScoreboardEntry[];
+  };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { results: types.ListItem[] };
+  export type ContestSetRecommendedRequest = { [key: string]: any };
+  export type ContestSetRecommendedResponse = {};
+  export type ContestStatsRequest = { [key: string]: any };
+  export type _ContestStatsServerResponse = any;
+  export type ContestStatsResponse = {
+    distribution: { [key: number]: number };
+    max_wait_time?: Date;
+    max_wait_time_guid?: string;
+    pending_runs: string[];
+    size_of_bucket: number;
+    total_points: number;
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+  };
+  export type ContestUpdateRequest = { [key: string]: any };
+  export type ContestUpdateResponse = {
+    teamsGroupName?: string;
+    title: string;
+  };
+  export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
+  export type ContestUpdateEndTimeForIdentityResponse = {};
+  export type ContestUsersRequest = { [key: string]: any };
+  export type _ContestUsersServerResponse = any;
+  export type ContestUsersResponse = {
+    groups: { alias: string; name: string }[];
+    users: types.ContestUser[];
+  };
 
   // Course
-  export type CourseActivityReportRequest = { [key: string]: any;};
-  export type _CourseActivityReportServerResponse = any
-  export type CourseActivityReportResponse = { events: types.ActivityEvent[]; pagerItems: types.PageItem[]; };
-  export type CourseAddAdminRequest = { [key: string]: any;};
-  export type CourseAddAdminResponse = {  };
-  export type CourseAddGroupAdminRequest = { [key: string]: any;};
-  export type CourseAddGroupAdminResponse = {  };
-  export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any;};
-  export type CourseAddGroupTeachingAssistantResponse = {  };
-  export type CourseAddProblemRequest = { [key: string]: any;};
-  export type CourseAddProblemResponse = { solutionStatus: string; };
-  export type CourseAddStudentRequest = { [key: string]: any;};
-  export type CourseAddStudentResponse = {  };
-  export type CourseAddTeachingAssistantRequest = { [key: string]: any;};
-  export type CourseAddTeachingAssistantResponse = {  };
-  export type CourseAdminDetailsRequest = { [key: string]: any;};
-  export type _CourseAdminDetailsServerResponse = any
+  export type CourseActivityReportRequest = { [key: string]: any };
+  export type _CourseActivityReportServerResponse = any;
+  export type CourseActivityReportResponse = {
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
+  };
+  export type CourseAddAdminRequest = { [key: string]: any };
+  export type CourseAddAdminResponse = {};
+  export type CourseAddGroupAdminRequest = { [key: string]: any };
+  export type CourseAddGroupAdminResponse = {};
+  export type CourseAddGroupTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddGroupTeachingAssistantResponse = {};
+  export type CourseAddProblemRequest = { [key: string]: any };
+  export type CourseAddProblemResponse = { solutionStatus: string };
+  export type CourseAddStudentRequest = { [key: string]: any };
+  export type CourseAddStudentResponse = {};
+  export type CourseAddTeachingAssistantRequest = { [key: string]: any };
+  export type CourseAddTeachingAssistantResponse = {};
+  export type CourseAdminDetailsRequest = { [key: string]: any };
+  export type _CourseAdminDetailsServerResponse = any;
   export type CourseAdminDetailsResponse = types.CourseDetails;
-  export type CourseAdminsRequest = { [key: string]: any;};
-  export type CourseAdminsResponse = { admins: { role: string; username: string; }[]; group_admins: { alias: string; name: string; role: string; }[]; group_teaching_assistants: { alias: string; name: string; role: string; }[]; teaching_assistants: { role: string; username: string; }[]; };
-  export type CourseArbitrateRequestRequest = { [key: string]: any;};
-  export type CourseArbitrateRequestResponse = {  };
-  export type CourseArchiveRequest = { [key: string]: any;};
-  export type CourseArchiveResponse = {  };
-  export type CourseAssignmentDetailsRequest = { [key: string]: any;};
-  export type _CourseAssignmentDetailsServerResponse = any
-  export type CourseAssignmentDetailsResponse = { admin: boolean; alias: string; assignment_type?: string; courseAssignments: types.CourseAssignment[]; description?: string; director: string; finish_time?: Date; name: string; problems: types.ProblemsetProblem[]; problemset_id: number; start_time: Date; };
-  export type CourseAssignmentScoreboardRequest = { [key: string]: any;};
-  export type _CourseAssignmentScoreboardServerResponse = any
+  export type CourseAdminsRequest = { [key: string]: any };
+  export type CourseAdminsResponse = {
+    admins: { role: string; username: string }[];
+    group_admins: { alias: string; name: string; role: string }[];
+    group_teaching_assistants: { alias: string; name: string; role: string }[];
+    teaching_assistants: { role: string; username: string }[];
+  };
+  export type CourseArbitrateRequestRequest = { [key: string]: any };
+  export type CourseArbitrateRequestResponse = {};
+  export type CourseArchiveRequest = { [key: string]: any };
+  export type CourseArchiveResponse = {};
+  export type CourseAssignmentDetailsRequest = { [key: string]: any };
+  export type _CourseAssignmentDetailsServerResponse = any;
+  export type CourseAssignmentDetailsResponse = {
+    admin: boolean;
+    alias: string;
+    assignment_type?: string;
+    courseAssignments: types.CourseAssignment[];
+    description?: string;
+    director: string;
+    finish_time?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemset_id: number;
+    start_time: Date;
+  };
+  export type CourseAssignmentScoreboardRequest = { [key: string]: any };
+  export type _CourseAssignmentScoreboardServerResponse = any;
   export type CourseAssignmentScoreboardResponse = types.Scoreboard;
-  export type CourseAssignmentScoreboardEventsRequest = { [key: string]: any;};
-  export type CourseAssignmentScoreboardEventsResponse = { events: types.ScoreboardEvent[]; };
-  export type CourseClarificationsRequest = { [key: string]: any;};
-  export type _CourseClarificationsServerResponse = any
-  export type CourseClarificationsResponse = { clarifications: types.Clarification[]; };
-  export type CourseCloneRequest = { [key: string]: any;};
-  export type CourseCloneResponse = { alias: string; };
-  export type CourseCreateRequest = { [key: string]: any;};
-  export type CourseCreateResponse = {  };
-  export type CourseCreateAssignmentRequest = { [key: string]: any;};
-  export type CourseCreateAssignmentResponse = {  };
-  export type CourseDetailsRequest = { [key: string]: any;};
-  export type _CourseDetailsServerResponse = any
+  export type CourseAssignmentScoreboardEventsRequest = { [key: string]: any };
+  export type CourseAssignmentScoreboardEventsResponse = {
+    events: types.ScoreboardEvent[];
+  };
+  export type CourseClarificationsRequest = { [key: string]: any };
+  export type _CourseClarificationsServerResponse = any;
+  export type CourseClarificationsResponse = {
+    clarifications: types.Clarification[];
+  };
+  export type CourseCloneRequest = { [key: string]: any };
+  export type CourseCloneResponse = { alias: string };
+  export type CourseCreateRequest = { [key: string]: any };
+  export type CourseCreateResponse = {};
+  export type CourseCreateAssignmentRequest = { [key: string]: any };
+  export type CourseCreateAssignmentResponse = {};
+  export type CourseDetailsRequest = { [key: string]: any };
+  export type _CourseDetailsServerResponse = any;
   export type CourseDetailsResponse = types.CourseDetails;
-  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any;};
-  export type CourseGenerateTokenForCloneCourseResponse = { token: string; };
-  export type CourseGetProblemUsersRequest = { [key: string]: any;};
-  export type CourseGetProblemUsersResponse = { identities: string[]; };
-  export type CourseIntroDetailsRequest = { [key: string]: any;};
-  export type _CourseIntroDetailsServerResponse = any
+  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any };
+  export type CourseGenerateTokenForCloneCourseResponse = { token: string };
+  export type CourseGetProblemUsersRequest = { [key: string]: any };
+  export type CourseGetProblemUsersResponse = { identities: string[] };
+  export type CourseIntroDetailsRequest = { [key: string]: any };
+  export type _CourseIntroDetailsServerResponse = any;
   export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
-  export type CourseListAssignmentsRequest = { [key: string]: any;};
-  export type _CourseListAssignmentsServerResponse = any
-  export type CourseListAssignmentsResponse = { assignments: types.CourseAssignment[]; };
-  export type CourseListSolvedProblemsRequest = { [key: string]: any;};
-  export type CourseListSolvedProblemsResponse = { user_problems: { [key: string]: { alias: string; title: string; username: string; }[]; }; };
-  export type CourseListStudentsRequest = { [key: string]: any;};
-  export type CourseListStudentsResponse = { students: types.CourseStudent[]; };
-  export type CourseListUnsolvedProblemsRequest = { [key: string]: any;};
-  export type CourseListUnsolvedProblemsResponse = { user_problems: { [key: string]: { alias: string; title: string; username: string; }[]; }; };
-  export type CourseMyProgressRequest = { [key: string]: any;};
-  export type CourseMyProgressResponse = { assignments: types.AssignmentProgress; };
-  export type CourseProblemClarificationsRequest = { [key: string]: any;};
-  export type _CourseProblemClarificationsServerResponse = any
-  export type CourseProblemClarificationsResponse = { clarifications: types.Clarification[]; };
-  export type CourseRegisterForCourseRequest = { [key: string]: any;};
-  export type CourseRegisterForCourseResponse = {  };
-  export type CourseRemoveAdminRequest = { [key: string]: any;};
-  export type CourseRemoveAdminResponse = {  };
-  export type CourseRemoveAssignmentRequest = { [key: string]: any;};
-  export type CourseRemoveAssignmentResponse = {  };
-  export type CourseRemoveGroupAdminRequest = { [key: string]: any;};
-  export type CourseRemoveGroupAdminResponse = {  };
-  export type CourseRemoveGroupTeachingAssistantRequest = { [key: string]: any;};
-  export type CourseRemoveGroupTeachingAssistantResponse = {  };
-  export type CourseRemoveProblemRequest = { [key: string]: any;};
-  export type CourseRemoveProblemResponse = {  };
-  export type CourseRemoveStudentRequest = { [key: string]: any;};
-  export type CourseRemoveStudentResponse = {  };
-  export type CourseRemoveTeachingAssistantRequest = { [key: string]: any;};
-  export type CourseRemoveTeachingAssistantResponse = {  };
-  export type CourseRequestFeedbackRequest = { [key: string]: any;};
-  export type CourseRequestFeedbackResponse = {  };
-  export type CourseRequestsRequest = { [key: string]: any;};
-  export type _CourseRequestsServerResponse = any
-  export type CourseRequestsResponse = { users: types.IdentityRequest[]; };
-  export type CourseRunsRequest = { [key: string]: any;};
-  export type _CourseRunsServerResponse = any
-  export type CourseRunsResponse = { runs: types.Run[]; totalRuns: number; };
-  export type CourseSearchUsersRequest = { [key: string]: any;};
-  export type CourseSearchUsersResponse = { results: types.ListItem[]; };
-  export type CourseStudentProgressRequest = { [key: string]: any;};
-  export type _CourseStudentProgressServerResponse = any
-  export type CourseStudentProgressResponse = { problems: types.CourseProblem[]; };
-  export type CourseStudentsProgressRequest = { [key: string]: any;};
-  export type CourseStudentsProgressResponse = { nextPage?: number; progress: types.StudentProgressInCourse[]; };
-  export type CourseToggleTeachingAssistantRequest = { [key: string]: any;};
-  export type CourseToggleTeachingAssistantResponse = { teaching_assistant_enabled: boolean; };
-  export type CourseUpdateRequest = { [key: string]: any;};
-  export type CourseUpdateResponse = {  };
-  export type CourseUpdateAssignmentRequest = { [key: string]: any;};
-  export type CourseUpdateAssignmentResponse = {  };
-  export type CourseUpdateAssignmentsOrderRequest = { [key: string]: any;};
-  export type CourseUpdateAssignmentsOrderResponse = {  };
-  export type CourseUpdateProblemsOrderRequest = { [key: string]: any;};
-  export type CourseUpdateProblemsOrderResponse = {  };
+  export type CourseListAssignmentsRequest = { [key: string]: any };
+  export type _CourseListAssignmentsServerResponse = any;
+  export type CourseListAssignmentsResponse = {
+    assignments: types.CourseAssignment[];
+  };
+  export type CourseListSolvedProblemsRequest = { [key: string]: any };
+  export type CourseListSolvedProblemsResponse = {
+    user_problems: {
+      [key: string]: { alias: string; title: string; username: string }[];
+    };
+  };
+  export type CourseListStudentsRequest = { [key: string]: any };
+  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
+  export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
+  export type CourseListUnsolvedProblemsResponse = {
+    user_problems: {
+      [key: string]: { alias: string; title: string; username: string }[];
+    };
+  };
+  export type CourseMyProgressRequest = { [key: string]: any };
+  export type CourseMyProgressResponse = {
+    assignments: types.AssignmentProgress;
+  };
+  export type CourseProblemClarificationsRequest = { [key: string]: any };
+  export type _CourseProblemClarificationsServerResponse = any;
+  export type CourseProblemClarificationsResponse = {
+    clarifications: types.Clarification[];
+  };
+  export type CourseRegisterForCourseRequest = { [key: string]: any };
+  export type CourseRegisterForCourseResponse = {};
+  export type CourseRemoveAdminRequest = { [key: string]: any };
+  export type CourseRemoveAdminResponse = {};
+  export type CourseRemoveAssignmentRequest = { [key: string]: any };
+  export type CourseRemoveAssignmentResponse = {};
+  export type CourseRemoveGroupAdminRequest = { [key: string]: any };
+  export type CourseRemoveGroupAdminResponse = {};
+  export type CourseRemoveGroupTeachingAssistantRequest = {
+    [key: string]: any;
+  };
+  export type CourseRemoveGroupTeachingAssistantResponse = {};
+  export type CourseRemoveProblemRequest = { [key: string]: any };
+  export type CourseRemoveProblemResponse = {};
+  export type CourseRemoveStudentRequest = { [key: string]: any };
+  export type CourseRemoveStudentResponse = {};
+  export type CourseRemoveTeachingAssistantRequest = { [key: string]: any };
+  export type CourseRemoveTeachingAssistantResponse = {};
+  export type CourseRequestFeedbackRequest = { [key: string]: any };
+  export type CourseRequestFeedbackResponse = {};
+  export type CourseRequestsRequest = { [key: string]: any };
+  export type _CourseRequestsServerResponse = any;
+  export type CourseRequestsResponse = { users: types.IdentityRequest[] };
+  export type CourseRunsRequest = { [key: string]: any };
+  export type _CourseRunsServerResponse = any;
+  export type CourseRunsResponse = { runs: types.Run[]; totalRuns: number };
+  export type CourseSearchUsersRequest = { [key: string]: any };
+  export type CourseSearchUsersResponse = { results: types.ListItem[] };
+  export type CourseStudentProgressRequest = { [key: string]: any };
+  export type _CourseStudentProgressServerResponse = any;
+  export type CourseStudentProgressResponse = {
+    problems: types.CourseProblem[];
+  };
+  export type CourseStudentsProgressRequest = { [key: string]: any };
+  export type CourseStudentsProgressResponse = {
+    nextPage?: number;
+    progress: types.StudentProgressInCourse[];
+  };
+  export type CourseToggleTeachingAssistantRequest = { [key: string]: any };
+  export type CourseToggleTeachingAssistantResponse = {
+    teaching_assistant_enabled: boolean;
+  };
+  export type CourseUpdateRequest = { [key: string]: any };
+  export type CourseUpdateResponse = {};
+  export type CourseUpdateAssignmentRequest = { [key: string]: any };
+  export type CourseUpdateAssignmentResponse = {};
+  export type CourseUpdateAssignmentsOrderRequest = { [key: string]: any };
+  export type CourseUpdateAssignmentsOrderResponse = {};
+  export type CourseUpdateProblemsOrderRequest = { [key: string]: any };
+  export type CourseUpdateProblemsOrderResponse = {};
 
   // Grader
-  export type GraderStatusRequest = { [key: string]: any;};
-  export type GraderStatusResponse = { grader: types.GraderStatus; };
+  export type GraderStatusRequest = { [key: string]: any };
+  export type GraderStatusResponse = { grader: types.GraderStatus };
 
   // Group
-  export type GroupAddUserRequest = { [key: string]: any;};
-  export type GroupAddUserResponse = {  };
-  export type GroupCreateRequest = { [key: string]: any;};
-  export type GroupCreateResponse = {  };
-  export type GroupCreateScoreboardRequest = { [key: string]: any;};
-  export type GroupCreateScoreboardResponse = {  };
-  export type GroupDetailsRequest = { [key: string]: any;};
-  export type GroupDetailsResponse = { group: { alias?: string; create_time: number; description?: string; name?: string; }; scoreboards: types.GroupScoreboard[]; };
-  export type GroupListRequest = { [key: string]: any;};
+  export type GroupAddUserRequest = { [key: string]: any };
+  export type GroupAddUserResponse = {};
+  export type GroupCreateRequest = { [key: string]: any };
+  export type GroupCreateResponse = {};
+  export type GroupCreateScoreboardRequest = { [key: string]: any };
+  export type GroupCreateScoreboardResponse = {};
+  export type GroupDetailsRequest = { [key: string]: any };
+  export type GroupDetailsResponse = {
+    group: {
+      alias?: string;
+      create_time: number;
+      description?: string;
+      name?: string;
+    };
+    scoreboards: types.GroupScoreboard[];
+  };
+  export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = types.GroupListItem[];
-  export type GroupMembersRequest = { [key: string]: any;};
-  export type GroupMembersResponse = { identities: types.Identity[]; };
-  export type GroupMyListRequest = { [key: string]: any;};
-  export type _GroupMyListServerResponse = any
-  export type GroupMyListResponse = { groups: { alias: string; create_time: Date; description?: string; name: string; }[]; };
-  export type GroupRemoveUserRequest = { [key: string]: any;};
-  export type GroupRemoveUserResponse = {  };
-  export type GroupUpdateRequest = { [key: string]: any;};
-  export type GroupUpdateResponse = {  };
+  export type GroupMembersRequest = { [key: string]: any };
+  export type GroupMembersResponse = { identities: types.Identity[] };
+  export type GroupMyListRequest = { [key: string]: any };
+  export type _GroupMyListServerResponse = any;
+  export type GroupMyListResponse = {
+    groups: {
+      alias: string;
+      create_time: Date;
+      description?: string;
+      name: string;
+    }[];
+  };
+  export type GroupRemoveUserRequest = { [key: string]: any };
+  export type GroupRemoveUserResponse = {};
+  export type GroupUpdateRequest = { [key: string]: any };
+  export type GroupUpdateResponse = {};
 
   // GroupScoreboard
-  export type GroupScoreboardAddContestRequest = { [key: string]: any;};
-  export type GroupScoreboardAddContestResponse = {  };
-  export type GroupScoreboardDetailsRequest = { [key: string]: any;};
-  export type _GroupScoreboardDetailsServerResponse = any
+  export type GroupScoreboardAddContestRequest = { [key: string]: any };
+  export type GroupScoreboardAddContestResponse = {};
+  export type GroupScoreboardDetailsRequest = { [key: string]: any };
+  export type _GroupScoreboardDetailsServerResponse = any;
   export type GroupScoreboardDetailsResponse = types.GroupScoreboardDetails;
-  export type GroupScoreboardListRequest = { [key: string]: any;};
-  export type GroupScoreboardListResponse = { scoreboards: { alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }[]; };
-  export type GroupScoreboardRemoveContestRequest = { [key: string]: any;};
-  export type GroupScoreboardRemoveContestResponse = {  };
+  export type GroupScoreboardListRequest = { [key: string]: any };
+  export type GroupScoreboardListResponse = {
+    scoreboards: {
+      alias: string;
+      create_time: number;
+      description: string;
+      group_id: number;
+      group_scoreboard_id: number;
+      name: string;
+    }[];
+  };
+  export type GroupScoreboardRemoveContestRequest = { [key: string]: any };
+  export type GroupScoreboardRemoveContestResponse = {};
 
   // Identity
-  export type IdentityBulkCreateRequest = { [key: string]: any;};
-  export type IdentityBulkCreateResponse = {  };
-  export type IdentityBulkCreateForTeamsRequest = { [key: string]: any;};
-  export type IdentityBulkCreateForTeamsResponse = {  };
-  export type IdentityChangePasswordRequest = { [key: string]: any;};
-  export type IdentityChangePasswordResponse = {  };
-  export type IdentityCreateRequest = { [key: string]: any;};
-  export type IdentityCreateResponse = { username: string; };
-  export type IdentitySelectIdentityRequest = { [key: string]: any;};
-  export type IdentitySelectIdentityResponse = {  };
-  export type IdentityUpdateRequest = { [key: string]: any;};
-  export type IdentityUpdateResponse = {  };
-  export type IdentityUpdateIdentityTeamRequest = { [key: string]: any;};
-  export type IdentityUpdateIdentityTeamResponse = {  };
+  export type IdentityBulkCreateRequest = { [key: string]: any };
+  export type IdentityBulkCreateResponse = {};
+  export type IdentityBulkCreateForTeamsRequest = { [key: string]: any };
+  export type IdentityBulkCreateForTeamsResponse = {};
+  export type IdentityChangePasswordRequest = { [key: string]: any };
+  export type IdentityChangePasswordResponse = {};
+  export type IdentityCreateRequest = { [key: string]: any };
+  export type IdentityCreateResponse = { username: string };
+  export type IdentitySelectIdentityRequest = { [key: string]: any };
+  export type IdentitySelectIdentityResponse = {};
+  export type IdentityUpdateRequest = { [key: string]: any };
+  export type IdentityUpdateResponse = {};
+  export type IdentityUpdateIdentityTeamRequest = { [key: string]: any };
+  export type IdentityUpdateIdentityTeamResponse = {};
 
   // Notification
-  export type NotificationMyListRequest = { [key: string]: any;};
-  export type _NotificationMyListServerResponse = any
-  export type NotificationMyListResponse = { notifications: types.Notification[]; };
-  export type NotificationReadNotificationsRequest = { [key: string]: any;};
-  export type NotificationReadNotificationsResponse = {  };
+  export type NotificationMyListRequest = { [key: string]: any };
+  export type _NotificationMyListServerResponse = any;
+  export type NotificationMyListResponse = {
+    notifications: types.Notification[];
+  };
+  export type NotificationReadNotificationsRequest = { [key: string]: any };
+  export type NotificationReadNotificationsResponse = {};
 
   // Problem
-  export type ProblemAddAdminRequest = { [key: string]: any;};
-  export type ProblemAddAdminResponse = {  };
-  export type ProblemAddGroupAdminRequest = { [key: string]: any;};
-  export type ProblemAddGroupAdminResponse = {  };
-  export type ProblemAddTagRequest = { [key: string]: any;};
-  export type ProblemAddTagResponse = { name: string; };
-  export type ProblemAdminListRequest = { [key: string]: any;};
-  export type ProblemAdminListResponse = { pagerItems: types.PageItem[]; problems: types.ProblemListItem[]; };
-  export type ProblemAdminsRequest = { [key: string]: any;};
-  export type ProblemAdminsResponse = { admins: types.ProblemAdmin[]; group_admins: types.ProblemGroupAdmin[]; };
-  export type ProblemBestScoreRequest = { [key: string]: any;};
-  export type ProblemBestScoreResponse = { score: number; };
-  export type ProblemClarificationsRequest = { [key: string]: any;};
-  export type _ProblemClarificationsServerResponse = any
-  export type ProblemClarificationsResponse = { clarifications: types.Clarification[]; };
-  export type ProblemConvertZipToCdpRequest = { [key: string]: any;};
-  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP; };
-  export type ProblemCreateRequest = { [key: string]: any;};
-  export type ProblemCreateResponse = {  };
-  export type ProblemDeleteRequest = { [key: string]: any;};
-  export type ProblemDeleteResponse = {  };
-  export type ProblemDetailsRequest = { [key: string]: any;};
-  export type _ProblemDetailsServerResponse = any
+  export type ProblemAddAdminRequest = { [key: string]: any };
+  export type ProblemAddAdminResponse = {};
+  export type ProblemAddGroupAdminRequest = { [key: string]: any };
+  export type ProblemAddGroupAdminResponse = {};
+  export type ProblemAddTagRequest = { [key: string]: any };
+  export type ProblemAddTagResponse = { name: string };
+  export type ProblemAdminListRequest = { [key: string]: any };
+  export type ProblemAdminListResponse = {
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+  };
+  export type ProblemAdminsRequest = { [key: string]: any };
+  export type ProblemAdminsResponse = {
+    admins: types.ProblemAdmin[];
+    group_admins: types.ProblemGroupAdmin[];
+  };
+  export type ProblemBestScoreRequest = { [key: string]: any };
+  export type ProblemBestScoreResponse = { score: number };
+  export type ProblemClarificationsRequest = { [key: string]: any };
+  export type _ProblemClarificationsServerResponse = any;
+  export type ProblemClarificationsResponse = {
+    clarifications: types.Clarification[];
+  };
+  export type ProblemConvertZipToCdpRequest = { [key: string]: any };
+  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP };
+  export type ProblemCreateRequest = { [key: string]: any };
+  export type ProblemCreateResponse = {};
+  export type ProblemDeleteRequest = { [key: string]: any };
+  export type ProblemDeleteResponse = {};
+  export type ProblemDetailsRequest = { [key: string]: any };
+  export type _ProblemDetailsServerResponse = any;
   export type ProblemDetailsResponse = types.ProblemDetails;
-  export type ProblemListRequest = { [key: string]: any;};
-  export type ProblemListResponse = { results: types.ProblemListItem[]; total: number; };
-  export type ProblemListForTypeaheadRequest = { [key: string]: any;};
-  export type ProblemListForTypeaheadResponse = { results: types.ListItem[]; };
-  export type ProblemMyListRequest = { [key: string]: any;};
-  export type ProblemMyListResponse = { pagerItems: types.PageItem[]; problems: types.ProblemListItem[]; };
-  export type ProblemRandomKarelProblemRequest = { [key: string]: any;};
-  export type ProblemRandomKarelProblemResponse = { alias: string; };
-  export type ProblemRandomLanguageProblemRequest = { [key: string]: any;};
-  export type ProblemRandomLanguageProblemResponse = { alias: string; };
-  export type ProblemRejudgeRequest = { [key: string]: any;};
-  export type ProblemRejudgeResponse = {  };
-  export type ProblemRemoveAdminRequest = { [key: string]: any;};
-  export type ProblemRemoveAdminResponse = {  };
-  export type ProblemRemoveGroupAdminRequest = { [key: string]: any;};
-  export type ProblemRemoveGroupAdminResponse = {  };
-  export type ProblemRemoveTagRequest = { [key: string]: any;};
-  export type ProblemRemoveTagResponse = {  };
-  export type ProblemRunsRequest = { [key: string]: any;};
-  export type _ProblemRunsServerResponse = any
-  export type ProblemRunsResponse = { runs: types.Run[]; totalRuns: number; };
-  export type ProblemRunsDiffRequest = { [key: string]: any;};
-  export type ProblemRunsDiffResponse = { diff: types.RunsDiff[]; };
-  export type ProblemSelectVersionRequest = { [key: string]: any;};
-  export type ProblemSelectVersionResponse = {  };
-  export type ProblemSolutionRequest = { [key: string]: any;};
-  export type ProblemSolutionResponse = { solution?: types.ProblemStatement; };
-  export type ProblemStatsRequest = { [key: string]: any;};
-  export type ProblemStatsResponse = { cases_stats: { [key: string]: number; }; pending_runs: string[]; total_runs: number; verdict_counts: { [key: string]: number; }; };
-  export type ProblemTagsRequest = { [key: string]: any;};
-  export type ProblemTagsResponse = { tags: { name: string; public: boolean; }[]; };
-  export type ProblemUpdateRequest = { [key: string]: any;};
-  export type ProblemUpdateResponse = { rejudged: boolean; };
-  export type ProblemUpdateProblemLevelRequest = { [key: string]: any;};
-  export type ProblemUpdateProblemLevelResponse = {  };
-  export type ProblemUpdateSolutionRequest = { [key: string]: any;};
-  export type ProblemUpdateSolutionResponse = {  };
-  export type ProblemUpdateStatementRequest = { [key: string]: any;};
-  export type ProblemUpdateStatementResponse = {  };
-  export type ProblemVersionsRequest = { [key: string]: any;};
-  export type _ProblemVersionsServerResponse = any
-  export type ProblemVersionsResponse = { log: types.ProblemVersion[]; published: string; };
+  export type ProblemListRequest = { [key: string]: any };
+  export type ProblemListResponse = {
+    results: types.ProblemListItem[];
+    total: number;
+  };
+  export type ProblemListForTypeaheadRequest = { [key: string]: any };
+  export type ProblemListForTypeaheadResponse = { results: types.ListItem[] };
+  export type ProblemMyListRequest = { [key: string]: any };
+  export type ProblemMyListResponse = {
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+  };
+  export type ProblemRandomKarelProblemRequest = { [key: string]: any };
+  export type ProblemRandomKarelProblemResponse = { alias: string };
+  export type ProblemRandomLanguageProblemRequest = { [key: string]: any };
+  export type ProblemRandomLanguageProblemResponse = { alias: string };
+  export type ProblemRejudgeRequest = { [key: string]: any };
+  export type ProblemRejudgeResponse = {};
+  export type ProblemRemoveAdminRequest = { [key: string]: any };
+  export type ProblemRemoveAdminResponse = {};
+  export type ProblemRemoveGroupAdminRequest = { [key: string]: any };
+  export type ProblemRemoveGroupAdminResponse = {};
+  export type ProblemRemoveTagRequest = { [key: string]: any };
+  export type ProblemRemoveTagResponse = {};
+  export type ProblemRunsRequest = { [key: string]: any };
+  export type _ProblemRunsServerResponse = any;
+  export type ProblemRunsResponse = { runs: types.Run[]; totalRuns: number };
+  export type ProblemRunsDiffRequest = { [key: string]: any };
+  export type ProblemRunsDiffResponse = { diff: types.RunsDiff[] };
+  export type ProblemSelectVersionRequest = { [key: string]: any };
+  export type ProblemSelectVersionResponse = {};
+  export type ProblemSolutionRequest = { [key: string]: any };
+  export type ProblemSolutionResponse = { solution?: types.ProblemStatement };
+  export type ProblemStatsRequest = { [key: string]: any };
+  export type ProblemStatsResponse = {
+    cases_stats: { [key: string]: number };
+    pending_runs: string[];
+    total_runs: number;
+    verdict_counts: { [key: string]: number };
+  };
+  export type ProblemTagsRequest = { [key: string]: any };
+  export type ProblemTagsResponse = {
+    tags: { name: string; public: boolean }[];
+  };
+  export type ProblemUpdateRequest = { [key: string]: any };
+  export type ProblemUpdateResponse = { rejudged: boolean };
+  export type ProblemUpdateProblemLevelRequest = { [key: string]: any };
+  export type ProblemUpdateProblemLevelResponse = {};
+  export type ProblemUpdateSolutionRequest = { [key: string]: any };
+  export type ProblemUpdateSolutionResponse = {};
+  export type ProblemUpdateStatementRequest = { [key: string]: any };
+  export type ProblemUpdateStatementResponse = {};
+  export type ProblemVersionsRequest = { [key: string]: any };
+  export type _ProblemVersionsServerResponse = any;
+  export type ProblemVersionsResponse = {
+    log: types.ProblemVersion[];
+    published: string;
+  };
 
   // ProblemForfeited
-  export type ProblemForfeitedGetCountsRequest = { [key: string]: any;};
-  export type ProblemForfeitedGetCountsResponse = { allowed: number; seen: number; };
+  export type ProblemForfeitedGetCountsRequest = { [key: string]: any };
+  export type ProblemForfeitedGetCountsResponse = {
+    allowed: number;
+    seen: number;
+  };
 
   // Problemset
-  export type ProblemsetDetailsRequest = { [key: string]: any;};
-  export type _ProblemsetDetailsServerResponse = any
+  export type ProblemsetDetailsRequest = { [key: string]: any };
+  export type _ProblemsetDetailsServerResponse = any;
   export type ProblemsetDetailsResponse = types.Problemset;
-  export type ProblemsetScoreboardRequest = { [key: string]: any;};
-  export type _ProblemsetScoreboardServerResponse = any
+  export type ProblemsetScoreboardRequest = { [key: string]: any };
+  export type _ProblemsetScoreboardServerResponse = any;
   export type ProblemsetScoreboardResponse = types.Scoreboard;
-  export type ProblemsetScoreboardEventsRequest = { [key: string]: any;};
-  export type ProblemsetScoreboardEventsResponse = { events: types.ScoreboardEvent[]; };
+  export type ProblemsetScoreboardEventsRequest = { [key: string]: any };
+  export type ProblemsetScoreboardEventsResponse = {
+    events: types.ScoreboardEvent[];
+  };
 
   // QualityNomination
-  export type QualityNominationCreateRequest = { [key: string]: any;};
-  export type QualityNominationCreateResponse = { qualitynomination_id: number; };
-  export type QualityNominationDetailsRequest = { [key: string]: any;};
-  export type _QualityNominationDetailsServerResponse = any
-  export type QualityNominationDetailsResponse = { author: { name?: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nomination_status: string; nominator: { name?: string; username: string; }; original_contents?: { source?: string; statements: { [key: string]: types.ProblemStatement; }; tags?: { name: string; source: string; }[]; }; problem: { alias: string; title: string; }; qualitynomination_id: number; reviewer: boolean; time: Date; votes: { time?: Date; user: { name?: string; username: string; }; vote: number; }[]; };
-  export type QualityNominationListRequest = { [key: string]: any;};
-  export type _QualityNominationListServerResponse = any
-  export type QualityNominationListResponse = { nominations: types.NominationListItem[]; pager_items: types.PageItem[]; };
-  export type QualityNominationMyAssignedListRequest = { [key: string]: any;};
-  export type _QualityNominationMyAssignedListServerResponse = any
-  export type QualityNominationMyAssignedListResponse = { nominations: { author: { name?: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name?: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time?: Date; user: { name?: string; username: string; }; vote: number; }[]; }[]; };
-  export type QualityNominationMyListRequest = { [key: string]: any;};
-  export type _QualityNominationMyListServerResponse = any
-  export type QualityNominationMyListResponse = { nominations: types.NominationListItem[]; pager_items: types.PageItem[]; };
-  export type QualityNominationResolveRequest = { [key: string]: any;};
-  export type QualityNominationResolveResponse = {  };
+  export type QualityNominationCreateRequest = { [key: string]: any };
+  export type QualityNominationCreateResponse = {
+    qualitynomination_id: number;
+  };
+  export type QualityNominationDetailsRequest = { [key: string]: any };
+  export type _QualityNominationDetailsServerResponse = any;
+  export type QualityNominationDetailsResponse = {
+    author: { name?: string; username: string };
+    contents?: {
+      before_ac?: boolean;
+      difficulty?: number;
+      quality?: number;
+      rationale?: string;
+      reason?: string;
+      statements?: { [key: string]: string };
+      tags?: string[];
+    };
+    nomination: string;
+    nomination_status: string;
+    nominator: { name?: string; username: string };
+    original_contents?: {
+      source?: string;
+      statements: { [key: string]: types.ProblemStatement };
+      tags?: { name: string; source: string }[];
+    };
+    problem: { alias: string; title: string };
+    qualitynomination_id: number;
+    reviewer: boolean;
+    time: Date;
+    votes: {
+      time?: Date;
+      user: { name?: string; username: string };
+      vote: number;
+    }[];
+  };
+  export type QualityNominationListRequest = { [key: string]: any };
+  export type _QualityNominationListServerResponse = any;
+  export type QualityNominationListResponse = {
+    nominations: types.NominationListItem[];
+    pager_items: types.PageItem[];
+  };
+  export type QualityNominationMyAssignedListRequest = { [key: string]: any };
+  export type _QualityNominationMyAssignedListServerResponse = any;
+  export type QualityNominationMyAssignedListResponse = {
+    nominations: {
+      author: { name?: string; username: string };
+      contents?: {
+        before_ac?: boolean;
+        difficulty?: number;
+        quality?: number;
+        rationale?: string;
+        reason?: string;
+        statements?: { [key: string]: string };
+        tags?: string[];
+      };
+      nomination: string;
+      nominator: { name?: string; username: string };
+      problem: { alias: string; title: string };
+      qualitynomination_id: number;
+      status: string;
+      time: Date;
+      votes: {
+        time?: Date;
+        user: { name?: string; username: string };
+        vote: number;
+      }[];
+    }[];
+  };
+  export type QualityNominationMyListRequest = { [key: string]: any };
+  export type _QualityNominationMyListServerResponse = any;
+  export type QualityNominationMyListResponse = {
+    nominations: types.NominationListItem[];
+    pager_items: types.PageItem[];
+  };
+  export type QualityNominationResolveRequest = { [key: string]: any };
+  export type QualityNominationResolveResponse = {};
 
   // Reset
-  export type ResetCreateRequest = { [key: string]: any;};
-  export type ResetCreateResponse = { message?: string; token?: string; };
-  export type ResetGenerateTokenRequest = { [key: string]: any;};
-  export type ResetGenerateTokenResponse = { link: string; token: string; };
-  export type ResetUpdateRequest = { [key: string]: any;};
-  export type ResetUpdateResponse = { message: string; };
+  export type ResetCreateRequest = { [key: string]: any };
+  export type ResetCreateResponse = { message?: string; token?: string };
+  export type ResetGenerateTokenRequest = { [key: string]: any };
+  export type ResetGenerateTokenResponse = { link: string; token: string };
+  export type ResetUpdateRequest = { [key: string]: any };
+  export type ResetUpdateResponse = { message: string };
 
   // Run
-  export type RunCountsRequest = { [key: string]: any;};
-  export type RunCountsResponse = { ac: { [key: string]: number; }; total: { [key: string]: number; }; };
-  export type RunCreateRequest = { [key: string]: any;};
-  export type _RunCreateServerResponse = any
-  export type RunCreateResponse = { guid: string; nextSubmissionTimestamp: Date; submission_deadline: Date; submit_delay: number; };
-  export type RunDetailsRequest = { [key: string]: any;};
-  export type _RunDetailsServerResponse = any
+  export type RunCountsRequest = { [key: string]: any };
+  export type RunCountsResponse = {
+    ac: { [key: string]: number };
+    total: { [key: string]: number };
+  };
+  export type RunCreateRequest = { [key: string]: any };
+  export type _RunCreateServerResponse = any;
+  export type RunCreateResponse = {
+    guid: string;
+    nextSubmissionTimestamp: Date;
+    submission_deadline: Date;
+    submit_delay: number;
+  };
+  export type RunDetailsRequest = { [key: string]: any };
+  export type _RunDetailsServerResponse = any;
   export type RunDetailsResponse = types.RunDetails;
-  export type RunDisqualifyRequest = { [key: string]: any;};
-  export type RunDisqualifyResponse = { runs: { guid?: string; username?: string; }[]; };
-  export type RunExecuteRequest = { [key: string]: any;};
-  export type _RunExecuteServerResponse = any
-  export type RunExecuteResponse = { nextExecutionTimestamp: Date; };
-  export type RunExecuteForIDERequest = { [key: string]: any;};
-  export type _RunExecuteForIDEServerResponse = any
-  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date; };
-  export type RunGetSubmissionFeedbackRequest = { [key: string]: any;};
-  export type _RunGetSubmissionFeedbackServerResponse = any
+  export type RunDisqualifyRequest = { [key: string]: any };
+  export type RunDisqualifyResponse = {
+    runs: { guid?: string; username?: string }[];
+  };
+  export type RunExecuteRequest = { [key: string]: any };
+  export type _RunExecuteServerResponse = any;
+  export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
+  export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
+  export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
-  export type RunListRequest = { [key: string]: any;};
-  export type _RunListServerResponse = any
-  export type RunListResponse = { runs: types.Run[]; totalRuns: number; };
-  export type RunRejudgeRequest = { [key: string]: any;};
-  export type RunRejudgeResponse = {  };
-  export type RunRequalifyRequest = { [key: string]: any;};
-  export type RunRequalifyResponse = {  };
-  export type RunSourceRequest = { [key: string]: any;};
-  export type RunSourceResponse = { compile_error?: string; details?: { compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: types.CaseResult[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }; source: string; };
-  export type RunStatusRequest = { [key: string]: any;};
-  export type _RunStatusServerResponse = any
+  export type RunListRequest = { [key: string]: any };
+  export type _RunListServerResponse = any;
+  export type RunListResponse = { runs: types.Run[]; totalRuns: number };
+  export type RunRejudgeRequest = { [key: string]: any };
+  export type RunRejudgeResponse = {};
+  export type RunRequalifyRequest = { [key: string]: any };
+  export type RunRequalifyResponse = {};
+  export type RunSourceRequest = { [key: string]: any };
+  export type RunSourceResponse = {
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      contest_score: number;
+      groups?: {
+        cases: types.CaseResult[];
+        contest_score: number;
+        group: string;
+        max_score: number;
+        score: number;
+      }[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    source: string;
+  };
+  export type RunStatusRequest = { [key: string]: any };
+  export type _RunStatusServerResponse = any;
   export type RunStatusResponse = types.Run;
 
   // School
-  export type SchoolCreateRequest = { [key: string]: any;};
-  export type SchoolCreateResponse = { school_id: number; };
-  export type SchoolListRequest = { [key: string]: any;};
-  export type SchoolListResponse = { results: types.SchoolListItem[]; };
-  export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any;};
-  export type SchoolSelectSchoolOfTheMonthResponse = {  };
+  export type SchoolCreateRequest = { [key: string]: any };
+  export type SchoolCreateResponse = { school_id: number };
+  export type SchoolListRequest = { [key: string]: any };
+  export type SchoolListResponse = { results: types.SchoolListItem[] };
+  export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
+  export type SchoolSelectSchoolOfTheMonthResponse = {};
 
   // Scoreboard
-  export type ScoreboardRefreshRequest = { [key: string]: any;};
-  export type ScoreboardRefreshResponse = {  };
+  export type ScoreboardRefreshRequest = { [key: string]: any };
+  export type ScoreboardRefreshResponse = {};
 
   // Session
-  export type SessionCurrentSessionRequest = { [key: string]: any;};
-  export type _SessionCurrentSessionServerResponse = any
-  export type SessionCurrentSessionResponse = { session?: types.CurrentSession; time: number; };
+  export type SessionCurrentSessionRequest = { [key: string]: any };
+  export type _SessionCurrentSessionServerResponse = any;
+  export type SessionCurrentSessionResponse = {
+    session?: types.CurrentSession;
+    time: number;
+  };
 
   // Submission
-  export type SubmissionListRequest = { [key: string]: any;};
-  export type _SubmissionListServerResponse = any
-  export type SubmissionListResponse = { submissions: types.Submission[]; };
-  export type SubmissionSetFeedbackRequest = { [key: string]: any;};
-  export type SubmissionSetFeedbackResponse = { submissionFeedback?: dao.SubmissionFeedback; submissionFeedbackThread?: dao.SubmissionFeedbackThread; };
-  export type SubmissionSetFeedbackListRequest = { [key: string]: any;};
-  export type SubmissionSetFeedbackListResponse = {  };
+  export type SubmissionListRequest = { [key: string]: any };
+  export type _SubmissionListServerResponse = any;
+  export type SubmissionListResponse = { submissions: types.Submission[] };
+  export type SubmissionSetFeedbackRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackResponse = {
+    submissionFeedback?: dao.SubmissionFeedback;
+    submissionFeedbackThread?: dao.SubmissionFeedbackThread;
+  };
+  export type SubmissionSetFeedbackListRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackListResponse = {};
 
   // Tag
-  export type TagFrequentTagsRequest = { [key: string]: any;};
-  export type TagFrequentTagsResponse = { frequent_tags: types.TagWithProblemCount[]; };
-  export type TagListRequest = { [key: string]: any;};
-  export type TagListResponse = { name: string; }[];
+  export type TagFrequentTagsRequest = { [key: string]: any };
+  export type TagFrequentTagsResponse = {
+    frequent_tags: types.TagWithProblemCount[];
+  };
+  export type TagListRequest = { [key: string]: any };
+  export type TagListResponse = { name: string }[];
 
   // TeamsGroup
-  export type TeamsGroupAddMembersRequest = { [key: string]: any;};
-  export type TeamsGroupAddMembersResponse = {  };
-  export type TeamsGroupCreateRequest = { [key: string]: any;};
-  export type TeamsGroupCreateResponse = {  };
-  export type TeamsGroupDetailsRequest = { [key: string]: any;};
-  export type TeamsGroupDetailsResponse = { team_group: { alias?: string; create_time: number; description?: string; name?: string; }; };
-  export type TeamsGroupListRequest = { [key: string]: any;};
+  export type TeamsGroupAddMembersRequest = { [key: string]: any };
+  export type TeamsGroupAddMembersResponse = {};
+  export type TeamsGroupCreateRequest = { [key: string]: any };
+  export type TeamsGroupCreateResponse = {};
+  export type TeamsGroupDetailsRequest = { [key: string]: any };
+  export type TeamsGroupDetailsResponse = {
+    team_group: {
+      alias?: string;
+      create_time: number;
+      description?: string;
+      name?: string;
+    };
+  };
+  export type TeamsGroupListRequest = { [key: string]: any };
   export type TeamsGroupListResponse = types.ListItem[];
-  export type TeamsGroupRemoveMemberRequest = { [key: string]: any;};
-  export type TeamsGroupRemoveMemberResponse = {  };
-  export type TeamsGroupRemoveTeamRequest = { [key: string]: any;};
-  export type TeamsGroupRemoveTeamResponse = {  };
-  export type TeamsGroupTeamsRequest = { [key: string]: any;};
-  export type TeamsGroupTeamsResponse = { identities: types.Identity[]; };
-  export type TeamsGroupTeamsMembersRequest = { [key: string]: any;};
-  export type TeamsGroupTeamsMembersResponse = { pageNumber: number; teamsUsers: types.TeamMember[]; totalRows: number; };
-  export type TeamsGroupUpdateRequest = { [key: string]: any;};
-  export type TeamsGroupUpdateResponse = {  };
+  export type TeamsGroupRemoveMemberRequest = { [key: string]: any };
+  export type TeamsGroupRemoveMemberResponse = {};
+  export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
+  export type TeamsGroupRemoveTeamResponse = {};
+  export type TeamsGroupTeamsRequest = { [key: string]: any };
+  export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
+  export type TeamsGroupUpdateRequest = { [key: string]: any };
+  export type TeamsGroupUpdateResponse = {};
 
   // Time
-  export type TimeGetRequest = { [key: string]: any;};
-  export type TimeGetResponse = { time: number; };
+  export type TimeGetRequest = { [key: string]: any };
+  export type TimeGetResponse = { time: number };
 
   // User
-  export type UserAcceptPrivacyPolicyRequest = { [key: string]: any;};
-  export type UserAcceptPrivacyPolicyResponse = {  };
-  export type UserAddExperimentRequest = { [key: string]: any;};
-  export type UserAddExperimentResponse = {  };
-  export type UserAddGroupRequest = { [key: string]: any;};
-  export type UserAddGroupResponse = {  };
-  export type UserAddRoleRequest = { [key: string]: any;};
-  export type UserAddRoleResponse = {  };
-  export type UserAssociateIdentityRequest = { [key: string]: any;};
-  export type UserAssociateIdentityResponse = {  };
-  export type UserChangePasswordRequest = { [key: string]: any;};
-  export type UserChangePasswordResponse = {  };
-  export type UserCoderOfTheMonthRequest = { [key: string]: any;};
-  export type _UserCoderOfTheMonthServerResponse = any
-  export type UserCoderOfTheMonthResponse = { coderinfo?: types.UserProfile; };
-  export type UserCoderOfTheMonthListRequest = { [key: string]: any;};
-  export type UserCoderOfTheMonthListResponse = { coders: types.CoderOfTheMonthList; };
-  export type UserContestStatsRequest = { [key: string]: any;};
-  export type _UserContestStatsServerResponse = any
-  export type UserContestStatsResponse = { contests: types.UserProfileContests; };
-  export type UserCreateRequest = { [key: string]: any;};
-  export type UserCreateResponse = { username: string; };
-  export type UserCreateAPITokenRequest = { [key: string]: any;};
-  export type UserCreateAPITokenResponse = { token: string; };
-  export type UserDeleteConfirmRequest = { [key: string]: any;};
-  export type UserDeleteConfirmResponse = {  };
-  export type UserDeleteRequestRequest = { [key: string]: any;};
-  export type UserDeleteRequestResponse = { token: string; };
-  export type UserExtraInformationRequest = { [key: string]: any;};
-  export type _UserExtraInformationServerResponse = any
-  export type UserExtraInformationResponse = { birth_date?: Date; email?: string; last_login?: Date; roles: string[]; username: string; verified: boolean; within_last_day: boolean; };
-  export type UserGenerateGitTokenRequest = { [key: string]: any;};
-  export type UserGenerateGitTokenResponse = { token: string; };
-  export type UserGenerateOmiUsersRequest = { [key: string]: any;};
-  export type UserGenerateOmiUsersResponse = { [key: string]: string; };
-  export type UserLastPrivacyPolicyAcceptedRequest = { [key: string]: any;};
-  export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean; };
-  export type UserListRequest = { [key: string]: any;};
-  export type UserListResponse = { results: types.ListItem[]; };
-  export type UserListAPITokensRequest = { [key: string]: any;};
-  export type _UserListAPITokensServerResponse = any
-  export type UserListAPITokensResponse = { tokens: types.ApiToken[]; };
-  export type UserListAssociatedIdentitiesRequest = { [key: string]: any;};
-  export type UserListAssociatedIdentitiesResponse = { identities: types.AssociatedIdentity[]; };
-  export type UserListUnsolvedProblemsRequest = { [key: string]: any;};
-  export type UserListUnsolvedProblemsResponse = { problems: types.Problem[]; };
-  export type UserLoginRequest = { [key: string]: any;};
-  export type UserLoginResponse = { auth_token: string; };
-  export type UserMailingListBackfillRequest = { [key: string]: any;};
-  export type UserMailingListBackfillResponse = { users: { [key: string]: boolean; }; };
-  export type UserProblemsCreatedRequest = { [key: string]: any;};
-  export type UserProblemsCreatedResponse = { problems: types.Problem[]; };
-  export type UserProblemsSolvedRequest = { [key: string]: any;};
-  export type UserProblemsSolvedResponse = { problems: types.Problem[]; };
-  export type UserProfileRequest = { [key: string]: any;};
-  export type _UserProfileServerResponse = any
+  export type UserAcceptPrivacyPolicyRequest = { [key: string]: any };
+  export type UserAcceptPrivacyPolicyResponse = {};
+  export type UserAddExperimentRequest = { [key: string]: any };
+  export type UserAddExperimentResponse = {};
+  export type UserAddGroupRequest = { [key: string]: any };
+  export type UserAddGroupResponse = {};
+  export type UserAddRoleRequest = { [key: string]: any };
+  export type UserAddRoleResponse = {};
+  export type UserAssociateIdentityRequest = { [key: string]: any };
+  export type UserAssociateIdentityResponse = {};
+  export type UserChangePasswordRequest = { [key: string]: any };
+  export type UserChangePasswordResponse = {};
+  export type UserCoderOfTheMonthRequest = { [key: string]: any };
+  export type _UserCoderOfTheMonthServerResponse = any;
+  export type UserCoderOfTheMonthResponse = { coderinfo?: types.UserProfile };
+  export type UserCoderOfTheMonthListRequest = { [key: string]: any };
+  export type UserCoderOfTheMonthListResponse = {
+    coders: types.CoderOfTheMonthList;
+  };
+  export type UserContestStatsRequest = { [key: string]: any };
+  export type _UserContestStatsServerResponse = any;
+  export type UserContestStatsResponse = {
+    contests: types.UserProfileContests;
+  };
+  export type UserCreateRequest = { [key: string]: any };
+  export type UserCreateResponse = { username: string };
+  export type UserCreateAPITokenRequest = { [key: string]: any };
+  export type UserCreateAPITokenResponse = { token: string };
+  export type UserDeleteConfirmRequest = { [key: string]: any };
+  export type UserDeleteConfirmResponse = {};
+  export type UserDeleteRequestRequest = { [key: string]: any };
+  export type UserDeleteRequestResponse = { token: string };
+  export type UserExtraInformationRequest = { [key: string]: any };
+  export type _UserExtraInformationServerResponse = any;
+  export type UserExtraInformationResponse = {
+    birth_date?: Date;
+    email?: string;
+    last_login?: Date;
+    roles: string[];
+    username: string;
+    verified: boolean;
+    within_last_day: boolean;
+  };
+  export type UserGenerateGitTokenRequest = { [key: string]: any };
+  export type UserGenerateGitTokenResponse = { token: string };
+  export type UserGenerateOmiUsersRequest = { [key: string]: any };
+  export type UserGenerateOmiUsersResponse = { [key: string]: string };
+  export type UserLastPrivacyPolicyAcceptedRequest = { [key: string]: any };
+  export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
+  export type UserListRequest = { [key: string]: any };
+  export type UserListResponse = { results: types.ListItem[] };
+  export type UserListAPITokensRequest = { [key: string]: any };
+  export type _UserListAPITokensServerResponse = any;
+  export type UserListAPITokensResponse = { tokens: types.ApiToken[] };
+  export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
+  export type UserListAssociatedIdentitiesResponse = {
+    identities: types.AssociatedIdentity[];
+  };
+  export type UserListUnsolvedProblemsRequest = { [key: string]: any };
+  export type UserListUnsolvedProblemsResponse = { problems: types.Problem[] };
+  export type UserLoginRequest = { [key: string]: any };
+  export type UserLoginResponse = { auth_token: string };
+  export type UserMailingListBackfillRequest = { [key: string]: any };
+  export type UserMailingListBackfillResponse = {
+    users: { [key: string]: boolean };
+  };
+  export type UserProblemsCreatedRequest = { [key: string]: any };
+  export type UserProblemsCreatedResponse = { problems: types.Problem[] };
+  export type UserProblemsSolvedRequest = { [key: string]: any };
+  export type UserProblemsSolvedResponse = { problems: types.Problem[] };
+  export type UserProfileRequest = { [key: string]: any };
+  export type _UserProfileServerResponse = any;
   export type UserProfileResponse = types.UserProfileInfo;
-  export type UserProfileStatisticsRequest = { [key: string]: any;};
-  export type UserProfileStatisticsResponse = { attempting: number; difficulty: { easy: number; hard: number; medium: number; unlabelled: number; }; solved: number; tags: { count: number; name: string; }[]; };
-  export type UserRemoveExperimentRequest = { [key: string]: any;};
-  export type UserRemoveExperimentResponse = {  };
-  export type UserRemoveGroupRequest = { [key: string]: any;};
-  export type UserRemoveGroupResponse = {  };
-  export type UserRemoveRoleRequest = { [key: string]: any;};
-  export type UserRemoveRoleResponse = {  };
-  export type UserRevokeAPITokenRequest = { [key: string]: any;};
-  export type UserRevokeAPITokenResponse = {  };
-  export type UserSelectCoderOfTheMonthRequest = { [key: string]: any;};
-  export type UserSelectCoderOfTheMonthResponse = {  };
-  export type UserStatsRequest = { [key: string]: any;};
-  export type UserStatsResponse = { heatmap: { count: number; date: string; }[]; runs: { date?: string; runs: number; verdict: string; }[]; };
-  export type UserStatusVerifiedRequest = { [key: string]: any;};
-  export type UserStatusVerifiedResponse = { username: string; verified: boolean; };
-  export type UserUpdateRequest = { [key: string]: any;};
-  export type UserUpdateResponse = {  };
-  export type UserUpdateBasicInfoRequest = { [key: string]: any;};
-  export type UserUpdateBasicInfoResponse = {  };
-  export type UserUpdateMainEmailRequest = { [key: string]: any;};
-  export type UserUpdateMainEmailResponse = {  };
-  export type UserValidateFilterRequest = { [key: string]: any;};
-  export type UserValidateFilterResponse = { admin: boolean; contest_admin: string[]; problem_admin: string[]; problemset_admin: number[]; user?: string; };
-  export type UserVerifyEmailRequest = { [key: string]: any;};
-  export type UserVerifyEmailResponse = {  };
-
+  export type UserProfileStatisticsRequest = { [key: string]: any };
+  export type UserProfileStatisticsResponse = {
+    attempting: number;
+    difficulty: {
+      easy: number;
+      hard: number;
+      medium: number;
+      unlabelled: number;
+    };
+    solved: number;
+    tags: { count: number; name: string }[];
+  };
+  export type UserRemoveExperimentRequest = { [key: string]: any };
+  export type UserRemoveExperimentResponse = {};
+  export type UserRemoveGroupRequest = { [key: string]: any };
+  export type UserRemoveGroupResponse = {};
+  export type UserRemoveRoleRequest = { [key: string]: any };
+  export type UserRemoveRoleResponse = {};
+  export type UserRevokeAPITokenRequest = { [key: string]: any };
+  export type UserRevokeAPITokenResponse = {};
+  export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
+  export type UserSelectCoderOfTheMonthResponse = {};
+  export type UserStatsRequest = { [key: string]: any };
+  export type UserStatsResponse = {
+    heatmap: { count: number; date: string }[];
+    runs: { date?: string; runs: number; verdict: string }[];
+  };
+  export type UserStatusVerifiedRequest = { [key: string]: any };
+  export type UserStatusVerifiedResponse = {
+    username: string;
+    verified: boolean;
+  };
+  export type UserUpdateRequest = { [key: string]: any };
+  export type UserUpdateResponse = {};
+  export type UserUpdateBasicInfoRequest = { [key: string]: any };
+  export type UserUpdateBasicInfoResponse = {};
+  export type UserUpdateMainEmailRequest = { [key: string]: any };
+  export type UserUpdateMainEmailResponse = {};
+  export type UserValidateFilterRequest = { [key: string]: any };
+  export type UserValidateFilterResponse = {
+    admin: boolean;
+    contest_admin: string[];
+    problem_admin: string[];
+    problemset_admin: number[];
+    user?: string;
+  };
+  export type UserVerifyEmailRequest = { [key: string]: any };
+  export type UserVerifyEmailResponse = {};
 }
 
 // Controller interfaces
 export namespace controllers {
   export interface Admin {
     platformReportStats: (
-      params?: messages.AdminPlatformReportStatsRequest
+      params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
   }
 
   export interface AiEditorial {
     generate: (
-      params?: messages.AiEditorialGenerateRequest
+      params?: messages.AiEditorialGenerateRequest,
     ) => Promise<messages.AiEditorialGenerateResponse>;
     review: (
-      params?: messages.AiEditorialReviewRequest
+      params?: messages.AiEditorialReviewRequest,
     ) => Promise<messages.AiEditorialReviewResponse>;
     status: (
-      params?: messages.AiEditorialStatusRequest
+      params?: messages.AiEditorialStatusRequest,
     ) => Promise<messages.AiEditorialStatusResponse>;
     updateJob: (
-      params?: messages.AiEditorialUpdateJobRequest
+      params?: messages.AiEditorialUpdateJobRequest,
     ) => Promise<messages.AiEditorialUpdateJobResponse>;
   }
 
   export interface Authorization {
     problem: (
-      params?: messages.AuthorizationProblemRequest
+      params?: messages.AuthorizationProblemRequest,
     ) => Promise<messages.AuthorizationProblemResponse>;
   }
 
   export interface Badge {
     badgeDetails: (
-      params?: messages.BadgeBadgeDetailsRequest
+      params?: messages.BadgeBadgeDetailsRequest,
     ) => Promise<messages.BadgeBadgeDetailsResponse>;
     list: (
-      params?: messages.BadgeListRequest
+      params?: messages.BadgeListRequest,
     ) => Promise<messages.BadgeListResponse>;
     myBadgeAssignationTime: (
-      params?: messages.BadgeMyBadgeAssignationTimeRequest
+      params?: messages.BadgeMyBadgeAssignationTimeRequest,
     ) => Promise<messages.BadgeMyBadgeAssignationTimeResponse>;
     myList: (
-      params?: messages.BadgeMyListRequest
+      params?: messages.BadgeMyListRequest,
     ) => Promise<messages.BadgeMyListResponse>;
     userList: (
-      params?: messages.BadgeUserListRequest
+      params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
   }
 
   export interface Certificate {
     generateContestCertificates: (
-      params?: messages.CertificateGenerateContestCertificatesRequest
+      params?: messages.CertificateGenerateContestCertificatesRequest,
     ) => Promise<messages.CertificateGenerateContestCertificatesResponse>;
     getCertificatePdf: (
-      params?: messages.CertificateGetCertificatePdfRequest
+      params?: messages.CertificateGetCertificatePdfRequest,
     ) => Promise<messages.CertificateGetCertificatePdfResponse>;
     getUserCertificates: (
-      params?: messages.CertificateGetUserCertificatesRequest
+      params?: messages.CertificateGetUserCertificatesRequest,
     ) => Promise<messages.CertificateGetUserCertificatesResponse>;
     validateCertificate: (
-      params?: messages.CertificateValidateCertificateRequest
+      params?: messages.CertificateValidateCertificateRequest,
     ) => Promise<messages.CertificateValidateCertificateResponse>;
   }
 
   export interface Clarification {
     create: (
-      params?: messages.ClarificationCreateRequest
+      params?: messages.ClarificationCreateRequest,
     ) => Promise<messages.ClarificationCreateResponse>;
     details: (
-      params?: messages.ClarificationDetailsRequest
+      params?: messages.ClarificationDetailsRequest,
     ) => Promise<messages.ClarificationDetailsResponse>;
     update: (
-      params?: messages.ClarificationUpdateRequest
+      params?: messages.ClarificationUpdateRequest,
     ) => Promise<messages.ClarificationUpdateResponse>;
   }
 
   export interface Contest {
     activityReport: (
-      params?: messages.ContestActivityReportRequest
+      params?: messages.ContestActivityReportRequest,
     ) => Promise<messages.ContestActivityReportResponse>;
     addAdmin: (
-      params?: messages.ContestAddAdminRequest
+      params?: messages.ContestAddAdminRequest,
     ) => Promise<messages.ContestAddAdminResponse>;
     addGroup: (
-      params?: messages.ContestAddGroupRequest
+      params?: messages.ContestAddGroupRequest,
     ) => Promise<messages.ContestAddGroupResponse>;
     addGroupAdmin: (
-      params?: messages.ContestAddGroupAdminRequest
+      params?: messages.ContestAddGroupAdminRequest,
     ) => Promise<messages.ContestAddGroupAdminResponse>;
     addProblem: (
-      params?: messages.ContestAddProblemRequest
+      params?: messages.ContestAddProblemRequest,
     ) => Promise<messages.ContestAddProblemResponse>;
     addUser: (
-      params?: messages.ContestAddUserRequest
+      params?: messages.ContestAddUserRequest,
     ) => Promise<messages.ContestAddUserResponse>;
     adminDetails: (
-      params?: messages.ContestAdminDetailsRequest
+      params?: messages.ContestAdminDetailsRequest,
     ) => Promise<messages.ContestAdminDetailsResponse>;
     adminList: (
-      params?: messages.ContestAdminListRequest
+      params?: messages.ContestAdminListRequest,
     ) => Promise<messages.ContestAdminListResponse>;
     admins: (
-      params?: messages.ContestAdminsRequest
+      params?: messages.ContestAdminsRequest,
     ) => Promise<messages.ContestAdminsResponse>;
     arbitrateRequest: (
-      params?: messages.ContestArbitrateRequestRequest
+      params?: messages.ContestArbitrateRequestRequest,
     ) => Promise<messages.ContestArbitrateRequestResponse>;
     archive: (
-      params?: messages.ContestArchiveRequest
+      params?: messages.ContestArchiveRequest,
     ) => Promise<messages.ContestArchiveResponse>;
     clarifications: (
-      params?: messages.ContestClarificationsRequest
+      params?: messages.ContestClarificationsRequest,
     ) => Promise<messages.ContestClarificationsResponse>;
     clone: (
-      params?: messages.ContestCloneRequest
+      params?: messages.ContestCloneRequest,
     ) => Promise<messages.ContestCloneResponse>;
     contestants: (
-      params?: messages.ContestContestantsRequest
+      params?: messages.ContestContestantsRequest,
     ) => Promise<messages.ContestContestantsResponse>;
     create: (
-      params?: messages.ContestCreateRequest
+      params?: messages.ContestCreateRequest,
     ) => Promise<messages.ContestCreateResponse>;
     createVirtual: (
-      params?: messages.ContestCreateVirtualRequest
+      params?: messages.ContestCreateVirtualRequest,
     ) => Promise<messages.ContestCreateVirtualResponse>;
     details: (
-      params?: messages.ContestDetailsRequest
+      params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;
     getNumberOfContestants: (
-      params?: messages.ContestGetNumberOfContestantsRequest
+      params?: messages.ContestGetNumberOfContestantsRequest,
     ) => Promise<messages.ContestGetNumberOfContestantsResponse>;
     list: (
-      params?: messages.ContestListRequest
+      params?: messages.ContestListRequest,
     ) => Promise<messages.ContestListResponse>;
     listParticipating: (
-      params?: messages.ContestListParticipatingRequest
+      params?: messages.ContestListParticipatingRequest,
     ) => Promise<messages.ContestListParticipatingResponse>;
     myList: (
-      params?: messages.ContestMyListRequest
+      params?: messages.ContestMyListRequest,
     ) => Promise<messages.ContestMyListResponse>;
     open: (
-      params?: messages.ContestOpenRequest
+      params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
     problemClarifications: (
-      params?: messages.ContestProblemClarificationsRequest
+      params?: messages.ContestProblemClarificationsRequest,
     ) => Promise<messages.ContestProblemClarificationsResponse>;
     problems: (
-      params?: messages.ContestProblemsRequest
+      params?: messages.ContestProblemsRequest,
     ) => Promise<messages.ContestProblemsResponse>;
     publicDetails: (
-      params?: messages.ContestPublicDetailsRequest
+      params?: messages.ContestPublicDetailsRequest,
     ) => Promise<messages.ContestPublicDetailsResponse>;
     registerForContest: (
-      params?: messages.ContestRegisterForContestRequest
+      params?: messages.ContestRegisterForContestRequest,
     ) => Promise<messages.ContestRegisterForContestResponse>;
     removeAdmin: (
-      params?: messages.ContestRemoveAdminRequest
+      params?: messages.ContestRemoveAdminRequest,
     ) => Promise<messages.ContestRemoveAdminResponse>;
     removeGroup: (
-      params?: messages.ContestRemoveGroupRequest
+      params?: messages.ContestRemoveGroupRequest,
     ) => Promise<messages.ContestRemoveGroupResponse>;
     removeGroupAdmin: (
-      params?: messages.ContestRemoveGroupAdminRequest
+      params?: messages.ContestRemoveGroupAdminRequest,
     ) => Promise<messages.ContestRemoveGroupAdminResponse>;
     removeProblem: (
-      params?: messages.ContestRemoveProblemRequest
+      params?: messages.ContestRemoveProblemRequest,
     ) => Promise<messages.ContestRemoveProblemResponse>;
     removeUser: (
-      params?: messages.ContestRemoveUserRequest
+      params?: messages.ContestRemoveUserRequest,
     ) => Promise<messages.ContestRemoveUserResponse>;
     replaceTeamsGroup: (
-      params?: messages.ContestReplaceTeamsGroupRequest
+      params?: messages.ContestReplaceTeamsGroupRequest,
     ) => Promise<messages.ContestReplaceTeamsGroupResponse>;
     report: (
-      params?: messages.ContestReportRequest
+      params?: messages.ContestReportRequest,
     ) => Promise<messages.ContestReportResponse>;
     requests: (
-      params?: messages.ContestRequestsRequest
+      params?: messages.ContestRequestsRequest,
     ) => Promise<messages.ContestRequestsResponse>;
     role: (
-      params?: messages.ContestRoleRequest
+      params?: messages.ContestRoleRequest,
     ) => Promise<messages.ContestRoleResponse>;
     runs: (
-      params?: messages.ContestRunsRequest
+      params?: messages.ContestRunsRequest,
     ) => Promise<messages.ContestRunsResponse>;
     runsDiff: (
-      params?: messages.ContestRunsDiffRequest
+      params?: messages.ContestRunsDiffRequest,
     ) => Promise<messages.ContestRunsDiffResponse>;
     scoreboard: (
-      params?: messages.ContestScoreboardRequest
+      params?: messages.ContestScoreboardRequest,
     ) => Promise<messages.ContestScoreboardResponse>;
     scoreboardEvents: (
-      params?: messages.ContestScoreboardEventsRequest
+      params?: messages.ContestScoreboardEventsRequest,
     ) => Promise<messages.ContestScoreboardEventsResponse>;
     scoreboardMerge: (
-      params?: messages.ContestScoreboardMergeRequest
+      params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
     searchUsers: (
-      params?: messages.ContestSearchUsersRequest
+      params?: messages.ContestSearchUsersRequest,
     ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
-      params?: messages.ContestSetRecommendedRequest
+      params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;
     stats: (
-      params?: messages.ContestStatsRequest
+      params?: messages.ContestStatsRequest,
     ) => Promise<messages.ContestStatsResponse>;
     update: (
-      params?: messages.ContestUpdateRequest
+      params?: messages.ContestUpdateRequest,
     ) => Promise<messages.ContestUpdateResponse>;
     updateEndTimeForIdentity: (
-      params?: messages.ContestUpdateEndTimeForIdentityRequest
+      params?: messages.ContestUpdateEndTimeForIdentityRequest,
     ) => Promise<messages.ContestUpdateEndTimeForIdentityResponse>;
     users: (
-      params?: messages.ContestUsersRequest
+      params?: messages.ContestUsersRequest,
     ) => Promise<messages.ContestUsersResponse>;
   }
 
   export interface Course {
     activityReport: (
-      params?: messages.CourseActivityReportRequest
+      params?: messages.CourseActivityReportRequest,
     ) => Promise<messages.CourseActivityReportResponse>;
     addAdmin: (
-      params?: messages.CourseAddAdminRequest
+      params?: messages.CourseAddAdminRequest,
     ) => Promise<messages.CourseAddAdminResponse>;
     addGroupAdmin: (
-      params?: messages.CourseAddGroupAdminRequest
+      params?: messages.CourseAddGroupAdminRequest,
     ) => Promise<messages.CourseAddGroupAdminResponse>;
     addGroupTeachingAssistant: (
-      params?: messages.CourseAddGroupTeachingAssistantRequest
+      params?: messages.CourseAddGroupTeachingAssistantRequest,
     ) => Promise<messages.CourseAddGroupTeachingAssistantResponse>;
     addProblem: (
-      params?: messages.CourseAddProblemRequest
+      params?: messages.CourseAddProblemRequest,
     ) => Promise<messages.CourseAddProblemResponse>;
     addStudent: (
-      params?: messages.CourseAddStudentRequest
+      params?: messages.CourseAddStudentRequest,
     ) => Promise<messages.CourseAddStudentResponse>;
     addTeachingAssistant: (
-      params?: messages.CourseAddTeachingAssistantRequest
+      params?: messages.CourseAddTeachingAssistantRequest,
     ) => Promise<messages.CourseAddTeachingAssistantResponse>;
     adminDetails: (
-      params?: messages.CourseAdminDetailsRequest
+      params?: messages.CourseAdminDetailsRequest,
     ) => Promise<messages.CourseAdminDetailsResponse>;
     admins: (
-      params?: messages.CourseAdminsRequest
+      params?: messages.CourseAdminsRequest,
     ) => Promise<messages.CourseAdminsResponse>;
     arbitrateRequest: (
-      params?: messages.CourseArbitrateRequestRequest
+      params?: messages.CourseArbitrateRequestRequest,
     ) => Promise<messages.CourseArbitrateRequestResponse>;
     archive: (
-      params?: messages.CourseArchiveRequest
+      params?: messages.CourseArchiveRequest,
     ) => Promise<messages.CourseArchiveResponse>;
     assignmentDetails: (
-      params?: messages.CourseAssignmentDetailsRequest
+      params?: messages.CourseAssignmentDetailsRequest,
     ) => Promise<messages.CourseAssignmentDetailsResponse>;
     assignmentScoreboard: (
-      params?: messages.CourseAssignmentScoreboardRequest
+      params?: messages.CourseAssignmentScoreboardRequest,
     ) => Promise<messages.CourseAssignmentScoreboardResponse>;
     assignmentScoreboardEvents: (
-      params?: messages.CourseAssignmentScoreboardEventsRequest
+      params?: messages.CourseAssignmentScoreboardEventsRequest,
     ) => Promise<messages.CourseAssignmentScoreboardEventsResponse>;
     clarifications: (
-      params?: messages.CourseClarificationsRequest
+      params?: messages.CourseClarificationsRequest,
     ) => Promise<messages.CourseClarificationsResponse>;
     clone: (
-      params?: messages.CourseCloneRequest
+      params?: messages.CourseCloneRequest,
     ) => Promise<messages.CourseCloneResponse>;
     create: (
-      params?: messages.CourseCreateRequest
+      params?: messages.CourseCreateRequest,
     ) => Promise<messages.CourseCreateResponse>;
     createAssignment: (
-      params?: messages.CourseCreateAssignmentRequest
+      params?: messages.CourseCreateAssignmentRequest,
     ) => Promise<messages.CourseCreateAssignmentResponse>;
     details: (
-      params?: messages.CourseDetailsRequest
+      params?: messages.CourseDetailsRequest,
     ) => Promise<messages.CourseDetailsResponse>;
     generateTokenForCloneCourse: (
-      params?: messages.CourseGenerateTokenForCloneCourseRequest
+      params?: messages.CourseGenerateTokenForCloneCourseRequest,
     ) => Promise<messages.CourseGenerateTokenForCloneCourseResponse>;
     getProblemUsers: (
-      params?: messages.CourseGetProblemUsersRequest
+      params?: messages.CourseGetProblemUsersRequest,
     ) => Promise<messages.CourseGetProblemUsersResponse>;
     introDetails: (
-      params?: messages.CourseIntroDetailsRequest
+      params?: messages.CourseIntroDetailsRequest,
     ) => Promise<messages.CourseIntroDetailsResponse>;
     listAssignments: (
-      params?: messages.CourseListAssignmentsRequest
+      params?: messages.CourseListAssignmentsRequest,
     ) => Promise<messages.CourseListAssignmentsResponse>;
     listSolvedProblems: (
-      params?: messages.CourseListSolvedProblemsRequest
+      params?: messages.CourseListSolvedProblemsRequest,
     ) => Promise<messages.CourseListSolvedProblemsResponse>;
     listStudents: (
-      params?: messages.CourseListStudentsRequest
+      params?: messages.CourseListStudentsRequest,
     ) => Promise<messages.CourseListStudentsResponse>;
     listUnsolvedProblems: (
-      params?: messages.CourseListUnsolvedProblemsRequest
+      params?: messages.CourseListUnsolvedProblemsRequest,
     ) => Promise<messages.CourseListUnsolvedProblemsResponse>;
     myProgress: (
-      params?: messages.CourseMyProgressRequest
+      params?: messages.CourseMyProgressRequest,
     ) => Promise<messages.CourseMyProgressResponse>;
     problemClarifications: (
-      params?: messages.CourseProblemClarificationsRequest
+      params?: messages.CourseProblemClarificationsRequest,
     ) => Promise<messages.CourseProblemClarificationsResponse>;
     registerForCourse: (
-      params?: messages.CourseRegisterForCourseRequest
+      params?: messages.CourseRegisterForCourseRequest,
     ) => Promise<messages.CourseRegisterForCourseResponse>;
     removeAdmin: (
-      params?: messages.CourseRemoveAdminRequest
+      params?: messages.CourseRemoveAdminRequest,
     ) => Promise<messages.CourseRemoveAdminResponse>;
     removeAssignment: (
-      params?: messages.CourseRemoveAssignmentRequest
+      params?: messages.CourseRemoveAssignmentRequest,
     ) => Promise<messages.CourseRemoveAssignmentResponse>;
     removeGroupAdmin: (
-      params?: messages.CourseRemoveGroupAdminRequest
+      params?: messages.CourseRemoveGroupAdminRequest,
     ) => Promise<messages.CourseRemoveGroupAdminResponse>;
     removeGroupTeachingAssistant: (
-      params?: messages.CourseRemoveGroupTeachingAssistantRequest
+      params?: messages.CourseRemoveGroupTeachingAssistantRequest,
     ) => Promise<messages.CourseRemoveGroupTeachingAssistantResponse>;
     removeProblem: (
-      params?: messages.CourseRemoveProblemRequest
+      params?: messages.CourseRemoveProblemRequest,
     ) => Promise<messages.CourseRemoveProblemResponse>;
     removeStudent: (
-      params?: messages.CourseRemoveStudentRequest
+      params?: messages.CourseRemoveStudentRequest,
     ) => Promise<messages.CourseRemoveStudentResponse>;
     removeTeachingAssistant: (
-      params?: messages.CourseRemoveTeachingAssistantRequest
+      params?: messages.CourseRemoveTeachingAssistantRequest,
     ) => Promise<messages.CourseRemoveTeachingAssistantResponse>;
     requestFeedback: (
-      params?: messages.CourseRequestFeedbackRequest
+      params?: messages.CourseRequestFeedbackRequest,
     ) => Promise<messages.CourseRequestFeedbackResponse>;
     requests: (
-      params?: messages.CourseRequestsRequest
+      params?: messages.CourseRequestsRequest,
     ) => Promise<messages.CourseRequestsResponse>;
     runs: (
-      params?: messages.CourseRunsRequest
+      params?: messages.CourseRunsRequest,
     ) => Promise<messages.CourseRunsResponse>;
     searchUsers: (
-      params?: messages.CourseSearchUsersRequest
+      params?: messages.CourseSearchUsersRequest,
     ) => Promise<messages.CourseSearchUsersResponse>;
     studentProgress: (
-      params?: messages.CourseStudentProgressRequest
+      params?: messages.CourseStudentProgressRequest,
     ) => Promise<messages.CourseStudentProgressResponse>;
     studentsProgress: (
-      params?: messages.CourseStudentsProgressRequest
+      params?: messages.CourseStudentsProgressRequest,
     ) => Promise<messages.CourseStudentsProgressResponse>;
     toggleTeachingAssistant: (
-      params?: messages.CourseToggleTeachingAssistantRequest
+      params?: messages.CourseToggleTeachingAssistantRequest,
     ) => Promise<messages.CourseToggleTeachingAssistantResponse>;
     update: (
-      params?: messages.CourseUpdateRequest
+      params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
     updateAssignment: (
-      params?: messages.CourseUpdateAssignmentRequest
+      params?: messages.CourseUpdateAssignmentRequest,
     ) => Promise<messages.CourseUpdateAssignmentResponse>;
     updateAssignmentsOrder: (
-      params?: messages.CourseUpdateAssignmentsOrderRequest
+      params?: messages.CourseUpdateAssignmentsOrderRequest,
     ) => Promise<messages.CourseUpdateAssignmentsOrderResponse>;
     updateProblemsOrder: (
-      params?: messages.CourseUpdateProblemsOrderRequest
+      params?: messages.CourseUpdateProblemsOrderRequest,
     ) => Promise<messages.CourseUpdateProblemsOrderResponse>;
   }
 
   export interface Grader {
     status: (
-      params?: messages.GraderStatusRequest
+      params?: messages.GraderStatusRequest,
     ) => Promise<messages.GraderStatusResponse>;
   }
 
   export interface Group {
     addUser: (
-      params?: messages.GroupAddUserRequest
+      params?: messages.GroupAddUserRequest,
     ) => Promise<messages.GroupAddUserResponse>;
     create: (
-      params?: messages.GroupCreateRequest
+      params?: messages.GroupCreateRequest,
     ) => Promise<messages.GroupCreateResponse>;
     createScoreboard: (
-      params?: messages.GroupCreateScoreboardRequest
+      params?: messages.GroupCreateScoreboardRequest,
     ) => Promise<messages.GroupCreateScoreboardResponse>;
     details: (
-      params?: messages.GroupDetailsRequest
+      params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;
     list: (
-      params?: messages.GroupListRequest
+      params?: messages.GroupListRequest,
     ) => Promise<messages.GroupListResponse>;
     members: (
-      params?: messages.GroupMembersRequest
+      params?: messages.GroupMembersRequest,
     ) => Promise<messages.GroupMembersResponse>;
     myList: (
-      params?: messages.GroupMyListRequest
+      params?: messages.GroupMyListRequest,
     ) => Promise<messages.GroupMyListResponse>;
     removeUser: (
-      params?: messages.GroupRemoveUserRequest
+      params?: messages.GroupRemoveUserRequest,
     ) => Promise<messages.GroupRemoveUserResponse>;
     update: (
-      params?: messages.GroupUpdateRequest
+      params?: messages.GroupUpdateRequest,
     ) => Promise<messages.GroupUpdateResponse>;
   }
 
   export interface GroupScoreboard {
     addContest: (
-      params?: messages.GroupScoreboardAddContestRequest
+      params?: messages.GroupScoreboardAddContestRequest,
     ) => Promise<messages.GroupScoreboardAddContestResponse>;
     details: (
-      params?: messages.GroupScoreboardDetailsRequest
+      params?: messages.GroupScoreboardDetailsRequest,
     ) => Promise<messages.GroupScoreboardDetailsResponse>;
     list: (
-      params?: messages.GroupScoreboardListRequest
+      params?: messages.GroupScoreboardListRequest,
     ) => Promise<messages.GroupScoreboardListResponse>;
     removeContest: (
-      params?: messages.GroupScoreboardRemoveContestRequest
+      params?: messages.GroupScoreboardRemoveContestRequest,
     ) => Promise<messages.GroupScoreboardRemoveContestResponse>;
   }
 
   export interface Identity {
     bulkCreate: (
-      params?: messages.IdentityBulkCreateRequest
+      params?: messages.IdentityBulkCreateRequest,
     ) => Promise<messages.IdentityBulkCreateResponse>;
     bulkCreateForTeams: (
-      params?: messages.IdentityBulkCreateForTeamsRequest
+      params?: messages.IdentityBulkCreateForTeamsRequest,
     ) => Promise<messages.IdentityBulkCreateForTeamsResponse>;
     changePassword: (
-      params?: messages.IdentityChangePasswordRequest
+      params?: messages.IdentityChangePasswordRequest,
     ) => Promise<messages.IdentityChangePasswordResponse>;
     create: (
-      params?: messages.IdentityCreateRequest
+      params?: messages.IdentityCreateRequest,
     ) => Promise<messages.IdentityCreateResponse>;
     selectIdentity: (
-      params?: messages.IdentitySelectIdentityRequest
+      params?: messages.IdentitySelectIdentityRequest,
     ) => Promise<messages.IdentitySelectIdentityResponse>;
     update: (
-      params?: messages.IdentityUpdateRequest
+      params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;
     updateIdentityTeam: (
-      params?: messages.IdentityUpdateIdentityTeamRequest
+      params?: messages.IdentityUpdateIdentityTeamRequest,
     ) => Promise<messages.IdentityUpdateIdentityTeamResponse>;
   }
 
   export interface Notification {
     myList: (
-      params?: messages.NotificationMyListRequest
+      params?: messages.NotificationMyListRequest,
     ) => Promise<messages.NotificationMyListResponse>;
     readNotifications: (
-      params?: messages.NotificationReadNotificationsRequest
+      params?: messages.NotificationReadNotificationsRequest,
     ) => Promise<messages.NotificationReadNotificationsResponse>;
   }
 
   export interface Problem {
     addAdmin: (
-      params?: messages.ProblemAddAdminRequest
+      params?: messages.ProblemAddAdminRequest,
     ) => Promise<messages.ProblemAddAdminResponse>;
     addGroupAdmin: (
-      params?: messages.ProblemAddGroupAdminRequest
+      params?: messages.ProblemAddGroupAdminRequest,
     ) => Promise<messages.ProblemAddGroupAdminResponse>;
     addTag: (
-      params?: messages.ProblemAddTagRequest
+      params?: messages.ProblemAddTagRequest,
     ) => Promise<messages.ProblemAddTagResponse>;
     adminList: (
-      params?: messages.ProblemAdminListRequest
+      params?: messages.ProblemAdminListRequest,
     ) => Promise<messages.ProblemAdminListResponse>;
     admins: (
-      params?: messages.ProblemAdminsRequest
+      params?: messages.ProblemAdminsRequest,
     ) => Promise<messages.ProblemAdminsResponse>;
     bestScore: (
-      params?: messages.ProblemBestScoreRequest
+      params?: messages.ProblemBestScoreRequest,
     ) => Promise<messages.ProblemBestScoreResponse>;
     clarifications: (
-      params?: messages.ProblemClarificationsRequest
+      params?: messages.ProblemClarificationsRequest,
     ) => Promise<messages.ProblemClarificationsResponse>;
     convertZipToCdp: (
-      params?: messages.ProblemConvertZipToCdpRequest
+      params?: messages.ProblemConvertZipToCdpRequest,
     ) => Promise<messages.ProblemConvertZipToCdpResponse>;
     create: (
-      params?: messages.ProblemCreateRequest
+      params?: messages.ProblemCreateRequest,
     ) => Promise<messages.ProblemCreateResponse>;
     delete: (
-      params?: messages.ProblemDeleteRequest
+      params?: messages.ProblemDeleteRequest,
     ) => Promise<messages.ProblemDeleteResponse>;
     details: (
-      params?: messages.ProblemDetailsRequest
+      params?: messages.ProblemDetailsRequest,
     ) => Promise<messages.ProblemDetailsResponse>;
     list: (
-      params?: messages.ProblemListRequest
+      params?: messages.ProblemListRequest,
     ) => Promise<messages.ProblemListResponse>;
     listForTypeahead: (
-      params?: messages.ProblemListForTypeaheadRequest
+      params?: messages.ProblemListForTypeaheadRequest,
     ) => Promise<messages.ProblemListForTypeaheadResponse>;
     myList: (
-      params?: messages.ProblemMyListRequest
+      params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
     randomKarelProblem: (
-      params?: messages.ProblemRandomKarelProblemRequest
+      params?: messages.ProblemRandomKarelProblemRequest,
     ) => Promise<messages.ProblemRandomKarelProblemResponse>;
     randomLanguageProblem: (
-      params?: messages.ProblemRandomLanguageProblemRequest
+      params?: messages.ProblemRandomLanguageProblemRequest,
     ) => Promise<messages.ProblemRandomLanguageProblemResponse>;
     rejudge: (
-      params?: messages.ProblemRejudgeRequest
+      params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;
     removeAdmin: (
-      params?: messages.ProblemRemoveAdminRequest
+      params?: messages.ProblemRemoveAdminRequest,
     ) => Promise<messages.ProblemRemoveAdminResponse>;
     removeGroupAdmin: (
-      params?: messages.ProblemRemoveGroupAdminRequest
+      params?: messages.ProblemRemoveGroupAdminRequest,
     ) => Promise<messages.ProblemRemoveGroupAdminResponse>;
     removeTag: (
-      params?: messages.ProblemRemoveTagRequest
+      params?: messages.ProblemRemoveTagRequest,
     ) => Promise<messages.ProblemRemoveTagResponse>;
     runs: (
-      params?: messages.ProblemRunsRequest
+      params?: messages.ProblemRunsRequest,
     ) => Promise<messages.ProblemRunsResponse>;
     runsDiff: (
-      params?: messages.ProblemRunsDiffRequest
+      params?: messages.ProblemRunsDiffRequest,
     ) => Promise<messages.ProblemRunsDiffResponse>;
     selectVersion: (
-      params?: messages.ProblemSelectVersionRequest
+      params?: messages.ProblemSelectVersionRequest,
     ) => Promise<messages.ProblemSelectVersionResponse>;
     solution: (
-      params?: messages.ProblemSolutionRequest
+      params?: messages.ProblemSolutionRequest,
     ) => Promise<messages.ProblemSolutionResponse>;
     stats: (
-      params?: messages.ProblemStatsRequest
+      params?: messages.ProblemStatsRequest,
     ) => Promise<messages.ProblemStatsResponse>;
     tags: (
-      params?: messages.ProblemTagsRequest
+      params?: messages.ProblemTagsRequest,
     ) => Promise<messages.ProblemTagsResponse>;
     update: (
-      params?: messages.ProblemUpdateRequest
+      params?: messages.ProblemUpdateRequest,
     ) => Promise<messages.ProblemUpdateResponse>;
     updateProblemLevel: (
-      params?: messages.ProblemUpdateProblemLevelRequest
+      params?: messages.ProblemUpdateProblemLevelRequest,
     ) => Promise<messages.ProblemUpdateProblemLevelResponse>;
     updateSolution: (
-      params?: messages.ProblemUpdateSolutionRequest
+      params?: messages.ProblemUpdateSolutionRequest,
     ) => Promise<messages.ProblemUpdateSolutionResponse>;
     updateStatement: (
-      params?: messages.ProblemUpdateStatementRequest
+      params?: messages.ProblemUpdateStatementRequest,
     ) => Promise<messages.ProblemUpdateStatementResponse>;
     versions: (
-      params?: messages.ProblemVersionsRequest
+      params?: messages.ProblemVersionsRequest,
     ) => Promise<messages.ProblemVersionsResponse>;
   }
 
   export interface ProblemForfeited {
     getCounts: (
-      params?: messages.ProblemForfeitedGetCountsRequest
+      params?: messages.ProblemForfeitedGetCountsRequest,
     ) => Promise<messages.ProblemForfeitedGetCountsResponse>;
   }
 
   export interface Problemset {
     details: (
-      params?: messages.ProblemsetDetailsRequest
+      params?: messages.ProblemsetDetailsRequest,
     ) => Promise<messages.ProblemsetDetailsResponse>;
     scoreboard: (
-      params?: messages.ProblemsetScoreboardRequest
+      params?: messages.ProblemsetScoreboardRequest,
     ) => Promise<messages.ProblemsetScoreboardResponse>;
     scoreboardEvents: (
-      params?: messages.ProblemsetScoreboardEventsRequest
+      params?: messages.ProblemsetScoreboardEventsRequest,
     ) => Promise<messages.ProblemsetScoreboardEventsResponse>;
   }
 
   export interface QualityNomination {
     create: (
-      params?: messages.QualityNominationCreateRequest
+      params?: messages.QualityNominationCreateRequest,
     ) => Promise<messages.QualityNominationCreateResponse>;
     details: (
-      params?: messages.QualityNominationDetailsRequest
+      params?: messages.QualityNominationDetailsRequest,
     ) => Promise<messages.QualityNominationDetailsResponse>;
     list: (
-      params?: messages.QualityNominationListRequest
+      params?: messages.QualityNominationListRequest,
     ) => Promise<messages.QualityNominationListResponse>;
     myAssignedList: (
-      params?: messages.QualityNominationMyAssignedListRequest
+      params?: messages.QualityNominationMyAssignedListRequest,
     ) => Promise<messages.QualityNominationMyAssignedListResponse>;
     myList: (
-      params?: messages.QualityNominationMyListRequest
+      params?: messages.QualityNominationMyListRequest,
     ) => Promise<messages.QualityNominationMyListResponse>;
     resolve: (
-      params?: messages.QualityNominationResolveRequest
+      params?: messages.QualityNominationResolveRequest,
     ) => Promise<messages.QualityNominationResolveResponse>;
   }
 
   export interface Reset {
     create: (
-      params?: messages.ResetCreateRequest
+      params?: messages.ResetCreateRequest,
     ) => Promise<messages.ResetCreateResponse>;
     generateToken: (
-      params?: messages.ResetGenerateTokenRequest
+      params?: messages.ResetGenerateTokenRequest,
     ) => Promise<messages.ResetGenerateTokenResponse>;
     update: (
-      params?: messages.ResetUpdateRequest
+      params?: messages.ResetUpdateRequest,
     ) => Promise<messages.ResetUpdateResponse>;
   }
 
   export interface Run {
     counts: (
-      params?: messages.RunCountsRequest
+      params?: messages.RunCountsRequest,
     ) => Promise<messages.RunCountsResponse>;
     create: (
-      params?: messages.RunCreateRequest
+      params?: messages.RunCreateRequest,
     ) => Promise<messages.RunCreateResponse>;
     details: (
-      params?: messages.RunDetailsRequest
+      params?: messages.RunDetailsRequest,
     ) => Promise<messages.RunDetailsResponse>;
     disqualify: (
-      params?: messages.RunDisqualifyRequest
+      params?: messages.RunDisqualifyRequest,
     ) => Promise<messages.RunDisqualifyResponse>;
     execute: (
-      params?: messages.RunExecuteRequest
+      params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
     executeForIDE: (
-      params?: messages.RunExecuteForIDERequest
+      params?: messages.RunExecuteForIDERequest,
     ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
-      params?: messages.RunGetSubmissionFeedbackRequest
+      params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
     list: (
-      params?: messages.RunListRequest
+      params?: messages.RunListRequest,
     ) => Promise<messages.RunListResponse>;
     rejudge: (
-      params?: messages.RunRejudgeRequest
+      params?: messages.RunRejudgeRequest,
     ) => Promise<messages.RunRejudgeResponse>;
     requalify: (
-      params?: messages.RunRequalifyRequest
+      params?: messages.RunRequalifyRequest,
     ) => Promise<messages.RunRequalifyResponse>;
     source: (
-      params?: messages.RunSourceRequest
+      params?: messages.RunSourceRequest,
     ) => Promise<messages.RunSourceResponse>;
     status: (
-      params?: messages.RunStatusRequest
+      params?: messages.RunStatusRequest,
     ) => Promise<messages.RunStatusResponse>;
   }
 
   export interface School {
     create: (
-      params?: messages.SchoolCreateRequest
+      params?: messages.SchoolCreateRequest,
     ) => Promise<messages.SchoolCreateResponse>;
     list: (
-      params?: messages.SchoolListRequest
+      params?: messages.SchoolListRequest,
     ) => Promise<messages.SchoolListResponse>;
     selectSchoolOfTheMonth: (
-      params?: messages.SchoolSelectSchoolOfTheMonthRequest
+      params?: messages.SchoolSelectSchoolOfTheMonthRequest,
     ) => Promise<messages.SchoolSelectSchoolOfTheMonthResponse>;
   }
 
   export interface Scoreboard {
     refresh: (
-      params?: messages.ScoreboardRefreshRequest
+      params?: messages.ScoreboardRefreshRequest,
     ) => Promise<messages.ScoreboardRefreshResponse>;
   }
 
   export interface Session {
     currentSession: (
-      params?: messages.SessionCurrentSessionRequest
+      params?: messages.SessionCurrentSessionRequest,
     ) => Promise<messages.SessionCurrentSessionResponse>;
   }
 
   export interface Submission {
     list: (
-      params?: messages.SubmissionListRequest
+      params?: messages.SubmissionListRequest,
     ) => Promise<messages.SubmissionListResponse>;
     setFeedback: (
-      params?: messages.SubmissionSetFeedbackRequest
+      params?: messages.SubmissionSetFeedbackRequest,
     ) => Promise<messages.SubmissionSetFeedbackResponse>;
     setFeedbackList: (
-      params?: messages.SubmissionSetFeedbackListRequest
+      params?: messages.SubmissionSetFeedbackListRequest,
     ) => Promise<messages.SubmissionSetFeedbackListResponse>;
   }
 
   export interface Tag {
     frequentTags: (
-      params?: messages.TagFrequentTagsRequest
+      params?: messages.TagFrequentTagsRequest,
     ) => Promise<messages.TagFrequentTagsResponse>;
     list: (
-      params?: messages.TagListRequest
+      params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;
   }
 
   export interface TeamsGroup {
     addMembers: (
-      params?: messages.TeamsGroupAddMembersRequest
+      params?: messages.TeamsGroupAddMembersRequest,
     ) => Promise<messages.TeamsGroupAddMembersResponse>;
     create: (
-      params?: messages.TeamsGroupCreateRequest
+      params?: messages.TeamsGroupCreateRequest,
     ) => Promise<messages.TeamsGroupCreateResponse>;
     details: (
-      params?: messages.TeamsGroupDetailsRequest
+      params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
     list: (
-      params?: messages.TeamsGroupListRequest
+      params?: messages.TeamsGroupListRequest,
     ) => Promise<messages.TeamsGroupListResponse>;
     removeMember: (
-      params?: messages.TeamsGroupRemoveMemberRequest
+      params?: messages.TeamsGroupRemoveMemberRequest,
     ) => Promise<messages.TeamsGroupRemoveMemberResponse>;
     removeTeam: (
-      params?: messages.TeamsGroupRemoveTeamRequest
+      params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
     teams: (
-      params?: messages.TeamsGroupTeamsRequest
+      params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
     teamsMembers: (
-      params?: messages.TeamsGroupTeamsMembersRequest
+      params?: messages.TeamsGroupTeamsMembersRequest,
     ) => Promise<messages.TeamsGroupTeamsMembersResponse>;
     update: (
-      params?: messages.TeamsGroupUpdateRequest
+      params?: messages.TeamsGroupUpdateRequest,
     ) => Promise<messages.TeamsGroupUpdateResponse>;
   }
 
   export interface Time {
     get: (
-      params?: messages.TimeGetRequest
+      params?: messages.TimeGetRequest,
     ) => Promise<messages.TimeGetResponse>;
   }
 
   export interface User {
     acceptPrivacyPolicy: (
-      params?: messages.UserAcceptPrivacyPolicyRequest
+      params?: messages.UserAcceptPrivacyPolicyRequest,
     ) => Promise<messages.UserAcceptPrivacyPolicyResponse>;
     addExperiment: (
-      params?: messages.UserAddExperimentRequest
+      params?: messages.UserAddExperimentRequest,
     ) => Promise<messages.UserAddExperimentResponse>;
     addGroup: (
-      params?: messages.UserAddGroupRequest
+      params?: messages.UserAddGroupRequest,
     ) => Promise<messages.UserAddGroupResponse>;
     addRole: (
-      params?: messages.UserAddRoleRequest
+      params?: messages.UserAddRoleRequest,
     ) => Promise<messages.UserAddRoleResponse>;
     associateIdentity: (
-      params?: messages.UserAssociateIdentityRequest
+      params?: messages.UserAssociateIdentityRequest,
     ) => Promise<messages.UserAssociateIdentityResponse>;
     changePassword: (
-      params?: messages.UserChangePasswordRequest
+      params?: messages.UserChangePasswordRequest,
     ) => Promise<messages.UserChangePasswordResponse>;
     coderOfTheMonth: (
-      params?: messages.UserCoderOfTheMonthRequest
+      params?: messages.UserCoderOfTheMonthRequest,
     ) => Promise<messages.UserCoderOfTheMonthResponse>;
     coderOfTheMonthList: (
-      params?: messages.UserCoderOfTheMonthListRequest
+      params?: messages.UserCoderOfTheMonthListRequest,
     ) => Promise<messages.UserCoderOfTheMonthListResponse>;
     contestStats: (
-      params?: messages.UserContestStatsRequest
+      params?: messages.UserContestStatsRequest,
     ) => Promise<messages.UserContestStatsResponse>;
     create: (
-      params?: messages.UserCreateRequest
+      params?: messages.UserCreateRequest,
     ) => Promise<messages.UserCreateResponse>;
     createAPIToken: (
-      params?: messages.UserCreateAPITokenRequest
+      params?: messages.UserCreateAPITokenRequest,
     ) => Promise<messages.UserCreateAPITokenResponse>;
     deleteConfirm: (
-      params?: messages.UserDeleteConfirmRequest
+      params?: messages.UserDeleteConfirmRequest,
     ) => Promise<messages.UserDeleteConfirmResponse>;
     deleteRequest: (
-      params?: messages.UserDeleteRequestRequest
+      params?: messages.UserDeleteRequestRequest,
     ) => Promise<messages.UserDeleteRequestResponse>;
     extraInformation: (
-      params?: messages.UserExtraInformationRequest
+      params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
     generateGitToken: (
-      params?: messages.UserGenerateGitTokenRequest
+      params?: messages.UserGenerateGitTokenRequest,
     ) => Promise<messages.UserGenerateGitTokenResponse>;
     generateOmiUsers: (
-      params?: messages.UserGenerateOmiUsersRequest
+      params?: messages.UserGenerateOmiUsersRequest,
     ) => Promise<messages.UserGenerateOmiUsersResponse>;
     lastPrivacyPolicyAccepted: (
-      params?: messages.UserLastPrivacyPolicyAcceptedRequest
+      params?: messages.UserLastPrivacyPolicyAcceptedRequest,
     ) => Promise<messages.UserLastPrivacyPolicyAcceptedResponse>;
     list: (
-      params?: messages.UserListRequest
+      params?: messages.UserListRequest,
     ) => Promise<messages.UserListResponse>;
     listAPITokens: (
-      params?: messages.UserListAPITokensRequest
+      params?: messages.UserListAPITokensRequest,
     ) => Promise<messages.UserListAPITokensResponse>;
     listAssociatedIdentities: (
-      params?: messages.UserListAssociatedIdentitiesRequest
+      params?: messages.UserListAssociatedIdentitiesRequest,
     ) => Promise<messages.UserListAssociatedIdentitiesResponse>;
     listUnsolvedProblems: (
-      params?: messages.UserListUnsolvedProblemsRequest
+      params?: messages.UserListUnsolvedProblemsRequest,
     ) => Promise<messages.UserListUnsolvedProblemsResponse>;
     login: (
-      params?: messages.UserLoginRequest
+      params?: messages.UserLoginRequest,
     ) => Promise<messages.UserLoginResponse>;
     mailingListBackfill: (
-      params?: messages.UserMailingListBackfillRequest
+      params?: messages.UserMailingListBackfillRequest,
     ) => Promise<messages.UserMailingListBackfillResponse>;
     problemsCreated: (
-      params?: messages.UserProblemsCreatedRequest
+      params?: messages.UserProblemsCreatedRequest,
     ) => Promise<messages.UserProblemsCreatedResponse>;
     problemsSolved: (
-      params?: messages.UserProblemsSolvedRequest
+      params?: messages.UserProblemsSolvedRequest,
     ) => Promise<messages.UserProblemsSolvedResponse>;
     profile: (
-      params?: messages.UserProfileRequest
+      params?: messages.UserProfileRequest,
     ) => Promise<messages.UserProfileResponse>;
     profileStatistics: (
-      params?: messages.UserProfileStatisticsRequest
+      params?: messages.UserProfileStatisticsRequest,
     ) => Promise<messages.UserProfileStatisticsResponse>;
     removeExperiment: (
-      params?: messages.UserRemoveExperimentRequest
+      params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
     removeGroup: (
-      params?: messages.UserRemoveGroupRequest
+      params?: messages.UserRemoveGroupRequest,
     ) => Promise<messages.UserRemoveGroupResponse>;
     removeRole: (
-      params?: messages.UserRemoveRoleRequest
+      params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
     revokeAPIToken: (
-      params?: messages.UserRevokeAPITokenRequest
+      params?: messages.UserRevokeAPITokenRequest,
     ) => Promise<messages.UserRevokeAPITokenResponse>;
     selectCoderOfTheMonth: (
-      params?: messages.UserSelectCoderOfTheMonthRequest
+      params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;
     stats: (
-      params?: messages.UserStatsRequest
+      params?: messages.UserStatsRequest,
     ) => Promise<messages.UserStatsResponse>;
     statusVerified: (
-      params?: messages.UserStatusVerifiedRequest
+      params?: messages.UserStatusVerifiedRequest,
     ) => Promise<messages.UserStatusVerifiedResponse>;
     update: (
-      params?: messages.UserUpdateRequest
+      params?: messages.UserUpdateRequest,
     ) => Promise<messages.UserUpdateResponse>;
     updateBasicInfo: (
-      params?: messages.UserUpdateBasicInfoRequest
+      params?: messages.UserUpdateBasicInfoRequest,
     ) => Promise<messages.UserUpdateBasicInfoResponse>;
     updateMainEmail: (
-      params?: messages.UserUpdateMainEmailRequest
+      params?: messages.UserUpdateMainEmailRequest,
     ) => Promise<messages.UserUpdateMainEmailResponse>;
     validateFilter: (
-      params?: messages.UserValidateFilterRequest
+      params?: messages.UserValidateFilterRequest,
     ) => Promise<messages.UserValidateFilterResponse>;
     verifyEmail: (
-      params?: messages.UserVerifyEmailRequest
+      params?: messages.UserVerifyEmailRequest,
     ) => Promise<messages.UserVerifyEmailResponse>;
   }
-
 }
