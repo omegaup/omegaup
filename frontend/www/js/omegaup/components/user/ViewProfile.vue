@@ -207,7 +207,6 @@
                   <div class="col-lg-6 mb-3">
                     <omegaup-problem-solving-progress
                       :solved="profileStatistics.solved"
-                      :attempting="profileStatistics.attempting"
                       :difficulty="profileStatistics.difficulty"
                     ></omegaup-problem-solving-progress>
                   </div>
