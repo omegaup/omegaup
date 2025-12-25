@@ -8,17 +8,17 @@
           viewBox="0 0 120 120"
           :aria-label="T.profileProblemProgress"
         >
-          <!-- Background circle -->
+          <!-- Background circle (light gray) -->
           <circle
             class="circle-bg"
             cx="60"
             cy="60"
             r="50"
             fill="none"
-            stroke="#3a3a3a"
+            stroke="#e8e8e8"
             stroke-width="10"
           />
-          <!-- Easy segment -->
+          <!-- Easy segment (green) -->
           <circle
             class="circle-segment easy"
             cx="60"
@@ -28,10 +28,10 @@
             stroke="#00b8a3"
             stroke-width="10"
             :stroke-dasharray="easyDash"
-            :stroke-dashoffset="easyOffset"
+            :stroke-dashoffset="0"
             transform="rotate(-90 60 60)"
           />
-          <!-- Medium segment -->
+          <!-- Medium segment (yellow) -->
           <circle
             class="circle-segment medium"
             cx="60"
@@ -44,7 +44,7 @@
             :stroke-dashoffset="mediumOffset"
             transform="rotate(-90 60 60)"
           />
-          <!-- Hard segment -->
+          <!-- Hard segment (red) -->
           <circle
             class="circle-segment hard"
             cx="60"
@@ -57,14 +57,14 @@
             :stroke-dashoffset="hardOffset"
             transform="rotate(-90 60 60)"
           />
-          <!-- Unlabelled segment -->
+          <!-- Unlabelled segment (gray) -->
           <circle
             class="circle-segment unlabelled"
             cx="60"
             cy="60"
             r="50"
             fill="none"
-            stroke="#808080"
+            stroke="#999999"
             stroke-width="10"
             :stroke-dasharray="unlabelledDash"
             :stroke-dashoffset="unlabelledOffset"
@@ -72,7 +72,10 @@
           />
         </svg>
         <div class="center-text">
-          <span class="solved-count">{{ solved }}</span>
+          <div class="solved-count-container">
+            <span class="solved-count">{{ solved }}</span>
+            <span class="total-count">/{{ total }}</span>
+          </div>
           <span class="solved-label">
             <span class="checkmark">✓</span> {{ T.profileSolved }}
           </span>
@@ -126,7 +129,7 @@ export default class ProblemSolvingProgress extends Vue {
 
   private readonly circumference = 2 * Math.PI * 50; // r=50
 
-  get totalSolved(): number {
+  get total(): number {
     return (
       this.difficulty.easy +
       this.difficulty.medium +
@@ -136,72 +139,67 @@ export default class ProblemSolvingProgress extends Vue {
   }
 
   get easyDash(): string {
-    const percent =
-      this.totalSolved > 0 ? this.difficulty.easy / this.totalSolved : 0;
+    if (this.total === 0) return `0 ${this.circumference}`;
+    const percent = this.difficulty.easy / this.total;
     return `${percent * this.circumference} ${this.circumference}`;
   }
 
-  get easyOffset(): number {
-    return 0;
-  }
-
   get mediumDash(): string {
-    const percent =
-      this.totalSolved > 0 ? this.difficulty.medium / this.totalSolved : 0;
+    if (this.total === 0) return `0 ${this.circumference}`;
+    const percent = this.difficulty.medium / this.total;
     return `${percent * this.circumference} ${this.circumference}`;
   }
 
   get mediumOffset(): number {
-    const easyPercent =
-      this.totalSolved > 0 ? this.difficulty.easy / this.totalSolved : 0;
+    if (this.total === 0) return 0;
+    const easyPercent = this.difficulty.easy / this.total;
     return -easyPercent * this.circumference;
   }
 
   get hardDash(): string {
-    const percent =
-      this.totalSolved > 0 ? this.difficulty.hard / this.totalSolved : 0;
+    if (this.total === 0) return `0 ${this.circumference}`;
+    const percent = this.difficulty.hard / this.total;
     return `${percent * this.circumference} ${this.circumference}`;
   }
 
   get hardOffset(): number {
-    const easyPercent =
-      this.totalSolved > 0 ? this.difficulty.easy / this.totalSolved : 0;
-    const mediumPercent =
-      this.totalSolved > 0 ? this.difficulty.medium / this.totalSolved : 0;
-    return -(easyPercent + mediumPercent) * this.circumference;
+    if (this.total === 0) return 0;
+    const prevPercent =
+      (this.difficulty.easy + this.difficulty.medium) / this.total;
+    return -prevPercent * this.circumference;
   }
 
   get unlabelledDash(): string {
-    const percent =
-      this.totalSolved > 0 ? this.difficulty.unlabelled / this.totalSolved : 0;
+    if (this.total === 0) return `0 ${this.circumference}`;
+    const percent = this.difficulty.unlabelled / this.total;
     return `${percent * this.circumference} ${this.circumference}`;
   }
 
   get unlabelledOffset(): number {
-    const easyPercent =
-      this.totalSolved > 0 ? this.difficulty.easy / this.totalSolved : 0;
-    const mediumPercent =
-      this.totalSolved > 0 ? this.difficulty.medium / this.totalSolved : 0;
-    const hardPercent =
-      this.totalSolved > 0 ? this.difficulty.hard / this.totalSolved : 0;
-    return -(easyPercent + mediumPercent + hardPercent) * this.circumference;
+    if (this.total === 0) return 0;
+    const prevPercent =
+      (this.difficulty.easy +
+        this.difficulty.medium +
+        this.difficulty.hard) /
+      this.total;
+    return -prevPercent * this.circumference;
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .problem-solving-progress {
-  background-color: #1a1a2e;
-  border-radius: 12px;
-  padding: 20px;
-  color: #fff;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .progress-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
@@ -231,17 +229,30 @@ export default class ProblemSolvingProgress extends Vue {
   align-items: center;
 }
 
+.solved-count-container {
+  display: flex;
+  align-items: baseline;
+}
+
 .solved-count {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.total-count {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #999;
 }
 
 .solved-label {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #00b8a3;
   display: flex;
   align-items: center;
   gap: 4px;
+  font-weight: 500;
 }
 
 .checkmark {
@@ -249,9 +260,9 @@ export default class ProblemSolvingProgress extends Vue {
 }
 
 .attempting-label {
-  font-size: 0.75rem;
-  color: #ffc01e;
-  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 6px;
 }
 
 .difficulty-cards {
@@ -261,39 +272,75 @@ export default class ProblemSolvingProgress extends Vue {
 }
 
 .difficulty-card {
-  background-color: #2a2a3e;
-  border-radius: 8px;
-  padding: 12px 20px;
+  border-radius: 10px;
+  padding: 14px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 100px;
+  min-width: 110px;
 }
 
 .difficulty-label {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .difficulty-count {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Easy - Mint/Cyan background */
+.difficulty-card.easy {
+  background-color: #c8f7e8;
 }
 
 .difficulty-card.easy .difficulty-label {
-  color: #00b8a3;
+  color: #00a383;
+}
+
+.difficulty-card.easy .difficulty-count {
+  color: #00a383;
+}
+
+/* Medium - Yellow/Gold background */
+.difficulty-card.medium {
+  background-color: #fff3c4;
 }
 
 .difficulty-card.medium .difficulty-label {
-  color: #ffc01e;
+  color: #d4a005;
+}
+
+.difficulty-card.medium .difficulty-count {
+  color: #d4a005;
+}
+
+/* Hard - Pink/Coral background */
+.difficulty-card.hard {
+  background-color: #ffd4d4;
 }
 
 .difficulty-card.hard .difficulty-label {
-  color: #ef4743;
+  color: #d45050;
+}
+
+.difficulty-card.hard .difficulty-count {
+  color: #d45050;
+}
+
+/* Unlabelled - Gray background */
+.difficulty-card.unlabelled {
+  background-color: #e8e8e8;
 }
 
 .difficulty-card.unlabelled .difficulty-label {
-  color: #808080;
+  color: #666;
+}
+
+.difficulty-card.unlabelled .difficulty-count {
+  color: #666;
 }
 
 @media (max-width: 576px) {
