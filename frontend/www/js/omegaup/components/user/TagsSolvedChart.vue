@@ -120,6 +120,9 @@ export default class TagsSolvedChart extends Vue {
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-height: 340px;
+  height: 100%;
+  width: 100%;
 }
 
 .chart-title {
