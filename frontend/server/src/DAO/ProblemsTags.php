@@ -124,7 +124,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                 count DESC, t.name ASC;
         ";
 
-        /** @var list<array{name: string, count: int}> */
+        /** @var list<array{count: int, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
