@@ -3,13 +3,11 @@
 /**
  * Test the apiProfileStatistics endpoint
  */
-class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
-{
+class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test basic profile statistics for a user with solved problems
      */
-    public function testProfileStatisticsBasic()
-    {
+    public function testProfileStatisticsBasic() {
         // Create a test user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -101,8 +99,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
     /**
      * Test profile statistics with attempting (partial) problems
      */
-    public function testProfileStatisticsWithAttempting()
-    {
+    public function testProfileStatisticsWithAttempting() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -130,8 +127,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
     /**
      * Test profile statistics for user with no solved problems
      */
-    public function testProfileStatisticsEmpty()
-    {
+    public function testProfileStatisticsEmpty() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
@@ -154,8 +150,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
     /**
      * Test profile statistics for another user's profile
      */
-    public function testProfileStatisticsOtherUser()
-    {
+    public function testProfileStatisticsOtherUser() {
         ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -184,8 +179,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
     /**
      * Test profile statistics respects private profile
      */
-    public function testProfileStatisticsPrivateProfile()
-    {
+    public function testProfileStatisticsPrivateProfile() {
         // Create a private user
         ['identity' => $privateUser] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['isPrivate' => true])
@@ -210,8 +204,7 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
     /**
      * Test that tags distribution is returned correctly
      */
-    public function testProfileStatisticsWithTags()
-    {
+    public function testProfileStatisticsWithTags() {
         // Create the problem author who can add tags
         ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
 

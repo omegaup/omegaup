@@ -11,8 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  */
-class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags
-{
+class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     /**
      * @return list<array{name: string, public: bool}>
      */
@@ -85,8 +84,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags
      *
      * @return list<array{name: string, count: int}>
      */
-    public static function getTagsDistributionForSolvedProblems(int $identityId): array
-    {
+    public static function getTagsDistributionForSolvedProblems(int $identityId): array {
         $sql = "
             SELECT
                 t.name,
@@ -133,8 +131,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags
         );
     }
 
-    public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void
-    {
+    public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
         $placeholders = join(
             ',',
             array_fill(

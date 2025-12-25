@@ -196,7 +196,10 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
-                <div class="row mb-4 statistics-boxes-row" v-if="profileStatistics">
+                <div
+                  v-if="profileStatistics"
+                  class="row mb-4 statistics-boxes-row"
+                >
                   <div class="col-lg-6 mb-3">
                     <omegaup-problem-solving-progress
                       :solved="profileStatistics.solved"
@@ -241,10 +244,10 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
-    Contest,
-    ContestResult,
-    Course,
-    Problem,
+  Contest,
+  ContestResult,
+  Course,
+  Problem,
 } from '../../linkable_resource';
 import * as ui from '../../ui';
 import badge_List from '../badge/List.vue';
@@ -420,7 +423,7 @@ a:hover {
   margin-top: 16px;
 }
 
-.statistics-boxes-row > [class*="col-"] {
+.statistics-boxes-row > [class*='col-'] {
   display: flex;
 }
 </style>
