@@ -14,11 +14,11 @@ In this table you will find the main topics about our project so you can start c
 | [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md)  | omegaUp' software architecture                      |
 | [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md)  | When and how is the deployment                               |
 
-:arrow_forward: :arrow_forward: :computer:  [Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-links.md)
+[Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-links.md)
 
 # How to use the main features of omegaUp.com?
 
-omegaUp is an eaducational platform where you can create problems, constests and courses. We also invite you to visit our [blog](https://blog.omegaup.com/) for the most recent updates.
+omegaUp is an educational platform where you can create problems, contests and courses. We also invite you to visit our [blog](https://blog.omegaup.com/) for the most recent updates.
 
 
  - [How to Create Problems for omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md)
