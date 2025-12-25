@@ -88,6 +88,12 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
         $this->assertArrayHasKey('hard', $response['difficulty']);
         $this->assertArrayHasKey('unlabelled', $response['difficulty']);
 
+        // Verify per-difficulty counts are correct
+        $this->assertSame(1, $response['difficulty']['easy']);
+        $this->assertSame(1, $response['difficulty']['medium']);
+        $this->assertSame(1, $response['difficulty']['hard']);
+        $this->assertSame(0, $response['difficulty']['unlabelled']);
+
         // Should have 3 solved problems total
         $this->assertSame(3, $response['solved']);
     }
@@ -206,28 +212,58 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase
      */
     public function testProfileStatisticsWithTags()
     {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Create the problem author who can add tags
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Create a problem with tags
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+        // Create a problem with the author
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'author' => $author,
+            ])
+        );
 
-        $login = self::login($identity);
+        // Add tags to the problem as the author
+        $authorLogin = self::login($author);
+        \OmegaUp\Controllers\Problem::apiAddTag(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problem['problem']->alias,
+                'name' => 'dp',
+                'public' => true,
+            ])
+        );
+        \OmegaUp\Controllers\Problem::apiAddTag(
+            new \OmegaUp\Request([
+                'auth_token' => $authorLogin->auth_token,
+                'problem_alias' => $problem['problem']->alias,
+                'name' => 'greedy',
+                'public' => true,
+            ])
+        );
 
-        // Submit AC run
+        // Create a solver user
+        ['identity' => $solver] = \OmegaUp\Test\Factories\User::createUser();
+        $solverLogin = self::login($solver);
+
+        // Submit AC run as the solver
         $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problem,
-            $identity,
-            $login
+            $solver,
+            $solverLogin
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
         $response = \OmegaUp\Controllers\User::apiProfileStatistics(
             new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
+                'auth_token' => $solverLogin->auth_token,
             ])
         );
 
-        // Tags array should be present (may be empty if no tags)
+        // Verify tags are present and contain the expected tags
         $this->assertIsArray($response['tags']);
+        $this->assertGreaterThan(0, count($response['tags']));
+        $tagNames = array_column($response['tags'], 'name');
+        $this->assertContains('dp', $tagNames);
+        $this->assertContains('greedy', $tagNames);
     }
 }

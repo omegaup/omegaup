@@ -857,10 +857,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems
     {
         $sql = "
             SELECT
-                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 0.5 THEN 1 ELSE 0 END) AS easy,
-                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0.5 AND p.difficulty < 2.5 THEN 1 ELSE 0 END) AS medium,
-                SUM(CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN 1 ELSE 0 END) AS hard,
-                SUM(CASE WHEN p.difficulty IS NULL THEN 1 ELSE 0 END) AS unlabelled
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 0.5 THEN p.problem_id END) AS easy,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled
             FROM
                 Problems p
             INNER JOIN
@@ -883,8 +883,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems
                         AND a.owner_id = i.user_id
                         AND i.user_id IS NOT NULL
                 )
-            GROUP BY
-                s.identity_id;
         ";
 
         /** @var array{easy: int|null, medium: int|null, hard: int|null, unlabelled: int|null}|null */
