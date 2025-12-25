@@ -101,19 +101,19 @@
       <!-- Difficulty Breakdown -->
       <div class="difficulty-list">
         <div class="difficulty-item easy">
-          <span class="difficulty-label">{{ T.profileEasy }}</span>
+          <span class="difficulty-label">Easy</span>
           <span class="difficulty-count">{{ difficulty.easy }}/{{ total }}</span>
         </div>
         <div class="difficulty-item medium">
-          <span class="difficulty-label">{{ T.profileMedium }}</span>
+          <span class="difficulty-label">Med.</span>
           <span class="difficulty-count">{{ difficulty.medium }}/{{ total }}</span>
         </div>
         <div class="difficulty-item hard">
-          <span class="difficulty-label">{{ T.profileHard }}</span>
+          <span class="difficulty-label">Hard</span>
           <span class="difficulty-count">{{ difficulty.hard }}/{{ total }}</span>
         </div>
         <div class="difficulty-item unlabelled">
-          <span class="difficulty-label">{{ T.profileUnlabelled }}</span>
+          <span class="difficulty-label">Other</span>
           <span class="difficulty-count">{{ difficulty.unlabelled }}/{{ total }}</span>
         </div>
       </div>
