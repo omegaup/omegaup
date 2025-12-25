@@ -16,7 +16,7 @@
             r="50"
             fill="none"
             stroke="#e8e8e8"
-            stroke-width="10"
+            stroke-width="14"
           />
           <!-- Easy segment (green) -->
           <circle
@@ -26,7 +26,7 @@
             r="50"
             fill="none"
             stroke="#00b8a3"
-            stroke-width="10"
+            stroke-width="14"
             :stroke-dasharray="easyDash"
             :stroke-dashoffset="0"
             transform="rotate(-90 60 60)"
@@ -41,7 +41,7 @@
             r="50"
             fill="none"
             stroke="#ffc01e"
-            stroke-width="10"
+            stroke-width="14"
             :stroke-dasharray="mediumDash"
             :stroke-dashoffset="mediumOffset"
             transform="rotate(-90 60 60)"
@@ -56,7 +56,7 @@
             r="50"
             fill="none"
             stroke="#ef4743"
-            stroke-width="10"
+            stroke-width="14"
             :stroke-dasharray="hardDash"
             :stroke-dashoffset="hardOffset"
             transform="rotate(-90 60 60)"
@@ -71,7 +71,7 @@
             r="50"
             fill="none"
             stroke="#999999"
-            stroke-width="10"
+            stroke-width="14"
             :stroke-dasharray="unlabelledDash"
             :stroke-dashoffset="unlabelledOffset"
             transform="rotate(-90 60 60)"
@@ -84,7 +84,6 @@
             <span class="solved-count">{{ solved }}</span>
             <span class="total-count">/{{ total }}</span>
           </div>
-          <span class="solved-label">{{ T.profileSolved }}</span>
           <span v-if="attempting > 0" class="attempting-label">
             {{ attempting }} {{ T.profileAttempting }}
           </span>
