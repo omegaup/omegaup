@@ -1,11 +1,16 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import Vue from 'vue';
 import TagsSolvedChart from './TagsSolvedChart.vue';
 
 // Mock Highcharts to avoid actual chart rendering in tests
+// Use render function instead of template since Vue runtime-only build
+// doesn't include the template compiler
 jest.mock('highcharts-vue', () => ({
   Chart: {
     name: 'highcharts',
-    template: '<div class="highcharts-mock"></div>',
+    render(h: Vue.CreateElement) {
+      return h('div', { class: 'highcharts-mock' });
+    },
   },
 }));
 
@@ -19,7 +24,7 @@ describe('TagsSolvedChart.vue', () => {
   ];
 
   it('should render the component with chart title', () => {
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -29,7 +34,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should render chart container when tags are provided', () => {
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -40,7 +45,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should show no-data message when tags array is empty', () => {
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: [],
       },
@@ -51,7 +56,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should compute correct chart options', () => {
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
@@ -71,7 +76,7 @@ describe('TagsSolvedChart.vue', () => {
       count: 25 - i,
     }));
 
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: manyTags,
       },
@@ -84,7 +89,7 @@ describe('TagsSolvedChart.vue', () => {
   });
 
   it('should have correct data structure for chart', () => {
-    const wrapper = mount(TagsSolvedChart, {
+    const wrapper = shallowMount(TagsSolvedChart, {
       propsData: {
         tags: defaultTags,
       },
