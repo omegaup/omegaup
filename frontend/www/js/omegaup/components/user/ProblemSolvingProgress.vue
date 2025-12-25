@@ -33,7 +33,9 @@
             @mouseenter="hoveredSegment = 'easy'"
             @mouseleave="hoveredSegment = null"
           >
-            <title>{{ T.profileEasy }}: {{ difficulty.easy }}/{{ total }}</title>
+            <title>
+              {{ T.profileEasy }}: {{ difficulty.easy }}/{{ total }}
+            </title>
           </circle>
           <!-- Medium segment (yellow) -->
           <circle
@@ -50,7 +52,9 @@
             @mouseenter="hoveredSegment = 'medium'"
             @mouseleave="hoveredSegment = null"
           >
-            <title>{{ T.profileMedium }}: {{ difficulty.medium }}/{{ total }}</title>
+            <title>
+              {{ T.profileMedium }}: {{ difficulty.medium }}/{{ total }}
+            </title>
           </circle>
           <!-- Hard segment (red) -->
           <circle
@@ -67,7 +71,9 @@
             @mouseenter="hoveredSegment = 'hard'"
             @mouseleave="hoveredSegment = null"
           >
-            <title>{{ T.profileHard }}: {{ difficulty.hard }}/{{ total }}</title>
+            <title>
+              {{ T.profileHard }}: {{ difficulty.hard }}/{{ total }}
+            </title>
           </circle>
           <!-- Unlabelled segment (gray) -->
           <circle
@@ -84,15 +90,23 @@
             @mouseenter="hoveredSegment = 'unlabelled'"
             @mouseleave="hoveredSegment = null"
           >
-            <title>{{ T.profileUnlabelled }}: {{ difficulty.unlabelled }}/{{ total }}</title>
+            <title>
+              {{ T.profileUnlabelled }}: {{ difficulty.unlabelled }}/{{ total }}
+            </title>
           </circle>
         </svg>
         <div class="center-text">
           <div class="solved-count-container">
-            <span class="solved-count" :style="hoveredCountStyle">{{ displayCount }}</span>
+            <span class="solved-count" :style="hoveredCountStyle">{{
+              displayCount
+            }}</span>
             <span class="total-count">/{{ total }}</span>
           </div>
-          <span v-if="hoveredSegment" class="hover-label" :style="hoveredLabelStyle">
+          <span
+            v-if="hoveredSegment"
+            class="hover-label"
+            :style="hoveredLabelStyle"
+          >
             {{ hoveredLabel }}
           </span>
         </div>
@@ -102,19 +116,27 @@
       <div class="difficulty-list">
         <div class="difficulty-item easy">
           <span class="difficulty-label">{{ T.profileEasy }}</span>
-          <span class="difficulty-count">{{ difficulty.easy }}/{{ total }}</span>
+          <span class="difficulty-count"
+            >{{ difficulty.easy }}/{{ total }}</span
+          >
         </div>
         <div class="difficulty-item medium">
           <span class="difficulty-label">{{ T.profileMedium }}</span>
-          <span class="difficulty-count">{{ difficulty.medium }}/{{ total }}</span>
+          <span class="difficulty-count"
+            >{{ difficulty.medium }}/{{ total }}</span
+          >
         </div>
         <div class="difficulty-item hard">
           <span class="difficulty-label">{{ T.profileHard }}</span>
-          <span class="difficulty-count">{{ difficulty.hard }}/{{ total }}</span>
+          <span class="difficulty-count"
+            >{{ difficulty.hard }}/{{ total }}</span
+          >
         </div>
         <div class="difficulty-item unlabelled">
           <span class="difficulty-label">{{ T.profileUnlabelled }}</span>
-          <span class="difficulty-count">{{ difficulty.unlabelled }}/{{ total }}</span>
+          <span class="difficulty-count"
+            >{{ difficulty.unlabelled }}/{{ total }}</span
+          >
         </div>
       </div>
     </div>
@@ -225,9 +247,7 @@ export default class ProblemSolvingProgress extends Vue {
   get unlabelledOffset(): number {
     if (this.total === 0) return 0;
     const prevPercent =
-      (this.difficulty.easy +
-        this.difficulty.medium +
-        this.difficulty.hard) /
+      (this.difficulty.easy + this.difficulty.medium + this.difficulty.hard) /
       this.total;
     return -prevPercent * this.circumference;
   }
