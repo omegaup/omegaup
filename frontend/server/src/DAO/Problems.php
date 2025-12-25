@@ -879,7 +879,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 )
         ";
 
-        /** @var array{easy: int|null, medium: int|null, hard: int|null, unlabelled: int|null}|null */
+        /** @var array{easy: int, hard: int, medium: int, unlabelled: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
