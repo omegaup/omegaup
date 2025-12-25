@@ -363,7 +363,7 @@ export default class ProblemSolvingProgress extends Vue {
 
 /* Medium - Orange/Yellow text */
 .difficulty-item.medium .difficulty-label {
-  color: #ffb800;
+  color: #ffc01e;
 }
 
 /* Hard - Red text */
@@ -373,7 +373,7 @@ export default class ProblemSolvingProgress extends Vue {
 
 /* Unlabelled - Gray text */
 .difficulty-item.unlabelled .difficulty-label {
-  color: #888;
+  color: #999999;
 }
 
 @media (max-width: 576px) {
