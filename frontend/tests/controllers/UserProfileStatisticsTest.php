@@ -241,4 +241,24 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertIsInt($tag['count']);
         }
     }
+
+    /**
+     * Test profile statistics throws NotFoundException for non-existent user
+     */
+    public function testProfileStatisticsUserNotFound() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiProfileStatistics(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => 'nonexistent_user_12345',
+                ])
+            );
+            $this->fail('Expected NotFoundException');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertSame('userNotExist', $e->getMessage());
+        }
+    }
 }
