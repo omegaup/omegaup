@@ -70,7 +70,10 @@ export default class TagsSolvedChart extends Vue {
         text: '',
       },
       tooltip: {
-        pointFormat: '<b>{point.y}</b> problems',
+        formatter: function (): string {
+          const point = this as unknown as Highcharts.Point;
+          return `<b>${point.y}</b> ${T.profileProblemsCount}`;
+        },
       },
       plotOptions: {
         pie: {
