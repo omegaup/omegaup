@@ -30,7 +30,9 @@
             :stroke-dasharray="easyDash"
             :stroke-dashoffset="0"
             transform="rotate(-90 60 60)"
-          />
+          >
+            <title>{{ T.profileEasy }}: {{ difficulty.easy }}/{{ total }}</title>
+          </circle>
           <!-- Medium segment (yellow) -->
           <circle
             class="circle-segment medium"
@@ -43,7 +45,9 @@
             :stroke-dasharray="mediumDash"
             :stroke-dashoffset="mediumOffset"
             transform="rotate(-90 60 60)"
-          />
+          >
+            <title>{{ T.profileMedium }}: {{ difficulty.medium }}/{{ total }}</title>
+          </circle>
           <!-- Hard segment (red) -->
           <circle
             class="circle-segment hard"
@@ -56,7 +60,9 @@
             :stroke-dasharray="hardDash"
             :stroke-dashoffset="hardOffset"
             transform="rotate(-90 60 60)"
-          />
+          >
+            <title>{{ T.profileHard }}: {{ difficulty.hard }}/{{ total }}</title>
+          </circle>
           <!-- Unlabelled segment (gray) -->
           <circle
             class="circle-segment unlabelled"
@@ -69,7 +75,9 @@
             :stroke-dasharray="unlabelledDash"
             :stroke-dashoffset="unlabelledOffset"
             transform="rotate(-90 60 60)"
-          />
+          >
+            <title>{{ T.profileUnlabelled }}: {{ difficulty.unlabelled }}/{{ total }}</title>
+          </circle>
         </svg>
         <div class="center-text">
           <div class="solved-count-container">
