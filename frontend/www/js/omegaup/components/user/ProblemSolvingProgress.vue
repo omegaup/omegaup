@@ -98,23 +98,23 @@
         </div>
       </div>
 
-      <!-- Difficulty Breakdown Cards -->
-      <div class="difficulty-cards">
-        <div class="difficulty-card easy">
+      <!-- Difficulty Breakdown -->
+      <div class="difficulty-list">
+        <div class="difficulty-item easy">
           <span class="difficulty-label">{{ T.profileEasy }}</span>
-          <span class="difficulty-count">{{ difficulty.easy }}</span>
+          <span class="difficulty-count">{{ difficulty.easy }}/{{ total }}</span>
         </div>
-        <div class="difficulty-card medium">
+        <div class="difficulty-item medium">
           <span class="difficulty-label">{{ T.profileMedium }}</span>
-          <span class="difficulty-count">{{ difficulty.medium }}</span>
+          <span class="difficulty-count">{{ difficulty.medium }}/{{ total }}</span>
         </div>
-        <div class="difficulty-card hard">
+        <div class="difficulty-item hard">
           <span class="difficulty-label">{{ T.profileHard }}</span>
-          <span class="difficulty-count">{{ difficulty.hard }}</span>
+          <span class="difficulty-count">{{ difficulty.hard }}/{{ total }}</span>
         </div>
-        <div class="difficulty-card unlabelled">
+        <div class="difficulty-item unlabelled">
           <span class="difficulty-label">{{ T.profileUnlabelled }}</span>
-          <span class="difficulty-count">{{ difficulty.unlabelled }}</span>
+          <span class="difficulty-count">{{ difficulty.unlabelled }}/{{ total }}</span>
         </div>
       </div>
     </div>
@@ -246,9 +246,8 @@ export default class ProblemSolvingProgress extends Vue {
 .progress-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 24px;
-  flex-wrap: wrap;
 }
 
 .circular-chart-container {
@@ -326,82 +325,52 @@ export default class ProblemSolvingProgress extends Vue {
   transition: color 0.1s ease;
 }
 
-.difficulty-cards {
+.difficulty-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.difficulty-card {
-  border-radius: 10px;
-  padding: 14px 24px;
+.difficulty-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 110px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  padding: 12px 20px;
+  min-width: 100px;
 }
 
 .difficulty-label {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .difficulty-count {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #666;
   margin-top: 2px;
 }
 
-/* Easy - Mint/Cyan background */
-.difficulty-card.easy {
-  background-color: #c8f7e8;
+/* Easy - Green text */
+.difficulty-item.easy .difficulty-label {
+  color: #00b8a3;
 }
 
-.difficulty-card.easy .difficulty-label {
-  color: #00a383;
+/* Medium - Orange/Yellow text */
+.difficulty-item.medium .difficulty-label {
+  color: #ffb800;
 }
 
-.difficulty-card.easy .difficulty-count {
-  color: #00a383;
+/* Hard - Red text */
+.difficulty-item.hard .difficulty-label {
+  color: #ef4743;
 }
 
-/* Medium - Yellow/Gold background */
-.difficulty-card.medium {
-  background-color: #fff3c4;
-}
-
-.difficulty-card.medium .difficulty-label {
-  color: #d4a005;
-}
-
-.difficulty-card.medium .difficulty-count {
-  color: #d4a005;
-}
-
-/* Hard - Pink/Coral background */
-.difficulty-card.hard {
-  background-color: #ffd4d4;
-}
-
-.difficulty-card.hard .difficulty-label {
-  color: #d45050;
-}
-
-.difficulty-card.hard .difficulty-count {
-  color: #d45050;
-}
-
-/* Unlabelled - Gray background */
-.difficulty-card.unlabelled {
-  background-color: #e8e8e8;
-}
-
-.difficulty-card.unlabelled .difficulty-label {
-  color: #666;
-}
-
-.difficulty-card.unlabelled .difficulty-count {
-  color: #666;
+/* Unlabelled - Gray text */
+.difficulty-item.unlabelled .difficulty-label {
+  color: #888;
 }
 
 @media (max-width: 576px) {
@@ -410,15 +379,16 @@ export default class ProblemSolvingProgress extends Vue {
     align-items: center;
   }
 
-  .difficulty-cards {
+  .difficulty-list {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 12px;
   }
 
-  .difficulty-card {
+  .difficulty-item {
     min-width: 80px;
-    padding: 10px 15px;
+    padding: 10px 16px;
   }
 }
 </style>
