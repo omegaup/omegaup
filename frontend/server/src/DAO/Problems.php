@@ -844,15 +844,15 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
     /**
      * Get count of solved problems grouped by difficulty level for a user.
-     * Difficulty mapping: Easy(0-0.5), Medium(0.5-2.5), Hard(2.5-4), Unlabelled(NULL)
+     * Difficulty mapping: Easy(0-1.5), Medium(1.5-2.5), Hard(2.5-4), Unlabelled(NULL)
      *
      * @return array{easy: int, medium: int, hard: int, unlabelled: int}
      */
     public static function getSolvedCountByDifficulty(int $identityId): array {
         $sql = "
             SELECT
-                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 0.5 THEN p.problem_id END) AS easy,
-                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 1.5 THEN p.problem_id END) AS easy,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 1.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
                 COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
                 COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled
             FROM
