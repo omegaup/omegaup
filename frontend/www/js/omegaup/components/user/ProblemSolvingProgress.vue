@@ -238,9 +238,12 @@ export default class ProblemSolvingProgress extends Vue {
 <style lang="scss" scoped>
 .problem-solving-progress {
   background-color: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-height: 340px;
+  height: 100%;
+  width: 100%;
 }
 
 .progress-container {

@@ -203,7 +203,7 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
-                <div class="row mb-4" v-if="profileStatistics">
+                <div class="row mb-4 statistics-boxes-row" v-if="profileStatistics">
                   <div class="col-lg-6 mb-3">
                     <omegaup-problem-solving-progress
                       :solved="profileStatistics.solved"
@@ -428,5 +428,13 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--user-chart-title-color);
+}
+
+.statistics-boxes-row {
+  margin-top: 16px;
+}
+
+.statistics-boxes-row > [class*="col-"] {
+  display: flex;
 }
 </style>
