@@ -91,10 +91,9 @@
             <div class="d-flex flex-column">
               <slot name="contest-button-calendar">
                 <b-button
-                  :href="getCalendarURL(contest.alias)"
-                  :download="`contest-${contest.alias}.ics`"
                   variant="primary"
                   class="d-flex align-items-center justify-content-center mb-2"
+                  @click="downloadCalendar(contest.alias)"
                 >
                   <font-awesome-icon class="mr-1" icon="calendar-alt" />
                   {{ T.contestAddToCalendar }}
@@ -191,6 +190,31 @@ export default class ContestCard extends Vue {
 
   getCalendarURL(alias: string): string {
     return `/api/contest/ical/?contest_alias=${encodeURIComponent(alias)}`;
+  }
+
+  downloadCalendar(alias: string): void {
+    const url = this.getCalendarURL(alias);
+    const filename = `contest-${alias}.ics`;
+
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        // Delay revocation to allow Chrome to complete the download
+        // See: https://stackoverflow.com/questions/30694453
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error('Calendar download failed:', error);
+      });
   }
 }
 </script>

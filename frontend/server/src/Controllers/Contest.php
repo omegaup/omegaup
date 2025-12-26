@@ -6214,14 +6214,19 @@ class Contest extends \OmegaUp\Controllers\Controller
             $contestUrl
         );
 
-        // Set headers for file download
+        // Set headers for file download - comprehensive for Chrome/Firefox compatibility
+        header('HTTP/1.1 200 OK', true, 200);
         header('Content-Type: text/calendar; charset=utf-8');
         header(
             'Content-Disposition: attachment; filename="contest-' .
                 $contestAlias . '.ics"'
         );
+        header('Content-Description: File Transfer');
+        header('Content-Transfer-Encoding: binary');
         header('Content-Length: ' . strlen($icsContent));
-        header('Cache-Control: no-cache, must-revalidate');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
 
         // Output the ICS content
         echo $icsContent;
