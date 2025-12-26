@@ -17,18 +17,18 @@ jobs:
       - uses: docker://chinthakagodawita/autoupdate-action:v1
         id: autoupdate
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Monitor all pull requests that are ready for review
-          PR_FILTER: 'all'
-          PR_READY_STATE: 'ready_for_review'
+          PR_FILTER: "all"
+          PR_READY_STATE: "ready_for_review"
           # Retry configuration for reliability
-          RETRY_COUNT: '5'
-          RETRY_SLEEP: '300'
+          RETRY_COUNT: "5"
+          RETRY_SLEEP: "300"
           # Report merge conflicts - when set to 'fail', the action will fail on conflicts
           # This ensures conflicts are detected and reported
-          MERGE_CONFLICT_ACTION: 'fail'
+          MERGE_CONFLICT_ACTION: "fail"
           # Custom merge message
-          MERGE_MSG: 'Auto-updated branch with latest changes from destination branch'
+          MERGE_MSG: "Auto-updated branch with latest changes from destination branch"
 
       # Check for PRs with merge conflicts and ensure they're visible
       # GitHub automatically shows merge conflicts on PRs, but we verify and log them
@@ -39,6 +39,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           script: |
+            // Validate context.repo exists before use
+            if (!context.repo || !context.repo.owner || !context.repo.repo) {
+              core.setFailed('context.repo, context.repo.owner, or context.repo.repo is undefined');
+              return;
+            }
+
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -50,8 +56,9 @@ jobs:
             });
 
             const conflictedPRs = [];
-            
-            for (const pr of prs.data) {
+
+            // prs is already the data array from the destructured response
+            for (const pr of prs) {
               // Skip draft PRs
               if (pr.draft) continue;
 
@@ -100,4 +107,3 @@ jobs:
           echo "GitHub will automatically show merge conflicts on affected PRs."
           echo "Contributors should resolve conflicts by rebasing their branch onto main."
           exit 1
-
