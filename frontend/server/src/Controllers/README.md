@@ -261,6 +261,7 @@
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
+  - [`/api/user/profileStatistics/`](#apiuserprofilestatistics)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
@@ -5085,6 +5086,27 @@ Get general user info
 ```typescript
 types.UserProfileInfo;
 ```
+
+## `/api/user/profileStatistics/`
+
+### Description
+
+Get profile statistics including solved problems by difficulty and tags distribution.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name         | Type                                                                  |
+| ------------ | --------------------------------------------------------------------- |
+| `attempting` | `number`                                                              |
+| `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
+| `solved`     | `number`                                                              |
+| `tags`       | `{ count: number; name: string; }[]`                                  |
 
 ## `/api/user/removeExperiment/`
 
