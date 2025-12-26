@@ -113,6 +113,11 @@
               <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
                 {{ T.contestPracticeMode }}
               </b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item :href="getCalendarURL(contest.alias)">
+                <font-awesome-icon class="mr-1" icon="calendar-alt" />
+                {{ T.contestAddToCalendar }}
+              </b-dropdown-item>
             </b-dropdown>
           </slot>
         </b-col>
@@ -122,24 +127,24 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
-import T from '../../lang';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import { ButtonPlugin, DropdownPlugin, LayoutPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(fas);
 
 @Component({
@@ -174,6 +179,10 @@ export default class ContestCard extends Vue {
 
   getPracticeContestURL(alias: string): string {
     return `/arena/${encodeURIComponent(alias)}/practice/`;
+  }
+
+  getCalendarURL(alias: string): string {
+    return `/api/contest/ical/contest_alias/${encodeURIComponent(alias)}/`;
   }
 }
 </script>

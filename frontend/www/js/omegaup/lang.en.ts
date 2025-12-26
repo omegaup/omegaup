@@ -300,6 +300,7 @@ const translations: { [key: string]: string; } = {
   contestButtonEnter: "Enter",
   contestButtonScoreboard: "Scoreboard",
   contestButtonSeeDetails: "See details",
+  contestAddToCalendar: "Add to Calendar",
   contestCanNotChangeToContestForTeams: "A normal contest cannot be changed to a contest for teams",
   contestCertificatesConfirmGenerate: "Are you sure you want to generate the certificates?, once the certificates are generated they cannot be modified. Make sure the scoreboard is unfrozen.",
   contestCertificatesCurrentContestError: "Certificates cannot be generated because the contest has not ended yet.",

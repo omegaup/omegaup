@@ -300,6 +300,7 @@ const translations: { [key: string]: string; } = {
   contestButtonEnter: "Entrar",
   contestButtonScoreboard: "Scoreboard",
   contestButtonSeeDetails: "Ver detalles",
+  contestAddToCalendar: "Agregar al Calendario",
   contestCanNotChangeToContestForTeams: "Un concurso normal no se puede cambiar a concurso para equipos",
   contestCertificatesConfirmGenerate: "\u00bfEst\u00e1s seguro de que quieres generar los diplomas?, una vez que se generen los diplomas no se podr\u00e1n modificar. Aseg\u00farate de que el scoreboard est\u00e9 descongelado.",
   contestCertificatesCurrentContestError: "Los diplomas no pueden ser generados porque el concurso a\u00fan no termina.",
