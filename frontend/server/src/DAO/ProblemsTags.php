@@ -70,7 +70,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [$problem->problem_id, $public]
+                [ $problem->problem_id, $public ]
             ) as $row
         ) {
             $results[] = $row['name'];
@@ -180,7 +180,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         /** @var string|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            [$problem->problem_id],
+            [ $problem->problem_id ],
         );
     }
 
@@ -205,7 +205,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                     `t`.`name` LIKE 'problemLevel%';";
             \OmegaUp\MySQLConnection::getInstance()->Execute(
                 $sql,
-                [$problem->problem_id],
+                [ $problem->problem_id ],
             );
 
             if ($tag) {
@@ -220,7 +220,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
 
                 \OmegaUp\MySQLConnection::getInstance()->Execute(
                     $sql,
-                    [$tag->tag_id, $problem->problem_id],
+                    [ $tag->tag_id, $problem->problem_id ],
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
