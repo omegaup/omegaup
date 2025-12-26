@@ -6180,49 +6180,6 @@ class Contest extends \OmegaUp\Controllers\Controller
         ];
     }
 
-    /**
-     * Returns an iCalendar (.ics) file for the specified contest.
-     *
-     * @return never
-     *
-     * @omegaup-request-param string $contest_alias
-     */
-    public static function apiIcal(\OmegaUp\Request $r): void
-    {
-        // Validate contest alias
-        $contestAlias = $r->ensureString(
-            'contest_alias',
-            fn(string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest) || is_null($contest->contest_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
-        }
-
-        // Generate the contest URL
-        $contestUrl = OMEGAUP_URL . '/arena/' . urlencode($contestAlias) . '/';
-
-        // Generate ICS content
-        $icsContent = \OmegaUp\IcsFormatter::formatContest(
-            $contest,
-            $contestUrl
-        );
-
-        // Set headers for file download
-        header('Content-Type: text/calendar; charset=utf-8');
-        header(
-            'Content-Disposition: attachment; filename="contest-' .
-                $contestAlias . '.ics"'
-        );
-        header('Content-Length: ' . strlen($icsContent));
-        header('Cache-Control: no-cache, must-revalidate');
-
-        // Output the ICS content
-        echo $icsContent;
-        exit;
-    }
-
     public static function isPublic(string $admissionMode): bool
     {
         return $admissionMode !== \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE;

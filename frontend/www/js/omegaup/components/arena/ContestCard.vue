@@ -88,18 +88,31 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            <slot name="contest-button-see-details">
-              <b-button
-                v-if="!contest.participating"
-                ref="contestButtonSeeDetails"
-                :href="getContestURL(contest.alias)"
-                variant="primary"
-                class="d-flex align-items-center justify-content-center"
-              >
-                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                {{ T.contestButtonSeeDetails }}
-              </b-button>
-            </slot>
+            <div class="d-flex flex-column">
+              <slot name="contest-button-calendar">
+                <b-button
+                  :href="getCalendarURL(contest.alias)"
+                  :download="`contest-${contest.alias}.ics`"
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center mb-2"
+                >
+                  <font-awesome-icon class="mr-1" icon="calendar-alt" />
+                  {{ T.contestAddToCalendar }}
+                </b-button>
+              </slot>
+              <slot name="contest-button-see-details">
+                <b-button
+                  v-if="!contest.participating"
+                  ref="contestButtonSeeDetails"
+                  :href="getContestURL(contest.alias)"
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  {{ T.contestButtonSeeDetails }}
+                </b-button>
+              </slot>
+            </div>
           </div>
           <slot name="contest-dropdown">
             <b-dropdown variant="primary" class="d-inline-block">
@@ -112,11 +125,6 @@
               </b-dropdown-item>
               <b-dropdown-item :href="getPracticeContestURL(contest.alias)">
                 {{ T.contestPracticeMode }}
-              </b-dropdown-item>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item :href="getCalendarURL(contest.alias)">
-                <font-awesome-icon class="mr-1" icon="calendar-alt" />
-                {{ T.contestAddToCalendar }}
               </b-dropdown-item>
             </b-dropdown>
           </slot>
@@ -182,7 +190,7 @@ export default class ContestCard extends Vue {
   }
 
   getCalendarURL(alias: string): string {
-    return `/api/contest/ical/contest_alias/${encodeURIComponent(alias)}/`;
+    return `/api/contest/ical/?contest_alias=${encodeURIComponent(alias)}`;
   }
 }
 </script>
