@@ -90,14 +90,23 @@
             </slot>
             <div class="d-flex flex-column">
               <slot name="contest-button-calendar">
-                <b-button
+                <b-dropdown
                   variant="primary"
                   class="d-flex align-items-center justify-content-center mb-2"
-                  @click="downloadCalendar(contest.alias)"
                 >
-                  <font-awesome-icon class="mr-1" icon="calendar-alt" />
-                  {{ T.contestAddToCalendar }}
-                </b-button>
+                  <template #button-content>
+                    <font-awesome-icon class="mr-1" icon="calendar-alt" />
+                    {{ T.contestAddToCalendar }}
+                  </template>
+                  <b-dropdown-item @click="subscribeToCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="sync" />
+                    {{ T.calendarSubscribe }}
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="downloadCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="download" />
+                    {{ T.calendarDownload }}
+                  </b-dropdown-item>
+                </b-dropdown>
               </slot>
               <slot name="contest-button-see-details">
                 <b-button
@@ -238,6 +247,15 @@ export default class ContestCard extends Vue {
           }, 1000);
         }
       });
+  }
+
+  subscribeToCalendar(alias: string): void {
+    // Use webcal:// protocol so calendar apps will subscribe
+    // instead of just importing once
+    const httpsUrl = `${window.location.origin}${this.getCalendarURL(alias)}`;
+    const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
+    window.location.href = webcalUrl;
+    ui.info(T.calendarSubscribeStarted);
   }
 }
 </script>

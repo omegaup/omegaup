@@ -7,7 +7,8 @@ namespace OmegaUp;
  *
  * @see https://tools.ietf.org/html/rfc5545
  */
-class IcsFormatter {
+class IcsFormatter
+{
     private const PRODID = '-//omegaUp//Contest Calendar//EN';
     private const VERSION = '2.0';
     private const LINE_LENGTH = 75;
@@ -46,6 +47,13 @@ class IcsFormatter {
             new \OmegaUp\Timestamp(\OmegaUp\Time::get())
         );
         $lines[] = 'UID:contest-' . $contest->contest_id . '@omegaup.com';
+        // SEQUENCE increments with each update - use last_updated timestamp
+        // This allows calendar apps to detect event changes
+        $lines[] = 'SEQUENCE:' . self::computeSequence($contest);
+        // LAST-MODIFIED tells calendar apps when the event was last changed
+        $lines[] = 'LAST-MODIFIED:' . self::formatTimestamp(
+            $contest->last_updated ?? new \OmegaUp\Timestamp(\OmegaUp\Time::get())
+        );
         $lines[] = self::foldLine(
             'SUMMARY:' . self::escapeText(
                 $contest->title ?? ''
@@ -68,12 +76,31 @@ class IcsFormatter {
     }
 
     /**
+     * Compute a SEQUENCE number for the event based on last_updated timestamp.
+     * SEQUENCE must be an integer that increments when the event is modified.
+     * Using the timestamp ensures it increases with each update.
+     *
+     * @param \OmegaUp\DAO\VO\Contests $contest
+     * @return int Sequence number
+     */
+    private static function computeSequence(\OmegaUp\DAO\VO\Contests $contest): int
+    {
+        if (is_null($contest->last_updated)) {
+            return 0;
+        }
+        // Use timestamp modulo to keep the number reasonable
+        // Max signed 32-bit int is 2147483647
+        return intval($contest->last_updated->time % 2147483647);
+    }
+
+    /**
      * Format a timestamp for iCalendar (UTC format).
      *
      * @param \OmegaUp\Timestamp $timestamp
      * @return string Formatted timestamp in YYYYMMDDTHHMMSSZ format
      */
-    private static function formatTimestamp(\OmegaUp\Timestamp $timestamp): string {
+    private static function formatTimestamp(\OmegaUp\Timestamp $timestamp): string
+    {
         return gmdate('Ymd\THis\Z', $timestamp->time);
     }
 
@@ -84,7 +111,8 @@ class IcsFormatter {
      * @param string $text
      * @return string Escaped text
      */
-    private static function escapeText(string $text): string {
+    private static function escapeText(string $text): string
+    {
         // Escape backslashes first, then other special characters
         $text = str_replace('\\', '\\\\', $text);
         $text = str_replace(';', '\\;', $text);
@@ -103,7 +131,8 @@ class IcsFormatter {
      * @param string $line
      * @return string Folded line
      */
-    private static function foldLine(string $line): string {
+    private static function foldLine(string $line): string
+    {
         if (strlen($line) <= self::LINE_LENGTH) {
             return $line;
         }
