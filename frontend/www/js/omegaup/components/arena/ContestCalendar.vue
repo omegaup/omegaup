@@ -59,12 +59,11 @@
     <!-- Calendar Grid -->
     <template v-else>
       <!-- Day headers -->
-      <div class="calendar-grid" :class="{ 'week-view-grid': viewMode === 'week' }">
-        <div
-          v-for="day in weekDays"
-          :key="day"
-          class="day-header"
-        >
+      <div
+        class="calendar-grid"
+        :class="{ 'week-view-grid': viewMode === 'week' }"
+      >
+        <div v-for="day in weekDays" :key="day" class="day-header">
           {{ day }}
         </div>
 
@@ -75,7 +74,7 @@
           class="day-cell"
           :class="{
             'other-month': !cell.isCurrentMonth,
-            'today': cell.isToday,
+            today: cell.isToday,
             'has-contests': cell.contests.length > 0,
           }"
           @click="selectDay(cell)"
@@ -147,21 +146,21 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-    ButtonGroupPlugin,
-    ButtonPlugin,
-    CardPlugin,
-    FormCheckboxPlugin,
-    ModalPlugin,
+  ButtonGroupPlugin,
+  ButtonPlugin,
+  CardPlugin,
+  FormCheckboxPlugin,
+  ModalPlugin,
 } from 'bootstrap-vue';
 
 import ContestCard from './ContestCard.vue';
 import {
-    CalendarCell,
-    formatMonthYear,
-    generateCalendarCells,
-    generateWeekCells,
-    getAllContests,
-    getWeekDaysHeader,
+  CalendarCell,
+  formatMonthYear,
+  generateCalendarCells,
+  generateWeekCells,
+  getAllContests,
+  getWeekDaysHeader,
 } from './calendarUtils';
 
 Vue.use(ButtonPlugin);
@@ -229,7 +228,13 @@ export default class ContestCalendar extends Vue {
           month: 'short',
           day: 'numeric',
         };
-        return `${startDate.toLocaleDateString(undefined, options)} - ${endDate.toLocaleDateString(undefined, options)}, ${endDate.getFullYear()}`;
+        return `${startDate.toLocaleDateString(
+          undefined,
+          options,
+        )} - ${endDate.toLocaleDateString(
+          undefined,
+          options,
+        )}, ${endDate.getFullYear()}`;
       }
       return '';
     }
@@ -314,7 +319,10 @@ export default class ContestCalendar extends Vue {
       hour: '2-digit',
       minute: '2-digit',
     };
-    return `${start.toLocaleDateString(undefined, options)} - ${end.toLocaleDateString(undefined, options)}`;
+    return `${start.toLocaleDateString(
+      undefined,
+      options,
+    )} - ${end.toLocaleDateString(undefined, options)}`;
   }
 
   getPeriodInfo(): { year: number; month: number; viewMode: string } {
