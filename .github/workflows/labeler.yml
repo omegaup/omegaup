@@ -197,9 +197,13 @@ Note: This PR might require additional review time due to its size.`;
             
             // Add new size label
             core.info(`Adding size label: ${newSizeLabel}`);
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              labels: [newSizeLabel]
-            });
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: [newSizeLabel]
+              });
+            } catch (error) {
+              core.warning(`Failed to add label ${newSizeLabel} to issue #${issueNumber}: ${error.message}`);
+            }
