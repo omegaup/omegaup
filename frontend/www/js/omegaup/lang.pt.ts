@@ -301,6 +301,7 @@ const translations: { [key: string]: string; } = {
   contestButtonScoreboard: "Scoreboard",
   contestButtonSeeDetails: "Ver detalhes",
   contestAddToCalendar: "Adicionar ao Calendário",
+  calendarDownloadFailed: "Falha ao baixar o arquivo do calendário",
   contestCanNotChangeToContestForTeams: "O concurso normal n\u00e3o pode ser alterado para o concurso para equipes",
   contestCertificatesConfirmGenerate: "Tem certeza de que deseja gerar os diplomas?, uma vez gerados os diplomas n\u00e3o poder\u00e3o ser modificados. Certifique-se de que o painel de avalia\u00e7\u00e3o esteja descongelado.",
   contestCertificatesCurrentContestError: "N\u00e3o \u00e9 poss\u00edvel gerar diplomas porque o concurso ainda n\u00e3o terminou.",
