@@ -6205,6 +6205,20 @@ class Contest extends \OmegaUp\Controllers\Controller
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
+        // Public contests are accessible anonymously
+        // Non-public contests require authentication and authorization
+        if (!self::isPublic($contest->admission_mode)) {
+            // Require authentication for non-public contests
+            $r->ensureIdentity();
+
+            // Check if user has access to the contest
+            if (!self::canAccessContest($contest, $r->identity)) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
+
         // Generate the contest URL
         $contestUrl = OMEGAUP_URL . '/arena/' . urlencode($contestAlias) . '/';
 

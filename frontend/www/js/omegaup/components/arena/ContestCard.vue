@@ -197,7 +197,12 @@ export default class ContestCard extends Vue {
     const filename = `contest-${alias}.ics`;
 
     fetch(url)
-      .then((response) => response.blob())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.blob();
+      })
       .then((blob) => {
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -213,6 +218,7 @@ export default class ContestCard extends Vue {
         }, 1000);
       })
       .catch((error) => {
+        ui.error(T.calendarDownloadFailed);
         console.error('Calendar download failed:', error);
       });
   }

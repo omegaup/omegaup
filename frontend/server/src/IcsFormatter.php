@@ -48,13 +48,17 @@ class IcsFormatter
             new \OmegaUp\Timestamp(\OmegaUp\Time::get())
         );
         $lines[] = 'UID:contest-' . $contest->contest_id . '@omegaup.com';
-        $lines[] = self::foldLine('SUMMARY:' . self::escapeText($contest->title));
+        $lines[] = self::foldLine(
+            'SUMMARY:' . self::escapeText(
+                $contest->title
+            )
+        );
         $lines[] = self::foldLine(
             'DESCRIPTION:' . self::escapeText(
                 $contest->description ?? ''
             )
         );
-        $lines[] = 'URL:' . $contestUrl;
+        $lines[] = self::foldLine('URL:' . $contestUrl);
         $lines[] = 'STATUS:CONFIRMED';
         $lines[] = 'TRANSP:OPAQUE';
         $lines[] = 'END:VEVENT';
@@ -111,6 +115,9 @@ class IcsFormatter
 
         $result = '';
         $currentLine = '';
+        // First line can use full LINE_LENGTH, continuation lines need 1 less
+        // because the leading space counts toward the 75 octet limit
+        $currentLimit = self::LINE_LENGTH;
 
         // Process character by character to handle multi-byte correctly
         $chars = preg_split('//u', $line, -1, PREG_SPLIT_NO_EMPTY);
@@ -119,13 +126,18 @@ class IcsFormatter
         }
 
         foreach ($chars as $char) {
-            $charLen = strlen($char);
-            if (strlen($currentLine) + $charLen > self::LINE_LENGTH) {
+            $charLen = strlen($char); // byte length
+            $currentLineLen = strlen($currentLine); // byte length
+
+            if ($currentLineLen + $charLen > $currentLimit) {
                 if ($result !== '') {
                     $result .= "\r\n ";
                 }
                 $result .= $currentLine;
                 $currentLine = $char;
+                // After first line, continuation lines are limited to LINE_LENGTH - 1
+                // because the leading space is part of the 75 octet limit
+                $currentLimit = self::LINE_LENGTH - 1;
             } else {
                 $currentLine .= $char;
             }
