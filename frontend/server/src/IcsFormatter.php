@@ -23,12 +23,11 @@ class IcsFormatter {
         \OmegaUp\DAO\VO\Contests $contest,
         string $contestUrl
     ): string {
-        if (is_null($contest->start_time) || is_null($contest->finish_time)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'contest_times'
-            );
-        }
+        // Contests must have start and finish times set
+        /** @var \OmegaUp\Timestamp */
+        $startTime = $contest->start_time;
+        /** @var \OmegaUp\Timestamp */
+        $finishTime = $contest->finish_time;
 
         $lines = [];
 
@@ -41,15 +40,15 @@ class IcsFormatter {
 
         // VEVENT
         $lines[] = 'BEGIN:VEVENT';
-        $lines[] = 'DTSTART:' . self::formatTimestamp($contest->start_time);
-        $lines[] = 'DTEND:' . self::formatTimestamp($contest->finish_time);
+        $lines[] = 'DTSTART:' . self::formatTimestamp($startTime);
+        $lines[] = 'DTEND:' . self::formatTimestamp($finishTime);
         $lines[] = 'DTSTAMP:' . self::formatTimestamp(
             new \OmegaUp\Timestamp(\OmegaUp\Time::get())
         );
         $lines[] = 'UID:contest-' . $contest->contest_id . '@omegaup.com';
         $lines[] = self::foldLine(
             'SUMMARY:' . self::escapeText(
-                $contest->title
+                $contest->title ?? ''
             )
         );
         $lines[] = self::foldLine(
