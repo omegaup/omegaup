@@ -10,6 +10,29 @@ import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import contestStore from './contestStore';
 
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  ButtonGroupPlugin,
+  ButtonPlugin,
+  CardPlugin,
+  FormCheckboxPlugin,
+  ModalPlugin,
+} from 'bootstrap-vue';
+
+Vue.use(ButtonPlugin);
+Vue.use(ButtonGroupPlugin);
+Vue.use(ModalPlugin);
+Vue.use(FormCheckboxPlugin);
+Vue.use(CardPlugin);
+library.add(fas);
+
+Vue.component('FontAwesomeIcon', FontAwesomeIcon);
+
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();

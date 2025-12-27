@@ -77,7 +77,14 @@
             today: cell.isToday,
             'has-contests': cell.contests.length > 0,
           }"
+          role="button"
+          tabindex="0"
+          :aria-label="`${cell.date.toLocaleDateString()}, ${
+            cell.contests.length
+          } contests`"
           @click="selectDay(cell)"
+          @keydown.enter="selectDay(cell)"
+          @keydown.space.prevent="selectDay(cell)"
         >
           <span class="day-number">{{ cell.day }}</span>
           <div class="contest-indicators">
@@ -134,24 +141,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-import 'bootstrap/dist/css/bootstrap.css';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  ButtonGroupPlugin,
-  ButtonPlugin,
-  CardPlugin,
-  FormCheckboxPlugin,
-  ModalPlugin,
-} from 'bootstrap-vue';
 
 import ContestCard from './ContestCard.vue';
 import {
@@ -162,13 +157,6 @@ import {
   getAllContests,
   getWeekDaysHeader,
 } from './calendarUtils';
-
-Vue.use(ButtonPlugin);
-Vue.use(ButtonGroupPlugin);
-Vue.use(ModalPlugin);
-Vue.use(FormCheckboxPlugin);
-Vue.use(CardPlugin);
-library.add(fas);
 
 @Component({
   components: {
@@ -331,12 +319,6 @@ export default class ContestCalendar extends Vue {
       month: this.currentMonth,
       viewMode: this.viewMode,
     };
-  }
-
-  @Watch('weekStartsOnMonday')
-  onWeekStartChanged(): void {
-    // Force recalculation of calendar cells
-    this.$forceUpdate();
   }
 }
 </script>

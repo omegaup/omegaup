@@ -18,10 +18,23 @@ export interface CalendarCell {
  */
 export function getWeekDaysHeader(
   weekStartsOnMonday: boolean = true,
+  locale: string = 'default',
 ): string[] {
-  const mondayStart = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const sundayStart = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  return weekStartsOnMonday ? mondayStart : sundayStart;
+  // Use a known week for reference.
+  // January 1, 2023 was a Sunday.
+  const sunday = new Date(2023, 0, 1);
+  const monday = new Date(2023, 0, 2);
+
+  const startDay = weekStartsOnMonday ? monday : sunday;
+  const days: string[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startDay);
+    d.setDate(d.getDate() + i);
+    days.push(d.toLocaleDateString(locale, { weekday: 'short' }));
+  }
+
+  return days;
 }
 
 /**
