@@ -1,13 +1,13 @@
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import { types } from '../api_types';
 import Vue from 'vue';
+import { types } from '../api_types';
 import arena_ContestList, {
-  ContestTab,
-  ContestOrder,
   ContestFilter,
+  ContestOrder,
+  ContestTab,
   UrlParams,
 } from '../components/arena/ContestListv2.vue';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
 import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
@@ -24,6 +24,9 @@ OmegaUp.on('ready', () => {
         break;
       case 'past':
         tab = ContestTab.Past;
+        break;
+      case 'calendar':
+        tab = ContestTab.Calendar;
         break;
       default:
         tab = ContestTab.Current;
@@ -87,6 +90,9 @@ OmegaUp.on('ready', () => {
             break;
           case 'past':
             tab = ContestTab.Past;
+            break;
+          case 'calendar':
+            tab = ContestTab.Calendar;
             break;
           default:
             tab = ContestTab.Current;
