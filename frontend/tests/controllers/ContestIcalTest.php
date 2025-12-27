@@ -216,7 +216,6 @@ class ContestIcalTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'username' => $identity->username,
             'resolution' => true,
-            'note' => '',
         ]));
 
         // Now the user should be able to download iCal
