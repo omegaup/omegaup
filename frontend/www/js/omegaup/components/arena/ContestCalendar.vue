@@ -307,10 +307,10 @@ export default class ContestCalendar extends Vue {
       hour: '2-digit',
       minute: '2-digit',
     };
-    return `${start.toLocaleDateString(
+    return `${start.toLocaleString(undefined, options)} - ${end.toLocaleString(
       undefined,
       options,
-    )} - ${end.toLocaleDateString(undefined, options)}`;
+    )}`;
   }
 
   getPeriodInfo(): { year: number; month: number; viewMode: string } {

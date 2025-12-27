@@ -54,7 +54,7 @@ class IcsFormatter {
         $lines[] = 'DTSTAMP:' . self::formatTimestamp(
             new \OmegaUp\Timestamp(\OmegaUp\Time::get())
         );
-        $lines[] = 'UID:contest-' . $contest->contest_id . '@omegaup.com';
+        $lines[] = 'UID:' . self::generateUniqueId($contest);
         // SEQUENCE increments with each update - use last_updated timestamp
         // This allows calendar apps to detect event changes
         $lines[] = 'SEQUENCE:' . self::computeSequence($contest);
@@ -83,6 +83,34 @@ class IcsFormatter {
         $lines[] = 'END:VCALENDAR';
 
         return implode("\r\n", $lines) . "\r\n";
+    }
+
+    /**
+     * Generate a unique ID for the iCalendar event.
+     * Uses contest_id if available, otherwise falls back to alias.
+     * Throws an exception if neither is available to ensure unique UIDs.
+     *
+     * @param \OmegaUp\DAO\VO\Contests $contest
+     * @return string Unique ID in the format "contest-{identifier}@omegaup.com"
+     * @throws \InvalidArgumentException if neither contest_id nor alias is available
+     */
+    private static function generateUniqueId(
+        \OmegaUp\DAO\VO\Contests $contest
+    ): string {
+        // Prefer contest_id as it's the primary key
+        if (!is_null($contest->contest_id) && $contest->contest_id > 0) {
+            return 'contest-' . $contest->contest_id . '@omegaup.com';
+        }
+
+        // Fall back to alias which is also unique
+        if (!is_null($contest->alias) && $contest->alias !== '') {
+            return 'contest-' . $contest->alias . '@omegaup.com';
+        }
+
+        // Neither identifier is available - cannot generate a unique UID
+        throw new \InvalidArgumentException(
+            'Contest is missing both contest_id and alias, cannot generate unique UID for ICS'
+        );
     }
 
     /**

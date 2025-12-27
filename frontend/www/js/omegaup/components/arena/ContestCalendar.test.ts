@@ -261,10 +261,9 @@ describe('ContestCalendar.vue', () => {
       });
 
       const dayCells = wrapper.findAll('.day-cell');
-      if (dayCells.length > 0) {
-        await dayCells.at(15)?.trigger('click');
-        expect(wrapper.emitted('date-selected')).toBeTruthy();
-      }
+      expect(dayCells.length).toBeGreaterThan(15);
+      await dayCells.at(15).trigger('click');
+      expect(wrapper.emitted('date-selected')).toBeTruthy();
     });
 
     it('Should have today class on the current day cell', () => {
