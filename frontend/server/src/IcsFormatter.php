@@ -7,8 +7,7 @@ namespace OmegaUp;
  *
  * @see https://tools.ietf.org/html/rfc5545
  */
-class IcsFormatter
-{
+class IcsFormatter {
     private const PRODID = '-//omegaUp//Contest Calendar//EN';
     private const VERSION = '2.0';
     private const LINE_LENGTH = 75;
@@ -24,10 +23,7 @@ class IcsFormatter
         \OmegaUp\DAO\VO\Contests $contest,
         string $contestUrl
     ): string {
-        // Contests must have start and finish times set
-        /** @var \OmegaUp\Timestamp */
         $startTime = $contest->start_time;
-        /** @var \OmegaUp\Timestamp */
         $finishTime = $contest->finish_time;
 
         $lines = [];
@@ -52,7 +48,7 @@ class IcsFormatter
         $lines[] = 'SEQUENCE:' . self::computeSequence($contest);
         // LAST-MODIFIED tells calendar apps when the event was last changed
         $lines[] = 'LAST-MODIFIED:' . self::formatTimestamp(
-            $contest->last_updated ?? new \OmegaUp\Timestamp(\OmegaUp\Time::get())
+            $contest->last_updated
         );
         $lines[] = self::foldLine(
             'SUMMARY:' . self::escapeText(
@@ -83,11 +79,7 @@ class IcsFormatter
      * @param \OmegaUp\DAO\VO\Contests $contest
      * @return int Sequence number
      */
-    private static function computeSequence(\OmegaUp\DAO\VO\Contests $contest): int
-    {
-        if (is_null($contest->last_updated)) {
-            return 0;
-        }
+    private static function computeSequence(\OmegaUp\DAO\VO\Contests $contest): int {
         // Use timestamp modulo to keep the number reasonable
         // Max signed 32-bit int is 2147483647
         return intval($contest->last_updated->time % 2147483647);
@@ -99,8 +91,7 @@ class IcsFormatter
      * @param \OmegaUp\Timestamp $timestamp
      * @return string Formatted timestamp in YYYYMMDDTHHMMSSZ format
      */
-    private static function formatTimestamp(\OmegaUp\Timestamp $timestamp): string
-    {
+    private static function formatTimestamp(\OmegaUp\Timestamp $timestamp): string {
         return gmdate('Ymd\THis\Z', $timestamp->time);
     }
 
@@ -111,8 +102,7 @@ class IcsFormatter
      * @param string $text
      * @return string Escaped text
      */
-    private static function escapeText(string $text): string
-    {
+    private static function escapeText(string $text): string {
         // Escape backslashes first, then other special characters
         $text = str_replace('\\', '\\\\', $text);
         $text = str_replace(';', '\\;', $text);
@@ -131,8 +121,7 @@ class IcsFormatter
      * @param string $line
      * @return string Folded line
      */
-    private static function foldLine(string $line): string
-    {
+    private static function foldLine(string $line): string {
         if (strlen($line) <= self::LINE_LENGTH) {
             return $line;
         }

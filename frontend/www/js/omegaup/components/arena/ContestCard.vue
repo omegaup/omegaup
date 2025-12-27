@@ -254,8 +254,9 @@ export default class ContestCard extends Vue {
     // instead of just importing once
     const httpsUrl = `${window.location.origin}${this.getCalendarURL(alias)}`;
     const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
-    window.location.href = webcalUrl;
+    // Show message before navigating so it's visible
     ui.info(T.calendarSubscribeStarted);
+    window.location.href = webcalUrl;
   }
 }
 </script>
