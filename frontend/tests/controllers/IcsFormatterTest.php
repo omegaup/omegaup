@@ -95,6 +95,7 @@ class IcsFormatterTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'title' => 'Test; Contest, with\\special: chars',
                 'description' => "Line1\nLine2\r\nLine3",
+                'alias' => 'test-escaping-contest',
             ])
         );
         $contest = $contestData['contest'];
@@ -159,6 +160,7 @@ class IcsFormatterTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'title' => $multiByteName,
+                'alias' => 'test-multibyte-contest',
             ])
         );
         $contest = $contestData['contest'];

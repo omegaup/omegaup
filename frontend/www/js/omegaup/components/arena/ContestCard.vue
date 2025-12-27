@@ -173,7 +173,6 @@ export default class ContestCard extends Vue {
 
   T = T;
   ui = ui;
-  isDownloadingCalendar = false;
 
   get contestDuration(): string {
     return time.formatContestDuration(
@@ -198,65 +197,12 @@ export default class ContestCard extends Vue {
     return `/arena/${encodeURIComponent(alias)}/practice/`;
   }
 
-  getCalendarURL(alias: string): string {
-    return `/api/contest/ical/?contest_alias=${encodeURIComponent(alias)}`;
-  }
-
   downloadCalendar(alias: string): void {
-    // Prevent duplicate downloads
-    if (this.isDownloadingCalendar) {
-      return;
-    }
-
-    this.isDownloadingCalendar = true;
-    const url = this.getCalendarURL(alias);
-    const filename = `contest-${alias}.ics`;
-    let blobUrl: string | null = null;
-
-    ui.info(T.calendarDownloadStarted);
-
-    fetch(url, { credentials: 'include' })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error ${response.status}`);
-        }
-        return response.blob();
-      })
-      .then((blob) => {
-        blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        ui.success(T.calendarDownloadSucceeded);
-      })
-      .catch((error) => {
-        ui.error(T.calendarDownloadFailed);
-        console.error('Calendar download failed:', error);
-      })
-      .finally(() => {
-        this.isDownloadingCalendar = false;
-        // Delay revocation to allow Chrome to complete the download
-        // See: https://stackoverflow.com/questions/30694453
-        if (blobUrl) {
-          const urlToRevoke = blobUrl;
-          setTimeout(() => {
-            URL.revokeObjectURL(urlToRevoke);
-          }, 1000);
-        }
-      });
+    this.$emit('download-calendar', alias);
   }
 
   subscribeToCalendar(alias: string): void {
-    // Use webcal:// protocol so calendar apps will subscribe
-    // instead of just importing once
-    const httpsUrl = `${window.location.origin}${this.getCalendarURL(alias)}`;
-    const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
-    // Show message before navigating so it's visible
-    ui.info(T.calendarSubscribeStarted);
-    window.location.href = webcalUrl;
+    this.$emit('subscribe-calendar', alias);
   }
 }
 </script>

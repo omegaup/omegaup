@@ -1,13 +1,15 @@
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import { types } from '../api_types';
 import Vue from 'vue';
+import { types } from '../api_types';
 import arena_ContestList, {
-  ContestTab,
-  ContestOrder,
   ContestFilter,
+  ContestOrder,
+  ContestTab,
   UrlParams,
 } from '../components/arena/ContestListv2.vue';
+import T from '../lang';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
+import * as ui from '../ui';
 import contestStore from './contestStore';
 
 OmegaUp.on('ready', () => {
@@ -135,6 +137,57 @@ OmegaUp.on('ready', () => {
               requestParams: params,
               name: params.tab_name,
             });
+          },
+          'download-calendar': (alias: string) => {
+            const url = `/api/contest/ical/?contest_alias=${encodeURIComponent(
+              alias,
+            )}`;
+            const filename = `contest-${alias}.ics`;
+            let blobUrl: string | null = null;
+
+            ui.info(T.calendarDownloadStarted);
+
+            fetch(url, { credentials: 'include' })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error ${response.status}`);
+                }
+                return response.blob();
+              })
+              .then((blob) => {
+                blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                ui.success(T.calendarDownloadSucceeded);
+              })
+              .catch((error) => {
+                ui.error(T.calendarDownloadFailed);
+                console.error('Calendar download failed:', error);
+              })
+              .finally(() => {
+                // Delay revocation to allow Chrome to complete the download
+                // See: https://stackoverflow.com/questions/30694453
+                if (blobUrl) {
+                  const urlToRevoke = blobUrl;
+                  setTimeout(() => {
+                    URL.revokeObjectURL(urlToRevoke);
+                  }, 1000);
+                }
+              });
+          },
+          'subscribe-calendar': (alias: string) => {
+            const calendarUrl = `/api/contest/ical/?contest_alias=${encodeURIComponent(
+              alias,
+            )}`;
+            const httpsUrl = `${window.location.origin}${calendarUrl}`;
+            const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
+            // Show message before navigating so it's visible
+            ui.info(T.calendarSubscribeStarted);
+            window.location.href = webcalUrl;
           },
         },
       });

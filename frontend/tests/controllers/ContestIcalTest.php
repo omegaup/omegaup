@@ -192,38 +192,47 @@ class ContestIcalTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that registration-mode contests work appropriately
      */
     public function testRegistrationContestIcalAccepted() {
-        // Create a registration contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'admissionMode' => 'registration',
-            ])
+        // Create a contest (starts as private by default in factory)
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Add a problem to the contest (required for registration/public modes)
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
         );
+
+        // Update contest to registration mode
+        $directorLogin = self::login($contestData['director']);
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'registration',
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         // Create a user, request access and accept
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Request access to contest
-        $login = self::login($identity);
+        $userLogin = self::login($identity);
         \OmegaUp\Controllers\Contest::apiRegisterForContest(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $userLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]));
 
         // Accept the request as director
-        $directorLogin = self::login($contestData['director']);
         \OmegaUp\Controllers\Contest::apiArbitrateRequest(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'username' => $identity->username,
             'resolution' => true,
-            'note' => '',
         ]));
 
         // Now the user should be able to download iCal
         ob_start();
         try {
             \OmegaUp\Controllers\Contest::apiIcal(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
+                'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ]));
             $this->fail('Expected ExitException to be thrown');
@@ -239,12 +248,23 @@ class ContestIcalTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that registration-mode contests deny access to non-accepted users
      */
     public function testRegistrationContestIcalNotAccepted() {
-        // Create a registration contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'admissionMode' => 'registration',
-            ])
+        // Create a contest (starts as private by default in factory)
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Add a problem to the contest (required for registration/public modes)
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
         );
+
+        // Update contest to registration mode
+        $directorLogin = self::login($contestData['director']);
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'registration',
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         // Create a user but don't request or accept
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

@@ -194,6 +194,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-button-scoreboard>
                 <div></div>
@@ -268,6 +270,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-button-scoreboard>
                 <div></div>
@@ -345,6 +349,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-enroll-status>
                 <div></div>
@@ -403,28 +409,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  TabsPlugin,
 } from 'bootstrap-vue';
+import infiniteScroll from 'vue-infinite-scroll';
 import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
-import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
@@ -682,6 +688,14 @@ class ArenaContestList extends Vue {
   ) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
+  }
+
+  onDownloadCalendar(alias: string): void {
+    this.$emit('download-calendar', alias);
+  }
+
+  onSubscribeCalendar(alias: string): void {
+    this.$emit('subscribe-calendar', alias);
   }
 }
 
