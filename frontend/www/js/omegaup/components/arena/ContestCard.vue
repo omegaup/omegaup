@@ -140,7 +140,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
+// Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -164,6 +164,7 @@ export default class ContestCard extends Vue {
 
   T = T;
   ui = ui;
+  isDownloadingCalendar = false;
 
   get contestDuration(): string {
     return time.formatContestDuration(
@@ -193,10 +194,19 @@ export default class ContestCard extends Vue {
   }
 
   downloadCalendar(alias: string): void {
+    // Prevent duplicate downloads
+    if (this.isDownloadingCalendar) {
+      return;
+    }
+
+    this.isDownloadingCalendar = true;
     const url = this.getCalendarURL(alias);
     const filename = `contest-${alias}.ics`;
+    let blobUrl: string | null = null;
 
-    fetch(url)
+    ui.info(T.calendarDownloadStarted);
+
+    fetch(url, { credentials: 'include' })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error ${response.status}`);
@@ -204,22 +214,29 @@ export default class ContestCard extends Vue {
         return response.blob();
       })
       .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
+        blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        // Delay revocation to allow Chrome to complete the download
-        // See: https://stackoverflow.com/questions/30694453
-        setTimeout(() => {
-          URL.revokeObjectURL(blobUrl);
-        }, 1000);
+        ui.success(T.calendarDownloadSucceeded);
       })
       .catch((error) => {
         ui.error(T.calendarDownloadFailed);
         console.error('Calendar download failed:', error);
+      })
+      .finally(() => {
+        this.isDownloadingCalendar = false;
+        // Delay revocation to allow Chrome to complete the download
+        // See: https://stackoverflow.com/questions/30694453
+        if (blobUrl) {
+          const urlToRevoke = blobUrl;
+          setTimeout(() => {
+            URL.revokeObjectURL(urlToRevoke);
+          }, 1000);
+        }
       });
   }
 }

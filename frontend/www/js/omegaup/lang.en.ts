@@ -176,6 +176,8 @@ const translations: { [key: string]: string; } = {
   buttonGoToCourses: "Go to courses",
   buttonGoToProblems: "Go to problems",
   calendarDownloadFailed: "Failed to download calendar file",
+  calendarDownloadStarted: "Downloading calendar file...",
+  calendarDownloadSucceeded: "Calendar file downloaded successfully",
   cannotAddProb: "Cannot add problem. You are not a contest admin.",
   cannotEditUngroupedGroup: "It is not possible to edit an ungrouped group",
   cannotRemoveProblem: "Cannot remove the problem. You are not a contest admin.",

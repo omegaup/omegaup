@@ -175,6 +175,8 @@
 	"buttonGoToCourses": "Ir para cursos",
 	"buttonGoToProblems": "Ir para problemas",
 	"calendarDownloadFailed": "Falha ao baixar arquivo do calend\u00e1rio",
+	"calendarDownloadStarted": "Baixando arquivo do calend\u00e1rio...",
+	"calendarDownloadSucceeded": "Arquivo do calend\u00e1rio baixado com sucesso",
 	"cannotAddProb": "N\u00e3o \u00e9 poss\u00edvel adicionar problema. Voc\u00ea n\u00e3o \u00e9 o diretor do concurso.",
 	"cannotEditUngroupedGroup": "N\u00e3o \u00e9 poss\u00edvel editar um grupo n\u00e3o agrupado",
 	"cannotRemoveProblem": "N\u00e3o \u00e9 poss\u00edvel eliminar problema. Voc\u00ea n\u00e3o \u00e9 o diretor do concurso.",

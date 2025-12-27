@@ -6191,6 +6191,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Output the ICS content
         echo $icsContent;
-        exit;
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 }
