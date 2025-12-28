@@ -1541,6 +1541,8 @@ const translations: { [key: string]: string; } = {
   profileGraduationDate: "Graduation date",
   profileIdentitiesEmpty: "No identities",
   profileIdentityAdded: "Identity added successfully",
+  profileImageAltGeneric: "Profile image",
+  profileImageAltWithUsername: "Profile image of %(username)",
   profileIsPrivate: "This profile is private",
   profileManageApiTokens: "Manage API tokens",
   profileManageIdentities: "Manage identities",
