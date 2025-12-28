@@ -158,6 +158,12 @@
             <td v-if="isSelectionMode" class="text-center">
               <input
                 type="checkbox"
+                :aria-label="
+                  ui.formatString(T.selectUserForComparison, {
+                    username: user.username,
+                  })
+                "
+                :aria-checked="isUserSelected(user.username)"
                 :checked="isUserSelected(user.username)"
                 :disabled="
                   !isUserSelected(user.username) && selectedUsers.length >= 2
@@ -200,16 +206,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as time from '../../time';
 import * as ui from '../../ui';
-import common_Paginator from '../common/Paginator.vue';
+import * as time from '../../time';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -225,8 +231,8 @@ library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important: base before overrides)
-import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 // Import Only Required Plugins
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);

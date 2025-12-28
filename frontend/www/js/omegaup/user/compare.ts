@@ -31,8 +31,14 @@ OmegaUp.on('ready', () => {
     return;
   }
 
+  const containerElement = document.getElementById('main-container');
+  if (!containerElement) {
+    console.error('Main container element not found');
+    return;
+  }
+
   new Vue({
-    el: '#main-container',
+    el: containerElement,
     components: {
       'omegaup-user-compare': user_CompareUsers,
     },

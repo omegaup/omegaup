@@ -1,6 +1,6 @@
 <?php
 
-namespace OmegaUp;
+namespace OmegaUp\Test\Controllers;
 
 /**
  * Test User Compare API
