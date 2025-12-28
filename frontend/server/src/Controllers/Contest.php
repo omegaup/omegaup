@@ -6153,8 +6153,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Public contests are accessible anonymously
-        // Non-public contests require authentication and authorization
-        if (!self::isPublic($contest->admission_mode)) {
+        // Private and registration-mode contests require authentication and access check
+        if ($contest->admission_mode !== 'public') {
             // Require authentication for non-public contests
             $r->ensureIdentity();
 
