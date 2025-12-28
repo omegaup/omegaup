@@ -194,8 +194,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Tags t ON t.tag_id = pt.tag_id
             ';
             $clauses[] = [
-                't.name = ?',
-                [$level]
+                't.name = ?', [$level]
             ];
         }
 
@@ -340,10 +339,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
             $userKey = is_null($userId) ? 'null' : $userId;
-            $callback =
-            /** @return list<int> */
-            fn(): array =>
-            self::getAccessibleAclIds($identityId, $userId);
+            $callback = /** @return list<int> */ fn (): array =>
+                self::getAccessibleAclIds($identityId, $userId);
             $cacheKey = "{$identityId}-{$userKey}";
 
             $accessibleAclIds = \OmegaUp\Cache::getFromCacheOrSet(
@@ -460,8 +457,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         if ($onlyQualitySeal) {
             $clauses[] = [
-                'p.quality_seal = ?',
-                [1]
+                'p.quality_seal = ?', [1]
             ];
         }
 
@@ -471,7 +467,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ' AND ',
                 array_map(
                     /** @param array{0: string, 1: list<string>} $clause */
-                    fn(array $clause) => $clause[0],
+                    fn (array $clause) => $clause[0],
                     $clauses
                 )
             );
@@ -513,17 +509,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
-            'accepted',
-            'title',
-            'quality',
-            'difficulty',
-            'alias',
-            'visibility',
-            'problem_id',
-            'quality_histogram',
-            'difficulty_histogram',
-            'submissions',
-            'quality_seal',
+            'accepted', 'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
+            'quality_histogram', 'difficulty_histogram', 'submissions', 'quality_seal',
         ];
         $problems = [];
         $hiddenTags = $identityType !== IDENTITY_ANONYMOUS ? \OmegaUp\DAO\Users::getHideTags(
@@ -597,7 +584,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
-            return null;
+                return null;
         }
 
         return new \OmegaUp\DAO\VO\Problems($rs);
@@ -671,7 +658,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (is_null($rs)) {
-            return null;
+                return null;
         }
         return new \OmegaUp\DAO\VO\Problems($rs);
     }
