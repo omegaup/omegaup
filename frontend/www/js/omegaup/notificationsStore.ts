@@ -178,7 +178,10 @@ export function createNotificationsStore(): Store<NotificationsState> {
 }
 
 /**
- * Default singleton store for client-side convenience.
- * For SSR or tests, use createNotificationsStore() instead.
+ * Default singleton store for client-side usage.
+ *
+ * WARNING: This singleton should NOT be used in SSR environments.
+ * If omegaUp ever adopts SSR, this pattern would need to change.
+ * For isolated instances (tests, SSR), use createNotificationsStore() instead.
  */
 export default createNotificationsStore();
