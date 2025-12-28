@@ -830,6 +830,90 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Get count of solved problems grouped by difficulty level for a user.
+     * Difficulty mapping: Easy(0-1.5), Medium(1.5-2.5), Hard(2.5-4), Unlabelled(NULL)
+     *
+     * @return array{easy: int, medium: int, hard: int, unlabelled: int}
+     */
+    public static function getSolvedCountByDifficulty(int $identityId): array {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 1.5 THEN p.problem_id END) AS easy,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 1.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Problems_Forfeited pf
+                    WHERE pf.problem_id = p.problem_id
+                        AND pf.user_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM ACLs a
+                    WHERE a.acl_id = p.acl_id
+                        AND a.owner_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+        ";
+
+        /** @var array{easy: int, hard: int, medium: int, unlabelled: int}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId]
+        );
+
+        return [
+            'easy' => intval($row['easy'] ?? 0),
+            'medium' => intval($row['medium'] ?? 0),
+            'hard' => intval($row['hard'] ?? 0),
+            'unlabelled' => intval($row['unlabelled'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get count of problems where the user has submissions but no AC verdict.
+     * These are problems the user is "attempting" but hasn't solved yet.
+     *
+     * @return int
+     */
+    public static function getAttemptingCount(int $identityId): int {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT p.problem_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            WHERE
+                s.identity_id = ?
+                AND s.type = 'normal'
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Submissions s2
+                    WHERE s2.problem_id = p.problem_id
+                        AND s2.identity_id = s.identity_id
+                        AND s2.verdict = 'AC'
+                );
+        ";
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId]
+        );
+    }
+
+    /**
      * Returns the list of problems created by a certain identity
      *
      * @return list<\OmegaUp\DAO\VO\Problems>

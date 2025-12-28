@@ -78,6 +78,59 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         return $results;
     }
 
+    /**
+     * Get tag distribution for problems solved by an identity.
+     * Returns tags sorted by count descending.
+     *
+     * @return list<array{name: string, count: int}>
+     */
+    public static function getTagsDistributionForSolvedProblems(int $identityId): array {
+        $sql = "
+            SELECT
+                t.name,
+                COUNT(DISTINCT p.problem_id) AS count
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            INNER JOIN
+                Problems_Tags pt ON pt.problem_id = p.problem_id
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            WHERE
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
+                AND t.public = 1
+                AND t.name NOT LIKE 'problemRestricted%'
+                AND t.name NOT LIKE 'problemLevel%'
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM Problems_Forfeited pf
+                    WHERE pf.problem_id = p.problem_id
+                        AND pf.user_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM ACLs a
+                    WHERE a.acl_id = p.acl_id
+                        AND a.owner_id = i.user_id
+                        AND i.user_id IS NOT NULL
+                )
+            GROUP BY
+                t.tag_id
+            ORDER BY
+                count DESC, t.name ASC;
+        ";
+
+        /** @var list<array{count: int, name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identityId]
+        );
+    }
+
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
         $placeholders = join(
             ',',
