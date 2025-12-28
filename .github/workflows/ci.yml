@@ -2,10 +2,80 @@ name: CI
 
 on:
   workflow_call: # make this workflow reusable
-  pull_request: {}
+  pull_request:
+    paths:
+      # Source code
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'cypress/**'
+      - 'bin/**'
+      # Dependencies
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'yarn.lock'
+      # Build & TypeScript config
+      - 'tsconfig.json'
+      - 'webpack.config*.js'
+      - '.babelrc'
+      # Test config
+      - 'jest.config.js'
+      - 'cypress.config.ts'
+      # Linter configs
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - '.stylelintrc.yml'
+      - '.flake8'
+      - '.pylintrc'
+      - '.lint.config.json'
+      - 'psalm.xml'
+      - 'setup.cfg'
+      # Docker
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      # Git & CI
+      - '.gitmodules'
+      - '.github/workflows/ci.yml'
   push:
     branches:
       - main
+    paths:
+      # Source code
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'cypress/**'
+      - 'bin/**'
+      # Dependencies
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'yarn.lock'
+      # Build & TypeScript config
+      - 'tsconfig.json'
+      - 'webpack.config*.js'
+      - '.babelrc'
+      # Test config
+      - 'jest.config.js'
+      - 'cypress.config.ts'
+      # Linter configs
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - '.stylelintrc.yml'
+      - '.flake8'
+      - '.pylintrc'
+      - '.lint.config.json'
+      - 'psalm.xml'
+      - 'setup.cfg'
+      # Docker
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      # Git & CI
+      - '.gitmodules'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   php:
