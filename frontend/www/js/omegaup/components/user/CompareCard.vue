@@ -89,6 +89,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as UI from '../../ui';
 
 @Component
 export default class CompareCard extends Vue {
@@ -105,9 +106,11 @@ export default class CompareCard extends Vue {
 
   get profileImageAlt(): string {
     if (this.profile.username) {
-      return `Profile picture of ${this.profile.username}`;
+      return UI.formatString(T.profileImageAltWithUsername, {
+        username: this.profile.username,
+      });
     }
-    return 'User profile picture';
+    return T.profileImageAltGeneric;
   }
 
   get rankDisplay(): string {
