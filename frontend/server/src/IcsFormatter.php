@@ -23,28 +23,8 @@ class IcsFormatter {
         \OmegaUp\DAO\VO\Contests $contest,
         string $contestUrl
     ): string {
-        // Validate required timestamp fields are present
-        // These should never be null for valid contests from the database,
-        // but we check defensively to provide clear error messages
-        if (!isset($contest->start_time)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'start_time'
-            );
-        }
-        if (!isset($contest->finish_time)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'finish_time'
-            );
-        }
-        if (!isset($contest->last_updated)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'last_updated'
-            );
-        }
-
+        // The Contests VO guarantees that start_time, finish_time, and last_updated
+        // are always non-null \OmegaUp\Timestamp objects (with defaults set in constructor)
         $startTime = $contest->start_time;
         $finishTime = $contest->finish_time;
         $lastUpdated = $contest->last_updated;

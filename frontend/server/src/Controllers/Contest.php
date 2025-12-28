@@ -224,15 +224,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
             $callback =
-                /** @return array{contests: list<ContestListItem>, count: int} */
-                fn() => \OmegaUp\DAO\Contests::getAllPublicContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query,
-                    $orderBy
-                );
+            /** @return array{contests: list<ContestListItem>, count: int} */
+            fn() => \OmegaUp\DAO\Contests::getAllPublicContests(
+                $page,
+                $pageSize,
+                $activeContests,
+                $recommended,
+                $query,
+                $orderBy
+            );
             if (empty($query)) {
                 [
                     'contests' => $contests,
@@ -274,15 +274,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
             $callback =
-                /** @return array{contests: list<ContestListItem>, count: int} */
-                fn() => \OmegaUp\DAO\Contests::getAllContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query,
-                    $orderBy
-                );
+            /** @return array{contests: list<ContestListItem>, count: int} */
+            fn() => \OmegaUp\DAO\Contests::getAllContests(
+                $page,
+                $pageSize,
+                $activeContests,
+                $recommended,
+                $query,
+                $orderBy
+            );
             if (empty($query)) {
                 [
                     'contests' => $contests,
@@ -1174,10 +1174,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
 
                 $callback =
-                    /** @return int */
-                    fn() => \OmegaUp\DAO\Contests::getNumberOfContestants(
-                        $contestID
-                    );
+                /** @return int */
+                fn() => \OmegaUp\DAO\Contests::getNumberOfContestants(
+                    $contestID
+                );
 
                 $contestants[$contestID] = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_CONTESTANTS_LIST,

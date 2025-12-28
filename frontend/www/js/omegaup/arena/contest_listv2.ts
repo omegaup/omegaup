@@ -1,16 +1,16 @@
-import Vue from 'vue';
-import { types } from '../api_types';
-import arena_ContestList, {
-  ContestFilter,
-  ContestOrder,
-  ContestTab,
-  UrlParams,
-} from '../components/arena/ContestListv2.vue';
-import T from '../lang';
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
-import * as ui from '../ui';
+import { types } from '../api_types';
+import Vue from 'vue';
+import arena_ContestList, {
+  ContestTab,
+  ContestOrder,
+  ContestFilter,
+  UrlParams,
+} from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
+import T from '../lang';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();

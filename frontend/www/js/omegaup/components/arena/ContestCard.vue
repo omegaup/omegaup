@@ -143,11 +143,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Vue, Prop, Component } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
+import T from '../../lang';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -158,9 +158,9 @@ Vue.use(ButtonPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
 @Component({
