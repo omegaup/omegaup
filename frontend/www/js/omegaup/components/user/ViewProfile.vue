@@ -246,28 +246,28 @@
 </template>
 
 <script lang="ts">
-import * as Highcharts from 'highcharts/highstock';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import {
-  Contest,
-  ContestResult,
-  Course,
-  Problem,
-} from '../../linkable_resource';
-import * as ui from '../../ui';
+import country_Flag from '../CountryFlag.vue';
+import user_BasicInfo from './BasicInfov2.vue';
+import user_Username from './Username.vue';
+import user_Charts from './Chartsv2.vue';
+import user_Heatmap from './UserHeatmap.vue';
+import user_MainInfo from './MainInfo.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
-import country_Flag from '../CountryFlag.vue';
-import user_BasicInfo from './BasicInfov2.vue';
-import user_Charts from './Chartsv2.vue';
-import user_MainInfo from './MainInfo.vue';
+import { types } from '../../api_types';
+import * as Highcharts from 'highcharts/highstock';
+import * as ui from '../../ui';
+import {
+  Problem,
+  ContestResult,
+  Contest,
+  Course,
+} from '../../linkable_resource';
 import problem_SolvingProgress from './ProblemSolvingProgress.vue';
 import tags_SolvedChart from './TagsSolvedChart.vue';
-import user_Heatmap from './UserHeatmap.vue';
-import user_Username from './Username.vue';
 
 export enum ViewProfileTabs {
   Badges = 'badges',

@@ -102,21 +102,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { dao, types } from '../../api_types';
-import T from '../../lang';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as ui from '../../ui';
-import user_BasicInformationEdit from './BasicInformationEdit.vue';
-import userDeleteAccount from './DeleteAccount.vue';
-import user_ManageApiTokens from './ManageApiTokens.vue';
-import user_ManageIdentities from './ManageIdentities.vue';
-import user_ManageSchools from './ManageSchools.vue';
-import user_PasswordAdd from './PasswordAdd.vue';
-import user_PasswordEdit from './PasswordEdit.vue';
-import user_PreferencesEdit from './PreferencesEdit.vue';
+import T from '../../lang';
+import { dao, types } from '../../api_types';
 import user_ProfileWrapper from './ProfileWrapper.vue';
-import { urlMapping } from './SidebarMainInfo.vue';
 import user_ViewProfile from './ViewProfile.vue';
+import user_PreferencesEdit from './PreferencesEdit.vue';
+import user_BasicInformationEdit from './BasicInformationEdit.vue';
+import user_PasswordEdit from './PasswordEdit.vue';
+import user_PasswordAdd from './PasswordAdd.vue';
+import { urlMapping } from './SidebarMainInfo.vue';
+import user_ManageSchools from './ManageSchools.vue';
+import user_ManageIdentities from './ManageIdentities.vue';
+import user_ManageApiTokens from './ManageApiTokens.vue';
+import userDeleteAccount from './DeleteAccount.vue';
 
 @Component({
   components: {
