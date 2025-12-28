@@ -150,8 +150,8 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import { ButtonPlugin, DropdownPlugin, LayoutPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);

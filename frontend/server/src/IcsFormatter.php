@@ -23,8 +23,31 @@ class IcsFormatter {
         \OmegaUp\DAO\VO\Contests $contest,
         string $contestUrl
     ): string {
+        // Validate required timestamp fields are present
+        // These should never be null for valid contests from the database,
+        // but we check defensively to provide clear error messages
+        if (!isset($contest->start_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'start_time'
+            );
+        }
+        if (!isset($contest->finish_time)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'finish_time'
+            );
+        }
+        if (!isset($contest->last_updated)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'last_updated'
+            );
+        }
+
         $startTime = $contest->start_time;
         $finishTime = $contest->finish_time;
+        $lastUpdated = $contest->last_updated;
 
         $lines = [];
 
@@ -45,11 +68,9 @@ class IcsFormatter {
         $lines[] = 'UID:contest-' . $contest->contest_id . '@omegaup.com';
         // SEQUENCE increments with each update - use last_updated timestamp
         // This allows calendar apps to detect event changes
-        $lines[] = 'SEQUENCE:' . self::computeSequence($contest);
+        $lines[] = 'SEQUENCE:' . self::computeSequence($contest, $lastUpdated);
         // LAST-MODIFIED tells calendar apps when the event was last changed
-        $lines[] = 'LAST-MODIFIED:' . self::formatTimestamp(
-            $contest->last_updated
-        );
+        $lines[] = 'LAST-MODIFIED:' . self::formatTimestamp($lastUpdated);
         $lines[] = self::foldLine(
             'SUMMARY:' . self::escapeText(
                 $contest->title ?? ''
@@ -60,6 +81,13 @@ class IcsFormatter {
                 $contest->description ?? ''
             )
         );
+        // Validate URL before inclusion to prevent malformed ICS output
+        if (!filter_var($contestUrl, FILTER_VALIDATE_URL)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'contestUrl'
+            );
+        }
         $lines[] = self::foldLine('URL:' . $contestUrl);
         $lines[] = 'STATUS:CONFIRMED';
         $lines[] = 'TRANSP:OPAQUE';
@@ -72,17 +100,44 @@ class IcsFormatter {
     }
 
     /**
-     * Compute a SEQUENCE number for the event based on last_updated timestamp.
-     * SEQUENCE must be an integer that increments when the event is modified.
-     * Using the timestamp ensures it increases with each update.
+     * Compute a SEQUENCE number for the event.
+     *
+     * Per RFC 5545, SEQUENCE must be a non-negative integer that increments
+     * when the event is modified. Ideally this would be a persistent counter
+     * stored in the database that increments on each update.
+     *
+     * As a fallback until a DB-backed sequence column is available, we use
+     * a stable deterministic hash of contest_id + last_updated timestamp.
+     * This ensures:
+     * - Same inputs always produce the same sequence (deterministic)
+     * - Different updates produce different sequences (content-based)
+     * - Value is bounded within valid 32-bit signed integer range
+     *
+     * TODO: Add `ical_sequence INT UNSIGNED NOT NULL DEFAULT 0` column to
+     * Contests table and increment it on each contest update for proper
+     * RFC 5545 compliance.
      *
      * @param \OmegaUp\DAO\VO\Contests $contest
-     * @return int Sequence number
+     * @param \OmegaUp\Timestamp $lastUpdated The validated last_updated timestamp
+     * @return int Non-negative sequence number
      */
-    private static function computeSequence(\OmegaUp\DAO\VO\Contests $contest): int {
-        // Use timestamp modulo to keep the number reasonable
-        // Max signed 32-bit int is 2147483647
-        return intval($contest->last_updated->time % 2147483647);
+    private static function computeSequence(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\Timestamp $lastUpdated
+    ): int {
+        // Create a stable hash from contest_id and last_updated timestamp
+        // This ensures the sequence is deterministic and changes when
+        // the contest is modified
+        $hashInput = strval(
+            $contest->contest_id
+        ) . ':' . strval(
+            $lastUpdated->time
+        );
+        $hash = crc32($hashInput);
+
+        // crc32 can return negative values on 32-bit systems, ensure non-negative
+        // Mask to 31 bits to ensure positive signed 32-bit integer
+        return abs($hash) & 0x7FFFFFFF;
     }
 
     /**
