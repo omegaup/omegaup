@@ -206,6 +206,22 @@ table.submissions-table > tbody > tr > td {
   background: var(--arena-submissions-list-verdict-je-ve-background-color);
 }
 
+.verdict-PA {
+  background: var(--arena-runs-table-status-pa-background-color);
+}
+
+.verdict-OLE {
+  background: var(--arena-runs-table-status-ole-background-color);
+}
+
+.verdict-RTE {
+  background: var(--arena-runs-table-status-rte-background-color);
+}
+
+.verdict-RFE {
+  background: var(--arena-runs-table-status-rfe-background-color);
+}
+
 .school-text {
   font-size: 0.9em;
 }

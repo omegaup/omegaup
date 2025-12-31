@@ -110,22 +110,27 @@ class CertificatesTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals($certificatesCutoff, $contest->certificate_cutoff);
 
-        $certificates = \OmegaUp\DAO\Certificates::getAll();
-        $this->assertCount(0, $certificates);
-        $notifications = \OmegaUp\DAO\Notifications::getAll();
-        $this->assertCount(0, $notifications);
+        $certificates = \OmegaUp\DAO\Certificates::countAll();
+        $this->assertSame(0, $certificates);
+        $notifications = \OmegaUp\DAO\Notifications::countAll();
+        $this->assertSame(0, $notifications);
 
         //Adds the certificates only for one contest to the database,
         //so it must be called after each successful call to the API
         \OmegaUp\Test\Utils::runGenerateContestCertificates();
 
-        $certificates = \OmegaUp\DAO\Certificates::getAll();
+        $certificates = \OmegaUp\DAO\Certificates::countAll();
         //Should add one certificate per contestant
-        $this->assertCount($numOfIdentities, $certificates);
+        $this->assertSame($numOfIdentities, $certificates);
 
-        $notifications = \OmegaUp\DAO\Notifications::getAll();
+        $notifications = \OmegaUp\DAO\Notifications::countAll();
         //Should add one notification per contestant
-        $this->assertCount($numOfIdentities, $notifications);
+        $this->assertSame($numOfIdentities, $notifications);
+
+        $certificates = \OmegaUp\DAO\Certificates::getByContestId(
+            $contestData['contest']->contest_id
+        );
+        $notifications = \OmegaUp\DAO\Notifications::getAll();
 
         //Check the certificates data
         $verificationCodes = [];

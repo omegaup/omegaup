@@ -11,7 +11,8 @@
               highCount: page * length,
             })
       }}
-      <a href="https://blog.omegaup.com/posts/el-nuevo-ranking-de-omegaup/"
+
+      <a :href="UserRankingFeatureGuideURL"
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
@@ -156,6 +157,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 
+import { getBlogUrl } from '../../urlHelper';
+
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -199,6 +202,11 @@ export default class UserRank extends Vue {
   searchedUsername: null | types.ListItem = null;
   showPopover: boolean = false;
   currentFilter = this.filter;
+
+  get UserRankingFeatureGuideURL(): string {
+    // Use the key defined in blog.json
+    return getBlogUrl('UserRankingFeatureGuideURL');
+  }
 
   get lastUpdatedText(): null | string {
     if (!this.lastUpdated) {

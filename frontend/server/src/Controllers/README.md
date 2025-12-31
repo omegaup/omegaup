@@ -1,5 +1,10 @@
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [AiEditorial](#aieditorial)
+  - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
+  - [`/api/aiEditorial/review/`](#apiaieditorialreview)
+  - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
+  - [`/api/aiEditorial/updateJob/`](#apiaieditorialupdatejob)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -107,6 +112,7 @@
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
+  - [`/api/course/toggleTeachingAssistant/`](#apicoursetoggleteachingassistant)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -147,6 +153,7 @@
   - [`/api/problem/admins/`](#apiproblemadmins)
   - [`/api/problem/bestScore/`](#apiproblembestscore)
   - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](#apiproblemcreate)
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
@@ -192,6 +199,8 @@
   - [`/api/run/create/`](#apiruncreate)
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
+  - [`/api/run/execute/`](#apirunexecute)
+  - [`/api/run/executeForIDE/`](#apirunexecuteforide)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -285,6 +294,93 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+# AiEditorial
+
+AI Editorial Controller
+
+## `/api/aiEditorial/generate/`
+
+### Description
+
+Generate AI editorial for a problem
+
+### Parameters
+
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `auth_token`    | `null\|string` |             |
+
+### Returns
+
+| Name     | Type     |
+| -------- | -------- |
+| `job_id` | `string` |
+
+## `/api/aiEditorial/review/`
+
+### Description
+
+Review and approve/reject an AI editorial
+
+When approved, the editorial is published to gitserver
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `action`   | `string`       |             |
+| `job_id`   | `string`       |             |
+| `language` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/aiEditorial/status/`
+
+### Description
+
+Get status of an AI editorial job
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `job_id` | `string` |             |
+
+### Returns
+
+| Name  | Type                          |
+| ----- | ----------------------------- |
+| `job` | `types.AiEditorialJobDetails` |
+
+## `/api/aiEditorial/updateJob/`
+
+### Description
+
+Update job status and content from AI worker
+
+This endpoint is called by the Python AI worker to update job status
+and content in the database after processing completion.
+
+### Parameters
+
+| Name                 | Type           | Description |
+| -------------------- | -------------- | ----------- |
+| `job_id`             | `string`       |             |
+| `status`             | `string`       |             |
+| `error_message`      | `null\|string` |             |
+| `md_en`              | `null\|string` |             |
+| `md_es`              | `null\|string` |             |
+| `md_pt`              | `null\|string` |             |
+| `validation_verdict` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Authorization
 
@@ -841,6 +937,7 @@ Creates a new contest
 | `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`       | `float\|null`                                              |             |
 | `problems`                  | `null\|string`                                             |             |
+| `recommended`               | `bool\|null`                                               |             |
 | `requests_user_information` | `bool\|null`                                               |             |
 | `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                | `float\|null`                                              |             |
@@ -1422,6 +1519,7 @@ Update a Contest
 | `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`                        | `float\|null`                                              |             |
 | `problems`                                   | `null\|string`                                             |             |
+| `recommended`                                | `bool\|null`                                               |             |
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
@@ -2295,6 +2393,24 @@ Search users in course assignment
 | `nextPage` | `number`                          |
 | `progress` | `types.StudentProgressInCourse[]` |
 
+## `/api/course/toggleTeachingAssistant/`
+
+### Description
+
+Toggles the AI Teaching Assistant feature for a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+
+### Returns
+
+| Name                         | Type      |
+| ---------------------------- | --------- |
+| `teaching_assistant_enabled` | `boolean` |
+
 ## `/api/course/update/`
 
 ### Description
@@ -2786,7 +2902,7 @@ _Nothing_
 
 # Notification
 
-BadgesController
+NotificationController
 
 ## `/api/notification/myList/`
 
@@ -2956,6 +3072,18 @@ Entry point for Problem clarifications API
 | Name             | Type                    |
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
+
+## `/api/problem/convertZipToCdp/`
+
+### Description
+
+Convert an uploaded ZIP file to CDP.
+
+### Returns
+
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
 
 ## `/api/problem/create/`
 
@@ -3689,7 +3817,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `mixed`                                                          |             |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
 
 ### Returns
 
@@ -3910,6 +4038,36 @@ Disqualify one or more submissions based on the received parameters:
 | Name   | Type                                    |
 | ------ | --------------------------------------- |
 | `runs` | `{ guid: string; username: string; }[]` |
+
+## `/api/run/execute/`
+
+### Description
+
+Get the next execution timestamp for a specific problemset:
+
+- Contest
+- Virtual contest
+- Practice contest
+- Course
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
+
+## `/api/run/executeForIDE/`
+
+### Description
+
+Get the next execution timestamp, no user session required, as the IDE
+runs independently.
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
 
 ## `/api/run/getSubmissionFeedback/`
 
@@ -4236,10 +4394,10 @@ Gets a list of tags
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
@@ -5022,12 +5180,14 @@ Get stats
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
 | `username` | `null\|string` |             |
+| `year`     | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                       |
-| ------ | -------------------------- |
-| `runs` | `types.UserProfileStats[]` |
+| Name      | Type                                                 |
+| --------- | ---------------------------------------------------- |
+| `heatmap` | `{ count: number; date: string; }[]`                 |
+| `runs`    | `{ date: string; runs: number; verdict: string; }[]` |
 
 ## `/api/user/statusVerified/`
 

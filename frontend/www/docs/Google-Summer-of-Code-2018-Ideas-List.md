@@ -1,11 +1,11 @@
-### Interested in applying to GSoC 2019? checkout our [2019 Ideas List](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2019-Ideas-List) ###
+### Interested in applying to GSoC 2019? checkout our [2019 Ideas List](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2019-Ideas-List.md) ###
 
 ## Table of Contents ##
-* [Project Ideas List](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2018-Ideas-List#ideas-list)
-* [How to Ramp Up](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2018-Ideas-List#how-to-ramp-up)
-* [Our Mailing List and Slack Channel](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2018-Ideas-List#our-mailing-list-and-slack-channel)
-* [How to Write Your Application](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2018-Ideas-List#how-to-write-your-application)
-* [FAQs](https://github.com/omegaup/omegaup/wiki/Google-Summer-of-Code-2018-Ideas-List#frequently-asked-questions)
+* [Project Ideas List](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md#ideas-list)
+* [How to Ramp Up](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md#how-to-ramp-up)
+* [Our Mailing List and Slack Channel](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md#our-mailing-list-and-slack-channel)
+* [How to Write Your Application](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md#how-to-write-your-application)
+* [FAQs](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Google-Summer-of-Code-2018-Ideas-List.md#frequently-asked-questions)
 
 # Ideas List #
 
@@ -137,7 +137,7 @@ If you are interested spending this summer collaborating with us, first of all, 
 * Visit [omegaup.org](https://omegaup.org/) to learn more about our work, our vision, and the people who are being benefited by our work.
 * Visit [omegaup.com](https://omegaup.com/), create an account and read a couple of our [problems in English](https://omegaup.com/problem/?query=&language=en&order_by=quality&mode=desc) to get a feel of our main product.
 * Read [this article](http://www.ioinformatics.org/oi/pdf/v8_2014_169_178.pdf) published by our co-founders to learn about the architecture and design of our platform.
-* Follow these [instructions](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)) to set up your development environment.
+* Follow these [instructions](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) to set up your development environment.
 * Find yourself an interesting bug to solve from our [issue tracker](https://github.com/omegaup/omegaup/issues), or reach out to the mailing list asking for one and we will be happy to find a good fit for you. We look forward to your pull request. Most of the conversations in the issue tracker are in Spanish, but feel free to switch the conversation to English on any issue. Alternatively, you can go and find bugs on [omegaup.com](https://omegaup.com) yourself, then report them in our [issue tracker](https://github.com/omegaup/omegaup/issues), and then fix them.
 * Coming soon: Ramp up information for specific project ideas.
 

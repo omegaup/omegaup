@@ -2230,11 +2230,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param null|string $username
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<UserProfileStats>}
+     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>, heatmap: list<array{date: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     * @omegaup-request-param null|string $year
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2255,11 +2256,81 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $runs = \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+            $identity->identity_id
+        );
+
+        $currentTimeStamp = \OmegaUp\Time::get();
+        $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
+        $year = $r->ensureOptionalInt('year');
+
+        $heatmapResult = self::generateHeatmapData($runs, $today, $year);
+
         return [
-            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                $identity->identity_id
-            ),
+            'runs' => $runs,
+            'heatmap' => $heatmapResult,
         ];
+    }
+
+    /**
+     * Generates heatmap data for user activity visualization.
+     *
+     * @param list<array{date: null|string, runs: int, verdict: string}> $runs The runs data from the database
+     * @param \DateTime $today The current date
+     * @param int|null $year Optional year to filter data
+     *
+     * @return list<array{date: string, count: int}> An array of date-count pairs representing user activity
+     */
+    private static function generateHeatmapData(
+        array $runs,
+        \DateTime $today,
+        ?int $year
+    ): array {
+        // Set date range based on year parameter if provided
+        if (!is_null($year)) {
+            $startDate = new \DateTime("{$year}-01-01");
+            $endDate = new \DateTime("{$year}-12-31");
+
+            // If the year is the current year, use today as the end date
+            if ($year === intval($today->format('Y'))) {
+                $endDate = $today;
+            }
+        } else {
+            // Otherwise use the default last 365 days
+            $startDate = (clone $today)->sub(new \DateInterval('P1Y'));
+            $endDate = $today;
+        }
+
+        // Initialize all dates with zero count
+        $heatmapData = [];
+        $currentDate = clone $startDate;
+        while ($currentDate <= $endDate) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $heatmapData[$dateStr] = 0;
+            $currentDate->add(new \DateInterval('P1D'));
+        }
+
+        // Fill in actual run counts for submissions
+        foreach ($runs as $run) {
+            if (!is_null($run['date'])) {
+                $runDate = new \DateTime($run['date']);
+                if ($runDate >= $startDate && $runDate <= $endDate) {
+                    $heatmapData[$run['date']] += $run['runs'];
+                }
+            }
+        }
+
+        // Format for frontend
+        /** @var list<array{date: string, count: int}> $heatmapResult */
+        $heatmapResult = [];
+        foreach ($heatmapData as $date => $count) {
+            $heatmapResult[] = [
+                'date' => strval($date),
+                'count' => intval($count)
+            ];
+        }
+
+        return $heatmapResult;
     }
 
     /**
@@ -3044,11 +3115,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['auth_token'],
-            'auth_token'
-        );
+        $filtersList = $r->ensureString('filter');
+        $authToken = $r->ensureOptionalString('auth_token');
 
         $response = [
             'user' => null,
@@ -3058,16 +3126,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset_admin' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
 
-        $filters = explode(',', $r['filter']);
+        $filters = explode(',', $filtersList);
         foreach ($filters as $filter) {
             $tokens = explode('/', $filter);
             if (count($tokens) < 2 || $tokens[0] != '') {
@@ -3102,7 +3168,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'userNotAllowed'
                         );
                     }
-                    if ($tokens[2] != $identity->username && !$session['is_admin']) {
+                    $username = $tokens[2];
+                    if ($username != $identity->username && !$session['is_admin']) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'userNotAllowed'
                         );
@@ -3115,11 +3182,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $contestAlias = $tokens[2];
                     $r2 = new \OmegaUp\Request([
-                        'contest_alias' => $tokens[2],
+                        'contest_alias' => $contestAlias,
                     ]);
-                    if (isset($r['auth_token'])) {
-                        $r2['auth_token'] = $r['auth_token'];
+                    if (!is_null($authToken)) {
+                        $r2['auth_token'] = $authToken;
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
@@ -3127,7 +3195,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
-                        $tokens[2],
+                        $contestAlias,
                         $identity,
                         $token
                     );
@@ -3145,11 +3213,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $problemsetId = $tokens[2];
                     [
                         'request' => $r2,
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
-                        'problemset_id' => $tokens[2],
-                        'auth_token' => $r['auth_token'],
+                        'problemset_id' => $problemsetId,
+                        'auth_token' => $authToken,
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
@@ -3164,7 +3233,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
-                        $response['problemset_admin'][] = intval($tokens[2]);
+                        $response['problemset_admin'][] = intval($problemsetId);
                     }
                     break;
                 case 'problem':
@@ -3174,7 +3243,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    $problem = \OmegaUp\DAO\Problems::getByAlias($tokens[2]);
+                    $problemAlias = $tokens[2];
+                    $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
@@ -3187,7 +3257,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $problem
                         )
                     ) {
-                        $response['problem_admin'][] = $tokens[2];
+                        $response['problem_admin'][] = $problemAlias;
                     } elseif (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'problemIsPrivate'
@@ -4181,7 +4251,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             'female'
                         )['coderinfo']
                     ],
-                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'schoolOfTheMonthData' => null,
                     'userRank' => self::getTopCodersOfTheMonth(
                         $rowCount
                     ),
@@ -4716,6 +4786,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
+     * @omegaup-request-param null|string $redirect
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4729,6 +4800,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
         $idToken = $r->ensureOptionalString('credential');
+        $redirect = $r->ensureOptionalString('redirect');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4752,7 +4824,8 @@ class User extends \OmegaUp\Controllers\Controller {
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
-                    $gCsrfToken
+                    $gCsrfToken,
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {

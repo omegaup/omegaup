@@ -211,6 +211,7 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-target=".logistics"]').click();
     cy.get('[data-score-board-visible-time]')
       .clear()
       .type(scoreBoardVisibleTime);
@@ -219,7 +220,9 @@ Cypress.Commands.add(
       cy.get('[data-different-start-time-input]').type(differentStartTime);
     }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
+    cy.get('[data-target=".scoring-rules"]').click();
     cy.get('[data-score-mode]').select(`${scoreMode}`);
+    cy.get('[data-target=".privacy"]').click();
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
@@ -275,7 +278,11 @@ Cypress.Commands.add(
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
-      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Wait for the language selector to be visible before trying to interact with it
+      cy.get('[name="language"]', { timeout: 10000 })
+        .should('be.visible')
+        .select(runs[idx].language);
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {
