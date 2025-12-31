@@ -73,6 +73,8 @@ BSD
 
 [omegaUp](https://omegaup.com) is a free educational platform that helps improve programming skills, used by tens of thousands of students and teachers in Latin America.
 
+See the [Issue Assignment Workflow](frontend/www/docs/Issue-Assignment-Workflow.md) for how to self-assign issues, deadlines, and limits.
+
 ## Local Development
 
 To set up the development environment locally, see the [Development Environment Setup Guide](frontend/www/docs/Development-Environment-Setup-Process.md).
