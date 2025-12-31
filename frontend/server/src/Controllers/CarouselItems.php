@@ -24,7 +24,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r->identity);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         $expiration = $r->ensureOptionalString('expiration_date');
         $carouselItem = new \OmegaUp\DAO\VO\CarouselItems([
@@ -36,7 +38,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'expiration_date' => is_null($expiration)
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
-            'status' => $r->ensureBool('status'),
+            'status' => $r->ensureBool('status') ? 'active' : 'inactive',
         ]);
 
         \OmegaUp\DAO\Base\CarouselItems::create($carouselItem);
@@ -52,7 +54,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r->identity);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         $carouselItemId = $r->ensureInt('carousel_item_id');
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
@@ -84,7 +88,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r->identity);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $r->ensureInt('carousel_item_id')
@@ -106,7 +112,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             ? null
             : new \OmegaUp\Timestamp(strtotime($expiration));
 
-        $carouselItem->status = $r['status'] ? 'true' : 'false';
+        $carouselItem->status = $r['status'] ? 'active' : 'inactive';
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];
@@ -119,7 +125,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        self::validateAdmin($r->identity);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         return [
             'carouselItems' => array_map(
@@ -131,7 +139,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                     'link' => $item->link ?? '',
                     'button_title' => $item->button_title ?? '',
                     'expiration_date' => $item->expiration_date,
-                    'status' => boolval($item->status)
+                    'status' => $item->status == 'active'
                 ],
                 \OmegaUp\DAO\Base\CarouselItems::getAll()
             ),
@@ -149,7 +157,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
 
         $activeItems = array_filter($allItems, function ($item) use ($now) {
             /** @var \OmegaUp\DAO\VO\CarouselItems $item */
-            return boolval($item->status) && (
+            return $item->status == 'active' && (
                 is_null($item->expiration_date) || $item->expiration_date >= $now
             );
         });
@@ -164,19 +172,10 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                     'link' => $item->link ?? '',
                     'button_title' => $item->button_title ?? '',
                     'expiration_date' => $item->expiration_date,
-                    'status' => boolval($item->status)
+                    'status' => $item->status == 'active'
                 ],
                 array_values($activeItems)
             ),
         ];
-    }
-
-    /**
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     */
-    private static function validateAdmin(\OmegaUp\DAO\VO\Identities $identity): void {
-        if (!\OmegaUp\Authorization::isSystemAdmin($identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
     }
 }
