@@ -74,7 +74,7 @@ export default class ProblemMarkdown extends Vue {
 
   @Emit('rendered')
   private renderMathJax(): void {
-    // console.log('[Markdown.vue] Rendered HTML:', this.html);
+    // console.log('[ProblemMarkdown.vue] Rendered HTML:', this.html);
     this.root.innerHTML = this.html;
     this.root
       .querySelectorAll(
