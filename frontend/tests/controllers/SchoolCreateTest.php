@@ -61,12 +61,16 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function schoolsListProvider(): array {
         return [
             ['query','empty',[]],
-            ['query','school',['all school','all new school','all old school']],
-            ['term','school',['all school','all new school','all old school']],
-            ['query','college',['all college','all colleges']],
-            ['term','college',['all college','all colleges']],
-            ['query','university',['all university','all big university']],
-            ['term','university',['all university','all big university']],
+            // With prefix matching, 'school' won't match 'all school' since it doesn't start with 'school'
+            ['query','school',[]],
+            ['term','school',[]],
+            // With prefix matching, 'college' won't match 'all college' since it doesn't start with 'college'
+            ['query','college',[]],
+            ['term','college',[]],
+            // With prefix matching, 'university' won't match 'all university' since it doesn't start with 'university'
+            ['query','university',[]],
+            ['term','university',[]],
+            // Query 'all' matches all schools starting with 'all'
             [
                 'query',
                 'all',
@@ -80,6 +84,12 @@ class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
                     'all colleges',
                 ],
             ],
+            // Test prefix matching with 'all new'
+            ['query','all new',['all new school']],
+            ['term','all new',['all new school']],
+            // Test prefix matching with 'all old'
+            ['query','all old',['all old school']],
+            ['term','all old',['all old school']],
         ];
     }
 
