@@ -403,7 +403,7 @@ import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
-import omegaup_problemMarkdown from './Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
 
