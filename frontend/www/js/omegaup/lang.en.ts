@@ -2186,6 +2186,7 @@ const translations: { [key: string]: string; } = {
   wordsUsersFeedback: "Coders Feedback",
   wordsVerdict: "Verdict",
   wordsVerdictsOf: "Verdicts of %(alias)",
+  wordsViewAll: "View all",
   wordsWallTimeInSeconds: "Wall-time (Sec)",
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
