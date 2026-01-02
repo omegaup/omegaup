@@ -51,14 +51,20 @@
       <div id="common-navbar"></div>
     {% endif %}
     <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
-      <div class="alert mt-0" id="status" style="display: none;">
-        <button type="button" class="close" id="alert-close">&times;</button>
-        <span class="message"></span>
-      </div>
-      {% if OMEGAUP_MAINTENANCE %}
-        <div id="announcement" class="alert alert-info mt-0">
-          {{ OMEGAUP_MAINTENANCE|raw }}
+      {% if fullWidth %}
+      <div class="container-lg px-3 px-md-5 pt-3">
+      {% endif %}
+        <div class="alert mt-0" id="status" style="display: none;">
+          <button type="button" class="close" id="alert-close">&times;</button>
+          <span class="message"></span>
         </div>
+        {% if OMEGAUP_MAINTENANCE %}
+          <div id="announcement" class="alert alert-{{ OMEGAUP_MAINTENANCE.type }} mt-0">
+            {{ OMEGAUP_MAINTENANCE.message|raw }}
+          </div>
+        {% endif %}
+      {% if fullWidth %}
+      </div>
       {% endif %}
 
       <script type="text/json" id="payload">{{ payload|json_encode|raw }}</script>
