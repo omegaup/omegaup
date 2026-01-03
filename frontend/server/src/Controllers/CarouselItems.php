@@ -111,7 +111,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalString('expiration_date')
         );
 
-        $carouselItem->status = $r['status'] ? 'active' : 'inactive';
+        $carouselItem->status = $r->ensureOptionalBool(
+            'status'
+        ) ? 'active' : 'inactive';
 
         \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];
