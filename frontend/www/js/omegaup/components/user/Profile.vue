@@ -24,6 +24,7 @@
             :selected-tab.sync="currentViewProfileSelectedTab"
             :heatmap-data="heatmapData"
             :available-years="availableYears"
+            :profile-statistics="profileStatistics"
             @heatmap-year-changed="
               (year) => $emit('heatmap-year-changed', year)
             "
@@ -149,6 +150,17 @@ export default class Profile extends Vue {
     count: number;
   }>;
   @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: null }) profileStatistics!: {
+    solved: number;
+    attempting: number;
+    difficulty: {
+      easy: number;
+      medium: number;
+      hard: number;
+      unlabelled: number;
+    };
+    tags: Array<{ name: string; count: number }>;
+  } | null;
 
   T = T;
   ui = ui;

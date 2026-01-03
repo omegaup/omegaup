@@ -196,6 +196,22 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
+                <div
+                  v-if="profileStatistics"
+                  class="row mb-4 statistics-boxes-row"
+                >
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-problem-solving-progress
+                      :solved="profileStatistics.solved"
+                      :difficulty="profileStatistics.difficulty"
+                    ></omegaup-problem-solving-progress>
+                  </div>
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-tags-solved-chart
+                      :tags="profileStatistics.tags"
+                    ></omegaup-tags-solved-chart>
+                  </div>
+                </div>
                 <div class="chart-section">
                   <omegaup-user-charts
                     v-if="charts"
@@ -243,6 +259,8 @@ import {
   Contest,
   Course,
 } from '../../linkable_resource';
+import problem_SolvingProgress from './ProblemSolvingProgress.vue';
+import tags_SolvedChart from './TagsSolvedChart.vue';
 
 export enum ViewProfileTabs {
   Badges = 'badges',
@@ -270,6 +288,8 @@ function getInitialSelectedTab(
     'omegaup-user-charts': user_Charts,
     'omegaup-user-heatmap': user_Heatmap,
     'omegaup-user-maininfo': user_MainInfo,
+    'omegaup-problem-solving-progress': problem_SolvingProgress,
+    'omegaup-tags-solved-chart': tags_SolvedChart,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-table-paginator': common_TablePaginator,
@@ -283,6 +303,17 @@ export default class ViewProfile extends Vue {
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
   @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: null }) profileStatistics!: {
+    solved: number;
+    attempting: number;
+    difficulty: {
+      easy: number;
+      medium: number;
+      hard: number;
+      unlabelled: number;
+    };
+    tags: Array<{ name: string; count: number }>;
+  } | null;
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -386,5 +417,13 @@ a:hover {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--user-chart-title-color);
+}
+
+.statistics-boxes-row {
+  margin-top: 16px;
+}
+
+.statistics-boxes-row > [class*='col-'] {
+  display: flex;
 }
 </style>
