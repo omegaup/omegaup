@@ -107,10 +107,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $carouselItem->link = $r->ensureString('link');
         $carouselItem->button_title = $r->ensureString('buttonTitle');
 
-        $expiration = $r->ensureOptionalString('expiration_date');
-        $carouselItem->expiration_date = is_null($expiration)
-            ? null
-            : new \OmegaUp\Timestamp(strtotime($expiration));
+        $carouselItem->expiration_date = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $r->ensureOptionalString('expiration_date')
+        );
 
         $carouselItem->status = $r['status'] ? 'active' : 'inactive';
 
