@@ -68,7 +68,9 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\Base\CarouselItems::delete($carouselItem);
+        // Soft delete
+        $carouselItem->status = 'inactive';
+        \OmegaUp\DAO\Base\CarouselItems::update($carouselItem);
         return ['status' => 'ok'];
     }
 
@@ -148,20 +150,12 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * List all status Carousel Items (homepage)
+     * List all active Carousel Items (homepage)
      *
      * @return CarouselItemListPayload
      */
     public static function apiListActive(\OmegaUp\Request $r): array {
-        $allItems = \OmegaUp\DAO\Base\CarouselItems::getAll();
-        $now = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
-
-        $activeItems = array_filter($allItems, function ($item) use ($now) {
-            /** @var \OmegaUp\DAO\VO\CarouselItems $item */
-            return $item->status == 'active' && (
-                is_null($item->expiration_date) || $item->expiration_date >= $now
-            );
-        });
+        $activeItems = \OmegaUp\DAO\CarouselItems::getActiveItems();
 
         return [
             'carouselItems' => array_map(
@@ -175,7 +169,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                     'expiration_date' => $item->expiration_date,
                     'status' => $item->status == 'active'
                 ],
-                array_values($activeItems)
+                $activeItems
             ),
         ];
     }

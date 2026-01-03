@@ -555,7 +555,7 @@ types.CarouselItemListPayload;
 
 ### Description
 
-List all status Carousel Items (homepage)
+List all active Carousel Items (homepage)
 
 ### Returns
 
