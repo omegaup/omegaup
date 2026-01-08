@@ -147,7 +147,7 @@ yarn test
 
 ## Codebase structure
 
-omegaUp code can be found at `/opt/omegaup` inside the contianer. The dev installation has two user accounts preconfigured by default: `omegaup` (admin) y `user` (normal user). Their passwords `omegaup` and `user`, respectively.
+omegaUp code can be found at `/opt/omegaup` inside the container. The dev installation has two user accounts preconfigured by default: `omegaup` (admin) y `user` (normal user). Their passwords `omegaup` and `user`, respectively.
 
 These are the directories that we are actively using in the development:
 
@@ -179,7 +179,7 @@ If the problem persists, ask for help in omegaUp's communication channels.
 
 ## Troubleshooting
 
-If your browser keeps ching `http` to `https`, you can disable the security policies for `localhost`. [See this.](https://hmheng.medium.com/exclude-localhost-from-chrome-chromium-browsers-forced-https-redirection-642c8befa9b).
+If your browser keeps changing `http` to `https`, you can disable the security policies for `localhost`. [See this.](https://hmheng.medium.com/exclude-localhost-from-chrome-chromium-browsers-forced-https-redirection-642c8befa9b).
 
 ---
 
@@ -260,7 +260,7 @@ If you encounter any problems not covered in this section, please file an issue 
 
 ## Authentication
 
-Once omegaup is running on your local environment, you can access `http://localhost:8001/` to se the website. Use the following credentials to log in:
+Once omegaup is running on your local environment, you can access `http://localhost:8001/` to see the website. Use the following credentials to log in:
 
 - `omegaup` (password `omegaup`): User with sysadmin privileges.
 - `user` (password `user`): User with regular privileges.
@@ -283,4 +283,4 @@ There are a huge list of users we use in tests:
 | course_test_user_1 | course_test_user_1 |
 | course_test_user_2 | course_test_user_2 |
 
-Feel free to create as much users as you need to test your changes. In development mode,the email verification is disabled, so you can use dummy emails.
+Feel free to create as many users as you need to test your changes. In development mode, the email verification is disabled, so you can use dummy emails.

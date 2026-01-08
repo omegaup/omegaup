@@ -1,6 +1,32 @@
 <template>
   <div class="user-heatmap-container">
     <div class="user-heatmap-wrapper">
+      <div class="heatmap-header">
+        <div class="heatmap-stats">
+          <div class="heatmap-primary">
+            <span class="stat-value">{{ totalSubmissions }}</span>
+            <span class="stat-label">
+              {{
+                ui.formatString(T.userHeatmapSubmissionsInYear, {
+                  year: selectedYear,
+                })
+              }}
+            </span>
+          </div>
+          <div class="heatmap-secondary">
+            <div class="secondary-item">
+              <span class="stat-label"
+                >{{ T.userHeatmapTotalActiveDays }}:</span
+              >
+              <span class="stat-value">{{ activeDays }}</span>
+            </div>
+            <div class="secondary-item">
+              <span class="stat-label">{{ T.userHeatmapMaxStreak }}:</span>
+              <span class="stat-value">{{ maxStreak }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="year-selector">
         <select
           v-model="selectedYear"
@@ -46,6 +72,10 @@ export default class UserHeatmap extends Vue {
 
   chart: Highcharts.Chart | null = null;
   selectedYear: number = new Date().getFullYear();
+  totalSubmissions = 0;
+  activeDays = 0;
+  maxStreak = 0;
+  hasRendered: boolean = false;
   T = T;
   ui = ui;
   COLORS = COLORS;
@@ -69,6 +99,7 @@ export default class UserHeatmap extends Vue {
     if (!newValue?.length) return;
 
     this.selectedYear = newValue[0];
+    this.hasRendered = false;
 
     this.$nextTick(() => {
       if (this.data && this.data.length > 0) {
@@ -81,6 +112,8 @@ export default class UserHeatmap extends Vue {
   onDataChange(): void {
     if (!this.data?.length) return;
 
+    this.hasRendered = false;
+
     this.$nextTick(() => {
       this.renderHeatmap();
     });
@@ -89,6 +122,7 @@ export default class UserHeatmap extends Vue {
   @Watch('isLoading')
   onLoadingChange(newValue: boolean): void {
     if (!newValue && this.data?.length) {
+      this.hasRendered = false;
       this.$nextTick(() => {
         this.renderHeatmap();
       });
@@ -100,6 +134,8 @@ export default class UserHeatmap extends Vue {
   }
 
   renderHeatmap(): void {
+    if (this.hasRendered) return;
+
     if (!this.heatmapContainer) {
       return;
     }
@@ -141,10 +177,7 @@ export default class UserHeatmap extends Vue {
       const currentDate = new Date(this.selectedYear, 0, i + 1);
 
       // Format date for map lookup (YYYY-MM-DD)
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const day = String(currentDate.getDate()).padStart(2, '0');
-      const dateStr = `${year}-${month}-${day}`;
+      const dateStr = this.formatDateToString(currentDate);
 
       const weekNumber = Math.floor((i + firstDayOffset) / 7);
       const dayOfWeek = currentDate.getDay();
@@ -180,11 +213,55 @@ export default class UserHeatmap extends Vue {
       colors: this.COLORS,
     });
 
+    this.setActivityStats(dateMap, firstDay, now);
+
     if (this.chart) {
       this.chart.destroy();
     }
 
     this.chart = new Highcharts.Chart(options);
+    this.hasRendered = true;
+  }
+
+  formatDateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  setActivityStats(dateMap: Map<string, number>, start: Date, now: Date): void {
+    const lastDay =
+      this.selectedYear === now.getFullYear()
+        ? new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        : new Date(this.selectedYear, 11, 31);
+    let totalSubmissionsCount = 0;
+    let activeDays = 0;
+    let currentStreak = 0;
+    let bestStreak = 0;
+
+    for (
+      let currentDate = new Date(start.getTime());
+      currentDate <= lastDay;
+      currentDate.setDate(currentDate.getDate() + 1)
+    ) {
+      const dateStr = this.formatDateToString(currentDate);
+      const runs = dateMap.get(dateStr) || 0;
+
+      totalSubmissionsCount += runs;
+
+      if (runs > 0) {
+        activeDays += 1;
+        currentStreak += 1;
+        bestStreak = Math.max(bestStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    }
+
+    this.totalSubmissions = totalSubmissionsCount;
+    this.activeDays = activeDays;
+    this.maxStreak = bestStreak;
   }
 
   beforeDestroy(): void {
@@ -209,6 +286,56 @@ export default class UserHeatmap extends Vue {
   width: 100%;
   background-color: var(--user-heatmap-wrapper-background-color);
   border-radius: 6px;
+}
+
+.heatmap-header {
+  padding: 12px 14px 4px 14px;
+  padding-right: 140px; /* Make room for year selector */
+}
+
+.heatmap-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.heatmap-primary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.heatmap-primary .stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.heatmap-primary .stat-label {
+  font-size: 0.75rem;
+}
+
+.heatmap-secondary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.secondary-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.secondary-item .stat-label {
+  font-size: 0.75rem;
+}
+
+.secondary-item .stat-value {
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .year-selector {
