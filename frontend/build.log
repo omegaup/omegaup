@@ -1,0 +1,31 @@
+yarn run v1.22.22
+$ cross-env webpack --config-name=frontend --mode=development --stats=minimal --color
+[webpack-cli] Error: 
+
+Vue packages version mismatch:
+
+- vue@2.6.12 (/workspaces/winter-of-contributing-viveksahu/node_modules/vue/dist/vue.runtime.common.js)
+- vue-template-compiler@2.7.16 (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-template-compiler/package.json)
+
+This may cause things to work incorrectly. Make sure to use the same version for both.
+If you are using vue-loader@>=10.0, simply update vue-template-compiler.
+If you are using vue-loader@<10.0 or vueify, re-installing vue-loader/vueify should bump vue-template-compiler to the latest.
+
+    at Object.<anonymous> (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-template-compiler/index.js:10:9)
+    at Module._compile (/workspaces/winter-of-contributing-viveksahu/node_modules/webpack-cli/node_modules/v8-compile-cache/v8-compile-cache.js:192:30)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1504:12)
+    at require (/workspaces/winter-of-contributing-viveksahu/node_modules/webpack-cli/node_modules/v8-compile-cache/v8-compile-cache.js:159:20)
+    at loadFromContext (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-loader/lib/compiler.js:30:10)
+    at loadTemplateCompiler (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-loader/lib/compiler.js:37:12)
+    at exports.resolveCompiler (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-loader/lib/compiler.js:25:23)
+    at VueLoaderPlugin.apply (/workspaces/winter-of-contributing-viveksahu/node_modules/vue-loader/lib/plugin-webpack5.js:144:22)
+    at createCompiler (/workspaces/winter-of-contributing-viveksahu/node_modules/webpack/lib/webpack.js:76:12)
+    at create (/workspaces/winter-of-contributing-viveksahu/node_modules/webpack/lib/webpack.js:143:16)
+    at webpack (/workspaces/winter-of-contributing-viveksahu/node_modules/webpack/lib/webpack.js:151:47)
+error Command failed with exit code 2.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

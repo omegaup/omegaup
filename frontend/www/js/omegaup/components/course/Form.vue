@@ -342,14 +342,14 @@ export default class CourseDetails extends Vue {
             {
               element: document.querySelector(
                 '.introjs-course-name',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideName,
             },
             {
               element: document.querySelector(
                 '.introjs-short-title',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideShortTitle,
             },
@@ -393,17 +393,17 @@ export default class CourseDetails extends Vue {
               intro: T.createCourseInteractiveGuideAskInformation,
             },
             {
-              element: document.querySelector('.introjs-level') as Element,
+              element: document.querySelector('.introjs-level') as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideLevel,
             },
             {
-              element: document.querySelector('.introjs-language') as Element,
+              element: document.querySelector('.introjs-language') as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideLanguage,
             },
             {
-              element: document.querySelector('.introjs-objective') as Element,
+              element: document.querySelector('.introjs-objective') as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideObjective,
             },
@@ -415,7 +415,7 @@ export default class CourseDetails extends Vue {
               intro: T.createCourseInteractiveGuideDescription,
             },
             {
-              element: document.querySelector('.introjs-submit') as Element,
+              element: document.querySelector('.introjs-submit') as HTMLElement | null,
               title,
               intro: T.createCourseInteractiveGuideSubmit,
             },

@@ -73,33 +73,33 @@ export default class Creator extends Vue {
               intro: T.problemCreatorIntroWorkspaceIntro,
               element: document.querySelector(
                 '[data-problem-creator-tabs]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroLoadTitle,
               intro: T.problemCreatorIntroLoadIntro,
               element: document.querySelector(
                 '[data-load-problem-button]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroDownloadTitle,
               intro: T.problemCreatorIntroDownloadIntro,
-              element: document.querySelector('[data-download-zip]') as Element,
+              element: document.querySelector('[data-download-zip]') as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroCreateTitle,
               intro: T.problemCreatorIntroCreateIntro,
               element: document.querySelector(
                 '[data-create-new-problem-button]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroNameTitle,
               intro: T.problemCreatorIntroNameIntro,
               element: document.querySelector(
                 'input[placeholder="New Problem"]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorIntroReadyTitle,
