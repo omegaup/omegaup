@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text x="20" y="40" font-family="Arial" font-size="26" fill="#000">AFTER: CSS Grid with 16px gap (Fixed)</text>
+  <text x="20" y="80" font-family="Arial" font-size="18" fill="#333">Editor | Preview — 16px gap · padding: 12px · border: #ddd · preview bg: #f9f9f9</text>
+  <rect x="20" y="120" width="440" height="360" fill="#ffffff" stroke="#ddd" stroke-width="1" rx="6" ry="6"/>
+  <rect x="486" y="120" width="440" height="360" fill="#f9f9f9" stroke="#ddd" stroke-width="1" rx="6" ry="6"/>
+  <text x="40" y="160" font-family="Arial" font-size="18" fill="#000">EDITOR</text>
+  <text x="506" y="160" font-family="Arial" font-size="18" fill="#000">PREVIEW</text>
+  <text x="40" y="200" font-family="Arial" font-size="16" fill="#666">Horizontal gap: 16px</text>
+  <text x="40" y="230" font-family="Arial" font-size="16" fill="#666">Padding: 12px · Borders: #ddd · Rounded corners</text>
+</svg>

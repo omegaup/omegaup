@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text x="20" y="40" font-family="Arial" font-size="26" fill="#000">BEFORE: Cramped layout (Issue #8520)</text>
+  <text x="20" y="80" font-family="Arial" font-size="18" fill="#333">Editor | Preview — 0px gap · padding: 10px · no border · looks odd</text>
+  <rect x="20" y="120" width="440" height="360" fill="#ffffff" stroke="#000" stroke-width="1"/>
+  <rect x="480" y="120" width="440" height="360" fill="#ffffff" stroke="#000" stroke-width="1"/>
+  <text x="40" y="160" font-family="Arial" font-size="18" fill="#000">EDITOR</text>
+  <text x="500" y="160" font-family="Arial" font-size="18" fill="#000">PREVIEW</text>
+  <text x="40" y="200" font-family="Arial" font-size="16" fill="#666">No spacing between boxes (0px)</text>
+  <text x="40" y="230" font-family="Arial" font-size="16" fill="#666">Padding: 10px</text>
+</svg>
