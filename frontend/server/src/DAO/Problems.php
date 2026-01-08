@@ -853,7 +853,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 AND a.acl_id IS NULL
         ";
 
-        /** @var array{easy: int, hard: int, medium: int, unlabelled: int, total: int}|null */
+        /** @var array{easy: int, hard: int, medium: int, total: int, unlabelled: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
