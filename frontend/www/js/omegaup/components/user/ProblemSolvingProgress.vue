@@ -1,5 +1,6 @@
 <template>
   <div class="problem-solving-progress">
+    <h5 class="chart-title">{{ T.profileProblemProgress }}</h5>
     <div class="progress-container">
       <!-- Circular Progress Chart -->
       <div class="circular-chart-container">
@@ -109,6 +110,9 @@
           >
             {{ hoveredLabel }}
           </span>
+          <span v-if="!hoveredSegment && attempting > 0" class="attempting-label">
+            {{ attempting }} {{ T.profileAttemptingProblems }}
+          </span>
         </div>
       </div>
 
@@ -156,8 +160,8 @@ interface DifficultyStats {
 
 @Component
 export default class ProblemSolvingProgress extends Vue {
-  @Prop({ required: true }) solved!: number;
   @Prop({ required: true }) difficulty!: DifficultyStats;
+  @Prop({ default: 0 }) attempting!: number;
 
   T = T;
 
@@ -173,7 +177,7 @@ export default class ProblemSolvingProgress extends Vue {
   };
 
   get displayCount(): number {
-    if (!this.hoveredSegment) return this.solved;
+    if (!this.hoveredSegment) return this.total;
     return this.difficulty[this.hoveredSegment];
   }
 
@@ -265,6 +269,13 @@ export default class ProblemSolvingProgress extends Vue {
   width: 100%;
 }
 
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
 .progress-container {
   display: flex;
   align-items: center;
@@ -319,19 +330,6 @@ export default class ProblemSolvingProgress extends Vue {
   font-size: 1.4rem;
   font-weight: 500;
   color: #999;
-}
-
-.solved-label {
-  font-size: 0.95rem;
-  color: #00b8a3;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-}
-
-.checkmark {
-  color: #00b8a3;
 }
 
 .attempting-label {

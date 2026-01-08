@@ -1602,6 +1602,7 @@ const translations: { [key: string]: string; } = {
   profileSchool: "School",
   profileSchoolMonthlySolvedProblemsCount: "Monthly solved problems count for the users of %(school)",
   profileSolvedProblems: "Solved problems",
+  profileAttemptingProblems: "Attempting",
   profileState: "State",
   profileStatistics: "Stats",
   profileStatisticsCumulative: "Cumulative",

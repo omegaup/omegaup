@@ -1,11 +1,11 @@
+import * as Highcharts from 'highcharts/highstock';
 import Vue from 'vue';
-import { OmegaUp } from '../omegaup';
-import { types } from '../api_types';
 import * as api from '../api';
-import * as ui from '../ui';
+import { types } from '../api_types';
 import T from '../lang';
 import mainStore from '../mainStore';
-import * as Highcharts from 'highcharts/highstock';
+import { OmegaUp } from '../omegaup';
+import * as ui from '../ui';
 
 import user_Profile from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
