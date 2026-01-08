@@ -107,7 +107,7 @@ public class Main {
   kt: `import java.util.*
 
 fun main() {
-    val scanner = Scanner(System.`in`)
+    val scanner = Scanner(System.\`in\`)
     val t = scanner.nextInt()
     repeat(t) {
         // Your code here
