@@ -21,6 +21,12 @@ from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
+from database.school_of_the_month import check_existing_school_of_the_next_month
+from database.school_of_the_month import remove_school_of_the_month_candidates
+from database.school_of_the_month import get_school_of_the_month_candidates
+from database.school_of_the_month import insert_school_of_the_month_candidates
+from database.school_of_the_month import School
+
 
 sys.path.insert(
     0,
@@ -28,6 +34,12 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+logging.basicConfig(
+    filename='update_ranks.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
 
 
 class Cutoff(NamedTuple):
@@ -582,6 +594,35 @@ def update_school_of_the_month_candidates(
                                              candidates)
 
 
+def testing_function(cur: mysql.connector.cursor.MySQLCursorDict,
+                     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+                     first_day_of_current_month: datetime.date,
+                     update_school_of_the_month: bool
+                     ) -> None:
+    logging.info('Testing function for school of the month candidates...')
+    first_day_of_next_month = get_first_day_of_next_month(
+        first_day_of_current_month)
+    exist_school = check_existing_school_of_the_next_month(
+        cur_readonly, first_day_of_next_month)
+    if exist_school:
+        logging.info('Skipping because already exist selected schools.')
+        return
+    remove_school_of_the_month_candidates(cur, first_day_of_next_month)
+    schools = get_school_of_the_month_candidates(
+        cur_readonly,
+        first_day_of_next_month,
+        first_day_of_current_month
+    )
+    if not schools:
+        logging.info('No eligible schools found.')
+        return
+    if update_school_of_the_month:
+        insert_school_of_the_month_candidates(
+            cur, first_day_of_next_month, schools)
+    else:
+        debug2_school_of_the_month_candidates(first_day_of_next_month, schools)
+
+
 def debug_school_of_the_month_candidates(
     first_day_of_next_month: datetime.date,
     candidates: Iterable[Mapping[str, Any]],
@@ -596,6 +637,27 @@ def debug_school_of_the_month_candidates(
             "time": first_day_of_next_month.isoformat(),
             "ranking": ranking,
             "score": candidate['score'],
+        }
+        log_entries.append(log_entry)
+
+    log_message = json.dumps(log_entries, indent=4)
+    logging.info(log_message)
+
+
+def debug2_school_of_the_month_candidates(
+    first_day_of_next_month: datetime.date,
+    candidates: List[School],
+) -> None:
+    '''Log school of the month candidates'''
+
+    log_entries = []
+    for ranking, candidate in enumerate(candidates, start=1):
+        log_entry = {
+            "school_id": candidate.school_id,
+            "name": candidate.name,
+            "time": first_day_of_next_month.isoformat(),
+            "ranking": ranking,
+            "score": candidate.score,
         }
         log_entries.append(log_entry)
 
