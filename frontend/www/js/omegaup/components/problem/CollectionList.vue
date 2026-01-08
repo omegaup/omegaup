@@ -10,8 +10,17 @@
         <h1 class="title-font p-0">{{ title }}</h1>
       </div>
     </div>
+    <div class="d-flex justify-content-end mb-3">
+      <button
+        class="btn btn-link filter-toggle"
+        :aria-label="filtersVisible ? 'Hide filters' : 'Show filters'"
+        @click="filtersVisible = !filtersVisible"
+      >
+        {{ filtersVisible ? '‹' : '›' }}
+      </button>
+    </div>
     <div class="row">
-      <div class="col col-md-3">
+      <div v-if="filtersVisible" class="col-12 col-md-3">
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
@@ -28,6 +37,7 @@
               )
           "
         ></omegaup-problem-filter-tags>
+
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
@@ -57,7 +67,7 @@
           "
         ></omegaup-problem-filter-quality>
       </div>
-      <div class="col p-0">
+      <div :class="filtersVisible ? 'col-12 col-md-9 p-0' : 'col-12 p-0'">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
@@ -139,6 +149,7 @@ export default class CollectionList extends Vue {
 
   T = T;
   level = this.data.level;
+  filtersVisible = true;
 
   get publicQualityTags(): types.TagWithProblemCount[] {
     const tagNames: Set<string> = new Set(
@@ -186,5 +197,11 @@ export default class CollectionList extends Vue {
 
 .max-width {
   max-width: 75rem;
+}
+
+.filter-toggle {
+  font-size: 2rem;
+  text-decoration: none;
+  padding: 0 0.5rem;
 }
 </style>
