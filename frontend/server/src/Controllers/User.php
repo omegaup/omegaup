@@ -2371,15 +2371,15 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        $totalSolved = ($difficultyStats['easy'] ?? 0) +
-            ($difficultyStats['medium'] ?? 0) +
-            ($difficultyStats['hard'] ?? 0) +
-            ($difficultyStats['unlabelled'] ?? 0);
-
         return [
-            'solved' => $totalSolved,
+            'solved' => $difficultyStats['total'],
             'attempting' => $attemptingCount,
-            'difficulty' => $difficultyStats,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
             'tags' => $tagsDistribution,
         ];
     }

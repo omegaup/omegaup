@@ -15,36 +15,23 @@ class UserProfileStatisticsTest extends \OmegaUp\Test\ControllerTestCase {
         $easyProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Easy Problem',
+                'difficulty' => 0.3, // Easy
             ])
         );
-        // Set difficulty manually by fetching and updating existing problem
-        $easyProblemVO = \OmegaUp\DAO\Problems::getByPK(
-            $easyProblem['problem']->problem_id
-        );
-        $easyProblemVO->difficulty = 0.3; // Easy
-        \OmegaUp\DAO\Problems::update($easyProblemVO);
 
         $mediumProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Medium Problem',
+                'difficulty' => 1.5, // Medium
             ])
         );
-        $mediumProblemVO = \OmegaUp\DAO\Problems::getByPK(
-            $mediumProblem['problem']->problem_id
-        );
-        $mediumProblemVO->difficulty = 1.5; // Medium
-        \OmegaUp\DAO\Problems::update($mediumProblemVO);
 
         $hardProblem = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'title' => 'Hard Problem',
+                'difficulty' => 3.0, // Hard
             ])
         );
-        $hardProblemVO = \OmegaUp\DAO\Problems::getByPK(
-            $hardProblem['problem']->problem_id
-        );
-        $hardProblemVO->difficulty = 3.0; // Hard
-        \OmegaUp\DAO\Problems::update($hardProblemVO);
 
         $login = self::login($identity);
 

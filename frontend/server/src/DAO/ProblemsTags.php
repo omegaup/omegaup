@@ -81,54 +81,77 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     /**
      * Get tag distribution for problems solved by an identity.
      * Returns tags sorted by count descending.
+     * If there are more than $maxTags, the remaining tags are grouped under 'Others'.
      *
      * @return list<array{name: string, count: int}>
      */
-    public static function getTagsDistributionForSolvedProblems(int $identityId): array {
+    public static function getTagsDistributionForSolvedProblems(
+        int $identityId,
+        int $maxTags = 10
+    ): array {
         $sql = "
             SELECT
                 t.name,
                 COUNT(DISTINCT p.problem_id) AS count
             FROM
-                Problems p
+                Tags t
+            INNER JOIN
+                Problems_Tags pt ON pt.tag_id = t.tag_id
+            INNER JOIN
+                Problems p ON p.problem_id = pt.problem_id
             INNER JOIN
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
-            INNER JOIN
-                Problems_Tags pt ON pt.problem_id = p.problem_id
-            INNER JOIN
-                Tags t ON t.tag_id = pt.tag_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
                 AND t.public = 1
                 AND t.name NOT LIKE 'problemRestricted%'
                 AND t.name NOT LIKE 'problemLevel%'
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM Problems_Forfeited pf
-                    WHERE pf.problem_id = p.problem_id
-                        AND pf.user_id = i.user_id
-                        AND i.user_id IS NOT NULL
-                )
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM ACLs a
-                    WHERE a.acl_id = p.acl_id
-                        AND a.owner_id = i.user_id
-                        AND i.user_id IS NOT NULL
-                )
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
             GROUP BY
-                t.tag_id
+                t.name
             ORDER BY
                 count DESC, t.name ASC;
         ";
 
         /** @var list<array{count: int, name: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        $allTags = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
         );
+
+        // If there are fewer or equal tags than the limit, return as is
+        if (count($allTags) <= $maxTags) {
+            return $allTags;
+        }
+
+        // Take the top N tags and group the rest under 'Others'
+        $topTags = array_slice($allTags, 0, $maxTags);
+        $remainingTags = array_slice($allTags, $maxTags);
+
+        $othersCount = 0;
+        foreach ($remainingTags as $tag) {
+            $othersCount += $tag['count'];
+        }
+
+        if ($othersCount > 0) {
+            $topTags[] = [
+                'name' => 'Others',
+                'count' => $othersCount,
+            ];
+        }
+
+        return $topTags;
     }
 
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {

@@ -833,7 +833,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * Get count of solved problems grouped by difficulty level for a user.
      * Difficulty mapping: Easy(0-1.5), Medium(1.5-2.5), Hard(2.5-4), Unlabelled(NULL)
      *
-     * @return array{easy: int, medium: int, hard: int, unlabelled: int}
+     * @return array{easy: int, medium: int, hard: int, unlabelled: int, total: int}
      */
     public static function getSolvedCountByDifficulty(int $identityId): array {
         $sql = "
@@ -841,32 +841,29 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 1.5 THEN p.problem_id END) AS easy,
                 COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 1.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
                 COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
-                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled,
+                COUNT(DISTINCT p.problem_id) AS total
             FROM
                 Problems p
             INNER JOIN
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM Problems_Forfeited pf
-                    WHERE pf.problem_id = p.problem_id
-                        AND pf.user_id = i.user_id
-                        AND i.user_id IS NOT NULL
-                )
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM ACLs a
-                    WHERE a.acl_id = p.acl_id
-                        AND a.owner_id = i.user_id
-                        AND i.user_id IS NOT NULL
-                )
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
         ";
 
-        /** @var array{easy: int, hard: int, medium: int, unlabelled: int}|null */
+        /** @var array{easy: int, hard: int, medium: int, unlabelled: int, total: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
@@ -877,6 +874,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             'medium' => intval($row['medium'] ?? 0),
             'hard' => intval($row['hard'] ?? 0),
             'unlabelled' => intval($row['unlabelled'] ?? 0),
+            'total' => intval($row['total'] ?? 0),
         ];
     }
 
@@ -894,9 +892,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Submissions s
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.identity_id = ?
                 AND s.type = 'normal'
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
                 AND NOT EXISTS (
                     SELECT 1
                     FROM Submissions s2
