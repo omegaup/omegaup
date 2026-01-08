@@ -747,28 +747,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
-                AND NOT EXISTS (
-                    SELECT
-                        `pf`.`problem_id`, `pf`.`user_id`
-                    FROM
-                        `Problems_Forfeited` AS `pf`
-                    WHERE
-                        `pf`.`problem_id` = `p`.`problem_id` AND
-                        `pf`.`user_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
-                AND NOT EXISTS (
-                    SELECT
-                        `a`.`acl_id`
-                    FROM
-                        `ACLs` AS `a`
-                    WHERE
-                        `a`.`acl_id` = `p`.`acl_id` AND
-                        `a`.`owner_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
             GROUP BY
                 p.problem_id
             ORDER BY
@@ -902,18 +892,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ACLs a ON a.acl_id = p.acl_id
                     AND a.owner_id = i.user_id
                     AND i.user_id IS NOT NULL
+            LEFT JOIN
+                Submissions s2 ON s2.problem_id = p.problem_id
+                    AND s2.identity_id = s.identity_id
+                    AND s2.verdict = 'AC'
             WHERE
                 s.identity_id = ?
                 AND s.type = 'normal'
                 AND pf.problem_id IS NULL
                 AND a.acl_id IS NULL
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM Submissions s2
-                    WHERE s2.problem_id = p.problem_id
-                        AND s2.identity_id = s.identity_id
-                        AND s2.verdict = 'AC'
-                );
+                AND s2.submission_id IS NULL;
         ";
 
         /** @var int */
