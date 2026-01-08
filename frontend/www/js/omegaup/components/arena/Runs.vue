@@ -193,6 +193,27 @@
               <th v-if="showDetails && !showDisqualify && !showRejudge">
                 {{ T.arenaRunsActions }}
               </th>
+              <th v-else-if="showDetails || showDisqualify || showRejudge">
+                <div class="dropdown">
+                  <button
+                    class="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {{ T.bulkAction }}
+                  </button>
+                  <div class="dropdown-menu">
+                    <button
+                      class="btn-link dropdown-item"
+                      @click="onDownloadAllCode()"
+                    >
+                      {{ T.wordsDownloadCode }}
+                    </button>
+                  </div>
+                </div>
+              </th>
               <th v-else></th>
             </tr>
           </thead>
@@ -444,6 +465,7 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -884,6 +906,43 @@ export default class Runs extends Vue {
 
   setFilterProblem(problemAlias: string): void {
     this.filterProblem = { key: problemAlias, value: problemAlias };
+  }
+
+  async onDownloadAllCode() {
+    if (!this.filteredRuns.length) {
+      ui.error(T.noRunsProvided);
+      return;
+    }
+
+    // Extract relevant fields for the request
+    const runs = this.filteredRuns;
+
+    try {
+      const response = await fetch('/api/run/downloadMultipleRuns/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ runs }),
+      });
+
+      if (!response.ok) {
+        ui.apiError(await response.json());
+        return;
+      }
+
+      // Handle the response as a file download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'runs.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      ui.error(error);
+    }
   }
 }
 </script>
