@@ -247,41 +247,51 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  mounted(): void {
+    if (window.innerWidth < 992) return;
+
+    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
+      '.nav-item.dropdown',
+    );
+
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener('mouseenter', () => {
+        dropdowns.forEach((d) => {
+          if (d !== dropdown) {
+            d.classList.remove('show');
+            d.querySelector('.dropdown-menu')?.classList.remove('show');
+            d.querySelector('.dropdown-toggle')?.setAttribute(
+              'aria-expanded',
+              'false',
+            );
+          }
+        });
+
+        dropdown.classList.add('show');
+        dropdown.querySelector('.dropdown-menu')?.classList.add('show');
+        dropdown
+          .querySelector('.dropdown-toggle')
+          ?.setAttribute('aria-expanded', 'true');
+      });
+
+      dropdown.addEventListener('mouseleave', () => {
+        dropdown.classList.remove('show');
+        dropdown.querySelector('.dropdown-menu')?.classList.remove('show');
+        dropdown
+          .querySelector('.dropdown-toggle')
+          ?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  beforeDestroy(): void {
+    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
+      '.nav-item.dropdown',
+    );
+    dropdowns.forEach((dropdown) => {
+      dropdown.replaceWith(dropdown.cloneNode(true));
+    });
+  }
 }
 </script>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.nav-link {
-  transition: background-color 0.2s ease;
-  border-radius: 4px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    text-decoration: none;
-  }
-}
-
-.dropdown-menu {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  min-width: 20rem;
-  max-width: 80vw;
-  width: max-content;
-  padding: 12px 14px;
-}
-
-.dropdown-item {
-  border-radius: 4px;
-  margin-bottom: 2px;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: rgba(187, 187, 187, 0.3);
-  }
-}
-</style>
