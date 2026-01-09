@@ -247,5 +247,51 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  mounted(): void {
+    if (window.innerWidth < 992) return;
+
+    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
+      '.nav-item.dropdown',
+    );
+
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener('mouseenter', () => {
+        dropdowns.forEach((d) => {
+          if (d !== dropdown) {
+            d.classList.remove('show');
+            d.querySelector('.dropdown-menu')?.classList.remove('show');
+            d.querySelector('.dropdown-toggle')?.setAttribute(
+              'aria-expanded',
+              'false',
+            );
+          }
+        });
+
+        dropdown.classList.add('show');
+        dropdown.querySelector('.dropdown-menu')?.classList.add('show');
+        dropdown
+          .querySelector('.dropdown-toggle')
+          ?.setAttribute('aria-expanded', 'true');
+      });
+
+      dropdown.addEventListener('mouseleave', () => {
+        dropdown.classList.remove('show');
+        dropdown.querySelector('.dropdown-menu')?.classList.remove('show');
+        dropdown
+          .querySelector('.dropdown-toggle')
+          ?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  beforeDestroy(): void {
+    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
+      '.nav-item.dropdown',
+    );
+    dropdowns.forEach((dropdown) => {
+      dropdown.replaceWith(dropdown.cloneNode(true));
+    });
+  }
 }
 </script>

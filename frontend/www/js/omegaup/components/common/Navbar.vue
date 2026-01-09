@@ -139,7 +139,10 @@
                     >
                       <font-awesome-icon :icon="['fas', 'user']" />
                       {{ T.navViewProfile }}
-                      <div v-if="profileProgress !== 0" class="progress mt-2">
+                      <div
+                        v-if="profileProgress !== 0"
+                        class="progress mt-2 position-relative"
+                      >
                         <div
                           class="progress-bar progress-bar-striped bg-info"
                           role="progressbar"
@@ -148,6 +151,9 @@
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
+                        <small class="progress-text">
+                          {{ profileProgress.toFixed(1) }}%
+                        </small>
                       </div>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -468,6 +474,33 @@ nav.navbar {
     background-color: var(--header-navbar-brand-background-color);
   }
 
+  .navbar-brand img {
+    transition: transform 0.3s ease;
+  }
+
+  .navbar-brand:hover img {
+    transform: scale(1.08);
+  }
+
+  .navbar-nav .nav-link {
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+  }
+
+  .navbar-nav .nav-link:hover {
+    background-color: var(--header-navbar-hover-background-color);
+    text-decoration: none;
+  }
+
+  .nav-user-link img {
+    border-radius: 4px;
+    transition: transform 0.25s ease;
+  }
+
+  .nav-user-link:hover img {
+    transform: scale(1.05);
+  }
+
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
   }
@@ -485,12 +518,41 @@ nav.navbar {
     max-height: 75vh;
     scrollbar-width: none;
   }
+
+  a[data-logout-button] {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 4px;
+  }
+
+  a[data-logout-button]:hover {
+    background-color: rgba($omegaup-pink, 0.2);
+    color: $omegaup-pink !important;
+  }
+
+  a[data-logout-button]:hover svg {
+    color: $omegaup-pink !important;
+  }
+}
+
+.progress {
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--header-navbar-dropdown-item-font-color);
+  pointer-events: none;
 }
 
 .allow-overflow {
-  overflow-y: scroll;
-  height: 65vh;
-  max-width: 40vw;
+  overflow-y: auto;
+  max-height: 65vh;
+  max-width: min(90vw, 420px);
 }
 
 .nav-login-text {
@@ -532,7 +594,7 @@ nav.navbar {
 
 @media only screen and (max-width: 992px) {
   .allow-overflow {
-    height: 45vh;
+    max-height: 45vh;
     max-width: 80vw;
   }
 }
