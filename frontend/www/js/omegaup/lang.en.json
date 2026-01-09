@@ -1558,6 +1558,7 @@
 	"profile": "Name",
 	"profileAddIdentitiesTooltip": "Add identities using their omegaUp account name",
 	"profileApiTokensEmpty": "No API tokens",
+	"profileAttemptingProblems": "Attempting",
 	"profileAuthorRank": "Author rank",
 	"profileBasicInformation": "Basic information",
 	"profileBookmarkedProblems": "Bookmarked problems",

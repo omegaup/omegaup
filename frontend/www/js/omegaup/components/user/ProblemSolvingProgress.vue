@@ -110,7 +110,10 @@
           >
             {{ hoveredLabel }}
           </span>
-          <span v-if="!hoveredSegment && attempting > 0" class="attempting-label">
+          <span
+            v-if="!hoveredSegment && attempting > 0"
+            class="attempting-label"
+          >
             {{ attempting }} {{ T.profileAttemptingProblems }}
           </span>
         </div>
