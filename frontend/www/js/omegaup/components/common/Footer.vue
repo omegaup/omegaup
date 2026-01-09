@@ -209,7 +209,7 @@ export default class Footer extends Vue {
 @import '../../../../sass/main.scss';
 
 .common-footer {
-  background-color: #5e5eff;
+  background-color: $omegaup-vibrant-blue;
   color: white;
   flex-grow: 1;
 
@@ -325,5 +325,5 @@ export default class Footer extends Vue {
   }
 }
 
-.text-center { text-align: center !important; }
+
 </style>
