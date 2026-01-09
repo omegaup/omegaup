@@ -6026,6 +6026,18 @@ export namespace messages {
   export type UserProfileRequest = { [key: string]: any };
   export type _UserProfileServerResponse = any;
   export type UserProfileResponse = types.UserProfileInfo;
+  export type UserProfileStatisticsRequest = { [key: string]: any };
+  export type UserProfileStatisticsResponse = {
+    attempting: number;
+    difficulty: {
+      easy: number;
+      hard: number;
+      medium: number;
+      unlabelled: number;
+    };
+    solved: number;
+    tags: { count: number; name: string }[];
+  };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -6853,6 +6865,9 @@ export namespace controllers {
     profile: (
       params?: messages.UserProfileRequest,
     ) => Promise<messages.UserProfileResponse>;
+    profileStatistics: (
+      params?: messages.UserProfileStatisticsRequest,
+    ) => Promise<messages.UserProfileStatisticsResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;
