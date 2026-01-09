@@ -1,61 +1,38 @@
 <template>
-  <!-- id-lint off -->
-  <div
-    id="testimonials-carousel-display"
-    class="carousel slide"
-    data-ride="carousel"
-    data-interval="8000"
-  >
-    <!-- id-lint off -->
-    <ol class="carousel-indicators">
-      <li
-        v-for="(_, index) in testimonials"
-        :key="index"
-        data-target="#testimonials-carousel-display"
-        :data-slide-to="index"
-        :class="{ active: !index }"
-      ></li>
-    </ol>
-    <div
-      class="carousel-inner text-center py-5 py-md-0 d-flex align-items-center"
-    >
-      <div
-        v-for="(testimonial, index) in testimonials"
-        :key="index"
-        class="carousel-item"
-        :class="{ active: !index }"
-      >
-        <div class="container-lg py-4 px-5">
-          <blockquote class="blockquote text-center">
-            <p class="mb-0">{{ testimonial.text[T.locale] }}</p>
-            <footer class="blockquote-footer mt-3">
-              {{ testimonial.author.name }},
-              <cite :title="testimonial.author.title[T.locale]">{{
-                testimonial.author.title[T.locale]
-              }}</cite>
-            </footer>
-          </blockquote>
+  <div class="testimonials-container py-5 my-5">
+    <div class="container-lg">
+      <div class="row align-items-center">
+        <!-- Left Column: Author Cards (Tabs) -->
+        <div class="col-lg-5 mb-5 mb-lg-0">
+          <div class="author-tabs pr-lg-4">
+            <div
+              v-for="(testimonial, index) in testimonials"
+              :key="index"
+              class="author-card p-4 mb-3 d-flex flex-column transition-all cursor-pointer"
+              :class="{ active: activeIndex === index }"
+              @click="activeIndex = index"
+            >
+              <span class="author-name font-weight-bold mb-1">{{ testimonial.author.name }}</span>
+              <span class="author-title small opacity-75">{{ testimonial.author.title[T.locale] }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Testimonial Content -->
+        <div class="col-lg-7">
+          <div class="testimonial-content pl-lg-4">
+            <h2 class="display-4 font-weight-bold mb-4 text-indigo">Testimonial</h2>
+            <transition name="fade" mode="out-in">
+              <div :key="activeIndex" class="testimonial-box">
+                <p class="lead font-italic mb-0">
+                  {{ testimonials[activeIndex].text[T.locale] }}
+                </p>
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
     </div>
-    <a
-      class="carousel-control-prev"
-      href="#testimonials-carousel-display"
-      role="button"
-      data-slide="prev"
-    >
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">{{ T.wordsPrevious }}</span>
-    </a>
-    <a
-      class="carousel-control-next"
-      href="#testimonials-carousel-display"
-      role="button"
-      data-slide="next"
-    >
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">{{ T.wordsNext }}</span>
-    </a>
   </div>
 </template>
 
@@ -68,34 +45,78 @@ import testimonialsConfig from '../../testimonials.config';
 export default class Testimonials extends Vue {
   T = T;
   testimonials = testimonialsConfig;
+  activeIndex = 0;
 }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.carousel {
-  background: var(--homepage-carousel-background-color) !important;
-  color: var(--homepage-carousel-font-color);
+.testimonials-container {
+  background: white;
 }
 
-.carousel-inner {
-  min-height: 31rem;
-
-  .carousel-item {
-    blockquote.blockquote {
-      font-size: 1.15rem;
-      line-height: 1.15;
-
-      footer {
-        color: wheat;
-      }
+.author-card {
+  background: #f8f9fa;
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  &.active {
+    background: #6366f1;
+    color: white;
+    box-shadow: 0 10px 15px rgba(99, 102, 241, 0.2);
+    transform: translateX(10px);
+    
+    .author-title {
+      opacity: 0.9 !important;
     }
   }
+  
+  &:not(.active):hover {
+    background: #f0f0f0;
+    transform: translateX(5px);
+  }
 }
-@media only screen and (min-width: 767px) {
-  .carousel-inner {
-    min-height: 12rem;
+
+.text-indigo {
+  color: #6366f1;
+}
+
+.testimonial-box {
+  min-height: 200px;
+  background: rgba(99, 102, 241, 0.03);
+  padding: 2.5rem;
+  border-left: 5px solid #6366f1;
+  border-radius: 0.5rem 1.5rem 1.5rem 0.5rem;
+  
+  p.lead {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #334155;
+  }
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+// Transitions
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@media (max-width: 991px) {
+  .author-card.active {
+    transform: translateY(-5px);
   }
 }
 </style>

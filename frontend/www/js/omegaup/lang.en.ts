@@ -805,6 +805,11 @@ const translations: { [key: string]: string; } = {
   homepageTeachSectionTitle: "Teach",
   homepageTrainSectionDescription: "Solve problems and improve your skills",
   homepageTrainSectionTitle: "Train",
+  homepageOpenSourceTitle: "OMEGAUP IS OPEN SOURCE",
+  homepageOpenSourceSubtitle: "HELP CONTRIBUTE TO THE PROJECT",
+  homepageGitHubRepository: "GITHUB REPOSITORY",
+  homepageWriteToUs: "Or write to us at:",
+  homepageGettingStartedTitle: "Get Started with Our Platform",
   identityAlreadyAssociated: "You already have one identity associated with the same group.",
   identityAlreadyInUse: "Identity is already used by another account.",
   identityInGroup: "Identity is already associated to the group.",
@@ -2192,4 +2197,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };

@@ -69,61 +69,17 @@
       </div>
     </div>
     <omegaup-testimonials></omegaup-testimonials>
-    <div class="container-lg py-5">
-      <omegaup-section
-        :title="T.homepageCompeteSectionTitle"
-        :description="T.homepageCompeteSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToContests,
-            href: '/arena/',
-          },
-        ]"
-        :image-src="'/media/homepage/contests_section.svg'"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageTrainSectionTitle"
-        :description="T.homepageTrainSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToProblems,
-            href: '/problem/',
-          },
-        ]"
-        :image-src="'/media/homepage/problems_section.svg'"
-        :image-to-right="true"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageCreateSectionTitle"
-        :description="T.homepageCreateSectionDescription"
-        :buttons="
-          !isUnder13User
-            ? [
-                {
-                  text: T.buttonCreateProblem,
-                  href: '/problem/new/',
-                },
-                {
-                  text: T.buttonCreateContest,
-                  href: '/contest/new/',
-                },
-              ]
-            : []
-        "
-        :image-src="'/media/homepage/create_section.svg'"
-      ></omegaup-section>
-      <omegaup-section
-        :title="T.homepageTeachSectionTitle"
-        :description="T.homepageTeachSectionDescription"
-        :buttons="[
-          {
-            text: T.buttonGoToCourses,
-            href: '/course/',
-          },
-        ]"
-        :image-src="'/media/homepage/courses_section.svg'"
-        :image-to-right="true"
-      ></omegaup-section>
+    <omegaup-getting-started
+      :is-under13-user="isUnder13User"
+    ></omegaup-getting-started>
+    <div class="container-lg my-5">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <omegaup-open-source-banner></omegaup-open-source-banner>
+        </div>
+      </div>
+    </div>
+    <div class="container-lg py-5 mb-5">
       <omegaup-sponsors
         :title="T.homepageSponsorsSectionTitle"
         :logos="[
@@ -153,6 +109,8 @@ import homepage_Carousel from './Carousel.vue';
 import homepage_CoderOfTheMonth from './CoderOfTheMonth.vue';
 import homepage_SchoolOfTheMonth from './SchoolOfTheMonth.vue';
 import homepage_Testimonials from './Testimonials.vue';
+import homepage_OpenSourceBanner from './OpenSourceBanner.vue';
+import homepage_GettingStarted from './GettingStarted.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
@@ -169,6 +127,8 @@ Vue.use(VueCookies, { expire: -1 });
     'omegaup-school-rank': school_Rank,
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
+    'omegaup-getting-started': homepage_GettingStarted,
+    'omegaup-open-source-banner': homepage_OpenSourceBanner,
     'omegaup-section': homepage_Section,
     'omegaup-sponsors': homepage_Sponsors,
     'omegaup-cookie-accept-decline': homepage_Cookie,
