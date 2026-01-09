@@ -1947,6 +1947,7 @@ userEditPrivateProfile = "¿Le gustaría ocultar los detalles del perfil de otro
 userEditProfileImage = "Imagen de perfil"
 userEditSchoolGrade = "Grado escolar"
 userEditSchoolSuccess = "La información de la escuela se actualizó correctamente."
+userEditShowProblemTags = "Mostrar etiquetas de problemas"
 userEditSuccess = "Perfil actualizado correctamente"
 userEditSuccessfulEmailUpdate = "Email actualizado correctamente. En unos minutos recibirás más instrucciones en tu email. No olvides revisar tu carpeta de Spam."
 userEditTertiary = "Vocacional"
