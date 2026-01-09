@@ -4756,16 +4756,15 @@ Compare two users' profiles and stats
 
 | Name        | Type           | Description |
 | ----------- | -------------- | ----------- |
-| `username`  | `null\|string` |             |
 | `username1` | `null\|string` |             |
 | `username2` | `null\|string` |             |
 
 ### Returns
 
-| Name    | Type                    |
-| ------- | ----------------------- |
-| `user1` | `types.UserCompareData` |
-| `user2` | `types.UserCompareData` |
+| Name    | Type                          |
+| ------- | ----------------------------- |
+| `user1` | `types.UserCompareData\|null` |
+| `user2` | `types.UserCompareData\|null` |
 
 ## `/api/user/contestStats/`
 

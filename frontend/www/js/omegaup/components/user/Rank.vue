@@ -195,7 +195,7 @@
       </table>
     </div>
     <div v-if="isIndex" class="card-footer">
-      <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
+      <a href="/rank/">{{ T.rankSeeGeneralRanking }}</a>
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator
