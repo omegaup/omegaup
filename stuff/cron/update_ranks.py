@@ -21,11 +21,13 @@ from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
-from database.school_of_the_month import check_existing_school_of_the_next_month
-from database.school_of_the_month import remove_school_of_the_month_candidates
-from database.school_of_the_month import get_school_of_the_month_candidates
-from database.school_of_the_month import insert_school_of_the_month_candidates
-from database.school_of_the_month import School
+from database.school_of_the_month import (
+    check_existing_school_of_the_next_month,
+    remove_school_of_the_month_candidates,
+    get_school_of_the_month_candidates,
+    insert_school_of_the_month_candidates,
+    School,
+)
 
 
 sys.path.insert(
@@ -594,12 +596,13 @@ def update_school_of_the_month_candidates(
                                              candidates)
 
 
-def testing_function(cur: mysql.connector.cursor.MySQLCursorDict,
-                     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-                     first_day_of_current_month: datetime.date,
-                     update_school_of_the_month: bool
-                     ) -> None:
-    logging.info('Testing function for school of the month candidates...')
+def update_school_new(cur: mysql.connector.cursor.MySQLCursorDict,
+                      cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+                      first_day_of_current_month: datetime.date,
+                      update_school_of_the_month: bool
+                      ) -> None:
+    '''Testing function for school of the month candidates'''
+    logging.info('Testing function for school of the month candidates... hola')
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
     exist_school = check_existing_school_of_the_next_month(
