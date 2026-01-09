@@ -2336,6 +2336,57 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get profile statistics including solved problems by difficulty and tags distribution.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiProfileStatistics(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        if (
+            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userProfileIsPrivate'
+            );
+        }
+
+        $difficultyStats = \OmegaUp\DAO\Problems::getSolvedCountByDifficulty(
+            $identity->identity_id
+        );
+        $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
+            $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+            $identity->identity_id
+        );
+
+        return [
+            'solved' => $difficultyStats['total'],
+            'attempting' => $attemptingCount,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
+            'tags' => $tagsDistribution,
+        ];
+    }
+
+    /**
      * It will return a boolean value indicating whether user can see
      * information of the given identity. There are three scenarios where this
      * function returns false:

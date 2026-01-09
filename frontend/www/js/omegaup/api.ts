@@ -2143,6 +2143,10 @@ export const User = {
       );
     return x;
   }),
+  profileStatistics: apiCall<
+    messages.UserProfileStatisticsRequest,
+    messages.UserProfileStatisticsResponse
+  >('/api/user/profileStatistics/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse
