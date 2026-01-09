@@ -4756,7 +4756,6 @@ Compare two users' profiles and stats
 
 | Name        | Type           | Description |
 | ----------- | -------------- | ----------- |
-| `username`  | `null\|string` |             |
 | `username1` | `null\|string` |             |
 | `username2` | `null\|string` |             |
 

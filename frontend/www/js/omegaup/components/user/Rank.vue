@@ -56,7 +56,7 @@
       <div class="d-flex flex-wrap align-items-center">
         <template v-if="!isSelectionMode">
           <a
-            href="/compare/"
+            href="/rank/compare/"
             class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
           >
             <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
@@ -331,7 +331,7 @@ export default class UserRank extends Vue {
 
   compareSelectedUsers(): void {
     if (this.selectedUsers.length === 2) {
-      window.location.href = `/compare/?username1=${encodeURIComponent(
+      window.location.href = `/rank/compare/?username1=${encodeURIComponent(
         this.selectedUsers[0],
       )}&username2=${encodeURIComponent(this.selectedUsers[1])}`;
     }
@@ -339,7 +339,7 @@ export default class UserRank extends Vue {
 
   compareVsMe(): void {
     if (this.selectedUsers.length === 1 && this.currentUsername) {
-      window.location.href = `/compare/?username1=${encodeURIComponent(
+      window.location.href = `/rank/compare/?username1=${encodeURIComponent(
         this.selectedUsers[0],
       )}&username2=${encodeURIComponent(this.currentUsername)}`;
     }
