@@ -16,94 +16,86 @@
         ><font-awesome-icon :icon="['fas', 'question-circle']" />
         {{ T.wordsRankingMeasurement }}</a
       >
-      <a
-        v-if="!isIndex && !isSelectionMode"
-        href="/compare/"
-        class="btn btn-outline-primary btn-sm ml-2 d-flex align-items-center"
-      >
-        <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
-        {{ T.compareUsersTitle }}
-      </a>
-      <button
-        v-if="!isIndex && !isSelectionMode"
-        class="btn btn-outline-secondary btn-sm ml-2 d-flex align-items-center"
-        @click="isSelectionMode = true"
-      >
-        <font-awesome-icon :icon="['fas', 'check-square']" class="mr-1" />
-        {{ T.selectTwoUsersToCompare }}
-      </button>
-      <template v-if="!isIndex && isSelectionMode">
-        <button
-          class="btn btn-outline-secondary btn-sm ml-2 d-flex align-items-center"
-          @click="cancelSelection"
-        >
-          <font-awesome-icon :icon="['fas', 'times']" class="mr-1" />
-          {{ T.wordsCancel }}
-        </button>
-        <button
-          class="btn btn-primary btn-sm ml-2 d-flex align-items-center"
-          :disabled="selectedUsers.length !== 2"
-          @click="compareSelectedUsers"
-        >
-          <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
-          {{ T.compareUsersTitle }}
-        </button>
-        <button
-          v-if="selectedUsers.length === 1 && currentUsername"
-          class="btn btn-outline-primary btn-sm ml-2 d-flex align-items-center"
-          @click="compareVsMe"
-        >
-          <font-awesome-icon :icon="['fas', 'user']" class="mr-1" />
-          {{ T.compareVsMe }}
-        </button>
-      </template>
     </h5>
-    <div v-if="!isIndex" class="card-body form-row">
-      <omegaup-common-typeahead
-        class="col col-md-3 pl-0 pr-2"
-        :existing-options="searchResultUsers"
-        :value.sync="searchedUsername"
-        :max-results="10"
-        @update-existing-options="
-          (query) => $emit('update-search-result-users', query)
-        "
-      ></omegaup-common-typeahead>
-      <button
-        class="btn btn-primary form-control col-4 col-md-2 mr-0 mr-md-2"
-        type="button"
-        @click="onSubmit"
-      >
-        {{ T.searchUser }}
-      </button>
-      <template v-if="Object.keys(availableFilters).length > 0">
-        <select
-          v-model="currentFilter"
-          class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
+    <div v-if="!isIndex" class="card-body">
+      <div class="form-row mb-2">
+        <omegaup-common-typeahead
+          class="col col-md-3 pl-0 pr-2"
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          @update-existing-options="
+            (query) => $emit('update-search-result-users', query)
+          "
+        ></omegaup-common-typeahead>
+        <button
+          class="btn btn-primary form-control col-4 col-md-2 mr-0 mr-md-2"
+          type="button"
+          @click="onSubmit"
         >
-          <option value="">
-            {{ T.wordsSelectFilter }}
-          </option>
-          <option
-            v-for="(item, key, index) in availableFilters"
-            :key="index"
-            :value="key"
+          {{ T.searchUser }}
+        </button>
+        <template v-if="Object.keys(availableFilters).length > 0">
+          <select
+            v-model="currentFilter"
+            class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
           >
-            {{ item }}
-          </option>
-        </select>
-      </template>
-      <template v-else-if="!isLogged && !isIndex">
-        <span
-          class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
-          >{{ T.mustLoginToFilterUsers }}</span
-        >
-      </template>
-      <template v-else-if="!isIndex">
-        <span
-          class="badge badge-info text-wrap p-2 mt-2 mt-lg-0 d-flex align-items-center"
-          >{{ T.mustUpdateBasicInfoToFilterUsers }}</span
-        >
-      </template>
+            <option value="">
+              {{ T.wordsSelectFilter }}
+            </option>
+            <option
+              v-for="(item, key, index) in availableFilters"
+              :key="index"
+              :value="key"
+            >
+              {{ item }}
+            </option>
+          </select>
+        </template>
+      </div>
+      <div class="d-flex flex-wrap align-items-center">
+        <template v-if="!isSelectionMode">
+          <a
+            href="/rank/compare/"
+            class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+          >
+            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
+            {{ T.compareUsersTitle }}
+          </a>
+          <button
+            class="btn btn-outline-secondary btn-sm mr-2 mb-2 d-flex align-items-center"
+            @click="isSelectionMode = true"
+          >
+            <font-awesome-icon :icon="['fas', 'check-square']" class="mr-1" />
+            {{ T.selectTwoUsersToCompare }}
+          </button>
+        </template>
+        <template v-else>
+          <button
+            class="btn btn-outline-secondary btn-sm mr-2 mb-2 d-flex align-items-center"
+            @click="cancelSelection"
+          >
+            <font-awesome-icon :icon="['fas', 'times']" class="mr-1" />
+            {{ T.wordsCancel }}
+          </button>
+          <button
+            class="btn btn-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+            :disabled="selectedUsers.length !== 2"
+            @click="compareSelectedUsers"
+          >
+            <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
+            {{ T.compareUsersTitle }}
+          </button>
+          <button
+            v-if="selectedUsers.length === 1 && currentUsername"
+            class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
+            @click="compareVsMe"
+          >
+            <font-awesome-icon :icon="['fas', 'user']" class="mr-1" />
+            {{ T.compareVsMe }}
+          </button>
+        </template>
+      </div>
     </div>
     <div v-if="ranking.length === 0" class="empty-category text-center m-4">
       <h2>{{ T.userRankEmptyList }}</h2>
@@ -206,16 +198,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 import * as time from '../../time';
+import * as ui from '../../ui';
+import common_Paginator from '../common/Paginator.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
-import common_Paginator from '../common/Paginator.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -231,8 +223,8 @@ library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 import { getBlogUrl } from '../../urlHelper';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins
 import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
