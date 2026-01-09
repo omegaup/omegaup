@@ -4980,9 +4980,9 @@ export namespace types {
   }
 
   export interface UserCompareData {
-    contestsCount: number | null;
+    contestsCount?: number;
     profile: types.UserProfileInfo;
-    solvedProblemsCount: number | null;
+    solvedProblemsCount?: number;
   }
 
   export interface UserComparePayload {

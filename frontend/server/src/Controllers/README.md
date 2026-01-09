@@ -4761,10 +4761,10 @@ Compare two users' profiles and stats
 
 ### Returns
 
-| Name    | Type                          |
-| ------- | ----------------------------- |
-| `user1` | `types.UserCompareData\|null` |
-| `user2` | `types.UserCompareData\|null` |
+| Name    | Type                    |
+| ------- | ----------------------- |
+| `user1` | `types.UserCompareData` |
+| `user2` | `types.UserCompareData` |
 
 ## `/api/user/contestStats/`
 
