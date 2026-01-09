@@ -18,7 +18,7 @@
             />
           </div>
           <div class="col-md-2 d-flex align-items-end justify-content-center">
-            <span class="h4 mb-2 text-muted">VS</span>
+            <span class="h4 mb-2 text-muted" aria-hidden="true">VS</span>
           </div>
           <div class="col-md-5">
             <label class="form-label">{{ T.compareUser2Label }}</label>

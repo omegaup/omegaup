@@ -219,4 +219,35 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
             $response['templateProperties']['payload']
         );
     }
+
+    /**
+     * Test comparing users without authentication
+     */
+    public function testCompareWithoutAuthentication() {
+        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['username' => 'publicuser1'])
+        );
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['username' => 'publicuser2'])
+        );
+
+        // Call compare API without authentication
+        $response = \OmegaUp\Controllers\User::apiCompare(
+            new \OmegaUp\Request([
+                'username1' => 'publicuser1',
+                'username2' => 'publicuser2',
+            ])
+        );
+
+        $this->assertNotNull($response['user1']);
+        $this->assertNotNull($response['user2']);
+        $this->assertSame(
+            'publicuser1',
+            $response['user1']['profile']['username']
+        );
+        $this->assertSame(
+            'publicuser2',
+            $response['user2']['profile']['username']
+        );
+    }
 }

@@ -136,7 +136,7 @@ export default class CompareCard extends Vue {
 .stat-item {
   text-align: center;
   padding: 0.5rem;
-  background-color: var(--compare-stat-bg, #f8f9fa);
+  background-color: #f8f9fa;
   border-radius: 0.25rem;
 }
 
