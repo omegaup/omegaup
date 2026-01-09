@@ -23,6 +23,7 @@ describe('ranking', () => {
   beforeEach(() => {
     dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
     jest.useFakeTimers();
+    scoreboard.start_time = new Date(now - 0.5 * 60 * 1000);
   });
 
   afterEach(() => {
