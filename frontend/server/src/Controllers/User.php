@@ -52,7 +52,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  * @psalm-type UserDocument=array{name: string, url: string}
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
- * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int, contestsCount: int}
+ * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int|null, contestsCount: int|null}
  * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -5152,11 +5152,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 $targetUser
             )
         ) {
-            // Return limited profile for private users
+            // Return limited profile for private users without counts to avoid leaking info
             return [
                 'profile' => self::getPrivateUserProfile($identity),
-                'solvedProblemsCount' => 0,
-                'contestsCount' => 0,
+                'solvedProblemsCount' => null,
+                'contestsCount' => null,
             ];
         }
 

@@ -56,7 +56,7 @@
       <div class="d-flex flex-wrap align-items-center">
         <template v-if="!isSelectionMode">
           <a
-            href="/rank/compare/"
+            href="/compare/"
             class="btn btn-outline-primary btn-sm mr-2 mb-2 d-flex align-items-center"
           >
             <font-awesome-icon :icon="['fas', 'exchange-alt']" class="mr-1" />
@@ -222,7 +222,7 @@ library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
 
 import { getBlogUrl } from '../../urlHelper';
 
-// Import Bootstrap and BootstrapVue CSS files (order is important)
+// Import Bootstrap and BootstrapVue CSS files (order is important: base before overrides)
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap/dist/css/bootstrap.css';
 // Import Only Required Plugins

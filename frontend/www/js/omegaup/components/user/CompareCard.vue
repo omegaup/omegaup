@@ -37,7 +37,7 @@
         <div class="stat-item">
           <div class="stat-label">{{ T.profileSolvedProblems }}</div>
           <div class="stat-value">
-            <strong>{{ solvedProblemsCount }}</strong>
+            <strong>{{ solvedProblemsCount !== null ? solvedProblemsCount : 'N/A' }}</strong>
           </div>
         </div>
 
@@ -45,7 +45,7 @@
         <div class="stat-item">
           <div class="stat-label">{{ T.profileContests }}</div>
           <div class="stat-value">
-            <strong>{{ contestsCount }}</strong>
+            <strong>{{ contestsCount !== null ? contestsCount : 'N/A' }}</strong>
           </div>
         </div>
 
@@ -94,14 +94,14 @@ import * as UI from '../../ui';
 @Component
 export default class CompareCard extends Vue {
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: 0 }) solvedProblemsCount!: number;
-  @Prop({ default: 0 }) contestsCount!: number;
+  @Prop({ default: null }) solvedProblemsCount!: number | null;
+  @Prop({ default: null }) contestsCount!: number | null;
   @Prop({ default: '' }) comparisonClass!: string;
 
   T = T;
 
   get profileUrl(): string {
-    return `/profile/${this.profile.username}/`;
+    return `/profile/${encodeURIComponent(this.profile.username || '')}/`;
   }
 
   get profileImageAlt(): string {

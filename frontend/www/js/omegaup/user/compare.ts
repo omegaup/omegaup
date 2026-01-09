@@ -5,8 +5,8 @@ import { OmegaUp } from '../omegaup';
 
 interface UserCompareData {
   profile: types.UserProfileInfo;
-  solvedProblemsCount: number;
-  contestsCount: number;
+  solvedProblemsCount: number | null;
+  contestsCount: number | null;
 }
 
 interface UserComparePayload {

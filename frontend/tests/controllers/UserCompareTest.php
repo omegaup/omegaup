@@ -27,6 +27,12 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
+        // Verify the run was graded as AC
+        $runFromDb = \OmegaUp\DAO\Runs::getByPK(
+            \OmegaUp\DAO\Submissions::getByGuid($run['response']['guid'])->current_run_id
+        );
+        $this->assertSame('AC', $runFromDb->verdict);
+
         // Login as user2 to call compare API
         $login2 = self::login($identity2);
 
@@ -149,6 +155,12 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run);
 
+        // Verify the run was graded as AC
+        $runFromDb = \OmegaUp\DAO\Runs::getByPK(
+            \OmegaUp\DAO\Submissions::getByGuid($run['response']['guid'])->current_run_id
+        );
+        $this->assertSame('AC', $runFromDb->verdict);
+
         // Login as public user to call compare API
         $publicLogin = self::login($publicIdentity);
 
@@ -164,9 +176,8 @@ class UserCompareTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($response['user2']);
         // Private profile should have limited info
         $this->assertTrue($response['user2']['profile']['is_private']);
-        // Verify that solved problems are hidden for private profiles
-        $this->assertSame(
-            0,
+        // Verify that solved problems are hidden for private profiles (null instead of actual count)
+        $this->assertNull(
             $response['user2']['solvedProblemsCount'],
             'Private profile should hide solved problems count'
         );

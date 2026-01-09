@@ -105,8 +105,8 @@ import user_CompareCard from './CompareCard.vue';
 
 interface UserCompareData {
   profile: types.UserProfileInfo;
-  solvedProblemsCount: number;
-  contestsCount: number;
+  solvedProblemsCount: number | null;
+  contestsCount: number | null;
 }
 
 @Component({
@@ -121,12 +121,19 @@ export default class CompareUsers extends Vue {
   @Prop({ default: null }) initialUsername2!: string | null;
 
   T = T;
-  user1: UserCompareData | null = this.initialUser1;
-  user2: UserCompareData | null = this.initialUser2;
-  inputUsername1: string = this.initialUsername1 || '';
-  inputUsername2: string = this.initialUsername2 || '';
+  user1: UserCompareData | null = null;
+  user2: UserCompareData | null = null;
+  inputUsername1: string = '';
+  inputUsername2: string = '';
   isLoading = false;
   errorMessage: string | null = null;
+
+  created(): void {
+    this.user1 = this.initialUser1 ?? this.user1;
+    this.user2 = this.initialUser2 ?? this.user2;
+    this.inputUsername1 = this.initialUsername1 ?? this.inputUsername1;
+    this.inputUsername2 = this.initialUsername2 ?? this.inputUsername2;
+  }
 
   get canCompare(): boolean {
     return (
@@ -181,6 +188,9 @@ export default class CompareUsers extends Vue {
 
     const solved1 = this.user1.solvedProblemsCount;
     const solved2 = this.user2.solvedProblemsCount;
+
+    // If either count is null (private profile), don't show comparison styling
+    if (solved1 === null || solved2 === null) return '';
 
     if (userNumber === 1) {
       if (solved1 > solved2) return 'compare-winner';

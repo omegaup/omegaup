@@ -2170,7 +2170,7 @@ const translations: { [key: string]: string; } = {
   wordsSearch: "Search",
   wordsSearchBy: "Search by",
   wordsSeeCourse: "See course",
-  wordsSeeGeneralRanking: "See the general ranking",
+  rankSeeGeneralRanking: "See the general ranking",
   wordsSeeLatestSubmissions: "See latest submissions sent by %(username)",
   wordsSeeSolution: "See Solution",
   wordsSelect: "Select",
