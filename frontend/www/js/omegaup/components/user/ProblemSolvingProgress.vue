@@ -101,7 +101,7 @@
             <span class="solved-count" :style="hoveredCountStyle">{{
               displayCount
             }}</span>
-            <span class="total-count">/{{ total }}</span>
+            <span v-if="hoveredSegment" class="total-count">/{{ total }}</span>
           </div>
           <span
             v-if="hoveredSegment"
