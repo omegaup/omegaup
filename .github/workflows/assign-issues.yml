@@ -156,6 +156,9 @@ jobs:
                                       issueNumber: issue.number
                                   });
 
+                                  // Only consider OPEN or MERGED PRs as valid linked PRs.
+                                  // CLOSED PRs are intentionally ignored so that abandoned/rejected work
+                                  // does not prevent automatic unassignment.
                                   const linkedPRs = result.repository.issue.timelineItems.nodes
                                       .filter(node => {
                                           const source = node.source;
