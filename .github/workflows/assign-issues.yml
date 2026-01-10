@@ -116,16 +116,16 @@ jobs:
 
                           console.log(`\nChecking issue #${issue.number}: ${issue.title}`);
 
+                          // Get issue timeline once per issue to find assignment dates
+                          const timelineEvents = await github.paginate(github.rest.issues.listEventsForTimeline, {
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: issue.number,
+                              per_page: 100
+                          });
+
                           for (const assignee of issue.assignees) {
                               console.log(`  Checking assignee: @${assignee.login}`);
-
-                              // Get issue timeline to find assignment date
-                              const timelineEvents = await github.paginate(github.rest.issues.listEventsForTimeline, {
-                                  owner: context.repo.owner,
-                                  repo: context.repo.repo,
-                                  issue_number: issue.number,
-                                  per_page: 100
-                              });
 
                               // Find the most recent assignment event for this user
                               const assignedEvents = timelineEvents.filter(
