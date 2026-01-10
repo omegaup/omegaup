@@ -41,7 +41,7 @@ const translations: { [key: string]: string; } = {
   apiNotFound: "El API solicitada no fue encontrada.",
   apiTokenAdd: "Agregar token de API",
   apiTokenDescription: "Si quieres usar la API de omegaup, puedes crear un token de API, cada token puede hacer hasta 1000 peticiones por hora y puedes tener hasta 5 tokens de API.",
-  apiTokenLastTimeUsed: "'\u00daltima vez usado",
+  apiTokenLastTimeUsed: "\u00daltima vez usado",
   apiTokenLimit: "L\u00edmite",
   apiTokenLimitExceeded: "N\u00famero m\u00e1ximo de tokens de API excedido.",
   apiTokenName: "Nombre del token",
