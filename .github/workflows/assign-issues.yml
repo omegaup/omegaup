@@ -67,7 +67,7 @@ jobs:
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
-                      const DAYS_UNTIL_UNASSIGN = 5;
+                      const DAYS_UNTIL_UNASSIGN = 7;
                       const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
                       console.log('Starting PR check and unassign workflow...');
