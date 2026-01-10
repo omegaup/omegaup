@@ -1,244 +1,246 @@
 name: "Assign Issues"
 
 on:
-  issue_comment:
-    types: [created]
-  schedule:
-    # Run daily to handle reminders and automatic unassignments
+    issue_comment:
+        types: [created]
+    schedule:
+        # Run daily to handle reminders and automatic unassignments
         - cron: "0 3 * * *"
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  assign:
-    # Only run on issue_comment events (handles /assign and /unassign commands)
-    if: github.event_name == 'issue_comment'
-    runs-on: ubuntu-22.04
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Assign or unassign issues
-        uses: takanome-dev/assign-issue-action@beta
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+    assign:
+        # Only run on issue_comment events (handles /assign and /unassign commands)
+        if: github.event_name == 'issue_comment'
+        runs-on: ubuntu-22.04
+        permissions:
+            issues: write
+            pull-requests: write
+        steps:
+            - name: Assign or unassign issues
+              uses: takanome-dev/assign-issue-action@beta
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
                   maintainers: ""
-          self_assign_cmd: /assign
-          self_unassign_cmd: /unassign
-          # Unassign after 7 days if no PR is opened
-          days_until_unassign: 7
-          enable_auto_suggestion: true
-          allow_self_assign_author: true
-          enable_reminder: true
-          reminder_days: auto
-          reminder_comment: >
-            Quick reminder: please open a pull request within 3.5 days
-            or this issue will be unassigned so others can pick it up.
+                  self_assign_cmd: /assign
+                  self_unassign_cmd: /unassign
+                  # Unassign after 7 days if no PR is opened
+                  days_until_unassign: 7
+                  enable_auto_suggestion: true
+                  allow_self_assign_author: true
+                  enable_reminder: true
+                  reminder_days: auto
+                  reminder_comment: >
+                      Quick reminder: please open a pull request within 3.5 days
+                      or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
-          max_assignments: 3
-          max_assignments_message: >
-            You already have the maximum number of assigned issues (3).
-            Please wrap up or unassign one before taking another.
-          block_assignment: true
-          block_assignment_comment: >
-            Kindly ask the maintainers to assign this issue to you again.
-          assigned_comment: >
-            Assigned! Please open a pull request within 7 days. If no
-            PR is opened, this issue will be automatically unassigned
-            to keep the queue moving.
-          unassigned_comment: >
-            Unassigned because no pull request was opened within 7
-            days. If you want to be assigned to this issue again,
-            kindly ask the maintainers to assign it to you again.
-          assignment_suggestion_comment: >
-            If you'd like to take this issue, comment with /assign.
-            Please note the 7-day PR expectation.
+                  max_assignments: 3
+                  max_assignments_message: >
+                      You already have the maximum number of assigned issues (3).
+                      Please wrap up or unassign one before taking another.
+                  block_assignment: true
+                  block_assignment_comment: >
+                      Kindly ask the maintainers to assign this issue to you again.
+                  assigned_comment: >
+                      Assigned! Please open a pull request within 7 days. If no
+                      PR is opened, this issue will be automatically unassigned
+                      to keep the queue moving.
+                  unassigned_comment: >
+                      Unassigned because no pull request was opened within 7
+                      days. If you want to be assigned to this issue again,
+                      kindly ask the maintainers to assign it to you again.
+                  assignment_suggestion_comment: >
+                      If you'd like to take this issue, comment with /assign.
+                      Please note the 7-day PR expectation.
 
-  check-pr-and-unassign:
-    # Only run on schedule or manual trigger (checks for PRs and unassigns stale assignments)
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-22.04
-    permissions:
-      issues: write
-      pull-requests: read
-    steps:
-      - name: Check for PRs and unassign stale issues
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const DAYS_UNTIL_UNASSIGN = 7;
-            const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    check-pr-and-unassign:
+        # Only run on schedule or manual trigger (checks for PRs and unassigns stale assignments)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        runs-on: ubuntu-22.04
+        permissions:
+            issues: write
+            pull-requests: read
+        steps:
+            - name: Check for PRs and unassign stale issues
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const core = require('@actions/core');
 
-            console.log('Starting PR check and unassign workflow...');
+                      const DAYS_UNTIL_UNASSIGN = 7;
+                      const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-            // Fetch all open issues with assignees
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open',
-                assignee: '*',
-                per_page: 100
-            });
+                      console.log('Starting PR check and unassign workflow...');
 
-            console.log(`Found ${issues.length} open issues with assignees`);
+                      // Fetch all open issues with assignees
+                      const issues = await github.paginate(github.rest.issues.listForRepo, {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          state: 'open',
+                          assignee: '*',
+                          per_page: 100
+                      });
 
-            // GraphQL query to find PRs that reference a specific issue (with cursor pagination)
-            const findLinkedPRsQuery = `
-                query($owner: String!, $repo: String!, $issueNumber: Int!, $cursor: String) {
-                    repository(owner: $owner, name: $repo) {
-                        issue(number: $issueNumber) {
-                            timelineItems(first: 100, after: $cursor, itemTypes: [CROSS_REFERENCED_EVENT]) {
-                                pageInfo {
-                                    hasNextPage
-                                    endCursor
-                                }
-                                nodes {
-                                    ... on CrossReferencedEvent {
-                                        source {
-                                            ... on PullRequest {
-                                                number
-                                                state
-                                                author {
-                                                    login
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            `;
+                      console.log(`Found ${issues.length} open issues with assignees`);
 
-            // Helper function to fetch all timeline items with cursor pagination
-            async function fetchAllLinkedPRs(issueNumber) {
-                const allNodes = [];
-                let cursor = null;
-                let hasNextPage = true;
+                      // GraphQL query to find PRs that reference a specific issue (with cursor pagination)
+                      const findLinkedPRsQuery = `
+                          query($owner: String!, $repo: String!, $issueNumber: Int!, $cursor: String) {
+                              repository(owner: $owner, name: $repo) {
+                                  issue(number: $issueNumber) {
+                                      timelineItems(first: 100, after: $cursor, itemTypes: [CROSS_REFERENCED_EVENT]) {
+                                          pageInfo {
+                                              hasNextPage
+                                              endCursor
+                                          }
+                                          nodes {
+                                              ... on CrossReferencedEvent {
+                                                  source {
+                                                      ... on PullRequest {
+                                                          number
+                                                          state
+                                                          author {
+                                                              login
+                                                          }
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      `;
 
-                while (hasNextPage) {
-                    const result = await github.graphql(findLinkedPRsQuery, {
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issueNumber: issueNumber,
-                        cursor: cursor
-                    });
+                      // Helper function to fetch all timeline items with cursor pagination
+                      async function fetchAllLinkedPRs(issueNumber) {
+                          const allNodes = [];
+                          let cursor = null;
+                          let hasNextPage = true;
 
-                    const timelineData = result.repository.issue.timelineItems;
-                    allNodes.push(...timelineData.nodes);
-                    hasNextPage = timelineData.pageInfo.hasNextPage;
-                    cursor = timelineData.pageInfo.endCursor;
-                }
+                          while (hasNextPage) {
+                              const result = await github.graphql(findLinkedPRsQuery, {
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issueNumber: issueNumber,
+                                  cursor: cursor
+                              });
 
-                return allNodes;
-            }
+                              const timelineData = result.repository.issue.timelineItems;
+                              allNodes.push(...timelineData.nodes);
+                              hasNextPage = timelineData.pageInfo.hasNextPage;
+                              cursor = timelineData.pageInfo.endCursor;
+                          }
 
-            for (const issue of issues) {
-                // Skip pull requests (they appear in issues API too)
-                if (issue.pull_request) {
-                    continue;
-                }
+                          return allNodes;
+                      }
 
-                console.log(`\nChecking issue #${issue.number}: ${issue.title}`);
+                      for (const issue of issues) {
+                          // Skip pull requests (they appear in issues API too)
+                          if (issue.pull_request) {
+                              continue;
+                          }
 
-                // Get issue timeline once per issue to find assignment dates
-                const timelineEvents = await github.paginate(github.rest.issues.listEventsForTimeline, {
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    per_page: 100
-                });
+                          console.log(`\nChecking issue #${issue.number}: ${issue.title}`);
 
-                for (const assignee of issue.assignees) {
-                    console.log(`  Checking assignee: @${assignee.login}`);
+                          // Get issue timeline once per issue to find assignment dates
+                          const timelineEvents = await github.paginate(github.rest.issues.listEventsForTimeline, {
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: issue.number,
+                              per_page: 100
+                          });
 
-                    // Find the most recent assignment event for this user
-                    const assignedEvents = timelineEvents.filter(
-                        e => e.event === 'assigned' && e.assignee && e.assignee.login === assignee.login
-                    );
+                          for (const assignee of issue.assignees) {
+                              console.log(`  Checking assignee: @${assignee.login}`);
 
-                    if (assignedEvents.length === 0) {
-                        console.log(`    No assignment event found, skipping`);
-                        continue;
-                    }
+                              // Find the most recent assignment event for this user
+                              const assignedEvents = timelineEvents.filter(
+                                  e => e.event === 'assigned' && e.assignee && e.assignee.login === assignee.login
+                              );
 
-                    const latestAssignment = assignedEvents[assignedEvents.length - 1];
-                    const assignedAt = new Date(latestAssignment.created_at);
-                    const daysSinceAssignment = (Date.now() - assignedAt.getTime()) / MS_PER_DAY;
+                              if (assignedEvents.length === 0) {
+                                  console.log(`    No assignment event found, skipping`);
+                                  continue;
+                              }
 
-                    console.log(`    Assigned ${daysSinceAssignment.toFixed(1)} days ago`);
+                              const latestAssignment = assignedEvents[assignedEvents.length - 1];
+                              const assignedAt = new Date(latestAssignment.created_at);
+                              const daysSinceAssignment = (Date.now() - assignedAt.getTime()) / MS_PER_DAY;
 
-                    if (daysSinceAssignment <= DAYS_UNTIL_UNASSIGN) {
-                        console.log(`    Within grace period, skipping`);
-                        continue;
-                    }
+                              console.log(`    Assigned ${daysSinceAssignment.toFixed(1)} days ago`);
 
-                    // Check for linked PRs by this assignee
-                    try {
-                        const allNodes = await fetchAllLinkedPRs(issue.number);
+                              if (daysSinceAssignment <= DAYS_UNTIL_UNASSIGN) {
+                                  console.log(`    Within grace period, skipping`);
+                                  continue;
+                              }
 
-                        // Only consider OPEN or MERGED PRs as valid linked PRs.
-                        // CLOSED PRs are intentionally ignored so that abandoned/rejected work
-                        // does not prevent automatic unassignment.
-                        // Note: Draft PRs have state 'OPEN' and are correctly treated as valid.
-                        const linkedPRs = allNodes
-                            .filter(node => {
-                                const source = node.source;
-                                const authorLogin = source?.author?.login;
-                                const state = source?.state;
-                                return (
-                                    typeof authorLogin === 'string' &&
-                                    authorLogin.toLowerCase() === assignee.login.toLowerCase() &&
-                                    (state === 'OPEN' || state === 'MERGED')
-                                );
-                            });
+                              // Check for linked PRs by this assignee
+                              try {
+                                  const allNodes = await fetchAllLinkedPRs(issue.number);
 
-                        if (linkedPRs.length > 0) {
-                            console.log(`    Found ${linkedPRs.length} linked PR(s) by assignee, keeping assignment`);
-                            continue;
-                        }
+                                  // Only consider OPEN or MERGED PRs as valid linked PRs.
+                                  // CLOSED PRs are intentionally ignored so that abandoned/rejected work
+                                  // does not prevent automatic unassignment.
+                                  // Note: Draft PRs have state 'OPEN' and are correctly treated as valid.
+                                  const linkedPRs = allNodes
+                                      .filter(node => {
+                                          const source = node.source;
+                                          const authorLogin = source?.author?.login;
+                                          const state = source?.state;
+                                          return (
+                                              typeof authorLogin === 'string' &&
+                                              authorLogin.toLowerCase() === assignee.login.toLowerCase() &&
+                                              (state === 'OPEN' || state === 'MERGED')
+                                          );
+                                      });
 
-                        console.log(`    No linked PR found, unassigning @${assignee.login}`);
+                                  if (linkedPRs.length > 0) {
+                                      console.log(`    Found ${linkedPRs.length} linked PR(s) by assignee, keeping assignment`);
+                                      continue;
+                                  }
 
-                        // Unassign the user
-                        await github.rest.issues.removeAssignees({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: issue.number,
-                            assignees: [assignee.login]
-                        });
+                                  console.log(`    No linked PR found, unassigning @${assignee.login}`);
 
-                        // Post a comment
-                        await github.rest.issues.createComment({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: issue.number,
-                            body: `@${assignee.login} has been automatically unassigned because no pull request was opened within ${DAYS_UNTIL_UNASSIGN} days.\n\nIf you'd like to work on this issue again, please comment \`/assign\`. The issue is now available for others to pick up.`
-                        });
+                                  // Unassign the user
+                                  await github.rest.issues.removeAssignees({
+                                      owner: context.repo.owner,
+                                      repo: context.repo.repo,
+                                      issue_number: issue.number,
+                                      assignees: [assignee.login]
+                                  });
 
-                        console.log(`    Successfully unassigned and commented`);
+                                  // Post a comment
+                                  await github.rest.issues.createComment({
+                                      owner: context.repo.owner,
+                                      repo: context.repo.repo,
+                                      issue_number: issue.number,
+                                      body: `@${assignee.login} has been automatically unassigned because no pull request was opened within ${DAYS_UNTIL_UNASSIGN} days.\n\nIf you'd like to work on this issue again, please comment \`/assign\`. The issue is now available for others to pick up.`
+                                  });
 
-                    } catch (error) {
-                        const message = error && error.message ? error.message : String(error);
-                        console.error(`    Error checking PRs for issue #${issue.number} and assignee @${assignee.login}: ${message}`);
-                        // Treat rate limiting / abuse detection as fatal to avoid silently partial runs.
-                        if (
-                            (error && (error.status === 403 || error.status === 429)) ||
-                            (message && /rate limit|abuse detection/i.test(message))
-                        ) {
-                            core.setFailed(
-                                `Rate limit or abuse detected while processing issue #${issue.number}. Stopping workflow to avoid silent failures.`
-                            );
-                            // Re-throw to stop further processing.
-                            throw error;
-                        }
-                        // For other errors, skip this assignee but continue with the rest.
-                        console.log(`    Skipping assignee @${assignee.login} for this run due to the above error.`);
-                        continue;
-                    }
-                }
-            }
+                                  console.log(`    Successfully unassigned and commented`);
 
-            console.log('\nPR check and unassign workflow completed.');
+                              } catch (error) {
+                                  const message = error && error.message ? error.message : String(error);
+                                  console.error(`    Error checking PRs for issue #${issue.number} and assignee @${assignee.login}: ${message}`);
+                                  // Treat rate limiting / abuse detection as fatal to avoid silently partial runs.
+                                  if (
+                                      (error && (error.status === 403 || error.status === 429)) ||
+                                      (message && /rate limit|abuse detection/i.test(message))
+                                  ) {
+                                      core.setFailed(
+                                          `Rate limit or abuse detected while processing issue #${issue.number}. Stopping workflow to avoid silent failures.`
+                                      );
+                                      // Re-throw to stop further processing.
+                                      throw error;
+                                  }
+                                  // For other errors, skip this assignee but continue with the rest.
+                                  console.log(`    Skipping assignee @${assignee.login} for this run due to the above error.`);
+                                  continue;
+                              }
+                          }
+                      }
+
+                      console.log('\nPR check and unassign workflow completed.');
