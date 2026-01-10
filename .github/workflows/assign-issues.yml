@@ -194,7 +194,22 @@ jobs:
                                   console.log(`    Successfully unassigned and commented`);
 
                               } catch (error) {
-                                  console.error(`    Error checking PRs for issue #${issue.number}: ${error.message}`);
+                                  const message = error && error.message ? error.message : String(error);
+                                  console.error(`    Error checking PRs for issue #${issue.number} and assignee @${assignee.login}: ${message}`);
+                                  // Treat rate limiting / abuse detection as fatal to avoid silently partial runs.
+                                  if (
+                                      (error && (error.status === 403 || error.status === 429)) ||
+                                      (message && /rate limit|abuse detection/i.test(message))
+                                  ) {
+                                      core.setFailed(
+                                          `Rate limit or abuse detected while processing issue #${issue.number}. Stopping workflow to avoid silent failures.`
+                                      );
+                                      // Re-throw to stop further processing.
+                                      throw error;
+                                  }
+                                  // For other errors, skip this assignee but continue with the rest.
+                                  console.log(`    Skipping assignee @${assignee.login} for this run due to the above error.`);
+                                  continue;
                               }
                           }
                       }
