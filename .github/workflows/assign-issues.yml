@@ -89,6 +89,7 @@ jobs:
                               repository(owner: $owner, name: $repo) {
                                   issue(number: $issueNumber) {
                                       timelineItems(first: 250, itemTypes: [CROSS_REFERENCED_EVENT]) {
+                                          totalCount
                                           nodes {
                                               ... on CrossReferencedEvent {
                                                   source {
@@ -155,6 +156,12 @@ jobs:
                                       repo: context.repo.repo,
                                       issueNumber: issue.number
                                   });
+
+                                  // Warn if timeline items may be truncated
+                                  const timelineData = result.repository.issue.timelineItems;
+                                  if (timelineData.totalCount > 250) {
+                                      console.warn(`    ⚠️ Issue #${issue.number} has ${timelineData.totalCount} cross-referenced events but only 250 were fetched. Results may be incomplete.`);
+                                  }
 
                                   // Only consider OPEN or MERGED PRs as valid linked PRs.
                                   // CLOSED PRs are intentionally ignored so that abandoned/rejected work
