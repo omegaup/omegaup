@@ -157,11 +157,16 @@ jobs:
                                   });
 
                                   const linkedPRs = result.repository.issue.timelineItems.nodes
-                                      .filter(node => node.source && node.source.author)
-                                      .filter(node =>
-                                          node.source.author.login.toLowerCase() === assignee.login.toLowerCase() &&
-                                          (node.source.state === 'OPEN' || node.source.state === 'MERGED')
-                                      );
+                                      .filter(node => {
+                                          const source = node.source;
+                                          const authorLogin = source?.author?.login;
+                                          const state = source?.state;
+                                          return (
+                                              typeof authorLogin === 'string' &&
+                                              authorLogin.toLowerCase() === assignee.login.toLowerCase() &&
+                                              (state === 'OPEN' || state === 'MERGED')
+                                          );
+                                      });
 
                                   if (linkedPRs.length > 0) {
                                       console.log(`    Found ${linkedPRs.length} linked PR(s) by assignee, keeping assignment`);
