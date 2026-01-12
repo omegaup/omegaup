@@ -891,8 +891,6 @@ class APIGenerator {
         if (empty($typeFields)) {
             return;
         }
-
-        $shortName = substr($typeName, 6);
         echo "\n**`{$typeName}` fields:**\n\n";
         echo "| Name | Type | Optional |\n";
         echo "|------|------|----------|\n";
