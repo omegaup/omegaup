@@ -28,17 +28,14 @@ class CarouselItems extends \OmegaUp\DAO\Base\CarouselItems {
                 ci.status = "active"
                 AND (
                     ci.expiration_date IS NULL
-                    OR ci.expiration_date >= ?
+                    OR ci.expiration_date >= NOW()
                 )
             ORDER BY
                 ci.carousel_item_id DESC;
         ';
 
         /** @var list<array<string, mixed>> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [new \OmegaUp\Timestamp(\OmegaUp\Time::get())]
-        );
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
 
         $items = [];
         foreach ($rs as $row) {
