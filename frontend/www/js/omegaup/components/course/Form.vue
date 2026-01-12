@@ -64,7 +64,7 @@
                 v-model="startTime"
                 name="start-date"
                 :disabled="readOnly"
-                :min="new Date()"
+                :min="update ? null : new Date()"
               ></omegaup-datepicker
             ></label>
           </div>

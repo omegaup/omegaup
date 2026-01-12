@@ -21,77 +21,78 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/carousel_slide_1.svg',
+    image: '/media/homepage/cursoofmi.png',
     title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
+      en: 'OFMI on YouTube',
+      es: 'OFMI en YouTube',
+      pt: 'OFMI no YouTube',
     },
     description: {
       en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+        'Holidays can also be a great time to learn at your own pace. If you want to keep training your mind and reinforce concepts, we invite you to check out our course. Learn, explore, and enjoy the process. Knowledge doesn’t take a vacation.',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'Las vacaciones también pueden ser un buen momento para aprender a tu ritmo. Si quieres seguir entrenando tu mente y reforzar conceptos, te invitamos a ver nuestro curso. Aprende, explora y disfruta el proceso. El conocimiento no se toma vacaciones.',
       pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
+        'As férias também podem ser um bom momento para aprender no seu próprio ritmo. Se você quer continuar treinando sua mente e reforçando conceitos, convidamos você a assistir ao nosso curso. Aprenda, explore e aproveite o processo. O conhecimento não tira férias.',
     },
     button: {
       text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
+        en: 'OFMI Course',
+        es: 'Curso OFMI',
+        pt: 'Curso OFMI',
       },
-      href: 'https://blog.omegaup.com/documentation/introduccion-a-omegaup/',
+      href:
+        'https://www.youtube.com/watch?v=eJThxTLg8QM&list=PLdSCJwXErQ8E2us6mFvv6rV_HLaowbqbC',
       target: '_blank',
     },
   },
   {
-    image: '/media/homepage/carousel_slide_2.svg',
+    image: '/media/homepage/copa.png',
     title: {
-      en: 'Would you like to learn to program?',
-      es: '¿Te gustaría aprender a programar?',
-      pt: 'Deseja aprender a programar?',
+      en: 'Copa de Comunidades de Programación',
+      es: 'Copa de Comunidades de Programación',
+      pt: 'Copa de Comunidades de Programação',
     },
     description: {
       en:
-        'Join the free Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
+        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
       es:
-        'Apúntate al curso gratuito de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
+        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
       pt:
-        'Participe do curso gratuito de Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
+        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
     },
     button: {
       text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
+        en: 'Final Ranklist',
+        es: 'Ranklist final',
+        pt: 'Ranklist final',
       },
-      href: '/course/introduccion_a_cpp/',
-      target: '_self',
+      href: 'https://omegaup.github.io/CCP/',
+      target: '_blank',
     },
   },
   {
-    image: '/media/homepage/discord_logo.svg',
+    image: '/media/homepage/Instagram.png',
     title: {
-      en: 'Join our coders community',
-      es: 'Únete a nuestra comunidad de coders',
-      pt: 'Junte-se à nossa comunidade de coders',
+      en: 'Do you already follow us on Instagram?',
+      es: '¿Ya nos sigues en Instagram?',
+      pt: 'Você já nos segue no Instagram?',
     },
     description: {
       en:
-        'Join omegaUp´s Discord server and hang out with your community, get help and learn about new projects.',
+        'Stay up to date with news, events, and much more. Follow us and be part of the community!',
       es:
-        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
+        'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
       pt:
-        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
+        'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
     },
     button: {
       text: {
-        en: 'Join here',
-        es: 'Únete aquí',
-        pt: 'Junte-se aqui',
+        en: 'Follow us',
+        es: 'Síguenos',
+        pt: 'Siga-nos',
       },
-      href: 'https://discord.com/invite/K3JFd9d3wk',
+      href: 'https://www.instagram.com/omegaup_org/',
       target: '_blank',
     },
   },

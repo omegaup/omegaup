@@ -231,6 +231,19 @@ OmegaUp.on('ready', async () => {
                 });
               });
           },
+          'execute-run': ({
+            target,
+          }: {
+            target: Vue & { currentNextExecutionTimestamp: Date };
+          }) => {
+            api.Run.execute()
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                target.currentNextExecutionTimestamp =
+                  response.nextExecutionTimestamp;
+              })
+              .catch(ui.apiError);
+          },
           'submit-run': ({
             problem,
             code,

@@ -1,32 +1,32 @@
+
 # omegaUp wiki
-¡Te damos la bienvenida al repositorio de omegaUp!
+Welcome to omegaUp repository!
 
-Aquí encontrarás información técnica de nuestro proyecto así como información de las funcionalidades de la plataforma
+Here you will find helpful technical information about our project, as well as documentation for the main features of omegaup.com
 
-# ¿Quieres ayudarnos a desarrollar?
-
-En esta tabla encontraras los temas más importantes para comenzar a programar.
+# Do you want help us?
+In this table you will find the main topics about our project so you can start coding.
 
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
-| [Primeros pasos](https://github.com/omegaup/omegaup/wiki/Quiero-desarrollar-en-omegaUp) |[Instalación de máquina virtual](https://github.com/omegaup/omegaup/wiki/How-to-Set-Up-Your-Development-Environment-(English)), información técnica general  |
-| [Cómo empezar a desarrollar](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-Hacer-un-Pull-Request) | Configuraciones en git, cómo enviar un PR                    |
-| [Arquitectura](https://github.com/omegaup/omegaup/wiki/Arquitectura)  | Arquitectura de software de omegaUp.com                      |
-| [Release and Deployment](https://github.com/omegaup/omegaup/wiki/Release-&-deployment)  | Cómo y cuándo es el deployment                               |
+| [First steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) | VM installation, general technical information  |
+| [VM set-up](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md) | Git configuration, how to send a PR                    |
+| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md)  | omegaUp' software architecture                      |
+| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md)  | When and how is the deployment                               |
 
-### :arrow_forward: :arrow_forward: :computer:  [Índice para desarrolladoras](https://github.com/omegaup/omegaup/wiki/Ligas-%C3%BAtiles)
+[Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-links.md)
 
-# ¿Cómo usar las funcionalidades de omegaUp?
-omegaUp es una plataforma educativa donde puedes crear problemas, concursos y cursos. También te invitamos a visitar nuestro [blog](https://blog.omegaup.com/) para las actualizaciones más recientes.
+# How to use the main features of omegaUp.com?
 
- - [Cómo escribir problemas para omegaUp](https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-omegaUp) 
- - [Corre un concurso en tu escuela](https://github.com/omegaup/omegaup/wiki/Corre-un-concurso-en-tu-escuela)
- - [Ambiente de evaluación](https://github.com/omegaup/omegaup/wiki/Ambiente-de-evaluaci%C3%B3n)
-
-# Navegadores soportados
+omegaUp is an educational platform where you can create problems, contests and courses. We also invite you to visit our [blog](https://blog.omegaup.com/) for the most recent updates.
 
 
-Los navegadores oficialmente soportados son los siguientes:
+ - [How to Create Problems for omegaUp](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-write-problems-for-omegaUp.md)
+ - [Implement a course in your school](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Run-a-contest-at-your-school.md)
+ - [How it works the online judge](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Evaluation-Environment.md)
+
+# Supported browsers
+
 
 * [Chrome](https://www.chromium.org/getting-involved/dev-channel): Stable Channel
 

@@ -58,9 +58,7 @@
               <a href="/course/">{{ T.navCourses }} </a>
             </li>
             <li class="mt-1">
-              <a href="https://blog.omegaup.com" target="_blank">{{
-                T.navBlog
-              }}</a>
+              <a :href="OmegaUpBlogURL" target="_blank">{{ T.navBlog }}</a>
             </li>
           </ul>
         </div>
@@ -69,12 +67,16 @@
         >
           <h4 class="column-title">{{ T.frontPageFooterSponsors }}</h4>
           <ul>
-            <li class="mt-1">
-              <a href="https://replit.com/" target="_blank">
+            <li class="mt-4">
+              <a
+                href="https://news.airbnb.com/2025-community-fund/"
+                target="_blank"
+              >
                 <img
                   class="sponsor-logo"
-                  src="/media/homepage/replit_logo.png"
-                  alt="ReplitLogo"
+                  src="/media/homepage/airbnb_logo.svg"
+                  alt="AirbnbLogo"
+                  width="100"
                 />
               </a>
             </li>
@@ -104,7 +106,7 @@
           <ul>
             <li class="mt-1">
               <a
-                href="https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-empezar-a-desarrollar"
+                href="https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md"
                 target="_blank"
                 >{{ T.frontPageFooterHelpUs }}</a
               >
@@ -137,18 +139,12 @@
           class="mb-2 m-md-0 list-unstyled d-flex justify-content-around d-md-inline-flex order-md-12"
         >
           <li class="pr-2">
-            <a
-              href="https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/"
-              target="_blank"
-            >
+            <a :href="CodeofConductPolicyURL" target="_blank">
               {{ T.frontPageFooterCodeConduct }}
             </a>
           </li>
           <li>
-            <a
-              href="https://blog.omegaup.com/policies/privacy-policy/"
-              target="_blank"
-            >
+            <a :href="PrivacyPolicyURL" target="_blank">
               {{ T.frontPageFooterPrivacyPolicy }}
             </a>
           </li>
@@ -170,6 +166,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
+import { getBlogUrl } from '../../urlHelper';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -192,6 +189,19 @@ export default class Footer extends Vue {
   T = T;
   ui = ui;
   reportAnIssueURL = reportAnIssueURL;
+
+  get OmegaUpBlogURL(): string {
+    // Use the key defined in blog-links-config.json
+    return getBlogUrl('OmegaUpBlogURL');
+  }
+
+  get PrivacyPolicyURL(): string {
+    return getBlogUrl('PrivacyPolicyURL');
+  }
+
+  get CodeofConductPolicyURL(): string {
+    return getBlogUrl('CodeofConductPolicyURL');
+  }
 }
 </script>
 

@@ -2,6 +2,11 @@
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+- [AiEditorial](#aieditorial)
+  - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
+  - [`/api/aiEditorial/review/`](#apiaieditorialreview)
+  - [`/api/aiEditorial/status/`](#apiaieditorialstatus)
+  - [`/api/aiEditorial/updateJob/`](#apiaieditorialupdatejob)
 - [Authorization](#authorization)
   - [`/api/authorization/problem/`](#apiauthorizationproblem)
 - [Badge](#badge)
@@ -10,6 +15,12 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [CarouselItems](#carouselitems)
+  - [`/api/carouselItems/create/`](#apicarouselitemscreate)
+  - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
+  - [`/api/carouselItems/list/`](#apicarouselitemslist)
+  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
+  - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
@@ -109,6 +120,7 @@
   - [`/api/course/searchUsers/`](#apicoursesearchusers)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
   - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
+  - [`/api/course/toggleTeachingAssistant/`](#apicoursetoggleteachingassistant)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -149,6 +161,7 @@
   - [`/api/problem/admins/`](#apiproblemadmins)
   - [`/api/problem/bestScore/`](#apiproblembestscore)
   - [`/api/problem/clarifications/`](#apiproblemclarifications)
+  - [`/api/problem/convertZipToCdp/`](#apiproblemconvertziptocdp)
   - [`/api/problem/create/`](#apiproblemcreate)
   - [`/api/problem/delete/`](#apiproblemdelete)
   - [`/api/problem/details/`](#apiproblemdetails)
@@ -195,6 +208,7 @@
   - [`/api/run/details/`](#apirundetails)
   - [`/api/run/disqualify/`](#apirundisqualify)
   - [`/api/run/execute/`](#apirunexecute)
+  - [`/api/run/executeForIDE/`](#apirunexecuteforide)
   - [`/api/run/getSubmissionFeedback/`](#apirungetsubmissionfeedback)
   - [`/api/run/list/`](#apirunlist)
   - [`/api/run/rejudge/`](#apirunrejudge)
@@ -255,6 +269,7 @@
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
+  - [`/api/user/profileStatistics/`](#apiuserprofilestatistics)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
@@ -302,6 +317,93 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+# AiEditorial
+
+AI Editorial Controller
+
+## `/api/aiEditorial/generate/`
+
+### Description
+
+Generate AI editorial for a problem
+
+### Parameters
+
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `language`      | `string`       |             |
+| `problem_alias` | `string`       |             |
+| `auth_token`    | `null\|string` |             |
+
+### Returns
+
+| Name     | Type     |
+| -------- | -------- |
+| `job_id` | `string` |
+
+## `/api/aiEditorial/review/`
+
+### Description
+
+Review and approve/reject an AI editorial
+
+When approved, the editorial is published to gitserver
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `action`   | `string`       |             |
+| `job_id`   | `string`       |             |
+| `language` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/aiEditorial/status/`
+
+### Description
+
+Get status of an AI editorial job
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `job_id` | `string` |             |
+
+### Returns
+
+| Name  | Type                          |
+| ----- | ----------------------------- |
+| `job` | `types.AiEditorialJobDetails` |
+
+## `/api/aiEditorial/updateJob/`
+
+### Description
+
+Update job status and content from AI worker
+
+This endpoint is called by the Python AI worker to update job status
+and content in the database after processing completion.
+
+### Parameters
+
+| Name                 | Type           | Description |
+| -------------------- | -------------- | ----------- |
+| `job_id`             | `string`       |             |
+| `status`             | `string`       |             |
+| `error_message`      | `null\|string` |             |
+| `md_en`              | `null\|string` |             |
+| `md_es`              | `null\|string` |             |
+| `md_pt`              | `null\|string` |             |
+| `validation_verdict` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Authorization
 
@@ -411,6 +513,95 @@ Returns a list of badges owned by a certain user
 | Name     | Type            |
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
+
+# CarouselItems
+
+CarouselItemController
+
+## `/api/carouselItems/create/`
+
+### Description
+
+Create a new Carousel Item
+
+### Parameters
+
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `buttonTitle`     | `string`       |             |
+| `excerpt`         | `string`       |             |
+| `image_url`       | `string`       |             |
+| `link`            | `string`       |             |
+| `status`          | `bool`         |             |
+| `title`           | `string`       |             |
+| `expiration_date` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/delete/`
+
+### Description
+
+Delete a Carousel Item
+
+### Parameters
+
+| Name               | Type  | Description |
+| ------------------ | ----- | ----------- |
+| `carousel_item_id` | `int` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/list/`
+
+### Description
+
+List all Carousel Items (admin only)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/listActive/`
+
+### Description
+
+List all active Carousel Items (homepage)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/update/`
+
+### Description
+
+Update a Carousel Item
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `buttonTitle`      | `string`       |             |
+| `carousel_item_id` | `int`          |             |
+| `excerpt`          | `string`       |             |
+| `image_url`        | `string`       |             |
+| `link`             | `string`       |             |
+| `status`           | `bool`         |             |
+| `title`            | `string`       |             |
+| `expiration_date`  | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Certificate
 
@@ -858,6 +1049,7 @@ Creates a new contest
 | `penalty_type`              | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`       | `float\|null`                                              |             |
 | `problems`                  | `null\|string`                                             |             |
+| `recommended`               | `bool\|null`                                               |             |
 | `requests_user_information` | `bool\|null`                                               |             |
 | `score_mode`                | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                | `float\|null`                                              |             |
@@ -1439,6 +1631,7 @@ Update a Contest
 | `penalty_type`                               | `'contest_start'\|'none'\|'problem_open'\|'runtime'\|null` |             |
 | `points_decay_factor`                        | `float\|null`                                              |             |
 | `problems`                                   | `null\|string`                                             |             |
+| `recommended`                                | `bool\|null`                                               |             |
 | `requests_user_information`                  | `'no'\|'optional'\|'required'\|null`                       |             |
 | `score_mode`                                 | `'all_or_nothing'\|'max_per_group'\|'partial'\|null`       |             |
 | `scoreboard`                                 | `float\|null`                                              |             |
@@ -2312,6 +2505,24 @@ Search users in course assignment
 | `nextPage` | `number`                          |
 | `progress` | `types.StudentProgressInCourse[]` |
 
+## `/api/course/toggleTeachingAssistant/`
+
+### Description
+
+Toggles the AI Teaching Assistant feature for a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+
+### Returns
+
+| Name                         | Type      |
+| ---------------------------- | --------- |
+| `teaching_assistant_enabled` | `boolean` |
+
 ## `/api/course/update/`
 
 ### Description
@@ -2803,7 +3014,7 @@ _Nothing_
 
 # Notification
 
-BadgesController
+NotificationController
 
 ## `/api/notification/myList/`
 
@@ -2973,6 +3184,18 @@ Entry point for Problem clarifications API
 | Name             | Type                    |
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
+
+## `/api/problem/convertZipToCdp/`
+
+### Description
+
+Convert an uploaded ZIP file to CDP.
+
+### Returns
+
+| Name  | Type        |
+| ----- | ----------- |
+| `cdp` | `types.CDP` |
 
 ## `/api/problem/create/`
 
@@ -3706,7 +3929,7 @@ nominator or a member of the reviewer group.
 | `rowcount` | `int`                                                            |             |
 | `column`   | `'author_username'\|'nominator_username'\|'problem_alias'\|null` |             |
 | `query`    | `null\|string`                                                   |             |
-| `status`   | `mixed`                                                          |             |
+| `status`   | `'all'\|'banned'\|'open'\|'resolved'\|'warning'\|null`           |             |
 
 ### Returns
 
@@ -3932,7 +4155,25 @@ Disqualify one or more submissions based on the received parameters:
 
 ### Description
 
-Get the next execution timestamp
+Get the next execution timestamp for a specific problemset:
+
+- Contest
+- Virtual contest
+- Practice contest
+- Course
+
+### Returns
+
+| Name                     | Type   |
+| ------------------------ | ------ |
+| `nextExecutionTimestamp` | `Date` |
+
+## `/api/run/executeForIDE/`
+
+### Description
+
+Get the next execution timestamp, no user session required, as the IDE
+runs independently.
 
 ### Returns
 
@@ -4265,10 +4506,10 @@ Gets a list of tags
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
@@ -4956,6 +5197,27 @@ Get general user info
 ```typescript
 types.UserProfileInfo;
 ```
+
+## `/api/user/profileStatistics/`
+
+### Description
+
+Get profile statistics including solved problems by difficulty and tags distribution.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name         | Type                                                                  |
+| ------------ | --------------------------------------------------------------------- |
+| `attempting` | `number`                                                              |
+| `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
+| `solved`     | `number`                                                              |
+| `tags`       | `{ count: number; name: string; }[]`                                  |
 
 ## `/api/user/removeExperiment/`
 

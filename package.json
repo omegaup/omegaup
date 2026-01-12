@@ -62,7 +62,7 @@
     "core-js": "^3.6.5",
     "cross-env": "^6.0.3",
     "css-loader": "^3.6",
-    "cypress": "14.1.0",
+    "cypress": "14.3.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-iframe": "^1.0.1",
     "cypress-wait-until": "^1.7.2",
@@ -78,6 +78,7 @@
     "highcharts": "^9.1.0",
     "highcharts-vue": "^1.3.5",
     "html-webpack-plugin": "^4.5",
+    "husky": "^9.1.7",
     "intro.js": "^7.0.1",
     "jest": "^26.6.3",
     "jest-each": "^27.3.1",
@@ -90,7 +91,7 @@
     "latinize": "^0.4.1",
     "mini-css-extract-plugin": "^1.3.1",
     "mock-socket": "^9.0.3",
-    "monaco-editor": "^0.21",
+    "monaco-editor": "0.21",
     "monaco-editor-webpack-plugin": "^2.1",
     "node-gyp": "^9.4.0",
     "pako": "^1.0.7",
@@ -104,7 +105,7 @@
     "sass-loader": "^12.3.0",
     "sortablejs": "^1.7.0",
     "source-map-support": "^0.5.19",
-    "storybook": "^7.4.6",
+    "storybook": "^7.6.21",
     "stream-browserify": "^3.0.0",
     "style-loader": "^2.0",
     "stylelint": "^13.13",
@@ -138,14 +139,14 @@
     "vue-typeahead-bootstrap": "^2.1.2",
     "vuex": "^3.0.1",
     "vuex-class": "^0.3.2",
-    "webpack": "^5.8",
+    "webpack": "^5.94",
     "webpack-cli": "^4.2",
     "wrapper-webpack-plugin": "^2.1"
   },
   "scripts": {
-    "test": "jest 'frontend/www/js/.*test\\.ts$'",
-    "test:watch": "jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
-    "test:coverage": "jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
+    "test": "cross-env TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
+    "test:watch": "cross-env TZ=UTC jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
+    "test:coverage": "cross-env TZ=UTC jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
     "dev": "cross-env webpack --config-name=frontend --mode=development --stats=minimal --color",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --stats=minimal --color",
     "dev-all": "cross-env webpack --mode=development --stats=minimal --color",
@@ -155,6 +156,7 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js",
     "test:e2e": "cypress run --browser chrome",
-    "storybook": "storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006",
+    "prepare": "husky"
   }
 }

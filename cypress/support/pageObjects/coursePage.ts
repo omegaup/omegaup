@@ -477,25 +477,6 @@ export class CoursePage {
       courseOptions.description,
     );
   }
-
-  verifyProblem(problemOptions: ProblemOptions): void {
-    cy.location('href').should('include', problemOptions.problemAlias);
-    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
-    cy.get('[name="problem_alias"]').should(
-      'have.value',
-      problemOptions.problemAlias,
-    );
-    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
-  }
-
-  verifyProblemRun(status: string): void {
-    cy.get('[data-run-status] > span').first().should('have.text', 'new');
-
-    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
-    cy.wait(['@runStatus'], { timeout: 10000 });
-
-    cy.get('[data-run-status] > span').first().should('have.text', status);
-  }
 }
 
 export const coursePage = new CoursePage();

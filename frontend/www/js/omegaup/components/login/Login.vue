@@ -8,7 +8,7 @@
         <div class="col-md-4 col-md-offset-2">
           <h4>{{ T.loginFederated }}</h4>
           <div class="row">
-            <div class="col-xs-12 col-sm-4 text-center py-2">
+            <div class="col-xs-12 text-left py-2 pl-3">
               <!-- id-lint off -->
               <div
                 id="g_id_onload"

@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence
+from typing import Any, Iterable, List, Mapping, NamedTuple, Sequence
 
 import mysql.connector
 import mysql.connector.cursor
@@ -118,7 +118,7 @@ def update_user_rank(
             `i`.`name`,
             `i`.`country_id`,
             `i`.`state_id`,
-            `isc`.`school_id`,
+            `full_isc`.`school_id`,
             `i`.`identity_id`,
             `i`.`user_id`,
             COUNT(`p`.`problem_id`) AS `problems_solved_count`,
@@ -142,18 +142,31 @@ def update_user_rank(
                 `iu`.user_id, `s`.`problem_id`
         ) AS up
         INNER JOIN
-            `Users` AS `u` ON `u`.`user_id` = `up`.`user_id`
+            `Users` AS `full_u` ON `full_u`.`user_id` = `up`.`user_id`
         INNER JOIN
             `Problems` AS `p`
         ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = u.`main_identity_id`
+            `Identities` AS `i`
+                ON `i`.`identity_id` = `full_u`.`main_identity_id`
         LEFT JOIN
-            `Identities_Schools` AS `isc`
+            `Identities_Schools` AS `full_isc`
         ON
-            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
+            `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `u`.`is_private` = 0
+            `full_u`.`is_private` = 0
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
+            AND `full_u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
             AND NOT EXISTS (
                 SELECT
                     `pf`.`problem_id`, `pf`.`user_id`
@@ -161,7 +174,7 @@ def update_user_rank(
                     `Problems_Forfeited` AS `pf`
                 WHERE
                     `pf`.`problem_id` = `p`.`problem_id` AND
-                    `pf`.`user_id` = `u`.`user_id`
+                    `pf`.`user_id` = `full_u`.`user_id`
             )
             AND NOT EXISTS (
                 SELECT
@@ -170,7 +183,7 @@ def update_user_rank(
                     `ACLs` AS `a`
                 WHERE
                     `a`.`acl_id` = `p`.`acl_id` AND
-                    `a`.`owner_id` = `u`.`user_id`
+                    `a`.`owner_id` = `full_u`.`user_id`
             )
         GROUP BY
             `identity_id`
@@ -217,11 +230,11 @@ def update_author_rank(
             `i`.`country_id`,
             `i`.`state_id`,
             `isc`.`school_id`,
-            SUM(`p`.`quality`) AS `author_score`
+            SUM(`full_p`.`quality`) AS `author_score`
         FROM
-            `Problems` AS `p`
+            `Problems` AS `full_p`
         INNER JOIN
-            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+            `ACLs` AS `a` ON `a`.`acl_id` = `full_p`.`acl_id`
         INNER JOIN
             `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
         INNER JOIN
@@ -231,7 +244,19 @@ def update_author_rank(
         ON
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `p`.`quality` IS NOT NULL
+            `full_p`.`quality` IS NOT NULL
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
+            AND `u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
         GROUP BY
             `u`.`user_id`
         ORDER BY
@@ -431,6 +456,7 @@ def update_school_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
+    update_school_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to school of the current month'''
 
@@ -467,6 +493,7 @@ def update_school_of_the_month_candidates(
         '''
         SELECT
             `s`.`school_id`,
+            `s`.`name`,
             IFNULL(
                 SUM(
                     ROUND(
@@ -526,24 +553,54 @@ def update_school_of_the_month_candidates(
         ''', (first_day_of_current_month, first_day_of_next_month,
               first_day_of_next_month))
 
-    for index, row in enumerate(cur_readonly.fetchall()):
-        cur.execute(
-            '''
-                    INSERT INTO
-                        `School_Of_The_Month` (
-                            `school_id`,
-                            `time`,
-                            `ranking`,
-                            `score`
-                        )
-                    VALUES (
-                        %s,
-                        %s,
-                        %s,
-                        %s
-                    );
-                    ''', (row['school_id'], first_day_of_next_month, index + 1,
-                          row['score']))
+    candidates = cur_readonly.fetchall()
+    if not candidates:
+        logging.info('No eligible schools found.')
+        return
+
+    if update_school_of_the_month:
+        for index, row in enumerate(candidates):
+            cur.execute(
+                '''
+                        INSERT INTO
+                            `School_Of_The_Month` (
+                                `school_id`,
+                                `time`,
+                                `ranking`,
+                                `score`
+                            )
+                        VALUES (
+                            %s,
+                            %s,
+                            %s,
+                            %s
+                        );
+                        ''', (row['school_id'], first_day_of_next_month,
+                              index + 1, row['score']))
+    else:
+        debug_school_of_the_month_candidates(first_day_of_next_month,
+                                             candidates)
+
+
+def debug_school_of_the_month_candidates(
+    first_day_of_next_month: datetime.date,
+    candidates: Iterable[Mapping[str, Any]],
+) -> None:
+    '''Log school of the month candidates'''
+
+    log_entries = []
+    for ranking, candidate in enumerate(candidates, start=1):
+        log_entry = {
+            "school_id": candidate['school_id'],
+            "name": candidate['name'],
+            "time": first_day_of_next_month.isoformat(),
+            "ranking": ranking,
+            "score": candidate['score'],
+        }
+        log_entries.append(log_entry)
+
+    log_message = json.dumps(log_entries, indent=4)
+    logging.info(log_message)
 
 
 def compute_points_for_user(
@@ -734,6 +791,7 @@ def update_schools_stats(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     dbconn: mysql.connector.MySQLConnection,
     date: datetime.date,
+    update_school_of_the_month: bool,
 ) -> None:
     '''Updates all the information and ranks related to schools'''
     logging.info('Updating schools stats...')
@@ -753,7 +811,8 @@ def update_schools_stats(
             raise
 
         try:
-            update_school_of_the_month_candidates(cur, cur_readonly, date)
+            update_school_of_the_month_candidates(cur, cur_readonly, date,
+                                                  update_school_of_the_month)
             dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
@@ -779,6 +838,8 @@ def main() -> None:
                         type=int,
                         default=100,
                         help='The number of candidates to save in the DB')
+    parser.add_argument('--update-school-of-the-month', action='store_true',
+                        help='Update the School of the month')
     args: argparse.Namespace = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -792,7 +853,8 @@ def main() -> None:
                                buffered=True, dictionary=True) as cur_readonly:
             update_problem_accepted_stats(cur, cur_readonly, dbconn.conn)
             update_users_stats(cur, cur_readonly, dbconn.conn, args)
-            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date)
+            update_schools_stats(cur, cur_readonly, dbconn.conn, args.date,
+                                 args.update_school_of_the_month)
     finally:
         dbconn.conn.close()
         logging.info('Done')

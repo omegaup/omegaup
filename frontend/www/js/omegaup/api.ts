@@ -104,6 +104,33 @@ export const Admin = {
   >('/api/admin/platformReportStats/'),
 };
 
+export const AiEditorial = {
+  generate: apiCall<
+    messages.AiEditorialGenerateRequest,
+    messages.AiEditorialGenerateResponse
+  >('/api/aiEditorial/generate/'),
+  review: apiCall<
+    messages.AiEditorialReviewRequest,
+    messages.AiEditorialReviewResponse
+  >('/api/aiEditorial/review/'),
+  status: apiCall<
+    messages.AiEditorialStatusRequest,
+    messages._AiEditorialStatusServerResponse,
+    messages.AiEditorialStatusResponse
+  >('/api/aiEditorial/status/', (x) => {
+    if (typeof x.job !== 'undefined' && x.job !== null)
+      x.job = ((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        return x;
+      })(x.job);
+    return x;
+  }),
+  updateJob: apiCall<
+    messages.AiEditorialUpdateJobRequest,
+    messages.AiEditorialUpdateJobResponse
+  >('/api/aiEditorial/updateJob/'),
+};
+
 export const Authorization = {
   problem: apiCall<
     messages.AuthorizationProblemRequest,
@@ -208,6 +235,65 @@ export const Badge = {
     })(x.badges);
     return x;
   }),
+};
+
+export const CarouselItems = {
+  create: apiCall<
+    messages.CarouselItemsCreateRequest,
+    messages.CarouselItemsCreateResponse
+  >('/api/carouselItems/create/'),
+  delete: apiCall<
+    messages.CarouselItemsDeleteRequest,
+    messages.CarouselItemsDeleteResponse
+  >('/api/carouselItems/delete/'),
+  list: apiCall<
+    messages.CarouselItemsListRequest,
+    messages._CarouselItemsListServerResponse,
+    messages.CarouselItemsListResponse
+  >('/api/carouselItems/list/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  listActive: apiCall<
+    messages.CarouselItemsListActiveRequest,
+    messages._CarouselItemsListActiveServerResponse,
+    messages.CarouselItemsListActiveResponse
+  >('/api/carouselItems/listActive/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  update: apiCall<
+    messages.CarouselItemsUpdateRequest,
+    messages.CarouselItemsUpdateResponse
+  >('/api/carouselItems/update/'),
 };
 
 export const Certificate = {
@@ -1055,6 +1141,10 @@ export const Course = {
     messages.CourseStudentsProgressRequest,
     messages.CourseStudentsProgressResponse
   >('/api/course/studentsProgress/'),
+  toggleTeachingAssistant: apiCall<
+    messages.CourseToggleTeachingAssistantRequest,
+    messages.CourseToggleTeachingAssistantResponse
+  >('/api/course/toggleTeachingAssistant/'),
   update: apiCall<messages.CourseUpdateRequest, messages.CourseUpdateResponse>(
     '/api/course/update/',
   ),
@@ -1250,6 +1340,10 @@ export const Problem = {
     })(x.clarifications);
     return x;
   }),
+  convertZipToCdp: apiCall<
+    messages.ProblemConvertZipToCdpRequest,
+    messages.ProblemConvertZipToCdpResponse
+  >('/api/problem/convertZipToCdp/'),
   create: apiCall<
     messages.ProblemCreateRequest,
     messages.ProblemCreateResponse
@@ -1691,6 +1785,16 @@ export const Run = {
     );
     return x;
   }),
+  executeForIDE: apiCall<
+    messages.RunExecuteForIDERequest,
+    messages._RunExecuteForIDEServerResponse,
+    messages.RunExecuteForIDEResponse
+  >('/api/run/executeForIDE/', (x) => {
+    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
+      x.nextExecutionTimestamp,
+    );
+    return x;
+  }),
   getSubmissionFeedback: apiCall<
     messages.RunGetSubmissionFeedbackRequest,
     messages._RunGetSubmissionFeedbackServerResponse,
@@ -2066,6 +2170,10 @@ export const User = {
       );
     return x;
   }),
+  profileStatistics: apiCall<
+    messages.UserProfileStatisticsRequest,
+    messages.UserProfileStatisticsResponse
+  >('/api/user/profileStatistics/'),
   removeExperiment: apiCall<
     messages.UserRemoveExperimentRequest,
     messages.UserRemoveExperimentResponse

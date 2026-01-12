@@ -221,7 +221,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     /**
-     * @param array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed, tag?: mixed, quality_seal?: bool} $contents
+     * @param array{tags?: string[], before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string, tag?: list<string>, quality_seal?: bool} $contents
      * @return \OmegaUp\DAO\VO\QualityNominations
      */
     public static function createNomination(
@@ -276,12 +276,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-
+        $qualityNomination = null;
         if ($nominationType === 'suggestion') {
             $atLeastOneFieldIsPresent = false;
             if (isset($contents['difficulty'])) {
                 if (
-                    !is_int($contents['difficulty']) ||
                     $contents['difficulty'] < 0 ||
                     $contents['difficulty'] > 4
                 ) {
@@ -293,19 +292,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $atLeastOneFieldIsPresent = true;
             }
             if (isset($contents['tags'])) {
-                if (!is_array($contents['tags'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
                 if (!empty($contents['tags'])) {
                     $atLeastOneFieldIsPresent = true;
                 }
             }
             if (isset($contents['quality'])) {
                 if (
-                    !is_int($contents['quality']) ||
                     $contents['quality'] < 0 ||
                     $contents['quality'] > 4
                 ) {
@@ -323,11 +315,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Tags must be strings.
-            if (isset($contents['tags']) && is_array($contents['tags'])) {
-                /** @var mixed $tag */
+            if (isset($contents['tags'])) {
+                /** @var string $tag */
                 foreach ($contents['tags'] as &$tag) {
                     if (
-                        !is_string($tag) ||
                         !in_array($tag, self::ALLOWED_TAGS)
                     ) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -353,13 +344,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($nominationType === 'promotion') {
             if (
-                (!isset($contents['statements'])
-                || !is_array($contents['statements']))
+                (!isset($contents['statements']))
                 || (!isset($contents['source'])
-                || !is_string($contents['source'])
                 || empty($contents['source']))
-                || (!isset($contents['tags'])
-                || !is_array($contents['tags']))
+                || (!isset($contents['tags']))
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
@@ -367,10 +355,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Tags must be strings.
-            /** @var mixed $tag */
+            /** @var string $tag */
             foreach ($contents['tags'] as &$tag) {
                 if (
-                    !is_string($tag) ||
                     !in_array($tag, self::ALLOWED_TAGS)
                 ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -393,14 +380,12 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             /**
              * Statements must be a dictionary of language => { 'markdown': string }.
              * @var string $language
-             * @var mixed $statement
+             * @var array{markdown: string} $statement
              */
             foreach ($contents['statements'] as $language => $statement) {
                 if (
-                    !is_array($statement) ||
                     empty($language) ||
                     !isset($statement['markdown']) ||
-                    !is_string($statement['markdown']) ||
                     empty($statement['markdown'])
                 ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -435,7 +420,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if ($contents['reason'] === 'duplicate') {
                 if (
                     !isset($contents['original']) ||
-                    !is_string($contents['original']) ||
                     empty($contents['original'])
                 ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -487,16 +471,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (
-                !isset($contents['quality_seal']) ||
-                (
-                    $contents['quality_seal'] &&
-                    !isset($contents['tag'])
-                )
-            ) {
+            if (!isset($contents['quality_seal'])) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'contents'
+                    'quality_seal'
                 );
             }
             if (
@@ -505,25 +483,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
-                    'contents'
+                    'level'
                 );
             }
 
-            if (
-                isset($contents['tags'])
-            ) {
-                if (!is_array($contents['tags'])) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'parameterInvalid',
-                        'contents'
-                    );
-                }
-                /** @var mixed $tag */
+            if (isset($contents['tags'])) {
+                /** @var list<string> $tag */
                 foreach ($contents['tags'] as &$tag) {
-                    if (
-                        !is_string($tag) ||
-                        !in_array($tag, self::ALLOWED_PUBLIC_TAGS)
-                    ) {
+                    if (!in_array($tag, self::ALLOWED_PUBLIC_TAGS)) {
                         throw new \OmegaUp\Exceptions\InvalidParameterException(
                             'parameterInvalid',
                             'contents'
@@ -532,16 +499,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            if (
-                \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                    $identity,
-                    $problem
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                    'qualityNominationReviewerHasAlreadySentNominationForProblem'
-                );
-            }
+            $qualityNomination = \OmegaUp\DAO\QualityNominations::getQualityNominationContentsForProblemAndReviewer(
+                $identity,
+                $problem
+            );
         }
 
         $nomination = new \OmegaUp\DAO\VO\QualityNominations([
@@ -551,29 +512,49 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'contents' => json_encode($contents),
             'status' => 'open',
         ]);
-        \OmegaUp\DAO\QualityNominations::create($nomination);
 
-        if ($nomination->nomination == 'promotion') {
-            $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
-                \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
-            );
-            if (is_null($qualityReviewerGroup)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'groupNotFound'
-                );
-            }
-            foreach (
-                \OmegaUp\DAO\Groups::sampleMembers(
-                    $qualityReviewerGroup,
-                    self::REVIEWERS_PER_NOMINATION
-                ) as $reviewer
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            if (
+                $nominationType === 'quality_tag' && !is_null(
+                    $qualityNomination
+                )
             ) {
-                \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
-                    'qualitynomination_id' => $nomination->qualitynomination_id,
-                    'user_id' => $reviewer->user_id,
-                ]));
+                $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
+                \OmegaUp\DAO\QualityNominations::update($nomination);
+            } else {
+                \OmegaUp\DAO\QualityNominations::create($nomination);
             }
+
+            if ($nomination->nomination == 'promotion') {
+                $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
+                    \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
+                );
+                if (is_null($qualityReviewerGroup)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'groupNotFound'
+                    );
+                }
+                foreach (
+                    \OmegaUp\DAO\Groups::sampleMembers(
+                        $qualityReviewerGroup,
+                        self::REVIEWERS_PER_NOMINATION
+                    ) as $reviewer
+                ) {
+                    \OmegaUp\DAO\QualityNominationReviewers::create(new \OmegaUp\DAO\VO\QualityNominationReviewers([
+                        'qualitynomination_id' => $nomination->qualitynomination_id,
+                        'user_id' => $reviewer->user_id,
+                    ]));
+                }
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
+
         return $nomination;
     }
 
@@ -655,11 +636,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
+        $contents = $r->ensureString('contents');
         /**
-         * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+         * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string} $contents
          */
-        $contents = json_decode($r['contents'], associative: true);
+        $contents = json_decode($contents, associative: true);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -702,7 +683,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $r->ensureMainUserIdentity();
-        self::validateMemberOfReviewerGroup($r);
+        self::validateMemberOfReviewerGroup($r->identity);
 
         $status = $r->ensureEnum(
             'status',
@@ -819,7 +800,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     ])
                 );
                 /**
-                * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+                * @var null|array{tags?: list<string>, before_ac?: bool, difficulty?: int, quality?: int, statements?: array<string, array{markdown: string}>, source?: string, reason?: string, original?: string} $contents
                 */
                 $contents = json_decode($nomination->contents ?? '{}', true);
                 $contents['rationale'] = $rationale;
@@ -956,15 +937,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ?int $nominator,
         ?int $assignee
     ): array {
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $pageSize = is_null(
-            $r['page_size']
-        ) ? self::PAGE_SIZE : intval(
-            $r['page_size']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? self::PAGE_SIZE;
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -988,9 +962,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return void
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function validateMemberOfReviewerGroup(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
-        if (!\OmegaUp\Authorization::isQualityReviewer($r->identity)) {
+    private static function validateMemberOfReviewerGroup(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): void {
+        if (!\OmegaUp\Authorization::isQualityReviewer($identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -1016,35 +991,27 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
+     *
      * @omegaup-request-param 'author_username'|'nominator_username'|'problem_alias'|null $column
      * @omegaup-request-param int $offset
      * @omegaup-request-param null|string $query
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
-     *
-     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
+     * @omegaup-request-param 'all'|'banned'|'open'|'resolved'|'warning'|null $status
      */
     public static function apiList(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
+        $offset = $r->ensureOptionalInt('offset') ?? 1;
+        $rowCount = $r->ensureOptionalInt('rowcount') ?? self::PAGE_SIZE;
+        $status = $r->ensureOptionalEnum(
             'status',
-            ['all','open','resolved','banned','warning']
-        );
-        $status = $r['status'] ?? 'all';
-        self::validateMemberOfReviewerGroup($r);
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null(
-            $r['rowcount']
-        ) ? self::PAGE_SIZE : intval(
-            $r['rowcount']
-        );
+            ['all','open','resolved','banned','warning'],
+            required: false
+        ) ?? 'all';
+        self::validateMemberOfReviewerGroup($r->identity);
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
         \OmegaUp\Validators::validateValidSubset(
@@ -1101,7 +1068,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $r->ensureMainUserIdentity();
-        self::validateMemberOfReviewerGroup($r);
+        self::validateMemberOfReviewerGroup($r->identity);
 
         return self::getListImpl(
             $r,
@@ -1122,15 +1089,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-
-        $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
-        $rowCount = is_null(
-            $r['rowcount']
-        ) ? self::PAGE_SIZE : intval(
-            $r['rowcount']
-        );
+        $offset = $r->ensureOptionalInt('offset') ?? 1;
+        $rowCount = $r->ensureOptionalInt('rowcount') ?? self::PAGE_SIZE;
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
 
@@ -1265,7 +1225,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|object, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */
@@ -1304,16 +1264,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-        self::validateMemberOfReviewerGroup($r);
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null(
-            $r['length']
-        ) ? self::PAGE_SIZE : intval(
-            $r['length']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
+        self::validateMemberOfReviewerGroup($r->identity);
 
         return [
             'templateProperties' => [
@@ -1343,15 +1296,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('length');
-
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null(
-            $r['length']
-        ) ? self::PAGE_SIZE : intval(
-            $r['length']
-        );
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
 
         return [
             'templateProperties' => [

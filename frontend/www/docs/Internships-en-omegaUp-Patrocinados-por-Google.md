@@ -27,7 +27,7 @@
 
 Te pedimos que completes la fase 1 antes de que comiences a trabajar con nuestro código.
 
- - Sigue estas [intrucciones](https://github.com/omegaup/omegaup/wiki/Development-Environment-Setup-Process) para instalar tu entorno de desarrollo.
+ - Sigue estas [intrucciones](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) para instalar tu entorno de desarrollo.
  - Busca alguna tarea pequeña que resolver en nuestro [issue tracker](https://github.com/omegaup/omegaup/issues), especialmente de nuestra lista de ["Good first issues"](https://github.com/omegaup/omegaup/labels/Good%20first%20issue), o pide que se te asigne uno en nuestro [canal de Discord](https://discord.gg/gMEMX7Mrwe). Alternativamente, puedes encontrar bugs o mejoras en omegaup.com tu mismo, reportalas en nuestro issue tracker.
  - Antes de comenzar a resolverlo, comenta el issue que te interesa resolverlo y pide que se te asigne. Esto es para asegurarnos de que nadie más está trabajando en el issue que tu encontraste.
  - Implementa tu solución y mandala a revisión. Una vez que sea aceptado tu cambio puedes moverte a la tercera fase.
@@ -199,18 +199,18 @@ Para familiarizarte con omegaUp.com y comenzar a desarrollar te recomendamos seg
  - Lee [este articulo](http://www.ioinformatics.org/oi/pdf/v8_2014_169_178.pdf) publicado por nuestros oc-fundadores para aprender acerca de la arquitectura y el diseño de nuestra plataforma.
 
 # Comunicación
-## Si tienes preguntas acerca del [entorno de desarrollo](https://github.com/omegaup/omegaup/wiki/Quiero-desarrollar-en-omegaUp) or the [codebase](https://github.com/omegaup/omegaup) o sobre el proceso de aplicación para GSoC, sigue nuestra guia [Obteniendo ayuda](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) para obtener respuestas a tus preguntas.
+## Si tienes preguntas acerca del [entorno de desarrollo](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Quiero-desarrollar-en-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) o sobre el proceso de aplicación para GSoC, sigue nuestra guia [Obteniendo ayuda](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) para obtener respuestas a tus preguntas.
 
 **Nuestro principal medio de comunicación con candidatos es nuestro [canal de Discor](https://discord.gg/gMEMX7Mrwe). Te invitamos a unirte!**
 
 # Preguntas frecuentes #
-   * **La instalación del entorno de desarrollo me esta fallando.** Sigue nuestra guía [Obteniendo ayuda](https://github.com/omegaup/omegaup/wiki/How-to-Get-Help) para resolver tu problema.
+   * **La instalación del entorno de desarrollo me esta fallando.** Sigue nuestra guía [Obteniendo ayuda](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) para resolver tu problema.
    * **Necesito saber hablar inglés?** Muy poco. Es necesario escribir tu aplicación en inglés, leer algunas documentaciones en inglés y leer/escribir código en inglés. Fuera de eso, usarás solamente español.
   * **Cuántos becarios se van a contratar?** Vamos a intentar conseguir 3 estudiantes, pero no hay ninguna garantía de que obtengamos los 3. Sabremos con certeza a mitades de mayo de 2023.
   * **Como escogemos a nuestros becarios?** Vamos a revisar todas las aplicaciones que recibamos y que estén completas y vamos a escoger a nuestros candidatos basados en 3 cosas:
     * Nivel de habilidad. Esto se busca medir en las 4 fases de la aplicación.
     * Plan de trabajo presentado en tu aplicación. Debe de estar bien estructurado y ser realista en cuanto a tiempos.
-    * Cultural fit. Nos gusta trabajar con gente que promueve la inclusión y que pro activamente buscan ayudar a sus compañeros. Una buena manera de mostrar eso es ayudando a otros candidatos que hacen preguntas en el [canal de Discordhttps://discord.gg/gMEMX7Mrwe).
+    * Cultural fit. Nos gusta trabajar con gente que promueve la inclusión y que pro activamente buscan ayudar a sus compañeros. Una buena manera de mostrar eso es ayudando a otros candidatos que hacen preguntas en el [canal de Discord](https://discord.gg/gMEMX7Mrwe).
 * **Hay aplicaciones de muestra?** Estos son 2 buenos ejemplos:
  * Carlos Cordova - [2018](https://docs.google.com/document/d/1ZEnC33hW4WjZ1WcsDjEtuIeNPuvW62q_hBFjhFosLOI/edit#heading=h.30j0zll)
  * 

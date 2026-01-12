@@ -2334,6 +2334,57 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get profile statistics including solved problems by difficulty and tags distribution.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiProfileStatistics(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        if (
+            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userProfileIsPrivate'
+            );
+        }
+
+        $difficultyStats = \OmegaUp\DAO\Problems::getSolvedCountByDifficulty(
+            $identity->identity_id
+        );
+        $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
+            $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+            $identity->identity_id
+        );
+
+        return [
+            'solved' => $difficultyStats['total'],
+            'attempting' => $attemptingCount,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
+            'tags' => $tagsDistribution,
+        ];
+    }
+
+    /**
      * It will return a boolean value indicating whether user can see
      * information of the given identity. There are three scenarios where this
      * function returns false:
@@ -3115,11 +3166,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['auth_token'],
-            'auth_token'
-        );
+        $filtersList = $r->ensureString('filter');
+        $authToken = $r->ensureOptionalString('auth_token');
 
         $response = [
             'user' => null,
@@ -3129,16 +3177,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset_admin' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
 
-        $filters = explode(',', $r['filter']);
+        $filters = explode(',', $filtersList);
         foreach ($filters as $filter) {
             $tokens = explode('/', $filter);
             if (count($tokens) < 2 || $tokens[0] != '') {
@@ -3173,7 +3219,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'userNotAllowed'
                         );
                     }
-                    if ($tokens[2] != $identity->username && !$session['is_admin']) {
+                    $username = $tokens[2];
+                    if ($username != $identity->username && !$session['is_admin']) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'userNotAllowed'
                         );
@@ -3186,11 +3233,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $contestAlias = $tokens[2];
                     $r2 = new \OmegaUp\Request([
-                        'contest_alias' => $tokens[2],
+                        'contest_alias' => $contestAlias,
                     ]);
-                    if (isset($r['auth_token'])) {
-                        $r2['auth_token'] = $r['auth_token'];
+                    if (!is_null($authToken)) {
+                        $r2['auth_token'] = $authToken;
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
@@ -3198,7 +3246,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
-                        $tokens[2],
+                        $contestAlias,
                         $identity,
                         $token
                     );
@@ -3216,11 +3264,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $problemsetId = $tokens[2];
                     [
                         'request' => $r2,
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
-                        'problemset_id' => $tokens[2],
-                        'auth_token' => $r['auth_token'],
+                        'problemset_id' => $problemsetId,
+                        'auth_token' => $authToken,
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
@@ -3235,7 +3284,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
-                        $response['problemset_admin'][] = intval($tokens[2]);
+                        $response['problemset_admin'][] = intval($problemsetId);
                     }
                     break;
                 case 'problem':
@@ -3245,7 +3294,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    $problem = \OmegaUp\DAO\Problems::getByAlias($tokens[2]);
+                    $problemAlias = $tokens[2];
+                    $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
@@ -3258,7 +3308,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $problem
                         )
                     ) {
-                        $response['problem_admin'][] = $tokens[2];
+                        $response['problem_admin'][] = $problemAlias;
                     } elseif (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'problemIsPrivate'
@@ -4252,7 +4302,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             'female'
                         )['coderinfo']
                     ],
-                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'schoolOfTheMonthData' => null,
                     'userRank' => self::getTopCodersOfTheMonth(
                         $rowCount
                     ),
@@ -4787,6 +4837,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
+     * @omegaup-request-param null|string $redirect
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4800,6 +4851,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
         $idToken = $r->ensureOptionalString('credential');
+        $redirect = $r->ensureOptionalString('redirect');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4823,7 +4875,8 @@ class User extends \OmegaUp\Controllers\Controller {
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
-                    $gCsrfToken
+                    $gCsrfToken,
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {
