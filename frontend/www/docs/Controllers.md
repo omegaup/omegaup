@@ -273,6 +273,7 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/user/problemsCreated/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserproblemscreated)
   - [`/api/user/problemsSolved/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserproblemssolved)
   - [`/api/user/profile/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserprofile)
+  - [`/api/user/profileStatistics/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserprofilestatistics)
   - [`/api/user/removeExperiment/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserremovegroup)
   - [`/api/user/removeRole/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserremoverole)
