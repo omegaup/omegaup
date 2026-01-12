@@ -1,3 +1,5 @@
+- [ACL](#acl)
+  - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
 - [AiEditorial](#aieditorial)
@@ -280,6 +282,20 @@
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
   - [`/api/user/validateFilter/`](#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](#apiuserverifyemail)
+
+# ACL
+
+## `/api/aCL/userOwnedAclReport/`
+
+### Description
+
+Returns all ACLs owned by the current user along with assigned roles for each.
+
+### Returns
+
+| Name   | Type                                                                                                                                                                |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `acls` | `{ acl_id: number; alias: string; type: string; users: { role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]; }[]` |
 
 # Admin
 
