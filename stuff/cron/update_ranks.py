@@ -460,11 +460,12 @@ def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
             ''', (row['score'], rank, row['school_id']))
 
 
-def update_school_of_the_month_candidates(cur: mysql.connector.cursor.MySQLCursorDict,
-                                          cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-                                          first_day_of_current_month: datetime.date,
-                                          update_school_of_the_month: bool
-                                          ) -> None:
+def update_school_of_the_month_candidates(
+    cur: mysql.connector.cursor.MySQLCursorDict,
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    update_school_of_the_month: bool,
+) -> None:
     '''Updates the list of candidates to school of the current month'''
     logging.info('Updating the candidates to school of the month...')
     first_day_of_next_month = get_first_day_of_next_month(
