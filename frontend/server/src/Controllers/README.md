@@ -358,6 +358,21 @@ Get status of an AI editorial job
 | ----- | ----------------------------- |
 | `job` | `types.AiEditorialJobDetails` |
 
+**`types.AiEditorialJobDetails` fields:**
+
+| Name                 | Type      | Optional |
+| -------------------- | --------- | -------- |
+| `created_at`         | `Date`    | No       |
+| `error_message`      | `string`  | Yes      |
+| `is_retriable`       | `boolean` | No       |
+| `job_id`             | `string`  | No       |
+| `md_en`              | `string`  | Yes      |
+| `md_es`              | `string`  | Yes      |
+| `md_pt`              | `string`  | Yes      |
+| `problem_alias`      | `string`  | No       |
+| `status`             | `string`  | No       |
+| `validation_verdict` | `string`  | Yes      |
+
 ## `/api/aiEditorial/updateJob/`
 
 ### Description
@@ -2113,6 +2128,12 @@ Returns details of a given course
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
 
+**`types.AssignmentProgress` fields:**
+
+| Name   | Type                      | Optional |
+| ------ | ------------------------- | -------- |
+| `[key` | `string]: types.Progress` | No       |
+
 ## `/api/course/problemClarifications/`
 
 ### Description
@@ -2508,6 +2529,19 @@ Calls to /status grader
 | Name     | Type                 |
 | -------- | -------------------- |
 | `grader` | `types.GraderStatus` |
+
+**`types.GraderStatus` fields:**
+
+| Name                  | Type                         | Optional |
+| --------------------- | ---------------------------- | -------- |
+| `broadcaster_sockets` | `number`                     | No       |
+| `embedded_runner`     | `boolean`                    | No       |
+| `queue`               | `{ run_queue_length: number` | No       |
+| `runner_queue_length` | `number`                     | No       |
+| `runners`             | `string[]`                   | No       |
+| `running`             | `{ id: number`               | No       |
+| `name`                | `string`                     | No       |
+| `status`              | `string`                     | No       |
 
 # Group
 
@@ -3086,6 +3120,17 @@ Convert an uploaded ZIP file to CDP.
 | ----- | ----------- |
 | `cdp` | `types.CDP` |
 
+**`types.CDP` fields:**
+
+| Name                      | Type                  | Optional |
+| ------------------------- | --------------------- | -------- |
+| `casesStore`              | `types.CDPCasesStore` | No       |
+| `problemCodeContent`      | `string`              | No       |
+| `problemCodeExtension`    | `string`              | No       |
+| `problemMarkdown`         | `string`              | No       |
+| `problemName`             | `string`              | No       |
+| `problemSolutionMarkdown` | `string`              | No       |
+
 ## `/api/problem/create/`
 
 ### Description
@@ -3413,6 +3458,15 @@ Returns the solution for a problem if conditions are satisfied.
 | Name       | Type                     |
 | ---------- | ------------------------ |
 | `solution` | `types.ProblemStatement` |
+
+**`types.ProblemStatement` fields:**
+
+| Name       | Type                      | Optional |
+| ---------- | ------------------------- | -------- |
+| `images`   | `{ [key: string]: string` | No       |
+| `language` | `string`                  | No       |
+| `markdown` | `string`                  | No       |
+| `sources`  | `{ [key: string]: string` | No       |
 
 ## `/api/problem/stats/`
 
@@ -4291,7 +4345,28 @@ contestant's machine and the server.
 | Name      | Type                   |
 | --------- | ---------------------- |
 | `session` | `types.CurrentSession` |
-| `time`    | `number`               |
+
+**`types.CurrentSession` fields:**
+
+| Name                         | Type                         | Optional |
+| ---------------------------- | ---------------------------- | -------- |
+| `apiTokenId`                 | `number`                     | Yes      |
+| `api_tokens`                 | `types.ApiToken[]`           | No       |
+| `associated_identities`      | `types.AssociatedIdentity[]` | No       |
+| `auth_token`                 | `string`                     | Yes      |
+| `cacheKey`                   | `string`                     | Yes      |
+| `classname`                  | `string`                     | No       |
+| `email`                      | `string`                     | Yes      |
+| `identity`                   | `dao.Identities`             | Yes      |
+| `is_admin`                   | `boolean`                    | No       |
+| `is_under_13_user`           | `boolean`                    | No       |
+| `loginIdentity`              | `dao.Identities`             | Yes      |
+| `mentor_can_choose_coder`    | `boolean`                    | No       |
+| `user`                       | `dao.Users`                  | Yes      |
+| `user_verification_deadline` | `Date`                       | Yes      |
+| `valid`                      | `boolean`                    | No       |
+
+| `time` | `number` |
 
 # Submission
 
@@ -4726,6 +4801,36 @@ date, calculate it and save it.
 | ----------- | ------------------- |
 | `coderinfo` | `types.UserProfile` |
 
+**`types.UserProfile` fields:**
+
+| Name                        | Type      | Optional |
+| --------------------------- | --------- | -------- |
+| `birth_date`                | `Date`    | Yes      |
+| `classname`                 | `string`  | No       |
+| `country`                   | `string`  | No       |
+| `country_id`                | `string`  | Yes      |
+| `email`                     | `string`  | Yes      |
+| `gender`                    | `string`  | Yes      |
+| `graduation_date`           | `Date`    | Yes      |
+| `gravatar_92`               | `string`  | No       |
+| `has_competitive_objective` | `boolean` | Yes      |
+| `has_learning_objective`    | `boolean` | Yes      |
+| `has_scholar_objective`     | `boolean` | Yes      |
+| `has_teaching_objective`    | `boolean` | Yes      |
+| `hide_problem_tags`         | `boolean` | No       |
+| `is_own_profile`            | `boolean` | No       |
+| `is_private`                | `boolean` | No       |
+| `locale`                    | `string`  | No       |
+| `name`                      | `string`  | Yes      |
+| `preferred_language`        | `string`  | Yes      |
+| `scholar_degree`            | `string`  | Yes      |
+| `school`                    | `string`  | Yes      |
+| `school_id`                 | `number`  | Yes      |
+| `state`                     | `string`  | Yes      |
+| `state_id`                  | `string`  | Yes      |
+| `username`                  | `string`  | Yes      |
+| `verified`                  | `boolean` | No       |
+
 ## `/api/user/coderOfTheMonthList/`
 
 ### Description
@@ -4745,6 +4850,18 @@ Returns the list of coders of the month
 | -------- | --------------------------- |
 | `coders` | `types.CoderOfTheMonthList` |
 
+**`types.CoderOfTheMonthList` fields:**
+
+| Name              | Type     | Optional |
+| ----------------- | -------- | -------- |
+| `classname`       | `string` | No       |
+| `country_id`      | `string` | No       |
+| `date`            | `string` | No       |
+| `gravatar_32`     | `string` | No       |
+| `problems_solved` | `number` | Yes      |
+| `score`           | `number` | Yes      |
+| `username`        | `string` | No       |
+
 ## `/api/user/contestStats/`
 
 ### Description
@@ -4762,6 +4879,13 @@ Get Contests which a certain user has participated in
 | Name       | Type                        |
 | ---------- | --------------------------- |
 | `contests` | `types.UserProfileContests` |
+
+**`types.UserProfileContests` fields:**
+
+| Name    | Type                                         | Optional |
+| ------- | -------------------------------------------- | -------- |
+| `[key`  | `string]: { data: types.ContestParticipated` | No       |
+| `place` | `number`                                     | No       |
 
 ## `/api/user/create/`
 
