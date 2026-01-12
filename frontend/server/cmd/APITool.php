@@ -838,6 +838,71 @@ class APIGenerator {
             new \PhpParser\Comment\Doc($docblock)
         );
     }
+    private function getTypeFields(string $type): array {
+        if (strpos($type, 'types.') !== 0) {
+            return [];
+        }
+
+        $typeName = substr($type, 6);
+        if (!isset($this->typeMapper->typeAliases[$typeName])) {
+            return [];
+        }
+
+        $typeDefinition = $this->typeMapper->typeAliases[$typeName]->typescriptExpansion;
+        $cleaned = trim($typeDefinition, '{} ');
+
+        if (empty($cleaned)) {
+            return [];
+        }
+
+        $fields = explode(';', $cleaned);
+        $typeFields = [];
+
+        foreach ($fields as $field) {
+            $field = trim($field);
+            if (empty($field)) {
+                continue;
+            }
+
+            if (strpos($field, ':') !== false) {
+                list($fieldName, $fieldType) = explode(':', $field, 2);
+                $fieldName = trim($fieldName);
+                $fieldType = trim($fieldType);
+
+                $isOptional = substr($fieldName, -1) === '?';
+                if ($isOptional) {
+                    $fieldName = substr($fieldName, 0, -1);
+                }
+
+                $typeFields[] = [
+                    'name' => $fieldName,
+                    'type' => $fieldType,
+                    'optional' => $isOptional
+                ];
+            }
+        }
+
+        return $typeFields;
+    }
+    private function generateTypeFieldsTable(
+        string $typeName,
+        array $typeFields
+    ): void {
+        if (empty($typeFields)) {
+            return;
+        }
+
+        $shortName = substr($typeName, 6);
+        echo "\n**`{$typeName}` fields:**\n\n";
+        echo "| Name | Type | Optional |\n";
+        echo "|------|------|----------|\n";
+
+        foreach ($typeFields as $field) {
+            $optionalText = $field['optional'] ? 'Yes' : 'No';
+            echo "| `{$field['name']}` | `{$field['type']}` | {$optionalText} |\n";
+        }
+        echo "\n";
+    }
 
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
@@ -1205,11 +1270,17 @@ EOD;
                     echo "|------|------|\n";
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        echo "| `{$paramName}` | `" . str_replace(
-                            '|',
-                            '\\|',
-                            $paramType
-                        ) . "` |\n";
+                        $escapedType = str_replace('|', '\\|', $paramType);
+                        echo "| `{$paramName}` | `{$escapedType}` |\n";
+
+                        // If this is a complex type, add its fields in a separate table
+                        $typeFields = $this->getTypeFields($paramType);
+                        if (!empty($typeFields)) {
+                            $this->generateTypeFieldsTable(
+                                $paramType,
+                                $typeFields
+                            );
+                        }
                     }
                 }
             }
