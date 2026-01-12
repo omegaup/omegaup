@@ -35,7 +35,7 @@ on:
       - 'docker-compose*.yml'
       # Git & CI
       - '.gitmodules'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   push:
     branches:
       - main
@@ -71,7 +71,7 @@ on:
       - 'docker-compose*.yml'
       # Git & CI
       - '.gitmodules'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
