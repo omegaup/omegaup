@@ -4,6 +4,8 @@ For more information about the API controllers, please refer to the [Controllers
 
 ### Index
 
+- [ACL](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#acl)
+  - [`/api/aCL/userOwnedAclReport/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiacluserownedaclreport)
 - [Admin](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#admin)
   - [`/api/admin/platformReportStats/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiadminplatformreportstats)
 - [AiEditorial](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#aieditorial)
