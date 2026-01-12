@@ -177,6 +177,7 @@ cannotAddProb = "Não é possível adicionar problema. Você não é o diretor d
 cannotEditUngroupedGroup = "Não é possível editar um grupo não agrupado"
 cannotRemoveProblem = "Não é possível eliminar problema. Você não é o diretor do concurso."
 cannotRemoveProblemWithSubmissions = "Você não pode eliminar um problema que já tenha soluções"
+carouselItemNotFound = "Item do carrossel não encontrado"
 caseAlreadyExists = "Já existe um caso de teste com esse nome"
 caseEditTitle = "Editar caso"
 caseModalBack = "Voltar"
