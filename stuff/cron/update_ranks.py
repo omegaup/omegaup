@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Iterable, List, Mapping, NamedTuple, Sequence
+from typing import List, NamedTuple, Sequence
 
 import mysql.connector
 import mysql.connector.cursor
@@ -36,12 +36,6 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
-
-logging.basicConfig(
-    filename='update_ranks.log',
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s'
-)
 
 
 class Cutoff(NamedTuple):
@@ -466,143 +460,13 @@ def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
             ''', (row['score'], rank, row['school_id']))
 
 
-def update_school_of_the_month_candidates(
-    cur: mysql.connector.cursor.MySQLCursorDict,
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    first_day_of_current_month: datetime.date,
-    update_school_of_the_month: bool,
-) -> None:
+def update_school_of_the_month_candidates(cur: mysql.connector.cursor.MySQLCursorDict,
+                                          cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+                                          first_day_of_current_month: datetime.date,
+                                          update_school_of_the_month: bool
+                                          ) -> None:
     '''Updates the list of candidates to school of the current month'''
-
     logging.info('Updating the candidates to school of the month...')
-    first_day_of_next_month = get_first_day_of_next_month(
-        first_day_of_current_month)
-
-    # First make sure there are not already selected schools of the month
-    cur.execute(
-        '''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `School_Of_The_Month`
-                WHERE
-                    `time` = %s AND
-                    `selected_by` IS NOT NULL;
-                ''', (first_day_of_next_month, ))
-
-    for row in cur.fetchall():
-        if row['count'] > 0:
-            logging.info('Skipping because already exist selected schools.')
-            return
-
-    cur.execute(
-        '''
-                DELETE FROM
-                    `School_Of_The_Month`
-                WHERE
-                    `time` = %s;
-                ''', (first_day_of_next_month, ))
-
-    cur_readonly.execute(
-        '''
-        SELECT
-            `s`.`school_id`,
-            `s`.`name`,
-            IFNULL(
-                SUM(
-                    ROUND(
-                        100 / LOG(2, `distinct_school_problems`.`accepted`+1),
-                        0
-                    )
-                ),
-                0.0
-            ) AS `score`
-        FROM
-            `Schools` AS `s`
-        INNER JOIN
-            (
-                SELECT
-                    `su`.`school_id`,
-                    `p`.`accepted`,
-                    MIN(`su`.`time`) AS `first_ac_time`
-                FROM
-                    `Submissions` AS `su`
-                INNER JOIN
-                    `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
-                WHERE
-                    `su`.`verdict` = "AC"
-                    AND `p`.`visibility` >= 1
-                    AND `su`.`school_id` IS NOT NULL
-                GROUP BY
-                    `su`.`school_id`,
-                    `su`.`problem_id`
-                HAVING
-                    `first_ac_time` BETWEEN %s AND %s
-            ) AS `distinct_school_problems`
-        ON
-            `distinct_school_problems`.`school_id` = `s`.`school_id`
-        WHERE
-            NOT EXISTS (
-                SELECT
-                    `sotm`.`school_id`,
-                    MAX(`time`) AS `latest_time`
-                FROM
-                    `School_Of_The_Month` AS `sotm`
-                WHERE
-                    `sotm`.`school_id` = `s`.`school_id`
-                    AND (
-                        `sotm`.`selected_by` IS NOT NULL OR
-                        `sotm`.`ranking` = 1
-                    )
-                GROUP BY
-                    `sotm`.`school_id`
-                HAVING
-                    DATE_ADD(`latest_time`, INTERVAL 1 YEAR) >= %s
-            )
-        GROUP BY
-            `s`.`school_id`
-        ORDER BY
-            `score` DESC
-        LIMIT 100;
-        ''', (first_day_of_current_month, first_day_of_next_month,
-              first_day_of_next_month))
-
-    candidates = cur_readonly.fetchall()
-    if not candidates:
-        logging.info('No eligible schools found.')
-        return
-
-    if update_school_of_the_month:
-        for index, row in enumerate(candidates):
-            cur.execute(
-                '''
-                        INSERT INTO
-                            `School_Of_The_Month` (
-                                `school_id`,
-                                `time`,
-                                `ranking`,
-                                `score`
-                            )
-                        VALUES (
-                            %s,
-                            %s,
-                            %s,
-                            %s
-                        );
-                        ''', (row['school_id'], first_day_of_next_month,
-                              index + 1, row['score']))
-    else:
-        debug_school_of_the_month_candidates(first_day_of_next_month,
-                                             candidates)
-
-
-def update_school_new(cur: mysql.connector.cursor.MySQLCursorDict,
-                      cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-                      first_day_of_current_month: datetime.date,
-                      update_school_of_the_month: bool
-                      ) -> None:
-    '''Testing function for school of the month candidates'''
-    logging.info('Testing function for school of the month candidates... hola')
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
     exist_school = check_existing_school_of_the_next_month(
@@ -623,31 +487,10 @@ def update_school_new(cur: mysql.connector.cursor.MySQLCursorDict,
         insert_school_of_the_month_candidates(
             cur, first_day_of_next_month, schools)
     else:
-        debug2_school_of_the_month_candidates(first_day_of_next_month, schools)
+        debug_school_of_the_month_candidates(first_day_of_next_month, schools)
 
 
 def debug_school_of_the_month_candidates(
-    first_day_of_next_month: datetime.date,
-    candidates: Iterable[Mapping[str, Any]],
-) -> None:
-    '''Log school of the month candidates'''
-
-    log_entries = []
-    for ranking, candidate in enumerate(candidates, start=1):
-        log_entry = {
-            "school_id": candidate['school_id'],
-            "name": candidate['name'],
-            "time": first_day_of_next_month.isoformat(),
-            "ranking": ranking,
-            "score": candidate['score'],
-        }
-        log_entries.append(log_entry)
-
-    log_message = json.dumps(log_entries, indent=4)
-    logging.info(log_message)
-
-
-def debug2_school_of_the_month_candidates(
     first_day_of_next_month: datetime.date,
     candidates: List[School],
 ) -> None:
@@ -665,6 +508,7 @@ def debug2_school_of_the_month_candidates(
         log_entries.append(log_entry)
 
     log_message = json.dumps(log_entries, indent=4)
+    logging.info('School of the month candidates:')
     logging.info(log_message)
 
 
