@@ -550,7 +550,7 @@ export default class Carousel extends Vue {
       const expirationDate = new Date(item.expiration_date);
       const now = new Date();
       if (expirationDate < now) {
-        return T.wordsArchive;
+        return T.wordsExpire;
       }
     }
 
