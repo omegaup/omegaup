@@ -1536,6 +1536,21 @@ export const Problem = {
   }),
 };
 
+export const ProblemBookmark = {
+  exists: apiCall<
+    messages.ProblemBookmarkExistsRequest,
+    messages.ProblemBookmarkExistsResponse
+  >('/api/problemBookmark/exists/'),
+  list: apiCall<
+    messages.ProblemBookmarkListRequest,
+    messages.ProblemBookmarkListResponse
+  >('/api/problemBookmark/list/'),
+  toggle: apiCall<
+    messages.ProblemBookmarkToggleRequest,
+    messages.ProblemBookmarkToggleResponse
+  >('/api/problemBookmark/toggle/'),
+};
+
 export const ProblemForfeited = {
   getCounts: apiCall<
     messages.ProblemForfeitedGetCountsRequest,
