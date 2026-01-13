@@ -2,13 +2,6 @@
   <div class="omegaup-admin-carousel card">
     <div class="card-header">
       <h2 class="card-title">{{ T.omegaupTitleCarouselManagement }}</h2>
-      <button
-        class="btn btn-primary float-right"
-        @click.prevent="showCreateModal = true"
-      >
-        <font-awesome-icon :icon="['fas', 'plus']" />
-        {{ T.carouselCreateNew }}
-      </button>
     </div>
     <div class="card-body">
       <div class="mb-2">
@@ -29,9 +22,16 @@
           style="width: auto"
         >
           <option value="active">{{ T.wordsActive }}</option>
-          <option value="archived">{{ T.wordsArchived }}</option>
+          <option value="archived">{{ T.wordsArchive }}</option>
           <option value="all">{{ T.wordsAll }}</option>
         </select>
+        <button
+          class="btn btn-primary float-right"
+          @click.prevent="showCreateModal = true"
+        >
+          <font-awesome-icon :icon="['fas', 'plus']" />
+          {{ T.carouselCreateNew }}
+        </button>
       </div>
       <table class="table table-striped">
         <thead>
@@ -44,7 +44,7 @@
             <th>{{ T.carouselExpirationDate }}</th>
             <th>{{ T.wordsStatus }}</th>
             <th>{{ T.wordsEdit }}</th>
-            <th>{{ T.wordsArchived }}</th>
+            <th>{{ T.wordsArchive }}</th>
           </tr>
         </thead>
         <tbody>
@@ -72,10 +72,8 @@
             </td>
             <td>
               <a :href="item.link" target="_blank">
-                <!-- {{
-                truncateText(item.link, 20)
-              }} -->
-              <font-awesome-icon :icon="['fas', 'link']" /></a>
+                <font-awesome-icon :icon="['fas', 'link']" />
+              </a>
             </td>
             <td>
               {{ getMultilingualText(item.button_title, currentLanguage) }}
@@ -88,13 +86,8 @@
               }}
             </td>
             <td>
-              <span
-                :class="{
-                  'badge badge-success': item.status,
-                  'badge badge-secondary': !item.status,
-                }"
-              >
-                {{ item.status ? T.wordsActive : T.wordsInactive }}
+              <span :class="getStatusBadgeClass(item)">
+                {{ getStatusText(item) }}
               </span>
             </td>
             <td>
@@ -114,8 +107,8 @@
               </button>
             </td>
           </tr>
-          <tr v-if="carouselItems.length === 0">
-            <td colspan="8" class="text-center">
+          <tr v-if="filteredCarouselItems.length === 0">
+            <td colspan="9" class="text-center">
               {{ T.carouselNoItems }}
             </td>
           </tr>
@@ -165,14 +158,27 @@
               <!-- Multilingual Fields -->
               <div v-for="lang in languages" :key="lang.code">
                 <div v-show="editingLanguage === lang.code">
-                  <div class="form-group">
-                    <label>{{ T.wordsTitle }} ({{ lang.name }}) *</label>
-                    <input
-                      v-model="multilingualData.title[lang.code]"
-                      type="text"
-                      class="form-control"
-                      required
-                    />
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label>{{ T.wordsTitle }} ({{ lang.name }}) *</label>
+                      <input
+                        v-model="multilingualData.title[lang.code]"
+                        type="text"
+                        class="form-control"
+                        required
+                      />
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label
+                        >{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label
+                      >
+                      <input
+                        v-model="multilingualData.button_title[lang.code]"
+                        type="text"
+                        class="form-control"
+                        required
+                      />
+                    </div>
                   </div>
                   <div class="form-group">
                     <label>{{ T.carouselExcerpt }} ({{ lang.name }}) *</label>
@@ -183,60 +189,53 @@
                       required
                     ></textarea>
                   </div>
-                  <div class="form-group">
-                    <label
-                      >{{ T.carouselButtonTitle }} ({{ lang.name }}) *</label
-                    >
-                    <input
-                      v-model="multilingualData.button_title[lang.code]"
-                      type="text"
-                      class="form-control"
-                      required
-                    />
-                  </div>
                 </div>
               </div>
 
               <!-- Non-multilingual Fields -->
-              <div class="form-group">
-                <label>{{ T.carouselImageUrl }} *</label>
-                <input
-                  v-model="currentItem.image_url"
-                  type="url"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label>{{ T.carouselLink }} *</label>
-                <input
-                  v-model="currentItem.link"
-                  type="url"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label>{{ T.carouselExpirationDate }}</label>
-                <input
-                  v-model="expirationDateInput"
-                  type="datetime-local"
-                  class="form-control"
-                />
-                <small class="form-text text-muted">
-                  {{ T.carouselExpirationDateHint }}
-                </small>
-              </div>
-              <div class="form-group">
-                <div class="form-check">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label>{{ T.carouselImageUrl }} *</label>
                   <input
-                    v-model="currentItem.status"
-                    type="checkbox"
-                    class="form-check-input"
+                    v-model="currentItem.image_url"
+                    type="url"
+                    class="form-control"
+                    required
                   />
-                  <label class="form-check-label">
-                    {{ T.wordsActive }}
-                  </label>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>{{ T.carouselLink }} *</label>
+                  <input
+                    v-model="currentItem.link"
+                    type="url"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label>{{ T.carouselExpirationDate }}</label>
+                  <input
+                    v-model="expirationDateInput"
+                    type="datetime-local"
+                    class="form-control"
+                  />
+                  <small class="form-text text-muted">
+                    {{ T.carouselExpirationDateHint }}
+                  </small>
+                </div>
+                <div class="form-group col-md-6">
+                  <div class="form-check mt-5">
+                    <input
+                      v-model="currentItem.status"
+                      type="checkbox"
+                      class="form-check-input"
+                    />
+                    <label class="form-check-label">
+                      {{ T.wordsActive }}
+                    </label>
+                  </div>
                 </div>
               </div>
             </form>
@@ -265,7 +264,7 @@
       class="modal-backdrop show"
     ></div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Archive Confirmation Modal -->
     <div
       v-if="showDeleteModal"
       class="modal show d-block"
@@ -301,7 +300,7 @@
               class="btn btn-danger"
               @click.prevent="deleteItem"
             >
-              {{ T.wordsDelete }}
+              {{ T.wordsArchive }}
             </button>
           </div>
         </div>
@@ -540,6 +539,47 @@ export default class Carousel extends Vue {
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  getStatusText(item: types.CarouselItem): string {
+    if (!item.status) {
+      return T.wordsInactive;
+    }
+
+    if (item.expiration_date) {
+      const expirationDate = new Date(item.expiration_date);
+      const now = new Date();
+      if (expirationDate < now) {
+        return T.wordsArchive;
+      }
+    }
+
+    return T.wordsActive;
+  }
+
+  getStatusBadgeClass(item: types.CarouselItem): Record<string, boolean> {
+    if (!item.status) {
+      return {
+        badge: true,
+        'badge-secondary': true,
+      };
+    }
+
+    if (item.expiration_date) {
+      const expirationDate = new Date(item.expiration_date);
+      const now = new Date();
+      if (expirationDate < now) {
+        return {
+          badge: true,
+          'badge-danger': true,
+        };
+      }
+    }
+
+    return {
+      badge: true,
+      'badge-success': true,
+    };
   }
 }
 </script>
