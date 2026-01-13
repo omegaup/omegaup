@@ -185,6 +185,10 @@
   - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
+- [ProblemBookmark](#problembookmark)
+  - [`/api/problemBookmark/exists/`](#apiproblembookmarkexists)
+  - [`/api/problemBookmark/list/`](#apiproblembookmarklist)
+  - [`/api/problemBookmark/toggle/`](#apiproblembookmarktoggle)
 - [ProblemForfeited](#problemforfeited)
   - [`/api/problemForfeited/getCounts/`](#apiproblemforfeitedgetcounts)
 - [Problemset](#problemset)
@@ -3716,6 +3720,59 @@ Entry point for Problem Versions API
 | ----------- | ------------------------ |
 | `log`       | `types.ProblemVersion[]` |
 | `published` | `string`                 |
+
+# ProblemBookmark
+
+ProblemBookmarkController
+
+## `/api/problemBookmark/exists/`
+
+### Description
+
+Check if a problem is bookmarked by the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type      |
+| ------------ | --------- |
+| `bookmarked` | `boolean` |
+
+## `/api/problemBookmark/list/`
+
+### Description
+
+Get list of bookmarked problems for the current user
+
+### Returns
+
+| Name       | Type                      |
+| ---------- | ------------------------- |
+| `problems` | `types.BookmarkProblem[]` |
+| `total`    | `number`                  |
+
+## `/api/problemBookmark/toggle/`
+
+### Description
+
+Toggle a bookmark for the current user
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type      |
+| ------------ | --------- |
+| `bookmarked` | `boolean` |
 
 # ProblemForfeited
 
