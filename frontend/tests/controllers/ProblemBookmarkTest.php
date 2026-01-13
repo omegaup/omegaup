@@ -3,21 +3,22 @@
  * Test for ProblemBookmarkController
  */
 class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testCreateBookmark() {
+    public function testToggleBookmark() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Login and create bookmark
+        // Login and toggle bookmark (should create bookmark)
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        $response = \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
             ])
         );
 
-        $this->assertTrue($response['success']);
+        $this->assertSame('ok', $response['status']);
+        $this->assertTrue($response['bookmarked']);
 
         // Verify bookmark was created by checking exists API
         $existsResponse = \OmegaUp\Controllers\ProblemBookmark::apiExists(
@@ -30,58 +31,35 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($existsResponse['bookmarked']);
     }
 
-    public function testCreateBookmarkAlreadyExists() {
+    public function testToggleBookmarkTwice() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Login and create bookmark twice
+        // Login and toggle bookmark (should create bookmark)
         $login = self::login($identity);
-        $response1 = \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        $response1 = \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
             ])
         );
 
-        $this->assertTrue($response1['success']);
+        $this->assertSame('ok', $response1['status']);
+        $this->assertTrue($response1['bookmarked']);
 
-        // Try to create again - should succeed without error
-        $response2 = \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        // Toggle again - should remove bookmark
+        $response2 = \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
             ])
         );
 
-        $this->assertTrue($response2['success']);
-    }
+        $this->assertSame('ok', $response2['status']);
+        $this->assertFalse($response2['bookmarked']);
 
-    public function testDeleteBookmark() {
-        // Create a user and a problem
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Login and create bookmark
-        $login = self::login($identity);
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['problem']->alias,
-            ])
-        );
-
-        // Delete the bookmark
-        $response = \OmegaUp\Controllers\ProblemBookmark::apiDelete(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['problem']->alias,
-            ])
-        );
-
-        $this->assertTrue($response['success']);
-
-        // Verify bookmark was deleted
+        // Verify bookmark was actually removed via apiExists
         $existsResponse = \OmegaUp\Controllers\ProblemBookmark::apiExists(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -90,24 +68,6 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertFalse($existsResponse['bookmarked']);
-    }
-
-    public function testDeleteBookmarkNotExists() {
-        // Create a user and a problem
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Login and try to delete a bookmark that doesn't exist
-        $login = self::login($identity);
-        $response = \OmegaUp\Controllers\ProblemBookmark::apiDelete(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['problem']->alias,
-            ])
-        );
-
-        // Should succeed without error even if bookmark doesn't exist
-        $this->assertTrue($response['success']);
     }
 
     public function testBookmarkExistsNotBookmarked() {
@@ -127,30 +87,6 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($response['bookmarked']);
     }
 
-    public function testBookmarkExistsBookmarked() {
-        // Create a user and a problem
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        // Login, create bookmark, then check
-        $login = self::login($identity);
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['problem']->alias,
-            ])
-        );
-
-        $response = \OmegaUp\Controllers\ProblemBookmark::apiExists(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['problem']->alias,
-            ])
-        );
-
-        $this->assertTrue($response['bookmarked']);
-    }
-
     public function testListBookmarkedProblems() {
         // Create a user and multiple problems
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -160,13 +96,13 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Login and bookmark two problems
         $login = self::login($identity);
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData1['problem']->alias,
             ])
         );
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData2['problem']->alias,
@@ -219,7 +155,7 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
 
         // User1 bookmarks the problem
         $login1 = self::login($identity1);
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login1->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
@@ -247,28 +183,12 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(0, $listResponse['total']);
     }
 
-    public function testCreateBookmarkWithoutLogin() {
+    public function testToggleBookmarkWithoutLogin() {
         // Create a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         try {
-            \OmegaUp\Controllers\ProblemBookmark::apiCreate(
-                new \OmegaUp\Request([
-                    'problem_alias' => $problemData['problem']->alias,
-                ])
-            );
-            $this->fail('Should have thrown an exception');
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $this->assertSame('loginRequired', $e->getMessage());
-        }
-    }
-
-    public function testDeleteBookmarkWithoutLogin() {
-        // Create a problem
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-
-        try {
-            \OmegaUp\Controllers\ProblemBookmark::apiDelete(
+            \OmegaUp\Controllers\ProblemBookmark::apiToggle(
                 new \OmegaUp\Request([
                     'problem_alias' => $problemData['problem']->alias,
                 ])
@@ -306,7 +226,7 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testCreateBookmarkInvalidProblem() {
+    public function testToggleBookmarkInvalidProblem() {
         // Create a user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -314,27 +234,7 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         try {
-            \OmegaUp\Controllers\ProblemBookmark::apiCreate(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'problem_alias' => 'nonexistent-problem-alias',
-                ])
-            );
-            $this->fail('Should have thrown an exception');
-        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertSame('problemNotFound', $e->getMessage());
-        }
-    }
-
-    public function testDeleteBookmarkInvalidProblem() {
-        // Create a user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        // Login and try to delete bookmark for non-existent problem
-        $login = self::login($identity);
-
-        try {
-            \OmegaUp\Controllers\ProblemBookmark::apiDelete(
+            \OmegaUp\Controllers\ProblemBookmark::apiToggle(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'problem_alias' => 'nonexistent-problem-alias',
@@ -392,7 +292,7 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create bookmark
-        \OmegaUp\Controllers\ProblemBookmark::apiCreate(
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
@@ -419,7 +319,7 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Delete bookmark
-        \OmegaUp\Controllers\ProblemBookmark::apiDelete(
+        \OmegaUp\Controllers\ProblemBookmark::apiToggle(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
