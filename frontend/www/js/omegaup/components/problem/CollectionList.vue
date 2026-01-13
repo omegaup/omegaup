@@ -28,6 +28,15 @@
               )
           "
         ></omegaup-problem-filter-tags>
+        <div class="mb-3">
+          <omegaup-toggle-switch
+            data-problem-tags-toggle
+            :checked-value="showProblemTags"
+            :text-description="T.userEditShowProblemTags"
+            :size="ToggleSwitchSize.Small"
+            @update:value="(value) => (showProblemTags = value)"
+          ></omegaup-toggle-switch>
+        </div>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
@@ -65,7 +74,7 @@
         </div>
         <omegaup-problem-base-list
           v-else
-          :problems="problems"
+          :problems="problemsToShow"
           :logged-in="loggedIn"
           :selected-tags="selectedTags"
           :pager-items="pagerItems"
@@ -81,6 +90,7 @@
           :sort-order="sortOrder"
           :column-name="columnName"
           :path="`/problem/collection/${level}/`"
+          :show-problem-tags="showProblemTags"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit(
@@ -106,6 +116,7 @@ import problem_FilterTags from './FilterTags.vue';
 import problem_BaseList from './BaseList.vue';
 import problem_FilterDifficulty from './FilterDifficulty.vue';
 import problem_FilterQuality from './FilterQuality.vue';
+import omegaup_ToggleSwitch, { ToggleSwitchSize } from '../ToggleSwitch.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
@@ -115,11 +126,12 @@ import { types } from '../../api_types';
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
     'omegaup-problem-filter-quality': problem_FilterQuality,
+    'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
 export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
-  @Prop() problems!: omegaup.Problem;
+  @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop({ default: () => [] }) selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
@@ -138,7 +150,18 @@ export default class CollectionList extends Vue {
   @Prop() quality!: string;
 
   T = T;
+  ToggleSwitchSize = ToggleSwitchSize;
   level = this.data.level;
+  showProblemTags = true;
+
+  get problemsToShow(): omegaup.Problem[] {
+    if (this.showProblemTags) return this.problems;
+    // Keep filtering logic intact but hide rendered tags by stripping them.
+    return this.problems.map((problem) => ({
+      ...problem,
+      tags: [],
+    }));
+  }
 
   get publicQualityTags(): types.TagWithProblemCount[] {
     const tagNames: Set<string> = new Set(
