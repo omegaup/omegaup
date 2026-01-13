@@ -1,6 +1,9 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
+    <nav
+      class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right"
+      data-enable-hover-dropdown
+    >
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img

@@ -249,14 +249,19 @@ export default class NavbarItems extends Vue {
   T = T;
 
   mounted(): void {
-    if (window.innerWidth < 992) return;
+    if (
+      window.innerWidth < 992 ||
+      !document.querySelector('[data-enable-hover-dropdown]')
+    ) {
+      return;
+    }
 
     const dropdowns = this.$el.querySelectorAll<HTMLElement>(
       '.nav-item.dropdown',
     );
 
     dropdowns.forEach((dropdown) => {
-      dropdown.addEventListener('mouseenter', () => {
+      const onEnter = () => {
         dropdowns.forEach((d) => {
           if (d !== dropdown) {
             d.classList.remove('show');
@@ -273,15 +278,20 @@ export default class NavbarItems extends Vue {
         dropdown
           .querySelector('.dropdown-toggle')
           ?.setAttribute('aria-expanded', 'true');
-      });
+      };
 
-      dropdown.addEventListener('mouseleave', () => {
+      const onLeave = () => {
         dropdown.classList.remove('show');
         dropdown.querySelector('.dropdown-menu')?.classList.remove('show');
         dropdown
           .querySelector('.dropdown-toggle')
           ?.setAttribute('aria-expanded', 'false');
-      });
+      };
+
+      dropdown.addEventListener('mouseenter', onEnter);
+      dropdown.addEventListener('mouseleave', onLeave);
+      (dropdown as any)._hoverEnter = onEnter;
+      (dropdown as any)._hoverLeave = onLeave;
     });
   }
 
@@ -290,7 +300,14 @@ export default class NavbarItems extends Vue {
       '.nav-item.dropdown',
     );
     dropdowns.forEach((dropdown) => {
-      dropdown.replaceWith(dropdown.cloneNode(true));
+      const enter = (dropdown as any)._hoverEnter;
+      const leave = (dropdown as any)._hoverLeave;
+
+      if (enter) dropdown.removeEventListener('mouseenter', enter);
+      if (leave) dropdown.removeEventListener('mouseleave', leave);
+
+      delete (dropdown as any)._hoverEnter;
+      delete (dropdown as any)._hoverLeave;
     });
   }
 }
