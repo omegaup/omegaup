@@ -11,7 +11,16 @@
       </div>
     </div>
     <div class="row">
-      <div class="col col-md-3">
+      <div v-show="showFilters" class="col col-md-3">
+        <div class="d-flex justify-content-end mb-2">
+          <button
+            class="btn btn-link btn-sm text-muted p-0"
+            type="button"
+            @click="showFilters = false"
+          >
+            {{ T.wordsHideFilters }}
+          </button>
+        </div>
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
@@ -57,7 +66,16 @@
           "
         ></omegaup-problem-filter-quality>
       </div>
-      <div class="col p-0">
+      <div :class="['col', 'p-0', { 'col-md-12': !showFilters }]">
+        <div v-if="!showFilters" class="mb-2">
+          <button
+            class="btn btn-link btn-sm text-muted p-0"
+            type="button"
+            @click="showFilters = true"
+          >
+            {{ T.wordsShowFilters }}
+          </button>
+        </div>
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
@@ -138,6 +156,7 @@ export default class CollectionList extends Vue {
   @Prop() quality!: string;
 
   T = T;
+  showFilters = true;
   level = this.data.level;
 
   get publicQualityTags(): types.TagWithProblemCount[] {
