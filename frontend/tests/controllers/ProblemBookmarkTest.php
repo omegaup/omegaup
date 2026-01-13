@@ -3,6 +3,9 @@
  * Test for ProblemBookmarkController
  */
 class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
+    /**
+     * Tests toggle bookmark functionality
+     */
     public function testToggleBookmark() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -31,6 +34,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($existsResponse['bookmarked']);
     }
 
+    /**
+     * Tests toggle bookmark twice to remove bookmark
+     */
     public function testToggleBookmarkTwice() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -70,6 +76,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($existsResponse['bookmarked']);
     }
 
+    /**
+     * Tests bookmark exists API when problem is not bookmarked
+     */
     public function testBookmarkExistsNotBookmarked() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -87,6 +96,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFalse($response['bookmarked']);
     }
 
+    /**
+     * Tests list bookmarked problems
+     */
     public function testListBookmarkedProblems() {
         // Create a user and multiple problems
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -131,6 +143,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotContains($problemData3['problem']->alias, $aliases);
     }
 
+    /**
+     * Tests list bookmarked problems when empty
+     */
     public function testListBookmarkedProblemsEmpty() {
         // Create a user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -147,6 +162,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(0, $response['problems']);
     }
 
+    /**
+     * Tests that bookmarks are user-specific
+     */
     public function testBookmarkIsUserSpecific() {
         // Create two users and a problem
         ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
@@ -183,6 +201,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(0, $listResponse['total']);
     }
 
+    /**
+     * Tests toggle bookmark without login
+     */
     public function testToggleBookmarkWithoutLogin() {
         // Create a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -199,6 +220,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Tests exists bookmark without login
+     */
     public function testExistsBookmarkWithoutLogin() {
         // Create a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -215,6 +239,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Tests list bookmarks without login
+     */
     public function testListBookmarksWithoutLogin() {
         try {
             \OmegaUp\Controllers\ProblemBookmark::apiList(
@@ -226,6 +253,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Tests toggle bookmark with invalid problem
+     */
     public function testToggleBookmarkInvalidProblem() {
         // Create a user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -246,6 +276,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Tests exists bookmark with invalid problem
+     */
     public function testExistsBookmarkInvalidProblem() {
         // Create a user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -266,6 +299,9 @@ class ProblemBookmarkTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Tests bookmark cache invalidation in profile
+     */
     public function testBookmarkCacheInvalidation() {
         // Create a user and a problem
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
