@@ -397,34 +397,49 @@
             </button>
           </div>
         </b-tab>
+        <b-tab
+          ref="calendarTab"
+          :title="T.contestListCalendar"
+          :title-link-class="titleLinkClass(ContestTab.Calendar)"
+          :active="currentTab === ContestTab.Calendar"
+          @click="currentTab = ContestTab.Calendar"
+        >
+          <omegaup-contest-calendar
+            v-if="currentTab === ContestTab.Calendar"
+            :contests="contests"
+            :loading="loading"
+            @date-selected="onDateSelected"
+          />
+        </b-tab>
       </b-tabs>
     </b-card>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  TabsPlugin,
 } from 'bootstrap-vue';
+import infiniteScroll from 'vue-infinite-scroll';
+import ContestCalendar from './ContestCalendar.vue';
 import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
-import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
@@ -435,6 +450,7 @@ export enum ContestTab {
   Current = 'current',
   Future = 'future',
   Past = 'past',
+  Calendar = 'calendar',
 }
 
 export enum ContestOrder {
@@ -464,6 +480,7 @@ export interface UrlParams {
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
+    'omegaup-contest-calendar': ContestCalendar,
     'omegaup-contest-skeleton': ContestSkeleton,
     FontAwesomeIcon,
   },
@@ -663,6 +680,8 @@ class ArenaContestList extends Vue {
   @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
     if (typeof oldValue === 'undefined') return;
+    // Don't fetch contests when switching to Calendar tab - it uses existing data
+    if (newValue === ContestTab.Calendar) return;
     this.fetchInitialContests();
   }
 
@@ -682,6 +701,11 @@ class ArenaContestList extends Vue {
   ) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
+  }
+
+  onDateSelected(date: Date): void {
+    // Log the selected date for debugging
+    console.log('Date selected:', date);
   }
 }
 
