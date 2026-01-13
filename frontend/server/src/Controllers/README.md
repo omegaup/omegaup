@@ -1,3 +1,5 @@
+- [ACL](#acl)
+  - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
 - [AiEditorial](#aieditorial)
@@ -13,6 +15,12 @@
   - [`/api/badge/myBadgeAssignationTime/`](#apibadgemybadgeassignationtime)
   - [`/api/badge/myList/`](#apibadgemylist)
   - [`/api/badge/userList/`](#apibadgeuserlist)
+- [CarouselItems](#carouselitems)
+  - [`/api/carouselItems/create/`](#apicarouselitemscreate)
+  - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
+  - [`/api/carouselItems/list/`](#apicarouselitemslist)
+  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
+  - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
   - [`/api/certificate/getCertificatePdf/`](#apicertificategetcertificatepdf)
@@ -265,6 +273,7 @@
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
+  - [`/api/user/profileStatistics/`](#apiuserprofilestatistics)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
@@ -277,6 +286,20 @@
   - [`/api/user/updateMainEmail/`](#apiuserupdatemainemail)
   - [`/api/user/validateFilter/`](#apiuservalidatefilter)
   - [`/api/user/verifyEmail/`](#apiuserverifyemail)
+
+# ACL
+
+## `/api/aCL/userOwnedAclReport/`
+
+### Description
+
+Returns all ACLs owned by the current user along with assigned roles for each.
+
+### Returns
+
+| Name   | Type                                                                                                                                                                |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `acls` | `{ acl_id: number; alias: string; type: string; users: { role_description: string; role_id: number; role_name: string; user_id: number; username: string; }[]; }[]` |
 
 # Admin
 
@@ -494,6 +517,95 @@ Returns a list of badges owned by a certain user
 | Name     | Type            |
 | -------- | --------------- |
 | `badges` | `types.Badge[]` |
+
+# CarouselItems
+
+CarouselItemController
+
+## `/api/carouselItems/create/`
+
+### Description
+
+Create a new Carousel Item
+
+### Parameters
+
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `buttonTitle`     | `string`       |             |
+| `excerpt`         | `string`       |             |
+| `image_url`       | `string`       |             |
+| `link`            | `string`       |             |
+| `status`          | `bool`         |             |
+| `title`           | `string`       |             |
+| `expiration_date` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/delete/`
+
+### Description
+
+Delete a Carousel Item
+
+### Parameters
+
+| Name               | Type  | Description |
+| ------------------ | ----- | ----------- |
+| `carousel_item_id` | `int` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/carouselItems/list/`
+
+### Description
+
+List all Carousel Items (admin only)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/listActive/`
+
+### Description
+
+List all active Carousel Items (homepage)
+
+### Returns
+
+```typescript
+types.CarouselItemListPayload;
+```
+
+## `/api/carouselItems/update/`
+
+### Description
+
+Update a Carousel Item
+
+### Parameters
+
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `buttonTitle`      | `string`       |             |
+| `carousel_item_id` | `int`          |             |
+| `excerpt`          | `string`       |             |
+| `image_url`        | `string`       |             |
+| `link`             | `string`       |             |
+| `status`           | `bool`         |             |
+| `title`            | `string`       |             |
+| `expiration_date`  | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # Certificate
 
@@ -5142,6 +5254,27 @@ Get general user info
 ```typescript
 types.UserProfileInfo;
 ```
+
+## `/api/user/profileStatistics/`
+
+### Description
+
+Get profile statistics including solved problems by difficulty and tags distribution.
+
+### Parameters
+
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
+
+### Returns
+
+| Name         | Type                                                                  |
+| ------------ | --------------------------------------------------------------------- |
+| `attempting` | `number`                                                              |
+| `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
+| `solved`     | `number`                                                              |
+| `tags`       | `{ count: number; name: string; }[]`                                  |
 
 ## `/api/user/removeExperiment/`
 
