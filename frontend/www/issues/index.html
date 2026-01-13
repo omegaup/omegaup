@@ -68,7 +68,7 @@
 		});
 
 		function fetchIssues(priority) {
-			return fetch('https://api.github.com/repos/omegaup/omegaup/issues?asignee=none&state=open&labels=ready,' + priority)
+			return fetch('https://api.github.com/repos/omegaup/omegaup/issues?assignee=none&state=open&labels=ready,' + priority)
 				.then(function(response) {
 					if (response.status != 200) {
 						console.error('Error fetching issues with priority ' + priority, response.status);
