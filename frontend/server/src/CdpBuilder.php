@@ -32,23 +32,67 @@ class CdpBuilder {
     }
 
     /**
+     * Determines whether to override the markdown based on language preferences.
+     *
+     * @param ?string $currentLanguage Currently selected language
+     * @param string $candidateLanguage Language of the candidate content.
+     * @param string $languagePreference User's preferred language.
+     *
+     * @return bool
+     */
+    public static function shouldOverrideMarkdown(
+        ?string $currentLanguage,
+        string $candidateLanguage,
+        string $languagePreference,
+    ): bool {
+        if (is_null($currentLanguage)) {
+            return true;
+        }
+
+        if ($currentLanguage === $languagePreference) {
+            return false;
+        }
+
+        if ($candidateLanguage === $languagePreference) {
+            return true;
+        }
+
+        if (
+            $currentLanguage !== \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE &&
+            $candidateLanguage === \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Set the problem statement markdown.
      *
      * @param CDPRaw $cdp Reference to the CDP to modify.
      * @param string $markdown Markdown content of the problem statement.
-     * @throws \OmegaUp\Exceptions\InvalidParameterException If the statement is already set.
+     * @param string $language Language code of this markdown (en|es|pt).
+     * @param string $languagePreference Preferred language code.
+     * @param ?string &$currentLanguage Currently selected language for the statement
      */
     public static function setProblemMarkdown(
         array &$cdp,
-        string $markdown
+        string $markdown,
+        string $language,
+        string $languagePreference,
+        ?string &$currentLanguage
     ): void {
-        if (!empty($cdp['problemMarkdown'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidProblemStatementNotEmpty',
-                'statement'
-            );
+        if (
+            !self::shouldOverrideMarkdown(
+                $currentLanguage,
+                $language,
+                $languagePreference
+            )
+        ) {
+            return;
         }
         $cdp['problemMarkdown'] = $markdown;
+        $currentLanguage = $language;
     }
 
     /**
@@ -56,19 +100,28 @@ class CdpBuilder {
      *
      * @param CDPRaw $cdp Reference to the CDP to modify.
      * @param string $markdown Markdown content of the problem solution.
-     * @throws \OmegaUp\Exceptions\InvalidParameterException If the solution is already set.
+     * @param string $language Language code of this markdown (en|es|pt).
+     * @param string $languagePreference Preferred language code.
+     * @param ?string &$currentLanguage Currently selected language for the solution
      */
     public static function setSolutionMarkdown(
         array &$cdp,
-        string $markdown
+        string $markdown,
+        string $language,
+        string $languagePreference,
+        ?string &$currentLanguage
     ): void {
-        if (!empty($cdp['problemSolutionMarkdown'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidProblemSolutionNotEmpty',
-                'solution'
-            );
+        if (
+            !self::shouldOverrideMarkdown(
+                $currentLanguage,
+                $language,
+                $languagePreference
+            )
+        ) {
+            return;
         }
         $cdp['problemSolutionMarkdown'] = $markdown;
+        $currentLanguage = $language;
     }
 
     /**

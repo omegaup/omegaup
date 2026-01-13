@@ -2,14 +2,85 @@ name: CI
 
 on:
   workflow_call: # make this workflow reusable
-  pull_request: {}
+  pull_request:
+    paths:
+      # Source code
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'cypress/**'
+      - 'bin/**'
+      # Dependencies
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'yarn.lock'
+      # Build & TypeScript config
+      - 'tsconfig.json'
+      - 'webpack.config*.js'
+      - '.babelrc'
+      # Test config
+      - 'jest.config.js'
+      - 'cypress.config.ts'
+      # Linter configs
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - '.stylelintrc.yml'
+      - '.flake8'
+      - '.pylintrc'
+      - '.lint.config.json'
+      - 'psalm.xml'
+      - 'setup.cfg'
+      # Docker
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      # Git & CI
+      - '.gitmodules'
+      - '.github/workflows/**'
   push:
     branches:
       - main
+    paths:
+      # Source code
+      - 'frontend/**'
+      - 'stuff/**'
+      - 'cypress/**'
+      - 'bin/**'
+      # Dependencies
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'yarn.lock'
+      # Build & TypeScript config
+      - 'tsconfig.json'
+      - 'webpack.config*.js'
+      - '.babelrc'
+      # Test config
+      - 'jest.config.js'
+      - 'cypress.config.ts'
+      # Linter configs
+      - '.eslintrc.js'
+      - '.prettierrc.json'
+      - '.stylelintrc.yml'
+      - '.flake8'
+      - '.pylintrc'
+      - '.lint.config.json'
+      - 'psalm.xml'
+      - 'setup.cfg'
+      # Docker
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      # Git & CI
+      - '.gitmodules'
+      - '.github/workflows/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   php:
     runs-on: ubuntu-22.04
+    timeout-minutes: 20
 
     services:
       mysql:
@@ -173,6 +244,7 @@ jobs:
 
   javascript:
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -278,103 +350,17 @@ jobs:
 
   cypress:
     runs-on: ubuntu-22.04
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Install wait-for-it
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Download the Docker containers
-        run: |
-          docker compose pull
-
-      - name: Clean up existing Docker volumes
-        run: |
-          # Ensure any existing containers and volumes are removed
-          docker compose down -v || true
-          # Make sure any orphaned volumes are cleaned up
-          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
-
-      - name: Start the Docker containers
-        run: |
-          docker compose up --no-build --detach
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 mysql grader runner gitserver broadcaster redis
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 gitserver:33861
-          wait-for-it -t 30 redis:6379
-
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                     -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                     -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
-        run: |
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
-          define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
-          EOF
-
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user setuptools
-          python3 -m pip install --user wheel
-          python3 -m pip install --user \
-            -r stuff/requirements.txt
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Initialize database
-        run: |
-          mysql \
-            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+        with:
+          install_host_python_deps: true
 
       - name: Install yarn dependencies
         run: yarn install
@@ -422,99 +408,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install wait-for-it
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+
+      - name: Wait for RabbitMQ
         run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Install retry
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y retry
-
-      - name: Download the Docker containers
-        run: |
-          docker compose pull
-
-      - name: Clean up existing Docker volumes
-        run: |
-          # Ensure any existing containers and volumes are removed
-          docker compose down -v || true
-          # Make sure any orphaned volumes are cleaned up
-          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
-
-      - name: Start the Docker containers
-        run: |
-          docker compose up --no-build --detach
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 rabbitmq mysql
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 mysql:13306
           retry -t 5 -d 5 -- docker compose exec -T rabbitmq rabbitmqctl await_startup
-
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                    -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                    -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
-        run: |
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
-          EOF
-
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Create database users
-        run: |
-          mysql -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
-          mysql -e 'GRANT ALL ON `omegaup`.* TO "omegaup"@"localhost";'
-
-      - name: Install Python dependencies
-        run: |
-          docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-
-      - name: Bootstrap environment
-        run: |
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Run Python tests
         run: |
@@ -544,99 +443,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install wait-for-it
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y wait-for-it
-
-      - name: Download the Docker containers
-        run: |
-          docker compose pull
-
-      - name: Clean up existing Docker volumes
-        run: |
-          # Ensure any existing containers and volumes are removed
-          docker compose down -v || true
-          # Make sure any orphaned volumes are cleaned up
-          docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
-
-      - name: Start the Docker containers
-        run: |
-          docker compose up --no-build --detach
-
-          # Add the container names as aliases to localhost
-          cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 mysql grader runner gitserver broadcaster redis
-          EOF
-
-          # Wait for some of the containers
-          wait-for-it -t 30 mysql:13306
-          wait-for-it -t 30 gitserver:33861
-          wait-for-it -t 30 redis:6379
-
-          for i in $(seq 10); do
-            if [[ "$(mysql \
-                     -uomegaup -pomegaup --host=mysql --port=13306 --skip-column-names --batch \
-                     -e 'SELECT 1;' || echo 0)" == "1" ]]; then
-              break
-            fi
-            sleep 1
-          done
-
-      - name: Create default configuration files
-        run: |
-          cat > frontend/server/config.php <<EOF
-          <?php
-          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
-          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
-          define('OMEGAUP_DB_HOST', 'mysql:13306');
-          define('OMEGAUP_DB_NAME', 'omegaup');
-          define('OMEGAUP_DB_PASS', 'omegaup');
-          define('OMEGAUP_DB_USER', 'omegaup');
-          define('OMEGAUP_ENVIRONMENT', 'development');
-          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
-          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
-          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
-          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
-          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'redis');
-          define('REDIS_PASS', '');
-          define('TEMPLATE_CACHE_DIR', '/tmp');
-          define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
-          EOF
-
-          cat > ~/.my.cnf << EOF
-          [client]
-          port=13306
-          host=mysql
-          protocol=tcp
-          user=root
-          password=omegaup
-          EOF
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user setuptools
-          python3 -m pip install --user wheel
-          python3 -m pip install --user \
-            -r stuff/requirements.txt
-          python3 -m pip install --user \
-            -r stuff/teaching_assistant/requirements.txt
-
-      - name: Install composer dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Initialize database
-        run: |
-          mysql \
-            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          # Create directory to prevent --purge from failing.
-          sudo mkdir -p /var/lib/omegaup
-          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
-          docker compose exec --user "$(id -u)":"$(id -g)" -T frontend bash -c "\
-            python3 -m venv /opt/omegaup/stuff/venv && \
-            python3 -m pip install wheel && \
-            python3 -m pip install -r /opt/omegaup/stuff/requirements.txt"
-          docker compose exec -T frontend python3 stuff/bootstrap-environment.py --purge --verbose
+      - name: Prepare Environment
+        uses: ./.github/actions/prepare-env
+        with:
+          install_host_python_deps: true
+          extra_python_requirements: stuff/teaching_assistant/requirements.txt
 
       - name: Run pre setup for course mode
         run: |

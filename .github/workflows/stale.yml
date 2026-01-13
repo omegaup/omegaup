@@ -5,6 +5,12 @@ on:
         # Run daily at 1:30 AM UTC
         - cron: "30 1 * * *"
     workflow_dispatch:
+    issue_comment:
+        types: [created]
+    issues:
+        types: [edited, reopened]
+    pull_request:
+        types: [edited, reopened]
 
 jobs:
     stale:
@@ -28,12 +34,16 @@ jobs:
                   remove-stale-when-updated: true
 
                   # Messages to post when marking as stale
-                  stale-issue-message: "This issue has been marked as stale because it has been open for 90 days with no activity. Please comment or update this issue to remove the stale label."
+                  stale-issue-message: "This issue has been marked as stale because it has been open for 45 days with no activity. Please comment or update this issue to remove the stale label."
                   stale-pr-message: "This pull request has been marked as stale because it has been open for 45 days with no activity. Please comment or update this PR to remove the stale label."
 
                   # Labels to use
                   stale-issue-label: "Stale"
                   stale-pr-label: "Stale"
+
+                  # Labels exempted from stale automation
+                  exempt-issue-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
+                  exempt-pr-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
 
                   # Maximum operations per run to avoid rate limits
                   operations-per-run: 100
