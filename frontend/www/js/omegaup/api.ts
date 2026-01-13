@@ -90,6 +90,13 @@ export function apiCall<
     });
 }
 
+export const ACL = {
+  userOwnedAclReport: apiCall<
+    messages.ACLUserOwnedAclReportRequest,
+    messages.ACLUserOwnedAclReportResponse
+  >('/api/aCL/userOwnedAclReport/'),
+};
+
 export const Admin = {
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
@@ -228,6 +235,65 @@ export const Badge = {
     })(x.badges);
     return x;
   }),
+};
+
+export const CarouselItems = {
+  create: apiCall<
+    messages.CarouselItemsCreateRequest,
+    messages.CarouselItemsCreateResponse
+  >('/api/carouselItems/create/'),
+  delete: apiCall<
+    messages.CarouselItemsDeleteRequest,
+    messages.CarouselItemsDeleteResponse
+  >('/api/carouselItems/delete/'),
+  list: apiCall<
+    messages.CarouselItemsListRequest,
+    messages._CarouselItemsListServerResponse,
+    messages.CarouselItemsListResponse
+  >('/api/carouselItems/list/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  listActive: apiCall<
+    messages.CarouselItemsListActiveRequest,
+    messages._CarouselItemsListActiveServerResponse,
+    messages.CarouselItemsListActiveResponse
+  >('/api/carouselItems/listActive/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  update: apiCall<
+    messages.CarouselItemsUpdateRequest,
+    messages.CarouselItemsUpdateResponse
+  >('/api/carouselItems/update/'),
 };
 
 export const Certificate = {

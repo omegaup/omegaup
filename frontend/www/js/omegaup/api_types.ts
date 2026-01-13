@@ -409,6 +409,33 @@ export namespace types {
       );
     }
 
+    export function CarouselItemListPayload(
+      elementId: string = 'payload',
+    ): types.CarouselItemListPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateDetailsPayload(
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
@@ -2873,6 +2900,21 @@ export namespace types {
     unsolvedProblems: types.Problem[];
   }
 
+  export interface CarouselItem {
+    button_title: string;
+    carousel_item_id: number;
+    excerpt: string;
+    expiration_date?: Date;
+    image_url: string;
+    link: string;
+    status: boolean;
+    title: string;
+  }
+
+  export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
+  }
+
   export interface CaseResult {
     contest_score: number;
     max_score: number;
@@ -5111,6 +5153,23 @@ export namespace types {
 
 // API messages
 export namespace messages {
+  // ACL
+  export type ACLUserOwnedAclReportRequest = { [key: string]: any };
+  export type ACLUserOwnedAclReportResponse = {
+    acls: {
+      acl_id: number;
+      alias: string;
+      type: string;
+      users: {
+        role_description: string;
+        role_id: number;
+        role_name: string;
+        user_id: number;
+        username: string;
+      }[];
+    }[];
+  };
+
   // Admin
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
@@ -5162,6 +5221,20 @@ export namespace messages {
   export type BadgeUserListRequest = { [key: string]: any };
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
+
+  // CarouselItems
+  export type CarouselItemsCreateRequest = { [key: string]: any };
+  export type CarouselItemsCreateResponse = {};
+  export type CarouselItemsDeleteRequest = { [key: string]: any };
+  export type CarouselItemsDeleteResponse = {};
+  export type CarouselItemsListRequest = { [key: string]: any };
+  export type _CarouselItemsListServerResponse = any;
+  export type CarouselItemsListResponse = types.CarouselItemListPayload;
+  export type CarouselItemsListActiveRequest = { [key: string]: any };
+  export type _CarouselItemsListActiveServerResponse = any;
+  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
+  export type CarouselItemsUpdateRequest = { [key: string]: any };
+  export type CarouselItemsUpdateResponse = {};
 
   // Certificate
   export type CertificateGenerateContestCertificatesRequest = {
@@ -6078,6 +6151,12 @@ export namespace messages {
 
 // Controller interfaces
 export namespace controllers {
+  export interface ACL {
+    userOwnedAclReport: (
+      params?: messages.ACLUserOwnedAclReportRequest,
+    ) => Promise<messages.ACLUserOwnedAclReportResponse>;
+  }
+
   export interface Admin {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
@@ -6121,6 +6200,24 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface CarouselItems {
+    create: (
+      params?: messages.CarouselItemsCreateRequest,
+    ) => Promise<messages.CarouselItemsCreateResponse>;
+    delete: (
+      params?: messages.CarouselItemsDeleteRequest,
+    ) => Promise<messages.CarouselItemsDeleteResponse>;
+    list: (
+      params?: messages.CarouselItemsListRequest,
+    ) => Promise<messages.CarouselItemsListResponse>;
+    listActive: (
+      params?: messages.CarouselItemsListActiveRequest,
+    ) => Promise<messages.CarouselItemsListActiveResponse>;
+    update: (
+      params?: messages.CarouselItemsUpdateRequest,
+    ) => Promise<messages.CarouselItemsUpdateResponse>;
   }
 
   export interface Certificate {
