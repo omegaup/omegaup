@@ -40,6 +40,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
             'status' => $r->ensureBool('status') ? 'active' : 'inactive',
+            'user_id' => $r->identity->user_id,
         ]);
 
         \OmegaUp\DAO\Base\CarouselItems::create($carouselItem);
