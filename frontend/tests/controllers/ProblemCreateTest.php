@@ -679,7 +679,7 @@ if __name__ == \'__main__\':
     }
 
     /**
-     * Basic test for uploadingg problem without statement
+     * Basic test for uploading problem without statement
      */
     public function testCreateProblemWithoutStatement() {
         // Get the problem data
