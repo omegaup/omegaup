@@ -13,16 +13,15 @@ namespace OmegaUp\DAO;
  */
 class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
-     * Finds schools that cotains 'name'
+     * Finds schools that start with 'name' (prefix matching)
+     * Used for search/autocomplete functionality.
      *
      * @param string $name
      * @return list<\OmegaUp\DAO\VO\Schools>
      */
     public static function findByName($name) {
-        // Note: We've added an index on the name column (idx_schools_name), but using
-        // LIKE '%term%' prevents MySQL from utilizing this index effectively.
-        // We maintain this pattern for compatibility with existing tests and functionality,
-        // though it requires a full table scan. The index will still benefit other queries.
+        // Using LIKE 'term%' (prefix matching) allows MySQL to utilize the idx_schools_name
+        // index effectively, enabling index range scans instead of full table scans.
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
@@ -32,9 +31,67 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
             FROM
                 Schools s
             WHERE
-                s.name LIKE CONCAT(\'%\', ?, \'%\')
+                s.name LIKE CONCAT(?, \'%\')
             LIMIT 10';
         $args = [$name];
+
+        $result = [];
+        /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $args
+            ) as $row
+        ) {
+            $result[] = new \OmegaUp\DAO\VO\Schools($row);
+        }
+        return $result;
+    }
+
+    /**
+     * Finds schools with exact name, country_id, and state_id match.
+     * Used for duplicate detection when creating schools.
+     * 
+     * This method respects the UNIQUE constraint on (name, country_id, state_id)
+     * and prevents false positives from prefix matching (e.g., "Test" vs "TestSchool").
+     *
+     * @param string $name
+     * @param null|string $countryId
+     * @param null|string $stateId
+     * @return list<\OmegaUp\DAO\VO\Schools>
+     */
+    public static function findByExactName(
+        string $name,
+        ?string $countryId = null,
+        ?string $stateId = null
+    ): array {
+        $sql = '
+            SELECT
+                ' .  \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Schools::FIELD_NAMES,
+            's'
+        ) . '
+            FROM
+                Schools s
+            WHERE
+                s.name = ?';
+        $args = [$name];
+
+        // Match country_id exactly (including NULL)
+        if (!is_null($countryId)) {
+            $sql .= ' AND s.country_id = ?';
+            $args[] = $countryId;
+        } else {
+            $sql .= ' AND s.country_id IS NULL';
+        }
+
+        // Match state_id exactly (including NULL)
+        if (!is_null($stateId)) {
+            $sql .= ' AND s.state_id = ?';
+            $args[] = $stateId;
+        } else {
+            $sql .= ' AND s.state_id IS NULL';
+        }
 
         $result = [];
         /** @var array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float, state_id: null|string} $row */
