@@ -3961,6 +3961,14 @@ export namespace types {
     verifyEmailSuccessfully?: string;
   }
 
+  export interface MaintenanceModeStatus {
+    enabled: boolean;
+    message_en?: string;
+    message_es?: string;
+    message_pt?: string;
+    type: string;
+  }
+
   export interface MergedScoreboardEntry {
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
@@ -4919,6 +4927,7 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: types.MaintenanceModeStatus;
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -5178,6 +5187,8 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5192,6 +5203,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6176,9 +6189,15 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
   }
 
   export interface AiEditorial {

@@ -1,7 +1,9 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getMaintenanceMode/`](#apiadmingetmaintenancemode)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/setMaintenanceMode/`](#apiadminsetmaintenancemode)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -303,6 +305,20 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 # Admin
 
+Admin Controller
+
+## `/api/admin/getMaintenanceMode/`
+
+### Description
+
+Get maintenance mode status
+
+### Returns
+
+```typescript
+types.MaintenanceModeStatus;
+```
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -321,6 +337,26 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/setMaintenanceMode/`
+
+### Description
+
+Set maintenance mode
+
+### Parameters
+
+| Name         | Type           | Description |
+| ------------ | -------------- | ----------- |
+| `enabled`    | `null\|bool`   |             |
+| `message_en` | `null\|string` |             |
+| `message_es` | `null\|string` |             |
+| `message_pt` | `null\|string` |             |
+| `type`       | `null\|string` |             |
+
+### Returns
+
+_Nothing_
 
 # AiEditorial
 
