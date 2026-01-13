@@ -495,6 +495,11 @@ nav.navbar {
     text-decoration: none;
   }
 
+  .navbar-nav .nav-link:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
   .nav-user-link img {
     border-radius: 4px;
     transition: transform 0.25s ease;

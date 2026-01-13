@@ -249,18 +249,15 @@ export default class NavbarItems extends Vue {
   T = T;
 
   mounted(): void {
-    if (
-      window.innerWidth < 992 ||
-      !document.querySelector('[data-enable-hover-dropdown]')
-    ) {
-      return;
-    }
-
+    if (window.innerWidth < 992) return;
     const dropdowns = this.$el.querySelectorAll<HTMLElement>(
       '.nav-item.dropdown',
     );
 
     dropdowns.forEach((dropdown) => {
+      const menu = dropdown.querySelector<HTMLElement>('.dropdown-menu');
+      const toggle = dropdown.querySelector<HTMLElement>('.dropdown-toggle');
+      if (!menu || !toggle) return;
       const onEnter = () => {
         dropdowns.forEach((d) => {
           if (d !== dropdown) {
@@ -274,18 +271,14 @@ export default class NavbarItems extends Vue {
         });
 
         dropdown.classList.add('show');
-        dropdown.querySelector('.dropdown-menu')?.classList.add('show');
-        dropdown
-          .querySelector('.dropdown-toggle')
-          ?.setAttribute('aria-expanded', 'true');
+        menu.classList.add('show');
+        toggle.setAttribute('aria-expanded', 'true');
       };
 
       const onLeave = () => {
         dropdown.classList.remove('show');
-        dropdown.querySelector('.dropdown-menu')?.classList.remove('show');
-        dropdown
-          .querySelector('.dropdown-toggle')
-          ?.setAttribute('aria-expanded', 'false');
+        menu.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
       };
 
       dropdown.addEventListener('mouseenter', onEnter);
