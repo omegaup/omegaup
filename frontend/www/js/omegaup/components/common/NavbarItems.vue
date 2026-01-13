@@ -250,6 +250,7 @@ export default class NavbarItems extends Vue {
 
   mounted(): void {
     if (window.innerWidth < 992) return;
+
     const dropdowns = this.$el.querySelectorAll<HTMLElement>(
       '.nav-item.dropdown',
     );
@@ -258,33 +259,17 @@ export default class NavbarItems extends Vue {
       const menu = dropdown.querySelector<HTMLElement>('.dropdown-menu');
       const toggle = dropdown.querySelector<HTMLElement>('.dropdown-toggle');
       if (!menu || !toggle) return;
+
       const onEnter = () => {
-        dropdowns.forEach((d) => {
-          if (d !== dropdown) {
-            d.classList.remove('show');
-            d.querySelector('.dropdown-menu')?.classList.remove('show');
-            d.querySelector('.dropdown-toggle')?.setAttribute(
-              'aria-expanded',
-              'false',
-            );
-          }
-        });
-
-        dropdown.classList.add('show');
-        menu.classList.add('show');
-        toggle.setAttribute('aria-expanded', 'true');
-      };
-
-      const onLeave = () => {
-        dropdown.classList.remove('show');
-        menu.classList.remove('show');
-        toggle.setAttribute('aria-expanded', 'false');
+        if (!dropdown.classList.contains('show')) {
+          dropdown.classList.add('show');
+          menu.classList.add('show');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
       };
 
       dropdown.addEventListener('mouseenter', onEnter);
-      dropdown.addEventListener('mouseleave', onLeave);
       (dropdown as any)._hoverEnter = onEnter;
-      (dropdown as any)._hoverLeave = onLeave;
     });
   }
 
@@ -292,15 +277,11 @@ export default class NavbarItems extends Vue {
     const dropdowns = this.$el.querySelectorAll<HTMLElement>(
       '.nav-item.dropdown',
     );
+
     dropdowns.forEach((dropdown) => {
       const enter = (dropdown as any)._hoverEnter;
-      const leave = (dropdown as any)._hoverLeave;
-
       if (enter) dropdown.removeEventListener('mouseenter', enter);
-      if (leave) dropdown.removeEventListener('mouseleave', leave);
-
       delete (dropdown as any)._hoverEnter;
-      delete (dropdown as any)._hoverLeave;
     });
   }
 }
