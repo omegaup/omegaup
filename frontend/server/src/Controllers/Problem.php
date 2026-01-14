@@ -2184,7 +2184,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if ($statementType === 'printable') {
             if (
                 is_null($identity) ||
-                !\OmegaUp\Authorization::canViewProblem($identity, $problem)
+                !\OmegaUp\Authorization::canViewProblemStatement(
+                    $identity,
+                    $problem,
+                    $problemset['problemset'] ?? null
+                )
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'userNotAllowed'
@@ -2199,11 +2203,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     )
                 ) {
                     if (
-                        is_null($problemset['contest']->finish_time) ||
                         $problemset['contest']->finish_time->time > \OmegaUp\Time::get()
                     ) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                            'contestStillRunning'
+                            'contestNotFinished'
                         );
                     }
                 }
