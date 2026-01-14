@@ -2081,7 +2081,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $response;
         }
 
-        if ($statementType !== 'markdown' && $statementType !== '') {
+        if ($statementType !== 'markdown' && $statementType !== 'printable' && $statementType !== '') {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'invalidStatementType'
             );
@@ -2180,6 +2180,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
+
+        if ($statementType === 'printable') {
+            if (
+                is_null($identity) ||
+                !\OmegaUp\Authorization::canViewProblem($identity, $problem)
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+
+            if (!is_null($problemset) && isset($problemset['contest'])) {
+                if (
+                    !\OmegaUp\Authorization::isAdmin(
+                        $identity,
+                        $problemset['problemset']
+                    )
+                ) {
+                    if (
+                        is_null($problemset['contest']->finish_time) ||
+                        $problemset['contest']->finish_time->time > \OmegaUp\Time::get()
+                    ) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'contestStillRunning'
+                        );
+                    }
+                }
+            }
+        }
+
         return $response;
     }
 
@@ -6801,7 +6831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             contestAlias: null,
             problemAlias: $problemAlias,
-            statementType: 'markdown',
+            statementType: 'printable',
             problemsetId: null
         );
         if (is_null($problem)) {
