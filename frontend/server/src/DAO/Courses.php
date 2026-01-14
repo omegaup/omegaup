@@ -684,7 +684,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $problemAlias = $row['problem_alias'];
 
             if (!isset($problemTitles[$problemAlias])) {
-                $problemTitles[$problemAlias] =  $row['problem_title'];
+                $problemTitles[$problemAlias] = $row['problem_title'];
             }
 
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
