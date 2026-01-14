@@ -35,7 +35,7 @@ on:
       - 'docker-compose*.yml'
       # Git & CI
       - '.gitmodules'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
   push:
     branches:
       - main
@@ -71,7 +71,7 @@ on:
       - 'docker-compose*.yml'
       # Git & CI
       - '.gitmodules'
-      - '.github/workflows/ci.yml'
+      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -117,7 +117,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Add mysql as alias to localhost
         run: |
