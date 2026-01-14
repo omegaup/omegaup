@@ -10,12 +10,20 @@ import arena_ContestList, {
 } from '../components/arena/ContestListv2.vue';
 import contestStore from './contestStore';
 
-OmegaUp.on('ready', () => {
-  time.setSugarLocale();
-  const payload = types.payloadParsers.ContestListv2Payload();
-  contestStore.commit('updateAll', payload.contests);
-  contestStore.commit('updateAllCounts', payload.countContests);
+/**
+ * Parses URL parameters and returns the contest filter state.
+ */
+function parseUrlState(): {
+  tab: ContestTab;
+  page: number;
+  sortOrder: ContestOrder;
+  filter: ContestFilter;
+} {
   let tab: ContestTab = ContestTab.Current;
+  let page: number = 1;
+  let sortOrder: ContestOrder = ContestOrder.None;
+  let filter: ContestFilter = ContestFilter.All;
+
   const hash = window.location.hash ? window.location.hash.slice(1) : '';
   if (hash !== '') {
     switch (hash) {
@@ -30,9 +38,7 @@ OmegaUp.on('ready', () => {
         break;
     }
   }
-  let page: number = 1;
-  let sortOrder: ContestOrder = ContestOrder.None;
-  let filter: ContestFilter = ContestFilter.All;
+
   const queryString = window.location.search;
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -96,11 +102,26 @@ OmegaUp.on('ready', () => {
     }
   }
 
-  new Vue({
+  return { tab, page, sortOrder, filter };
+}
+
+OmegaUp.on('ready', () => {
+  time.setSugarLocale();
+  const payload = types.payloadParsers.ContestListv2Payload();
+  contestStore.commit('updateAll', payload.contests);
+  contestStore.commit('updateAllCounts', payload.countContests);
+
+  const initialState = parseUrlState();
+
+  const vueInstance = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
     data: () => ({
       query: payload.query,
+      tab: initialState.tab,
+      page: initialState.page,
+      sortOrder: initialState.sortOrder,
+      filter: initialState.filter,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
@@ -108,10 +129,10 @@ OmegaUp.on('ready', () => {
           contests: contestStore.state.contests,
           countContests: contestStore.state.countContests,
           query: this.query,
-          tab,
-          page,
-          sortOrder,
-          filter,
+          tab: this.tab,
+          page: this.page,
+          sortOrder: this.sortOrder,
+          filter: this.filter,
           pageSize: payload.pageSize,
           loading: contestStore.state.loading,
         },
@@ -139,5 +160,14 @@ OmegaUp.on('ready', () => {
         },
       });
     },
+  });
+
+  // Handle browser back/forward button navigation
+  window.addEventListener('popstate', () => {
+    const state = parseUrlState();
+    vueInstance.tab = state.tab;
+    vueInstance.page = state.page;
+    vueInstance.sortOrder = state.sortOrder;
+    vueInstance.filter = state.filter;
   });
 });
