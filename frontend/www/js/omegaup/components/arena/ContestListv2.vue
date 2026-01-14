@@ -405,6 +405,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as time from '../../time';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { getExternalUrl } from '../../urlHelper';
@@ -598,11 +599,11 @@ class ArenaContestList extends Vue {
   }
 
   finishContestDate(contest: types.ContestListItem): string {
-    return contest.finish_time.toLocaleDateString();
+    return time.getContestDateForDisplay(contest.finish_time);
   }
 
   startContestDate(contest: types.ContestListItem): string {
-    return contest.start_time.toLocaleDateString();
+    return time.getContestDateForDisplay(contest.start_time);
   }
 
   getTimeLink(time: Date): string {
