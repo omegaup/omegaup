@@ -656,7 +656,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 GROUP BY
                     i.identity_id, pr.assignment_id, pr.problem_id
                 ORDER BY
-                    `pr`.`order`;';
+                    `pr`.`order`';
 
         /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
