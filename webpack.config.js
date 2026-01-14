@@ -30,7 +30,17 @@ module.exports = (env, argv) => {
   for (const entry of config) {
     Object.assign(entry, {
       devtool: devtool,
-      devServer: { historyApiFallback: true, noInfo: true },
+      devServer: {
+        historyApiFallback: true,
+        noInfo: true,
+        proxy: {
+          '/api': {
+            target: 'http://localhost:8001',
+            secure: false,
+            changeOrigin: true,
+          },
+        },
+      },
       performance: { hints: false },
       watchOptions: {
         aggregateTimeout: 300,

@@ -10,14 +10,22 @@ localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
 describe('StatementTab.vue', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('Should contain markdown buttons and contents and update the store accordingly', async () => {
     const wrapper = shallowMount(StatementTab, {
       localVue,
       store,
     });
 
-    const markdownButtons = wrapper.find('div.wmd-button-bar');
-    expect(markdownButtons.exists()).toBe(true);
+    const markdownButtons = wrapper.findAll('div.wmd-button-bar');
+    expect(markdownButtons.length).toBe(2);
 
     const textArea = wrapper.find('textarea.wmd-input');
     expect(textArea.exists()).toBe(true);
@@ -28,18 +36,21 @@ describe('StatementTab.vue', () => {
     const markdownContent = wrapper.find('omegaup-markdown-stub');
     expect(markdownContent.exists()).toBe(true);
 
-    await wrapper.trigger('click');
-
     expect(markdownContent.props()['markdown']).toBe(
       T.problemCreatorMarkdownPreviewInitialRender + 'Hello omegaUp',
     );
 
+    // Initial state should be empty before debounce triggers
     expect(wrapper.vm.$store.state.problemMarkdown).toBe('');
 
-    const markdownSaveButton = wrapper.find('button.btn-primary');
-    expect(markdownSaveButton.exists()).toBe(true);
-    await markdownSaveButton.trigger('click');
+    // Fast-forward time
+    jest.runAllTimers();
 
+    // Now it should be updated
     expect(wrapper.vm.$store.state.problemMarkdown).toBe('Hello omegaUp');
+
+    // Save button should be gone
+    const markdownSaveButton = wrapper.find('button.btn-primary');
+    expect(markdownSaveButton.exists()).toBe(false);
   });
 });
