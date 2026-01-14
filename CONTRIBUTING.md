@@ -1,71 +1,83 @@
-# Contributing Guide
+# Contributing to omegaUp
 
-Thank you for your interest in contributing to this project!   
-This document outlines the basic steps and expectations for contributors.
-
----
-
-## Getting Started
-
-Before contributing, please ensure you have:
-
-- A GitHub account
-- Forked the repository
-- Created a feature branch from `main` or the default branch
-
-For detailed local setup instructions, refer to:
-- `frontend/www/docs/Development-Environment-Setup-Process.md`
+Thank you for your interest in contributing to omegaUp! 
+This document explains how to get started as a contributor, follow project workflows, and submit changes for review.
 
 ---
 
-## Issue Assignment
+## Before You Start
 
-This repository uses an automated issue assignment workflow to keep contributions fair and active.
+If you are not confident using Git, we recommend reading an introductory Git tutorial before contributing.
 
-Please read:
-- `frontend/www/docs/Issue-Assignment-Workflow.md`
+To set up the development environment, run the project locally, and troubleshoot issues, please refer to:
 
-Quick summary:
-- Comment `/assign` on an issue to self-assign
-- Open a PR (draft is acceptable) within 7 days
-- If you need more time, request a maintainer to pin the issue
+📘 **Development Environment Setup Guide**  
+`frontend/www/docs/Development-Environment-Setup-Process.md`
 
----
-
-## Making Changes
-
-- Keep changes focused and minimal
-- Follow existing project structure and conventions
-- Write clear, readable code
-- Add comments where necessary
+This guide contains detailed instructions for Docker setup, running tests, authentication, and troubleshooting.
 
 ---
 
-## Pull Requests
+## Issue Assignment Workflow
 
-When submitting a pull request:
+omegaUp uses an automated issue assignment workflow to keep contributions fair and active.
 
-- Reference the related issue in the PR description
-- Use clear and descriptive commit messages
-- Open a **Draft PR** if work is still in progress
-- Ensure your PR passes all CI checks before requesting review
+- Use `/assign` to self-assign an issue.
+- You may have up to **3 active assignments** at a time.
+- A Pull Request (**Draft PR is acceptable**) must be opened within **7 days** of assignment.
+- Issues without PR activity may be automatically unassigned.
+
+📘 For full details, see:  
+`frontend/www/docs/Issue-Assignment-Workflow.md`
 
 ---
 
-## Documentation Contributions
+## Working on an Issue
 
-Documentation improvements are welcome!
+1. Fork the repository
+2. Create a new branch for your changes
+3. Make focused, incremental commits
+4. Open a Draft PR if work is in progress
 
-- Keep explanations concise and accurate
+Branch naming examples:
+- `docs/add-contributing-md`
+- `fix/login-validation`
+- `feat/problem-editor-ui`
+
+---
+
+## Commit Message Guidelines
+
+Use clear and descriptive commit messages:
+
+- `docs: add CONTRIBUTING.md`
+- `fix: correct submission validation`
+- `feat: improve problem editor UX`
+
+---
+
+## Pull Request Process
+
+- Open Pull Requests against the `main` branch
+- Link the related issue in the PR description (e.g. `Addresses #162`)
+- Use Draft PRs for work in progress
+- Ensure CI checks pass before requesting review
+- Keep PRs focused and avoid unrelated refactors
+
+---
+
+## Documentation and Translations
+
+- Documentation improvements are welcome
 - Avoid duplicating existing documentation
-- Link to other docs when appropriate
+- Translation changes should follow existing localization patterns
 
 ---
 
 ## Getting Help
 
-If you’re unsure about anything:
-- Ask questions in the relevant issue
-- Check existing documentation before opening a new issue
+If you need help:
+- Ask in the issue you’re working on
+- Open a discussion or issue for clarification
 
-Thank you for contributing! 
+We appreciate your contributions and collaboration 
