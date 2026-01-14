@@ -806,6 +806,11 @@ const translations: { [key: string]: string; } = {
   homepageTeachSectionTitle: "Ensine",
   homepageTrainSectionDescription: "Resolva problemas e melhore suas habilidades",
   homepageTrainSectionTitle: "Treine",
+  homepageOpenSourceTitle: "OMEGAUP \u00c9 C\u00d3DIGO ABERTO",
+  homepageOpenSourceSubtitle: "AJUDE A CONTRIBUIR PARA O PROJETO",
+  homepageGitHubRepository: "REPOSIT\u00d3RIO DO GITHUB",
+  homepageWriteToUs: "Ou escreva para n\u00f3s em:",
+  homepageGettingStartedTitle: "Comece com nossa plataforma",
   identityAlreadyAssociated: "Voc\u00ea j\u00e1 tem uma identidade associada ao mesmo grupo.",
   identityAlreadyInUse: "A identidade j\u00e1 \u00e9 usada por outra conta.",
   identityInGroup: "A identidade j\u00e1 est\u00e1 associada ao grupo",
@@ -2193,4 +2198,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar arquivo zip",
 };
 
-export {translations as default};
+export { translations as default };
