@@ -3,6 +3,7 @@ La carpeta `server` se divide principalmente en 2 grandes secciones. Los
 que son las librerias auxiliares, escritas en su mayoria por terceros.
 
 ## Acceso a los datos
+
 Existen 2 capaz entre la logica del negocio y la base de datos:
 
 * ORM
@@ -13,7 +14,7 @@ La carpeta `libs/dao` contiene las clases  Consiste en los Data Access Objects
 cada una de las tablas de la base de datos. Esta clase tiene sus setters y
 getters para cada uno de los campos de la base de datos.
 
-Los DAO que son clases estaticas para cada una de las tablas también, y ellas
+Los DAO que son clases estáticas para cada una de las tablas también, y ellas
 sirven para hacer obtener y persistentes los objetos VO.
 
 ## Controllers
@@ -21,20 +22,20 @@ sirven para hacer obtener y persistentes los objetos VO.
 Los controllers es donde se concentra la logica de negocio. Hay un controller
 por cada modulo del juez:
 
-  * Clarification Controller
-  * Contest Controller
-  * Contest Controller
-  * Grader Controller
-  * Group Controller
-  * GroupScoreboard Controller
-  * Problem Controller
-  * Run Controller
-  * School Controller
-  * Scoreboard Controller
-  * Session Controller
-  * Tag Controller
-  * Time Controller
-  * User Controller
+- Clarification Controller
+- Contest Controller
+- Contest Controller
+- Grader Controller
+- Group Controller
+- GroupScoreboard Controller
+- Problem Controller
+- Run Controller
+- School Controller
+- Scoreboard Controller
+- Session Controller
+- Tag Controller
+- Time Controller
+- User Controller
 
 Los controladores utiliza los DAOs y VOs para acceder a la BD, nunca llama a la
 base de datos directamente. Tampoco imprimen cosas en la pagina, para eso se

@@ -236,13 +236,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $identity['state_id']
                 );
+                if (!array_key_exists('gender', $identity)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'gender'
+                    );
+                }
+                $gender = $identity['gender'];
                 $newIdentity = self::createIdentity(
                     $identity['username'],
                     $identity['name'],
                     $identity['password'],
                     $countryId,
                     $stateId,
-                    $identity['gender'],
+                    $gender,
                     $group->alias
                 );
 
@@ -409,13 +416,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $teamIdentity['state_id']
                 );
+                if (!array_key_exists('gender', $teamIdentity)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'gender'
+                    );
+                }
+                $gender = $teamIdentity['gender'];
                 $newIdentity = self::createIdentityTeam(
                     $teamIdentity['username'],
                     $teamIdentity['name'],
                     $teamIdentity['password'],
                     $countryId,
                     $stateId,
-                    $teamIdentity['gender'],
+                    $gender,
                     $teamGroup->alias
                 );
 
@@ -962,7 +976,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Entry point for change passowrd of an identity
+     * Entry point for change password of an identity
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
@@ -1263,8 +1277,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Returns the prefered language as a string (en,es,fra) of the identity given
-     * If no identity is given, language is retrived from the browser.
+     * Returns the preferred language as a string (en,es,fra) of the identity given
+     * If no identity is given, language is retrieved from the browser.
      *
      * @omegaup-request-param null|string $lang
      */

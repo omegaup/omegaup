@@ -33,6 +33,7 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
+          teaching_assistant_enabled: false,
         } as types.CourseDetails,
         progress: {} as types.AssignmentProgress,
       },
@@ -74,6 +75,7 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
+          teaching_assistant_enabled: false,
         } as types.CourseDetails,
         progress: {} as types.AssignmentProgress,
       },
@@ -130,6 +132,7 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: true,
+          teaching_assistant_enabled: false,
         } as types.CourseDetails,
         progress: {
           'test-assignment': {

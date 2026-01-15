@@ -240,7 +240,6 @@ class Contest {
             'scoreboard' => $params->scoreboardPct,
             'penalty_type' => $params->penaltyType,
             'languages' => join(',', $params->languages),
-            'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
             'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,

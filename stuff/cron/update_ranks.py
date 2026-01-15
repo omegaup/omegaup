@@ -21,6 +21,14 @@ from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
 from database.coder_of_the_month import UserRank
+from database.school_of_the_month import (
+    check_existing_school_of_the_next_month,
+    remove_school_of_the_month_candidates,
+    get_school_of_the_month_candidates,
+    insert_school_of_the_month_candidates,
+    School,
+)
+
 
 sys.path.insert(
     0,
@@ -118,7 +126,7 @@ def update_user_rank(
             `i`.`name`,
             `i`.`country_id`,
             `i`.`state_id`,
-            `isc`.`school_id`,
+            `full_isc`.`school_id`,
             `i`.`identity_id`,
             `i`.`user_id`,
             COUNT(`p`.`problem_id`) AS `problems_solved_count`,
@@ -142,18 +150,31 @@ def update_user_rank(
                 `iu`.user_id, `s`.`problem_id`
         ) AS up
         INNER JOIN
-            `Users` AS `u` ON `u`.`user_id` = `up`.`user_id`
+            `Users` AS `full_u` ON `full_u`.`user_id` = `up`.`user_id`
         INNER JOIN
             `Problems` AS `p`
         ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = u.`main_identity_id`
+            `Identities` AS `i`
+                ON `i`.`identity_id` = `full_u`.`main_identity_id`
         LEFT JOIN
-            `Identities_Schools` AS `isc`
+            `Identities_Schools` AS `full_isc`
         ON
-            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
+            `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `u`.`is_private` = 0
+            `full_u`.`is_private` = 0
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
+            AND `full_u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
             AND NOT EXISTS (
                 SELECT
                     `pf`.`problem_id`, `pf`.`user_id`
@@ -161,7 +182,7 @@ def update_user_rank(
                     `Problems_Forfeited` AS `pf`
                 WHERE
                     `pf`.`problem_id` = `p`.`problem_id` AND
-                    `pf`.`user_id` = `u`.`user_id`
+                    `pf`.`user_id` = `full_u`.`user_id`
             )
             AND NOT EXISTS (
                 SELECT
@@ -170,7 +191,7 @@ def update_user_rank(
                     `ACLs` AS `a`
                 WHERE
                     `a`.`acl_id` = `p`.`acl_id` AND
-                    `a`.`owner_id` = `u`.`user_id`
+                    `a`.`owner_id` = `full_u`.`user_id`
             )
         GROUP BY
             `identity_id`
@@ -217,11 +238,11 @@ def update_author_rank(
             `i`.`country_id`,
             `i`.`state_id`,
             `isc`.`school_id`,
-            SUM(`p`.`quality`) AS `author_score`
+            SUM(`full_p`.`quality`) AS `author_score`
         FROM
-            `Problems` AS `p`
+            `Problems` AS `full_p`
         INNER JOIN
-            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+            `ACLs` AS `a` ON `a`.`acl_id` = `full_p`.`acl_id`
         INNER JOIN
             `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
         INNER JOIN
@@ -231,7 +252,19 @@ def update_author_rank(
         ON
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
         WHERE
-            `p`.`quality` IS NOT NULL
+            `full_p`.`quality` IS NOT NULL
+            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+            -- role_id = 1 is ADMIN_ROLE)
+            -- TODO: Replace magic numbers with constants
+            AND `u`.`user_id` NOT IN (
+                SELECT
+                    `ur`.`user_id`
+                FROM
+                    `User_Roles` AS `ur`
+                WHERE
+                    `ur`.`acl_id` = 1 AND
+                    `ur`.`role_id` = 1
+            )
         GROUP BY
             `u`.`user_id`
         ORDER BY
@@ -431,119 +464,53 @@ def update_school_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_current_month: datetime.date,
+    update_school_of_the_month: bool,
 ) -> None:
     '''Updates the list of candidates to school of the current month'''
-
     logging.info('Updating the candidates to school of the month...')
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
+    exist_school = check_existing_school_of_the_next_month(
+        cur_readonly, first_day_of_next_month)
+    if exist_school:
+        logging.info('Skipping because already exist selected schools.')
+        return
+    remove_school_of_the_month_candidates(cur, first_day_of_next_month)
+    schools = get_school_of_the_month_candidates(
+        cur_readonly,
+        first_day_of_next_month,
+        first_day_of_current_month
+    )
+    if not schools:
+        logging.info('No eligible schools found.')
+        return
+    if update_school_of_the_month:
+        insert_school_of_the_month_candidates(
+            cur, first_day_of_next_month, schools)
+    else:
+        debug_school_of_the_month_candidates(first_day_of_next_month, schools)
 
-    # First make sure there are not already selected schools of the month
-    cur.execute(
-        '''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `School_Of_The_Month`
-                WHERE
-                    `time` = %s AND
-                    `selected_by` IS NOT NULL;
-                ''', (first_day_of_next_month, ))
 
-    for row in cur.fetchall():
-        if row['count'] > 0:
-            logging.info('Skipping because already exist selected schools.')
-            return
+def debug_school_of_the_month_candidates(
+    first_day_of_next_month: datetime.date,
+    candidates: List[School],
+) -> None:
+    '''Log school of the month candidates'''
 
-    cur.execute(
-        '''
-                DELETE FROM
-                    `School_Of_The_Month`
-                WHERE
-                    `time` = %s;
-                ''', (first_day_of_next_month, ))
+    log_entries = []
+    for ranking, candidate in enumerate(candidates, start=1):
+        log_entry = {
+            "school_id": candidate.school_id,
+            "name": candidate.name,
+            "time": first_day_of_next_month.isoformat(),
+            "ranking": ranking,
+            "score": candidate.score,
+        }
+        log_entries.append(log_entry)
 
-    cur_readonly.execute(
-        '''
-        SELECT
-            `s`.`school_id`,
-            IFNULL(
-                SUM(
-                    ROUND(
-                        100 / LOG(2, `distinct_school_problems`.`accepted`+1),
-                        0
-                    )
-                ),
-                0.0
-            ) AS `score`
-        FROM
-            `Schools` AS `s`
-        INNER JOIN
-            (
-                SELECT
-                    `su`.`school_id`,
-                    `p`.`accepted`,
-                    MIN(`su`.`time`) AS `first_ac_time`
-                FROM
-                    `Submissions` AS `su`
-                INNER JOIN
-                    `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
-                WHERE
-                    `su`.`verdict` = "AC"
-                    AND `p`.`visibility` >= 1
-                    AND `su`.`school_id` IS NOT NULL
-                GROUP BY
-                    `su`.`school_id`,
-                    `su`.`problem_id`
-                HAVING
-                    `first_ac_time` BETWEEN %s AND %s
-            ) AS `distinct_school_problems`
-        ON
-            `distinct_school_problems`.`school_id` = `s`.`school_id`
-        WHERE
-            NOT EXISTS (
-                SELECT
-                    `sotm`.`school_id`,
-                    MAX(`time`) AS `latest_time`
-                FROM
-                    `School_Of_The_Month` AS `sotm`
-                WHERE
-                    `sotm`.`school_id` = `s`.`school_id`
-                    AND (
-                        `sotm`.`selected_by` IS NOT NULL OR
-                        `sotm`.`ranking` = 1
-                    )
-                GROUP BY
-                    `sotm`.`school_id`
-                HAVING
-                    DATE_ADD(`latest_time`, INTERVAL 1 YEAR) >= %s
-            )
-        GROUP BY
-            `s`.`school_id`
-        ORDER BY
-            `score` DESC
-        LIMIT 100;
-        ''', (first_day_of_current_month, first_day_of_next_month,
-              first_day_of_next_month))
-
-    for index, row in enumerate(cur_readonly.fetchall()):
-        cur.execute(
-            '''
-                    INSERT INTO
-                        `School_Of_The_Month` (
-                            `school_id`,
-                            `time`,
-                            `ranking`,
-                            `score`
-                        )
-                    VALUES (
-                        %s,
-                        %s,
-                        %s,
-                        %s
-                    );
-                    ''', (row['school_id'], first_day_of_next_month, index + 1,
-                          row['score']))
+    log_message = json.dumps(log_entries, indent=4)
+    logging.info('School of the month candidates:')
+    logging.info(log_message)
 
 
 def compute_points_for_user(
@@ -753,16 +720,14 @@ def update_schools_stats(
             logging.exception('Failed to update school ranking')
             raise
 
-        if update_school_of_the_month:
-            try:
-                update_school_of_the_month_candidates(cur, cur_readonly, date)
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to school of the month')
-                raise
-        else:
-            logging.info('Skipping updating School of the Month')
+        try:
+            update_school_of_the_month_candidates(cur, cur_readonly, date,
+                                                  update_school_of_the_month)
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to school of the month')
+            raise
         logging.info('Schools stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all schools stats')

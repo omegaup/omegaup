@@ -1,23 +1,20 @@
 # CODEOWNERS for the used languages
 
-## PHP, Python, and SQL files
+## Backend files (Shell scripts, Python, PHP, and SQL)
 
-*.php @heduenas @pabo99
-*.py @heduenas @pabo99
-*.sql @heduenas @pabo99
+*.sh @heduenas
+*.py @heduenas
+*.php @pabo99
+*.sql @pabo99
 
-## Vue, TypeScript, JavaScript, HTML, and CSS files
+## Frontend files (Vue, TypeScript, JavaScript, HTML, and CSS)
 
-*.vue @carlosabcs @tvanessa
-*.ts @carlosabcs
-*.js @carlosabcs
-*.html @carlosabcs @tvanessa
+*.vue @pabo99
+*.ts @heduenas
+*.js @heduenas
+*.html @pabo99
 *.css @carlosabcs
 
-## Lang files
+## Localization files
 
 *.lang @tvanessa
-
-## Default owner for everything else
-
-* @heduenas
