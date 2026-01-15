@@ -199,7 +199,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
             && !is_null($createUserParams->parentEmail)
         ) {
-            // Fill all the columns refering to user's parent
+            // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
@@ -438,7 +438,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!self::$sendEmailOnVerify) {
             self::$log->info(
-                'Not sending email beacause sendEmailOnVerify = FALSE'
+                'Not sending email because sendEmailOnVerify = FALSE'
             );
             return;
         }
@@ -859,7 +859,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'permission_key'
             );
 
-            // Pwd changes are by default unless explictly disabled
+            // Pwd changes are by default unless explicitly disabled
             $resetRequest = new \OmegaUp\Request();
             $resetRequest['auth_token'] = $r['auth_token'];
             $resetRequest['username'] = $username;
@@ -2778,7 +2778,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get full rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRankInfo
      */
@@ -2834,7 +2834,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRank
      */
@@ -2900,7 +2900,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return array{pager: list<PageItem>, ranking: UserRank}
      */
