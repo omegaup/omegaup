@@ -9,8 +9,8 @@ Existen 2 capaz entre la logica del negocio y la base de datos:
 * ORM
 * [Database.php](https://github.com/omegaup/omegaup/blob/master/frontend/server/libs/Database.php)
 
-La carpeta `libs/dao` contiene las classes  Consiste en los Data Access Objects
-(DAO) y los Value Objects (VO). Los  V son classes que se mapean directamente a
+La carpeta `libs/dao` contiene las clases  Consiste en los Data Access Objects
+(DAO) y los Value Objects (VO). Los  V son clases que se mapean directamente a
 cada una de las tablas de la base de datos. Esta clase tiene sus setters y
 getters para cada uno de los campos de la base de datos.
 
