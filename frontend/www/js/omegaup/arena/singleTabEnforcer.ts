@@ -185,6 +185,10 @@ export class SingleTabEnforcer {
    * The handler will be removed when destroy() is called.
    */
   public registerBeforeUnloadHandler(): void {
+    // Prevent orphaning previous listeners by returning early if already registered
+    if (this.beforeUnloadHandler) {
+      return;
+    }
     this.beforeUnloadHandler = () => {
       this.destroy();
     };
