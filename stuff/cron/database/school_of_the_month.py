@@ -58,7 +58,7 @@ def get_school_of_the_month_candidates(
         first_day_of_next_month: datetime.date,
         first_day_of_current_month: datetime.date
 ) -> List[School]:
-    '''Get school of the month candidates'''
+    '''Returns a list of elegible schools of the month candidates'''
     logging.info("Getting school of the month candidates")
     sql = '''
         SELECT
@@ -85,10 +85,22 @@ def get_school_of_the_month_candidates(
                     `Submissions` AS `su`
                 INNER JOIN
                     `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+                INNER JOIN
+                    `Identities` AS `i` 
+                    ON `i`.`identity_id` = `su`.`identity_id`
+                INNER JOIN
+                    `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
                 WHERE
                     `su`.`verdict` = "AC"
                     AND `p`.`visibility` >= 1
+                    -- Estoy asegurandome que 
+                    -- el problema tenga sello de calidad
+                    AND `p`.`quality_seal` = 1
                     AND `su`.`school_id` IS NOT NULL
+                    -- hay mail_email_id en la tabla de Users
+                    AND `u`.`main_email_id` IS NOT NULL
+                    -- Me estoy asegurando que el usuario también exista
+                    AND `i`.`user_id` IS NOT NULL
                 GROUP BY
                     `su`.`school_id`,
                     `su`.`problem_id`
