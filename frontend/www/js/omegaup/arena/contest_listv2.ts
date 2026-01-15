@@ -113,6 +113,15 @@ OmegaUp.on('ready', () => {
 
   const initialState = parseUrlState();
 
+  // Handle browser back/forward button navigation
+  const onPopState = () => {
+    const state = parseUrlState();
+    vueInstance.tab = state.tab;
+    vueInstance.page = state.page;
+    vueInstance.sortOrder = state.sortOrder;
+    vueInstance.filter = state.filter;
+  };
+
   const vueInstance = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
@@ -123,6 +132,9 @@ OmegaUp.on('ready', () => {
       sortOrder: initialState.sortOrder,
       filter: initialState.filter,
     }),
+    beforeUnmount() {
+      window.removeEventListener('popstate', onPopState);
+    },
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
@@ -162,12 +174,5 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  // Handle browser back/forward button navigation
-  window.addEventListener('popstate', () => {
-    const state = parseUrlState();
-    vueInstance.tab = state.tab;
-    vueInstance.page = state.page;
-    vueInstance.sortOrder = state.sortOrder;
-    vueInstance.filter = state.filter;
-  });
+  window.addEventListener('popstate', onPopState);
 });

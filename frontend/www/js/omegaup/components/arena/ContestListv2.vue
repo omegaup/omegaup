@@ -661,30 +661,22 @@ class ArenaContestList extends Vue {
   // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
   @Watch('tab')
   onTabPropChanged(newValue: ContestTab) {
-    if (this.currentTab !== newValue) {
-      this.currentTab = newValue;
-    }
+    this.currentTab = newValue;
   }
 
   @Watch('sortOrder')
   onSortOrderPropChanged(newValue: ContestOrder) {
-    if (this.currentOrder !== newValue) {
-      this.currentOrder = newValue;
-    }
+    this.currentOrder = newValue;
   }
 
   @Watch('filter')
   onFilterPropChanged(newValue: ContestFilter) {
-    if (this.currentFilter !== newValue) {
-      this.currentFilter = newValue;
-    }
+    this.currentFilter = newValue;
   }
 
   @Watch('page')
   onPagePropChanged(newValue: number) {
-    if (this.currentPage !== newValue) {
-      this.currentPage = newValue;
-    }
+    this.currentPage = newValue;
   }
 
   // Watchers for internal state - fetch data when user interacts with UI
