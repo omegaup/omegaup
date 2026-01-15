@@ -2182,19 +2182,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if ($statementType === 'printable') {
-            if (
-                is_null($identity) ||
-                !\OmegaUp\Authorization::canViewProblemStatement(
-                    $identity,
-                    $problem,
-                    $problemset['problemset'] ?? null
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'userNotAllowed'
-                );
-            }
-
             if (!is_null($problemset) && isset($problemset['contest'])) {
                 if (
                     !\OmegaUp\Authorization::isAdmin(
@@ -2205,9 +2192,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     if (
                         $problemset['contest']->finish_time->time > \OmegaUp\Time::get()
                     ) {
-                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                            'contestNotFinished'
-                        );
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException();
                     }
                 }
             }
