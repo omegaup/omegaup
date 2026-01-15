@@ -263,21 +263,30 @@ class Method {
     public $responseTypeMapping;
 
     /**
+     * @var array<string, string>
+     * @readonly
+     */
+    public $responsePropertyDescriptions = [];
+
+    /**
      * @param list<RequestParam> $requestParams
      * @param array<string, string>|string $responseTypeMapping
+     * @param array<string, string> $responsePropertyDescriptions
      */
     public function __construct(
         string $apiTypePrefix,
         string $docstringComment,
         $requestParams,
         ConversionResult $returnType,
-        $responseTypeMapping
+        $responseTypeMapping,
+        array $responsePropertyDescriptions = []
     ) {
         $this->apiTypePrefix = $apiTypePrefix;
         $this->docstringComment = $docstringComment;
         $this->requestParams = $requestParams;
         $this->returnType = $returnType;
         $this->responseTypeMapping = $responseTypeMapping;
+        $this->responsePropertyDescriptions = $responsePropertyDescriptions;
     }
 }
 
@@ -786,6 +795,23 @@ class TypeMapper {
             rootAPIReturnType: true,
         );
         $returnType = array_values($unionType->getAtomicTypes())[0];
+        /** @var array<string, string> */
+        $responsePropertyDescriptions = [];
+        // Parse @return-property annotations for descriptions
+        if (isset($docComment->tags['return-property'])) {
+            foreach ($docComment->tags['return-property'] as $propertyAnnotation) {
+                // Format: "property_name Description text"
+                if (
+                    preg_match(
+                        '/^(\S+)\s+(.+)$/',
+                        $propertyAnnotation,
+                        $matches
+                    ) === 1
+                ) {
+                    $responsePropertyDescriptions[$matches[1]] = $matches[2];
+                }
+            }
+        }
         if ($returnType instanceof \Psalm\Type\Atomic\TKeyedArray) {
             /** @var array<string, string> */
             $responseTypeMapping = [];
@@ -814,7 +840,8 @@ class TypeMapper {
                 $docComment->tags['omegaup-request-param'] ?? []
             ),
             $conversionResult,
-            $responseTypeMapping
+            $responseTypeMapping,
+            $responsePropertyDescriptions
         );
     }
 }
@@ -1182,14 +1209,15 @@ EOD;
 
                 if (!empty($method->requestParams)) {
                     echo "### Parameters\n\n";
-                    echo "| Name | Type | Description |\n";
-                    echo "|------|------|-------------|\n";
+                    echo "| Name | Type | Optional | Description |\n";
+                    echo "|------|------|----------|-------------|\n";
                     foreach ($method->requestParams as $requestParam) {
+                        $optional = $requestParam->isOptional ? 'Yes' : 'No';
                         echo "| `{$requestParam->name}` | `" . str_replace(
                             '|',
                             '\\|',
                             $requestParam->type
-                        ) . "` | {$requestParam->description} |\n";
+                        ) . "` | {$optional} | {$requestParam->description} |\n";
                     }
                 }
 
@@ -1201,15 +1229,31 @@ EOD;
                     echo "{$method->returnType->typescriptExpansion}\n";
                     echo "```\n\n";
                 } else {
-                    echo "| Name | Type |\n";
-                    echo "|------|------|\n";
+                    // Check if we have any descriptions to decide on table format
+                    $hasDescriptions = !empty($method->responsePropertyDescriptions);
+                    if ($hasDescriptions) {
+                        echo "| Name | Type | Description |\n";
+                        echo "|------|------|-------------|\n";
+                    } else {
+                        echo "| Name | Type |\n";
+                        echo "|------|------|\n";
+                    }
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        echo "| `{$paramName}` | `" . str_replace(
-                            '|',
-                            '\\|',
-                            $paramType
-                        ) . "` |\n";
+                        $description = $method->responsePropertyDescriptions[$paramName] ?? '';
+                        if ($hasDescriptions) {
+                            echo "| `{$paramName}` | `" . str_replace(
+                                '|',
+                                '\\|',
+                                $paramType
+                            ) . "` | {$description} |\n";
+                        } else {
+                            echo "| `{$paramName}` | `" . str_replace(
+                                '|',
+                                '\\|',
+                                $paramType
+                            ) . "` |\n";
+                        }
                     }
                 }
             }

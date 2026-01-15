@@ -3,7 +3,9 @@
  namespace OmegaUp\Controllers;
 
 /**
- * Description of ClarificationController
+ * Controller for handling clarifications in contests and course assignments.
+ * Clarifications allow users to ask questions about problems, and administrators can respond with answers.
+ * Clarifications can be public (visible to all participants) or private (visible only to the author and receiver).
  *
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
@@ -23,16 +25,19 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Creates a Clarification for a contest or an assignment of a course
+     * Creates a new clarification for a problem in a contest or an assignment of a course.
+     * Clarifications are created as private by default unless the receiver is the same as the author.
+     * The user must be logged in and have access to the contest or course assignment.
+     * Contest administrators or course administrators/teaching assistants will be notified of the clarification request.
      *
      * @return Clarification
      *
-     * @omegaup-request-param string|null $contest_alias
-     * @omegaup-request-param string|null $course_alias
-     * @omegaup-request-param string|null $assignment_alias
-     * @omegaup-request-param null|string $username
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param string $message
+     * @omegaup-request-param string|null $contest_alias Contest alias (required if course_alias is not provided)
+     * @omegaup-request-param string|null $course_alias Course alias (required if contest_alias is not provided)
+     * @omegaup-request-param string|null $assignment_alias Assignment alias (required if course_alias is provided)
+     * @omegaup-request-param null|string $username Username of the intended receiver (optional, for private clarifications)
+     * @omegaup-request-param string $problem_alias Problem alias
+     * @omegaup-request-param string $message Clarification content (1-200 characters)
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -218,11 +223,13 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * API for getting a clarification
+     * Returns the details of a clarification for a problem in a contest or course assignment.
+     * The user must be logged in and have access to view the clarification.
+     * Private clarifications can only be viewed by the author, receiver, or contest/course administrators.
      *
      * @return array{message: string, answer: null|string, time: \OmegaUp\Timestamp, problem_id: int, problemset_id: int|null}
      *
-     * @omegaup-request-param int $clarification_id
+     * @omegaup-request-param int $clarification_id The ID of the clarification to retrieve
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         // Authenticate the user
@@ -264,14 +271,17 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Update a clarification
+     * Updates the contents of a clarification for a problem in a contest or course assignment.
+     * Only contest administrators, course administrators, or teaching assistants can update clarifications.
+     * When an answer is provided, the clarification author will be notified.
+     * The clarification timestamp is automatically updated to the current time.
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $answer
-     * @omegaup-request-param int $clarification_id
-     * @omegaup-request-param null|string $message
-     * @omegaup-request-param bool|null $public
+     * @omegaup-request-param null|string $answer The answer to the clarification (optional)
+     * @omegaup-request-param int $clarification_id The ID of the clarification to update
+     * @omegaup-request-param null|string $message The clarification message content (optional)
+     * @omegaup-request-param bool|null $public Whether the clarification should be public (optional)
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         // Authenticate user
