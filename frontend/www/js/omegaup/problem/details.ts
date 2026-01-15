@@ -90,6 +90,8 @@ OmegaUp.on('ready', async () => {
       createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
+      isBookmarked: false,
+      isLoadingBookmark: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -126,6 +128,7 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
+          initialBookmarkedStatus: this.isBookmarked,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -436,6 +439,27 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
+          'toggle-bookmark': (problemAlias: string) => {
+            if (this.isLoadingBookmark) {
+              return;
+            }
+            this.isLoadingBookmark = true;
+            api.ProblemBookmark.toggle({ problem_alias: problemAlias })
+              .then((response) => {
+                this.isBookmarked = response.bookmarked;
+                ui.success(
+                  response.bookmarked
+                    ? T.problemBookmarkAdded
+                    : T.problemBookmarkRemoved,
+                );
+              })
+              .catch((error) => {
+                ui.apiError(error);
+              })
+              .finally(() => {
+                this.isLoadingBookmark = false;
+              });
+          },
         },
       });
     },
@@ -530,6 +554,14 @@ OmegaUp.on('ready', async () => {
       .catch(ui.apiError);
   }
 
+  // Check if problem is bookmarked after Vue instance is created
+  if (payload.user.loggedIn) {
+    api.ProblemBookmark.exists({ problem_alias: payload.problem.alias })
+      .then((response) => {
+        problemDetailsView.isBookmarked = response.bookmarked;
+      })
+      .catch(ui.apiError);
+  }
   if (runs) {
     runsStore.commit('setTotalRuns', payload.totalRuns);
     for (const run of runs) {
