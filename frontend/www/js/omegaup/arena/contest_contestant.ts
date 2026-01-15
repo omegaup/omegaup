@@ -56,8 +56,10 @@ OmegaUp.on('ready', async () => {
         mainContainer.innerHTML = `
           <div class="container mt-5">
             <div class="alert alert-danger text-center" role="alert">
-              <h4 class="alert-heading">${T.arenaContestMultipleTabsDetected}</h4>
-              <p class="mb-0">${message}</p>
+              <h4 class="alert-heading">${
+                T.arenaContestMultipleTabsDetected
+              }</h4>
+              <p class="mb-0">${ui.escape(message)}</p>
             </div>
           </div>
         `;

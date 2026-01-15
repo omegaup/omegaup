@@ -45,14 +45,29 @@ OmegaUp.on('ready', async () => {
     isBlocked = true;
     const mainContainer = document.getElementById('main-container');
     if (mainContainer) {
-      mainContainer.innerHTML = `
-        <div class="container mt-5">
-          <div class="alert alert-danger text-center" role="alert">
-            <h4 class="alert-heading">${T.arenaContestMultipleTabsDetected}</h4>
-            <p class="mb-0">${message}</p>
-          </div>
-        </div>
-      `;
+      // Clear existing content
+      mainContainer.innerHTML = '';
+
+      // Build DOM nodes safely to prevent XSS
+      const container = document.createElement('div');
+      container.className = 'container mt-5';
+
+      const alert = document.createElement('div');
+      alert.className = 'alert alert-danger text-center';
+      alert.setAttribute('role', 'alert');
+
+      const heading = document.createElement('h4');
+      heading.className = 'alert-heading';
+      heading.textContent = T.arenaContestMultipleTabsDetected;
+
+      const paragraph = document.createElement('p');
+      paragraph.className = 'mb-0';
+      paragraph.textContent = message;
+
+      alert.appendChild(heading);
+      alert.appendChild(paragraph);
+      container.appendChild(alert);
+      mainContainer.appendChild(container);
     }
   });
   // Give time for the BroadcastChannel to receive responses
