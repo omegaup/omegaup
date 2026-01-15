@@ -211,11 +211,17 @@ export default class ProblemStatementEdit extends Vue {
 @import '../../../../third_party/js/pagedown/demo/browser/demo.css';
 
 .wmd-preview,
+  
+.wmd-preview {
+  text-align: left;
+}
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
 }
 
 .row {
+    display: flex;
+    gap: 15px;
   .wmd-button-bar {
     flex-shrink: 0;
   }
@@ -232,7 +238,9 @@ export default class ProblemStatementEdit extends Vue {
   }
 
   [data-statement-edit-markdown] {
-    flex: 1;
+    flex: 0 0 auto;
+    max-width: 48%;
+      text-align: left;
     min-height: 400px;
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
