@@ -10,17 +10,11 @@
         <h1 class="title-font p-0">{{ title }}</h1>
       </div>
     </div>
-    <div class="d-flex justify-content-end mb-3">
-      <button
-        class="btn btn-link filter-toggle"
-        :aria-label="filtersVisible ? 'Hide filters' : 'Show filters'"
-        @click="filtersVisible = !filtersVisible"
+    <div class="d-flex flex-row">
+      <div
+        class="filters-sidebar"
+        :class="{ 'filters-hidden': !filtersVisible }"
       >
-        {{ filtersVisible ? '‹' : '›' }}
-      </button>
-    </div>
-    <div class="row">
-      <div v-if="filtersVisible" class="col-12 col-md-3">
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
@@ -67,12 +61,27 @@
           "
         ></omegaup-problem-filter-quality>
       </div>
-      <div :class="filtersVisible ? 'col-12 col-md-9 p-0' : 'col-12 p-0'">
+
+      <div class="flex-grow-1 main-content-wrapper">
+        <button
+          class="btn btn-link filter-toggle mb-3"
+          :aria-label="
+            filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+          "
+          @click="filtersVisible = !filtersVisible"
+        >
+          {{ filtersVisible ? '‹' : '›' }}
+          {{
+            filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+          }}
+        </button>
+
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
           </div>
         </div>
+
         <omegaup-problem-base-list
           v-else
           :problems="problems"
@@ -102,8 +111,7 @@
                 selectedTags,
               )
           "
-        >
-        </omegaup-problem-base-list>
+        />
       </div>
     </div>
   </div>
@@ -199,9 +207,27 @@ export default class CollectionList extends Vue {
   max-width: 75rem;
 }
 
+.filters-sidebar {
+  width: 250px;
+  min-width: 250px;
+  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s ease;
+  overflow: hidden;
+  padding-right: 1rem;
+}
+
+.filters-sidebar.filters-hidden {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+}
+
+.main-content-wrapper {
+  min-width: 0;
+}
+
 .filter-toggle {
+  padding: 0.5rem 1rem;
   font-size: 2rem;
   text-decoration: none;
-  padding: 0 0.5rem;
 }
 </style>

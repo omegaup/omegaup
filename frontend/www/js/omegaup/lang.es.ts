@@ -275,6 +275,8 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthRank: "Top 100 coders del mes pasado",
   codersOfTheMonthUser: "Coder",
   collecionOtherTags: "Otras etiquetas",
+  collectionHideFilters: "Ocultar filtros",
+  collectionShowFilters: "Mostrar filtros",
   collectionTitle: "Colecciones de Problemas",
   contentCreator: "Contribuidor",
   contentOrderUpdated: "El orden del contenido se ha actualizado",
