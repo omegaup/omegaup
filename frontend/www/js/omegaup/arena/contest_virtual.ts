@@ -31,11 +31,36 @@ import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
+import T from '../lang';
+import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+
+  // Enforce single tab for virtual contests
+  let isBlocked = false;
+  enforceSingleTab(payload.contest.alias, (message: string) => {
+    isBlocked = true;
+    const mainContainer = document.getElementById('main-container');
+    if (mainContainer) {
+      mainContainer.innerHTML = `
+        <div class="container mt-5">
+          <div class="alert alert-danger text-center" role="alert">
+            <h4 class="alert-heading">${T.arenaContestMultipleTabsDetected}</h4>
+            <p class="mb-0">${message}</p>
+          </div>
+        </div>
+      `;
+    }
+  });
+  // Give time for the BroadcastChannel to receive responses
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  if (isBlocked) {
+    return; // Stop initialization if blocked
+  }
+
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';

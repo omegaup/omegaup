@@ -37,6 +37,7 @@ import socketStore from './socketStore';
 import { myRunsStore, RunFilters, runsStore } from './runsStore';
 import T from '../lang';
 import { DisqualificationType } from '../components/arena/Runs.vue';
+import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -44,6 +45,31 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
+
+  // Enforce single tab for non-admin contestants
+  if (!contestAdmin) {
+    let isBlocked = false;
+    enforceSingleTab(payload.contest.alias, (message: string) => {
+      isBlocked = true;
+      const mainContainer = document.getElementById('main-container');
+      if (mainContainer) {
+        mainContainer.innerHTML = `
+          <div class="container mt-5">
+            <div class="alert alert-danger text-center" role="alert">
+              <h4 class="alert-heading">${T.arenaContestMultipleTabsDetected}</h4>
+              <p class="mb-0">${message}</p>
+            </div>
+          </div>
+        `;
+      }
+    });
+    // Give time for the BroadcastChannel to receive responses
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (isBlocked) {
+      return; // Stop initialization if blocked
+    }
+  }
+
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
