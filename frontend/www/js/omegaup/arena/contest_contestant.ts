@@ -49,24 +49,56 @@ OmegaUp.on('ready', async () => {
   // Enforce single tab for non-admin contestants
   if (!contestAdmin) {
     let isBlocked = false;
-    enforceSingleTab(payload.contest.alias, (message: string) => {
-      isBlocked = true;
-      const mainContainer = document.getElementById('main-container');
-      if (mainContainer) {
-        mainContainer.innerHTML = `
-          <div class="container mt-5">
-            <div class="alert alert-danger text-center" role="alert">
-              <h4 class="alert-heading">${
-                T.arenaContestMultipleTabsDetected
-              }</h4>
-              <p class="mb-0">${ui.escape(message)}</p>
-            </div>
-          </div>
-        `;
-      }
+    const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+
+      const timeoutId = window.setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve();
+      }, TAB_ENFORCER_TIMEOUT_MS);
+
+      enforceSingleTab(payload.contest.alias, (message: string) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        isBlocked = true;
+        window.clearTimeout(timeoutId);
+
+        const mainContainer = document.getElementById('main-container');
+        if (mainContainer) {
+          // Clear any existing content safely
+          mainContainer.textContent = '';
+
+          const containerDiv = document.createElement('div');
+          containerDiv.className = 'container mt-5';
+
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-danger text-center';
+          alertDiv.setAttribute('role', 'alert');
+
+          const heading = document.createElement('h4');
+          heading.className = 'alert-heading';
+          heading.textContent = T.arenaContestMultipleTabsDetected;
+
+          const paragraph = document.createElement('p');
+          paragraph.className = 'mb-0';
+          paragraph.textContent = message;
+
+          alertDiv.appendChild(heading);
+          alertDiv.appendChild(paragraph);
+          containerDiv.appendChild(alertDiv);
+          mainContainer.appendChild(containerDiv);
+        }
+        resolve();
+      });
     });
-    // Give time for the BroadcastChannel to receive responses
-    await new Promise((resolve) => setTimeout(resolve, 100));
+
     if (isBlocked) {
       return; // Stop initialization if blocked
     }

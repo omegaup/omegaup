@@ -41,37 +41,56 @@ OmegaUp.on('ready', async () => {
 
   // Enforce single tab for virtual contests
   let isBlocked = false;
-  enforceSingleTab(payload.contest.alias, (message: string) => {
-    isBlocked = true;
-    const mainContainer = document.getElementById('main-container');
-    if (mainContainer) {
-      // Clear existing content
-      mainContainer.innerHTML = '';
+  const TAB_ENFORCER_TIMEOUT_MS = 1000;
 
-      // Build DOM nodes safely to prevent XSS
-      const container = document.createElement('div');
-      container.className = 'container mt-5';
+  await new Promise<void>((resolve) => {
+    let settled = false;
 
-      const alert = document.createElement('div');
-      alert.className = 'alert alert-danger text-center';
-      alert.setAttribute('role', 'alert');
+    const timeoutId = window.setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve();
+    }, TAB_ENFORCER_TIMEOUT_MS);
 
-      const heading = document.createElement('h4');
-      heading.className = 'alert-heading';
-      heading.textContent = T.arenaContestMultipleTabsDetected;
+    enforceSingleTab(payload.contest.alias, (message: string) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      isBlocked = true;
+      window.clearTimeout(timeoutId);
 
-      const paragraph = document.createElement('p');
-      paragraph.className = 'mb-0';
-      paragraph.textContent = message;
+      const mainContainer = document.getElementById('main-container');
+      if (mainContainer) {
+        // Clear existing content
+        mainContainer.innerHTML = '';
 
-      alert.appendChild(heading);
-      alert.appendChild(paragraph);
-      container.appendChild(alert);
-      mainContainer.appendChild(container);
-    }
+        // Build DOM nodes safely to prevent XSS
+        const container = document.createElement('div');
+        container.className = 'container mt-5';
+
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger text-center';
+        alert.setAttribute('role', 'alert');
+
+        const heading = document.createElement('h4');
+        heading.className = 'alert-heading';
+        heading.textContent = T.arenaContestMultipleTabsDetected;
+
+        const paragraph = document.createElement('p');
+        paragraph.className = 'mb-0';
+        paragraph.textContent = message;
+
+        alert.appendChild(heading);
+        alert.appendChild(paragraph);
+        container.appendChild(alert);
+        mainContainer.appendChild(container);
+      }
+      resolve();
+    });
   });
-  // Give time for the BroadcastChannel to receive responses
-  await new Promise((resolve) => setTimeout(resolve, 100));
   if (isBlocked) {
     return; // Stop initialization if blocked
   }

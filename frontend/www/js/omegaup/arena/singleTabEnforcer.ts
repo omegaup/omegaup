@@ -9,6 +9,11 @@ import T from '../lang';
  */
 interface TabMessage {
   type: 'ping' | 'pong';
+  /**
+   * Unix timestamp in milliseconds. Currently not used by the enforcer logic,
+   * but reserved for future features such as detecting stale messages or
+   * aiding debugging of cross-tab communication.
+   */
   timestamp: number;
 }
 
@@ -34,8 +39,12 @@ export interface SingleTabEnforcerOptions {
  * const enforcer = new SingleTabEnforcer({
  *   contestAlias: 'my-contest',
  *   onBlocked: (message) => {
- *     // Show error UI
- *     document.body.innerHTML = `<div class="error">${message}</div>`;
+ *     // Show error UI using safe DOM manipulation to avoid XSS
+ *     const errorDiv = document.createElement('div');
+ *     errorDiv.className = 'error';
+ *     errorDiv.textContent = message;
+ *     document.body.innerHTML = '';
+ *     document.body.appendChild(errorDiv);
  *   },
  * });
  *

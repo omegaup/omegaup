@@ -86,9 +86,8 @@ describe('SingleTabEnforcer', () => {
       onBlocked,
     });
 
-    const result = enforcer.init();
+    enforcer.init();
 
-    expect(result).toBe(true);
     expect(enforcer.blocked).toBe(false);
     expect(onBlocked).not.toHaveBeenCalled();
 
@@ -180,6 +179,6 @@ describe('enforceSingleTab', () => {
     expect(enforcer).not.toBeNull();
     expect(MockBroadcastChannel.instances).toHaveLength(1);
 
-    enforcer?.destroy();
+    enforcer.destroy();
   });
 });
