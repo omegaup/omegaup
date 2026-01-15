@@ -18,6 +18,7 @@ location /rekarel/ {
 }
 rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
+rewrite ^/admin/carousel/?$ /admin/carousel.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
 rewrite ^/arena/?$ /arena/indexv2.php?page_size=10 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
