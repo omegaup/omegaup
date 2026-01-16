@@ -142,7 +142,28 @@ export default class Arena extends Vue {
 [data-arena-wrapper] {
   background: var(--arena-background-color);
   font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+[data-arena-wrapper] > .text-center {
+  flex-shrink: 0;
+}
+
+[data-arena-wrapper] > .nav {
+  flex-shrink: 0;
+}
+
+[data-arena-wrapper] > .tab-content {
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  position: relative;
+  scrollbar-width: none;
 }
 
 .socket-status-error {
