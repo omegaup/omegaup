@@ -18,7 +18,6 @@ describe('notificationsStore', () => {
       position: NotificationPosition.Top,
       visible: false,
       counter: 0,
-      uiReady: false,
       autoHideTimeout: null,
     };
     storeConfig = createNotificationsStoreConfig();
@@ -68,18 +67,6 @@ describe('notificationsStore', () => {
         expect(state.visible).toBe(false);
       });
     });
-
-    describe('setUiReady', () => {
-      it('should set uiReady state', () => {
-        expect(state.uiReady).toBe(false);
-
-        storeConfig.mutations.setUiReady(state, true);
-        expect(state.uiReady).toBe(true);
-
-        storeConfig.mutations.setUiReady(state, false);
-        expect(state.uiReady).toBe(false);
-      });
-    });
   });
 
   describe('createNotificationsStore factory', () => {
@@ -108,7 +95,6 @@ describe('notificationsStore', () => {
       expect(store.state.position).toBe(NotificationPosition.Top);
       expect(store.state.visible).toBe(false);
       expect(store.state.counter).toBe(0);
-      expect(store.state.uiReady).toBe(false);
       expect(store.state.autoHideTimeout).toBeNull();
     });
   });
@@ -123,54 +109,29 @@ describe('notificationsStore', () => {
   });
 
   describe('displayStatus action', () => {
-    it('should commit setUiReady when ensureVisible is true and uiReady is false', () => {
+    it('should show notification with message and type', () => {
       const store = createNotificationsStore();
-
-      expect(store.state.uiReady).toBe(false);
 
       store.dispatch('displayStatus', {
         message: 'Test message',
         type: MessageType.Info,
-        ensureVisible: true,
       });
 
-      expect(store.state.uiReady).toBe(true);
       expect(store.state.visible).toBe(true);
-      expect(store.state.message).toBe('Test message');
-    });
-
-    it('should not change uiReady if ensureVisible is false', () => {
-      const store = createNotificationsStore();
-
-      store.dispatch('displayStatus', {
-        message: 'Test message',
-        type: MessageType.Info,
-        ensureVisible: false,
-      });
-
-      expect(store.state.uiReady).toBe(false);
-      expect(store.state.visible).toBe(true);
-    });
-
-    it('should not change uiReady if already true', () => {
-      const store = createNotificationsStore();
-
-      // First, set uiReady to true
-      store.commit('setUiReady', true);
-
-      store.dispatch('displayStatus', {
-        message: 'Test message',
-        type: MessageType.Info,
-        ensureVisible: true,
-      });
-
-      // Should still be true, no DOM operations involved
-      expect(store.state.uiReady).toBe(true);
-
-      // Verify notification content and visibility were properly set
       expect(store.state.message).toBe('Test message');
       expect(store.state.type).toBe(MessageType.Info);
-      expect(store.state.visible).toBe(true);
+    });
+
+    it('should set position when provided', () => {
+      const store = createNotificationsStore();
+
+      store.dispatch('displayStatus', {
+        message: 'Test message',
+        type: MessageType.Info,
+        position: NotificationPosition.TopRight,
+      });
+
+      expect(store.state.position).toBe(NotificationPosition.TopRight);
     });
   });
 });

@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
 
 @Component
@@ -38,36 +38,8 @@ export default class GlobalNotifications extends Vue {
     return notificationsStore.getters.alertClass;
   }
 
-  get isUiReady(): boolean {
-    return notificationsStore.getters.isUiReady;
-  }
-
   get positionClass(): string {
     return notificationsStore.getters.positionClass;
-  }
-
-  mounted(): void {
-    // Handle case where isUiReady is already true when component mounts
-    // (watcher only fires on changes, not initial state)
-    if (this.isUiReady) {
-      this.emitUiReady();
-    }
-  }
-
-  @Watch('isUiReady')
-  onUiReadyChange(ready: boolean): void {
-    if (ready) {
-      this.emitUiReady();
-    }
-  }
-
-  /**
-   * Emits the 'ui-ready' event to the parent component.
-   * Called from mounted() and the isUiReady watcher to notify
-   * that the UI is ready for DOM manipulation.
-   */
-  private emitUiReady(): void {
-    this.$emit('ui-ready');
   }
 
   dismiss(): void {

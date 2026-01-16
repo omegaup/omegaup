@@ -14,18 +14,7 @@ OmegaUp.on('ready', () => {
       'omegaup-global-notifications': common_GlobalNotifications,
     },
     render: function (createElement) {
-      // Listen for ui-ready event emitted by GlobalNotifications component
-      // This handles the legacy loading/root element visibility in a Vue-native way
-      return createElement('omegaup-global-notifications', {
-        on: {
-          'ui-ready': () => {
-            const loadingEl = document.getElementById('loading');
-            const rootEl = document.getElementById('root');
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (rootEl) rootEl.style.display = 'block';
-          },
-        },
-      });
+      return createElement('omegaup-global-notifications');
     },
   });
 });

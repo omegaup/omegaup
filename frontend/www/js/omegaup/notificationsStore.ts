@@ -32,7 +32,6 @@ export interface NotificationsState {
   position: NotificationPosition;
   visible: boolean;
   counter: number;
-  uiReady: boolean;
   autoHideTimeout: ReturnType<typeof setTimeout> | null;
 }
 
@@ -48,7 +47,6 @@ function createStoreConfig() {
       position: NotificationPosition.Top,
       visible: false,
       counter: 0,
-      uiReady: false,
       autoHideTimeout: null,
     } as NotificationsState,
 
@@ -67,10 +65,6 @@ function createStoreConfig() {
         Vue.set(state, 'visible', false);
         Vue.set(state, 'message', null);
         Vue.set(state, 'type', null);
-      },
-
-      setUiReady(state: NotificationsState, ready: boolean) {
-        Vue.set(state, 'uiReady', ready);
       },
 
       setPosition(state: NotificationsState, position: NotificationPosition) {
@@ -102,18 +96,11 @@ function createStoreConfig() {
           message: string;
           type: MessageType;
           autoHide?: boolean;
-          ensureVisible?: boolean;
           position?: NotificationPosition;
         },
       ) {
         // Clear any existing auto-hide timeout
         commit('clearAutoHideTimeout');
-
-        // Ensure UI is visible when a notification is triggered
-        // DOM manipulation (hide loading, show root) is handled by GlobalNotifications.vue
-        if (payload.ensureVisible && !state.uiReady) {
-          commit('setUiReady', true);
-        }
 
         // Set position if provided
         if (payload.position) {
@@ -155,7 +142,6 @@ function createStoreConfig() {
       message: (state: NotificationsState) => state.message,
       type: (state: NotificationsState) => state.type,
       alertClass: (state: NotificationsState) => state.type || '',
-      isUiReady: (state: NotificationsState) => state.uiReady,
       position: (state: NotificationsState) => state.position,
       positionClass: (state: NotificationsState) =>
         `notification-${state.position}`,

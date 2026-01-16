@@ -105,7 +105,6 @@ export function displayStatus({
     type,
     autoHide,
     position,
-    ensureVisible: true, // Signal to ensure UI is ready
   });
 }
 
