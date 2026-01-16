@@ -247,42 +247,5 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
-
-  mounted(): void {
-    if (window.innerWidth < 992) return;
-
-    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
-      '.nav-item.dropdown',
-    );
-
-    dropdowns.forEach((dropdown) => {
-      const menu = dropdown.querySelector<HTMLElement>('.dropdown-menu');
-      const toggle = dropdown.querySelector<HTMLElement>('.dropdown-toggle');
-      if (!menu || !toggle) return;
-
-      const onEnter = () => {
-        if (!dropdown.classList.contains('show')) {
-          dropdown.classList.add('show');
-          menu.classList.add('show');
-          toggle.setAttribute('aria-expanded', 'true');
-        }
-      };
-
-      dropdown.addEventListener('mouseenter', onEnter);
-      (dropdown as any)._hoverEnter = onEnter;
-    });
-  }
-
-  beforeDestroy(): void {
-    const dropdowns = this.$el.querySelectorAll<HTMLElement>(
-      '.nav-item.dropdown',
-    );
-
-    dropdowns.forEach((dropdown) => {
-      const enter = (dropdown as any)._hoverEnter;
-      if (enter) dropdown.removeEventListener('mouseenter', enter);
-      delete (dropdown as any)._hoverEnter;
-    });
-  }
 }
 </script>

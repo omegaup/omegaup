@@ -542,6 +542,33 @@ nav.navbar {
   }
 }
 
+@media (min-width: 992px) {
+  .navbar-nav .dropdown {
+    position: relative;
+  }
+
+  .navbar-nav .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    height: 10px;
+    width: 100%;
+  }
+
+  .navbar-nav .dropdown:not(.show):hover > .dropdown-menu {
+    display: block;
+  }
+
+  .navbar-nav > .nav-item.dropdown > .dropdown-toggle {
+    pointer-events: none;
+  }
+
+  .navbar-nav > .nav-item.dropdown > .dropdown-toggle:focus {
+    pointer-events: auto;
+  }
+}
+
 .progress {
   position: relative;
 }
