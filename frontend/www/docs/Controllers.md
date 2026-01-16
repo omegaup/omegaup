@@ -261,6 +261,7 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/user/changePassword/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiusercoderofthemonthlist)
+  - [`/api/user/compare/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiusercompare)
   - [`/api/user/contestStats/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiuserconteststats)
   - [`/api/user/create/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiusercreate)
   - [`/api/user/createAPIToken/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apiusercreateapitoken)
