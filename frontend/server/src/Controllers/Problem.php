@@ -5085,14 +5085,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Check if problem is bookmarked by the user
-        $bookmarkRequest = new \OmegaUp\Request([
-            'problem_alias' => $problem->alias,
-        ]);
-        $bookmarkRequest->identity = $identity;
-        $bookmarkResult = \OmegaUp\Controllers\ProblemBookmark::apiExists(
-            $bookmarkRequest
+        $isBookmarked = \OmegaUp\DAO\ProblemBookmarks::existsByPK(
+            intval($identity->identity_id),
+            intval($problem->problem_id)
         );
-        $isBookmarked = $bookmarkResult['bookmarked'];
 
         return [
             'user' => [
