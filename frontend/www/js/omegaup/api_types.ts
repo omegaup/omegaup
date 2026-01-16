@@ -4131,6 +4131,7 @@ export namespace types {
     clarifications?: types.Clarification[];
     hasVisitedSection?: boolean;
     histogram: types.Histogram;
+    isBookmarked?: boolean;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
