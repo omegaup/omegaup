@@ -36,7 +36,7 @@ Te pedimos que completes la fase 1 antes de que comiences a trabajar con nuestro
 
 En este paso esperamos que ya estés familiarizado con nuestro entorno de desarrollo y con nuestro código ya que eso hace más fácil entender nuestra lista de ideas de proyectos mostrada al inicio de esta página. **Te pedimos que no comiences a trabajar en esta fase hasta que tengas por lo menos una solución aceptada como se describe en la fase 2.**
 
- - Crea un documento de diseño para tu proyecto usando [este templete](https://docs.google.com/document/d/1_FKfpc2M3VLDVYqvT8ZgsgwIJ3zaZnyUVmSm-H3h6UQ/edit). **El documento tiene que estar escrito en inglés**, no tiene que ser un inglés perfecto solo tiene que ser entendible.
+ - Crea un documento de diseño para tu proyecto usando [este template](https://docs.google.com/document/d/1_FKfpc2M3VLDVYqvT8ZgsgwIJ3zaZnyUVmSm-H3h6UQ/edit). **El documento tiene que estar escrito en inglés**, no tiene que ser un inglés perfecto solo tiene que ser entendible.
  - También te recomendamos mandarnos un borrador de tu aplicación para darte retroalimentación. Envía el link a tu borrador a través de este formulario `https://forms.gle/XRCU4MS9oAJCXuk3A`. Asegurate de que cualquier persona con la liga pueda ver el documento y pueda comentar.
  - Vamos a tratar de darte la mayor cantidad posible de retroalimentación. Sin embargo, no vamos a dar retroalimentación a ningún1 candidato que no haya completado las fases 1 y 2.
  - Cuando consideres que tu aplicación está lista, no olvides **enviarla a [Google](https://summerofcode.withgoogle.com/age-verification/student/?next=%2Fstudent-signup%2F)**. Si no la envías, no podrás ser seleccionado para Summer of Code 2023.

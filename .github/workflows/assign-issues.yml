@@ -22,14 +22,14 @@ jobs:
                   maintainers: ""
                   self_assign_cmd: /assign
                   self_unassign_cmd: /unassign
-                  # Unassign after 5 days if no PR is opened
+                  # Unassign after 7 days if no PR is opened
                   days_until_unassign: 7
                   enable_auto_suggestion: true
                   allow_self_assign_author: true
                   enable_reminder: true
                   reminder_days: auto
                   reminder_comment: >
-                      Quick reminder: please open a pull request within 2.5 days
+                      Quick reminder: please open a pull request within 3.5 days
                       or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
@@ -41,13 +41,13 @@ jobs:
                   block_assignment_comment: >
                       Kindly ask the maintainers to assign this issue to you again.
                   assigned_comment: >
-                      Assigned! Please open a pull request within 5 days. If no
+                      Assigned! Please open a pull request within 7 days. If no
                       PR is opened, this issue will be automatically unassigned
                       to keep the queue moving.
                   unassigned_comment: >
-                      Unassigned because no pull request was opened within 5
+                      Unassigned because no pull request was opened within 7
                       days. If you want to be assigned to this issue again,
                       kindly ask the maintainers to assign it to you again.
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
-                      Please note the 5-day PR expectation.
+                      Please note the 7-day PR expectation.

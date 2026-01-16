@@ -114,7 +114,7 @@ abstract class CacheAdapter {
         // independent caches can still make progress.
         //
         // This is preferred over apcu_entry() because that function grabs a
-        // *global* lock that blocks evey single APCu function call!
+        // *global* lock that blocks every single APCu function call!
         $lockFile = '/tmp/omegaup-cache-' . sha1($lockGroup) . '.lock';
 
         $f = fopen($lockFile, 'w');

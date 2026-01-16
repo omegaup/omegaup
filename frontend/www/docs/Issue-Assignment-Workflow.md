@@ -9,11 +9,11 @@ This repository uses the [`takanome-dev/assign-issue-action`](https://github.com
 
 ### Limits and deadlines
 - Maximum concurrent assignments per contributor: **3**.
-- You must open a PR (draft is fine) within **5 days** of assignment.
-- A reminder is posted roughly halfway (~2.5 days) before auto-unassignment.
-- If no PR is opened by day 5, you are automatically unassigned and blocked from self-reassigning; ask a maintainer if you need it back.
+- You must open a PR (draft is fine) within **7 days** of assignment.
+- A reminder is posted roughly halfway (~3.5 days) before auto-unassignment.
+- If no PR is opened by day 7, you are automatically unassigned and blocked from self-reassigning; ask a maintainer if you need it back.
 
 ### Tips for new contributors
-- Comment `/assign`, then open a PR (draft is OK) within 5 days to keep the slot.
+- Comment `/assign`, then open a PR (draft is OK) within 7 days to keep the slot.
 - Use `/unassign` if you can’t continue, so others can pick it up.
 - If you need more time, ask a maintainer to add the `📌 Pinned` label.

@@ -36,7 +36,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -151,7 +151,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -189,7 +189,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -321,7 +321,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -538,7 +538,7 @@ if __name__ == \'__main__\':
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -610,7 +610,7 @@ if __name__ == \'__main__\':
     }
 
     /**
-     * test for count problems whit levelTag
+     * test for count problems with levelTag
      */
     public function testCountProblemsWithLevelTags() {
         // Create problems by level
@@ -706,7 +706,7 @@ if __name__ == \'__main__\':
     }
 
     /**
-     * Basic test for uploadin problem missing outputs
+     * Basic test for uploading problem missing outputs
      */
     public function testCreateProblemMissingOutput() {
         // Get the problem data
@@ -757,7 +757,7 @@ if __name__ == \'__main__\':
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
         $problem = $problems[0];
 
@@ -858,7 +858,7 @@ if __name__ == \'__main__\':
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($r['title']);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertCount(1, $problems);
         $problem = $problems[0];
 

@@ -34,7 +34,7 @@ jobs:
                   remove-stale-when-updated: true
 
                   # Messages to post when marking as stale
-                  stale-issue-message: "This issue has been marked as stale because it has been open for 90 days with no activity. Please comment or update this issue to remove the stale label."
+                  stale-issue-message: "This issue has been marked as stale because it has been open for 45 days with no activity. Please comment or update this issue to remove the stale label."
                   stale-pr-message: "This pull request has been marked as stale because it has been open for 45 days with no activity. Please comment or update this PR to remove the stale label."
 
                   # Labels to use

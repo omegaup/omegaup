@@ -34,8 +34,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
- * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
- * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
+ * @psalm-type BookmarkProblem=array{alias: string, title: string}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
+ * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
  * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
@@ -198,7 +199,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
             && !is_null($createUserParams->parentEmail)
         ) {
-            // Fill all the columns refering to user's parent
+            // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
@@ -437,7 +438,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!self::$sendEmailOnVerify) {
             self::$log->info(
-                'Not sending email beacause sendEmailOnVerify = FALSE'
+                'Not sending email because sendEmailOnVerify = FALSE'
             );
             return;
         }
@@ -858,7 +859,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'permission_key'
             );
 
-            // Pwd changes are by default unless explictly disabled
+            // Pwd changes are by default unless explicitly disabled
             $resetRequest = new \OmegaUp\Request();
             $resetRequest['auth_token'] = $r['auth_token'];
             $resetRequest['username'] = $username;
@@ -2334,6 +2335,57 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get profile statistics including solved problems by difficulty and tags distribution.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiProfileStatistics(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        if (
+            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userProfileIsPrivate'
+            );
+        }
+
+        $difficultyStats = \OmegaUp\DAO\Problems::getSolvedCountByDifficulty(
+            $identity->identity_id
+        );
+        $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
+            $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+            $identity->identity_id
+        );
+
+        return [
+            'solved' => $difficultyStats['total'],
+            'attempting' => $attemptingCount,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
+            'tags' => $tagsDistribution,
+        ];
+    }
+
+    /**
      * It will return a boolean value indicating whether user can see
      * information of the given identity. There are three scenarios where this
      * function returns false:
@@ -2726,7 +2778,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get full rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRankInfo
      */
@@ -2782,7 +2834,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRank
      */
@@ -2848,7 +2900,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return array{pager: list<PageItem>, ranking: UserRank}
      */
@@ -4467,6 +4519,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         $targetIdentityId
                     ),
                     'createdProblems' => self::getCreatedProblems(
+                        $targetIdentityId
+                    ),
+                    'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
                         $targetIdentityId
                     ),
                     'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(

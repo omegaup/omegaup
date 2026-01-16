@@ -129,6 +129,16 @@ export default class UserHeatmap extends Vue {
     }
   }
 
+  @Watch('selectedYear')
+  onSelectedYearChange(): void {
+    this.hasRendered = false;
+    this.$nextTick(() => {
+      if (this.data?.length) {
+        this.renderHeatmap();
+      }
+    });
+  }
+
   onYearChange(): void {
     this.$emit('year-changed', this.selectedYear);
   }

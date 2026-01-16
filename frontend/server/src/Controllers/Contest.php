@@ -5175,7 +5175,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * This function reviews changes in penalty type, admission mode, finish
-     * time and window length to recalcualte information previously stored
+     * time and window length to recalculate information previously stored
      */
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,

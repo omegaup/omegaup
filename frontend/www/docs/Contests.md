@@ -2,7 +2,7 @@
 
 **Open/Registration Contests**
 + Any user can register for the contest.
-+ Only partcipants admitted by the admins have the access.
++ Only participants admitted by the admins have the access.
 
 **Closed/Private Contest**
 + I have a list of email addresses of the users who will participate.
