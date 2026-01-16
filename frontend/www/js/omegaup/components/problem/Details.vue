@@ -37,6 +37,11 @@
           :problem="problem"
           :show-visibility-indicators="showVisibilityIndicators"
           :show-edit-link="user.admin"
+          :user-logged-in="user.loggedIn"
+          :is-bookmarked="bookmarkedStatus"
+          @toggle-bookmark="
+            (problemAlias) => $emit('toggle-bookmark', problemAlias)
+          "
         ></omegaup-problem-settings-summary>
 
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
@@ -509,6 +514,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: true }) useNewVerdictTable!: boolean;
+  @Prop({ default: false }) bookmarkedStatus!: boolean;
 
   @Ref('statement-markdown')
   readonly statementMarkdown!: omegaup_problemMarkdown;
