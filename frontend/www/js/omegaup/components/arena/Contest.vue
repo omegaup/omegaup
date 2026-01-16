@@ -1,5 +1,15 @@
 <template>
+  <!-- Show error UI when tab is blocked -->
+  <div v-if="isBlocked" class="container mt-5">
+    <div class="alert alert-danger text-center" role="alert">
+      <h4 class="alert-heading">{{ T.arenaContestMultipleTabsDetected }}</h4>
+      <p class="mb-0">{{ blockedMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Normal arena content when not blocked -->
   <omegaup-arena
+    v-else
     :active-tab="activeTab"
     :title="ui.contestTitle(contest)"
     :clarifications="currentClarifications"
@@ -289,6 +299,8 @@ export default class ArenaContest extends Vue {
   @Prop({ default: false }) lockdown!: boolean;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) isBlocked!: boolean;
+  @Prop({ default: null }) blockedMessage!: string | null;
 
   T = T;
   ui = ui;

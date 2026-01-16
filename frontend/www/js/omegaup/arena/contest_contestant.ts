@@ -47,8 +47,10 @@ OmegaUp.on('ready', async () => {
   const contestAdmin = Boolean(payload.adminPayload);
 
   // Enforce single tab for non-admin contestants
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+
   if (!contestAdmin) {
-    let isBlocked = false;
     const TAB_ENFORCER_TIMEOUT_MS = 1000;
 
     await new Promise<void>((resolve) => {
@@ -68,40 +70,11 @@ OmegaUp.on('ready', async () => {
         }
         settled = true;
         isBlocked = true;
+        blockedMessage = message;
         window.clearTimeout(timeoutId);
-
-        const mainContainer = document.getElementById('main-container');
-        if (mainContainer) {
-          // Clear any existing content safely
-          mainContainer.textContent = '';
-
-          const containerDiv = document.createElement('div');
-          containerDiv.className = 'container mt-5';
-
-          const alertDiv = document.createElement('div');
-          alertDiv.className = 'alert alert-danger text-center';
-          alertDiv.setAttribute('role', 'alert');
-
-          const heading = document.createElement('h4');
-          heading.className = 'alert-heading';
-          heading.textContent = T.arenaContestMultipleTabsDetected;
-
-          const paragraph = document.createElement('p');
-          paragraph.className = 'mb-0';
-          paragraph.textContent = message;
-
-          alertDiv.appendChild(heading);
-          alertDiv.appendChild(paragraph);
-          containerDiv.appendChild(alertDiv);
-          mainContainer.appendChild(containerDiv);
-        }
         resolve();
       });
     });
-
-    if (isBlocked) {
-      return; // Stop initialization if blocked
-    }
   }
 
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
@@ -197,6 +170,8 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -231,6 +206,8 @@ OmegaUp.on('ready', async () => {
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({

@@ -41,6 +41,7 @@ OmegaUp.on('ready', async () => {
 
   // Enforce single tab for virtual contests
   let isBlocked = false;
+  let blockedMessage: string | null = null;
   const TAB_ENFORCER_TIMEOUT_MS = 1000;
 
   await new Promise<void>((resolve) => {
@@ -60,40 +61,11 @@ OmegaUp.on('ready', async () => {
       }
       settled = true;
       isBlocked = true;
+      blockedMessage = message;
       window.clearTimeout(timeoutId);
-
-      const mainContainer = document.getElementById('main-container');
-      if (mainContainer) {
-        // Clear existing content
-        mainContainer.innerHTML = '';
-
-        // Build DOM nodes safely to prevent XSS
-        const container = document.createElement('div');
-        container.className = 'container mt-5';
-
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-danger text-center';
-        alert.setAttribute('role', 'alert');
-
-        const heading = document.createElement('h4');
-        heading.className = 'alert-heading';
-        heading.textContent = T.arenaContestMultipleTabsDetected;
-
-        const paragraph = document.createElement('p');
-        paragraph.className = 'mb-0';
-        paragraph.textContent = message;
-
-        alert.appendChild(heading);
-        alert.appendChild(paragraph);
-        container.appendChild(alert);
-        mainContainer.appendChild(container);
-      }
       resolve();
     });
   });
-  if (isBlocked) {
-    return; // Stop initialization if blocked
-  }
 
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
@@ -216,6 +188,8 @@ OmegaUp.on('ready', async () => {
       nextSubmissionTimestamp,
       nextExecutionTimestamp,
       runDetailsData: runDetails,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -243,6 +217,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({
