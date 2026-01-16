@@ -202,7 +202,7 @@ table td {
 }
 
 .bookmark-inactive {
-  color: #6c757d;
+  color: $omegaup-grey--lighter;
   opacity: 0.5;
 }
 </style>
