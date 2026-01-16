@@ -50,8 +50,15 @@ OmegaUp.on('ready', async () => {
   let isBlocked = false;
   let blockedMessage: string | null = null;
 
+  console.log('[SingleTabEnforcer] contestAdmin:', contestAdmin);
+
   if (!contestAdmin) {
     const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+    console.log(
+      '[SingleTabEnforcer] Starting enforcement for contest:',
+      payload.contest.alias,
+    );
 
     await new Promise<void>((resolve) => {
       let settled = false;
@@ -60,12 +67,20 @@ OmegaUp.on('ready', async () => {
         if (settled) {
           return;
         }
+        console.log(
+          '[SingleTabEnforcer] Timeout expired, no other tab detected',
+        );
         settled = true;
         resolve();
       }, TAB_ENFORCER_TIMEOUT_MS);
 
       enforceSingleTab(payload.contest.alias, (message: string) => {
+        console.log(
+          '[SingleTabEnforcer] Blocked! Another tab detected. Message:',
+          message,
+        );
         if (settled) {
+          console.log('[SingleTabEnforcer] But already settled, ignoring');
           return;
         }
         settled = true;
@@ -75,6 +90,15 @@ OmegaUp.on('ready', async () => {
         resolve();
       });
     });
+
+    console.log(
+      '[SingleTabEnforcer] Final state - isBlocked:',
+      isBlocked,
+      'blockedMessage:',
+      blockedMessage,
+    );
+  } else {
+    console.log('[SingleTabEnforcer] Skipping enforcement (user is admin)');
   }
 
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);

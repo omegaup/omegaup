@@ -31,7 +31,6 @@ import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
-import T from '../lang';
 import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {

@@ -1,21 +1,22 @@
 <template>
-  <!-- Show error UI when tab is blocked -->
-  <div v-if="isBlocked" class="container mt-5">
-    <div class="alert alert-danger text-center" role="alert">
-      <h4 class="alert-heading">{{ T.arenaContestMultipleTabsDetected }}</h4>
-      <p class="mb-0">{{ blockedMessage }}</p>
+  <div>
+    <!-- Show error UI when tab is blocked -->
+    <div v-if="isBlocked" class="container mt-5">
+      <div class="alert alert-danger text-center" role="alert">
+        <h4 class="alert-heading">{{ T.arenaContestMultipleTabsDetected }}</h4>
+        <p class="mb-0">{{ blockedMessage }}</p>
+      </div>
     </div>
-  </div>
 
-  <!-- Normal arena content when not blocked -->
-  <omegaup-arena
-    v-else
-    :active-tab="activeTab"
-    :title="ui.contestTitle(contest)"
-    :clarifications="currentClarifications"
-    :should-show-runs="contestAdmin"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
-  >
+    <!-- Normal arena content when not blocked -->
+    <omegaup-arena
+      v-else
+      :active-tab="activeTab"
+      :title="ui.contestTitle(contest)"
+      :clarifications="currentClarifications"
+      :should-show-runs="contestAdmin"
+      @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+    >
     <template #socket-status>
       <sup :class="socketClass" :title="socketStatusTitle">{{
         socketStatus
@@ -216,35 +217,36 @@
         "
       ></omegaup-arena-clarification-list>
     </template>
-  </omegaup-arena>
+    </omegaup-arena>
+  </div>
 </template>
 
 <script lang="ts">
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import * as Highcharts from 'highcharts/highstock';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
+import { ContestClarificationType } from '../../arena/clarifications';
+import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 import T from '../../lang';
-import arena_Arena from './Arena.vue';
-import arena_ClarificationList from './ClarificationList.vue';
-import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_NavbarMiniranking from './NavbarMiniranking.vue';
-import arena_Runs from './Runs.vue';
+import { omegaup } from '../../omegaup';
+import * as ui from '../../ui';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
-import arena_Summary from './Summary.vue';
-import arena_Scoreboard from './Scoreboard.vue';
+import { AdmissionMode } from '../common/Publish.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
-import { omegaup } from '../../omegaup';
-import { ContestClarificationType } from '../../arena/clarifications';
-import { SocketStatus } from '../../arena/events_socket';
-import { AdmissionMode } from '../common/Publish.vue';
-import { SubmissionRequest } from '../../arena/submissions';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import arena_Arena from './Arena.vue';
+import arena_ClarificationList from './ClarificationList.vue';
+import arena_NavbarMiniranking from './NavbarMiniranking.vue';
+import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_Runs from './Runs.vue';
+import arena_Scoreboard from './Scoreboard.vue';
+import arena_Summary from './Summary.vue';
 library.add(fas);
 
 @Component({
