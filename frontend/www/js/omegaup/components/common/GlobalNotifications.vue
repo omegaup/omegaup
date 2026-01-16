@@ -78,7 +78,11 @@ export default class GlobalNotifications extends Vue {
 
 <style lang="scss" scoped>
 .alert {
-  position: relative;
+  position: fixed;
+  top: 56px; // Below navbar
+  left: 0;
+  right: 0;
+  z-index: 1040;
   margin-bottom: 0;
   border-radius: 0;
   overflow: hidden;
@@ -142,7 +146,7 @@ export default class GlobalNotifications extends Vue {
 
 .notification-top-right {
   position: fixed;
-  top: 1rem;
+  top: 60px; // Below navbar
   right: 1rem;
   left: auto;
   max-width: 400px;
