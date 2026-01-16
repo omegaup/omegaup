@@ -561,11 +561,15 @@ nav.navbar {
   }
 
   .navbar-nav > .nav-item.dropdown > .dropdown-toggle {
-    pointer-events: none;
+    cursor: default;
   }
 
-  .navbar-nav > .nav-item.dropdown > .dropdown-toggle:focus {
-    pointer-events: auto;
+  .navbar-collapse:has(.navbar-nav .dropdown:hover) .dropdown-menu.show {
+    display: none !important;
+  }
+
+  .navbar-nav .dropdown:hover > .dropdown-menu.show {
+    display: block !important;
   }
 }
 
