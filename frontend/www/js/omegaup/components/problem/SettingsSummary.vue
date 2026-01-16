@@ -37,7 +37,7 @@
         v-if="userLoggedIn"
         data-bookmark-button
         class="btn btn-link p-0 ml-2"
-        :title="isBookmarked ? T.wordsRemoveBookmark : T.wordsAddBookmark"
+        :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"
         @click.prevent.stop="onToggleBookmark"
       >
         <font-awesome-icon

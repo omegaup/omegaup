@@ -90,7 +90,7 @@ OmegaUp.on('ready', async () => {
       createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
-      isBookmarked: false,
+      isBookmarked: payload.isBookmarked,
       isLoadingBookmark: false,
     }),
     render: function (createElement) {
@@ -128,7 +128,7 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
-          initialBookmarkedStatus: this.isBookmarked,
+          bookmarkedStatus: this.isBookmarked,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -554,14 +554,6 @@ OmegaUp.on('ready', async () => {
       .catch(ui.apiError);
   }
 
-  // Check if problem is bookmarked after Vue instance is created
-  if (payload.user.loggedIn) {
-    api.ProblemBookmark.exists({ problem_alias: payload.problem.alias })
-      .then((response) => {
-        problemDetailsView.isBookmarked = response.bookmarked;
-      })
-      .catch(ui.apiError);
-  }
   if (runs) {
     runsStore.commit('setTotalRuns', payload.totalRuns);
     for (const run of runs) {

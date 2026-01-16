@@ -38,7 +38,7 @@
           :show-visibility-indicators="showVisibilityIndicators"
           :show-edit-link="user.admin"
           :user-logged-in="user.loggedIn"
-          :is-bookmarked="initialBookmarkedStatus"
+          :is-bookmarked="bookmarkedStatus"
           @toggle-bookmark="
             (problemAlias) => $emit('toggle-bookmark', problemAlias)
           "
@@ -514,7 +514,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: true }) useNewVerdictTable!: boolean;
-  @Prop({ default: false }) initialBookmarkedStatus!: boolean;
+  @Prop({ default: false }) bookmarkedStatus!: boolean;
 
   @Ref('statement-markdown')
   readonly statementMarkdown!: omegaup_problemMarkdown;
