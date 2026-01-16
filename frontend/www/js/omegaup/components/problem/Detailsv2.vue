@@ -239,17 +239,16 @@ export default class ProblemDetails extends Vue {
     // to inject Vue components into the DOM after it's being rendered, so that
     // all the templating and interactivity can be handled by Vue instead of by
     // JavaScript.
-    const libinteractiveInterfaceNameElement = this.statementMarkdown.$el.querySelector(
-      'span.libinteractive-interface-name',
-    ) as HTMLElement;
+    const libinteractiveInterfaceNameElement =
+      this.statementMarkdown.$el.querySelector(
+        'span.libinteractive-interface-name',
+      ) as HTMLElement;
     if (
       libinteractiveInterfaceNameElement &&
       this.problem.settings?.interactive?.module_name
     ) {
-      libinteractiveInterfaceNameElement.innerText = this.problem.settings.interactive.module_name.replace(
-        /\.idl$/,
-        '',
-      );
+      libinteractiveInterfaceNameElement.innerText =
+        this.problem.settings.interactive.module_name.replace(/\.idl$/, '');
     }
 
     const outputOnlyDownloadElement = this.statementMarkdown.$el.querySelector(
@@ -262,9 +261,10 @@ export default class ProblemDetails extends Vue {
       );
     }
 
-    const libinteractiveDownloadFormElement = this.statementMarkdown.$el.querySelector(
-      '.libinteractive-download form',
-    ) as HTMLElement;
+    const libinteractiveDownloadFormElement =
+      this.statementMarkdown.$el.querySelector(
+        '.libinteractive-download form',
+      ) as HTMLElement;
     if (libinteractiveDownloadFormElement) {
       libinteractiveDownloadFormElement.addEventListener(
         'submit',
@@ -276,9 +276,9 @@ export default class ProblemDetails extends Vue {
           const commit = this.problem.commit;
           const os = (form.querySelector('.download-os') as HTMLInputElement)
             ?.value;
-          const lang = (form.querySelector(
-            '.download-lang',
-          ) as HTMLInputElement)?.value;
+          const lang = (
+            form.querySelector('.download-lang') as HTMLInputElement
+          )?.value;
           const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
           ui.navigateTo(
@@ -294,9 +294,10 @@ export default class ProblemDetails extends Vue {
       );
     }
 
-    const libinteractiveDownloadLangElement = this.statementMarkdown.$el.querySelector(
-      '.libinteractive-download .download-lang',
-    ) as HTMLSelectElement;
+    const libinteractiveDownloadLangElement =
+      this.statementMarkdown.$el.querySelector(
+        '.libinteractive-download .download-lang',
+      ) as HTMLSelectElement;
     if (libinteractiveDownloadLangElement) {
       libinteractiveDownloadLangElement.addEventListener(
         'change',
@@ -308,9 +309,9 @@ export default class ProblemDetails extends Vue {
             }
             form = form.parentElement;
           }
-          (form.querySelector(
-            '.libinteractive-extension',
-          ) as HTMLElement).innerText = libinteractiveDownloadLangElement.value;
+          (
+            form.querySelector('.libinteractive-extension') as HTMLElement
+          ).innerText = libinteractiveDownloadLangElement.value;
         },
       );
     }

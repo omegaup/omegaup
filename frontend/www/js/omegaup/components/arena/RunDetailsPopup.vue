@@ -275,14 +275,16 @@ export default class ArenaRunDetailsPopup extends Vue {
     feedbackList: { lineNumber: number; feedback: string }[],
     guid: string,
   ) {
-    this.$parent.$parent.$parent.$parent.$emit('save-feedback-list', {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.$parent!.$parent!.$parent!.$parent!.$emit('save-feedback-list', {
       feedbackList,
       guid,
     });
   }
 
   onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
-    this.$parent.$parent.$parent.$parent.$emit('submit-feedback-thread', {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.$parent!.$parent!.$parent!.$parent!.$emit('submit-feedback-thread', {
       feedback,
       guid,
     });

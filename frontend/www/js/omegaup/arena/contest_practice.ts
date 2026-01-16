@@ -105,8 +105,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
