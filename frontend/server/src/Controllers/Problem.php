@@ -5110,7 +5110,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 rowcount: 0,
             ),
             'allowedSolutionsToSee' => $allowedSolutionsToSee,
-            'isBookmarked' => $isBookmarked
+            'isBookmarked' => $isBookmarked,
         ];
     }
 
