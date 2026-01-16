@@ -64,7 +64,6 @@
       </div>
 
       <button
-        v-b-tooltip.hover
         class="btn btn-outline-secondary btn-sm filter-toggle"
         :title="
           filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
