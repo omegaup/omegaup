@@ -46,6 +46,7 @@
               )
           "
         ></omegaup-problem-filter-difficulty>
+
         <omegaup-problem-filter-quality
           :quality="quality"
           @change-quality="
@@ -62,20 +63,23 @@
         ></omegaup-problem-filter-quality>
       </div>
 
-      <div class="flex-grow-1 main-content-wrapper">
-        <button
-          class="btn btn-link filter-toggle mb-3"
-          :aria-label="
-            filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
-          "
-          @click="filtersVisible = !filtersVisible"
-        >
-          {{ filtersVisible ? '‹' : '›' }}
-          {{
-            filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
-          }}
-        </button>
+      <button
+        v-b-tooltip.hover
+        class="btn btn-outline-secondary btn-sm filter-toggle"
+        :title="
+          filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+        "
+        :aria-label="
+          filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+        "
+        @click="filtersVisible = !filtersVisible"
+      >
+        <font-awesome-icon
+          :icon="filtersVisible ? 'chevron-left' : 'chevron-right'"
+        />
+      </button>
 
+      <div class="flex-grow-1 main-content-wrapper">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
@@ -126,6 +130,14 @@ import problem_FilterDifficulty from './FilterDifficulty.vue';
 import problem_FilterQuality from './FilterQuality.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faChevronLeft, faChevronRight);
 
 @Component({
   components: {
@@ -133,6 +145,7 @@ import { types } from '../../api_types';
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
     'omegaup-problem-filter-quality': problem_FilterQuality,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class CollectionList extends Vue {
@@ -219,15 +232,19 @@ export default class CollectionList extends Vue {
   width: 0;
   min-width: 0;
   opacity: 0;
+  padding-right: 0;
+}
+
+.filter-toggle {
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+  line-height: 1;
+  padding: 0.25rem 0.35rem;
 }
 
 .main-content-wrapper {
   min-width: 0;
-}
-
-.filter-toggle {
-  padding: 0.5rem 1rem;
-  font-size: 2rem;
-  text-decoration: none;
+  flex: 1;
 }
 </style>
