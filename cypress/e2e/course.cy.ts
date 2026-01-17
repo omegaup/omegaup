@@ -29,7 +29,7 @@ describe('Course Test Part 1', () => {
 
     // We are creating an course with assignment that end after two minutes
     // so that it can be used as a past assignment which will be tested later
-    // on in the test.
+    // in the test.
     cy.login(loginOptions[1]);
     cy.createProblem(problemOptions[0]);
     coursePage.createCourse(courseOptions);
