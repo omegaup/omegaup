@@ -113,6 +113,13 @@
                   :title="T.profileCreatedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="bookmarkedProblems"
+                  :items-per-page="30"
+                  :title="T.profileBookmarkedProblems"
+                  class="mb-3"
+                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="currentSelectedTab == ViewProfileTabs.Contests"
@@ -339,6 +346,12 @@ export default class ViewProfile extends Vue {
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
+  }
+  get bookmarkedProblems(): Problem[] {
+    if (!this.data?.bookmarkedProblems) return [];
+    return this.data.bookmarkedProblems.map(
+      (problem: types.BookmarkProblem) => new Problem(problem as types.Problem),
+    );
   }
   get rank(): string {
     switch (this.profile.classname) {

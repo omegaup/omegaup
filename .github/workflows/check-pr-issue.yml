@@ -49,8 +49,40 @@ jobs:
             console.log(`PR Author: ${prAuthor}`);
 
             if (linkedIssues.length === 0) {
-              core.setFailed("❌ PR is not linked to any issue. Please add 'Fixes #issue_number' to the PR description.");
-              return;
+              const prBody = context.payload.pull_request.body || "";
+              const issueMatches = prBody.match(/#\d+/g) || [];
+              const mentionedIssueNumbers = issueMatches.map(x => Number(x.replace("#", "")));
+
+              if (mentionedIssueNumbers.length === 0) {
+                core.setFailed("❌ PR is not linked to any issue. Please add 'Fixes #issue_number' to the PR description.");
+                return;
+              }
+
+              let isAssigned = false;
+
+              for (const issueNumber of mentionedIssueNumbers) {
+                const issue = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber
+                });
+
+                const assignees = issue.data.assignees.map(node => node.login.toLowerCase());
+                console.log(`Issue #${issueNumber} assignees: ${JSON.stringify(assignees)}`);
+
+                if (assignees.includes(prAuthor)) {
+                  isAssigned = true;
+                  break;
+                }
+              }
+
+              if (!isAssigned) {
+                core.setFailed(`❌ Linked issue(s) ${mentionedIssueNumbers.map(n => "#" + n).join(", ")} are not assigned to you (@${prAuthor}). Please assign the issue to yourself before submitting.`);
+                return;
+              } else {
+                console.log("✅ PR is correctly linked to an issue assigned to the author.");
+                return;
+              }
             }
 
             let isAssigned = false;
