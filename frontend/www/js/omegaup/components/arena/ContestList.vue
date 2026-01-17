@@ -887,7 +887,7 @@ export default ArenaContestList;
 
 .reset-btn {
   line-height: 1.5;
-  color: #6c757d;
+  color: var(--arena-reset-text-color);
   background-color: var(--arena-runs-table-status-je-ve-font-color);
   background-clip: padding-box;
   border: none;
