@@ -2183,6 +2183,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if ($statementType === 'printable') {
             if (!is_null($problemset) && isset($problemset['contest'])) {
+                if (is_null($identity)) {
+                    throw new \OmegaUp\Exceptions\UnauthorizedException(
+                        'userNotAllowed'
+                    );
+                }
                 if (
                     !\OmegaUp\Authorization::isAdmin(
                         $identity,
