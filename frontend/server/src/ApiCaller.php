@@ -194,7 +194,7 @@ class ApiCaller {
      */
     private static function createRequest() {
         $apiAsUrl = \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/';
-        // Spliting only by '/' results in URIs with parameters like this:
+        // Splitting only by '/' results in URIs with parameters like this:
         //      /api/problem/list/?page=1
         //                       ^^
         // Adding '?' as a separator results in URIs like this:

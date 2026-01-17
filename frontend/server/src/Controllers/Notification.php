@@ -3,7 +3,7 @@
  namespace OmegaUp\Controllers;
 
 /**
- * BadgesController
+ * NotificationController
  *
  * @psalm-type NotificationContents=array{type: string, badge?: string, message?: string, status?: string, url?: string, body?: array{localizationString: string, localizationParams: list<string, string>, url: string, iconUrl: string}}
  * @psalm-type Notification=array{contents: NotificationContents, notification_id: int, timestamp: \OmegaUp\Timestamp}
@@ -60,19 +60,33 @@ class Notification extends \OmegaUp\Controllers\Controller {
         string $contestTitle,
         array $verificationCodes
     ): void {
-        foreach ($usersIds as $index => $userId) {
-            \OmegaUp\Controllers\Notification::setCommonNotification(
-                [$userId],
-                new \OmegaUp\TranslationString(
-                    'notificationNewContestCertificate'
-                ),
-                \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
-                "/certificates/mine/#{$verificationCodes[$index]}",
-                [
-                    'contest_title' => $contestTitle,
-                ]
-            );
+        if (empty($usersIds)) {
+            return;
         }
+
+        $notifications = [];
+        foreach ($usersIds as $index => $userId) {
+            $notifications[] = new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $userId,
+                'contents' => json_encode(
+                    [
+                        'type' => \OmegaUp\DAO\Notifications::CERTIFICATE_AWARDED,
+                        'body' => [
+                            'localizationString' => new \OmegaUp\TranslationString(
+                                'notificationNewContestCertificate'
+                            ),
+                            'localizationParams' => [
+                                'contest_title' => $contestTitle,
+                            ],
+                            'url' => "/certificates/mine/#{$verificationCodes[$index]}",
+                            'iconUrl' => '/media/info.png',
+                        ]
+                    ]
+                ),
+            ]);
+        }
+
+        \OmegaUp\DAO\Notifications::createBulk($notifications);
     }
 
     /**
@@ -157,14 +171,19 @@ class Notification extends \OmegaUp\Controllers\Controller {
         array $userIds,
         string $contents
     ): void {
-        foreach ($userIds as $userId) {
-            \OmegaUp\DAO\Notifications::create(
-                new \OmegaUp\DAO\VO\Notifications([
-                    'user_id' => $userId,
-                    'contents' => $contents,
-                ])
-            );
+        if (empty($userIds)) {
+            return;
         }
+
+        $notifications = [];
+        foreach ($userIds as $userId) {
+            $notifications[] = new \OmegaUp\DAO\VO\Notifications([
+                'user_id' => $userId,
+                'contents' => $contents,
+            ]);
+        }
+
+        \OmegaUp\DAO\Notifications::createBulk($notifications);
     }
 
     /**

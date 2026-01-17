@@ -33,6 +33,22 @@
       <a v-if="showEditLink" :href="`/problem/${problem.alias}/edit/`">
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
+      <button
+        v-if="userLoggedIn"
+        data-bookmark-button
+        class="btn btn-link p-0 ml-2"
+        :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"
+        @click.prevent.stop="onToggleBookmark"
+      >
+        <font-awesome-icon
+          :icon="['fas', 'bookmark']"
+          class="bookmark-icon"
+          :class="{
+            'bookmark-active': isBookmarked,
+            'bookmark-inactive': !isBookmarked,
+          }"
+        />
+      </button>
     </h3>
     <table
       v-if="problem.accepts_submissions"
@@ -80,6 +96,7 @@ import {
   faEyeSlash,
   faBan,
   faExternalLinkAlt,
+  faBookmark,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faExclamationTriangle,
@@ -87,6 +104,7 @@ library.add(
   faEyeSlash,
   faBan,
   faExternalLinkAlt,
+  faBookmark,
 );
 
 @Component({
@@ -99,8 +117,14 @@ export default class ProblemSettingsSummary extends Vue {
   @Prop({ default: null }) problemsetTitle!: null | string;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) showEditLink!: boolean;
+  @Prop({ default: false }) userLoggedIn!: boolean;
+  @Prop({ default: false }) isBookmarked!: boolean;
 
   T = T;
+
+  onToggleBookmark(): void {
+    this.$emit('toggle-bookmark', this.problem.alias);
+  }
 
   get title(): string {
     if (this.showVisibilityIndicators) {
@@ -167,5 +191,18 @@ export default class ProblemSettingsSummary extends Vue {
 
 table td {
   padding: 0.5rem;
+}
+
+.bookmark-icon {
+  font-size: 1.5em;
+}
+
+.bookmark-active {
+  color: $omegaup-blue;
+}
+
+.bookmark-inactive {
+  color: $omegaup-grey--lighter;
+  opacity: 0.5;
 }
 </style>

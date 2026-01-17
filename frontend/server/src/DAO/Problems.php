@@ -591,6 +591,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Gets multiple problems based on a list of aliases in a single query.
+     *
+     * @param list<string> $aliases
+     * @return array<string, \OmegaUp\DAO\VO\Problems> Map of alias => Problems
+     */
+    final public static function getByAliases(
+        array $aliases
+    ): array {
+        if (empty($aliases)) {
+            return [];
+        }
+
+        // Deduplicate aliases to avoid redundant parameter binding and DB work
+        $aliases = array_values(array_unique($aliases));
+        $placeholders = join(',', array_fill(0, count($aliases), '?'));
+        $sql = 'SELECT ' . \OmegaUp\DAO\DAO::getFields(
+            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
+            'Problems'
+        ) . " FROM Problems WHERE alias IN ({$placeholders});";
+
+        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $aliases);
+
+        $problems = [];
+        foreach ($rs as $row) {
+            $problem = new \OmegaUp\DAO\VO\Problems($row);
+            if (is_null($problem->alias)) {
+                continue;
+            }
+            $problems[$problem->alias] = $problem;
+        }
+
+        return $problems;
+    }
+
+    /**
      * Gets a certain problem based on its alias and the problemset
      * it is supposed to be part of.
      *
@@ -711,28 +747,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
             WHERE
                 s.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
-                AND NOT EXISTS (
-                    SELECT
-                        `pf`.`problem_id`, `pf`.`user_id`
-                    FROM
-                        `Problems_Forfeited` AS `pf`
-                    WHERE
-                        `pf`.`problem_id` = `p`.`problem_id` AND
-                        `pf`.`user_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
-                AND NOT EXISTS (
-                    SELECT
-                        `a`.`acl_id`
-                    FROM
-                        `ACLs` AS `a`
-                    WHERE
-                        `a`.`acl_id` = `p`.`acl_id` AND
-                        `a`.`owner_id` = `i`.`user_id` AND
-                        `i`.`user_id` IS NOT NULL
-                )
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
             GROUP BY
                 p.problem_id
             ORDER BY
@@ -791,6 +817,98 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $problems;
+    }
+
+    /**
+     * Get count of solved problems grouped by difficulty level for a user.
+     * Difficulty mapping: Easy(0-1.5), Medium(1.5-2.5), Hard(2.5-4), Unlabelled(NULL)
+     *
+     * @return array{easy: int, medium: int, hard: int, unlabelled: int, total: int}
+     */
+    public static function getSolvedCountByDifficulty(int $identityId): array {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 0 AND p.difficulty < 1.5 THEN p.problem_id END) AS easy,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 1.5 AND p.difficulty < 2.5 THEN p.problem_id END) AS medium,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NOT NULL AND p.difficulty >= 2.5 AND p.difficulty <= 4 THEN p.problem_id END) AS hard,
+                COUNT(DISTINCT CASE WHEN p.difficulty IS NULL THEN p.problem_id END) AS unlabelled,
+                COUNT(DISTINCT p.problem_id) AS total
+            FROM
+                Problems p
+            INNER JOIN
+                Submissions s ON s.problem_id = p.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            WHERE
+                s.verdict = 'AC' AND s.type = 'normal' AND s.identity_id = ?
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
+        ";
+
+        /** @var array{easy: int, hard: int, medium: int, total: int, unlabelled: int}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId]
+        );
+
+        return [
+            'easy' => intval($row['easy'] ?? 0),
+            'medium' => intval($row['medium'] ?? 0),
+            'hard' => intval($row['hard'] ?? 0),
+            'unlabelled' => intval($row['unlabelled'] ?? 0),
+            'total' => intval($row['total'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get count of problems where the user has submissions but no AC verdict.
+     * These are problems the user is "attempting" but hasn't solved yet.
+     *
+     * @return int
+     */
+    public static function getAttemptingCount(int $identityId): int {
+        $sql = "
+            SELECT
+                COUNT(DISTINCT p.problem_id)
+            FROM
+                Submissions s
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Problems_Forfeited pf ON pf.problem_id = p.problem_id
+                    AND pf.user_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                ACLs a ON a.acl_id = p.acl_id
+                    AND a.owner_id = i.user_id
+                    AND i.user_id IS NOT NULL
+            LEFT JOIN
+                Submissions s2 ON s2.problem_id = p.problem_id
+                    AND s2.identity_id = s.identity_id
+                    AND s2.verdict = 'AC'
+            WHERE
+                s.identity_id = ?
+                AND s.type = 'normal'
+                AND pf.problem_id IS NULL
+                AND a.acl_id IS NULL
+                AND s2.submission_id IS NULL;
+        ";
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$identityId]
+        );
     }
 
     /**

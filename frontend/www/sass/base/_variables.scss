@@ -1,6 +1,6 @@
 // Variables are one of the more straightforward features of Sass but are still on occasion
 // used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
-// Without one, they become harder to understand and re-use.
+// Without one, they become harder to understand and reuse.
 
 :root {
   // STATUS
@@ -315,4 +315,8 @@
   --monaco-editor-toolbar-label-color: #777777;
   --monaco-editor-toolbar-label-border-color: #cccccc;
   --monaco-editor-toolbar-border-bottom-color: #ccc;
+
+  // CONTEST CARD
+  --contest-card-border-color: rgba(0, 0, 0, 0.125);
+  --contest-card-hover-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }

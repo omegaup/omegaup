@@ -58,4 +58,47 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
             [$user->user_id]
         );
     }
+
+    /**
+     * Creates multiple notifications in a single bulk INSERT query.
+     * This method is optimized for creating many notifications at once,
+     * reducing database round-trips from O(N) to O(1).
+     *
+     * @param list<\OmegaUp\DAO\VO\Notifications> $notifications Array of Notification objects to create
+     * @return int Number of rows affected
+     */
+    public static function createBulk(array $notifications): int {
+        if (empty($notifications)) {
+            return 0;
+        }
+
+        $rowPlaceholders = [];
+        $params = [];
+
+        foreach ($notifications as $notification) {
+            $rowPlaceholders[] = '(?, ?, ?, ?)';
+            $params[] = (
+                is_null($notification->user_id) ?
+                null :
+                intval($notification->user_id)
+            );
+            $params[] = \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $notification->timestamp
+            );
+            $params[] = intval($notification->read);
+            $params[] = $notification->contents;
+        }
+
+        $sql = '
+            INSERT INTO
+                `Notifications` (
+                    `user_id`,
+                    `timestamp`,
+                    `read`,
+                    `contents`
+                ) VALUES ' . join(', ', $rowPlaceholders) . ';';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
 }

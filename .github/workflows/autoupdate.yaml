@@ -1,0 +1,109 @@
+name: autoupdate
+
+on:
+  # Trigger on pushes to main branch
+  # This will automatically update all PRs targeting main when changes are pushed
+  push:
+    branches:
+      - main
+
+jobs:
+  autoupdate:
+    name: autoupdate
+    runs-on: ubuntu-22.04
+    # Allow the job to continue even if autoupdate fails, so we can check and report conflicts
+    continue-on-error: true
+    steps:
+      - uses: docker://chinthakagodawita/autoupdate-action:v1
+        id: autoupdate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Monitor all pull requests that are ready for review
+          PR_FILTER: "all"
+          PR_READY_STATE: "ready_for_review"
+          # Retry configuration for reliability
+          RETRY_COUNT: "5"
+          RETRY_SLEEP: "300"
+          # Report merge conflicts - when set to 'fail', the action will fail on conflicts
+          # This ensures conflicts are detected and reported
+          MERGE_CONFLICT_ACTION: "fail"
+          # Custom merge message
+          MERGE_MSG: "Auto-updated branch with latest changes from destination branch"
+
+      # Check for PRs with merge conflicts and ensure they're visible
+      # GitHub automatically shows merge conflicts on PRs, but we verify and log them
+      - name: Check and report merge conflicts
+        if: steps.autoupdate.outputs.conflicted == 'true' || steps.autoupdate.outcome == 'failure'
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            // Validate context.repo exists before use
+            if (!context.repo || !context.repo.owner || !context.repo.repo) {
+              core.setFailed('context.repo, context.repo.owner, or context.repo.repo is undefined');
+              return;
+            }
+
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              base: 'main',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+
+            const conflictedPRs = [];
+
+            // prs is already the data array from the destructured response
+            for (const pr of prs) {
+              // Skip draft PRs
+              if (pr.draft) continue;
+
+              try {
+                // Get PR details to check mergeable status
+                const { data: prDetails } = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                });
+
+                // mergeable === false indicates conflicts
+                // mergeable === null means GitHub is still checking
+                if (prDetails.mergeable === false) {
+                  conflictedPRs.push({
+                    number: pr.number,
+                    title: pr.title,
+                    url: pr.html_url
+                  });
+                  
+                  console.log(`PR #${pr.number} has merge conflicts: ${pr.html_url}`);
+                }
+              } catch (error) {
+                console.log(`Could not check PR #${pr.number}: ${error.message}`);
+              }
+            }
+
+            if (conflictedPRs.length > 0) {
+              console.log(`\n⚠️ Found ${conflictedPRs.length} PR(s) with merge conflicts:`);
+              conflictedPRs.forEach(pr => {
+                console.log(`  - PR #${pr.number}: ${pr.title} (${pr.url})`);
+              });
+              
+              // Set output for summary
+              core.setOutput('conflicted_count', conflictedPRs.length);
+              core.setOutput('conflicted_prs', conflictedPRs.map(pr => `#${pr.number}`).join(', '));
+            } else {
+              console.log('No PRs with merge conflicts detected.');
+            }
+
+      # Fail the workflow if conflicts were detected (makes it visible in Actions)
+      - name: Fail if conflicts detected
+        if: steps.autoupdate.outputs.conflicted == 'true' || steps.autoupdate.outcome == 'failure'
+        run: |
+          echo "::error::Merge conflicts detected during auto-update."
+          echo "GitHub will automatically show merge conflicts on affected PRs."
+          echo "Contributors should resolve conflicts by rebasing their branch onto main."
+          exit 1

@@ -478,7 +478,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
                     default:
                         self::$log->error(
-                            'penalty_type for this contests is not a valid option, asuming `none`.'
+                            'penalty_type for this contests is not a valid option, assuming `none`.'
                         );
                         $start = null;
                 }
@@ -1577,7 +1577,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Given the run resouce path, fetches its contents from S3.
+     * Given the run resource path, fetches its contents from S3.
      *
      * @param  string       $resourcePath The run's resource path.
      * @param  bool         $passthru     Whether to output directly.

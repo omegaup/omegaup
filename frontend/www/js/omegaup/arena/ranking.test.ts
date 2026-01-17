@@ -1,20 +1,20 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
-import { types } from '../api_types';
-import T from '../lang';
-import {
-  onRankingChanged,
-  onRankingEvents,
-  updateProblemScore,
-  createChart,
-  scoreboardColors,
-  mergeRankings,
-  onVirtualRankingChanged,
-} from './ranking';
-import { rankingStoreConfig } from './rankingStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
+import { types } from '../api_types';
+import T from '../lang';
 import { ScoreMode } from './navigation';
+import {
+  createChart,
+  mergeRankings,
+  onRankingChanged,
+  onRankingEvents,
+  onVirtualRankingChanged,
+  scoreboardColors,
+  updateProblemScore,
+} from './ranking';
+import { rankingStoreConfig } from './rankingStore';
 
 describe('ranking', () => {
   const now = Date.now();
@@ -23,6 +23,7 @@ describe('ranking', () => {
   beforeEach(() => {
     dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
     jest.useFakeTimers();
+    scoreboard.start_time = new Date(now - 0.5 * 60 * 1000);
   });
 
   afterEach(() => {
@@ -72,8 +73,10 @@ describe('ranking', () => {
         },
       },
     ],
-    start_time: new Date(),
-    time: new Date(),
+    // start_time must be relative to 'now' so that currentDelta is predictable
+    // when mergeRankings() computes: (new Date().getTime() - start_time) / (1000 * 60)
+    start_time: new Date(now - 30 * 1000),
+    time: new Date(now),
     title: 'contest',
   };
   const scoreboardEvents: types.ScoreboardEvent[] = [
