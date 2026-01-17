@@ -155,7 +155,8 @@ describe('ContestList.vue', () => {
         description: 'hello contest 3',
         contest_id: 3,
         contestants: 15,
-        finish_time: yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
+        finish_time:
+          yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'alfadown',
         original_finish_time: yesterday,
