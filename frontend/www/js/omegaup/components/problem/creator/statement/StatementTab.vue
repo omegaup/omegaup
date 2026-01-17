@@ -125,7 +125,7 @@ export default class StatementTab extends Vue {
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
     width: 100%;
-    margin-top: 33px;
+    margin-top: 35px;
   }
 }
 </style>
