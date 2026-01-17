@@ -1260,6 +1260,34 @@ CREATE TABLE `User_Rank_Cutoffs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Readme_Report_Log` (
+  `readme_id` int NOT NULL COMMENT 'README reportado',
+  `reporter_user_id` int NOT NULL COMMENT 'Usuario que hizo el reporte',
+  `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del reporte',
+  PRIMARY KEY (`readme_id`,`reporter_user_id`),
+  KEY `readme_id` (`readme_id`),
+  KEY `reporter_user_id` (`reporter_user_id`),
+  CONSTRAINT `fk_urel_readme_id` FOREIGN KEY (`readme_id`) REFERENCES `User_Readmes` (`readme_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_urel_reporter_user_id` FOREIGN KEY (`reporter_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de reportes de READMEs de usuarios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Readmes` (
+  `readme_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador único del README',
+  `user_id` int NOT NULL COMMENT 'Usuario dueño del README',
+  `content` text NOT NULL COMMENT 'Contenido del README en Markdown',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Indica si el README es visible (1 = sí, 0 = no)',
+  `last_edit_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Última vez que se editó el README',
+  `report_count` int NOT NULL DEFAULT '0' COMMENT 'Número de reportes recibidos',
+  `is_disabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el README está deshabilitado por exceso de reportes (1 = sí, 0 = no)',
+  PRIMARY KEY (`readme_id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_ure_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='READMEs de perfil de usuarios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Roles` (
   `user_id` int NOT NULL,
   `role_id` int NOT NULL,

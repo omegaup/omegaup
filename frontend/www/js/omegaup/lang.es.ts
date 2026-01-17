@@ -2192,6 +2192,7 @@ const translations: { [key: string]: string; } = {
   wordsUsersFeedback: "Opiniones de coders",
   wordsVerdict: "Veredicto",
   wordsVerdictsOf: "Veredictos de %(alias)",
+  wordsViewAll: "Ver todos",
   wordsWallTimeInSeconds: "Tiempo-real (Seg)",
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
