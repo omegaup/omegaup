@@ -543,11 +543,11 @@ nav.navbar {
 }
 
 @media (min-width: 992px) {
-  .navbar-nav .dropdown {
+  .dropdown {
     position: relative;
   }
 
-  .navbar-nav .dropdown::before {
+  .dropdown::before {
     content: '';
     position: absolute;
     top: 100%;
@@ -556,20 +556,22 @@ nav.navbar {
     width: 100%;
   }
 
-  .navbar-nav .dropdown:not(.show):hover > .dropdown-menu {
+  .navbar-nav:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
     display: block;
   }
 
-  .navbar-nav > .nav-item.dropdown > .dropdown-toggle {
-    cursor: default;
+  .navbar-right:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
+    display: block;
   }
 
-  .navbar-collapse:has(.navbar-nav .dropdown:hover) .dropdown-menu.show {
-    display: none !important;
-  }
-
-  .navbar-nav .dropdown:hover > .dropdown-menu.show {
+  .dropdown.show > .dropdown-menu {
     display: block !important;
+  }
+
+  .navbar-collapse:has(.dropdown.show)
+    .dropdown:not(.show):hover
+    > .dropdown-menu {
+    display: none !important;
   }
 }
 
