@@ -113,7 +113,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testProblemListWithTags() {
         // Get 3 problems
-        $n = 3;
+        $problemsCount = 3;
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
@@ -125,28 +125,32 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTagNumberTheory',
         ];
         $problemData = [];
-        for ($i = 0; $i < $n; $i++) {
-            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 'promoted'
-            ]));
-            for ($j = 0; $j <= $i; $j++) {
+        foreach (range(0, $problemsCount - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'visibility' => 'promoted'
+                ])
+            );
+            foreach (range(0, $i) as $j) {
                 \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
                     $tags[$j],
-                    1 /* public */
+                    public: 1
                 );
             }
         }
 
         // Get 1 problem private, should not appear
-        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 'private'
-        ]));
-        for ($j = 0; $j < $n; $j++) {
+        $privateProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private'
+            ])
+        );
+        foreach (range(0, $problemsCount - 1) as $j) {
             \OmegaUp\Test\Factories\Problem::addTag(
                 $privateProblemData,
                 $tags[$j],
-                1 /* public */
+                public: 1
             );
         }
 
@@ -154,19 +158,19 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         // Test one tag at a time
-        for ($j = 0; $j < $n; $j++) {
+        foreach (range(0, $problemsCount - 1) as $j) {
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'tag' => $tags[$j],
             ]));
-            // $n public problems but not the private problem that has all tags.
-            // But only problems $j or later have tag $j.
-            $this->assertCount($n - $j, $response['results']);
+            // $problemsCount public problems but not the private problem that has
+            // all tags. But only problems $j or later have tag $j.
+            $this->assertCount($problemsCount - $j, $response['results']);
         }
 
         // Test multiple tags at a time
         $expectedTags = [];
-        for ($j = 0; $j < $n; $j++) {
+        foreach (range(0, $problemsCount - 1) as $j) {
             $expectedTags[] = $tags[$j];
             $plainTags = implode(',', $expectedTags);
 
@@ -174,9 +178,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'tag' => $plainTags,
             ]));
-            // $n public problems but not the private problem that has all tags.
-            // But only problems $j or later have tags[0] through tags[$j].
-            $this->assertCount($n - $j, $response['results']);
+            // $problemsCount public problems but not the private problem that has
+            // all tags. But only problems $j or later have tags[0] through tags[$j].
+            $this->assertCount($problemsCount - $j, $response['results']);
         }
     }
 
@@ -1116,7 +1120,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test 'page', 'order_by' and 'sort_order' parametes of the apiList() method, and search by title.
+     * Test 'page', 'order_by' and 'sort_order' parameters of the apiList() method, and search by title.
      */
     public function testProblemListPager() {
         // Create a user and some problems with submissions for the tests.

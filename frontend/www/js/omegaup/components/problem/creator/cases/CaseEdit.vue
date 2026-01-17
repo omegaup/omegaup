@@ -168,14 +168,14 @@
                   </b-col>
                   <b-col cols="3" class="pl-2 pr-0 text-center">
                     <b-dropdown
-                      data-array-modal-dropdown
+                      :data-array-modal-dropdown="line.lineID"
                       :text="getLineNameFromKind(line.data.kind)"
                       variant="light"
                     >
                       <b-dropdown-item
                         v-for="lineKindOption in lineKindOptions"
                         :key="lineKindOption.kind"
-                        :data-array-modal-dropdown="lineKindOption.kind"
+                        :data-array-modal-dropdown-kind="`${line.lineID}-${lineKindOption.kind}`"
                         @click="
                           editLineKind([line.lineID, lineKindOption.kind])
                         "
@@ -188,7 +188,7 @@
                         getEditIconDisplay(line) ===
                         EditIconDisplayOption.EDIT_ICON
                       "
-                      data-line-edit-button
+                      :data-line-edit-button="line.lineID"
                       size="sm"
                       type="button"
                       :title="T.problemCreatorLineEdit"

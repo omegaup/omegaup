@@ -40,13 +40,13 @@ if [ $GIT_PUSH -eq 1 ]; then
 	# Fetch the remote in case we don't know the remote ref (e.g. when rebasing
 	# from the UI).
 	if [ "${REMOTE_HASH}" == "${EMPTY_HASH}" ]; then
-		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD upstream/main)"
+		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD FETCH_HEAD)"
 		ARGS="${MERGE_BASE}"
 		echo "New branch. Running validations across all changed files since ${MERGE_BASE}..."
 	elif ! git cat-file -e "${REMOTE_HASH}"; then
 		echo $'\e[31mUnknown remote hash ' "\"${REMOTE_HASH}\"" $'.\e[0m You may have missed to run `git pull`.'
 		confirm 'Do you still want to push? [y/N]'
-		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD upstream/main)"
+		MERGE_BASE="$(git fetch upstream main && git merge-base HEAD FETCH_HEAD)"
 		ARGS="${MERGE_BASE}"
 		echo "Running validations across all files since ${MERGE_BASE}..."
 	fi
@@ -58,7 +58,7 @@ if [ $GIT_PUSH -eq 1 ]; then
 	fi
 fi
 
-if ! which docker compose >/dev/null; then
+if ! command -v docker compose &> /dev/null; then
 	echo -e "\033[0;31mERROR\033[0m: \`docker compose\` not found. Please run \`git push\` outside the container."
 	exit 1
 fi

@@ -34,7 +34,7 @@
             block
             split
             right
-            data-layout-dropdown
+            :data-layout-dropdown="layout.layoutID"
             :text="layout.name"
             variant="primary"
             @click="showLayout[layout.layoutID] = !showLayout[layout.layoutID]"

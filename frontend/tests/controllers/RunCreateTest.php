@@ -320,7 +320,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'admissionMode' => 'private'
         ]));
 
-        // Create a second user not regitered to private contest
+        // Create a second user not registered to private contest
         [
             'identity' => $identity2,
         ] = \OmegaUp\Test\Factories\User::createUser();
@@ -633,7 +633,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($this->contestantIdentity);
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => '', // Not inside a contest
+            // Not inside a contest
             'problem_alias' => $problemData['request']['problem_alias'],
             'language' => 'c11-gcc',
             'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
@@ -756,7 +756,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => '', // Not inside a contest
+                // Not inside a contest
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
@@ -786,7 +786,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $login = self::login($this->contestantIdentity);
             $r = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => '', // Not inside a contest
+                // Not inside a contest
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'language' => 'c11-gcc',
                 'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",

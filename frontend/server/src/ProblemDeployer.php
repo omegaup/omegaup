@@ -499,10 +499,10 @@ class ProblemDeployer {
     ): void {
         $curl = curl_init();
 
-        $pktline = "${oldOid} ${newOid} refs/heads/published\n";
+        $pktline = "{$oldOid} {$newOid} refs/heads/published\n";
         $pktline = sprintf('%04x%s', 4 + strlen($pktline), $pktline);
 
-        $payload = "${pktline}0000";  // flush.
+        $payload = "{$pktline}0000";  // flush.
         $payload .= "\x50\x41\x43\x4B";  // PACK
         $payload .= "\x00\x00\x00\x02";  // packfile version (2)
         $payload .= "\x00\x00\x00\x00";  // number of objects (0)
@@ -587,6 +587,124 @@ class ProblemDeployer {
                 "rename problem failed: HTTP/{$statusCode}: {$error}"
             );
             throw $error;
+        }
+    }
+
+    /**
+     * Commits a modified version of the current problem ZIP, excluding or rename certain paths
+     * and adding new files. Uses 'theirs' merge strategy to replace the problem completely.
+     *
+     * @param string $message
+     * @param \OmegaUp\DAO\VO\Identities $identity
+     * @param string $currentZipPath
+     * @param array<string> $pathsToExclude
+     * @param array<string, string> $filesToAdd
+     * @param array<string, string> $pathsToRename
+     *
+     * @throws \OmegaUp\Exceptions\ProblemDeploymentFailedException
+     */
+    public function commitModifiedZip(
+        string $message,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $currentZipPath,
+        array $pathsToExclude,
+        array $filesToAdd,
+        array $pathsToRename = []
+    ): void {
+        if (!file_exists($currentZipPath)) {
+            throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerInternalError',
+                'Current zip file does not exist'
+            );
+        }
+
+        $tmpfile = tmpfile();
+        try {
+            $zipPath = stream_get_meta_data($tmpfile)['uri'];
+            $zipArchive = new \ZipArchive();
+            /** @var true|int */
+            $err = $zipArchive->open(
+                $zipPath,
+                \ZipArchive::OVERWRITE
+            );
+            if ($err !== true) {
+                $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $err
+                );
+                $this->log->error("commit files failed: {$error}");
+                throw $error;
+            }
+            $currentZip = new \ZipArchive();
+            if ($currentZip->open($currentZipPath) !== true) {
+                $zipArchive->close();
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    'Could not open current zip file'
+                );
+            }
+
+            for ($i = 0; $i < $currentZip->numFiles; $i++) {
+                $filename = $currentZip->getNameIndex($i);
+                $shouldExclude = false;
+                foreach ($pathsToExclude as $excludePath) {
+                    if (str_starts_with($filename, $excludePath)) {
+                        $shouldExclude = true;
+                        break;
+                    }
+                }
+                if ($shouldExclude) {
+                    continue;
+                }
+
+                // Check if file should be renamed (by prefix)
+                $newFilename = $filename;
+                foreach ($pathsToRename as $oldPrefix => $newPrefix) {
+                    if (str_starts_with($filename, $oldPrefix)) {
+                        // Replace only the prefix, keep the rest
+                        $newFilename = $newPrefix . substr(
+                            $filename,
+                            strlen(
+                                $oldPrefix
+                            )
+                        );
+                        break;
+                    }
+                }
+
+                $contents = $currentZip->getFromIndex($i);
+                if ($contents === false) {
+                    $this->log->warning("Could not read file: {$filename}");
+                    continue;
+                }
+
+                $zipArchive->addFromString($newFilename, $contents);
+            }
+            $currentZip->close();
+
+            foreach ($filesToAdd as $path => $content) {
+                $zipArchive->addFromString($path, $content);
+            }
+
+            $zipArchive->close();
+
+            $result = $this->execute(
+                $zipPath,
+                strval($identity->username),
+                $message,
+                null,
+                null,
+                'theirs', // Use 'theirs' strategy to replace completely
+                false,
+                $this->acceptsSubmissions,
+                $this->updatePublished
+            );
+            $this->processResult($result);
+        } finally {
+            fclose($tmpfile);
+            if (file_exists($currentZipPath)) {
+                @unlink($currentZipPath);
+            }
         }
     }
 }

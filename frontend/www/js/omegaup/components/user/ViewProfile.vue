@@ -113,6 +113,13 @@
                   :title="T.profileCreatedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="bookmarkedProblems"
+                  :items-per-page="30"
+                  :title="T.profileBookmarkedProblems"
+                  class="mb-3"
+                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="currentSelectedTab == ViewProfileTabs.Contests"
@@ -196,11 +203,23 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
-                <omegaup-user-charts
-                  v-if="charts"
-                  :data="charts"
-                  :username="profile.username"
-                ></omegaup-user-charts>
+                <div class="chart-section">
+                  <omegaup-user-charts
+                    v-if="charts"
+                    :data="charts"
+                    :username="profile.username"
+                  ></omegaup-user-charts>
+                </div>
+                <div class="chart-section-heatmap">
+                  <omegaup-user-heatmap
+                    :username="profile.username"
+                    :available-years="availableYears"
+                    :data="charts"
+                    @year-changed="
+                      (year) => $emit('heatmap-year-changed', year)
+                    "
+                  ></omegaup-user-heatmap>
+                </div>
               </div>
             </div>
           </div>
@@ -217,6 +236,7 @@ import country_Flag from '../CountryFlag.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Chartsv2.vue';
+import user_Heatmap from './UserHeatmap.vue';
 import user_MainInfo from './MainInfo.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
@@ -255,6 +275,7 @@ function getInitialSelectedTab(
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
+    'omegaup-user-heatmap': user_Heatmap,
     'omegaup-user-maininfo': user_MainInfo,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
@@ -268,6 +289,7 @@ export default class ViewProfile extends Vue {
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
+  @Prop({ default: () => [] }) availableYears!: number[];
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -325,6 +347,12 @@ export default class ViewProfile extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
+  get bookmarkedProblems(): Problem[] {
+    if (!this.data?.bookmarkedProblems) return [];
+    return this.data.bookmarkedProblems.map(
+      (problem: types.BookmarkProblem) => new Problem(problem as types.Problem),
+    );
+  }
   get rank(): string {
     switch (this.profile.classname) {
       case 'user-rank-beginner':
@@ -352,5 +380,24 @@ export default class ViewProfile extends Vue {
 <style lang="scss">
 a:hover {
   cursor: pointer;
+}
+
+.chart-section {
+  background-color: var(--user-chart-section-background-color);
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.chart-section-heatmap {
+  background-color: var(--user-chart-section-heatmap-background-color);
+  border-radius: 4px;
+  padding: 0px;
+  margin-top: 15px;
+}
+
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--user-chart-title-color);
 }
 </style>

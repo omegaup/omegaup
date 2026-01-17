@@ -194,7 +194,7 @@ class ApiCaller {
      */
     private static function createRequest() {
         $apiAsUrl = \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/';
-        // Spliting only by '/' results in URIs with parameters like this:
+        // Splitting only by '/' results in URIs with parameters like this:
         //      /api/problem/list/?page=1
         //                       ^^
         // Adding '?' as a separator results in URIs like this:
@@ -202,7 +202,7 @@ class ApiCaller {
         //                       ^
         $args = preg_split('/[\/?]/', $apiAsUrl);
 
-        if ($args === false || count($args) < 2) {
+        if ($args === false || count($args) < 4) {
             self::$log->error(
                 'Api called with URI with less args than expected: ' . count(
                     $args
@@ -359,9 +359,7 @@ class ApiCaller {
         $stringifiedException = strval($apiException);
         if ($apiException->getCode() >= 500 && $apiException->getCode() < 600) {
             self::$log->error($stringifiedException);
-            if (extension_loaded('newrelic')) {
-                newrelic_notice_error($stringifiedException);
-            }
+            \OmegaUp\NewRelicHelper::noticeError($stringifiedException);
         } else {
             self::$log->info($stringifiedException);
         }

@@ -84,7 +84,7 @@ describe('BasicInformationEdit.vue', () => {
       propsData: basicInformationEditProps,
     });
 
-    await wrapper.find('input[data-username]').setValue('omegaup modified');
+    await wrapper.find('input[data-username]').setValue('omegaup_modified');
     await wrapper.find('input[data-name]').setValue('omegaUp admin modified');
     await wrapper.findComponent(date_Picker).setValue('2001-01-01');
     await wrapper
@@ -105,7 +105,7 @@ describe('BasicInformationEdit.vue', () => {
     expect(wrapper.emitted('update-user-basic-information')).toEqual([
       [
         {
-          username: 'omegaup modified',
+          username: 'omegaup_modified',
           name: 'omegaUp admin modified',
           gender: 'other',
           country_id: 'CA',
@@ -124,7 +124,7 @@ describe('BasicInformationEdit.vue', () => {
     await wrapper
       .find('input[data-name]')
       .setValue(
-        'A name that exceeds the allowed limit of charachters for this field',
+        'A name that exceeds the allowed limit of characters for this field',
       );
 
     await wrapper.find('button[type="submit"]').trigger('submit');
@@ -139,5 +139,33 @@ describe('BasicInformationEdit.vue', () => {
         },
       ],
     ]);
+  });
+
+  it('Should show error when username is invalid', async () => {
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: basicInformationEditProps,
+    });
+
+    // Test invalid characters
+    await wrapper.find('input[data-username]').setValue('invalid@username');
+    await wrapper.find('button[type="submit"]').trigger('submit');
+    expect(wrapper.emitted('update-user-basic-information-error')).toEqual([
+      [{ description: T.parameterInvalidAlias }],
+    ]);
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
+
+    // Test too short username
+    await wrapper.find('input[data-username]').setValue('a');
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
+
+    // Test empty username
+    await wrapper.find('input[data-username]').setValue('');
+    expect(wrapper.find('input[data-username]').classes()).toContain(
+      'is-invalid',
+    );
   });
 });

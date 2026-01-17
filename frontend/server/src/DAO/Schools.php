@@ -13,12 +13,16 @@ namespace OmegaUp\DAO;
  */
 class Schools extends \OmegaUp\DAO\Base\Schools {
     /**
-     * Finds schools that cotains 'name'
+     * Finds schools that contains 'name'
      *
      * @param string $name
      * @return list<\OmegaUp\DAO\VO\Schools>
      */
     public static function findByName($name) {
+        // Note: We've added an index on the name column (idx_schools_name), but using
+        // LIKE '%term%' prevents MySQL from utilizing this index effectively.
+        // We maintain this pattern for compatibility with existing tests and functionality,
+        // though it requires a full table scan. The index will still benefit other queries.
         $sql = '
             SELECT
                 ' .  \OmegaUp\DAO\DAO::getFields(
@@ -86,6 +90,9 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                 Schools s
             WHERE
                 s.score != 0
+        ';
+
+        $sqlOrder = '
             ORDER BY
                 s.`ranking` IS NULL, s.`ranking` ASC
         ';
@@ -112,7 +119,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
 
         /** @var list<array{country_id: null|string, name: string, ranking: int|null, school_id: int, score: float}> */
         $rank = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlFrom . $sqlLimit,
+            $sql . $sqlFrom . $sqlOrder . $sqlLimit,
             [
                 max(0, $page - 1) * $rowsPerPage,
                 $rowsPerPage,

@@ -12,13 +12,14 @@ namespace OmegaUp\Controllers;
  * @psalm-type ApiToken=array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, duration_minutes: int|null, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, score_mode?: string, scoreboard_url?: string, scoreboard_url_admin?: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, isUnder13User: bool, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null, userVerificationDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, isAdmin: bool, mentorCanChooseCoder: bool, isUnder13User: bool, userVerificationDeadline: \OmegaUp\Timestamp|null, inContest: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: string, userCountry: string, userTypes: list<string>, apiTokens: list<ApiToken>, nextRegisteredContestForUser: ContestListItem|null}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, timestamp: \OmegaUp\Timestamp|null, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
+ * @psalm-type UserRankTableLoggedOutPayload=array{isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>, lastUpdated: \OmegaUp\Timestamp|null}
  * @psalm-type UserDependent=array{classname: string, name: null|string, parent_email_verification_deadline: \OmegaUp\Timestamp|null, parent_verified: bool|null, username: string}
  * @psalm-type UserDependentsPayload=array{dependents:list<UserDependent>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
@@ -33,8 +34,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
- * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
- * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
+ * @psalm-type BookmarkProblem=array{alias: string, title: string}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
+ * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
  * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
@@ -49,6 +51,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
+ * @psalm-type UserDocument=array{name: string, url: string}
+ * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -195,7 +199,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
             && !is_null($createUserParams->parentEmail)
         ) {
-            // Fill all the columns refering to user's parent
+            // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
@@ -434,7 +438,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!self::$sendEmailOnVerify) {
             self::$log->info(
-                'Not sending email beacause sendEmailOnVerify = FALSE'
+                'Not sending email because sendEmailOnVerify = FALSE'
             );
             return;
         }
@@ -855,7 +859,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'permission_key'
             );
 
-            // Pwd changes are by default unless explictly disabled
+            // Pwd changes are by default unless explicitly disabled
             $resetRequest = new \OmegaUp\Request();
             $resetRequest['auth_token'] = $r['auth_token'];
             $resetRequest['username'] = $username;
@@ -2227,11 +2231,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param null|string $username
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<UserProfileStats>}
+     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>, heatmap: list<array{date: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     * @omegaup-request-param null|string $year
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2252,10 +2257,131 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $runs = \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+            $identity->identity_id
+        );
+
+        $currentTimeStamp = \OmegaUp\Time::get();
+        $today = new \DateTime(date('Y-m-d', $currentTimeStamp));
+        $year = $r->ensureOptionalInt('year');
+
+        $heatmapResult = self::generateHeatmapData($runs, $today, $year);
+
         return [
-            'runs' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                $identity->identity_id
-            ),
+            'runs' => $runs,
+            'heatmap' => $heatmapResult,
+        ];
+    }
+
+    /**
+     * Generates heatmap data for user activity visualization.
+     *
+     * @param list<array{date: null|string, runs: int, verdict: string}> $runs The runs data from the database
+     * @param \DateTime $today The current date
+     * @param int|null $year Optional year to filter data
+     *
+     * @return list<array{date: string, count: int}> An array of date-count pairs representing user activity
+     */
+    private static function generateHeatmapData(
+        array $runs,
+        \DateTime $today,
+        ?int $year
+    ): array {
+        // Set date range based on year parameter if provided
+        if (!is_null($year)) {
+            $startDate = new \DateTime("{$year}-01-01");
+            $endDate = new \DateTime("{$year}-12-31");
+
+            // If the year is the current year, use today as the end date
+            if ($year === intval($today->format('Y'))) {
+                $endDate = $today;
+            }
+        } else {
+            // Otherwise use the default last 365 days
+            $startDate = (clone $today)->sub(new \DateInterval('P1Y'));
+            $endDate = $today;
+        }
+
+        // Initialize all dates with zero count
+        $heatmapData = [];
+        $currentDate = clone $startDate;
+        while ($currentDate <= $endDate) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $heatmapData[$dateStr] = 0;
+            $currentDate->add(new \DateInterval('P1D'));
+        }
+
+        // Fill in actual run counts for submissions
+        foreach ($runs as $run) {
+            if (!is_null($run['date'])) {
+                $runDate = new \DateTime($run['date']);
+                if ($runDate >= $startDate && $runDate <= $endDate) {
+                    $heatmapData[$run['date']] += $run['runs'];
+                }
+            }
+        }
+
+        // Format for frontend
+        /** @var list<array{date: string, count: int}> $heatmapResult */
+        $heatmapResult = [];
+        foreach ($heatmapData as $date => $count) {
+            $heatmapResult[] = [
+                'date' => strval($date),
+                'count' => intval($count)
+            ];
+        }
+
+        return $heatmapResult;
+    }
+
+    /**
+     * Get profile statistics including solved problems by difficulty and tags distribution.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiProfileStatistics(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        if (
+            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userProfileIsPrivate'
+            );
+        }
+
+        $difficultyStats = \OmegaUp\DAO\Problems::getSolvedCountByDifficulty(
+            $identity->identity_id
+        );
+        $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
+            $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+            $identity->identity_id
+        );
+
+        return [
+            'solved' => $difficultyStats['total'],
+            'attempting' => $attemptingCount,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
+            'tags' => $tagsDistribution,
         ];
     }
 
@@ -2523,7 +2649,6 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             $r['birth_date'] = $birthDate;
         }
-
         if (!is_null($r['locale'])) {
             // find language in Language
             \OmegaUp\Validators::validateStringNonEmpty(
@@ -2653,7 +2778,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get full rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRankInfo
      */
@@ -2709,7 +2834,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRank
      */
@@ -2775,7 +2900,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return array{pager: list<PageItem>, ranking: UserRank}
      */
@@ -3042,11 +3167,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty($r['filter'], 'filter');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['auth_token'],
-            'auth_token'
-        );
+        $filtersList = $r->ensureString('filter');
+        $authToken = $r->ensureOptionalString('auth_token');
 
         $response = [
             'user' => null,
@@ -3056,16 +3178,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'problemset_admin' => [],
         ];
 
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $r
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $identity = $session['identity'];
         if (!is_null($identity)) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
 
-        $filters = explode(',', $r['filter']);
+        $filters = explode(',', $filtersList);
         foreach ($filters as $filter) {
             $tokens = explode('/', $filter);
             if (count($tokens) < 2 || $tokens[0] != '') {
@@ -3100,7 +3220,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'userNotAllowed'
                         );
                     }
-                    if ($tokens[2] != $identity->username && !$session['is_admin']) {
+                    $username = $tokens[2];
+                    if ($username != $identity->username && !$session['is_admin']) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'userNotAllowed'
                         );
@@ -3113,11 +3234,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $contestAlias = $tokens[2];
                     $r2 = new \OmegaUp\Request([
-                        'contest_alias' => $tokens[2],
+                        'contest_alias' => $contestAlias,
                     ]);
-                    if (isset($r['auth_token'])) {
-                        $r2['auth_token'] = $r['auth_token'];
+                    if (!is_null($authToken)) {
+                        $r2['auth_token'] = $authToken;
                     }
                     $token = null;
                     if (count($tokens) >= 4) {
@@ -3125,7 +3247,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
-                        $tokens[2],
+                        $contestAlias,
                         $identity,
                         $token
                     );
@@ -3143,11 +3265,12 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
+                    $problemsetId = $tokens[2];
                     [
                         'request' => $r2,
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
-                        'problemset_id' => $tokens[2],
-                        'auth_token' => $r['auth_token'],
+                        'problemset_id' => $problemsetId,
+                        'auth_token' => $authToken,
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
@@ -3162,7 +3285,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
-                        $response['problemset_admin'][] = intval($tokens[2]);
+                        $response['problemset_admin'][] = intval($problemsetId);
                     }
                     break;
                 case 'problem':
@@ -3172,7 +3295,8 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    $problem = \OmegaUp\DAO\Problems::getByAlias($tokens[2]);
+                    $problemAlias = $tokens[2];
+                    $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
                     if (is_null($problem)) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
@@ -3185,7 +3309,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $problem
                         )
                     ) {
-                        $response['problem_admin'][] = $tokens[2];
+                        $response['problem_admin'][] = $problemAlias;
                     } elseif (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'problemIsPrivate'
@@ -3951,7 +4075,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: UserRankTablePayload|UserRankTableLoggedOutPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $filter
      * @omegaup-request-param int|null $length
@@ -3970,8 +4094,6 @@ class User extends \OmegaUp\Controllers\Controller {
             ]
         );
         $currentFilter = $filter ?? \OmegaUp\DAO\Enum\RankFilter::NONE;
-
-        $availableFilters = [];
         $params = [];
         if ($currentFilter !== \OmegaUp\DAO\Enum\RankFilter::NONE) {
             $params[ 'filter'] = $currentFilter;
@@ -3983,84 +4105,122 @@ class User extends \OmegaUp\Controllers\Controller {
             // Do nothing. Not logged user can access here
             $r->identity = null;
         }
+
         if (is_null($r->identity)) {
-            [
-                'ranking' => $ranking,
-                'pager' => $pager,
-            ] = self::getRankByProblemsSolvedWithPager(
-                loggedIdentity: null,
-                filteredBy: $currentFilter,
+            return self::getRankToLoggedOutUser(
                 offset: $page,
                 rowCount: $length,
-                params: $params,
             );
-
-            return [
-                'templateProperties' => [
-                    'payload' => [
-                        'page' => $page,
-                        'length' => $length,
-                        'filter' => $currentFilter,
-                        'availableFilters' => $availableFilters,
-                        'isIndex' => false,
-                        'isLogged' => false,
-                        'ranking' => $ranking,
-                        'pagerItems' => $pager,
-                        'lastUpdated' => $ranking['rank'][0]['timestamp'] ?? null,
-                    ],
-                    'title' => new \OmegaUp\TranslationString(
-                        'omegaupTitleUsersRank'
-                    )
-                ],
-                'entrypoint' => 'users_rank',
-            ];
         }
-
-        if (!is_null($r->identity->country_id)) {
-            $availableFilters['country'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByCountry'
-                );
-        }
-        if (!is_null($r->identity->state_id)) {
-            $availableFilters['state'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterByState'
-                );
-        }
-
-        $schoolId = null;
-        if (!is_null($r->identity->current_identity_school_id)) {
-            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $r->identity->current_identity_school_id
-            );
-            if (!is_null($identitySchool)) {
-                $schoolId = $identitySchool->school_id;
-            }
-        }
-        if (!is_null($schoolId)) {
-            $availableFilters['school'] =
-                \OmegaUp\Translations::getInstance($r->identity)->get(
-                    'wordsFilterBySchool'
-                );
-        }
-        [
-            'ranking' => $ranking,
-            'pager' => $pager,
-        ] = self::getRankByProblemsSolvedWithPager(
+        return self::getRankToLoggedInUser(
             loggedIdentity: $r->identity,
             filteredBy: $currentFilter,
             offset: $page,
             rowCount: $length,
             params: $params,
         );
+    }
+
+    /**
+     * when the user is logged out:
+     * prepare all the properties to be sent to the rank table view via TypeScript
+     *
+     * @return array{templateProperties: array{payload: UserRankTableLoggedOutPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     */
+    public static function getRankToLoggedOutUser(
+        int $offset,
+        int $rowCount,
+    ) {
+        [
+            'ranking' => $ranking,
+            'pager' => $pager,
+        ] = self::getRankByProblemsSolvedWithPager(
+            loggedIdentity: null,
+            filteredBy: \OmegaUp\DAO\Enum\RankFilter::NONE,
+            offset: $offset,
+            rowCount: $rowCount,
+            params: [],
+        );
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'page' => $offset,
+                    'length' => $rowCount,
+                    'isLogged' => false,
+                    'ranking' => $ranking,
+                    'pagerItems' => $pager,
+                    'lastUpdated' => $ranking['rank'][0]['timestamp'] ?? null,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersRank'
+                )
+            ],
+            'entrypoint' => 'users_rank',
+        ];
+    }
+
+    /**
+     * When the user is logged in:
+     * prepare all the properties to be sent to the rank table view via TypeScript
+     *
+     * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     */
+    public static function getRankToLoggedInUser(
+        \OmegaUp\DAO\VO\Identities $loggedIdentity,
+        string $filteredBy,
+        int $offset,
+        int $rowCount,
+        array $params
+    ) {
+        $availableFilters = [];
+        if (!is_null($loggedIdentity->country_id)) {
+            $availableFilters['country'] =
+                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
+                    'wordsFilterByCountry'
+                );
+        }
+        if (!is_null($loggedIdentity->state_id)) {
+            $availableFilters['state'] =
+                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
+                    'wordsFilterByState'
+                );
+        }
+        $schoolId = null;
+        if (!is_null($loggedIdentity->current_identity_school_id)) {
+            $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $loggedIdentity->current_identity_school_id
+            );
+            if (!is_null($identitySchool)) {
+                $schoolId = $identitySchool->school_id;
+            }
+        }
+
+        if (!is_null($schoolId)) {
+            $availableFilters['school'] =
+                \OmegaUp\Translations::getInstance($loggedIdentity)->get(
+                    'wordsFilterBySchool'
+                );
+        }
+
+        [
+            'ranking' => $ranking,
+            'pager' => $pager,
+        ] = self::getRankByProblemsSolvedWithPager(
+            loggedIdentity: $loggedIdentity,
+            filteredBy: $filteredBy,
+            offset: $offset,
+            rowCount: $rowCount,
+            params: $params,
+        );
 
         return [
             'templateProperties' => [
                 'payload' => [
-                    'page' => $page,
-                    'length' => $length,
-                    'filter' => $currentFilter,
+                    'page' => $offset,
+                    'length' => $rowCount,
+                    'filter' => $filteredBy,
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
                     'isLogged' => true,
@@ -4143,7 +4303,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             'female'
                         )['coderinfo']
                     ],
-                    'schoolOfTheMonthData' => \OmegaUp\Controllers\School::getSchoolOfTheMonth()['schoolinfo'],
+                    'schoolOfTheMonthData' => null,
                     'userRank' => self::getTopCodersOfTheMonth(
                         $rowCount
                     ),
@@ -4359,6 +4519,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         $targetIdentityId
                     ),
                     'createdProblems' => self::getCreatedProblems(
+                        $targetIdentityId
+                    ),
+                    'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
                         $targetIdentityId
                     ),
                     'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
@@ -4678,6 +4841,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
      * @omegaup-request-param null|string $third_party_login
+     * @omegaup-request-param null|string $redirect
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4691,6 +4855,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
         $idToken = $r->ensureOptionalString('credential');
+        $redirect = $r->ensureOptionalString('redirect');
         if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
@@ -4714,7 +4879,8 @@ class User extends \OmegaUp\Controllers\Controller {
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
-                    $gCsrfToken
+                    $gCsrfToken,
+                    $redirect
                 );
             }
         } catch (\OmegaUp\Exceptions\ExitException $e) {
@@ -4900,6 +5066,61 @@ class User extends \OmegaUp\Controllers\Controller {
             self::$log->error($e);
             return $response;
         }
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: UserDocsPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getDocsForTypeScript(\OmegaUp\Request $r) {
+        /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
+        $dir = strval(OMEGAUP_ROOT);
+        /** @var list<string> */
+        $files = array_diff(scandir("{$dir}/www/docs/"), ['.', '..']);
+
+        $docs = [
+            'pdf' => [],
+            'dir' => [],
+        ];
+
+        foreach ($files as $file) {
+            if (is_file("$dir/www/docs/$file")) {
+                $name = preg_replace('/\.[^.]+$/', '', $file);
+                $name = str_replace('-', ' ', $name);
+                $name = ucwords($name);
+                if (preg_match('/\.pdf$/', $file)) {
+                    $docs['pdf'][] = [
+                        'name' => $name,
+                        'url' => "/docs/{$file}",
+                    ];
+                }
+            } else {
+                $docs['dir'][] = [
+                    'name' => $file,
+                    'url' => "/docs/{$file}",
+                ];
+            }
+        }
+        // Adding three more directories ignored by git
+        $docs['dir'][] = [
+            'name' => 'C++',
+            'url' => '/docs/cpp/en/',
+        ];
+        $docs['dir'][] = [
+            'name' => 'Java',
+            'url' => '/docs/java/en/',
+        ];
+        $docs['dir'][] = [
+            'name' => 'Pascal',
+            'url' => '/docs/pas/en/',
+        ];
+
+        return [
+            'templateProperties' => [
+                'payload' => ['docs' => $docs],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
+            ],
+            'entrypoint' => 'common_docs',
+        ];
     }
 }
 

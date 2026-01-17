@@ -1,12 +1,12 @@
 <template>
-  <div class="mr-auto">
+  <div class="mr-auto mt-2 mt-lg-0">
     <ul
       v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-      class="navbar-nav align-items-center"
+      class="navbar-nav align-items-start px-3"
     >
       <li
         v-if="isLoggedIn"
-        class="nav-item dropdown nav-contests"
+        class="nav-item dropdown nav-contests nav-item-align"
         :class="{ active: navbarSection === 'contests' }"
       >
         <a
@@ -20,7 +20,7 @@
         >
           {{ T.wordsContests }}
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <slot name="contests-items">
             <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
               {{ T.navViewContests }}
@@ -48,7 +48,7 @@
       </li>
       <li
         v-if="isLoggedIn"
-        class="nav-item dropdown nav-courses"
+        class="nav-item dropdown nav-courses nav-item-align"
         :class="{ active: navbarSection === 'courses' }"
       >
         <a
@@ -62,7 +62,7 @@
         >
           {{ T.navCourses }}
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <slot name="courses-items">
             <a class="dropdown-item" href="/course/" data-nav-courses-all>
               {{ T.navViewCourses }}
@@ -87,7 +87,7 @@
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
       <li
-        class="nav-item dropdown nav-problems"
+        class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
       >
         <a
@@ -101,7 +101,7 @@
         >
           {{ T.wordsProblems }}
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <slot name="problems-items">
             <a
               class="dropdown-item"
@@ -118,13 +118,37 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
-            <a
-              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
-              class="dropdown-item"
-              href="/problem/new/"
-              data-nav-problems-create
-              >{{ T.myproblemsListCreateProblem }}</a
-            >
+            <template v-if="!isLoggedIn">
+              <a class="dropdown-item" href="/problem/creator/">{{
+                T.createZipFileForProblem
+              }}</a>
+            </template>
+            <template v-else>
+              <form class="collapse-submenu">
+                <button
+                  type="button"
+                  class="dropdown-item dropdown-toggle"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
+                  data-nav-problems-create-options
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
+                >
+                  {{ T.myproblemsListCreateProblem }}
+                </button>
+                <div class="collapse collapse-links pl-3">
+                  <a class="dropdown-item" href="/problem/creator/">{{
+                    T.myproblemsListCreateZipFileProblem
+                  }}</a>
+                  <a
+                    class="dropdown-item"
+                    href="/problem/new/"
+                    data-nav-problems-create
+                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                  >
+                </div>
+              </form>
+            </template>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
             }}</a>
@@ -132,7 +156,7 @@
         </div>
       </li>
       <li
-        class="nav-item dropdown nav-rank"
+        class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
       >
         <a
@@ -145,7 +169,7 @@
         >
           {{ T.navRanking }}
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
@@ -164,7 +188,7 @@
           }}</a>
         </div>
       </li>
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
           href="#"
@@ -175,7 +199,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"

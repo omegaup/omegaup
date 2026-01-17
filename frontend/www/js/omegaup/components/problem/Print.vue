@@ -22,7 +22,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import problem_SettingsSummary from './SettingsSummary.vue';
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -32,7 +32,7 @@ library.add(faPrint);
 @Component({
   components: {
     FontAwesomeIcon,
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
   },
 })

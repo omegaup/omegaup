@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, is_teaching_assistant: bool, languages: list<string>|null, name: string, needs_basic_information: bool, recommended: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, teaching_assistant_enabled: bool, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, suggestions?: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -80,7 +80,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunDetailsGroup=array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}
  * @psalm-type RunDetailsV2=array{admin: bool, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, judged_by?: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type RunWithDetails=array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, details: null|RunDetailsV2, execution: null|string, guid: string, language: string, memory: int, output: null|string, penalty: int, runtime: int, score: float, score_by_group?: array<string, float|null>, status: string, status_memory: null|string, status_runtime: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<RunWithDetails>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ArenaCourseDetails=array{alias: string, assignments: list<CourseAssignment>, name: string, languages: list<string>|null}
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
@@ -92,6 +92,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     const ADMISSION_MODE_PUBLIC = 'public';
     const ADMISSION_MODE_PRIVATE = 'private';
     const ADMISSION_MODE_REGISTRATION = 'registration';
+
+    // Assignment type constants
+    const ASSIGNMENT_TYPE_HOMEWORK = 'homework';
+    const ASSIGNMENT_TYPE_LESSON = 'lesson';
+    const ASSIGNMENT_TYPE_TEST = 'test';
 
     // Course level constants
     const COURSE_LEVEL_INTRODUCTORY = 'introductory';
@@ -534,6 +539,23 @@ class Course extends \OmegaUp\Controllers\Controller {
         return $course;
     }
 
+    private static function ensureIsCourseAdmin(
+        string $courseAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): \OmegaUp\DAO\VO\Courses {
+        $course = self::validateCourseExists($courseAlias);
+
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin(
+                $identity,
+                $course
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return $course;
+    }
+
     /**
      * Gets the Group assigned to the Course.
      *
@@ -774,7 +796,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visibility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -2128,60 +2150,67 @@ class Course extends \OmegaUp\Controllers\Controller {
         $request->accepted = $r->ensureBool('resolution');
         $request->last_update = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
-        \OmegaUp\DAO\CourseIdentityRequest::update($request);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        // Save this action in the history
-        \OmegaUp\DAO\CourseIdentityRequestHistory::create(
-            new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
-                'identity_id' => $request->identity_id,
-                'course_id' => $course->course_id,
-                'time' => $request->last_update,
-                'admin_id' => intval($r->user->user_id),
-                'accepted' => $request->accepted,
-            ])
-        );
+            \OmegaUp\DAO\CourseIdentityRequest::update($request);
 
-        if (!is_null($targetIdentity->user_id)) {
-            if ($request->accepted) {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationAccepted'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
-            } else {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationRejected'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
-            }
-            \OmegaUp\Controllers\Notification::setCommonNotification(
-                [$targetIdentity->user_id],
-                $localizationString,
-                $notificationType,
-                "/course/{$course->alias}/",
-                [
-                    'courseName' => $course->name,
-                ]
+            // Save this action in the history
+            \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+                new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                    'identity_id' => $request->identity_id,
+                    'course_id' => $course->course_id,
+                    'time' => $request->last_update,
+                    'admin_id' => intval($r->user->user_id),
+                    'accepted' => $request->accepted,
+                ])
             );
-        }
 
-        self::$log->info(
-            "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
-        );
+            if (!is_null($targetIdentity->user_id)) {
+                if ($request->accepted) {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationAccepted'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
+                } else {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationRejected'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
+                }
+                \OmegaUp\Controllers\Notification::setCommonNotification(
+                    [$targetIdentity->user_id],
+                    $localizationString,
+                    $notificationType,
+                    "/course/{$course->alias}/",
+                    [
+                        'courseName' => $course->name,
+                    ]
+                );
+            }
 
-        // If the request was accepted, we need to automatically add the student to the course
-        if (!$request->accepted) {
-            return ['status' => 'ok'];
-        }
+            self::$log->info(
+                "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
+            );
 
-        $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $targetIdentity->identity_id,
-            'share_user_information' => $request->share_user_information,
-        ]);
-        if (!is_null($request->accept_teacher)) {
-            $groupIdentity->accept_teacher = $request->accept_teacher;
+            // If the request was accepted, we need to automatically add the student to the course
+            if ($request->accepted) {
+                $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => $course->group_id,
+                    'identity_id' => $targetIdentity->identity_id,
+                    'share_user_information' => $request->share_user_information,
+                ]);
+                if (!is_null($request->accept_teacher)) {
+                    $groupIdentity->accept_teacher = $request->accept_teacher;
+                }
+                \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-        \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
 
         return ['status' => 'ok'];
     }
@@ -2880,7 +2909,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -5379,6 +5408,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'show_scoreboard' => boolval($course->show_scoreboard),
             'recommended' => boolval($course->recommended),
             'requests_user_information' => $course->requests_user_information,
+            'teaching_assistant_enabled' => boolval(
+                $course->teaching_assistant_enabled
+            ),
             'unlimited_duration' => false,
         ];
 
@@ -5506,7 +5538,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates and authenticate token for operations when user can be logged
      * in or not. This is the only private function that receives Request as a
-     * parameter because it needs authenticate it wheter there is no token.
+     * parameter because it needs authenticate it whether there is no token.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -5572,7 +5604,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // hasToken is true, it means we do not autenticate request user
+        // hasToken is true, it means we do not authenticate request user
         return [
             'courseAdmin' => $courseAdmin,
             'hasToken' => true,
@@ -6111,6 +6143,44 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
             'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Toggles the AI Teaching Assistant feature for a course
+     *
+     * @return array{status: string, teaching_assistant_enabled: bool}
+     *
+     * @omegaup-request-param string $course_alias
+     */
+    public static function apiToggleTeachingAssistant(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $course = self::ensureIsCourseAdmin($courseAlias, $r->identity);
+
+        $course->teaching_assistant_enabled = !$course->teaching_assistant_enabled;
+
+        try {
+            \OmegaUp\DAO\Courses::update($course);
+        } catch (\Exception $e) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'unableToUpdateTAEnabledField',
+            );
+        }
+
+        self::$log->info(
+            "Course AI TA toggled (alias): {$courseAlias}, enabled: " . ($course->teaching_assistant_enabled ? 'true' : 'false')
+        );
+
+        return [
+            'status' => 'ok',
+            'teaching_assistant_enabled' => $course->teaching_assistant_enabled,
         ];
     }
 

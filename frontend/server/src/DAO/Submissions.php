@@ -166,6 +166,62 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         int $identityId,
         ?\OmegaUp\DAO\VO\Contests $contest = null
     ): bool {
+        $maxRetries = 3;
+        $retryCount = 0;
+
+        while ($retryCount < $maxRetries) {
+            try {
+                return self::isInsideSubmissionGapSingle(
+                    $submission,
+                    $problemId,
+                    $identityId,
+                    $contest
+                );
+            } catch (\mysqli_sql_exception $e) {
+                $retryCount++;
+
+                // Check if this is a deadlock or lock timeout error
+                $errorCode = $e->getCode();
+                $isDeadlock = in_array($errorCode, [1205, 1213]);
+
+                if (!$isDeadlock || $retryCount >= $maxRetries) {
+                    throw $e;
+                }
+
+                // Exponential backoff with jitter
+                $waitTime = max(
+                    value: 0,
+                    values: intval(
+                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
+                    )
+                );
+                $jitter = rand(0, 50000);
+                usleep($waitTime + $jitter);
+
+                // Log the retry attempt if NewRelic is available
+                if (extension_loaded('newrelic')) {
+                    \newrelic_notice_error(
+                        "Submission gap deadlock retry attempt {$retryCount}/{$maxRetries}: " . $e->getMessage(),
+                        $e
+                    );
+                }
+            }
+        }
+
+        throw new \RuntimeException(
+            'Maximum retry attempts exceeded for submission gap check'
+        );
+    }
+
+    /**
+     * Single attempt to check submission gap
+     */
+    private static function isInsideSubmissionGapSingle(
+        \OmegaUp\DAO\VO\Submissions $submission,
+        int $problemId,
+        int $identityId,
+        ?\OmegaUp\DAO\VO\Contests $contest = null
+    ): bool {
         $problemsetId = $contest?->problemset_id;
         // Acquire row-level locks using `FOR UPDATE` so that multiple
         // concurrent queries cannot all obtain the same submission time and
@@ -233,10 +289,11 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * @return list<array{alias: string, classname: string, guid: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
-        int $identityId = null,
+        ?int $identityId = null,
         ?int $page = 1,
-        int $rowsPerPage = 100,
+        ?int $rowsPerPage = 100,
     ): array {
+        $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
         if (is_null($identityId)) {
             $indexHint = 'USE INDEX(PRIMARY)';
         } else {
@@ -275,7 +332,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= 24 * 3600
+                s.`time` >= ?
                 AND s.status = 'ready'
                 AND u.is_private = 0
                 AND p.visibility >= ?
@@ -288,9 +345,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     OR c.finish_time < s.time
                 )
         ";
-        $params = [
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-        ];
+        $params = [$limitDate, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC];
 
         if (!is_null($identityId)) {
             $sql .= '

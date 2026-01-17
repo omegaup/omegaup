@@ -41,7 +41,7 @@ export class CoursePage {
     });
 
     cy.get('@savedStudentsNames').should('deep.equal', users);
-    cy.get('#alert-close').click();
+    cy.get('[data-alert-close]').click();
   }
 
   addAssignmentWithProblems(
@@ -88,7 +88,7 @@ export class CoursePage {
     }
     cy.get('button[data-schedule-assignment]').click();
     cy.get('.omegaup-course-assignmentdetails').should('not.be.visible');
-    cy.get('#alert-close').click();
+    cy.get('[data-alert-close]').click();
   }
 
   enterCourse(courseAlias: string, firstTime: boolean = true): void {
@@ -157,7 +157,8 @@ export class CoursePage {
     runOptions: RunOptions,
   ): void {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-    cy.get('[data-new-run]').click();
+    cy.waitUntil(() => cy.get('[data-new-run] a').should('be.visible'));
+    cy.get('[data-new-run] a').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').first().type(fileContent);
@@ -326,7 +327,7 @@ export class CoursePage {
         .type(courseOptions.objective);
     }
     cy.get('form[data-course-form]').submit();
-    cy.get('#alert-close').click();
+    cy.get('[data-alert-close]').click();
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
     cy.get('[data-course-edit-content-button]').click();
@@ -475,25 +476,6 @@ export class CoursePage {
       'have.value',
       courseOptions.description,
     );
-  }
-
-  verifyProblem(problemOptions: ProblemOptions): void {
-    cy.location('href').should('include', problemOptions.problemAlias);
-    cy.get('[name="title"]').should('have.value', problemOptions.problemAlias);
-    cy.get('[name="problem_alias"]').should(
-      'have.value',
-      problemOptions.problemAlias,
-    );
-    cy.get('[name="source"]').should('have.value', problemOptions.problemAlias);
-  }
-
-  verifyProblemRun(status: string): void {
-    cy.get('[data-run-status] > span').first().should('have.text', 'new');
-
-    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
-    cy.wait(['@runStatus'], { timeout: 10000 });
-
-    cy.get('[data-run-status] > span').first().should('have.text', status);
   }
 }
 

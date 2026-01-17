@@ -67,31 +67,51 @@
 
         <button
           v-if="isRunButton"
-          class="btn btn-sm btn-secondary mr-2 my-sm-0 ephemeral-button"
+          :disabled="!canExecute"
+          :class="{ disabled: !canExecute }"
+          class="btn btn-sm btn-secondary mr-2 my-sm-0"
           data-run-button
           @click.prevent="handleRun"
         >
-          <span>{{ T.wordsRun }}</span>
-          <span
-            v-if="isRunLoading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <omegaup-countdown
+            v-if="!canExecute"
+            :target-time="nextExecutionTimestamp"
+            :countdown-format="omegaup.CountdownFormat.EventCountdown"
+            @finish="now = Date.now()"
+          ></omegaup-countdown>
+          <template v-else>
+            <span>{{ T.wordsRun }}</span>
+            <span
+              v-if="isRunLoading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </template>
         </button>
         <button
           v-if="isSubmitButton"
-          class="btn btn-sm btn-primary my-2 my-sm-0 ephemeral-button"
+          :disabled="!canSubmit"
+          :class="{ disabled: !canSubmit }"
+          class="btn btn-sm btn-primary my-2 my-sm-0"
           data-submit-button
           @click.prevent="handleSubmit"
         >
-          <span>{{ T.wordsSubmit }}</span>
-          <span
-            v-if="isSubmitLoading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <omegaup-countdown
+            v-if="!canSubmit"
+            :target-time="nextSubmissionTimestamp"
+            :countdown-format="omegaup.CountdownFormat.EventCountdown"
+            @finish="now = Date.now()"
+          ></omegaup-countdown>
+          <template v-else>
+            <span>{{ T.wordsSubmit }}</span>
+            <span
+              v-if="isSubmitLoading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </template>
         </button>
       </form>
     </div>
@@ -100,8 +120,12 @@
 </template>
 
 <script lang="ts">
+import * as monaco from 'monaco-editor';
+(window as any).monaco = monaco;
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
 import JSZip from 'jszip';
@@ -153,16 +177,19 @@ interface ComponentState {
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class Ephemeral extends Vue {
   @Prop({ required: true }) acceptedLanguages!: string[];
   @Prop({ required: true }) isEmbedded!: boolean;
   @Prop({ required: true }) canRun!: boolean;
-  @Prop({ required: true }) canSubmit!: boolean;
+  @Prop({ required: true }) shouldShowSubmitButton!: boolean;
   @Prop({ required: true }) initialLanguage!: string;
   @Prop({ required: true }) initialTheme!: Util.MonacoThemes;
   @Prop({ required: true }) problem!: types.ProblemInfo;
+  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: null }) nextExecutionTimestamp!: null | Date;
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
@@ -175,10 +202,12 @@ export default class Ephemeral extends Vue {
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
   T = T;
+  omegaup = omegaup;
   isRunLoading = false;
   isSubmitLoading = false;
   zipHref: string | null = null;
   zipDownload: string | null = null;
+  now: number = Date.now();
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -211,6 +240,18 @@ export default class Ephemeral extends Vue {
   get isDark() {
     return this.theme === Util.MonacoThemes.VSDark;
   }
+  get canSubmit(): boolean {
+    if (!this.nextSubmissionTimestamp) {
+      return true;
+    }
+    return this.nextSubmissionTimestamp.getTime() <= this.now;
+  }
+  get canExecute(): boolean {
+    if (!this.nextExecutionTimestamp) {
+      return true;
+    }
+    return this.nextExecutionTimestamp.getTime() <= this.now;
+  }
 
   toggleTheme() {
     store.dispatch(
@@ -223,7 +264,7 @@ export default class Ephemeral extends Vue {
   initProblem() {
     // use commits for synchronous behavior
     // or else bugs occur where layout toggles cases column
-    // when it shouldnt
+    // when it shouldn't
     store.commit('updatingSettings', true);
     store
       .dispatch('initProblem', {
@@ -232,7 +273,7 @@ export default class Ephemeral extends Vue {
         languages: this.acceptedLanguages,
         problem: this.problem,
         showRunButton: this.canRun,
-        showSubmitButton: this.canSubmit,
+        showSubmitButton: this.shouldShowSubmitButton,
       })
       .then(() => {
         store.commit('updatingSettings', false);
@@ -345,6 +386,16 @@ export default class Ephemeral extends Vue {
   }
   handleRun() {
     if (this.isRunLoading) return;
+
+    postMessage({
+      method: 'executeRun',
+      params: {
+        problem_alias: store.getters['alias'],
+        language: store.getters['request.language'],
+        source: store.getters['request.source'],
+      },
+    });
+    this.$emit('execute-run');
 
     this.isRunLoading = true;
     fetch(`/grader/ephemeral/run/new/`, {
@@ -499,7 +550,7 @@ export default class Ephemeral extends Vue {
     reader.addEventListener('loadend', async (e) => {
       if (e.target?.readyState != FileReader.DONE) return;
       // due to the way files are strcutured
-      // to work as intended i use async awaits instead of promisses
+      // to work as intended i use async awaits instead of promises
 
       JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
         await store.dispatch('reset');
@@ -554,7 +605,7 @@ export default class Ephemeral extends Vue {
               ?.async('string')
               .then((value) => {
                 // the validator need to be set first
-                // before updaing language and source
+                // before updating language and source
                 store.dispatch('Validator', 'custom').then(() => {
                   store.dispatch(
                     'request.input.validator.custom_validator.language',
@@ -723,6 +774,12 @@ div {
     background: var(--vs-dark-background-color);
     color: var(--vs-dark-font-color);
     border-bottom: 1px solid var(--vs-dark-background-color);
+
+    /* Target the language selector */
+    .form-control.form-control-sm[data-language-select] {
+      background-color: var(--vs-dark-background-color);
+      color: var(--vs-dark-font-color);
+    }
   }
   &.vs {
     background: var(--vs-background-color);
