@@ -172,17 +172,13 @@ export class EventsSocket {
         .catch(ui.ignoreError);
       return;
     }
-    const {
-      currentRanking,
-      ranking,
-      users,
-      lastTimeUpdated,
-    } = onRankingChanged({
-      scoreboard,
-      currentUsername: this.currentUsername,
-      navbarProblems: this.navbarProblems,
-      scoreMode: this.scoreMode,
-    });
+    const { currentRanking, ranking, users, lastTimeUpdated } =
+      onRankingChanged({
+        scoreboard,
+        currentUsername: this.currentUsername,
+        navbarProblems: this.navbarProblems,
+        scoreMode: this.scoreMode,
+      });
     rankingStore.commit('updateRanking', ranking);
     rankingStore.commit('updateMiniRankingUsers', users);
     rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);

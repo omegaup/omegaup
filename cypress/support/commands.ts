@@ -111,6 +111,7 @@ Cypress.Commands.add(
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
     cy.get('button[type="submit"]').click(); // Submit
+    cy.url().should('include', problemAlias);
   },
 );
 

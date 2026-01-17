@@ -349,7 +349,8 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    target.selectedRevision = target.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision =
+                      revision;
                     break;
                   }
                 }
@@ -396,11 +397,13 @@ OmegaUp.on('ready', () => {
             api.Contest.update({
               contest_alias: payload.details.alias,
               admission_mode: admissionMode,
-              default_show_all_contestants_in_scoreboard: defaultShowAllContestantsInScoreboard,
+              default_show_all_contestants_in_scoreboard:
+                defaultShowAllContestantsInScoreboard,
             })
               .then(() => {
                 contestEdit.details.admission_mode = admissionMode;
-                contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
+                contestEdit.details.default_show_all_contestants_in_scoreboard =
+                  defaultShowAllContestantsInScoreboard;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
                 `);
@@ -645,7 +648,8 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 contestEdit.certificatesDetails.certificatesStatus = 'queued';
-                contestEdit.certificatesDetails.certificateCutoff = certificateCutoff;
+                contestEdit.certificatesDetails.certificateCutoff =
+                  certificateCutoff;
                 ui.success(T.contestCertificatesGenerateSuccessfully);
               })
               .catch(ui.apiError);
