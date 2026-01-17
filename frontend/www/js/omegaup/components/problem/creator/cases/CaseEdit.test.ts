@@ -9,6 +9,8 @@ import {
   generateCase,
   generateGroup,
 } from '@/js/omegaup/problem/creator/modules/cases';
+import CaseSimpleForm from './CasesForm.vue';
+import DeleteConfirmationForm from './DeleteConfirmationForm.vue';
 
 import T from '../../../../lang';
 import { MatrixDistinctType } from '@/js/omegaup/problem/creator/types';
@@ -53,15 +55,19 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    // There are currently 7 bootstrap buttons on the page.
+    // There are currently 10 bootstrap buttons on the page.
     // - Edit case
     // - Delete case
-    // - Download .in
-    // - Download .txt
-    // - Delete lines
-    // - Add new line
+    // - Generate array (menu "Generate input")
+    // - Generate matrix (menu "Generate input")
+    // - Download .in (menu with three dots)
+    // - Download .txt (menu with three dots)
+    // - Erase input
     // - Erase output
-    const initialBButtonsCount = 7;
+    // - Generate array (inside array modal)
+    // - Generate matrix (inside matrix modal)
+
+    const initialBButtonsCount = 10;
 
     const buttons = wrapper.findAllComponents(BButton);
     expect(buttons.length).toBe(initialBButtonsCount);
@@ -75,7 +81,8 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+    const dropdowns = wrapper.findAll('b-dropdown-stub');
+    expect(dropdowns.length).toBeGreaterThanOrEqual(2);
   });
 
   it('Should show a grouped case', async () => {
@@ -98,7 +105,8 @@ describe('CaseEdit.vue', () => {
     expect(
       wrapper.find('bicontrashfill-stub').element.parentElement?.textContent,
     ).toContain(T.problemCreatorDeleteCase);
-    expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+    const dropdowns = wrapper.findAll('b-dropdown-stub');
+    expect(dropdowns.length).toBeGreaterThanOrEqual(2);
   });
 
   it('Should delete a case', async () => {
@@ -128,7 +136,7 @@ describe('CaseEdit.vue', () => {
     expect(store.state.casesStore.selected.groupID).toBe(UUID_NIL);
   });
 
-  it('Should add, modify and delete a line', async () => {
+  it('Should write and erase inputs', async () => {
     const wrapper = mount(CaseEdit, { localVue, store: store });
 
     const groupID = newGroup.groupID;
@@ -139,49 +147,29 @@ describe('CaseEdit.vue', () => {
     });
     await Vue.nextTick();
 
-    expect(wrapper.text()).toContain(newCase.name);
-    expect(wrapper.text()).toContain(newGroup.name);
+    const inputTextarea = wrapper.find('textarea[data-input-textarea]');
+    expect(inputTextarea.exists()).toBeTruthy();
 
-    wrapper.vm.addNewLine();
-    await Vue.nextTick();
+    const testInput = '1 2 3\n4 5 6';
+    await inputTextarea.setValue(testInput);
 
-    expect(wrapper.find('table').exists()).toBeTruthy();
-    const formInputs = wrapper.findAll('input');
-
-    formInputs.at(0).setValue('testLabel');
-    formInputs.at(1).setValue('testValue');
-    await wrapper.trigger('click');
-
-    expect(wrapper.vm.getLinesFromSelectedCase[0].label).toBe('testLabel');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe('testValue');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('line');
-
-    // There are 4 dropdown items for each line:
-    // - Line
-    // - Multiline
-    // - Array
-    // - Matrix
-    const dropdownItemCount = 4;
-
-    const dropdowns = wrapper.findAll('a.dropdown-item');
-    expect(dropdowns.length).toBe(dropdownItemCount);
-
-    await dropdowns.at(1).trigger('click');
+    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(1);
     expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(testInput);
 
-    await dropdowns.at(2).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
+    expect((inputTextarea.element as HTMLInputElement).value).toBe(testInput);
 
-    await dropdowns.at(3).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
+    const eraseInputButton = wrapper.find('button[data-erase-input]');
+    expect(eraseInputButton.exists()).toBeTruthy();
 
-    wrapper.vm.deleteLine(wrapper.vm.getLinesFromSelectedCase[0].lineID);
+    await eraseInputButton.trigger('click');
     await Vue.nextTick();
 
-    const formInputsUpdated = wrapper.findAll('input');
+    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(1);
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('multiline');
+    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe('');
 
-    // The input element should be replaced by textarea element
-    expect(formInputsUpdated.length).toBe(0);
+    expect((inputTextarea.element as HTMLInputElement).value).toBe('');
   });
 
   it('Should write and erase outputs', async () => {
@@ -242,7 +230,7 @@ describe('CaseEdit.vue', () => {
     await Vue.nextTick();
 
     const editButton = wrapper.find('button');
-    expect(editButton.text()).toBe(T.caseEditTitle);
+    expect(editButton.text()).toBe(T.problemCreatorEditCase);
 
     await editButton.trigger('click');
 
@@ -456,21 +444,15 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
 
-    wrapper.vm.addNewLine();
-    await Vue.nextTick();
+    const generateArrayButton = wrapper.find(
+      'button[data-menu-generate-array]',
+    );
+    expect(generateArrayButton.exists()).toBeTruthy();
 
-    const dropdowns = wrapper.findAll('a.dropdown-item');
-
-    await dropdowns.at(2).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('array');
-
-    const editSVG = wrapper.find('svg.bi-pencil-square');
-    expect(editSVG.exists()).toBeTruthy();
-
-    const editIcon = wrapper.find(`button[data-line-edit-button]`);
-    await editIcon.trigger('click');
+    await generateArrayButton.trigger('click');
 
     const modalBody = wrapper.find('div[data-array-modal]');
+    expect(modalBody.exists()).toBeTruthy();
 
     const modalInputs = modalBody.findAll('input');
 
@@ -513,7 +495,8 @@ describe('CaseEdit.vue', () => {
 
     await modalFooter.find('button.btn-success').trigger('click');
 
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
+    const inputTextarea = wrapper.find('textarea[data-input-textarea]');
+    expect((inputTextarea.element as HTMLTextAreaElement).value).toBe(
       '10 10 10 10 10',
     );
   });
@@ -532,19 +515,15 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.text()).toContain(newCase.name);
     expect(wrapper.text()).toContain(newGroup.name);
 
-    const dropdowns = wrapper.findAll('a.dropdown-item');
-    expect(dropdowns.length).toBe(4);
+    const generateMatrixButton = wrapper.find(
+      'button[data-menu-generate-matrix]',
+    );
+    expect(generateMatrixButton.exists()).toBeTruthy();
 
-    await dropdowns.at(3).trigger('click');
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
-
-    const editSVG = wrapper.find('svg.bi-pencil-square');
-    expect(editSVG.exists()).toBeTruthy();
-
-    const editIcon = wrapper.find(`button[data-line-edit-button]`);
-    await editIcon.trigger('click');
+    await generateMatrixButton.trigger('click');
 
     const modalBody = wrapper.find('div[data-matrix-modal]');
+    expect(modalBody.exists()).toBeTruthy();
 
     const modalInputs = modalBody.findAll('input');
     expect(modalInputs.length).toBe(4);
@@ -574,12 +553,11 @@ describe('CaseEdit.vue', () => {
     const footerButtons = modalFooter.findAll('button');
     expect(footerButtons.length).toBe(2);
 
-    wrapper.vm.editLineValue([
-      wrapper.vm.getLinesFromSelectedCase[0].lineID,
-      wrapper.vm.matrixModalEditArray,
-    ]);
+    await modalFooter.find('button.btn-success').trigger('click');
+    await Vue.nextTick();
 
-    expect(wrapper.vm.getLinesFromSelectedCase[0].data.value).toBe(
+    const inputTextarea = wrapper.find('textarea[data-input-textarea]');
+    expect((inputTextarea.element as HTMLTextAreaElement).value).toBe(
       '20 20 20\n20 20 20\n20 20 20',
     );
   });
@@ -619,14 +597,12 @@ describe('CaseEdit.vue', () => {
           caseID,
         });
         await Vue.nextTick();
-        const dropdowns = wrapper.findAll('a.dropdown-item');
-        expect(dropdowns.length).toBe(4);
+        const generateMatrixButton = wrapper.find(
+          'button[data-menu-generate-matrix]',
+        );
+        expect(generateMatrixButton.exists()).toBeTruthy();
 
-        await dropdowns.at(3).trigger('click');
-        expect(wrapper.vm.getLinesFromSelectedCase[0].data.kind).toBe('matrix');
-
-        const editIcon = wrapper.find(`button[data-line-edit-button]`);
-        await editIcon.trigger('click');
+        await generateMatrixButton.trigger('click');
 
         const modalBody = wrapper.find('div[data-matrix-modal]');
 
@@ -668,65 +644,28 @@ describe('CaseEdit.vue', () => {
     const menuDropdown = wrapper.find('div[data-menu-dropdown]');
     expect(menuDropdown.exists()).toBeTruthy();
 
-    // There are four buttons in the dropdown area.
+    // There are 3 buttons in the dropdown area.
     // - Toggle dropdown
-    // - delete lines
     // - Download .in
     // - Download .txt
-    const dropdownAreaButtonsCount = 4;
+    const dropdownAreaButtonsCount = 3;
 
     const dropdownButtons = menuDropdown.findAll('button');
     expect(dropdownButtons.length).toBe(dropdownAreaButtonsCount);
 
-    const deleteButton = menuDropdown.find('button[data-menu-delete-lines]');
     const downloadInButton = menuDropdown.find('button[data-menu-download-in]');
     const downloadTxtButton = menuDropdown.find(
       'button[data-menu-download-txt]',
     );
 
-    expect(deleteButton.text()).toBe(T.problemCreatorLinesDelete);
     expect(downloadInButton.text()).toBe(T.problemCreatorCaseDownloadIn);
     expect(downloadTxtButton.text()).toBe(T.problemCreatorCaseDownloadTxt);
 
-    wrapper.vm.addNewLine();
+    const inputTextarea = wrapper.find('textarea[data-input-textarea]');
+    expect(inputTextarea.exists()).toBeTruthy();
+
+    await inputTextarea.setValue('ome g a\nu\np');
     await Vue.nextTick();
-
-    // Only one line is added.
-    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(1);
-
-    await deleteButton.trigger('click');
-
-    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(0);
-
-    wrapper.vm.addNewLine();
-    wrapper.vm.addNewLine();
-    await Vue.nextTick();
-
-    // Two lines are added, so!
-    expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
-
-    const dropdownsMultiline = wrapper.findAll(
-      `a[data-array-modal-dropdown-kind]`,
-    );
-
-    // There are two dropdown items for multiline, one for each line.
-    const fragment = 'multiline';
-    const filteredDropdowns = dropdownsMultiline.filter((node) => {
-      const nodeAttribute = node.attributes('data-array-modal-dropdown-kind');
-      return nodeAttribute?.includes(fragment);
-    });
-    expect(filteredDropdowns.length).toBe(2);
-
-    await filteredDropdowns.at(1).trigger('click');
-
-    const formInputs = wrapper.findAll('input');
-    const formTextArea = wrapper.find('textarea');
-
-    await formInputs.at(0).setValue('testLabel');
-    await formInputs.at(1).setValue('ome g a');
-
-    await formInputs.at(2).setValue('testLabel');
-    await formTextArea.setValue('u\np');
 
     expect(
       wrapper.vm.getStringifiedLinesFromCaseGroupID({
@@ -749,5 +688,53 @@ describe('CaseEdit.vue', () => {
     ]);
 
     mockDownload.mockRestore();
+  });
+
+  it('renders CaseSimpleForm and DeleteConfirmationForm when editing mode is enabled', async () => {
+    const wrapper = mount(CaseEdit, {
+      localVue,
+      store,
+      provide: {
+        isEditing: true,
+        problemAlias: 'alias',
+      },
+    });
+
+    const groupID = newGroup.groupID;
+    const caseID = newCase.caseID;
+    store.commit('casesStore/setSelected', {
+      groupID,
+      caseID,
+    });
+    await Vue.nextTick();
+
+    const simpleForm = wrapper.findComponent(CaseSimpleForm);
+    expect(simpleForm.exists()).toBe(true);
+
+    expect(simpleForm.props('isCaseEdit')).toBe(true);
+
+    expect(simpleForm.props('isTruncatedInput')).toBe(false);
+    expect(simpleForm.props('isTruncatedOutput')).toBe(false);
+
+    expect(wrapper.find('input[name="input_file"]').exists()).toBe(false);
+    expect(wrapper.find('input[name="output_file"]').exists()).toBe(false);
+
+    simpleForm.setProps({
+      isTruncatedInput: true,
+      isTruncatedOutput: true,
+    });
+    await Vue.nextTick();
+
+    expect(wrapper.find('input[name="input_file"]').exists()).toBe(true);
+    expect(wrapper.find('input[name="output_file"]').exists()).toBe(true);
+
+    wrapper.vm.confirmingDelete = true;
+    await Vue.nextTick();
+
+    const deleteForm = wrapper.findComponent(DeleteConfirmationForm);
+    expect(deleteForm.exists()).toBe(true);
+
+    expect(deleteForm.props('visible')).toBe(true);
+    expect(deleteForm.props('itemName')).toBe(wrapper.vm.itemNameForDelete);
   });
 });
