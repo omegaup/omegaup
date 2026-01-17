@@ -1,6 +1,7 @@
 import formatDuration from 'date-fns/formatDuration';
 import intervalToDuration from 'date-fns/intervalToDuration';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import format from 'date-fns/format';
 import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
@@ -316,6 +317,53 @@ export function formatContestDuration(
     );
   }
   return formatDelta(delta);
+}
+
+export function formatRelativeHoursMinutes(targetDate: Date): string {
+  const diffMs = targetDate.getTime() - Date.now();
+  const totalMinutes = Math.floor(Math.abs(diffMs) / (1000 * 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${minutes}m`;
+}
+
+export function formatDateForContest(date: Date): string {
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
+  }
+  return format(date, 'd MMM yyyy', { locale: currentLocale });
+}
+
+export function getContestDateForDisplay(targetDate: Date): string {
+  const now = Date.now();
+  const targetTime = targetDate.getTime();
+  const diffMs = Math.abs(targetTime - now);
+  const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+
+  if (diffMs < FORTY_EIGHT_HOURS) {
+    if (targetTime > now) {
+      return formatRelativeHoursMinutes(targetDate);
+    }
+    return formatRelativeHoursMinutes(targetDate);
+  }
+
+  return formatDateForContest(targetDate);
 }
 
 /**
