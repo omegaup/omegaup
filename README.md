@@ -87,6 +87,39 @@ To set up the development environment locally, see the [Development Environment 
 
 ### Quick Start
 
+## 👋 New Contributor Onboarding
+
+If this is your first time contributing to omegaUp, this section will help you
+navigate the existing documentation and get started smoothly.
+
+### Getting Oriented
+Begin by reading this README to understand what omegaUp does and how the
+repository is organized.
+
+### Local Development Setup
+A complete local development guide already exists and should be followed
+step by step:
+
+📄 Documentation: [Development Environment Setup Guide](frontend/www/docs/Development-Environment-Setup-Process.md)   
+🎥 https://youtu.be/08rFcs6TV9U
+
+### Common Pitfalls
+New contributors often run into issues such as:
+- Missing required dependencies
+- Package managers not installed or configured
+- Services not running before starting the application
+
+### Verifying Your Setup
+After completing the setup, make sure:
+- The application starts without errors
+- The web interface loads correctly in the browser
+
+### Next Steps
+Once everything is working, look for beginner-friendly issues and make a small
+contribution to get familiar with the workflow.
+
+If you get stuck, feel free to ask questions in the issue tracker.
+
 ### Demo Video
 🎥 https://youtu.be/08rFcs6TV9U
 
