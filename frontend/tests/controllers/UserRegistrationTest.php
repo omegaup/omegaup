@@ -167,6 +167,73 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test GitHub login creates new identity when email doesn't exist
+     */
+    public function testGitHubLoginCreatesNewIdentity(): void {
+        $email = 'newgithubuser' . uniqid() . '@example.com';
+        $name = 'GitHub Test User';
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Session::loginViaGitHubEmail($email, $name);
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // Expected
+        }
+        ob_end_clean();
+
+        $identity = \OmegaUp\DAO\Identities::findByEmail($email);
+        $this->assertNotNull($identity);
+        $this->assertStringContainsString($name, $identity->name);
+    }
+
+    /**
+     * Test GitHub login with existing user associates properly
+     */
+    public function testGitHubLoginExistingUserAssociation(): void {
+        ['identity' => $identity, 'user' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Session::loginViaGitHubEmail(
+                $email->email,
+                'GitHub Name'
+            );
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // Expected
+        }
+        ob_end_clean();
+
+        $githubIdentity = \OmegaUp\DAO\Identities::findByEmail($email->email);
+        $this->assertNotNull($githubIdentity);
+        $this->assertEquals(
+            $identity->identity_id,
+            $githubIdentity->identity_id
+        );
+    }
+
+    /**
+     * Test GitHub state management in login payload
+     */
+    public function testGitHubStateManagementInLoginPage(): void {
+        $r = new \OmegaUp\Request([]);
+
+        $response = \OmegaUp\Controllers\User::getLoginDetailsForTypeScript($r);
+
+        $this->assertArrayHasKey(
+            'githubClientId',
+            $response['templateProperties']['payload']
+        );
+        $this->assertArrayHasKey(
+            'githubState',
+            $response['templateProperties']['payload']
+        );
+        $this->assertIsString(
+            $response['templateProperties']['payload']['githubState']
+        );
+    }
+
+    /**
      * User logged via google, try log in with native mode, and
      * different username
      */
