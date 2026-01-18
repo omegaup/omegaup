@@ -87,7 +87,10 @@ export const contestStoreConfig = {
         return;
       }
       commit('setLoading', true);
-      api.Contest.list(payload.requestParams)
+      api.Contest.list({
+        ...payload.requestParams,
+        page_size: 3,
+      })
         .then((response) => {
           commit('updateList', {
             name: payload.name,
@@ -103,7 +106,9 @@ export const contestStoreConfig = {
 };
 
 function generateCacheKey(params: UrlParams) {
-  return `${params.tab_name}-${params.filter}-${params.sort_order}-${params.query}-${params.page}`;
+  return `${params.tab_name}-${params.filter}-${params.sort_order}-${
+    params.query
+  }-${params.page}-${(params as any).page_size || ''}`;
 }
 
 export default new Vuex.Store<ContestState>(contestStoreConfig);

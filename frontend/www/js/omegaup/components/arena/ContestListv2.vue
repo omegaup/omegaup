@@ -479,7 +479,7 @@ class ArenaContestList extends Vue {
   @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
-  @Prop({ default: 10 }) pageSize!: number;
+  @Prop({ default: 3 }) pageSize!: number;
   @Prop({ default: false }) loading!: boolean;
 
   T = T;

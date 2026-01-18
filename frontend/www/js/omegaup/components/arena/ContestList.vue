@@ -205,7 +205,7 @@
             </div>
             <div v-else class="d-flex">
               <div
-                v-for="contestItem in getContestsForTab(tab).slice(0, 10)"
+                v-for="contestItem in getContestsForTab(tab).slice(0, 3)"
                 :key="contestItem.contest_id"
                 class="mr-3"
                 style="min-width: 300px; max-width: 300px"
@@ -417,6 +417,13 @@
         "
         class="text-center mb-2"
       >
+        <button
+          class="btn btn-outline-primary w-100"
+          :disabled="isScrollLoading"
+          @click="loadMoreContests"
+        >
+          {{ showMoreContestButtonText }}
+        </button>
         <button
           class="btn btn-outline-primary w-100"
           :disabled="isScrollLoading"
