@@ -63,6 +63,7 @@ const translations: { [key: string]: string; } = {
   arenaCommonTimeLimit: "Limite de tempo (caso)",
   arenaContestEndedUsePractice: "Este concurso terminou. Para continuar a enviar solu\u00e7\u00f5es use o Modo de Pr\u00e1tica clicando aqui.",
   arenaContestHasAlreadyStarted: "Este concurso j\u00e1 come\u00e7ou",
+  arenaContestMultipleTabsDetected: "Voc\u00ea j\u00e1 tem este concurso aberto em outra guia. Feche esta guia e volte para a original.",
   arenaContestNotOpened: "Voc\u00ea precisa abrir o conjunto de problemas no modo n\u00e3o administrativo para fazer envios.",
   arenaContestOrganizer: "Organizador",
   arenaContestPracticeOriginalRunsText: "Para ver as solu\u00e7\u00f5es do concurso original, clique [aqui](/arena/%(contestAlias)/#runs)",

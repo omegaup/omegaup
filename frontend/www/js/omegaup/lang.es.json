@@ -62,6 +62,7 @@
 	"arenaCommonTimeLimit": "L\u00edmite de tiempo (caso)",
 	"arenaContestEndedUsePractice": "Este concurso ha terminado. Para continuar enviando soluciones usa nuestro Modo Pr\u00e1ctica haciendo clic aqu\u00ed.",
 	"arenaContestHasAlreadyStarted": "Este concurso ha comenzado",
+	"arenaContestMultipleTabsDetected": "Ya tienes este concurso abierto en otra pesta\u00f1a. Por favor cierra esta pesta\u00f1a y regresa a la original.",
 	"arenaContestNotOpened": "Necesitas abrir el concurso como no-administrador para hacer env\u00edos.",
 	"arenaContestOrganizer": "Organiza",
 	"arenaContestPracticeOriginalRunsText": "Para ver los env\u00edos del concurso, da clic [aqu\u00ed](/arena/%(contestAlias)/#runs)",
