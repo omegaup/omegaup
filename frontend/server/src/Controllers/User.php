@@ -4855,10 +4855,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $code
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
-     * @omegaup-request-param null|string $third_party_login
      * @omegaup-request-param null|string $redirect
+     * @omegaup-request-param null|string $state
+     * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4877,11 +4879,25 @@ class User extends \OmegaUp\Controllers\Controller {
             $thirdPartyLogin = 'facebook';
         }
 
+        $sessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        $githubState = $sessionManager->getCookie('github_oauth_state');
+        if (is_null($githubState) && !$r->offsetExists('code')) {
+            $githubState = \OmegaUp\SecurityTools::randomString(16);
+            $sessionManager->setCookie(
+                'github_oauth_state',
+                $githubState,
+                \OmegaUp\Time::get() + APC_USER_CACHE_SESSION_TIMEOUT,
+                '/'
+            );
+        }
+
         $response = [
             'templateProperties' => [
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'githubClientId' => OMEGAUP_GITHUB_CLIENT_ID,
+                    'githubState' => $githubState,
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-signup'
                     ),
@@ -4893,6 +4909,8 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif ($thirdPartyLogin === 'github') {
+                \OmegaUp\Controllers\Session::loginViaGithubCallback($r);
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,

@@ -89,6 +89,83 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testGitHubLoginNewUser(): void {
+        $email = 'newuser' . \OmegaUp\Time::get() . '@github.com';
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Session::loginViaGitHubEmail(
+                $email,
+                'Test User'
+            );
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            //expected.
+        }
+        ob_end_clean();
+
+        $identity = \OmegaUp\DAO\Identities::findByEmail($email);
+        $this->assertNotNull($identity);
+    }
+
+    public function testGitHubLoginExistingUser(): void {
+        ['identity' => $identity, 'user' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        $this->assertNotNull($identity->username);
+        $this->assertNotNull($identity->user_id);
+        $this->assertNotNull($user->main_email_id);
+
+        $email = \OmegaUp\DAO\Emails::getByPK(intval($user->main_email_id));
+        $this->assertNotNull($email);
+        $emailAddress = strval($email->email);
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Session::loginViaGitHubEmail(
+                $emailAddress,
+                'GitHub User'
+            );
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            //expected.
+        }
+        ob_end_clean();
+
+        $githubIdentity = \OmegaUp\DAO\Identities::findByEmail($emailAddress);
+        $this->assertNotNull($githubIdentity);
+        $this->assertSame($identity->identity_id, $githubIdentity->identity_id);
+    }
+
+    public function testGitHubCSRFValidation(): void {
+        $originalSessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        /** @var \OmegaUp\SessionManager&\PHPUnit\Framework\MockObject\MockObject */
+        $sessionManagerMock = $this->getMockBuilder(
+            \OmegaUp\SessionManager::class
+        )
+            ->onlyMethods(['getCookie'])
+            ->getMock();
+        $sessionManagerMock->expects($this->once())
+            ->method('getCookie')
+            ->with('github_oauth_state')
+            ->willReturn('expected-state');
+
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+            $sessionManagerMock
+        );
+
+        try {
+            $this->expectException(
+                \OmegaUp\Exceptions\InvalidParameterException::class
+            );
+            $this->expectExceptionMessage('loginGitHubInvalidCSRFToken');
+            \OmegaUp\Controllers\Session::loginViaGithub(
+                'dummy-code',
+                'different-state'
+            );
+        } finally {
+            \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+                $originalSessionManager
+            );
+        }
+    }
+
     /**
      * User logged via google, try log in with native mode, and
      * different username
