@@ -1147,6 +1147,7 @@
 	"problemCreatorDeleteGroup": "Eliminar grupo",
 	"problemCreatorEditCase": "Editar caso",
 	"problemCreatorEmpty": "",
+	"problemCreatorSelectLanguage": "Selecciona un lenguaje",
 	"problemCreatorEraseOutput": "Borrar salida",
 	"problemCreatorGenerateProblem": "Generar Problema",
 	"problemCreatorGroup": "Grupo",
