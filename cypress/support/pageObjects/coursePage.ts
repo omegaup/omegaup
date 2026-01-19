@@ -327,7 +327,7 @@ export class CoursePage {
         .type(courseOptions.objective);
     }
     cy.get('form[data-course-form]').submit();
-    cy.get('[data-alert-close]').click();
+    cy.get('[data-alert-close]').click({ force: true });
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
     cy.get('[data-course-edit-content-button]').click();
