@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-4">
+  <div class="card">
     <div class="card-header">
       <h2 class="card-title">{{ T.loginSignupHeader }}</h2>
     </div>
