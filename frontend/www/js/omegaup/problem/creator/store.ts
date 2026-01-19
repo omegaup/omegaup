@@ -102,17 +102,18 @@ const store = new Vuex.Store({
       state.problemSolutionMarkdown = T.problemCreatorEmpty;
 
       localStorageHelper.clearDraft(STORAGE_KEY, STORAGE_TIMESTAMP_KEY);
-      // Also reset the cases module state
-      (store as Vuex.Store<StoreState>).commit('casesStore/resetStore');
     },
   },
 });
 
+store.subscribe((mutation) => {
+  if (mutation.type === 'resetStore') {
+    store.commit('casesStore/resetStore');
+  }
+});
+
 if (savedDraft && (savedDraft as any).casesStore) {
-  (store as Vuex.Store<StoreState>).commit(
-    'casesStore/replaceState',
-    (savedDraft as any).casesStore,
-  );
+  store.commit('casesStore/replaceState', (savedDraft as any).casesStore);
 }
 
 export default store;
