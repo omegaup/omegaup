@@ -52,8 +52,19 @@ export default class Creator extends Vue {
   currentSolutionMarkdownProp: string = T.problemCreatorEmpty;
   currentMarkdownProp: string = T.problemCreatorEmpty;
 
+  created() {
+    this.hydrateFromStore();
+  }
+
   mounted() {
     this.launchIntro();
+  }
+
+  hydrateFromStore() {
+    this.currentMarkdownProp = this.$store.state.problemMarkdown;
+    this.codeProp = this.$store.state.problemCodeContent;
+    this.extensionProp = this.$store.state.problemCodeExtension;
+    this.currentSolutionMarkdownProp = this.$store.state.problemSolutionMarkdown;
   }
 
   launchIntro() {

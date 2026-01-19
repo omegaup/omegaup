@@ -208,7 +208,21 @@ export default class CodeTab extends Vue {
   updateCode() {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
+    this.$store.commit('persistDraft');
     this.$emit('show-update-success-message');
+  }
+
+  created(): void {
+    this.code = this.codeProp;
+    this.extension = this.extensionProp;
+    if (this.extension && this.allowedExtensions.includes(this.extension)) {
+      const languageInfo = Object.values(supportedLanguages).find(
+        (language) => language.extension === this.extension,
+      );
+      if (languageInfo) {
+        this.selectedLanguage = languageInfo.language;
+      }
+    }
   }
 
   startIntroGuide() {
