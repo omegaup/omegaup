@@ -663,7 +663,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       state: GraderStore,
       caseData: { name: string; in?: string; out?: string; weight?: number },
     ) {
-      // if case doesnt already exist create it?
+      // if case doesn't already exist create it?
       // no! always create a case
       // 2 cases can be of same name and different data
 
