@@ -98,6 +98,7 @@ def get_school_of_the_month_candidates(
                     AND `p`.`quality_seal` = 1
                     AND `su`.`school_id` IS NOT NULL
                     -- hay mail_email_id en la tabla de Users
+                    AND `u`.`main_email_id` IS NOT NULL
                     -- Me estoy asegurando que el usuario también exista
                     AND `i`.`user_id` IS NOT NULL
                 GROUP BY
