@@ -1148,6 +1148,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorDeleteGroup: "Eliminar grupo",
   problemCreatorEditCase: "Editar caso",
   problemCreatorEmpty: "",
+  problemCreatorSelectLanguage: "Selecciona un lenguaje",
   problemCreatorEraseOutput: "Borrar salida",
   problemCreatorGenerateProblem: "Generar Problema",
   problemCreatorGroup: "Grupo",
@@ -2199,4 +2200,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };
