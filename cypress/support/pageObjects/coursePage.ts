@@ -327,7 +327,9 @@ export class CoursePage {
         .type(courseOptions.objective);
     }
     cy.get('form[data-course-form]').submit();
-    cy.get('[data-alert-close]').click();
+    // After submitting the course form, the alert can briefly be covered or not considered
+    // actionable by Cypress, so we force the click here to avoid flakiness in this context.
+    cy.get('[data-alert-close]').click({ force: true });
     cy.get('[data-course-edit-content]').click();
     cy.get('div[data-content-tab]').should('be.visible');
     cy.get('[data-course-edit-content-button]').click();
