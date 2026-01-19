@@ -32,23 +32,67 @@ class CdpBuilder {
     }
 
     /**
+     * Determines whether to override the markdown based on language preferences.
+     *
+     * @param ?string $currentLanguage Currently selected language
+     * @param string $candidateLanguage Language of the candidate content.
+     * @param string $languagePreference User's preferred language.
+     *
+     * @return bool
+     */
+    public static function shouldOverrideMarkdown(
+        ?string $currentLanguage,
+        string $candidateLanguage,
+        string $languagePreference,
+    ): bool {
+        if (is_null($currentLanguage)) {
+            return true;
+        }
+
+        if ($currentLanguage === $languagePreference) {
+            return false;
+        }
+
+        if ($candidateLanguage === $languagePreference) {
+            return true;
+        }
+
+        if (
+            $currentLanguage !== \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE &&
+            $candidateLanguage === \OmegaUp\Controllers\Problem::DEFAULT_LANGUAGE
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Set the problem statement markdown.
      *
      * @param CDPRaw $cdp Reference to the CDP to modify.
      * @param string $markdown Markdown content of the problem statement.
-     * @throws \OmegaUp\Exceptions\InvalidParameterException If the statement is already set.
+     * @param string $language Language code of this markdown (en|es|pt).
+     * @param string $languagePreference Preferred language code.
+     * @param ?string &$currentLanguage Currently selected language for the statement
      */
     public static function setProblemMarkdown(
         array &$cdp,
-        string $markdown
+        string $markdown,
+        string $language,
+        string $languagePreference,
+        ?string &$currentLanguage
     ): void {
-        if (!empty($cdp['problemMarkdown'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidProblemStatementNotEmpty',
-                'statement'
-            );
+        if (
+            !self::shouldOverrideMarkdown(
+                $currentLanguage,
+                $language,
+                $languagePreference
+            )
+        ) {
+            return;
         }
         $cdp['problemMarkdown'] = $markdown;
+        $currentLanguage = $language;
     }
 
     /**
@@ -56,19 +100,28 @@ class CdpBuilder {
      *
      * @param CDPRaw $cdp Reference to the CDP to modify.
      * @param string $markdown Markdown content of the problem solution.
-     * @throws \OmegaUp\Exceptions\InvalidParameterException If the solution is already set.
+     * @param string $language Language code of this markdown (en|es|pt).
+     * @param string $languagePreference Preferred language code.
+     * @param ?string &$currentLanguage Currently selected language for the solution
      */
     public static function setSolutionMarkdown(
         array &$cdp,
-        string $markdown
+        string $markdown,
+        string $language,
+        string $languagePreference,
+        ?string &$currentLanguage
     ): void {
-        if (!empty($cdp['problemSolutionMarkdown'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidProblemSolutionNotEmpty',
-                'solution'
-            );
+        if (
+            !self::shouldOverrideMarkdown(
+                $currentLanguage,
+                $language,
+                $languagePreference
+            )
+        ) {
+            return;
         }
         $cdp['problemSolutionMarkdown'] = $markdown;
+        $currentLanguage = $language;
     }
 
     /**
@@ -192,15 +245,88 @@ class CdpBuilder {
         array $points
     ): array {
         $groups = [];
+        $autoPoints = empty($points);
+
+        /**
+         * @psalm-param array{in: string, out: string} $caseData
+         * @psalm-return CDPCase
+         */
+        $buildCase = function (
+            string $groupID,
+            string $groupName,
+            string $caseName,
+            array $caseData
+        ) use (
+            $points,
+            $autoPoints
+        ): array {
+            $caseID = self::generate_uuid_v4();
+            $lineID = self::generate_uuid_v4();
+
+            $casePath = $groupName === 'ungrouped' ? $caseName : "$groupName.$caseName";
+            $casePoints = $points[$casePath] ?? 100;
+
+            /** @var string $input */
+            $input = $caseData['in'];
+            /** @var string $output */
+            $output = $caseData['out'];
+
+            return [
+                'caseID' => $caseID,
+                'groupID' => $groupID,
+                'lines' => [
+                    [
+                        'lineID' => $lineID,
+                        'caseID' => $caseID,
+                        'label' => '',
+                        'data' => [
+                            'kind' => 'multiline',
+                            'value' => $input
+                        ]
+                    ]
+                ],
+                'points' => $casePoints,
+                'autoPoints' => $autoPoints,
+                'output' => $output,
+                'name' => strval($caseName)
+            ];
+        };
 
         foreach ($cases as $groupName => $casesInGroup) {
+            uksort($casesInGroup, 'strnatcmp');
+            if ($groupName === 'ungrouped') {
+                foreach ($casesInGroup as $caseName => $caseData) {
+                    if (!isset($caseData['in'], $caseData['out'])) {
+                        continue;
+                    }
+                    $groupID = self::generate_uuid_v4();
+
+                    $case = $buildCase(
+                        $groupID,
+                        $groupName,
+                        $caseName,
+                        $caseData
+                    );
+
+                    $groups[] = [
+                        'groupID' => $groupID,
+                        'name' => strval($caseName),
+                        'points' => $case['points'],
+                        'autoPoints' => $autoPoints,
+                        'ungroupedCase' => true,
+                        'cases' => [$case]
+                    ];
+                }
+                continue;
+            }
+
             $groupID = self::generate_uuid_v4();
             $group = [
                 'groupID' => $groupID,
-                'name' => $groupName === 'ungrouped' ? '' : $groupName,
+                'name' => strval($groupName),
                 'points' => 100,
-                'autoPoints' => true,
-                'ungroupedCase' => $groupName === 'ungrouped',
+                'autoPoints' => $autoPoints,
+                'ungroupedCase' => false,
                 'cases' => []
             ];
 
@@ -208,32 +334,12 @@ class CdpBuilder {
                 if (!isset($caseData['in']) || !isset($caseData['out'])) {
                     continue;
                 }
-
-                $caseID = self::generate_uuid_v4();
-                $lineID = self::generate_uuid_v4();
-
-                $casePath = $groupName === 'ungrouped' ? $caseName : "$groupName.$caseName";
-                $casePoints = $points[$casePath] ?? 100;
-
-                $case = [
-                    'caseID' => $caseID,
-                    'groupID' => $groupID,
-                    'lines' => [
-                        [
-                            'lineID' => $lineID,
-                            'caseID' => $caseID,
-                            'label' => '',
-                            'data' => [
-                                'kind' => 'multiline',
-                                'value' => $caseData['in']
-                            ]
-                        ]
-                    ],
-                    'points' => $casePoints,
-                    'autoPoints' => true,
-                    'output' => $caseData['out'],
-                    'name' => $caseName
-                ];
+                $case = $buildCase(
+                    $groupID,
+                    $groupName,
+                    $caseName,
+                    $caseData
+                );
 
                 $group['cases'][] = $case;
             }
@@ -241,20 +347,11 @@ class CdpBuilder {
             $groups[] = $group;
         }
 
-        $firstGroup = $groups[0] ?? null;
-        $firstCase = null;
-
-        if (!is_null($firstGroup) && !empty($firstGroup['cases'])) {
-            $firstCase = $firstGroup['cases'][0];
-        }
-
         return [
             'groups' => $groups,
             'selected' => [
-                'groupID' => !empty(
-                    $firstGroup
-                ) ? $firstGroup['groupID'] : null,
-                'caseID' => !empty($firstCase) ? $firstCase['caseID'] : null
+                'groupID' => '00000000-0000-0000-0000-000000000000',
+                'caseID' => '00000000-0000-0000-0000-000000000000'
             ],
             'layouts' => [],
             'hide' => false
@@ -315,6 +412,10 @@ class CdpBuilder {
         $base64References = [];
         foreach ($processedImages as $data) {
             $base64References[] = "[{$data['id']}]: {$data['data']}";
+        }
+
+        if (empty($base64References)) {
+            return $newMarkdown;
         }
 
         $base64Appendix = implode("\n", $base64References);

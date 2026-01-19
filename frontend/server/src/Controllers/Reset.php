@@ -131,7 +131,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the password of a given user, this is the second and last step
      * in order to reset the password. This operation is done if and only if
-     * the correct parameters are suplied.
+     * the correct parameters are supplied.
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -242,7 +242,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Support doesn't need wait to resest passwords
+        // Support doesn't need wait to reset passwords
         if (
             !is_null($r->identity) &&
             \OmegaUp\Authorization::isSupportTeamMember(
