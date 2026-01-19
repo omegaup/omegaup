@@ -1148,7 +1148,6 @@ const translations: { [key: string]: string; } = {
   problemCreatorDeleteGroup: "(D31373 gr0up)",
   problemCreatorEditCase: "(Edi7 ca53)",
   problemCreatorEmpty: "()",
-  problemCreatorSelectLanguage: "(S313c7 a 1anguag3)",
   problemCreatorEraseOutput: "(C13ar 0u7pu7)",
   problemCreatorGenerateProblem: "(G3n3ra73 Pr0b13m)",
   problemCreatorGroup: "(Gr0up)",
@@ -1206,6 +1205,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorRenameModalBack: "(Back)",
   problemCreatorRenameModalRename: "(R3nam3)",
   problemCreatorRenameModalTitle: "(R3nam3 Lay0u7)",
+  problemCreatorSelectLanguage: "(S313c7 a 1anguag3)",
   problemCreatorSolution: "(S01u7i0n)",
   problemCreatorSolutionTabIntroEditorIntro: "(Wri73 y0ur 501u7i0n h3r3 u5ing Markd0wn 5yn7ax.)",
   problemCreatorSolutionTabIntroEditorTitle: "(Markd0wn Edi70r)",
@@ -2200,4 +2200,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export { translations as default };
+export {translations as default};

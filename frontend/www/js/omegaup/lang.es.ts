@@ -1148,7 +1148,6 @@ const translations: { [key: string]: string; } = {
   problemCreatorDeleteGroup: "Eliminar grupo",
   problemCreatorEditCase: "Editar caso",
   problemCreatorEmpty: "",
-  problemCreatorSelectLanguage: "Selecciona un lenguaje",
   problemCreatorEraseOutput: "Borrar salida",
   problemCreatorGenerateProblem: "Generar Problema",
   problemCreatorGroup: "Grupo",
@@ -1206,6 +1205,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorRenameModalBack: "Atr\u00e1s",
   problemCreatorRenameModalRename: "Renombrar",
   problemCreatorRenameModalTitle: "Renombrar el layout",
+  problemCreatorSelectLanguage: "Selecciona un lenguaje",
   problemCreatorSolution: "Soluci\u00f3n",
   problemCreatorSolutionTabIntroEditorIntro: "Escribe tu soluci\u00f3n aqu\u00ed usando la sintaxis de Markdown.",
   problemCreatorSolutionTabIntroEditorTitle: "Editor Markdown",
@@ -2200,4 +2200,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export { translations as default };
+export {translations as default};
