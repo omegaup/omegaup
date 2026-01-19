@@ -37,12 +37,6 @@ sys.path.insert(
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
-logging.basicConfig(
-    filename='update_ranks.log',
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s'
-)
-
 
 class Cutoff(NamedTuple):
     '''Cutoff percentile for user ranking.'''
