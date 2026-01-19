@@ -11,16 +11,21 @@
           v-if="page.url"
           class="page-link"
           :href="page.url"
-          :class="{ disabled: page.class !== 'active' }"
-          >{{ page.label }}</a
+          :class="{ disabled: page.class === 'active' }"
+          :aria-disabled="page.class === 'active'"
         >
+          {{ page.label }}
+        </a>
+
         <a
           v-else
           class="page-link"
-          :class="{ disabled: page.class !== 'active' }"
+          :class="{ disabled: page.class === 'active' }"
+          :aria-disabled="page.class === 'active'"
           @click.prevent="$emit('page-changed', page.page)"
-          >{{ page.label }}</a
         >
+          {{ page.label }}
+        </a>
       </li>
     </ul>
   </div>
