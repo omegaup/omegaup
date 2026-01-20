@@ -57,7 +57,12 @@ function createStoreConfig() {
     mutations: {
       showNotification(
         state: NotificationsState,
-        payload: { message: string; type: MessageType; link?: string; linkText?: string },
+        payload: {
+          message: string;
+          type: MessageType;
+          link?: string;
+          linkText?: string;
+        },
       ) {
         Vue.set(state, 'message', payload.message);
         Vue.set(state, 'type', payload.type);

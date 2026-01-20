@@ -17,7 +17,9 @@
       </button>
       <span v-if="message" class="message">
         {{ message }}
-        <a v-if="link && linkText" :href="link" class="alert-link">{{ linkText }}</a>
+        <a v-if="link && linkText" :href="link" class="alert-link">{{
+          linkText
+        }}</a>
       </span>
     </div>
   </transition>
