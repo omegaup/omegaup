@@ -112,6 +112,20 @@ export function error(message: string): void {
   displayStatus({ message, type: MessageType.Danger });
 }
 
+export function errorWithLink(
+  message: string,
+  link: string,
+  linkText: string,
+): void {
+  notificationsStore.dispatch('displayStatus', {
+    message,
+    type: MessageType.Danger,
+    autoHide: false,
+    link,
+    linkText,
+  });
+}
+
 export function info(message: string): void {
   displayStatus({ message, type: MessageType.Info });
 }

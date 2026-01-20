@@ -555,6 +555,7 @@ const translations: { [key: string]: string; } = {
   courseEditArchive: "Archive",
   courseEditClone: "Clone",
   courseEditCourseClonedSuccessfully: "Your course has been cloned successfully! <a href=\"/course/%(course_alias)/edit/\">Edit course</a>",
+  courseEditCourseCloned: "Your course has been cloned successfully!",
   courseEditCourseEdited: "Your course has been edited",
   courseEditCourseEditedAndGoToCourse: "Your course has been edited! <a href=\"/course/%(alias)\">Go to course</a>",
   courseEditGoToCourse: "Go to course",
@@ -1815,6 +1816,8 @@ const translations: { [key: string]: string; } = {
   under13UserException: "You can't access this site from an account for children under 13 years of age",
   unnecessaryTokenForPublicCourses: "Token is unnecessary for public courses",
   unsupportedBrowser: "Your browser doesn't support all the features on this page. Please try to update to a <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">supported browser</a>.",
+  unsupportedBrowserMessage: "Your browser doesn't support all the features on this page. Please try to update to a",
+  unsupportedBrowserLinkText: "supported browser",
   unverifiedUser: "Unverified account.",
   updateItemsSuccess: "All the selected items has been updated",
   updateProblemLevel: "Update problem level",
@@ -2200,4 +2203,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };

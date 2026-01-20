@@ -563,10 +563,11 @@ OmegaUp.on('ready', () => {
               start_time: startTime.getTime() / 1000,
             })
               .then(() => {
-                ui.success(
-                  ui.formatString(T.courseEditCourseClonedSuccessfully, {
-                    course_alias: alias,
-                  }),
+                // Use successWithLink to properly render the link instead of embedding HTML
+                ui.successWithLink(
+                  T.courseEditCourseCloned,
+                  `/course/${alias}/edit/`,
+                  T.courseEdit,
                   /*autoHide=*/ false,
                 );
               })
