@@ -89,7 +89,9 @@ def upgrade(args: argparse.Namespace, auth: Sequence[str]) -> None:
 
     print('-- PrivacyStatements')
     print('INSERT INTO `PrivacyStatements` (`type`, `git_object_id`) VALUES ')
-    print(','.join(f"  ('{entry[0]}', '{entry[1]}')" for entry in missing) + ';')
+    values = ','.join(
+        f"  ('{entry[0]}', '{entry[1]}')" for entry in missing)
+    print(values + ';')
 
 
 def _main() -> None:

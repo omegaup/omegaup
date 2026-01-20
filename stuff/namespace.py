@@ -12,7 +12,8 @@ def _find_files(search: str) -> Iterable[str]:
     return [
         x.decode('utf-8') for x in subprocess.check_output([
             '/usr/bin/git', 'grep', '--null',
-            '--files-with-matches', '--perl-regexp', rf'(?<!\\)\b{re.escape(search)}\b',
+            '--files-with-matches', '--perl-regexp',
+            rf'(?<!\\)\b{re.escape(search)}\b',
             '--', '*.php'
         ]).strip(b'\x00').split(b'\x00')
     ]

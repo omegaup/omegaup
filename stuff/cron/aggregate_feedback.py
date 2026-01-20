@@ -287,7 +287,8 @@ def replace_voted_tags(dbconn: lib.db.Connection,
                        FROM
                            `Tags` AS `t`
                        WHERE
-                           `t`.`name` IN ({', '.join('%s' for _ in problem_tags)});""",
+                           `t`.`name` IN (
+                               {', '.join('%s' for _ in problem_tags)});""",
                     (problem_id, ) + tuple(problem_tags))
                 for level, code, message in (cur.fetchwarnings() or []):
                     if code == errorcode.ER_DUP_ENTRY:
