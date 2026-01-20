@@ -1813,7 +1813,6 @@ const translations: { [key: string]: string; } = {
   unableToVerifyCaptcha: "N\u00e3o pudemos verificar o captcha. Recarregue a p\u00e1gina e tente novamente",
   under13UserException: "Voc\u00ea n\u00e3o pode ingressar a este s\u00edtio usando uma conta para crian\u00e7as menores de 13 anos de idade",
   unnecessaryTokenForPublicCourses: "O token \u00e9 desnecess\u00e1rio para cursos p\u00fablicos",
-  unsupportedBrowser: "Seu navegador n\u00e3o suporta todos os recursos desta p\u00e1gina. Por favor tente atualizar a um <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">navegador suportado</a>.",
   unsupportedBrowserLinkText: "navegador suportado",
   unsupportedBrowserMessage: "Seu navegador n\u00e3o suporta todos os recursos desta p\u00e1gina. Por favor tente atualizar a um",
   unverifiedUser: "Conta n\u00e3o verificada.",

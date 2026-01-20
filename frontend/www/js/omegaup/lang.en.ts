@@ -1813,7 +1813,6 @@ const translations: { [key: string]: string; } = {
   unableToVerifyCaptcha: "We failed to verify the captcha. Please reload the page and try again.",
   under13UserException: "You can't access this site from an account for children under 13 years of age",
   unnecessaryTokenForPublicCourses: "Token is unnecessary for public courses",
-  unsupportedBrowser: "Your browser doesn't support all the features on this page. Please try to update to a <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">supported browser</a>.",
   unsupportedBrowserLinkText: "supported browser",
   unsupportedBrowserMessage: "Your browser doesn't support all the features on this page. Please try to update to a",
   unverifiedUser: "Unverified account.",
