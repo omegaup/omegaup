@@ -4,19 +4,43 @@ This is a quick guide to enable “Sign in with GitHub” in a local omegaUp ins
 
 ## Create the OAuth App
 
-1. Go to https://github.com/settings/developers and choose **OAuth Apps → New OAuth App**.
-2. Use a descriptive name such as `omegaUp local`.
-3. Homepage URL: `http://localhost:8001/`.
-4. Authorization callback URL: `http://localhost:8001/login?third_party_login=github`.
-5. Save and note the **Client ID** and **Client Secret**.
+1. Sign in to GitHub and open https://github.com/settings/developers.
+2. Click **OAuth Apps → New OAuth App**.
+3. Fill the form:
+   - Application name: `omegaUp local` (or any name you prefer)
+   - Homepage URL: `http://localhost:8001/`
+   - Authorization callback URL: `http://localhost:8001/login?third_party_login=github`
+4. Click **Register application**.
+5. On the app page, copy the **Client ID** and generate/copy the **Client Secret** (you will not see the secret again).
 
 ## Configure omegaUp
 
-1. Copy `frontend/server/config.default.php` to `frontend/server/config.php` if you have not already.
-2. Set these values in `frontend/server/config.php`:
-   - `OMEGAUP_GITHUB_CLIENT_ID`
-   - `OMEGAUP_GITHUB_CLIENT_SECRET`
-3. Restart your local stack so the new configuration is loaded (e.g., `docker-compose up -d --force-recreate frontend`).
+1. Open `frontend/server/config.default.php` and find the GitHub section:
+   ```php
+   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'xxxxx');
+   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'xxxxx');
+   ```
+2. Replace the placeholder values with your actual credentials:
+   ```php
+   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'your_real_client_id_here');
+   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'your_real_client_secret_here');
+   ```
+3. Restart your local stack:
+   ```bash
+   docker-compose restart frontend
+   ```
+
+### ⚠️ IMPORTANT: Before Committing
+
+**You MUST revert your credentials before pushing to git:**
+
+1. Before `git add` or `git commit`, restore the placeholders:
+   ```php
+   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'xxxxx');
+   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'xxxxx');
+   ```
+2. Or use `git checkout frontend/server/config.default.php` to discard changes.
+3. **Never commit real secrets to git** — they will be permanently in the repository history.
 
 ## Tips
 
