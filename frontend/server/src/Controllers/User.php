@@ -4310,7 +4310,11 @@ class User extends \OmegaUp\Controllers\Controller {
         $homepageDescription = \OmegaUp\Translations::getInstance()->get(
             'omegaupDescriptionHomepage'
         );
-        if (empty($homepageDescription) || $homepageDescription === 'omegaupDescriptionHomepage') {
+        if (
+            empty(
+                $homepageDescription
+            ) || $homepageDescription === 'omegaupDescriptionHomepage'
+        ) {
             $homepageDescription = 'omegaUp is a free educational platform that helps improve programming skills. Practice coding problems, participate in contests, and learn from thousands of students and teachers in Latin America. Planning a better future. For everyone.';
         }
 

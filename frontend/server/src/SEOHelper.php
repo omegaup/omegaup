@@ -141,7 +141,9 @@ class SEOHelper {
      * @return string Current URL
      */
     private static function getCurrentUrl(): string {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+        $protocol = (!empty(
+            $_SERVER['HTTPS']
+        ) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
         $host = $_SERVER['HTTP_HOST'] ?? 'omegaup.com';
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         return $protocol . $host . $uri;
@@ -154,7 +156,10 @@ class SEOHelper {
      * @param string $baseUrl Base URL
      * @return string Absolute URL
      */
-    private static function ensureAbsoluteUrl(string $url, string $baseUrl): string {
+    private static function ensureAbsoluteUrl(
+        string $url,
+        string $baseUrl
+    ): string {
         if (preg_match('/^https?:\/\//', $url)) {
             return $url;
         }
