@@ -33,6 +33,8 @@ export interface NotificationsState {
   visible: boolean;
   counter: number;
   autoHideTimeout: ReturnType<typeof setTimeout> | null;
+  link: string | null;
+  linkText: string | null;
 }
 
 /**
@@ -48,23 +50,29 @@ function createStoreConfig() {
       visible: false,
       counter: 0,
       autoHideTimeout: null,
+      link: null,
+      linkText: null,
     } as NotificationsState,
 
     mutations: {
       showNotification(
         state: NotificationsState,
-        payload: { message: string; type: MessageType },
+        payload: { message: string; type: MessageType; link?: string; linkText?: string },
       ) {
         Vue.set(state, 'message', payload.message);
         Vue.set(state, 'type', payload.type);
         Vue.set(state, 'visible', true);
         Vue.set(state, 'counter', state.counter + 1);
+        Vue.set(state, 'link', payload.link || null);
+        Vue.set(state, 'linkText', payload.linkText || null);
       },
 
       hideNotification(state: NotificationsState) {
         Vue.set(state, 'visible', false);
         Vue.set(state, 'message', null);
         Vue.set(state, 'type', null);
+        Vue.set(state, 'link', null);
+        Vue.set(state, 'linkText', null);
       },
 
       setPosition(state: NotificationsState, position: NotificationPosition) {
@@ -97,6 +105,8 @@ function createStoreConfig() {
           type: MessageType;
           autoHide?: boolean;
           position?: NotificationPosition;
+          link?: string;
+          linkText?: string;
         },
       ) {
         // Clear any existing auto-hide timeout
@@ -111,6 +121,8 @@ function createStoreConfig() {
         commit('showNotification', {
           message: payload.message,
           type: payload.type,
+          link: payload.link,
+          linkText: payload.linkText,
         });
 
         // Auto-hide success messages after 5 seconds
@@ -145,6 +157,8 @@ function createStoreConfig() {
       position: (state: NotificationsState) => state.position,
       positionClass: (state: NotificationsState) =>
         `notification-${state.position}`,
+      link: (state: NotificationsState) => state.link,
+      linkText: (state: NotificationsState) => state.linkText,
     },
   };
 }

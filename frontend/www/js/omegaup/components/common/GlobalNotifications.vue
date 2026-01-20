@@ -15,7 +15,10 @@
       >
         &times;
       </button>
-      <span v-if="message" class="message">{{ message }}</span>
+      <span v-if="message" class="message">
+        {{ message }}
+        <a v-if="link && linkText" :href="link" class="alert-link">{{ linkText }}</a>
+      </span>
     </div>
   </transition>
 </template>
@@ -40,6 +43,14 @@ export default class GlobalNotifications extends Vue {
 
   get positionClass(): string {
     return notificationsStore.getters.positionClass;
+  }
+
+  get link(): string | null {
+    return notificationsStore.getters.link;
+  }
+
+  get linkText(): string | null {
+    return notificationsStore.getters.linkText;
   }
 
   dismiss(): void {
