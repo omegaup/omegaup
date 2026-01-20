@@ -234,6 +234,101 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test GitHub login with empty email throws exception
+     */
+    public function testGitHubLoginWithEmptyEmailThrowsException(): void {
+        ob_start();
+        try {
+            try {
+                \OmegaUp\Controllers\Session::loginViaGitHubEmail(
+                    '',
+                    'Test User'
+                );
+                $this->fail('Expected exception was not thrown');
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertStringContainsString(
+                    'loginGitHubNoEmail',
+                    $e->getMessage()
+                );
+            }
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    /**
+     * Test GitHub CSRF validation catches mismatched states
+     */
+    public function testGitHubCSRFMismatchedStateThrowsException(): void {
+        $originalSessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        /** @var \OmegaUp\SessionManager&\PHPUnit\Framework\MockObject\MockObject */
+        $sessionManagerMock = $this->getMockBuilder(
+            \OmegaUp\SessionManager::class
+        )
+            ->onlyMethods(['getCookie'])
+            ->getMock();
+        $sessionManagerMock->expects($this->once())
+            ->method('getCookie')
+            ->with('github_oauth_state')
+            ->willReturn('stored-state');
+
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+            $sessionManagerMock
+        );
+
+        try {
+            $this->expectException(
+                \OmegaUp\Exceptions\InvalidParameterException::class
+            );
+            $this->expectExceptionMessage('loginGitHubInvalidCSRFToken');
+            \OmegaUp\Controllers\Session::loginViaGithub(
+                'dummy-code',
+                'different-state'
+            );
+        } finally {
+            \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+                $originalSessionManager
+            );
+        }
+    }
+
+    /**
+     * Test GitHub login with missing stored state throws exception
+     */
+    public function testGitHubLoginWithMissingStoredStateThrowsException(): void {
+        $originalSessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        /** @var \OmegaUp\SessionManager&\PHPUnit\Framework\MockObject\MockObject */
+        $sessionManagerMock = $this->getMockBuilder(
+            \OmegaUp\SessionManager::class
+        )
+            ->onlyMethods(['getCookie'])
+            ->getMock();
+        $sessionManagerMock->expects($this->once())
+            ->method('getCookie')
+            ->with('github_oauth_state')
+            ->willReturn(null);
+
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+            $sessionManagerMock
+        );
+
+        try {
+            $this->expectException(
+                \OmegaUp\Exceptions\InvalidParameterException::class
+            );
+            $this->expectExceptionMessage('loginGitHubInvalidCSRFToken');
+            \OmegaUp\Controllers\Session::loginViaGithub(
+                'dummy-code',
+                'any-state'
+            );
+        } finally {
+            \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+                $originalSessionManager
+            );
+        }
+    }
+
+    /**
      * User logged via google, try log in with native mode, and
      * different username
      */
