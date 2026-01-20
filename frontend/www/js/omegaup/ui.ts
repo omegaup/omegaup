@@ -134,6 +134,21 @@ export function success(message: string, autoHide: boolean = true): void {
   displayStatus({ message, type: MessageType.Success, autoHide });
 }
 
+export function successWithLink(
+  message: string,
+  link: string,
+  linkText: string,
+  autoHide: boolean = true,
+): void {
+  notificationsStore.dispatch('displayStatus', {
+    message,
+    type: MessageType.Success,
+    autoHide,
+    link,
+    linkText,
+  });
+}
+
 export function warning(message: string): void {
   displayStatus({ message, type: MessageType.Warning });
 }
