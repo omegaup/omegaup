@@ -1,6 +1,17 @@
 User-agent: *
 Allow: /api/session/currentSession/
+Allow: /problems/
+Allow: /arena/
+Allow: /contest/
+Allow: /course/
+Allow: /profile/
+Allow: /rank/
+Allow: /schools/
 Disallow: /admin/
 Disallow: /api/
 Disallow: /install/
 Disallow: /login/
+Disallow: /grader/
+
+# Sitemap location
+Sitemap: https://omegaup.com/sitemap.xml

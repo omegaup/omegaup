@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="container-lg py-4">
+      <h1 class="text-center mb-4">{{ T.omegaupTitleCommonIndex }}</h1>
+    </div>
     <omegaup-carousel></omegaup-carousel>
     <div
       v-if="
