@@ -28,14 +28,10 @@
               <!-- id-lint on -->
               <button
                 data-login-github
-                class="btn btn-block mt-3"
+                class="btn btn-block btn-outline-secondary mt-3 github-login-btn"
                 type="button"
                 :disabled="!githubClientId"
-                style="
-                  background-color: #000000;
-                  border-color: #000000;
-                  color: #ffffff;
-                "
+                aria-label="Sign in with GitHub"
                 @click.prevent="loginWithGithub"
               >
                 <img
@@ -44,11 +40,6 @@
                   class="github-icon"
                   height="20"
                   width="20"
-                  style="
-                    display: inline-block;
-                    margin-right: 8px;
-                    vertical-align: middle;
-                  "
                 />
                 {{ T.loginGithub }}
               </button>
@@ -149,7 +140,7 @@ export default class Login extends Vue {
       this.githubCsrfState = this.githubState;
       sessionStorage.setItem('github_oauth_state', this.githubState);
     } else {
-      const generatedState = Math.random().toString(36).substring(2);
+      const generatedState = this.generateSecureRandomString();
       this.githubCsrfState = generatedState;
       sessionStorage.setItem('github_oauth_state', generatedState);
     }
@@ -167,7 +158,7 @@ export default class Login extends Vue {
     const state =
       sessionStorage.getItem('github_oauth_state') ||
       this.githubCsrfState ||
-      Math.random().toString(36).substring(2);
+      this.generateSecureRandomString();
     sessionStorage.setItem('github_oauth_state', state);
     document.cookie = `github_oauth_state=${state};path=/;SameSite=Lax`;
 
@@ -190,5 +181,53 @@ export default class Login extends Vue {
 
     window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
   }
+
+  generateSecureRandomString(): string {
+    const validChars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const len = 16;
+
+    if (typeof window.crypto === 'object') {
+      const arr = new Uint8Array(len);
+      window.crypto.getRandomValues(arr);
+      return Array.from(
+        arr,
+        (value) => validChars[value % validChars.length],
+      ).join('');
+    }
+
+    // Without window.crypto
+    let result = '';
+    for (let i = 0; i < len; i++) {
+      result += validChars.charAt(
+        Math.floor(Math.random() * validChars.length),
+      );
+    }
+    return result;
+  }
 }
 </script>
+
+<style scoped>
+.github-login-btn {
+  background-color: var(--btn-github-background-color);
+  border: 1px solid var(--btn-github-border-color);
+  color: var(--btn-github-font-color);
+}
+
+.github-login-btn:hover:not(:disabled) {
+  background-color: var(--btn-github-background-color--hover);
+  border-color: var(--btn-github-border-color--hover);
+}
+
+.github-login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.github-icon {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+</style>
