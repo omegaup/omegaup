@@ -186,10 +186,10 @@ OmegaUp.on('ready', () => {
 
                 api.Course.update(request)
                   .then(() => {
-                    ui.success(
-                      ui.formatString(T.courseEditCourseEditedAndGoToCourse, {
-                        alias: request.alias,
-                      }),
+                    ui.successWithLink(
+                      T.courseEditCourseEdited,
+                      `/course/${request.alias}`,
+                      T.courseEditGoToCourse,
                     );
                     this.data.course.name = request.name;
                     window.scrollTo(0, 0);
