@@ -2,34 +2,36 @@
   <div>
     <ul class="nav nav-tabs mb-3" role="tablist">
       <li class="nav-item" role="presentation">
-        <button
+        <a
+          :href="`#${AvailableTabs.Login}`"
           class="nav-link"
-          :class="{ active: activeTab === 'login' }"
-          type="button"
+          :class="{ active: activeTab === AvailableTabs.Login }"
           role="tab"
-          @click="activeTab = 'login'"
+          @click.prevent="setActiveTab(AvailableTabs.Login)"
         >
           {{ T.omegaupTitleLogin }}
-        </button>
+        </a>
       </li>
       <li class="nav-item" role="presentation">
-        <button
+        <a
+          :href="`#${AvailableTabs.Signup}`"
           class="nav-link"
-          :class="{ active: activeTab === 'signup' }"
-          type="button"
+          :class="{ active: activeTab === AvailableTabs.Signup }"
           role="tab"
-          @click="activeTab = 'signup'"
+          @click.prevent="setActiveTab(AvailableTabs.Signup)"
         >
           {{ T.loginSignUp }}
-        </button>
+        </a>
       </li>
     </ul>
 
+    <!-- Tab Content -->
     <div class="tab-content">
+      <!-- Login Tab -->
       <div
-        v-show="activeTab === 'login'"
+        v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
-        :class="{ active: activeTab === 'login' }"
+        :class="{ active: activeTab === AvailableTabs.Login }"
         role="tabpanel"
       >
         <omegaup-login
@@ -40,10 +42,11 @@
         </omegaup-login>
       </div>
 
+      <!-- Sign Up Tab -->
       <div
-        v-show="activeTab === 'signup'"
+        v-show="activeTab === AvailableTabs.Signup"
         class="tab-pane"
-        :class="{ active: activeTab === 'signup' }"
+        :class="{ active: activeTab === AvailableTabs.Signup }"
         role="tabpanel"
       >
         <omegaup-signup
@@ -67,6 +70,11 @@ import VueRecaptcha from 'vue-recaptcha';
 import omegaup_Login from './Login.vue';
 import omegaup_Signup from './Signup.vue';
 
+export enum AvailableTabs {
+  Login = 'login',
+  Signup = 'signup',
+}
+
 @Component({
   components: {
     'omegaup-login': omegaup_Login,
@@ -82,13 +90,52 @@ export default class Signin extends Vue {
   @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
 
   T = T;
-  activeTab: string = 'login';
+  AvailableTabs = AvailableTabs;
+  activeTab: AvailableTabs = AvailableTabs.Login;
+
+  mounted(): void {
+    // Read hash from URL on mount
+    const hash = window.location.hash.substring(1);
+    if (hash === AvailableTabs.Login || hash === AvailableTabs.Signup) {
+      this.activeTab = hash as AvailableTabs;
+    }
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', this.onHashChange);
+  }
+
+  beforeDestroy(): void {
+    // Clean up event listener
+    window.removeEventListener('hashchange', this.onHashChange);
+  }
+
+  setActiveTab(tab: AvailableTabs): void {
+    this.activeTab = tab;
+    window.location.hash = `#${tab}`;
+  }
+
+  onHashChange(): void {
+    const hash = window.location.hash.substring(1);
+    if (hash === AvailableTabs.Login || hash === AvailableTabs.Signup) {
+      this.activeTab = hash as AvailableTabs;
+    }
+  }
 }
 </script>
 
 <style scoped>
+:root {
+  --signin-nav-tabs-border-color: #dee2e6;
+  --signin-nav-link-color: #6c757d;
+  --signin-nav-link-background-color: #e9ecef;
+  --signin-nav-link-hover-background-color: #d6d9dc;
+  --signin-nav-link-hover-color: #495057;
+  --signin-nav-link-active-color: #212529;
+  --signin-nav-link-active-background-color: #fff;
+}
+
 .nav-tabs {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--signin-nav-tabs-border-color);
   display: flex;
   margin-bottom: 0;
 }
@@ -98,9 +145,9 @@ export default class Signin extends Vue {
 }
 
 .nav-link {
-  color: #6c757d;
-  background-color: #e9ecef;
-  border: 1px solid #dee2e6;
+  color: var(--signin-nav-link-color);
+  background-color: var(--signin-nav-link-background-color);
+  border: 1px solid var(--signin-nav-tabs-border-color);
   border-bottom: none;
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
@@ -113,14 +160,16 @@ export default class Signin extends Vue {
 }
 
 .nav-link:hover {
-  background-color: #d6d9dc;
-  color: #495057;
+  background-color: var(--signin-nav-link-hover-background-color);
+  color: var(--signin-nav-link-hover-color);
 }
 
 .nav-link.active {
-  color: #212529;
-  background-color: #fff;
-  border-color: #dee2e6 #dee2e6 #fff;
+  color: var(--signin-nav-link-active-color);
+  background-color: var(--signin-nav-link-active-background-color);
+  border-color: var(--signin-nav-tabs-border-color)
+    var(--signin-nav-tabs-border-color)
+    var(--signin-nav-link-active-background-color);
   position: relative;
   z-index: 1;
   margin-bottom: -1px;
