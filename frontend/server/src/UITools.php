@@ -247,10 +247,37 @@ class UITools {
          * checked from the constructor of the exception
          */
         $localizedText = \OmegaUp\Translations::getInstance()->get($titleVar);
-        $twigProperties['title'] = \OmegaUp\ApiUtils::formatString(
+        $formattedTitle = \OmegaUp\ApiUtils::formatString(
             $localizedText,
             $twigProperties['title']->args
         );
+        $twigProperties['title'] = $formattedTitle;
+
+        // Generate default SEO metadata if not provided
+        if (!isset($twigProperties['seoMeta'])) {
+            $defaultDescription = \OmegaUp\Translations::getInstance()->get(
+                'omegaupDescriptionDefault'
+            );
+            if (empty($defaultDescription) || $defaultDescription === 'omegaupDescriptionDefault') {
+                $defaultDescription = 'Free educational platform that helps improve programming skills, used by tens of thousands of students and teachers in Latin America. Planning a better future. For everyone.';
+            }
+            $twigProperties['seoMeta'] = \OmegaUp\SEOHelper::generateMetadata(
+                $formattedTitle,
+                $defaultDescription
+            );
+        }
+
+        // Add structured data if not provided
+        if (!isset($twigProperties['seoMeta']['structuredData'])) {
+            // Generate both schemas and wrap in a container
+            $organizationSchema = \OmegaUp\SEOHelper::generateOrganizationSchema(OMEGAUP_URL);
+            $websiteSchema = \OmegaUp\SEOHelper::generateWebSiteSchema(OMEGAUP_URL);
+            // Return as array for multiple schemas
+            $twigProperties['seoMeta']['structuredData'] = [
+                $organizationSchema,
+                $websiteSchema,
+            ];
+        }
 
         $twigContext = array_merge(
             $twigContext,

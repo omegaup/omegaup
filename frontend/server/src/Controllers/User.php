@@ -4238,6 +4238,29 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
 
+        $homepageDescription = \OmegaUp\Translations::getInstance()->get(
+            'omegaupDescriptionHomepage'
+        );
+        if (empty($homepageDescription) || $homepageDescription === 'omegaupDescriptionHomepage') {
+            $homepageDescription = 'omegaUp is a free educational platform that helps improve programming skills. Practice coding problems, participate in contests, and learn from thousands of students and teachers in Latin America. Planning a better future. For everyone.';
+        }
+
+        $seoMeta = \OmegaUp\SEOHelper::generateMetadata(
+            'omegaUp - Free Programming Practice Platform',
+            $homepageDescription,
+            OMEGAUP_URL . '/',
+            OMEGAUP_URL . '/media/omegaup.png'
+        );
+
+        // Add hreflang tags for multi-language support
+        $seoMeta['hreflang'] = \OmegaUp\SEOHelper::generateHreflangTags(
+            OMEGAUP_URL,
+            '/'
+        );
+
+        // Add Apple touch icon
+        $seoMeta['appleTouchIcon'] = OMEGAUP_URL . '/favicon-76x76.png';
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -4269,6 +4292,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCommonIndex'
                 ),
+                'seoMeta' => $seoMeta,
             ],
             'entrypoint' => 'common_index',
         ];
