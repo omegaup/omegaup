@@ -258,7 +258,11 @@ class UITools {
             $defaultDescription = \OmegaUp\Translations::getInstance()->get(
                 'omegaupDescriptionDefault'
             );
-            if (empty($defaultDescription) || $defaultDescription === 'omegaupDescriptionDefault') {
+            if (
+                empty(
+                    $defaultDescription
+                ) || $defaultDescription === 'omegaupDescriptionDefault'
+            ) {
                 $defaultDescription = 'Free educational platform that helps improve programming skills, used by tens of thousands of students and teachers in Latin America. Planning a better future. For everyone.';
             }
             $twigProperties['seoMeta'] = \OmegaUp\SEOHelper::generateMetadata(
@@ -270,8 +274,12 @@ class UITools {
         // Add structured data if not provided
         if (!isset($twigProperties['seoMeta']['structuredData'])) {
             // Generate both schemas and wrap in a container
-            $organizationSchema = \OmegaUp\SEOHelper::generateOrganizationSchema(OMEGAUP_URL);
-            $websiteSchema = \OmegaUp\SEOHelper::generateWebSiteSchema(OMEGAUP_URL);
+            $organizationSchema = \OmegaUp\SEOHelper::generateOrganizationSchema(
+                OMEGAUP_URL
+            );
+            $websiteSchema = \OmegaUp\SEOHelper::generateWebSiteSchema(
+                OMEGAUP_URL
+            );
             // Return as array for multiple schemas
             $twigProperties['seoMeta']['structuredData'] = [
                 $organizationSchema,
