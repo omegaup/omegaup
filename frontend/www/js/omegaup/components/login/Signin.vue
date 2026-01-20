@@ -25,9 +25,7 @@
       </li>
     </ul>
 
-    <!-- Tab Content -->
     <div class="tab-content">
-      <!-- Login Tab -->
       <div
         v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
@@ -42,7 +40,6 @@
         </omegaup-login>
       </div>
 
-      <!-- Sign Up Tab -->
       <div
         v-show="activeTab === AvailableTabs.Signup"
         class="tab-pane"
@@ -94,18 +91,15 @@ export default class Signin extends Vue {
   activeTab: AvailableTabs = AvailableTabs.Login;
 
   mounted(): void {
-    // Read hash from URL on mount
     const hash = window.location.hash.substring(1);
     if (hash === AvailableTabs.Login || hash === AvailableTabs.Signup) {
       this.activeTab = hash as AvailableTabs;
     }
 
-    // Listen for hash changes
     window.addEventListener('hashchange', this.onHashChange);
   }
 
   beforeDestroy(): void {
-    // Clean up event listener
     window.removeEventListener('hashchange', this.onHashChange);
   }
 
