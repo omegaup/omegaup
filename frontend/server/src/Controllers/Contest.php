@@ -79,6 +79,7 @@ namespace OmegaUp\Controllers;
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
     const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
+    const MAX_CONTEST_LENGTH_SYSADMIN_SECONDS = 5184000; // 60 days
     const CONTEST_LIST_PAGE_SIZE = 10;
 
     /**
@@ -2841,8 +2842,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contestLength = $finishTime->time - $startTime->time;
         }
 
-        // Validate max contest length
-        if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
+        // Validate max contest length (sys-admins get an extended limit)
+        $isSystemAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
+        $maxContestLength = $isSystemAdmin
+            ? \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SYSADMIN_SECONDS
+            : \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS;
+
+        if ($contestLength > $maxContestLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestLengthTooLong',
                 'finish_time'
