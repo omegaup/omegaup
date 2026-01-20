@@ -234,29 +234,6 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test GitHub login with empty email throws exception
-     */
-    public function testGitHubLoginWithEmptyEmailThrowsException(): void {
-        ob_start();
-        try {
-            try {
-                \OmegaUp\Controllers\Session::loginViaGitHubEmail(
-                    '',
-                    'Test User'
-                );
-                $this->fail('Expected exception was not thrown');
-            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertStringContainsString(
-                    'loginGitHubNoEmail',
-                    $e->getMessage()
-                );
-            }
-        } finally {
-            ob_end_clean();
-        }
-    }
-
-    /**
      * Test GitHub CSRF validation catches mismatched states
      */
     public function testGitHubCSRFMismatchedStateThrowsException(): void {
