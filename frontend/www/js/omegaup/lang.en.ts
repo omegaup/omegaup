@@ -1205,6 +1205,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorRenameModalBack: "Back",
   problemCreatorRenameModalRename: "Rename",
   problemCreatorRenameModalTitle: "Rename Layout",
+  problemCreatorSelectLanguage: "Select a language",
   problemCreatorSolution: "Solution",
   problemCreatorSolutionTabIntroEditorIntro: "Write your solution here using Markdown syntax.",
   problemCreatorSolutionTabIntroEditorTitle: "Markdown Editor",
