@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex align-items-center justify-content-between">
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
-      <div>
+      <div class="d-flex flex-nowrap align-items-center">
         <b-button
           data-toggle-layout-sidebar
           size="sm"
