@@ -198,6 +198,12 @@
               <template #contest-button-scoreboard>
                 <div></div>
               </template>
+              <template #contest-button-virtual>
+                <div></div>
+              </template>
+              <template #contest-button-practice>
+                <div></div>
+              </template>
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
@@ -209,9 +215,6 @@
                     }}
                   </a>
                 </b-card-text>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
               </template>
             </omegaup-contest-card>
           </template>
@@ -272,6 +275,12 @@
               <template #contest-button-scoreboard>
                 <div></div>
               </template>
+              <template #contest-button-virtual>
+                <div></div>
+              </template>
+              <template #contest-button-practice>
+                <div></div>
+              </template>
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
@@ -285,9 +294,6 @@
                 </b-card-text>
               </template>
               <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-dropdown>
                 <div></div>
               </template>
             </omegaup-contest-card>
@@ -422,7 +428,7 @@ import {
   DropdownPlugin,
   LayoutPlugin,
 } from 'bootstrap-vue';
-import ContestCard from './ContestCard.vue';
+import ContestCard from './ContestCardv2.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);

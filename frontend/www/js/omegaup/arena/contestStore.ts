@@ -2,7 +2,11 @@ import Vue from 'vue';
 import Vuex, { Commit } from 'vuex';
 import * as api from '../api';
 import { messages, types } from '../api_types';
-import { ContestTab, ContestOrder, ContestFilter } from '../components/arena/ContestList.vue';
+import {
+  ContestTab,
+  ContestOrder,
+  ContestFilter,
+} from '../components/arena/ContestList.vue';
 
 Vue.use(Vuex);
 
