@@ -604,6 +604,7 @@
 	"courseNewFormLanguages": "Establecer lenguajes para el curso actual",
 	"courseNewFormLevel": "Nivel",
 	"courseNewFormLevelDesc": "El nivel de dificultad del curso.",
+	"courseNewFormLevelPlaceholder": "Selecciona un nivel",
 	"courseNewFormObjective": "Objetivo",
 	"courseNewFormObjectiveDesc": "Describe lo que tus estudiantes aprender\u00e1n en este curso.",
 	"courseNewFormScheduleCourse": "Agendar curso",

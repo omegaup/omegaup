@@ -603,6 +603,7 @@ courseNewFormEndDateDesc = "Data e hora (no horário local), em que o curso vai 
 courseNewFormLanguages = "Definir idiomas para o curso atual"
 courseNewFormLevel = "Nível"
 courseNewFormLevelDesc = "O nível de dificuldade do curso."
+courseNewFormLevelPlaceholder = "Selecione um nível"
 courseNewFormObjective = "Objetivo"
 courseNewFormObjectiveDesc = "Descreva o que seus estudantes aprenderão neste curso."
 courseNewFormScheduleCourse = "Criar o curso"

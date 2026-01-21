@@ -605,6 +605,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormLanguages: "Establecer lenguajes para el curso actual",
   courseNewFormLevel: "Nivel",
   courseNewFormLevelDesc: "El nivel de dificultad del curso.",
+  courseNewFormLevelPlaceholder: "Selecciona un nivel",
   courseNewFormObjective: "Objetivo",
   courseNewFormObjectiveDesc: "Describe lo que tus estudiantes aprender\u00e1n en este curso.",
   courseNewFormScheduleCourse: "Agendar curso",
@@ -2200,4 +2201,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };
