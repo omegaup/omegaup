@@ -13,34 +13,24 @@ This is a quick guide to enable “Sign in with GitHub” in a local omegaUp ins
 4. Click **Register application**.
 5. On the app page, copy the **Client ID** and generate/copy the **Client Secret** (you will not see the secret again).
 
-## Configure omegaUp
+## Configure omegaUp 
 
-1. Open `frontend/server/config.default.php` and find the GitHub section:
+1. Create `frontend/server/config.php` if it doesn't exist, or edit it if it already exists. Add your GitHub OAuth credentials at the end of the file:
    ```php
-   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'xxxxx');
-   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'xxxxx');
+      <?php
+      define('OMEGAUP_GITHUB_CLIENT_ID', 'your_real_client_id_here');
+      define('OMEGAUP_GITHUB_CLIENT_SECRET', 'your_real_client_secret_here');
    ```
-2. Replace the placeholder values with your actual credentials:
-   ```php
-   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'your_real_client_id_here');
-   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'your_real_client_secret_here');
-   ```
-3. Restart your local stack:
-   ```bash
-   docker-compose restart frontend
-   ```
+2. No Docker Compose restart is required.
 
-### ⚠️ IMPORTANT: Before Committing
+### Important Notes
 
 **You MUST revert your credentials before pushing to git:**
 
-1. Before `git add` or `git commit`, restore the placeholders:
-   ```php
-   try_define('OMEGAUP_GITHUB_CLIENT_ID', 'xxxxx');
-   try_define('OMEGAUP_GITHUB_CLIENT_SECRET', 'xxxxx');
-   ```
-2. Or use `git checkout frontend/server/config.default.php` to discard changes.
-3. **Never commit real secrets to git** — they will be permanently in the repository history.
+- **Never commit OAuth credentials** - `config.php` is not versioned for this reason.
+- **Do not edit `frontend/server/config.default.php`** - use `config.php` for local configuration.
+- **`config.php` is deleted when Docker Compose is restarted** - store your credentials securely or regenerate them as needed.
+- **If the GitHub login button is disabled**, verify the client ID is properly defined in `config.php`.
 
 ## Tips
 
