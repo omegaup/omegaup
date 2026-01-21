@@ -3010,6 +3010,21 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX
         );
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::USER_COMPARE_DATA
+        );
+    }
+
+    /**
+     * Invalidate user compare data cache for a specific user.
+     * This should be called when a user's compare data changes,
+     * such as when they join a contest.
+     */
+    public static function invalidateUserCompareDataCache(string $username): void {
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_COMPARE_DATA,
+            $username
+        );
     }
 
     /**
@@ -5164,17 +5179,26 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
         }
 
-        $profile = self::getUserProfile($loggedIdentity, $identity);
-        $solvedProblemsCount = count(
-            self::getSolvedProblems($identity->identity_id)
-        );
-        $contestsCount = count(self::getContestStats($identity));
+        // Cache the expensive data fetching operations
+        /** @var UserCompareData */
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_COMPARE_DATA,
+            $username,
+            function () use ($loggedIdentity, $identity): array {
+                $profile = self::getUserProfile($loggedIdentity, $identity);
+                $solvedProblemsCount = count(
+                    self::getSolvedProblems($identity->identity_id)
+                );
+                $contestsCount = count(self::getContestStats($identity));
 
-        return [
-            'profile' => $profile,
-            'solvedProblemsCount' => $solvedProblemsCount,
-            'contestsCount' => $contestsCount,
-        ];
+                return [
+                    'profile' => $profile,
+                    'solvedProblemsCount' => $solvedProblemsCount,
+                    'contestsCount' => $contestsCount,
+                ];
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
     }
 
     /**
