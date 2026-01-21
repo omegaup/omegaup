@@ -111,8 +111,8 @@ interface UserCompareData {
 export default class CompareUsers extends Vue {
   @Prop({ default: null }) user1!: UserCompareData | null;
   @Prop({ default: null }) user2!: UserCompareData | null;
-  @Prop({ default: null }) initialUsername1!: string | null;
-  @Prop({ default: null }) initialUsername2!: string | null;
+  @Prop({ default: null }) username1!: string | null;
+  @Prop({ default: null }) username2!: string | null;
   @Prop({ default: false }) isLoading!: boolean;
 
   T = T;
