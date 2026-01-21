@@ -745,7 +745,8 @@ export default ArenaContestList;
 }
 
 .contest-card {
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   padding: 1rem;
 }
 
