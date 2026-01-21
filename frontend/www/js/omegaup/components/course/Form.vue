@@ -188,7 +188,7 @@
               :multiple="true"
               :placeholder="T.courseNewFormLanguages"
               :close-on-select="false"
-              :allow-empty="false"
+              :allow-empty="true"
             >
             </vue-multiselect>
           </div>
@@ -256,6 +256,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
@@ -440,6 +441,10 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
+    if (this.selectedLanguages.length === 0) {
+      ui.error(T.courseNewFormSelectAtLeastOneLanguage);
+      return;
+    }
     this.$emit('submit', {
       name: this.name,
       description: this.description,
