@@ -127,6 +127,9 @@ export default class CompareCard extends Vue {
 </script>
 
 <style lang="scss" scoped>
+$stat-item-bg: #f8f9fa;
+$stat-label-color: #6c757d;
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -136,13 +139,13 @@ export default class CompareCard extends Vue {
 .stat-item {
   text-align: center;
   padding: 0.5rem;
-  background-color: #f8f9fa;
+  background-color: $stat-item-bg;
   border-radius: 0.25rem;
 }
 
 .stat-label {
   font-size: 0.75rem;
-  color: #6c757d;
+  color: $stat-label-color;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
