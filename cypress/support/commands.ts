@@ -83,12 +83,14 @@ Cypress.Commands.add(
       cy.get('.introjs-skipbutton').click();
     }
     // Fill basic problem form
-    cy.get('[name="title"]').type(problemAlias).blur();
+    cy.get('.problem-form').within(() => {
+      cy.get('[name="title"]').type(problemAlias).blur();
 
-    // Alias should be the same as title.
-    cy.get('[name="problem_alias"]').should('have.value', problemAlias);
+      // Alias should be the same as title.
+      cy.get('[name="problem_alias"]').should('have.value', problemAlias);
 
-    cy.get('[name="source"]').type(problemAlias);
+      cy.get('[name="source"]').type(problemAlias);
+    });
     cy.get('[name="problem_contents"]').attachFile(zipFile);
     cy.get('[data-tags-input]').type(autoCompleteTextTag);
 
@@ -207,9 +209,11 @@ Cypress.Commands.add(
     if (shouldShowIntro) {
       cy.get('.introjs-skipbutton').click();
     }
-    cy.get('[name="title"]').type(contestAlias);
-    cy.get('[name="alias"]').type(contestAlias);
-    cy.get('[name="description"]').type(description);
+    cy.get('.contest-form').within(() => {
+      cy.get('[name="title"]').type(contestAlias);
+      cy.get('[name="alias"]').type(contestAlias);
+      cy.get('[name="description"]').type(description);
+    });
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
     cy.get('[data-target=".logistics"]').click();
