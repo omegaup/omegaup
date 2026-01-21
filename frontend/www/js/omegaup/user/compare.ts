@@ -6,14 +6,8 @@ import { OmegaUp } from '../omegaup';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserComparePayload();
 
-  const containerElement = document.getElementById('main-container');
-  if (!containerElement) {
-    console.error('Main container element not found');
-    return;
-  }
-
   new Vue({
-    el: containerElement,
+    el: '#main-container',
     components: {
       'omegaup-user-compare': user_CompareUsers,
     },
