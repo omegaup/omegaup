@@ -38,7 +38,9 @@
           <div class="stat-label">{{ T.profileSolvedProblems }}</div>
           <div class="stat-value">
             <strong>{{
-              solvedProblemsCount !== null ? solvedProblemsCount : 'N/A'
+              solvedProblemsCount !== null
+                ? solvedProblemsCount
+                : T.wordsNotApplicable
             }}</strong>
           </div>
         </div>
@@ -48,7 +50,7 @@
           <div class="stat-label">{{ T.profileContests }}</div>
           <div class="stat-value">
             <strong>{{
-              contestsCount !== null ? contestsCount : 'N/A'
+              contestsCount !== null ? contestsCount : T.wordsNotApplicable
             }}</strong>
           </div>
         </div>
