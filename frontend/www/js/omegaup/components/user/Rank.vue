@@ -108,8 +108,7 @@
             <th
               v-if="isSelectionMode"
               scope="col"
-              class="text-center align-middle"
-              style="width: 40px"
+              class="text-center align-middle selection-column"
             >
               {{ T.wordsSelect }}
             </th>
@@ -211,11 +210,11 @@ import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faCheckSquare,
-  faExchangeAlt,
-  faQuestionCircle,
-  faTimes,
-  faUser,
+    faCheckSquare,
+    faExchangeAlt,
+    faQuestionCircle,
+    faTimes,
+    faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
@@ -380,5 +379,10 @@ export default class UserRank extends Vue {
 
 .column-width {
   max-width: 4rem;
+}
+
+.selection-column {
+  width: 40px;
+  font-size: 0.75rem;
 }
 </style>
