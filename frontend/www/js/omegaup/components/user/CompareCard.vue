@@ -14,9 +14,11 @@
           />
         </a>
         <h5 class="card-title mb-1">
-          <a :href="profileUrl" :class="profile.classname">
-            {{ profile.username }}
-          </a>
+          <omegaup-user-username
+            :classname="profile.classname"
+            :username="profile.username"
+            :linkify="true"
+          ></omegaup-user-username>
         </h5>
         <p v-if="profile.name" class="text-muted small mb-0">
           {{ profile.name }}
@@ -96,8 +98,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
+import user_Username from './Username.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-user-username': user_Username,
+  },
+})
 export default class CompareCard extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) solvedProblemsCount!: number | null;
