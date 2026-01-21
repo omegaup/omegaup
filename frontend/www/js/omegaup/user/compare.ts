@@ -66,7 +66,7 @@ OmegaUp.on('ready', () => {
           isLoading: this.isLoading,
         },
         on: {
-          compare: this.onCompare,
+          compare: (this as any).onCompare,
         },
       });
     },

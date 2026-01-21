@@ -210,11 +210,11 @@ import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-    faCheckSquare,
-    faExchangeAlt,
-    faQuestionCircle,
-    faTimes,
-    faUser,
+  faCheckSquare,
+  faExchangeAlt,
+  faQuestionCircle,
+  faTimes,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faCheckSquare, faExchangeAlt, faQuestionCircle, faTimes, faUser);
