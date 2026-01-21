@@ -116,13 +116,8 @@ export default class CompareUsers extends Vue {
   @Prop({ default: false }) isLoading!: boolean;
 
   T = T;
-  inputUsername1: string = '';
-  inputUsername2: string = '';
-
-  created(): void {
-    this.inputUsername1 = this.initialUsername1 ?? this.inputUsername1;
-    this.inputUsername2 = this.initialUsername2 ?? this.inputUsername2;
-  }
+  inputUsername1: string = this.initialUsername1 ?? '';
+  inputUsername2: string = this.initialUsername2 ?? '';
 
   get canCompare(): boolean {
     return (
