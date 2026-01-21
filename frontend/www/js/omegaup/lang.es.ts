@@ -2201,4 +2201,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export { translations as default };
+export {translations as default};

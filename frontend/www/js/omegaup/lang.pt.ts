@@ -605,6 +605,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormLanguages: "Definir idiomas para o curso atual",
   courseNewFormLevel: "N\u00edvel",
   courseNewFormLevelDesc: "O n\u00edvel de dificuldade do curso.",
+  courseNewFormLevelPlaceholder: "Selecione um n\u00edvel",
   courseNewFormObjective: "Objetivo",
   courseNewFormObjectiveDesc: "Descreva o que seus estudantes aprender\u00e3o neste curso.",
   courseNewFormScheduleCourse: "Criar o curso",
