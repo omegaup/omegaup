@@ -603,6 +603,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormEndDate: "Fecha de fin",
   courseNewFormEndDateDesc: "La hora (en hora local) en la que termina el curso.",
   courseNewFormLanguages: "Establecer lenguajes para el curso actual",
+  courseNewFormLanguagesRequired: "Por favor selecciona al menos un lenguaje",
   courseNewFormLevel: "Nivel",
   courseNewFormLevelDesc: "El nivel de dificultad del curso.",
   courseNewFormObjective: "Objetivo",
@@ -2200,4 +2201,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };

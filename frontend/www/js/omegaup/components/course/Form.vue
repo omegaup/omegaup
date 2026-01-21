@@ -188,7 +188,10 @@
               :multiple="true"
               :placeholder="T.courseNewFormLanguages"
               :close-on-select="false"
-              :allow-empty="false"
+              :allow-empty="true"
+              :class="{
+                'is-invalid': invalidParameterName === 'languages',
+              }"
             >
             </vue-multiselect>
           </div>
@@ -440,6 +443,10 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
+    if (!this.selectedLanguages || this.selectedLanguages.length === 0) {
+      this.$emit('invalid-languages');
+      return;
+    }
     this.$emit('submit', {
       name: this.name,
       description: this.description,
