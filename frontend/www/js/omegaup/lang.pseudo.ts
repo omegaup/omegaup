@@ -283,7 +283,6 @@ const translations: { [key: string]: string; } = {
   compareUser1Label: "(U53r 1)",
   compareUser2Label: "(U53r 2)",
   compareUserNotFound: "(U53r n07 f0und)",
-  compareUsersError: "(An 3rr0r 0ccurr3d whi13 c0mparing u53r5)",
   compareUsersTitle: "(C0mpar3 U53r5)",
   compareVsMe: "(C0mpar3 v5 m3)",
   contentCreator: "(C0n7ribu70r)",

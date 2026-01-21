@@ -283,7 +283,6 @@ const translations: { [key: string]: string; } = {
   compareUser1Label: "User 1",
   compareUser2Label: "User 2",
   compareUserNotFound: "User not found",
-  compareUsersError: "An error occurred while comparing users",
   compareUsersTitle: "Compare Users",
   compareVsMe: "Compare vs me",
   contentCreator: "Contributor",
