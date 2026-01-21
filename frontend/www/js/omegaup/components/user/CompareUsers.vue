@@ -116,8 +116,8 @@ export default class CompareUsers extends Vue {
   @Prop({ default: false }) isLoading!: boolean;
 
   T = T;
-  inputUsername1: string = this.initialUsername1 ?? '';
-  inputUsername2: string = this.initialUsername2 ?? '';
+  inputUsername1: string = this.username1 ?? '';
+  inputUsername2: string = this.username2 ?? '';
 
   get canCompare(): boolean {
     return (
@@ -159,16 +159,18 @@ export default class CompareUsers extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .compare-winner {
-  border-color: #28a745 !important;
+  border-color: var(--user-compare-winner-border-color) !important;
   border-width: 2px !important;
 }
 
 .compare-loser {
-  border-color: #6c757d !important;
+  border-color: var(--user-compare-loser-border-color) !important;
 }
 
 .compare-tie {
-  border-color: #ffc107 !important;
+  border-color: var(--user-compare-tie-border-color) !important;
 }
 </style>

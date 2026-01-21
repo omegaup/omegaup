@@ -136,8 +136,7 @@ export default class CompareCard extends Vue {
 </script>
 
 <style lang="scss" scoped>
-$stat-item-bg: #f8f9fa;
-$stat-label-color: #6c757d;
+@import '../../../../sass/main.scss';
 
 .stats-grid {
   display: grid;
@@ -148,13 +147,13 @@ $stat-label-color: #6c757d;
 .stat-item {
   text-align: center;
   padding: 0.5rem;
-  background-color: $stat-item-bg;
+  background-color: var(--user-compare-stat-item-background-color);
   border-radius: 0.25rem;
 }
 
 .stat-label {
   font-size: 0.75rem;
-  color: $stat-label-color;
+  color: var(--user-compare-stat-label-font-color);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
