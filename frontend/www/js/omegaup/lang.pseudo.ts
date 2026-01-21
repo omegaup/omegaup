@@ -603,6 +603,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormEndDate: "(End da73)",
   courseNewFormEndDateDesc: "(Tim3 and da73 (in 10ca1 7im3) in which 7h3 c0ur53 wi11 3nd.)",
   courseNewFormLanguages: "(S37 1anguag35 f0r 7h3 curr3n7 c0ur53)",
+  courseNewFormSelectAtLeastOneLanguage: "(P13a53 5313c7 a7 13a57 0n3 1anguag3)",
   courseNewFormLevel: "(L3v31)",
   courseNewFormLevelDesc: "(Th3 c0ur53'5 difficu17y 13v31.)",
   courseNewFormObjective: "(Obj3c7iv3)",

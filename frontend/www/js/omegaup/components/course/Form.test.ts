@@ -2,8 +2,15 @@ import { shallowMount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import course_Form from './Form.vue';
+
+jest.mock('../../ui');
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 const baseCourseFormProps = {
   allLanguages: { py2: 'Python 2', py3: 'Python 3' },
@@ -55,5 +62,35 @@ describe('Form.vue', () => {
     });
 
     expect(wrapper.find(selector).text()).toBe(T.courseNewFormScheduleCourse);
+  });
+
+  it('Should show error when submitting form with no languages selected', async () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: {
+        ...baseCourseFormProps,
+        course: {
+          ...baseCourseFormProps.course,
+          languages: [],
+        },
+      },
+    });
+
+    await wrapper.find('form').trigger('submit.prevent');
+
+    expect(ui.error).toHaveBeenCalledWith(
+      T.courseNewFormSelectAtLeastOneLanguage,
+    );
+    expect(wrapper.emitted('submit')).toBeUndefined();
+  });
+
+  it('Should emit submit event when form has languages selected', async () => {
+    const wrapper = shallowMount(course_Form, {
+      propsData: baseCourseFormProps,
+    });
+
+    await wrapper.find('form').trigger('submit.prevent');
+
+    expect(ui.error).not.toHaveBeenCalled();
+    expect(wrapper.emitted('submit')).toBeDefined();
   });
 });
