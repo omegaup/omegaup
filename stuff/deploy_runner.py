@@ -118,9 +118,9 @@ class RemoteRunner:
 
         subprocess.check_call(
             ['/usr/bin/scp', src,
-             '%s:.tmp' % self._hostname])
+             f'{self._hostname}:.tmp'])
         if mode is not None:
-            self.sudo(['/bin/chmod', '0%o' % mode, '.tmp'])
+            self.sudo(['/bin/chmod', f'0{mode:o}', '.tmp'])
         if owner is not None:
             self.sudo(['/bin/chown', owner, '.tmp'])
         if group is not None:
@@ -145,7 +145,7 @@ class RemoteRunner:
         else:
             run = self.run
 
-        tmpfile = '/tmp/.%f.tmp' % (time.time())
+        tmpfile = f'/tmp/.{time.time()}.tmp'
         run(['/bin/cp', '/dev/stdin', tmpfile],
             stdin=contents,
             capture=False,
@@ -154,7 +154,7 @@ class RemoteRunner:
             run(['/bin/chown', owner, tmpfile])
 
         if mode is not None:
-            run(['/bin/chmod', '0%o' % mode, tmpfile])
+            run(['/bin/chmod', f'0{mode:o}', tmpfile])
         if group is not None:
             run(['/bin/chgrp', group, tmpfile])
         return run(['/bin/mv', tmpfile, dest])
@@ -163,7 +163,7 @@ class RemoteRunner:
 def hash_for(filename: str) -> str:
     '''Returns the hash for the specified file.'''
 
-    sha1sum_filename = '%s.SHA1SUM' % filename
+    sha1sum_filename = f'{filename}.SHA1SUM'
     if not os.path.exists(sha1sum_filename):
         logging.info('%s not found, returning null hash for %s',
                      sha1sum_filename, filename)
