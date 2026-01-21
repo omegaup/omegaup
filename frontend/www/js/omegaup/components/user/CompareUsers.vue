@@ -93,10 +93,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import * as api from '../../api';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 import user_CompareCard from './CompareCard.vue';
 
 interface UserCompareData {
@@ -111,21 +109,17 @@ interface UserCompareData {
   },
 })
 export default class CompareUsers extends Vue {
-  @Prop({ default: null }) initialUser1!: UserCompareData | null;
-  @Prop({ default: null }) initialUser2!: UserCompareData | null;
+  @Prop({ default: null }) user1!: UserCompareData | null;
+  @Prop({ default: null }) user2!: UserCompareData | null;
   @Prop({ default: null }) initialUsername1!: string | null;
   @Prop({ default: null }) initialUsername2!: string | null;
+  @Prop({ default: false }) isLoading!: boolean;
 
   T = T;
-  user1: UserCompareData | null = null;
-  user2: UserCompareData | null = null;
   inputUsername1: string = '';
   inputUsername2: string = '';
-  isLoading = false;
 
   created(): void {
-    this.user1 = this.initialUser1 ?? this.user1;
-    this.user2 = this.initialUser2 ?? this.user2;
     this.inputUsername1 = this.initialUsername1 ?? this.inputUsername1;
     this.inputUsername2 = this.initialUsername2 ?? this.inputUsername2;
   }
@@ -139,38 +133,13 @@ export default class CompareUsers extends Vue {
   fetchComparison(): void {
     if (!this.canCompare) return;
 
-    // Trim usernames
     const trimmedUsername1 = this.inputUsername1.trim();
     const trimmedUsername2 = this.inputUsername2.trim();
 
-    this.isLoading = true;
-
-    // Update URL
-    const url = new URL(window.location.href);
-    if (trimmedUsername1) {
-      url.searchParams.set('username1', trimmedUsername1);
-    } else {
-      url.searchParams.delete('username1');
-    }
-    if (trimmedUsername2) {
-      url.searchParams.set('username2', trimmedUsername2);
-    } else {
-      url.searchParams.delete('username2');
-    }
-    window.history.pushState({}, '', url.toString());
-
-    api.User.compare({
+    this.$emit('compare', {
       username1: trimmedUsername1 || undefined,
       username2: trimmedUsername2 || undefined,
-    })
-      .then((response) => {
-        this.user1 = response.user1 as UserCompareData | null;
-        this.user2 = response.user2 as UserCompareData | null;
-      })
-      .catch(ui.apiError)
-      .finally(() => {
-        this.isLoading = false;
-      });
+    });
   }
 
   getComparisonClass(userNumber: number): string {
