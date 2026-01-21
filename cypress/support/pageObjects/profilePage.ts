@@ -12,7 +12,11 @@ export class ProfilePage {
     cy.get('a[href="/profile/#edit-basic-information"]').click();
     cy.get('[data-name]').type(userName);
     cy.get('[data-save-profile-changes-button]').click();
-    cy.get('#alert-close').click();
+    // Wait for success notification and dismiss it
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
   }
   updatePreferredLanguage(preferredLanguage: string): void {
     cy.get('[data-nav-user]').click();
@@ -151,6 +155,12 @@ export class ProfilePage {
     cy.get('[data-identity-username]').type(identityLogin.username);
     cy.get('[data-identity-password]').type(identityLogin.password);
     cy.get('[data-add-identity-button]').click();
+
+    // Wait for success notification and dismiss it
+    cy.get('.alert[role="alert"]')
+      .should('be.visible')
+      .find('[data-alert-close]')
+      .click();
 
     cy.get('[data-added-identity-username]').should('have.length', 2);
     cy.get('[data-added-identity-username]')
