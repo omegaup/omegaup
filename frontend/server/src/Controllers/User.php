@@ -5134,7 +5134,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         ?string $username
     ): ?array {
-        if (is_null($username) || $username === '') {
+        if (empty($username)) {
             return null;
         }
 
