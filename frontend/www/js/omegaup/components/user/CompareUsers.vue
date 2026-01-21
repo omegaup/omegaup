@@ -41,11 +41,6 @@
           </button>
         </div>
 
-        <!-- Error Message -->
-        <div v-if="errorMessage" class="alert alert-danger mb-4" role="alert">
-          {{ errorMessage }}
-        </div>
-
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-5">
           <div class="spinner-border text-primary" role="status">
@@ -101,6 +96,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import * as api from '../../api';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import user_CompareCard from './CompareCard.vue';
 
 interface UserCompareData {
@@ -126,7 +122,6 @@ export default class CompareUsers extends Vue {
   inputUsername1: string = '';
   inputUsername2: string = '';
   isLoading = false;
-  errorMessage: string | null = null;
 
   created(): void {
     this.user1 = this.initialUser1 ?? this.user1;
@@ -149,7 +144,6 @@ export default class CompareUsers extends Vue {
     const trimmedUsername2 = this.inputUsername2.trim();
 
     this.isLoading = true;
-    this.errorMessage = null;
 
     // Update URL
     const url = new URL(window.location.href);
@@ -172,12 +166,8 @@ export default class CompareUsers extends Vue {
       .then((response) => {
         this.user1 = response.user1 as UserCompareData | null;
         this.user2 = response.user2 as UserCompareData | null;
-        this.errorMessage = null;
       })
-      .catch((error: { message?: string }) => {
-        console.error('Compare error:', error);
-        this.errorMessage = error.message || T.compareUsersError;
-      })
+      .catch(ui.apiError)
       .finally(() => {
         this.isLoading = false;
       });
