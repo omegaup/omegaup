@@ -7,6 +7,7 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
   let availableFilters: {
     country?: string;
     school?: string;
@@ -47,6 +48,7 @@ OmegaUp.on('ready', () => {
           pagerItems: payload.pagerItems,
           searchResultUsers: this.searchResultUsers,
           lastUpdated: payload.lastUpdated,
+          currentUsername: commonPayload.currentUsername,
         },
         on: {
           'update-search-result-users': (query: string) => {
