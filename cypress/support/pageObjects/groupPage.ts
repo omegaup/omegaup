@@ -7,8 +7,10 @@ export class GroupPage {
 
     cy.get('[href="/group/new/"]').click();
 
-    cy.get('[name="title"]').type(groupOptions.groupTitle);
-    cy.get('[name="description"]').type(groupOptions.groupDescription);
+    cy.get('[data-group-new]').within(() => {
+      cy.get('[name="title"]').type(groupOptions.groupTitle);
+      cy.get('[name="description"]').type(groupOptions.groupDescription);
+    });
 
     cy.get('[data-group-new]').submit();
   }
@@ -56,11 +58,13 @@ export class GroupPage {
     cy.get('[data-nav-user-teams-groups]').click();
     cy.get('[href="/teamsgroup/new/"]').click();
 
-    cy.get('[name="title"]').type(teamGroupOptions.groupTitle);
-    cy.get('[name="description"]').type(teamGroupOptions.groupDescription);
-    cy.get('[name="number-of-contestants"]')
-      .clear()
-      .type(teamGroupOptions.noOfContestants);
+    cy.get('[data-teams-group]').within(() => {
+      cy.get('[name="title"]').type(teamGroupOptions.groupTitle);
+      cy.get('[name="description"]').type(teamGroupOptions.groupDescription);
+      cy.get('[name="number-of-contestants"]')
+        .clear()
+        .type(teamGroupOptions.noOfContestants);
+    });
 
     cy.get('[data-create-teams-group]').click();
   }
