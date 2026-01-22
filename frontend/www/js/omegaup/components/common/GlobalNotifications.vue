@@ -16,10 +16,7 @@
         &times;
       </button>
       <span v-if="message" class="message">
-        {{ message }}
-        <a v-if="link && linkText" :href="link" class="alert-link">{{
-          linkText
-        }}</a>
+        <omegaup-markdown :markdown="message"></omegaup-markdown>
       </span>
     </div>
   </transition>
@@ -28,8 +25,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class GlobalNotifications extends Vue {
   get visible(): boolean {
     return notificationsStore.getters.isVisible;
@@ -45,14 +47,6 @@ export default class GlobalNotifications extends Vue {
 
   get positionClass(): string {
     return notificationsStore.getters.positionClass;
-  }
-
-  get link(): string | null {
-    return notificationsStore.getters.link;
-  }
-
-  get linkText(): string | null {
-    return notificationsStore.getters.linkText;
   }
 
   dismiss(): void {
@@ -95,6 +89,25 @@ export default class GlobalNotifications extends Vue {
   .message {
     display: block;
     padding-right: 2rem;
+
+    // Override Markdown component styling for notifications
+    ::v-deep [data-markdown-statement] {
+      display: inline;
+      max-width: none;
+      margin: 0;
+      text-align: left;
+
+      p {
+        display: inline;
+        margin: 0;
+        text-align: left;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: underline;
+      }
+    }
   }
 }
 

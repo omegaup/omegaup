@@ -186,10 +186,8 @@ OmegaUp.on('ready', () => {
 
                 api.Course.update(request)
                   .then(() => {
-                    ui.successWithLink(
-                      T.courseEditCourseEdited,
-                      `/course/${request.alias}`,
-                      T.courseEditGoToCourse,
+                    ui.success(
+                      `${T.courseEditCourseEdited} [${T.courseEditGoToCourse}](/course/${request.alias})`,
                     );
                     this.data.course.name = request.name;
                     window.scrollTo(0, 0);
@@ -563,11 +561,8 @@ OmegaUp.on('ready', () => {
               start_time: startTime.getTime() / 1000,
             })
               .then(() => {
-                // Use successWithLink to properly render the link instead of embedding HTML
-                ui.successWithLink(
-                  T.courseEditCourseCloned,
-                  `/course/${alias}/edit/`,
-                  T.courseEdit,
+                ui.success(
+                  `${T.courseEditCourseCloned} [${T.courseEdit}](/course/${alias}/edit/)`,
                   /*autoHide=*/ false,
                 );
               })

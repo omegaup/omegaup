@@ -22,9 +22,5 @@ function isBrowserSupported() {
 }
 
 if (!isBrowserSupported()) {
-  omegaup.UI.errorWithLink(
-    omegaup.T.unsupportedBrowserMessage,
-    'https://github.com/omegaup/omegaup#navegadores-soportados',
-    omegaup.T.unsupportedBrowserLinkText,
-  );
+  omegaup.UI.error(omegaup.T.unsupportedBrowser);
 }

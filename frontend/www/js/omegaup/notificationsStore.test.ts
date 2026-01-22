@@ -19,8 +19,6 @@ describe('notificationsStore', () => {
       visible: false,
       counter: 0,
       autoHideTimeout: null,
-      link: null,
-      linkText: null,
     };
     storeConfig = createNotificationsStoreConfig();
   });

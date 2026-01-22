@@ -112,41 +112,12 @@ export function error(message: string): void {
   displayStatus({ message, type: MessageType.Danger });
 }
 
-export function errorWithLink(
-  message: string,
-  link: string,
-  linkText: string,
-): void {
-  notificationsStore.dispatch('displayStatus', {
-    message,
-    type: MessageType.Danger,
-    autoHide: false,
-    link,
-    linkText,
-  });
-}
-
 export function info(message: string): void {
   displayStatus({ message, type: MessageType.Info });
 }
 
 export function success(message: string, autoHide: boolean = true): void {
   displayStatus({ message, type: MessageType.Success, autoHide });
-}
-
-export function successWithLink(
-  message: string,
-  link: string,
-  linkText: string,
-  autoHide: boolean = true,
-): void {
-  notificationsStore.dispatch('displayStatus', {
-    message,
-    type: MessageType.Success,
-    autoHide,
-    link,
-    linkText,
-  });
 }
 
 export function warning(message: string): void {
