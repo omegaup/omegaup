@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-3" role="tablist">
       <li class="nav-item" role="presentation">
         <a
@@ -26,9 +25,7 @@
       </li>
     </ul>
 
-    <!-- Tab Content -->
     <div class="tab-content">
-      <!-- Login Tab -->
       <div
         v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
@@ -43,7 +40,6 @@
         </omegaup-login>
       </div>
 
-      <!-- Sign Up Tab -->
       <div
         v-show="activeTab === AvailableTabs.Signup"
         class="tab-pane"

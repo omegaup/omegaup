@@ -59,7 +59,6 @@ OmegaUp.on('ready', () => {
     ui.success(payload.verifyEmailSuccessfully);
   }
 
-  // Read hash from URL on mount
   const locationHash = window.location.hash.substring(1);
   let initialActiveTab: AvailableTabs = AvailableTabs.Login;
   if (
