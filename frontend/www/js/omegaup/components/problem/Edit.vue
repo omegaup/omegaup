@@ -101,171 +101,205 @@
       </li>
     </ul>
 
-    <div class="tab-content mt-2">
-      <div v-if="showTab === 'edit'" class="tab-pane active">
-        <omegaup-problem-form
-          :data="data"
-          :original-visibility="data.originalVisibility"
-          :is-update="true"
-        ></omegaup-problem-form>
-      </div>
+    <keep-alive>
+      <div class="tab-content mt-2">
+        <div
+          v-show="showTab === 'edit'"
+          class="tab-pane"
+          :class="{ active: showTab === 'edit' }"
+        >
+          <omegaup-problem-form
+            :data="data"
+            :original-visibility="data.originalVisibility"
+            :is-update="true"
+          ></omegaup-problem-form>
+        </div>
 
-      <div v-if="showTab === 'markdown'" class="tab-pane active">
-        <omegaup-problem-statementedit
-          :statement="currentStatement"
-          markdown-type="statements"
-          :alias="data.alias"
-          :title="data.title"
-          :source="data.source"
-          :problemsetter="data.problemsetter"
-          @update-markdown-contents="
-            (statements, newLanguage, currentMarkdown) =>
-              $emit(
-                'update-markdown-contents',
-                statements,
-                newLanguage,
-                currentMarkdown,
-                'statements',
-              )
-          "
-        ></omegaup-problem-statementedit>
-      </div>
+        <div
+          v-show="showTab === 'markdown'"
+          class="tab-pane"
+          :class="{ active: showTab === 'markdown' }"
+        >
+          <omegaup-problem-statementedit
+            :statement="currentStatement"
+            markdown-type="statements"
+            :alias="data.alias"
+            :title="data.title"
+            :source="data.source"
+            :problemsetter="data.problemsetter"
+            @update-markdown-contents="
+              (statements, newLanguage, currentMarkdown) =>
+                $emit(
+                  'update-markdown-contents',
+                  statements,
+                  newLanguage,
+                  currentMarkdown,
+                  'statements',
+                )
+            "
+          ></omegaup-problem-statementedit>
+        </div>
 
-      <div v-if="showTab === 'version'" class="tab-pane active">
-        <omegaup-problem-versions
-          :log="data.log"
-          :published-revision="data.publishedRevision"
-          :value="data.publishedRevision"
-          :show-footer="true"
-          @emit-select-version="
-            (selectedRevision, updatePublished) =>
-              $emit('select-version', selectedRevision, updatePublished)
-          "
-          @emit-runs-diff="
-            (addProblemComponent, selectedCommit) =>
-              $emit('runs-diff', addProblemComponent, selectedCommit)
-          "
-        ></omegaup-problem-versions>
-      </div>
+        <div
+          v-show="showTab === 'version'"
+          class="tab-pane"
+          :class="{ active: showTab === 'version' }"
+        >
+          <omegaup-problem-versions
+            :log="data.log"
+            :published-revision="data.publishedRevision"
+            :value="data.publishedRevision"
+            :show-footer="true"
+            @emit-select-version="
+              (selectedRevision, updatePublished) =>
+                $emit('select-version', selectedRevision, updatePublished)
+            "
+            @emit-runs-diff="
+              (addProblemComponent, selectedCommit) =>
+                $emit('runs-diff', addProblemComponent, selectedCommit)
+            "
+          ></omegaup-problem-versions>
+        </div>
 
-      <div v-if="showTab === 'solution'" class="tab-pane active">
-        <omegaup-problem-statementedit
-          :statement="
-            data.solution || { markdown: '', language: 'es', images: {} }
-          "
-          markdown-type="solutions"
-          :title="data.title"
-          @update-markdown-contents="
-            (solutions, newLanguage, currentMarkdown) =>
-              $emit(
-                'update-markdown-contents',
-                solutions,
-                newLanguage,
-                currentMarkdown,
-                'solutions',
-              )
-          "
-        ></omegaup-problem-statementedit>
-      </div>
+        <div
+          v-show="showTab === 'solution'"
+          class="tab-pane"
+          :class="{ active: showTab === 'solution' }"
+        >
+          <omegaup-problem-statementedit
+            :statement="
+              data.solution || { markdown: '', language: 'es', images: {} }
+            "
+            markdown-type="solutions"
+            :title="data.title"
+            @update-markdown-contents="
+              (solutions, newLanguage, currentMarkdown) =>
+                $emit(
+                  'update-markdown-contents',
+                  solutions,
+                  newLanguage,
+                  currentMarkdown,
+                  'solutions',
+                )
+            "
+          ></omegaup-problem-statementedit>
+        </div>
 
-      <div v-if="showTab === 'admins'" class="tab-pane active">
-        <omegaup-common-admins
-          :admins="admins"
-          :search-result-users="searchResultUsers"
-          @add-admin="(username) => $emit('add-admin', username)"
-          @remove-admin="(username) => $emit('remove-admin', username)"
-          @update-search-result-users="
-            (query) => $emit('update-search-result-users', query)
-          "
-        ></omegaup-common-admins>
-        <omegaup-common-groupadmins
-          :group-admins="groups"
-          :search-result-groups="searchResultGroups"
-          @add-group-admin="
-            (groupAlias) => $emit('add-group-admin', groupAlias)
-          "
-          @remove-group-admin="
-            (groupAlias) => $emit('remove-group-admin', groupAlias)
-          "
-          @update-search-result-groups="
-            (query) => $emit('update-search-result-groups', query)
-          "
-        ></omegaup-common-groupadmins>
-      </div>
+        <div
+          v-show="showTab === 'admins'"
+          class="tab-pane"
+          :class="{ active: showTab === 'admins' }"
+        >
+          <omegaup-common-admins
+            :admins="admins"
+            :search-result-users="searchResultUsers"
+            @add-admin="(username) => $emit('add-admin', username)"
+            @remove-admin="(username) => $emit('remove-admin', username)"
+            @update-search-result-users="
+              (query) => $emit('update-search-result-users', query)
+            "
+          ></omegaup-common-admins>
+          <omegaup-common-groupadmins
+            :group-admins="groups"
+            :search-result-groups="searchResultGroups"
+            @add-group-admin="
+              (groupAlias) => $emit('add-group-admin', groupAlias)
+            "
+            @remove-group-admin="
+              (groupAlias) => $emit('remove-group-admin', groupAlias)
+            "
+            @update-search-result-groups="
+              (query) => $emit('update-search-result-groups', query)
+            "
+          ></omegaup-common-groupadmins>
+        </div>
 
-      <div v-if="showTab === 'tags'" class="tab-pane active">
-        <omegaup-problem-tags
-          :alias="data.alias"
-          :title="data.title"
-          :initial-allow-tags="data.allowUserAddTags"
-          :can-add-new-tags="true"
-          :public-tags="data.publicTags"
-          :level-tags="data.levelTags"
-          :problem-level="data.problemLevel"
-          :selected-public-tags="data.selectedPublicTags"
-          :selected-private-tags="data.selectedPrivateTags"
-          @emit-update-problem-level="
-            (levelTag) => $emit('update-problem-level', levelTag)
-          "
-          @emit-add-tag="
-            (alias, tagname, isPublic) =>
-              $emit('add-tag', alias, tagname, isPublic)
-          "
-          @emit-remove-tag="
-            (alias, tagname, isPublic) =>
-              $emit('remove-tag', alias, tagname, isPublic)
-          "
-          @emit-change-allow-user-add-tag="
-            (alias, title, allowTags) =>
-              $emit('change-allow-user-add-tag', alias, title, allowTags)
-          "
-        ></omegaup-problem-tags>
-      </div>
+        <div
+          v-show="showTab === 'tags'"
+          class="tab-pane"
+          :class="{ active: showTab === 'tags' }"
+        >
+          <omegaup-problem-tags
+            :alias="data.alias"
+            :title="data.title"
+            :initial-allow-tags="data.allowUserAddTags"
+            :can-add-new-tags="true"
+            :public-tags="data.publicTags"
+            :level-tags="data.levelTags"
+            :problem-level="data.problemLevel"
+            :selected-public-tags="data.selectedPublicTags"
+            :selected-private-tags="data.selectedPrivateTags"
+            @emit-update-problem-level="
+              (levelTag) => $emit('update-problem-level', levelTag)
+            "
+            @emit-add-tag="
+              (alias, tagname, isPublic) =>
+                $emit('add-tag', alias, tagname, isPublic)
+            "
+            @emit-remove-tag="
+              (alias, tagname, isPublic) =>
+                $emit('remove-tag', alias, tagname, isPublic)
+            "
+            @emit-change-allow-user-add-tag="
+              (alias, title, allowTags) =>
+                $emit('change-allow-user-add-tag', alias, title, allowTags)
+            "
+          ></omegaup-problem-tags>
+        </div>
 
-      <div v-if="showTab === 'download'" class="tab-pane active">
-        <div class="card">
-          <div class="card-body">
-            <form class="form" @submit.prevent="onDownload">
+        <div
+          v-show="showTab === 'download'"
+          class="tab-pane"
+          :class="{ active: showTab === 'download' }"
+        >
+          <div class="card">
+            <div class="card-body">
+              <form class="form" @submit.prevent="onDownload">
+                <div class="form-group">
+                  {{ T.problemDownloadZip }}:
+                  <button class="btn btn-primary" type="submit">
+                    {{ T.wordsDownload }}
+                  </button>
+                </div>
+              </form>
               <div class="form-group">
-                {{ T.problemDownloadZip }}:
-                <button class="btn btn-primary" type="submit">
-                  {{ T.wordsDownload }}
+                {{ T.problemPrintableVersion }}:
+                <button class="btn btn-primary" @click="onGotoPrintableVersion">
+                  {{ T.contestPrintableVersion }}
                 </button>
               </div>
-            </form>
-            <div class="form-group">
-              {{ T.problemPrintableVersion }}:
-              <button class="btn btn-primary" @click="onGotoPrintableVersion">
-                {{ T.contestPrintableVersion }}
-              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      <div v-if="showTab === 'delete'" class="tab-pane active">
-        <div class="card">
-          <div class="card-body">
-            <div class="form-group">
-              <div class="alert alert-danger">
-                <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
-                <hr />
-                <omegaup-markdown
-                  :markdown="T.wordsDangerZoneDesc"
-                ></omegaup-markdown>
-                <br /><br />
-                <button
-                  class="btn btn-danger"
-                  @click.prevent="showConfirmationModal = true"
-                >
-                  {{ T.wordsDelete }}
-                </button>
+        <div
+          v-show="showTab === 'delete'"
+          class="tab-pane"
+          :class="{ active: showTab === 'delete' }"
+        >
+          <div class="card">
+            <div class="card-body">
+              <div class="form-group">
+                <div class="alert alert-danger">
+                  <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
+                  <hr />
+                  <omegaup-markdown
+                    :markdown="T.wordsDangerZoneDesc"
+                  ></omegaup-markdown>
+                  <br /><br />
+                  <button
+                    class="btn btn-danger"
+                    @click.prevent="showConfirmationModal = true"
+                  >
+                    {{ T.wordsDelete }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </keep-alive>
     <b-modal
       v-model="showConfirmationModal"
       :title="T.problemEditDeleteRequireConfirmation"
