@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-3" role="tablist">
       <li class="nav-item" role="presentation">
         <a
@@ -25,7 +26,9 @@
       </li>
     </ul>
 
+    <!-- Tab Content -->
     <div class="tab-content">
+      <!-- Login Tab -->
       <div
         v-show="activeTab === AvailableTabs.Login"
         class="tab-pane"
@@ -40,6 +43,7 @@
         </omegaup-login>
       </div>
 
+      <!-- Sign Up Tab -->
       <div
         v-show="activeTab === AvailableTabs.Signup"
         class="tab-pane"
@@ -61,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import VueRecaptcha from 'vue-recaptcha';
 import omegaup_Login from './Login.vue';
@@ -85,48 +89,26 @@ export default class Signin extends Vue {
   @Prop() googleClientId!: string;
   @Prop() hasVisitedSection!: string;
   @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
+  @Prop({ default: AvailableTabs.Login }) initialActiveTab!: AvailableTabs;
 
   T = T;
   AvailableTabs = AvailableTabs;
-  activeTab: AvailableTabs = AvailableTabs.Login;
+  activeTab: AvailableTabs = this.initialActiveTab;
 
-  mounted(): void {
-    const hash = window.location.hash.substring(1);
-    if (hash === AvailableTabs.Login || hash === AvailableTabs.Signup) {
-      this.activeTab = hash as AvailableTabs;
-    }
-
-    window.addEventListener('hashchange', this.onHashChange);
-  }
-
-  beforeDestroy(): void {
-    window.removeEventListener('hashchange', this.onHashChange);
+  @Watch('initialActiveTab')
+  onInitialActiveTabChanged(newValue: AvailableTabs): void {
+    this.activeTab = newValue;
   }
 
   setActiveTab(tab: AvailableTabs): void {
     this.activeTab = tab;
     window.location.hash = `#${tab}`;
   }
-
-  onHashChange(): void {
-    const hash = window.location.hash.substring(1);
-    if (hash === AvailableTabs.Login || hash === AvailableTabs.Signup) {
-      this.activeTab = hash as AvailableTabs;
-    }
-  }
 }
 </script>
 
-<style scoped>
-:root {
-  --signin-nav-tabs-border-color: #dee2e6;
-  --signin-nav-link-color: #6c757d;
-  --signin-nav-link-background-color: #e9ecef;
-  --signin-nav-link-hover-background-color: #d6d9dc;
-  --signin-nav-link-hover-color: #495057;
-  --signin-nav-link-active-color: #212529;
-  --signin-nav-link-active-background-color: #fff;
-}
+<style scoped lang="scss">
+@import '../../../../sass/main.scss';
 
 .nav-tabs {
   border-bottom: 1px solid var(--signin-nav-tabs-border-color);

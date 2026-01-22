@@ -4,7 +4,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import login_Signin from '../components/login/Signin.vue';
+import login_Signin, { AvailableTabs } from '../components/login/Signin.vue';
 import VueRecaptcha from 'vue-recaptcha';
 
 OmegaUp.on('ready', () => {
@@ -58,6 +58,17 @@ OmegaUp.on('ready', () => {
   } else if (payload.verifyEmailSuccessfully) {
     ui.success(payload.verifyEmailSuccessfully);
   }
+
+  // Read hash from URL on mount
+  const locationHash = window.location.hash.substring(1);
+  let initialActiveTab: AvailableTabs = AvailableTabs.Login;
+  if (
+    locationHash === AvailableTabs.Login ||
+    locationHash === AvailableTabs.Signup
+  ) {
+    initialActiveTab = locationHash as AvailableTabs;
+  }
+
   new Vue({
     el: '#main-container',
     components: {
@@ -72,6 +83,7 @@ OmegaUp.on('ready', () => {
           googleClientId,
           hasVisitedSection: payload.hasVisitedSection,
           useSignupFormWithBirthDate,
+          initialActiveTab: initialActiveTab,
         },
         on: {
           'register-and-login': ({
