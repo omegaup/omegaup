@@ -332,7 +332,7 @@
             cols="12"
             md="6"
             lg="4"
-            class="mb-4"
+            class="mb-4 d-flex align-items-stretch"
           >
             <omegaup-contest-card :contest="contestItem">
               <!-- Slots -->
@@ -461,7 +461,7 @@ import {
   DropdownPlugin,
   LayoutPlugin,
 } from 'bootstrap-vue';
-import ContestCard from './ContestCard.vue';
+import ContestCard from './ContestCardv2.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
