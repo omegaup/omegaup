@@ -41,7 +41,7 @@ export class CoursePage {
     });
 
     cy.get('@savedStudentsNames').should('deep.equal', users);
-    cy.get('[data-alert-close]').click();
+    cy.get('[data-alert-close]').click({ force: true });
   }
 
   addAssignmentWithProblems(
@@ -88,7 +88,7 @@ export class CoursePage {
     }
     cy.get('button[data-schedule-assignment]').click();
     cy.get('.omegaup-course-assignmentdetails').should('not.be.visible');
-    cy.get('[data-alert-close]').click();
+    cy.get('[data-alert-close]').click({ force: true });
   }
 
   enterCourse(courseAlias: string, firstTime: boolean = true): void {
