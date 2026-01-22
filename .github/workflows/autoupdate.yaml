@@ -25,6 +25,8 @@ jobs:
           # Monitor all pull requests that are ready for review
           PR_FILTER: "all"
           PR_READY_STATE: "ready_for_review"
+          # Exclude PRs with these labels
+          EXCLUDED_LABELS: "blocked → not yet ready,blocked → waiting input,blocked → waiting parent,Stale"
           # Retry configuration for reliability
           RETRY_COUNT: "5"
           RETRY_SLEEP: "300"
