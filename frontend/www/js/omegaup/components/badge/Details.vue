@@ -4,11 +4,13 @@
     <figure
       class="px-2 py-4 row justify-content-center align-items-center text-center"
     >
-      <img
-        class="col-lg-6 badge-icon"
-        :class="{ 'badge-icon-gray': !badge.assignation_time }"
-        :src="iconUrl"
-      />
+      <badge-3d class="col-lg-6 badge-icon">
+        <img
+          :class="{ 'badge-icon-gray': !badge.assignation_time }"
+          :src="iconUrl"
+          :alt="name"
+        />
+      </badge-3d>
       <figcaption class="col-lg-6 p-0 mt-4 mt-lg-0 badge-description">
         {{ description }}
       </figcaption>
@@ -50,10 +52,12 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Markdown from '../Markdown.vue';
+import Badge3D from './Badge3D.vue';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'badge-3d': Badge3D,
   },
 })
 export default class BadgeDetails extends Vue {
@@ -101,6 +105,7 @@ export default class BadgeDetails extends Vue {
 .badge {
   &-icon {
     max-width: 300px;
+    height: 300px;
 
     &-gray {
       filter: grayscale(100%);
