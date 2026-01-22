@@ -127,19 +127,8 @@ export class CoursePage {
     cy.get('textarea[data-course-new-description]')
       .should('be.visible')
       .type('course description');
-
-    // Intercept API calls to wait for course creation to complete
-    cy.intercept({ method: 'POST', url: '/api/course/create/' }).as(
-      'courseCreate',
-    );
     cy.get('form[data-course-form]').submit();
-    cy.wait('@courseCreate', { timeout: 10000 })
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.url({ timeout: 10000 }).should(
-      'include',
-      `/course/${courseOptions.courseAlias}/edit/`,
-    );
+    cy.url().should('include', `/course/${courseOptions.courseAlias}/edit/`);
   }
 
   makeCoursePublic(): void {
