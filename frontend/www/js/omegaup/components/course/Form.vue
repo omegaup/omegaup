@@ -181,19 +181,22 @@
           </div>
           <div class="form-group col-md-6 introjs-language">
             <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
-            <vue-multiselect
-              v-model="selectedLanguages"
-              :disabled="readOnly"
-              :options="Object.keys(allLanguages)"
-              :multiple="true"
-              :placeholder="T.courseNewFormLanguages"
-              :close-on-select="false"
-              :allow-empty="true"
+            <div
               :class="{
-                'is-invalid': invalidParameterName === 'languages',
+                'is-invalid-wrapper': invalidParameterName === 'languages',
               }"
             >
-            </vue-multiselect>
+              <vue-multiselect
+                v-model="selectedLanguages"
+                :disabled="readOnly"
+                :options="Object.keys(allLanguages)"
+                :multiple="true"
+                :placeholder="T.courseNewFormLanguages"
+                :close-on-select="false"
+                :allow-empty="true"
+              >
+              </vue-multiselect>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -479,5 +482,9 @@ export default class CourseDetails extends Vue {
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
+}
+
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: #dc3545;
 }
 </style>
