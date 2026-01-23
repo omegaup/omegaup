@@ -322,36 +322,36 @@ export default class Signup extends Vue {
               intro: T.signUpFormInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-username') as Element,
+              element: document.querySelector('.introjs-username') as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuideUsername,
             },
             {
-              element: document.querySelector('.introjs-email') as Element,
+              element: document.querySelector('.introjs-email') as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuideEmail,
             },
             {
-              element: document.querySelector('.introjs-password') as Element,
+              element: document.querySelector('.introjs-password') as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuidePassword,
             },
             {
               element: document.querySelector(
                 '.introjs-confirmpassword',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuideConfirmPassword,
             },
             {
               element: document.querySelector(
                 '.introjs-terms-and-conditions',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuideTermsAndConditions,
             },
             {
-              element: document.querySelector('.introjs-register') as Element,
+              element: document.querySelector('.introjs-register') as HTMLElement | null,
               title,
               intro: T.signUpFormInteractiveGuideRegister,
             },
