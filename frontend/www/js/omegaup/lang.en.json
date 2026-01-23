@@ -372,7 +372,7 @@
 	"contestIntroScoreboardTimePercentOneHundred": "The live scoreboard will be shown throughout the contest.",
 	"contestIntroScoreboardTimePercentZero": "The scoreboard will not be shown during the contest.",
 	"contestIntroSubmissionsSeparationDesc": "For each incorrect submission you must wait %(window_length) to make a new submission.",
-	"contestLengthTooLong": "Contests can't last more than 31 days.",
+	"contestLengthTooLong": "Contests can't last more than %(max_days) days.",
 	"contestListArchivedContests": "Archived contests",
 	"contestListCurrent": "Current",
 	"contestListEmpty": "There are no contests that meet those characteristics",

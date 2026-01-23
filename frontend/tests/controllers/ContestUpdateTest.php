@@ -356,6 +356,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('31', $e->getErrorMessage());
         }
     }
 
@@ -414,6 +415,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('60', $e->getErrorMessage());
         }
     }
 

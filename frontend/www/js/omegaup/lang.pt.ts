@@ -373,7 +373,7 @@ const translations: { [key: string]: string; } = {
   contestIntroScoreboardTimePercentOneHundred: "O painel ao vivo ser\u00e1 mostrado durante todo o concurso.",
   contestIntroScoreboardTimePercentZero: "O painel n\u00e3o ser\u00e1 mostrado durante o concurso.",
   contestIntroSubmissionsSeparationDesc: "Para cada envio incorreto, voc\u00ea deve aguardar %(window_length) para fazer um novo envio.",
-  contestLengthTooLong: "A dura\u00e7\u00e3o do concurso n\u00e3o podem ser maior \u00e1 31 dias.",
+  contestLengthTooLong: "A dura\u00e7\u00e3o do concurso n\u00e3o podem ser maior \u00e1 %(max_days) dias.",
   contestListArchivedContests: "Concursos arquivados",
   contestListCurrent: "Atuais",
   contestListEmpty: "N\u00e3o h\u00e1 concursos que atendam a essas caracter\u00edsticas",

@@ -2849,9 +2849,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             : \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS;
 
         if ($contestLength > $maxContestLength) {
+            $maxDays = intval($maxContestLength / (60 * 60 * 24)); // Convert seconds to days
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestLengthTooLong',
-                'finish_time'
+                'finish_time',
+                ['max_days' => strval($maxDays)]
             );
         }
 

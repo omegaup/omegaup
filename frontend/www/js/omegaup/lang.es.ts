@@ -373,7 +373,7 @@ const translations: { [key: string]: string; } = {
   contestIntroScoreboardTimePercentOneHundred: "El scoreboard en vivo se mostrar\u00e1 durante todo el concurso.",
   contestIntroScoreboardTimePercentZero: "El scoreboard no se mostrar\u00e1 durante el concurso.",
   contestIntroSubmissionsSeparationDesc: "Por cada env\u00edo incorrecto se deber\u00e1 esperar %(window_length) para hacer un nuevo env\u00edo.",
-  contestLengthTooLong: "La duraci\u00f3n del concurso no puede ser mayor a 31 d\u00edas.",
+  contestLengthTooLong: "La duraci\u00f3n del concurso no puede ser mayor a %(max_days) d\u00edas.",
   contestListArchivedContests: "Concursos archivados",
   contestListCurrent: "Actuales",
   contestListEmpty: "No hay concursos con esas caracter\u00edsticas",
