@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -195,8 +195,6 @@
                 v-for="contestItem in contestList"
                 :key="contestItem.contest_id"
                 cols="12"
-                sm="6"
-                lg="4"
                 class="mb-4"
               >
                 <omegaup-contest-card :contest="contestItem">
@@ -279,8 +277,6 @@
                 v-for="contestItem in contestList"
                 :key="contestItem.contest_id"
                 cols="12"
-                sm="6"
-                lg="4"
                 class="mb-4"
               >
                 <omegaup-contest-card :contest="contestItem">
@@ -366,8 +362,6 @@
                 v-for="contestItem in contestList"
                 :key="contestItem.contest_id"
                 cols="12"
-                sm="6"
-                lg="4"
                 class="mb-4"
               >
                 <omegaup-contest-card :contest="contestItem">
@@ -426,7 +420,7 @@
         </b-tab>
       </b-tabs>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -449,7 +443,7 @@ import {
   DropdownPlugin,
   LayoutPlugin,
 } from 'bootstrap-vue';
-import ContestCard from './ContestCardv2.vue';
+import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
 import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);

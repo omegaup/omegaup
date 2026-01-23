@@ -1317,6 +1317,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestList'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'arena_contest_list',
         ];
@@ -5741,7 +5742,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_list',
+            'entrypoint' => 'arena_contest_listv2',
         ];
     }
 
