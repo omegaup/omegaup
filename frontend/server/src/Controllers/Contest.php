@@ -78,7 +78,7 @@ namespace OmegaUp\Controllers;
 
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
-    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
+    const MAX_CONTEST_LENGTH_SECONDS = 60 * 60 * 24 * 31; // 31 days
     const MAX_CONTEST_LENGTH_SYSADMIN_SECONDS = 60 * 60 * 24 * 60; // 60 days
     const CONTEST_LIST_PAGE_SIZE = 10;
 
