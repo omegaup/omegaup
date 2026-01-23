@@ -187,7 +187,9 @@ OmegaUp.on('ready', () => {
                 api.Course.update(request)
                   .then(() => {
                     ui.success(
-                      `${T.courseEditCourseEdited} [${T.courseEditGoToCourse}](/course/${request.alias})`,
+                      ui.formatString(T.courseEditCourseEditedAndGoToCourse, {
+                        alias: request.alias,
+                      }),
                     );
                     this.data.course.name = request.name;
                     window.scrollTo(0, 0);
@@ -562,7 +564,9 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(
-                  `${T.courseEditCourseCloned} [${T.courseEdit}](/course/${alias}/edit/)`,
+                  ui.formatString(T.courseEditCourseClonedSuccessfully, {
+                    course_alias: alias,
+                  }),
                   /*autoHide=*/ false,
                 );
               })

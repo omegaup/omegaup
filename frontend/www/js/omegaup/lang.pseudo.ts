@@ -563,8 +563,9 @@ const translations: { [key: string]: string; } = {
   courseEditAdmissionModeSelect: "(S313c7 c0ur53 admi55i0n m0d3)",
   courseEditArchive: "(Archiv3)",
   courseEditClone: "(C10n3)",
-  courseEditCourseCloned: "(Y0ur c0ur53 ha5 b33n c10n3d 5ucc355fu11y!)",
+  courseEditCourseClonedSuccessfully: "(Y0ur c0ur53 ha5 b33n c10n3d 5ucc355fu11y! <a href=\"/course/%(course_alias)/edit/\">Edi7 c0ur53</a>)",
   courseEditCourseEdited: "(Y0ur c0ur53 ha5 b33n 3di73d)",
+  courseEditCourseEditedAndGoToCourse: "(Y0ur c0ur53 ha5 b33n 3di73d! <a href=\"/course/%(alias)\">G0 70 c0ur53</a>)",
   courseEditGoToCourse: "(G0 70 c0ur53)",
   courseEditGroupAdminsEmpty: "(N0 admin gr0up5)",
   courseEditGroupTeachingAssistant: "(T3aching a55i57an7 gr0up)",
@@ -2214,4 +2215,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export {translations as default};
+export { translations as default };

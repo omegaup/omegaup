@@ -56,6 +56,8 @@ export default class GlobalNotifications extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .alert {
   position: fixed;
   top: 56px; // Below navbar
@@ -91,6 +93,7 @@ export default class GlobalNotifications extends Vue {
     padding-right: 2rem;
 
     // Override Markdown component styling for notifications
+    /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
     ::v-deep [data-markdown-statement] {
       display: inline;
       max-width: none;
@@ -104,7 +107,7 @@ export default class GlobalNotifications extends Vue {
       }
 
       a {
-        color: inherit;
+        color: $omegaup-links;
         text-decoration: underline;
       }
     }

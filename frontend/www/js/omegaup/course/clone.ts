@@ -39,7 +39,9 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(
-                  `${T.courseEditCourseCloned} [${T.courseEdit}](/course/${alias}/edit/)`,
+                  ui.formatString(T.courseEditCourseClonedSuccessfully, {
+                    course_alias: alias,
+                  }),
                   /*autoHide=*/ false,
                 );
               })

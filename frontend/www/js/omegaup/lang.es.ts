@@ -563,8 +563,9 @@ const translations: { [key: string]: string; } = {
   courseEditAdmissionModeSelect: "Seleccionar el modo de acceso del curso",
   courseEditArchive: "Archivar",
   courseEditClone: "Clonar",
-  courseEditCourseCloned: "Tu curso ha sido clonado exitosamente!",
+  courseEditCourseClonedSuccessfully: "Tu curso ha sido clonado exitosamente! <a href=\"/course/%(course_alias)/edit/\">Editar curso</a>",
   courseEditCourseEdited: "Tu curso ha sido editado.",
+  courseEditCourseEditedAndGoToCourse: "Tu curso ha sido editado! <a href=\"/course/%(alias)\">Ir al curso</a>",
   courseEditGoToCourse: "Ir al curso",
   courseEditGroupAdminsEmpty: "No hay grupos de admins",
   courseEditGroupTeachingAssistant: "Grupo de asistentes de ense\u00f1anza",
@@ -2214,4 +2215,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };
