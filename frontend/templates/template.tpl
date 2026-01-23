@@ -47,14 +47,12 @@
   <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
     <script type="text/json" id="header-payload">{{ headerPayload|json_encode|raw }}</script>
     {% jsInclude 'common_navbar' omitRuntime %}
+    {% jsInclude 'common_global_notifications' omitRuntime %}
     {% if not hideFooterAndHeader %}
       <div id="common-navbar"></div>
     {% endif %}
-    <main role="main" {% if not fullWidth %}class="container-lg py-5 px-3 px-md-5"{% endif %}>
-      <div class="alert mt-0" id="status" style="display: none;">
-        <button type="button" class="close" id="alert-close">&times;</button>
-        <span class="message"></span>
-      </div>
+    <main role="main" class="flex-grow-1{% if not fullWidth %} container-lg py-5 px-3 px-md-5{% endif %}">
+      <div id="global-notifications" role="status" aria-live="polite" aria-atomic="false" aria-relevant="additions"></div>
       {% if OMEGAUP_MAINTENANCE %}
         <div id="announcement" class="alert alert-info mt-0">
           {{ OMEGAUP_MAINTENANCE|raw }}

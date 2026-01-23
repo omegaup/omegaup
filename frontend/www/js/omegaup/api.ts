@@ -90,6 +90,13 @@ export function apiCall<
     });
 }
 
+export const ACL = {
+  userOwnedAclReport: apiCall<
+    messages.ACLUserOwnedAclReportRequest,
+    messages.ACLUserOwnedAclReportResponse
+  >('/api/aCL/userOwnedAclReport/'),
+};
+
 export const Admin = {
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
@@ -228,6 +235,65 @@ export const Badge = {
     })(x.badges);
     return x;
   }),
+};
+
+export const CarouselItems = {
+  create: apiCall<
+    messages.CarouselItemsCreateRequest,
+    messages.CarouselItemsCreateResponse
+  >('/api/carouselItems/create/'),
+  delete: apiCall<
+    messages.CarouselItemsDeleteRequest,
+    messages.CarouselItemsDeleteResponse
+  >('/api/carouselItems/delete/'),
+  list: apiCall<
+    messages.CarouselItemsListRequest,
+    messages._CarouselItemsListServerResponse,
+    messages.CarouselItemsListResponse
+  >('/api/carouselItems/list/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  listActive: apiCall<
+    messages.CarouselItemsListActiveRequest,
+    messages._CarouselItemsListActiveServerResponse,
+    messages.CarouselItemsListActiveResponse
+  >('/api/carouselItems/listActive/', (x) => {
+    x.carouselItems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (
+          typeof x.expiration_date !== 'undefined' &&
+          x.expiration_date !== null
+        )
+          x.expiration_date = ((x: number) => new Date(x * 1000))(
+            x.expiration_date,
+          );
+        return x;
+      });
+    })(x.carouselItems);
+    return x;
+  }),
+  update: apiCall<
+    messages.CarouselItemsUpdateRequest,
+    messages.CarouselItemsUpdateResponse
+  >('/api/carouselItems/update/'),
 };
 
 export const Certificate = {
@@ -1470,6 +1536,21 @@ export const Problem = {
   }),
 };
 
+export const ProblemBookmark = {
+  exists: apiCall<
+    messages.ProblemBookmarkExistsRequest,
+    messages.ProblemBookmarkExistsResponse
+  >('/api/problemBookmark/exists/'),
+  list: apiCall<
+    messages.ProblemBookmarkListRequest,
+    messages.ProblemBookmarkListResponse
+  >('/api/problemBookmark/list/'),
+  toggle: apiCall<
+    messages.ProblemBookmarkToggleRequest,
+    messages.ProblemBookmarkToggleResponse
+  >('/api/problemBookmark/toggle/'),
+};
+
 export const ProblemForfeited = {
   getCounts: apiCall<
     messages.ProblemForfeitedGetCountsRequest,
@@ -1976,6 +2057,45 @@ export const User = {
     messages.UserCoderOfTheMonthListRequest,
     messages.UserCoderOfTheMonthListResponse
   >('/api/user/coderOfTheMonthList/'),
+  compare: apiCall<
+    messages.UserCompareRequest,
+    messages._UserCompareServerResponse,
+    messages.UserCompareResponse
+  >('/api/user/compare/', (x) => {
+    if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+      x.user1 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user1);
+    if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+      x.user2 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user2);
+    return x;
+  }),
   contestStats: apiCall<
     messages.UserContestStatsRequest,
     messages._UserContestStatsServerResponse,

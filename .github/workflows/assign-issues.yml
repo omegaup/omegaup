@@ -35,9 +35,9 @@ jobs:
                       or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
-                  max_assignments: 3
+                  max_assignments: 5
                   max_assignments_message: >
-                      You already have the maximum number of assigned issues (3).
+                      You already have the maximum number of assigned issues (5).
                       Please wrap up or unassign one before taking another.
                   block_assignment: true
                   block_assignment_comment: >
