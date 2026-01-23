@@ -113,7 +113,7 @@ def _parse(text: str) -> Sequence[Table]:
                    | (Suppress(CaselessKeyword('ON UPDATE')) +
                       reference_option('on_update'))))
 
-    # key_part_with_order allows for optional ASC/DESC after column names in indexes
+    # key_part_with_order: optional ASC/DESC after column names in indexes
     key_part_with_order = identifier + Opt(
         Suppress(CaselessKeyword('ASC') | CaselessKeyword('DESC')))
 
