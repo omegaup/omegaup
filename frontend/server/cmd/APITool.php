@@ -849,6 +849,23 @@ class APIGenerator {
         }
 
         $typeDefinition = $this->typeMapper->typeAliases[$typeName]->typescriptExpansion;
+        if (
+            preg_match(
+                '/^\{\s*\[key:\s*(\w+)\]:\s*(\w+)\s*;\s*\}$/s',
+                $typeDefinition,
+                $matches
+            )
+        ) {
+            return [
+                '_is_simple_dict' => true,
+                '_key_type' => $matches[1],
+                '_value_type' => $matches[2]
+            ];
+        }
+        if (preg_match('/^\{\s*\[key:\s*\w+\]:\s*.+\{/s', $typeDefinition)) {
+            return ['_is_complex_dict' => true, '_definition' => $typeDefinition];
+        }
+
         $cleaned = trim($typeDefinition, '{} ');
 
         if (empty($cleaned)) {
@@ -857,6 +874,7 @@ class APIGenerator {
 
         $fields = explode(';', $cleaned);
         $typeFields = [];
+        $hasNestedStructures = false;
 
         foreach ($fields as $field) {
             $field = trim($field);
@@ -873,17 +891,44 @@ class APIGenerator {
                 if ($isOptional) {
                     $fieldName = substr($fieldName, 0, -1);
                 }
+                if (
+                    strpos($fieldType, '{') !== false ||
+                    (strpos(
+                        $fieldType,
+                        '['
+                    ) !== false && strpos(
+                        $fieldType,
+                        ']'
+                    ) !== false &&
+                    strpos(
+                        $fieldType,
+                        'types.'
+                    ) === false && strpos(
+                        $fieldType,
+                        'dao.'
+                    ) === false)
+                ) {
+                    $hasNestedStructures = true;
+                }
+                if (preg_match('/^(.+)\[\]$/', $fieldType, $matches)) {
+                    $fieldType = 'List[' . $matches[1] . ']';
+                }
 
                 $typeFields[] = [
                     'name' => $fieldName,
                     'type' => $fieldType,
-                    'optional' => $isOptional
+                    'required' => !$isOptional
                 ];
             }
         }
 
+        if ($hasNestedStructures) {
+            return ['_is_complex_dict' => true, '_definition' => $typeDefinition];
+        }
+
         return $typeFields;
     }
+
     private function generateTypeFieldsTable(
         string $typeName,
         array $typeFields
@@ -891,13 +936,35 @@ class APIGenerator {
         if (empty($typeFields)) {
             return;
         }
+        if (isset($typeFields['_is_simple_dict'])) {
+            echo "\n**`{$typeName}` type:**\n\n";
+            echo "`Record<{$typeFields['_key_type']}, {$typeFields['_value_type']}>`\n\n";
+            echo "A dictionary/map where keys are `{$typeFields['_key_type']}` and values are `{$typeFields['_value_type']}`.\n\n";
+            return;
+        }
+        if (isset($typeFields['_is_complex_dict'])) {
+            echo "\n**`{$typeName}` structure:**\n\n";
+            echo "```typescript\n";
+
+            $definition = $typeFields['_definition'];
+
+            $definition = str_replace('{ ', "{\n  ", $definition);
+            $definition = str_replace('; }', ";\n}", $definition);
+            $definition = str_replace('; ', ";\n  ", $definition);
+            echo $definition . "\n";
+            echo "```\n\n";
+            return;
+        }
+
         echo "\n**`{$typeName}` fields:**\n\n";
-        echo "| Name | Type | Optional |\n";
+        echo "| Name | Type | Required |\n";
         echo "|------|------|----------|\n";
 
         foreach ($typeFields as $field) {
-            $optionalText = $field['optional'] ? 'Yes' : 'No';
-            echo "| `{$field['name']}` | `{$field['type']}` | {$optionalText} |\n";
+            $requiredMark = $field['required'] ? '✓' : '';
+            $escapedType = str_replace('|', '\\|', $field['type']);
+            $requiredCell = $requiredMark !== '' ? $requiredMark : ' ';
+            echo "| `{$field['name']}` | `{$escapedType}` | {$requiredCell} |\n";
         }
         echo "\n";
     }
@@ -1245,15 +1312,21 @@ EOD;
 
                 if (!empty($method->requestParams)) {
                     echo "### Parameters\n\n";
-                    echo "| Name | Type | Description |\n";
-                    echo "|------|------|-------------|\n";
+                    echo "| Name | Type | Description | Required |\n";
+                    echo "|------|------|-------------|----------|\n";
                     foreach ($method->requestParams as $requestParam) {
-                        echo "| `{$requestParam->name}` | `" . str_replace(
+                        $requiredMark = !$requestParam->isOptional ? '✓' : '';
+                        $description = $requestParam->description ?? '';
+                        $escapedType = str_replace(
                             '|',
                             '\\|',
                             $requestParam->type
-                        ) . "` | {$requestParam->description} |\n";
+                        );
+                        $descCell = $description !== '' ? $description : ' ';
+                        $requiredCell = $requiredMark !== '' ? $requiredMark : ' ';
+                        echo "| `{$requestParam->name}` | `{$escapedType}` | {$descCell} | {$requiredCell} |\n";
                     }
+                    echo "\n";
                 }
 
                 echo "### Returns\n\n";
@@ -1268,10 +1341,12 @@ EOD;
                     echo "|------|------|\n";
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        $escapedType = str_replace('|', '\\|', $paramType);
+                        $displayType = $paramType;
+                        if (preg_match('/^(.+)\[\]$/', $paramType, $matches)) {
+                            $displayType = 'List[' . $matches[1] . ']';
+                        }
+                        $escapedType = str_replace('|', '\\|', $displayType);
                         echo "| `{$paramName}` | `{$escapedType}` |\n";
-
-                        // If this is a complex type, add its fields in a separate table
                         $typeFields = $this->getTypeFields($paramType);
                         if (!empty($typeFields)) {
                             $this->generateTypeFieldsTable(
