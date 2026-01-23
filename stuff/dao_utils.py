@@ -113,16 +113,20 @@ def _parse(text: str) -> Sequence[Table]:
                    | (Suppress(CaselessKeyword('ON UPDATE')) +
                       reference_option('on_update'))))
 
+    # key_part_with_order allows for optional ASC/DESC after column names in indexes
+    key_part_with_order = identifier + Opt(
+        Suppress(CaselessKeyword('ASC') | CaselessKeyword('DESC')))
+
     constraint_definition = (
         (((CaselessKeyword('PRIMARY KEY')('type')) |
           ((CaselessKeyword('FULLTEXT KEY') | CaselessKeyword('UNIQUE KEY')
             | CaselessKeyword('KEY'))('type') + identifier('index_name'))) +
-         '(' + delimited_list(identifier)('key_part') + ')') |
+         '(' + delimited_list(key_part_with_order)('key_part') + ')') |
         (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') +
          ((CaselessKeyword('FOREIGN KEY')
            ('type') + '(' + delimited_list(identifier)
            ('key_part') + ')' + reference_definition)
-          | (CaselessKeyword('CHECK')('type') + Regex('[^,\n]+'))))
+          | (CaselessKeyword('CHECK')('type') + Regex('[^,\\n]+'))))
     ).set_parse_action(Constraint)
 
     column_type = (Word(alphanums) + Opt('(' + Regex('[^)]+') + ')') +
