@@ -449,7 +449,9 @@ export default class CourseDetails extends Vue {
       objective: this.objective,
       start_time: this.startTime,
       alias: this.alias,
-      level: this.level,
+      // Only include level if it has a valid value (not empty string)
+      // This prevents sending an empty string which is not a valid level option
+      ...(this.level ? { level: this.level } : {}),
       languages: this.selectedLanguages,
       show_scoreboard: this.showScoreboard,
       needs_basic_information: this.needsBasicInformation,
