@@ -302,11 +302,20 @@ export default class Signup extends Vue {
     const title = T.signUpFormInteractiveGuideTitle;
 
     if (!this.hasVisitedSection) {
-      introJs()
-        .setOptions({
+      // Check if user has dismissed the tutorial before
+      const hasDismissedTutorial = localStorage.getItem(
+        'signup-tutorial-dismissed',
+      );
+
+      if (!hasDismissedTutorial) {
+        const introInstance = introJs().setOptions({
           nextLabel: T.interactiveGuideNextButton,
           prevLabel: T.interactiveGuidePreviousButton,
           doneLabel: T.interactiveGuideDoneButton,
+          showBullets: false,
+          showProgress: true,
+          exitOnEsc: false,
+          exitOnOverlayClick: false,
           steps: [
             {
               title,
@@ -347,8 +356,19 @@ export default class Signup extends Vue {
               intro: T.signUpFormInteractiveGuideRegister,
             },
           ],
-        })
-        .start();
+        });
+
+        // Handle skip button click to mark tutorial as dismissed
+        introInstance.onexit(() => {
+          localStorage.setItem('signup-tutorial-dismissed', 'true');
+        });
+
+        introInstance.oncomplete(() => {
+          localStorage.setItem('signup-tutorial-dismissed', 'true');
+        });
+
+        introInstance.start();
+      }
       this.$cookies.set('has-visited-signup', true, -1);
     }
   }
