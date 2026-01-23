@@ -957,18 +957,37 @@ class APIGenerator {
         }
 
         echo "\n**`{$typeName}` fields:**\n\n";
-        echo "| Name | Type | Required |\n";
-        echo "|------|------|----------|\n";
+
+        $nameWidth = 4;
+        $typeWidth = 4;
+        $requiredWidth = 8;
+
+        foreach ($typeFields as $field) {
+            $nameWidth = max($nameWidth, strlen($field['name']) + 2); // +2 for backticks
+            $typeWidth = max($typeWidth, strlen($field['type']) + 2); // +2 for backticks
+        }
+
+        $this->printTableRow(
+            ['Name', 'Type', 'Required'],
+            [$nameWidth, $typeWidth, $requiredWidth]
+        );
+
+        echo '|' . str_repeat('-', $nameWidth + 2);
+        echo '|' . str_repeat('-', $typeWidth + 2);
+        echo '|' . str_repeat('-', $requiredWidth + 2) . "|\n";
 
         foreach ($typeFields as $field) {
             $requiredMark = $field['required'] ? '✓' : '';
             $escapedType = str_replace('|', '\\|', $field['type']);
             $requiredCell = $requiredMark !== '' ? $requiredMark : ' ';
-            echo "| `{$field['name']}` | `{$escapedType}` | {$requiredCell} |\n";
+
+            $this->printTableRow(
+                ["`{$field['name']}`", "`{$escapedType}`", $requiredCell],
+                [$nameWidth, $typeWidth, $requiredWidth]
+            );
         }
         echo "\n";
     }
-
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
         $controllerClassName = "\\OmegaUp\\Controllers\\{$controllerClassBasename}";
@@ -1312,8 +1331,39 @@ EOD;
 
                 if (!empty($method->requestParams)) {
                     echo "### Parameters\n\n";
-                    echo "| Name | Type | Description | Required |\n";
-                    echo "|------|------|-------------|----------|\n";
+
+                    $nameWidth = 4;
+                    $typeWidth = 4;
+                    $descWidth = 11;
+                    $requiredWidth = 8;
+
+                    foreach ($method->requestParams as $requestParam) {
+                        $nameWidth = max(
+                            $nameWidth,
+                            strlen(
+                                $requestParam->name
+                            ) + 2
+                        ); // +2 for backticks
+                        $typeWidth = max(
+                            $typeWidth,
+                            strlen(
+                                $requestParam->type
+                            ) + 2
+                        ); // +2 for backticks
+                        $description = $requestParam->description ?? '';
+                        $descWidth = max($descWidth, strlen($description));
+                    }
+
+                    $this->printTableRow(
+                        ['Name', 'Type', 'Description', 'Required'],
+                        [$nameWidth, $typeWidth, $descWidth, $requiredWidth]
+                    );
+
+                    echo '|' . str_repeat('-', $nameWidth + 2);
+                    echo '|' . str_repeat('-', $typeWidth + 2);
+                    echo '|' . str_repeat('-', $descWidth + 2);
+                    echo '|' . str_repeat('-', $requiredWidth + 2) . "|\n";
+
                     foreach ($method->requestParams as $requestParam) {
                         $requiredMark = !$requestParam->isOptional ? '✓' : '';
                         $description = $requestParam->description ?? '';
@@ -1322,9 +1372,11 @@ EOD;
                             '\\|',
                             $requestParam->type
                         );
-                        $descCell = $description !== '' ? $description : ' ';
-                        $requiredCell = $requiredMark !== '' ? $requiredMark : ' ';
-                        echo "| `{$requestParam->name}` | `{$escapedType}` | {$descCell} | {$requiredCell} |\n";
+
+                        $this->printTableRow(
+                            ["`{$requestParam->name}`", "`{$escapedType}`", $description, $requiredMark],
+                            [$nameWidth, $typeWidth, $descWidth, $requiredWidth]
+                        );
                     }
                     echo "\n";
                 }
@@ -1337,8 +1389,31 @@ EOD;
                     echo "{$method->returnType->typescriptExpansion}\n";
                     echo "```\n\n";
                 } else {
-                    echo "| Name | Type |\n";
-                    echo "|------|------|\n";
+                    $nameWidth = 4;
+                    $typeWidth = 4;
+
+                    foreach ($method->responseTypeMapping as $paramName => $paramType) {
+                        $displayType = $paramType;
+                        if (preg_match('/^(.+)\[\]$/', $paramType, $matches)) {
+                            $displayType = 'List[' . $matches[1] . ']';
+                        }
+                        $nameWidth = max($nameWidth, strlen($paramName) + 2); // +2 for backticks
+                        $typeWidth = max(
+                            $typeWidth,
+                            strlen(
+                                $displayType
+                            ) + 2
+                        ); // +2 for backticks
+                    }
+
+                    $this->printTableRow(
+                        ['Name', 'Type'],
+                        [$nameWidth, $typeWidth]
+                    );
+
+                    echo '|' . str_repeat('-', $nameWidth + 2);
+                    echo '|' . str_repeat('-', $typeWidth + 2) . "|\n";
+
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
                         $displayType = $paramType;
@@ -1346,7 +1421,12 @@ EOD;
                             $displayType = 'List[' . $matches[1] . ']';
                         }
                         $escapedType = str_replace('|', '\\|', $displayType);
-                        echo "| `{$paramName}` | `{$escapedType}` |\n";
+
+                        $this->printTableRow(
+                            ["`{$paramName}`", "`{$escapedType}`"],
+                            [$nameWidth, $typeWidth]
+                        );
+
                         $typeFields = $this->getTypeFields($paramType);
                         if (!empty($typeFields)) {
                             $this->generateTypeFieldsTable(
@@ -1355,9 +1435,19 @@ EOD;
                             );
                         }
                     }
+                    echo "\n";
                 }
             }
         }
+    }
+    private function printTableRow(array $columns, array $widths): void {
+        echo '|';
+        foreach ($columns as $index => $value) {
+            $width = $widths[$index];
+            $paddedValue = str_pad($value, $width, ' ', STR_PAD_RIGHT);
+            echo " {$paddedValue} |";
+        }
+        echo "\n";
     }
 
     public function generateControllersDoc(): void {
