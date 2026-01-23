@@ -1898,6 +1898,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User '{$r->identity->username}' joined contest '{$response['contest']->alias}'"
         );
+
+        // Invalidate user compare data cache since contest count changed
+        \OmegaUp\Controllers\User::invalidateUserCompareDataCache(
+            strval($r->identity->username)
+        );
+
         return ['status' => 'ok'];
     }
 
