@@ -484,7 +484,8 @@ export default class CourseDetails extends Vue {
   background: var(--multiselect-tag-background-color);
 }
 
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
-  border-color: #dc3545;
+  border-color: var(--form-input-error-color);
 }
 </style>
