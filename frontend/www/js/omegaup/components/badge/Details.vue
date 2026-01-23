@@ -4,13 +4,16 @@
     <figure
       class="px-2 py-4 row justify-content-center align-items-center text-center"
     >
-      <badge-3d class="col-lg-6 badge-icon">
-        <img
-          :class="{ 'badge-icon-gray': !badge.assignation_time }"
-          :src="iconUrl"
-          :alt="name"
-        />
-      </badge-3d>
+      <div class="col-lg-6 d-flex justify-content-center">
+        <badge-3d class="badge-icon-wrapper">
+          <img
+            :class="{ 'badge-icon-gray': !badge.assignation_time }"
+            :src="iconUrl"
+            :alt="name"
+            class="badge-icon-img"
+          />
+        </badge-3d>
+      </div>
       <figcaption class="col-lg-6 p-0 mt-4 mt-lg-0 badge-description">
         {{ description }}
       </figcaption>
@@ -103,13 +106,19 @@ export default class BadgeDetails extends Vue {
 
 <style lang="scss" scoped>
 .badge {
-  &-icon {
-    max-width: 300px;
-    height: 300px;
+  &-icon-wrapper {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+  }
 
-    &-gray {
-      filter: grayscale(100%);
-    }
+  &-icon-img {
+    width: 100%;
+    height: 100%;
+  }
+
+  &-icon-gray {
+    filter: grayscale(100%);
   }
 
   &-description {
@@ -124,7 +133,6 @@ export default class BadgeDetails extends Vue {
     font-size: 1.1em;
 
     >>> &-icon {
-      // See: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
       font-size: 30px;
     }
   }
