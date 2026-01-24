@@ -108,7 +108,7 @@ import * as ui from '../../ui';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../markdown';
 
-import omegaup_problemMarkdown from './Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import user_Username from '../user/Username.vue';
 
 const markdownConverter = new markdown.Converter({

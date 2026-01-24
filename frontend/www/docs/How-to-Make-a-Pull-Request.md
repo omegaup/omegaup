@@ -158,7 +158,7 @@ git add .
 - Commit your changes:
 
 ```bash
-git commit -m "Write a description for your commited changes."
+git commit -m "Write a description for your committed changes."
 ```
 
 - **Run the validators**: Before pushing your changes, we strongly recommend running the following command:

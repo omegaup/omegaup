@@ -1898,6 +1898,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User '{$r->identity->username}' joined contest '{$response['contest']->alias}'"
         );
+
+        // Invalidate user compare data cache since contest count changed
+        \OmegaUp\Controllers\User::invalidateUserCompareDataCache(
+            strval($r->identity->username)
+        );
+
         return ['status' => 'ok'];
     }
 
@@ -5175,7 +5181,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * This function reviews changes in penalty type, admission mode, finish
-     * time and window length to recalcualte information previously stored
+     * time and window length to recalculate information previously stored
      */
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,

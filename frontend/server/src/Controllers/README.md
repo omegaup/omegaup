@@ -255,6 +255,7 @@
   - [`/api/user/changePassword/`](#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
+  - [`/api/user/compare/`](#apiusercompare)
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
   - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
@@ -2909,7 +2910,7 @@ _Nothing_
 
 ### Description
 
-Entry point for change passowrd of an identity
+Entry point for change password of an identity
 
 ### Parameters
 
@@ -4101,7 +4102,7 @@ token and then they can send it to end user
 
 Updates the password of a given user, this is the second and last step
 in order to reset the password. This operation is done if and only if
-the correct parameters are suplied.
+the correct parameters are supplied.
 
 ### Parameters
 
@@ -4912,6 +4913,26 @@ Returns the list of coders of the month
 | Name     | Type                        |
 | -------- | --------------------------- |
 | `coders` | `types.CoderOfTheMonthList` |
+
+## `/api/user/compare/`
+
+### Description
+
+Compare two users' profiles and stats
+
+### Parameters
+
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `username1` | `null\|string` |             |
+| `username2` | `null\|string` |             |
+
+### Returns
+
+| Name    | Type                    |
+| ------- | ----------------------- |
+| `user1` | `types.UserCompareData` |
+| `user2` | `types.UserCompareData` |
 
 ## `/api/user/contestStats/`
 
