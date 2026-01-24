@@ -300,75 +300,64 @@ export default class Signup extends Vue {
 
   mounted() {
     const title = T.signUpFormInteractiveGuideTitle;
+    const hasDismissedTutorial = localStorage.getItem('signup-tutorial-dismissed');
 
-    if (!this.hasVisitedSection) {
-      // Check if user has dismissed the tutorial before
-      const hasDismissedTutorial = localStorage.getItem(
-        'signup-tutorial-dismissed',
-      );
+    if (!this.hasVisitedSection && !hasDismissedTutorial) {
+      const introInstance = introJs().setOptions({
+        nextLabel: T.interactiveGuideNextButton,
+        prevLabel: T.interactiveGuidePreviousButton,
+        doneLabel: T.interactiveGuideDoneButton,
+        showBullets: false,
+        showProgress: true,
+        exitOnEsc: false,
+        exitOnOverlayClick: false,
+        steps: [
+          {
+            title,
+            intro: T.signUpFormInteractiveGuideWelcome,
+          },
+          {
+            element: document.querySelector('.introjs-username') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuideUsername,
+          },
+          {
+            element: document.querySelector('.introjs-email') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuideEmail,
+          },
+          {
+            element: document.querySelector('.introjs-password') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuidePassword,
+          },
+          {
+            element: document.querySelector('.introjs-confirmpassword') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuideConfirmPassword,
+          },
+          {
+            element: document.querySelector('.introjs-terms-and-conditions') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuideTermsAndConditions,
+          },
+          {
+            element: document.querySelector('.introjs-register') as HTMLElement | null,
+            title,
+            intro: T.signUpFormInteractiveGuideRegister,
+          },
+        ],
+      });
 
-      if (!hasDismissedTutorial) {
-        const introInstance = introJs().setOptions({
-          nextLabel: T.interactiveGuideNextButton,
-          prevLabel: T.interactiveGuidePreviousButton,
-          doneLabel: T.interactiveGuideDoneButton,
-          showBullets: false,
-          showProgress: true,
-          exitOnEsc: false,
-          exitOnOverlayClick: false,
-          steps: [
-            {
-              title,
-              intro: T.signUpFormInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-username') as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuideUsername,
-            },
-            {
-              element: document.querySelector('.introjs-email') as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuideEmail,
-            },
-            {
-              element: document.querySelector('.introjs-password') as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuidePassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-confirmpassword',
-              ) as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuideConfirmPassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-terms-and-conditions',
-              ) as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuideTermsAndConditions,
-            },
-            {
-              element: document.querySelector('.introjs-register') as HTMLElement | null,
-              title,
-              intro: T.signUpFormInteractiveGuideRegister,
-            },
-          ],
-        });
+      introInstance.onexit(() => {
+        localStorage.setItem('signup-tutorial-dismissed', 'true');
+      });
 
-        // Handle skip button click to mark tutorial as dismissed
-        introInstance.onexit(() => {
-          localStorage.setItem('signup-tutorial-dismissed', 'true');
-        });
+      introInstance.oncomplete(() => {
+        localStorage.setItem('signup-tutorial-dismissed', 'true');
+      });
 
-        introInstance.oncomplete(() => {
-          localStorage.setItem('signup-tutorial-dismissed', 'true');
-        });
-
-        introInstance.start();
-      }
+      introInstance.start();
       this.$cookies.set('has-visited-signup', true, -1);
     }
   }
