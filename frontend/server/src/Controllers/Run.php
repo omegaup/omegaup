@@ -1551,6 +1551,122 @@ class Run extends \OmegaUp\Controllers\Controller {
         return $result;
     }
 
+    public static function apiDownloadMultipleRuns(\OmegaUp\Request $r): void {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureIdentity();
+        $identity = $r->identity;
+
+        // Decode the JSON request body manually
+        $requestData = json_decode(file_get_contents('php://input'), true);
+        $runs = $requestData['runs'] ?? [];
+
+        if (empty($runs)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'noRunsProvided'
+            );
+        }
+
+        $zip = new \ZipArchive();
+        $zipFilename = tempnam(sys_get_temp_dir(), 'runs_') . '.zip';
+
+        if (
+            $zip->open(
+                $zipFilename,
+                \ZipArchive::CREATE | \ZipArchive::OVERWRITE
+            ) !== true
+        ) {
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'zipCreationFailed'
+            );
+        }
+
+        foreach ($runs as $run) {
+            if (
+                !isset(
+                    $run['alias'],
+                    $run['guid'],
+                    $run['username'],
+                    $run['language']
+                )
+            ) {
+                continue; // Skip invalid entries
+            }
+
+            $alias = $run['alias'];
+            $guid = $run['guid'];
+            $username = $run['username'];
+            $language = $run['language'];
+
+            // Fetch the source code
+            $sourceCode = self::getSourceCode($guid, $identity);
+            if (!$sourceCode) {
+                continue;
+            }
+
+            // Define file path inside ZIP: "problem_alias/username.language"
+            $zipPath = "{$alias}/{$username}-{$guid}.{$language}";
+            $zip->addFromString($zipPath, $sourceCode);
+        }
+
+        $zip->close();
+
+        // Send the ZIP file as a response
+        header('Content-Type: application/zip');
+        header(
+            "Content-Disposition: attachment; filename={$runs[0]['contest_alias']}.zip"
+        );
+        header('Content-Length: ' . filesize($zipFilename));
+
+        readfile($zipFilename);
+        unlink($zipFilename);
+
+        throw new \OmegaUp\Exceptions\ExitException();
+    }
+
+    /**
+     * Retrieves the source code for a given run, ensuring the user has permission.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    private static function getSourceCode(
+        string $guid,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): ?string {
+        [
+            'run' => $run,
+            'submission' => $submission,
+        ] = self::validateDetailsRequest($guid);
+
+        if (is_null($submission->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (is_null($run->commit) || is_null($run->version)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
+
+        $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (
+            !\OmegaUp\Authorization::canViewSubmission($identity, $submission) ||
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+        ) {
+            return null;
+        }
+
+        $details = self::getOptionalRunDetails(
+            $submission,
+            $run,
+            null,
+            showDetails: true
+        );
+
+        return $details['source'] ?? null;
+    }
+
     /**
      * @param list<string> $headers
      * @return bool|null|string

@@ -167,6 +167,7 @@
 	"banningDeclinedByReviewer": "Suspensi\u00f3n denegada por juez.",
 	"banningProblemDueToReport": "Suspendiendo problema por reporte de una cuenta.",
 	"birthdayInTheFuture": "No tienes edad suficiente para usar omegaUp",
+	"bulkAction": "Acci\u00f3n Masiva",
 	"bulkOperationError": "Hubo un error al ejecutar la operaci\u00f3n",
 	"bulkUserAddError": "Se produjo un error al agregar las cuentas. Los siguientes nombres o correos electr\u00f3nicos no se encontraron en omegaUp:<br><br><b>%(userEmail)</b>.<br><br>Sin embargo, el resto de cuentas se han agregado correctamente.",
 	"bulkUserAddSuccess": "Cuentas exitosamente agregadas.",
@@ -953,6 +954,7 @@
 	"newPublicTagsNotAllowed": "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
 	"noChangesDetected": "No se detectaron cambios",
 	"noCoders": "No hay coders",
+	"noRunsProvided": "No se proporcionaron ejecuciones.",
 	"nominationsRangeHeader": "Reportes de problemas (del %(lowCount) al %(highCount))",
 	"notProblemLevelTag": "La etiqueta enviada no es una etiqueta de nivel.",
 	"notificationContestClarificationRequest": "Ha sido solicitada una nueva clarificaci\u00f3n para el problema %(problemAlias) del concurso %(contestAlias), que administras.",
@@ -2214,5 +2216,6 @@
 	"wordsWallTimeInSeconds": "Tiempo-real (Seg)",
 	"wordsWarningProblem": "Conservar con una advertencia",
 	"wordsYes": "S\u00ed",
+	"zipCreationFailed": "Fallo en la creaci\u00f3n del archivo zip.",
 	"zipPrepare": "Preparar archivo zip"
 }
