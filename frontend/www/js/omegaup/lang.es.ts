@@ -614,6 +614,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormEndDate: "Fecha de fin",
   courseNewFormEndDateDesc: "La hora (en hora local) en la que termina el curso.",
   courseNewFormLanguages: "Establecer lenguajes para el curso actual",
+  courseNewFormLanguagesRequired: "Por favor selecciona al menos un lenguaje",
   courseNewFormLevel: "Nivel",
   courseNewFormLevelDesc: "El nivel de dificultad del curso.",
   courseNewFormObjective: "Objetivo",
