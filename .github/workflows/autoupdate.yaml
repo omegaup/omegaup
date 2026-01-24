@@ -95,7 +95,7 @@ jobs:
             // --- Enhanced Summary Reporting ---
             await core.summary
               .addHeading('Auto-update Summary')
-              .addText('This workflow runs on every push to `main` to keep internal PRs synced.')
+              .addRaw('This workflow runs on every push to `main` to keep internal PRs synced.')
               .addTable([
                 ['Status', 'Count', 'Pull Requests'],
                 ['✅ Updated', results.updated.length.toString(), results.updated.join(', ') || '-'],
