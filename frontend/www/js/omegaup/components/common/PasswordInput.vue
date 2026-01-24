@@ -15,11 +15,15 @@
     <button
       type="button"
       class="password-toggle-btn"
-      :aria-label="showPassword ? T.passwordHidePassword : T.passwordShowPassword"
+      :aria-label="
+        showPassword ? T.passwordHidePassword : T.passwordShowPassword
+      "
       :title="showPassword ? T.passwordHidePassword : T.passwordShowPassword"
       @click="togglePasswordVisibility"
     >
-      <font-awesome-icon :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']" />
+      <font-awesome-icon
+        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']"
+      />
     </button>
   </div>
 </template>
