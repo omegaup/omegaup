@@ -658,33 +658,33 @@ export default class Form extends Vue {
               intro: T.createContestInteractiveGuideWelcome,
             },
             {
-              element: document.querySelector('.introjs-style') as Element,
+              element: document.querySelector('.introjs-style') as HTMLElement | null,
               title,
               intro: T.createContestInteractiveGuideStyle,
             },
             {
               element: document.querySelector(
                 '.introjs-contest-title',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.createContestInteractiveGuideContestTitle,
             },
             {
               element: document.querySelector(
                 '.introjs-short-title',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.createContestInteractiveGuideShortTitle,
             },
             {
               element: document.querySelector(
                 '.introjs-description',
-              ) as Element,
+              ) as HTMLElement | null,
               title,
               intro: T.createContestInteractiveGuideDescription,
             },
             {
-              element: document.querySelector('.introjs-schedule') as Element,
+              element: document.querySelector('.introjs-schedule') as HTMLElement | null,
               title,
               intro: T.createContestInteractiveGuideSchedule,
             },

@@ -129,28 +129,28 @@ export default class SolutionTab extends Vue {
               intro: T.problemCreatorSolutionTabIntroToolbarIntro,
               element: document.querySelector(
                 '[data-solution-markdown-toolbar]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorSolutionTabIntroEditorTitle,
               intro: T.problemCreatorSolutionTabIntroEditorIntro,
               element: document.querySelector(
                 '[data-problem-creator-solution-editor-markdown]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorSolutionTabIntroPreviewTitle,
               intro: T.problemCreatorSolutionTabIntroPreviewIntro,
               element: document.querySelector(
                 '[data-problem-creator-solution-previewer-markdown]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorSolutionTabIntroSaveTitle,
               intro: T.problemCreatorSolutionTabIntroSaveIntro,
               element: document.querySelector(
                 '[data-problem-creator-solution-save-markdown]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
           ],
         })

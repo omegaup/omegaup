@@ -93,23 +93,24 @@ export default class CasesTab extends Vue {
               intro: T.problemCreatorCasesTabIntroSidebarIntro,
               element: document.querySelector(
                 '[data-cases-sidebar]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
             {
               title: T.problemCreatorCasesTabIntroAddPanelTitle,
               intro: T.problemCreatorCasesTabIntroAddPanelIntro,
               element: document.querySelector(
                 '[data-cases-add-panel]',
-              ) as Element,
+              ) as HTMLElement | null,
             },
           ],
         });
 
-        intro.onbeforechange(() => {
+        intro.onbeforechange((): boolean => {
           var currentStep = intro.currentStep();
           if (currentStep === 1) {
             this.openAddWindow();
           }
+          return true;
         });
 
         intro.start();
@@ -118,4 +119,5 @@ export default class CasesTab extends Vue {
     }
   }
 }
+
 </script>

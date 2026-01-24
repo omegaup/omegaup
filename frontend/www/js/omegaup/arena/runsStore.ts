@@ -56,7 +56,7 @@ export const runsStoreConfig = {
       state.index = {};
     },
     applyFilter(state: RunsState, filter: RunFilters) {
-      state.filters = Object.assign(state.filters, filter);
+      state.filters = Object.assign(state.filters ?? {}, filter);
     },
     removeFilter(
       state: RunsState,
