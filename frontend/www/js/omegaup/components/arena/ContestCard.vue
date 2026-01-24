@@ -88,18 +88,39 @@
                 {{ T.contestButtonEnter }}
               </b-button>
             </slot>
-            <slot name="contest-button-see-details">
-              <b-button
-                v-if="!contest.participating"
-                ref="contestButtonSeeDetails"
-                :href="getContestURL(contest.alias)"
-                variant="primary"
-                class="d-flex align-items-center justify-content-center"
-              >
-                <font-awesome-icon class="mr-1" icon="sign-in-alt" />
-                {{ T.contestButtonSeeDetails }}
-              </b-button>
-            </slot>
+            <div class="d-flex flex-column">
+              <slot name="contest-button-calendar">
+                <b-dropdown
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center mb-2"
+                >
+                  <template #button-content>
+                    <font-awesome-icon class="mr-1" icon="calendar-alt" />
+                    {{ T.contestAddToCalendar }}
+                  </template>
+                  <b-dropdown-item @click="subscribeToCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="sync" />
+                    {{ T.calendarSubscribe }}
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="downloadCalendar(contest.alias)">
+                    <font-awesome-icon class="mr-1" icon="download" />
+                    {{ T.calendarDownload }}
+                  </b-dropdown-item>
+                </b-dropdown>
+              </slot>
+              <slot name="contest-button-see-details">
+                <b-button
+                  v-if="!contest.participating"
+                  ref="contestButtonSeeDetails"
+                  :href="getContestURL(contest.alias)"
+                  variant="primary"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  <font-awesome-icon class="mr-1" icon="sign-in-alt" />
+                  {{ T.contestButtonSeeDetails }}
+                </b-button>
+              </slot>
+            </div>
           </div>
           <slot name="contest-dropdown">
             <b-dropdown variant="primary" class="d-inline-block">
@@ -122,24 +143,24 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
-import T from '../../lang';
 
-// Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
+// Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 import { ButtonPlugin, DropdownPlugin, LayoutPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(fas);
 
 @Component({
@@ -152,6 +173,7 @@ export default class ContestCard extends Vue {
 
   T = T;
   ui = ui;
+  isDownloadingCalendar = false;
 
   get contestDuration(): string {
     return time.formatContestDuration(
@@ -174,6 +196,67 @@ export default class ContestCard extends Vue {
 
   getPracticeContestURL(alias: string): string {
     return `/arena/${encodeURIComponent(alias)}/practice/`;
+  }
+
+  getCalendarURL(alias: string): string {
+    return `/api/contest/ical/?contest_alias=${encodeURIComponent(alias)}`;
+  }
+
+  downloadCalendar(alias: string): void {
+    // Prevent duplicate downloads
+    if (this.isDownloadingCalendar) {
+      return;
+    }
+
+    this.isDownloadingCalendar = true;
+    const url = this.getCalendarURL(alias);
+    const filename = `contest-${alias}.ics`;
+    let blobUrl: string | null = null;
+
+    ui.info(T.calendarDownloadStarted);
+
+    fetch(url, { credentials: 'include' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        ui.success(T.calendarDownloadSucceeded);
+      })
+      .catch((error) => {
+        ui.error(T.calendarDownloadFailed);
+        console.error('Calendar download failed:', error);
+      })
+      .finally(() => {
+        this.isDownloadingCalendar = false;
+        // Delay revocation to allow Chrome to complete the download
+        // See: https://stackoverflow.com/questions/30694453
+        if (blobUrl) {
+          const urlToRevoke = blobUrl;
+          setTimeout(() => {
+            URL.revokeObjectURL(urlToRevoke);
+          }, 1000);
+        }
+      });
+  }
+
+  subscribeToCalendar(alias: string): void {
+    // Use webcal:// protocol so calendar apps will subscribe
+    // instead of just importing once
+    const httpsUrl = `${window.location.origin}${this.getCalendarURL(alias)}`;
+    const webcalUrl = httpsUrl.replace(/^https?:\/\//, 'webcal://');
+    // Show message before navigating so it's visible
+    ui.info(T.calendarSubscribeStarted);
+    window.location.href = webcalUrl;
   }
 }
 </script>

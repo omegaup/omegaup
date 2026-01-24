@@ -1,14 +1,37 @@
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import { types } from '../api_types';
 import Vue from 'vue';
+import { types } from '../api_types';
 import arena_ContestList, {
-  ContestTab,
-  ContestOrder,
   ContestFilter,
+  ContestOrder,
+  ContestTab,
   UrlParams,
 } from '../components/arena/ContestListv2.vue';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
 import contestStore from './contestStore';
+
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  ButtonGroupPlugin,
+  ButtonPlugin,
+  CardPlugin,
+  FormCheckboxPlugin,
+  ModalPlugin,
+} from 'bootstrap-vue';
+
+Vue.use(ButtonPlugin);
+Vue.use(ButtonGroupPlugin);
+Vue.use(ModalPlugin);
+Vue.use(FormCheckboxPlugin);
+Vue.use(CardPlugin);
+library.add(fas);
+
+Vue.component('FontAwesomeIcon', FontAwesomeIcon);
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -24,6 +47,9 @@ OmegaUp.on('ready', () => {
         break;
       case 'past':
         tab = ContestTab.Past;
+        break;
+      case 'calendar':
+        tab = ContestTab.Calendar;
         break;
       default:
         tab = ContestTab.Current;
@@ -87,6 +113,9 @@ OmegaUp.on('ready', () => {
             break;
           case 'past':
             tab = ContestTab.Past;
+            break;
+          case 'calendar':
+            tab = ContestTab.Calendar;
             break;
           default:
             tab = ContestTab.Current;
