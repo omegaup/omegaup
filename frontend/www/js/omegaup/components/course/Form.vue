@@ -22,7 +22,9 @@
           </div>
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-short-title">
-              <span class="field-required">{{ T.courseNewFormShortTitleAlias }}</span>
+              <span class="field-required">{{
+                T.courseNewFormShortTitleAlias
+              }}</span>
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
                 icon="info-circle" />
@@ -219,7 +221,9 @@
           </div>
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100 introjs-description">
-              <span class="field-required">{{ T.courseNewFormDescription }}</span>
+              <span class="field-required">{{
+                T.courseNewFormDescription
+              }}</span>
               <textarea
                 v-model="description"
                 :disabled="readOnly"
