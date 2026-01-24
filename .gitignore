@@ -128,3 +128,4 @@ cypress/downloads/*
 # to check for inefficient queries.
 # Once the inefficient queries are fixed, this file should be deleted.
 stuff/inefficient_queries.csv
+start.sh
