@@ -78,7 +78,7 @@ def init(program: str, args: argparse.Namespace) -> None:
                             force=True)
     else:
         logging.basicConfig(filename=args.logfile or '',
-                            format='%%(asctime)s:%s:%%(message)s' % program,
+                            format=f'%(asctime)s:{program}:%(message)s',
                             level=log_level)
 
 
