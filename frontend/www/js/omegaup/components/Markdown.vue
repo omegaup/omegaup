@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
 
 declare global {
@@ -41,6 +41,11 @@ export default class Markdown extends Vue {
   }
 
   mounted(): void {
+    this.root.innerHTML = this.html;
+  }
+
+  @Watch('markdown')
+  onMarkdownChanged(): void {
     this.root.innerHTML = this.html;
   }
 }

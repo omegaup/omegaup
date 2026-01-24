@@ -15,7 +15,9 @@
       >
         &times;
       </button>
-      <span v-if="message" class="message">{{ message }}</span>
+      <span v-if="message" class="message">
+        <omegaup-markdown :markdown="message"></omegaup-markdown>
+      </span>
     </div>
   </transition>
 </template>
@@ -23,8 +25,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class GlobalNotifications extends Vue {
   get visible(): boolean {
     return notificationsStore.getters.isVisible;
@@ -49,6 +56,8 @@ export default class GlobalNotifications extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .alert {
   position: fixed;
   top: 56px; // Below navbar
@@ -82,6 +91,26 @@ export default class GlobalNotifications extends Vue {
   .message {
     display: block;
     padding-right: 2rem;
+
+    // Override Markdown component styling for notifications
+    /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+    ::v-deep [data-markdown-statement] {
+      display: inline;
+      max-width: none;
+      margin: 0;
+      text-align: left;
+
+      p {
+        display: inline;
+        margin: 0;
+        text-align: left;
+      }
+
+      a {
+        color: $omegaup-links;
+        text-decoration: underline;
+      }
+    }
   }
 }
 
