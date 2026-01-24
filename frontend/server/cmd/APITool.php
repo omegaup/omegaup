@@ -851,15 +851,16 @@ class APIGenerator {
         $typeDefinition = $this->typeMapper->typeAliases[$typeName]->typescriptExpansion;
         if (
             preg_match(
-                '/^\{\s*\[key:\s*(\w+)\]:\s*(\w+)\s*;\s*\}$/s',
+                '/^\{\s*\[key:\s*(\w+)\]:\s*(.+?)\s*;?\s*\}$/s',
                 $typeDefinition,
                 $matches
             )
         ) {
             return [
-                '_is_simple_dict' => true,
+                '_is_index_signature' => true,
                 '_key_type' => $matches[1],
-                '_value_type' => $matches[2]
+                '_value_type' => trim($matches[2], ';'),
+                '_definition' => $typeDefinition
             ];
         }
         if (preg_match('/^\{\s*\[key:\s*\w+\]:\s*.+\{/s', $typeDefinition)) {
@@ -934,6 +935,14 @@ class APIGenerator {
         array $typeFields
     ): void {
         if (empty($typeFields)) {
+            return;
+        }
+        if (isset($typeFields['_is_index_signature'])) {
+            echo "\n**`{$typeName}` type:**\n\n";
+            echo "```typescript\n";
+            echo $typeFields['_definition'] . "\n";
+            echo "```\n\n";
+            echo "An object with `{$typeFields['_key_type']}` keys and `{$typeFields['_value_type']}` values.\n\n";
             return;
         }
         if (isset($typeFields['_is_simple_dict'])) {

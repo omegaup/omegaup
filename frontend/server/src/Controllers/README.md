@@ -2244,11 +2244,13 @@ Returns details of a given course
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
 
-**`types.AssignmentProgress` fields:**
+**`types.AssignmentProgress` type:**
 
-| Name   | Type                      | Required |
-| ------ | ------------------------- | -------- |
-| `[key` | `string]: types.Progress` | ✓        |
+```typescript
+{ [key: string]: types.Progress; }
+```
+
+An object with `string` keys and `types.Progress` values.
 
 ## `/api/course/problemClarifications/`
 
@@ -5098,16 +5100,13 @@ Get Contests which a certain user has participated in
 | ---------- | --------------------------- |
 | `contests` | `types.UserProfileContests` |
 
-**`types.UserProfileContests` structure:**
+**`types.UserProfileContests` type:**
 
 ```typescript
-{
-  [key: string]: {
-  data: types.ContestParticipated;
-  place: number;
-};
-}
+{ [key: string]: { data: types.ContestParticipated; place: number; }; }
 ```
+
+An object with `string` keys and `{ data: types.ContestParticipated; place: number; }` values.
 
 ## `/api/user/create/`
 
