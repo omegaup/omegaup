@@ -276,6 +276,8 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthRank: "(T0p 100 c0d3r5 0f 7h3 pr3vi0u5 m0n7h)",
   codersOfTheMonthUser: "(C0d3r)",
   collecionOtherTags: "(O7h3r 7ag5)",
+  collectionHideFilters: "(Hid3 fi173r5)",
+  collectionShowFilters: "(Sh0w fi173r5)",
   collectionTitle: "(Pr0b13m C0113c7i0n5)",
   compareButton: "(C0mpar3)",
   compareDescription: "(C0mpar3 7h3 pr0fi135 and 57a7i57ic5 0f 7w0 u53r5)",
