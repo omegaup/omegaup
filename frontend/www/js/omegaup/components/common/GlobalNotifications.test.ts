@@ -10,6 +10,12 @@ import GlobalNotifications from './GlobalNotifications.vue';
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+// Simple stub for markdown component that just renders the text
+const MarkdownStub = {
+  props: ['markdown'],
+  template: '<div>{{ markdown }}</div>',
+};
+
 // Variable to hold the mock store that will be injected
 let mockStore: Store<NotificationsState>;
 
@@ -57,6 +63,9 @@ describe('GlobalNotifications.vue', () => {
     // Store starts with visible: false by default
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
     });
 
     expect(wrapper.find('.alert').exists()).toBe(false);
@@ -71,6 +80,9 @@ describe('GlobalNotifications.vue', () => {
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
     });
 
     // Assert alert is rendered
@@ -94,6 +106,9 @@ describe('GlobalNotifications.vue', () => {
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
     });
 
     const alert = wrapper.find('.alert');
@@ -110,6 +125,9 @@ describe('GlobalNotifications.vue', () => {
 
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
     });
 
     const closeButton = wrapper.find('.close');
@@ -123,6 +141,9 @@ describe('GlobalNotifications.vue', () => {
   it('should have dismiss method that dispatches to store', () => {
     const wrapper = shallowMount(GlobalNotifications, {
       localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
     });
 
     // Call dismiss method directly
