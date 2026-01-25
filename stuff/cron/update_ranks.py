@@ -26,7 +26,6 @@ from database.school_of_the_month import (
     remove_school_of_the_month_candidates,
     get_school_of_the_month_candidates,
     insert_school_of_the_month_candidates,
-    get_last_12_schools_of_the_month,
     School,
     get_sot_user_problems,
     get_sot_eligible_users
