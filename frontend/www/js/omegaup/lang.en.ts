@@ -63,6 +63,7 @@ const translations: { [key: string]: string; } = {
   arenaCommonTimeLimit: "Time limit (case)",
   arenaContestEndedUsePractice: "This contest has ended. To continue sending solutions please use our Practice Mode by clicking here.",
   arenaContestHasAlreadyStarted: "This contest has already started",
+  arenaContestMultipleTabsDetected: "You already have this contest open in another tab. Please close this tab and return to the original one.",
   arenaContestNotOpened: "You need to open the problemset in non-admin mode to make submissions.",
   arenaContestOrganizer: "Organizer",
   arenaContestPracticeOriginalRunsText: "To see the runs from the original contest, click [here](/arena/%(contestAlias)/#runs)",

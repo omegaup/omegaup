@@ -37,6 +37,7 @@ import socketStore from './socketStore';
 import { myRunsStore, RunFilters, runsStore } from './runsStore';
 import T from '../lang';
 import { DisqualificationType } from '../components/arena/Runs.vue';
+import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -44,6 +45,62 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
+
+  // Enforce single tab for non-admin contestants
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+
+  console.log('[SingleTabEnforcer] contestAdmin:', contestAdmin);
+
+  if (!contestAdmin) {
+    const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+    console.log(
+      '[SingleTabEnforcer] Starting enforcement for contest:',
+      payload.contest.alias,
+    );
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+
+      const timeoutId = window.setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        console.log(
+          '[SingleTabEnforcer] Timeout expired, no other tab detected',
+        );
+        settled = true;
+        resolve();
+      }, TAB_ENFORCER_TIMEOUT_MS);
+
+      enforceSingleTab(payload.contest.alias, (message: string) => {
+        console.log(
+          '[SingleTabEnforcer] Blocked! Another tab detected. Message:',
+          message,
+        );
+        if (settled) {
+          console.log('[SingleTabEnforcer] But already settled, ignoring');
+          return;
+        }
+        settled = true;
+        isBlocked = true;
+        blockedMessage = message;
+        window.clearTimeout(timeoutId);
+        resolve();
+      });
+    });
+
+    console.log(
+      '[SingleTabEnforcer] Final state - isBlocked:',
+      isBlocked,
+      'blockedMessage:',
+      blockedMessage,
+    );
+  } else {
+    console.log('[SingleTabEnforcer] Skipping enforcement (user is admin)');
+  }
+
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
@@ -137,6 +194,8 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -171,6 +230,8 @@ OmegaUp.on('ready', async () => {
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({
