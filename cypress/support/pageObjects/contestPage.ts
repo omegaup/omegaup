@@ -192,8 +192,14 @@ export class ContestPage {
   verifyContestDetails(contestOptions: ContestOptions): void {
     cy.visit(`/contest/${contestOptions.contestAlias}/edit`);
     cy.get('.contest-form').within(() => {
-      cy.get('[name="title"]').should('have.value', contestOptions.contestAlias);
-      cy.get('[name="alias"]').should('have.value', contestOptions.contestAlias);
+      cy.get('[name="title"]').should(
+        'have.value',
+        contestOptions.contestAlias,
+      );
+      cy.get('[name="alias"]').should(
+        'have.value',
+        contestOptions.contestAlias,
+      );
       cy.get('[name="description"]').should(
         'have.value',
         contestOptions.description,
