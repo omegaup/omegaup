@@ -12,6 +12,9 @@
             class="form-control"
             name="language"
           >
+            <option value="" disabled>
+              {{ T.problemCreatorSelectLanguage }}
+            </option>
             <option
               v-for="(language, key) in allowedLanguages"
               :key="key"
@@ -94,7 +97,7 @@ export default class CodeTab extends Vue {
   T = T;
   ui = ui;
   omegaup = omegaup;
-  selectedLanguage = T.problemCreatorEmpty;
+  selectedLanguage = '';
   codeInternal = T.problemCreatorEmpty;
   extensionInternal = T.problemCreatorEmpty;
 

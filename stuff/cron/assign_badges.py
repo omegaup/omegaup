@@ -43,13 +43,13 @@ def get_current_owners(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
-    cur_readonly.execute('''
+    cur_readonly.execute(f'''
         SELECT
             ub.user_id
         FROM
             Users_Badges ub
         WHERE
-            ub.badge_alias = '%s';''' % badge)
+            ub.badge_alias = '{badge}';''')
     return set(row['user_id'] for row in cur_readonly)
 
 

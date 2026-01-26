@@ -538,6 +538,7 @@ class Cache {
     const RUN_COUNTS = 'run-counts-';
     const RUN_TOTAL_COUNTS = 'run-total-counts';
     const USER_PROFILE = 'profile-';
+    const USER_COMPARE_DATA = 'user-compare-data-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_CONTESTANTS_LIST = 'contest-contestants-list';

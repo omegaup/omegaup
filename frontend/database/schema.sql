@@ -1144,6 +1144,8 @@ CREATE TABLE `Submissions` (
   KEY `verdict_type_time` (`verdict`,`type`,`time`),
   KEY `idx_time_status` (`time`,`status`),
   KEY `idx_submissions_identity_verdict_type_problem` (`identity_id`,`verdict`,`type`,`problem_id`),
+  KEY `idx_submissions_identity_problem_time` (`identity_id`,`problem_id`,`time` DESC),
+  KEY `idx_submissions_identity_problem_problemset_time` (`identity_id`,`problem_id`,`problemset_id`,`time` DESC),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
