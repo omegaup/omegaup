@@ -232,12 +232,8 @@ def _setup_development_quality_data(args: argparse.Namespace) -> None:
     logging.info('Setting up development quality data...')
 
     try:
-        # Import lib.db for database connection
         import lib.db  # pylint: disable=import-outside-toplevel
 
-        # Create database connection using existing infrastructure
-        # Note: We use 'mysql' (Docker service name) since this runs
-        # inside the container
         db_args = lib.db.DatabaseConnectionArguments(
             user=args.username or 'omegaup',
             password=args.password or 'omegaup',
@@ -251,7 +247,6 @@ def _setup_development_quality_data(args: argparse.Namespace) -> None:
 
         try:
             with dbconn.cursor() as cur:
-                # Step 1: Set quality_seal=1 for all visible problems
                 cur.execute("""
                     UPDATE `Problems`
                     SET `quality_seal` = 1,
@@ -266,9 +261,6 @@ def _setup_development_quality_data(args: argparse.Namespace) -> None:
                     WHERE `quality_seal` = 0
                       AND `visibility` >= 1;
                 """)
-                affected_problems = cur.rowcount  # type: ignore
-
-                # Step 2: Add level tags for bootstrap problems
                 cur.execute("""
                     INSERT INTO `Problems_Tags`
                         (`problem_id`, `tag_id`, `source`)
@@ -290,15 +282,7 @@ def _setup_development_quality_data(args: argparse.Namespace) -> None:
                           AND pt.`tag_id` = t.`tag_id`
                     );
                 """)
-                affected_tags = cur.rowcount  # type: ignore
-
                 dbconn.conn.commit()
-
-                logging.info(
-                    'Development quality data configured: '
-                    '%d problems marked, %d tags added',
-                    affected_problems, affected_tags
-                )
 
         except Exception:  # pylint: disable=broad-except
             logging.exception('Failed to setup development quality data')
