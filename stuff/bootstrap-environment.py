@@ -437,8 +437,8 @@ def _main() -> None:
     if args.seed_mode == "synthetic":
         if not HAS_SYNTHETIC_DATASET:
             logging.error(
-                'Synthetic dataset mode requested but dependencies are missing. '
-                'Install with: pip3 install tqdm pyyaml'
+                'Synthetic dataset mode requested but dependencies are '
+                'missing. Install with: pip3 install tqdm pyyaml'
             )
             sys.exit(1)
 
