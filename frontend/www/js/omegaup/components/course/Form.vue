@@ -186,16 +186,21 @@
             <label class="font-weight-bold w-100">
               <span class="field-required">{{ T.wordsLanguages }}</span>
             </label>
-            <vue-multiselect
-              v-model="selectedLanguages"
-              :disabled="readOnly"
-              :options="Object.keys(allLanguages)"
-              :multiple="true"
-              :placeholder="T.courseNewFormLanguages"
-              :close-on-select="false"
-              :allow-empty="false"
+            <div
+              :class="{
+                'is-invalid-wrapper': invalidParameterName === 'languages',
+              }"
             >
-            </vue-multiselect>
+              <vue-multiselect
+                v-model="selectedLanguages"
+                :disabled="readOnly"
+                :options="Object.keys(allLanguages)"
+                :multiple="true"
+                :placeholder="T.courseNewFormLanguages"
+                :close-on-select="false"
+              >
+              </vue-multiselect>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -447,6 +452,10 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
+    if (!this.selectedLanguages || this.selectedLanguages.length === 0) {
+      this.$emit('invalid-languages');
+      return;
+    }
     this.$emit('submit', {
       name: this.name,
       description: this.description,
@@ -479,5 +488,10 @@ export default class CourseDetails extends Vue {
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
 }
 </style>
