@@ -1072,6 +1072,7 @@ const translations: { [key: string]: string; } = {
   parameterInvalidZipFilePath: "(Th3 ZIP fi13 c0n7ain5 an inva1id pa7h (f0rbidd3n charac73r5 d373c73d))",
   parameterInvalidZipFileSizeTooLong: "(Th3 fi13 3xc33d5 7h3 maximum a110w3d 5iz3 0f %(max_length) MB)",
   parameterInvalidZipIntegrity: "(Th3 ZIP fi13 i5 c0rrup73d 0r c0u1d n07 b3 0p3n3d)",
+  parameterName_finish_time: "(Fini5h 7im3)",
   parameterNotADate: "(Param373r mu57 b3 a da73.)",
   parameterNotANumber: "(Param373r mu57 b3 a numb3r.)",
   parameterNotFound: "(Param373r va1u3 n07 f0und.)",

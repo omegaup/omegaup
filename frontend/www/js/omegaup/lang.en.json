@@ -1071,6 +1071,7 @@
 	"parameterInvalidZipFilePath": "The ZIP file contains an invalid path (forbidden characters detected)",
 	"parameterInvalidZipFileSizeTooLong": "The file exceeds the maximum allowed size of %(max_length) MB",
 	"parameterInvalidZipIntegrity": "The ZIP file is corrupted or could not be opened",
+	"parameterName_finish_time": "Finish time",
 	"parameterNotADate": "Parameter must be a date.",
 	"parameterNotANumber": "Parameter must be a number.",
 	"parameterNotFound": "Parameter value not found.",

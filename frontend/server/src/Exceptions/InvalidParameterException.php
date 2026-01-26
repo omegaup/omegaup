@@ -46,6 +46,19 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
         if (is_null($this->parameter)) {
             return $localizedText;
         }
-        return "{$this->parameter}: $localizedText";
+        // Try to translate the parameter name
+        $parameterNameKey = "parameterName_{$this->parameter}";
+        $translatedParameterName = \OmegaUp\Translations::getInstance()->get(
+            $parameterNameKey
+        );
+        // If translation doesn't exist or is empty, use the original parameter name
+        if (
+            empty(
+                $translatedParameterName
+            ) || $translatedParameterName === "{untranslated:{$parameterNameKey}}"
+        ) {
+            $translatedParameterName = $this->parameter;
+        }
+        return "{$translatedParameterName}: $localizedText";
     }
 }

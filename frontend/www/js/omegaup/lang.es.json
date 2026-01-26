@@ -1071,6 +1071,7 @@
 	"parameterInvalidZipFilePath": "El archivo ZIP contiene una ruta inv\u00e1lida (se detectaron caracteres prohibidos)",
 	"parameterInvalidZipFileSizeTooLong": "El archivo excede el tama\u00f1o m\u00e1ximo permitido de %(max_length) MB",
 	"parameterInvalidZipIntegrity": "El archivo ZIP est\u00e1 da\u00f1ado o no se pudo abrir",
+	"parameterName_finish_time": "Fecha de fin",
 	"parameterNotADate": "El campo debe ser una fecha.",
 	"parameterNotANumber": "El campo debe ser un n\u00famero",
 	"parameterNotFound": "No existe en la base de datos",

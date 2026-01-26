@@ -1072,6 +1072,7 @@ const translations: { [key: string]: string; } = {
   parameterInvalidZipFilePath: "O arquivo ZIP cont\u00e9m um caminho inv\u00e1lido (caracteres proibidos detectados)",
   parameterInvalidZipFileSizeTooLong: "O arquivo excede o tamanho m\u00e1ximo permitido de %(max_length) MB",
   parameterInvalidZipIntegrity: "O arquivo ZIP est\u00e1 corrompido ou n\u00e3o p\u00f4de ser aberto.",
+  parameterName_finish_time: "Data de t\u00e9rmino",
   parameterNotADate: "Par\u00e2metro deve ser uma data",
   parameterNotANumber: "Par\u00e2metro deve ser um n\u00famero",
   parameterNotFound: "Valor do par\u00e2metro n\u00e3o encontrado",

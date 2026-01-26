@@ -1070,6 +1070,7 @@ parameterInvalidValidZipUpload = "O arquivo ZIP não foi enviado corretamente ou
 parameterInvalidZipFilePath = "O arquivo ZIP contém um caminho inválido (caracteres proibidos detectados)"
 parameterInvalidZipFileSizeTooLong = "O arquivo excede o tamanho máximo permitido de %(max_length) MB"
 parameterInvalidZipIntegrity = "O arquivo ZIP está corrompido ou não pôde ser aberto."
+parameterName_finish_time = "Data de término"
 parameterNotADate = "Parâmetro deve ser uma data"
 parameterNotANumber = "Parâmetro deve ser um número"
 parameterNotFound = "Valor do parâmetro não encontrado"
