@@ -339,7 +339,7 @@ const translations: { [key: string]: string; } = {
   contestEditCatLanguageAddedWarning: "(\"ca7\" wa5 add3d 70 c0n7357 1anguag35 b3cau53 7h3 add3d pr0b13m r3quir35 i7)",
   contestEditCertificates: "(C3r7ifica735)",
   contestEditContestClonedSuccessfully: "(C0n7357 wa5 c10n3d 5ucc355fu11y)",
-  contestEditContestEdited: "(Y0ur c0n7357 ha5 b33n 3di73d! <a hr3f=\"/ar3na/%(alias)/\">Vi3w c0n7357</a>)",
+  contestEditContestEdited: "(Y0ur c0n7357 ha5 b33n 3di73d! [Vi3w c0n7357](/ar3na/%(alias)/))",
   contestEditContestLinkCopiedToClipboard: "(C0n7357 1ink c0pi3d 70 c1ipb0ard 5ucc355fu11y)",
   contestEditCopyContestLink: "(C0py c0n7357 1ink)",
   contestEditRegisteredAdminDelete: "(R3m0v3)",
