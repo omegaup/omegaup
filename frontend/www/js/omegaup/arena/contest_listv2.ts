@@ -119,9 +119,11 @@ OmegaUp.on('ready', () => {
           'fetch-page': async ({
             params,
             urlObj,
+            shouldUpdateUrl = true,
           }: {
             params: UrlParams;
             urlObj: URL;
+            shouldUpdateUrl?: boolean;
           }) => {
             for (const [key, value] of Object.entries(params)) {
               if (value) {
@@ -130,7 +132,9 @@ OmegaUp.on('ready', () => {
                 urlObj.searchParams.delete(key);
               }
             }
-            window.history.pushState({}, '', urlObj);
+            if (shouldUpdateUrl) {
+              window.history.pushState({}, '', urlObj);
+            }
             await contestStore.dispatch('fetchContestList', {
               requestParams: params,
               name: params.tab_name,
