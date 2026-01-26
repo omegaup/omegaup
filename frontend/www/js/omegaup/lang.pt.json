@@ -1646,6 +1646,8 @@
 	"reportProblemFormQuestion": "Por que voc\u00ea deseja relatar esse problema?",
 	"reportProblemFormSpam": "\u00c9 spam.",
 	"reportProblemFormThanksForReview": "Obrigado pelo seu relat\u00f3rio!.",
+	"reportStatsCopiedToClipboard": "O relat\u00f3rio de estat\u00edsticas foi copiado para foi copiado para a prancheta",
+	"reportStatsGenerate": "Gerar",
 	"requestCoder": "Coder",
 	"requestDate": "Data de aplica\u00e7\u00e3o",
 	"requestFeedback": "A solicita\u00e7\u00e3o de feedback foi enviada a todos os administradores",

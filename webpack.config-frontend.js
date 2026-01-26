@@ -18,6 +18,7 @@ module.exports = {
       './frontend/www/js/omegaup/omegaup-legacy.js',
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
+    admin_report_stats: './frontend/www/js/omegaup/admin/report_stats.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
     admin_support: './frontend/www/js/omegaup/admin/support.ts',
     admin_user: './frontend/www/js/omegaup/admin/user.ts',

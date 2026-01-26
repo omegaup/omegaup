@@ -1647,6 +1647,8 @@ const translations: { [key: string]: string; } = {
   reportProblemFormQuestion: "(Why d0 y0u wan7 70 r3p0r7 7hi5 pr0b13m?)",
   reportProblemFormSpam: "(I5 Spam.)",
   reportProblemFormThanksForReview: "(Thank5 f0r y0ur r3p0r7!)",
+  reportStatsCopiedToClipboard: "(Th3 r3p0r7 57a75 wa5 c0pi3d 70 7h3 c1ipb0ard)",
+  reportStatsGenerate: "(G3n3ra73)",
   requestCoder: "(C0d3r)",
   requestDate: "(Da73 0f r3qu357)",
   requestFeedback: "(Th3 f33dback r3qu357 ha5 b33n 53n7 70 a11 7h3 admini57ra70r5.)",

@@ -1647,6 +1647,8 @@ const translations: { [key: string]: string; } = {
   reportProblemFormQuestion: "Why do you want to report this problem?",
   reportProblemFormSpam: "Is Spam.",
   reportProblemFormThanksForReview: "Thanks for your report!",
+  reportStatsCopiedToClipboard: "The report stats was copied to the clipboard",
+  reportStatsGenerate: "Generate",
   requestCoder: "Coder",
   requestDate: "Date of request",
   requestFeedback: "The feedback request has been sent to all the administrators.",

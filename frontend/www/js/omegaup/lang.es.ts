@@ -1647,6 +1647,8 @@ const translations: { [key: string]: string; } = {
   reportProblemFormQuestion: "\u00bfPor qu\u00e9 quieres reportar este problema?",
   reportProblemFormSpam: "Es Spam.",
   reportProblemFormThanksForReview: "\u00a1Gracias por tu reporte!",
+  reportStatsCopiedToClipboard: "El reporte de estad\u00edsticas fue copiado al portapapeles",
+  reportStatsGenerate: "Generar",
   requestCoder: "Coder",
   requestDate: "Fecha de solicitud",
   requestFeedback: "La solicitud de retroalimentaci\u00f3n ha sido enviada a todos los administradores",
