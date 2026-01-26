@@ -48,6 +48,10 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
         }
         // Try to translate the parameter name
         $parameterNameKey = "parameterName_{$this->parameter}";
+        /**
+         * @psalm-suppress TranslationStringNotALiteralString parameter name
+         * translation keys are constructed dynamically
+         */
         $translatedParameterName = \OmegaUp\Translations::getInstance()->get(
             $parameterNameKey
         );
