@@ -177,6 +177,7 @@
                   data-target=".logistics"
                   aria-expanded="false"
                   aria-controls="logistics-collapse"
+                  @click.prevent
                 >
                   {{ T.contestNewFormLogistics }}
                   <span v-if="hasErrorsInSection('logistics')" class="text-danger ml-2">⚠</span>
@@ -326,14 +327,13 @@
                   data-toggle="collapse"
                   data-target=".scoring-rules"
                   aria-expanded="false"
-                  aria-controls="scoring-rules-collapse"
                 >
                   {{ T.contestNewFormScoringRules }}
                   <span v-if="hasErrorsInSection('scoring')" class="text-danger ml-2">⚠</span>
                 </button>
               </h2>
             </div>
-            <div id="scoring-rules-collapse" class="collapse card-body scoring-rules">
+            <div class="collapse card-body scoring-rules">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label for="score-mode">
@@ -457,13 +457,12 @@
                   data-toggle="collapse"
                   data-target=".privacy"
                   aria-expanded="false"
-                  aria-controls="privacy-collapse"
                 >
                   {{ T.contestNewFormPrivacy }}
                 </button>
               </h2>
             </div>
-            <div id="privacy-collapse" class="collapse card-body privacy">
+            <div class="collapse card-body privacy">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label>
@@ -672,3 +671,357 @@ export default class Form extends Vue {
       this.$cookies.set('has-visited-create-contest', true, -1);
     }
   }
+
+  @Watch('windowLengthEnabled')
+  onPropertyChange(newValue: boolean): void {
+    if (!newValue) {
+      this.windowLength = null;
+    }
+  }
+
+  @Watch('invalidParameterName')
+  onInvalidParameterChange(newValue: string | null): void {
+    if (!newValue) {
+      return;
+    }
+    this.$nextTick(() => {
+      const invalidElement = document.querySelector('.is-invalid');
+      if (invalidElement) {
+        invalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+
+  get validationErrors(): string[] {
+    return Object.values(this.localErrors).filter(Boolean);
+  }
+
+  hasErrorsInSection(section: string): boolean {
+    const sectionFields = {
+      basic: ['title', 'alias', 'finishTime', 'description'],
+      logistics: ['windowLength', 'scoreboard', 'teamsGroup'],
+      scoring: ['submissionsGap', 'penalty', 'pointsDecayFactor'],
+    };
+    const fields = sectionFields[section as keyof typeof sectionFields] || [];
+    return fields.some(field => this.localErrors[field]);
+  }
+
+  validateField(fieldName: string): boolean {
+    switch (fieldName) {
+      case 'title':
+        if (!this.title || this.title.trim().length === 0) {
+          this.localErrors.title = 'Contest title is required';
+          return false;
+        }
+        break;
+      case 'alias':
+        if (!this.alias || this.alias.trim().length === 0) {
+          this.localErrors.alias = 'Contest alias is required';
+          return false;
+        }
+        if (!/^[a-z0-9-]+$/.test(this.alias)) {
+          this.localErrors.alias = 'Alias can only contain lowercase letters, numbers, and hyphens';
+          return false;
+        }
+        break;
+      case 'description':
+        if (!this.description || this.description.trim().length === 0) {
+          this.localErrors.description = 'Description is required';
+          return false;
+        }
+        break;
+      case 'scoreboard':
+        if (this.scoreboard < 0 || this.scoreboard > 100) {
+          this.localErrors.scoreboard = 'Scoreboard percentage must be between 0 and 100';
+          return false;
+        }
+        break;
+      case 'submissionsGap':
+        if (this.submissionsGap < 0) {
+          this.localErrors.submissionsGap = 'Submissions gap must be 0 or greater';
+          return false;
+        }
+        break;
+      case 'penalty':
+        if (this.penalty < 0) {
+          this.localErrors.penalty = 'Penalty must be 0 or greater';
+          return false;
+        }
+        break;
+      case 'pointsDecayFactor':
+        if (this.pointsDecayFactor < 0 || this.pointsDecayFactor > 1) {
+          this.localErrors.pointsDecayFactor = 'Points decay factor must be between 0 and 1';
+          return false;
+        }
+        break;
+      case 'windowLength':
+        if (this.windowLengthEnabled && (!this.windowLength || this.windowLength <= 0)) {
+          this.localErrors.windowLength = 'Window length must be greater than 0';
+          return false;
+        }
+        break;
+    }
+    return true;
+  }
+
+  validateDates(): void {
+    this.clearFieldError('finishTime');
+    if (this.startTime && this.finishTime && this.finishTime <= this.startTime) {
+      this.localErrors.finishTime = 'End date must be after start date';
+    }
+  }
+
+  clearFieldError(fieldName: string): void {
+    delete this.localErrors[fieldName];
+    this.$forceUpdate();
+  }
+
+  validateForm(): boolean {
+    this.localErrors = {};
+    
+    const fields = [
+      'title', 'alias', 'description', 'scoreboard', 
+      'submissionsGap', 'penalty', 'pointsDecayFactor'
+    ];
+    
+    fields.forEach(field => this.validateField(field));
+    this.validateDates();
+
+    if (this.languages.length === 0) {
+      this.localErrors.languages = 'At least one language must be selected';
+    }
+
+    if (this.currentContestForTeams && !this.currentTeamsGroupAlias) {
+      this.localErrors.teamsGroup = 'Teams group must be selected for team contests';
+    }
+
+    return Object.keys(this.localErrors).length === 0;
+  }
+
+  confirmPresetChange(presetType: string): void {
+    if (this.hasFormChanged && !this.update) {
+      if (!confirm('Applying this preset will overwrite your current form values. Continue?')) {
+        return;
+      }
+    }
+
+    switch (presetType) {
+      case 'omi':
+        this.fillOmi();
+        break;
+      case 'preioi':
+        this.fillPreIoi();
+        break;
+      case 'conacup':
+        this.fillConacup();
+        break;
+      case 'icpc':
+        this.fillIcpc();
+        break;
+    }
+    
+    this.hasFormChanged = true;
+  }
+
+  fillOmi(): void {
+    this.languages = Object.keys(this.allLanguages);
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = 0;
+    this.scoreboard = 0;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'detailed';
+    this.penalty = 0;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+    this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
+  }
+
+  fillPreIoi(): void {
+    this.languages = Object.keys(this.allLanguages);
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
+    this.windowLengthEnabled = true;
+    this.windowLength = 180;
+    this.scoreboard = 0;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 0;
+    this.feedback = 'detailed';
+    this.penalty = 0;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+    this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
+  }
+
+  fillConacup(): void {
+    this.languages = Object.keys(this.allLanguages);
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = 0;
+    this.scoreboard = 75;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'detailed';
+    this.penalty = 20;
+    this.penaltyType = 'none';
+    this.showScoreboardAfter = true;
+    this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
+  }
+
+  fillIcpc(): void {
+    const languagesKeys = Object.keys(this.allLanguages);
+    this.languages = languagesKeys.filter(
+      (lang) =>
+        lang.includes('c11') ||
+        lang.includes('cpp') ||
+        lang.includes('py') ||
+        lang.includes('java'),
+    );
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderICPCStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = null;
+    this.scoreboard = 80;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'none';
+    this.penalty = 20;
+    this.penaltyType = 'contest_start';
+    this.showScoreboardAfter = true;
+    this.currentScoreMode = ScoreMode.AllOrNothing;
+    this.localErrors = {};
+  }
+
+  onSubmit() {
+    if (!this.validateForm()) {
+      this.$nextTick(() => {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+          firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const contest: types.ContestAdminDetails = {
+      admin: true,
+      admission_mode: this.update ? this.admissionMode : 'private',
+      alias: this.alias,
+      archived: false,
+      available_languages: {},
+      canSetRecommended: false,
+      director: '',
+      opened: false,
+      penalty_calc_policy: 'sum',
+      problemset_id: 0,
+      show_penalty: true,
+      title: this.title,
+      description: this.description,
+      has_submissions: this.hasSubmissions,
+      start_time: this.startTime,
+      finish_time: this.finishTime,
+      points_decay_factor: this.pointsDecayFactor,
+      submissions_gap: (this.submissionsGap || 1) * 60,
+      languages: this.languages,
+      feedback: this.feedback,
+      penalty: this.penalty,
+      scoreboard: this.scoreboard,
+      penalty_type: this.penaltyType,
+      default_show_all_contestants_in_scoreboard: this.defaultShowAllContestantsInScoreboard,
+      show_scoreboard_after: this.showScoreboardAfter,
+      score_mode: this.currentScoreMode,
+      needs_basic_information: this.needsBasicInformation,
+      requests_user_information: this.requestsUserInformation,
+      contest_for_teams: this.currentContestForTeams,
+    };
+
+    if (this.canSetRecommended) {
+      contest.recommended = this.recommended;
+    }
+
+    if (this.windowLengthEnabled && this.windowLength) {
+      contest.window_length = this.windowLength;
+    }
+    
+    const request = {
+      contest,
+      teamsGroupAlias: this.currentTeamsGroupAlias?.key,
+    };
+    
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 1000);
+
+    if (this.update) {
+      this.$emit('update-contest', request);
+      return;
+    }
+    this.$emit('create-contest', request);
+  }
+
+  get minDateTimeForContest(): null | Date {
+    if (this.update) {
+      return null;
+    }
+    return new Date();
+  }
+
+  get teamsGroupName(): null | string {
+    return this.currentTeamsGroupAlias?.value ?? null;
+  }
+
+  get catLanguageBlocked(): boolean {
+    if (!this.problems) {
+      return false;
+    }
+    for (const problem of this.problems) {
+      if (problem.languages.split(',').includes('cat')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  onRemove(language: string) {
+    if (this.catLanguageBlocked && language == 'cat') {
+      this.$emit('language-remove-blocked', language);
+      return;
+    }
+    const index = this.languages.indexOf(language);
+    this.languages.splice(index, 1);
+    this.hasFormChanged = true;
+  }
+
+  onSelect(language: string) {
+    this.languages.push(language);
+    this.hasFormChanged = true;
+  }
+
+  updateTeamsGroups(query: string) {
+    this.$emit('update-search-result-teams-groups', query);
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: var(--multiselect-tag-background-color);
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+</style>
