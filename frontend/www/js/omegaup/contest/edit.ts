@@ -406,9 +406,11 @@ OmegaUp.on('ready', () => {
                 contestEdit.details.admission_mode = admissionMode;
                 contestEdit.details.default_show_all_contestants_in_scoreboard =
                   defaultShowAllContestantsInScoreboard;
-                ui.success(`
-                  ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
-                `);
+                ui.success(
+                  ui.formatString(T.contestEditContestEdited, {
+                    alias: payload.details.alias,
+                  }),
+                );
                 this.refreshDetails();
                 if (admissionMode === 'registration') {
                   this.refreshRequests();
