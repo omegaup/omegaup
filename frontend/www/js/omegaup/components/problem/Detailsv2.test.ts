@@ -78,6 +78,7 @@ describe('Detailsv2.vue', () => {
     version: '123',
     visibility: 1,
     visits: 5,
+    ephemeralGraderEnabled: true,
   };
 
   const runs: types.RunWithDetails[] = [
@@ -128,7 +129,7 @@ describe('Detailsv2.vue', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         allRuns: runs,
-        problem,
+        problem: { ...problem, ephemeralGraderEnabled: true },
         user: {
           loggedIn: true,
           admin: true,

@@ -14,6 +14,7 @@ describe('Print.vue', () => {
     accepts_submissions: true,
     creation_date: now,
     email_clarifications: false,
+    ephemeralGraderEnabled: true,
     order: 'asc',
     show_diff: 'none',
     score: 1,

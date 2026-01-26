@@ -6,7 +6,7 @@
  * Description of GraderController
  *
  * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
- * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string}
+ * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string, ephemeralGraderEnabled: bool}
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
@@ -42,6 +42,12 @@ class Grader extends \OmegaUp\Controllers\Controller {
             $r->user?->user_id
         );
 
+        // Get ephemeral grader enabled status
+        $ephemeralGraderEnabled = \OmegaUp\SystemSettings::getBooleanSetting(
+            'ephemeral_grader_enabled',
+            true
+        );
+
         return [
             'templateProperties' => [
                 'title' => new \OmegaUp\TranslationString(
@@ -52,6 +58,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
                     'preferredLanguage' => $preferredLanguage,
+                    'ephemeralGraderEnabled' => $ephemeralGraderEnabled,
                 ],
             ],
             'entrypoint' => 'grader_ide',

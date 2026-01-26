@@ -73,6 +73,7 @@ Here we can add code.
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
+    ephemeralGraderEnabled: true,
   };
 
   const runDetailsData: types.RunDetails = {
@@ -422,7 +423,7 @@ int main() {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
-        problem,
+        problem: { ...problem, ephemeralGraderEnabled: true },
         runDetailsData,
         user,
         nominationStatus,
@@ -448,6 +449,7 @@ int main() {
           ...problem,
           karel_problem: true,
           languages: ['kp', 'kj'],
+          ephemeralGraderEnabled: false,
         },
         runDetailsData,
         user,
