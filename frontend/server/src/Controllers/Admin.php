@@ -2,16 +2,35 @@
 
  namespace OmegaUp\Controllers;
 
+ /**
+ * Admin Controller
+ *
+ * @psalm-type ReportStatsPayload=array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
+ */
 class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats for an overall platform report.
      *
-     * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
+     * If start_time and end_time are not provided, the report will cover the
+     * current year.
+     *
+     * If start_time is not provided, it will be set to the first day of the
+     * current year.
+     *
+     * If end_time is not provided, it will be set to the current time.
+     *
+     * If both start_time and end_time are provided, the report will cover the
+     * range [start_time, end_time].
+     *
+     * For a full time range report, set start_time to 0 and end_time to the
+     * current time. Alternative, end_time can be left unset.
+     *
+     * @return ReportStatsPayload
      *
      * @omegaup-request-param int|null $end_time
      * @omegaup-request-param int|null $start_time
      */
-    public static function apiPlatformReportStats(\OmegaUp\Request $r): array {
+    public static function apiPlatformReportStats(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
@@ -19,18 +38,25 @@ class Admin extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['start_time'],
-            'start_time'
-        );
-        \OmegaUp\Validators::validateOptionalNumber($r['end_time'], 'end_time');
+        $startTime = $r->ensureOptionalInt('start_time');
+        $endTime = $r->ensureOptionalInt('end_time');
 
-        $startTime = empty($r['start_time']) ?
-            strtotime('first day of this January') :
-            intval($r['start_time']);
-        $endTime = empty($r['end_time']) ?
-            \OmegaUp\Time::get() :
-            intval($r['end_time']);
+        return self::getPlatformReportStats($startTime, $endTime);
+    }
+
+    /**
+     * @return ReportStatsPayload
+     */
+    private static function getPlatformReportStats(
+        ?int $startTime,
+        ?int $endTime
+    ) {
+        if (is_null($startTime)) {
+            $startTime = strtotime('first day of January ' . date('Y'));
+        }
+        if (is_null($endTime)) {
+            $endTime = \OmegaUp\Time::get();
+        }
 
         return [
             'report' => [
@@ -77,6 +103,39 @@ class Admin extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Get stats for an overall platform report.
+     *
+     * @return array{templateProperties: array{payload: ReportStatsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $end_time
+     * @omegaup-request-param int|null $start_time
+     */
+    public static function getPlatformReportStatsForTypeScript(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $startTime = $r->ensureOptionalInt('start_time');
+        $endTime = $r->ensureOptionalInt('end_time');
+
+        return [
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleReportStats'
+                ),
+                'payload' => array_merge(
+                    self::getPlatformReportStats($startTime, $endTime),
+                    ['startTimestamp' => $startTime, 'endTimestamp' => $endTime],
+                ),
+            ],
+            'entrypoint' => 'admin_report_stats',
         ];
     }
 }

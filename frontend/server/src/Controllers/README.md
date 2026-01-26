@@ -304,11 +304,27 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 # Admin
 
+Admin Controller
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
 
 Get stats for an overall platform report.
+
+If start_time and end_time are not provided, the report will cover the
+current year.
+
+If start_time is not provided, it will be set to the first day of the
+current year.
+
+If end_time is not provided, it will be set to the current time.
+
+If both start_time and end_time are provided, the report will cover the
+range [start_time, end_time].
+
+For a full time range report, set start_time to 0 and end_time to the
+current time. Alternative, end_time can be left unset.
 
 ### Parameters
 
@@ -319,9 +335,9 @@ Get stats for an overall platform report.
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                     |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+```typescript
+types.ReportStatsPayload;
+```
 
 # AiEditorial
 

@@ -1037,6 +1037,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleQualityNominationList: "(Pr0b13m r3p0r7 1i57)",
   omegaupTitleQualityNominationMyList: "(My pr0b13m r3p0r7 1i57)",
   omegaupTitleRecoverPassword: "(R3c0v3r y0ur pa55w0rd)",
+  omegaupTitleReportStats: "(R3p0r7 57a75)",
   omegaupTitleSchoolOfTheMonth: "(Sch0015 0f 7h3 M0n7h)",
   omegaupTitleSchoolProfile: "(Sch001 Pr0fi13)",
   omegaupTitleSchoolsRank: "(Sch001 ranking)",
