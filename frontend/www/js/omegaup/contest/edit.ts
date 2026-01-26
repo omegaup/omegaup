@@ -404,7 +404,8 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 contestEdit.details.admission_mode = admissionMode;
-                contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
+                contestEdit.details.default_show_all_contestants_in_scoreboard =
+                  defaultShowAllContestantsInScoreboard;
                 ui.success(
                   ui.formatString(T.contestEditContestEdited, {
                     alias: payload.details.alias,
