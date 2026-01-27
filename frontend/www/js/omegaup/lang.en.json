@@ -405,6 +405,7 @@
 	"contestNewFormImmediateSummaryFeedbackDesc": "After evaluating each submission, the summary of scores and verdicts for each group of cases will be shown.",
 	"contestNewFormLanguageRemoveBlockedWarning": "Cannot remove \"%(language)\" from languages because there is at least one problem that requires it",
 	"contestNewFormLanguages": "Set languages to the current contest",
+	"contestNewFormLanguagesRequired": "Please select at least one language",
 	"contestNewFormLogistics": "Logistics (optional)",
 	"contestNewFormNoPenalty": "Coders with the same score will end up in a draw, regardless of the time it has taken each coder.",
 	"contestNewFormNumberOfContestants": "Number of contestants",
