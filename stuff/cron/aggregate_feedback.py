@@ -37,34 +37,33 @@ VOTES_NUM = 5
 QUALITYNOMINATION_QUESTION_CHANGE_ID = 18663
 
 # SQL Queries
-GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
-                                    FROM `QualityNominations` as qn
-                                    LEFT JOIN `User_Rank` as ur
-                                    ON ur.`user_id` = qn.`user_id`
-                                    WHERE `nomination` = 'suggestion'
-                                      AND qn.`qualitynomination_id` > %s
-                                      AND qn.`qualitynomination_id` IN (
-                                          SELECT MAX(qualitynomination_id)
-                                          FROM `QualityNominations`
-                                          WHERE
-                                            `user_id` = qn.`user_id` AND
-                                            `problem_id` = qn.`problem_id`
-                                      );"""
+# SQL Queries
+GET_ALL_SCORES_AND_SUGGESTIONS = """
+    SELECT qn.contents, ur.score
+    FROM QualityNominations AS qn
+    LEFT JOIN User_Rank AS ur ON ur.user_id = qn.user_id
+    WHERE qn.nomination = 'suggestion'
+    AND qn.qualitynomination_id > %s
+    AND qn.qualitynomination_id IN (
+        SELECT MAX(qualitynomination_id)
+        FROM QualityNominations
+        WHERE user_id = qn.user_id AND problem_id = qn.problem_id
+    );"""
 
-GET_PROBLEM_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
-                                        FROM `QualityNominations` as qn
-                                        LEFT JOIN `User_Rank` as ur
-                                        ON ur.`user_id` = qn.`user_id`
-                                        WHERE qn.`nomination` = 'suggestion'
-                                        AND qn.`qualitynomination_id` > %s
-                                        AND qn.`problem_id` = %s
-                                        AND qn.`qualitynomination_id` IN (
-                                          SELECT MAX(qualitynomination_id)
-                                          FROM `QualityNominations`
-                                          WHERE
-                                            `user_id` = qn.`user_id` AND
-                                            `problem_id` = qn.`problem_id`
-                                        );"""
+GET_PROBLEM_SCORES_AND_SUGGESTIONS = """
+    SELECT qn.contents, ur.score
+    FROM QualityNominations AS qn
+    LEFT JOIN User_Rank AS ur ON ur.user_id = qn.user_id
+    WHERE qn.nomination = 'suggestion'
+    AND qn.qualitynomination_id > %s
+    AND qn.problem_id = %s
+    AND qn.qualitynomination_id IN (
+        SELECT MAX(qualitynomination_id)
+        FROM QualityNominations
+        WHERE user_id = qn.user_id AND problem_id = qn.problem_id
+    );"""
+
+
 
 # weighting factors according to user's range
 WEIGHTING_FACTORS = {
