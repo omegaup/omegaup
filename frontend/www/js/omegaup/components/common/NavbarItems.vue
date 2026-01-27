@@ -199,7 +199,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
