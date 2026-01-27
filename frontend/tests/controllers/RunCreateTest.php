@@ -320,7 +320,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'admissionMode' => 'private'
         ]));
 
-        // Create a second user not regitered to private contest
+        // Create a second user not registered to private contest
         [
             'identity' => $identity2,
         ] = \OmegaUp\Test\Factories\User::createUser();

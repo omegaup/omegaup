@@ -211,8 +211,7 @@ def get_cotm_eligible_users(
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
-        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
-            last_12_coders_str)
+        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category

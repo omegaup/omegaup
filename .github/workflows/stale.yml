@@ -1,5 +1,4 @@
 name: "Close Stale Issues and PRs"
-
 on:
     schedule:
         # Run daily at 1:30 AM UTC
@@ -11,7 +10,6 @@ on:
         types: [edited, reopened]
     pull_request:
         types: [edited, reopened]
-
 jobs:
     stale:
         runs-on: ubuntu-22.04
@@ -26,27 +24,23 @@ jobs:
                   days-before-issue-stale: 45
                   # Mark PRs as stale after 45 days of inactivity
                   days-before-pr-stale: 45
-
                   # Never automatically close issues/PRs (set to -1)
                   days-before-close: -1
-
                   # Remove stale label when issues/PRs are updated or commented on
                   remove-stale-when-updated: true
-
+                  # Only remove the stale label, not all labels
+                  remove-issue-stale-when-updated: true
+                  remove-pr-stale-when-updated: true
                   # Messages to post when marking as stale
-                  stale-issue-message: "This issue has been marked as stale because it has been open for 90 days with no activity. Please comment or update this issue to remove the stale label."
+                  stale-issue-message: "This issue has been marked as stale because it has been open for 45 days with no activity. Please comment or update this issue to remove the stale label."
                   stale-pr-message: "This pull request has been marked as stale because it has been open for 45 days with no activity. Please comment or update this PR to remove the stale label."
-
                   # Labels to use
                   stale-issue-label: "Stale"
                   stale-pr-label: "Stale"
-
                   # Labels exempted from stale automation
                   exempt-issue-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
                   exempt-pr-labels: "blocked → waiting input,blocked → waiting parent,blocked → not yet ready,P0,P1,regression"
-
                   # Maximum operations per run to avoid rate limits
                   operations-per-run: 100
-
                   # Enable statistics in logs
                   enable-statistics: true

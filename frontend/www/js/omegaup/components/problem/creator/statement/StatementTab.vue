@@ -46,7 +46,7 @@ import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
 import * as ui from '../../../../ui';
 
-import omegaup_problemMarkdown from '../../Markdown.vue';
+import omegaup_problemMarkdown from '../../ProblemMarkdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -185,6 +185,8 @@ export default class StatementTab extends Vue {
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
+    width: 100%;
+    margin-top: 35px;
   }
 }
 </style>

@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex align-items-center justify-content-between">
       <h5 class="mb-0 d-none d-md-inline">{{ T.problemCreatorGroups }}</h5>
-      <div>
+      <div class="d-flex flex-nowrap align-items-center">
         <b-button
           data-toggle-layout-sidebar
           size="sm"
@@ -100,57 +100,59 @@
     <div>
       <b-card class="border-0">
         <b-row class="mb-1">
-          <b-button
-            data-sidebar-groups="ungrouped"
-            variant="light"
-            data-placement="top"
-            :title="T.problemCreatorUngroupedCases"
-            class="w-84"
-            @click="showUngroupedCases = !showUngroupedCases"
-          >
-            <div class="d-flex justify-content-between">
-              <div class="mr-2 text-truncate">
-                {{ T.problemCreatorUngrouped }}
+          <div class="d-flex flex-nowrap align-items-center w-100">
+            <b-button
+              data-sidebar-groups="ungrouped"
+              variant="light"
+              data-placement="top"
+              :title="T.problemCreatorUngroupedCases"
+              class="w-84"
+              @click="showUngroupedCases = !showUngroupedCases"
+            >
+              <div class="d-flex justify-content-between">
+                <div class="mr-2 text-truncate">
+                  {{ T.problemCreatorUngrouped }}
+                </div>
+                <div class="d-inline-block text-nowrap">
+                  <b-badge
+                    data-sidebar-ungrouped-cases="count"
+                    variant="primary"
+                    class="mr-1"
+                    >{{ ungroupedCases.length }}</b-badge
+                  >
+                  <b-badge data-sidebar-ungrouped-cases="points" variant="info">
+                    {{ Math.round(getTotalPointsForUngroupedCases) }}
+                    {{ T.problemCreatorPointsAbbreviation }}</b-badge
+                  >
+                </div>
               </div>
-              <div class="d-inline-block text-nowrap">
-                <b-badge
-                  data-sidebar-ungrouped-cases="count"
-                  variant="primary"
-                  class="mr-1"
-                  >{{ ungroupedCases.length }}</b-badge
-                >
-                <b-badge data-sidebar-ungrouped-cases="points" variant="info">
-                  {{ Math.round(getTotalPointsForUngroupedCases) }}
-                  {{ T.problemCreatorPointsAbbreviation }}</b-badge
-                >
-              </div>
-            </div>
-          </b-button>
-          <b-dropdown variant="light" size="sm" right no-caret>
-            <template #button-content>
-              <BIconThreeDotsVertical />
-            </template>
-            <b-dropdown-item disabled
-              ><b-row>
-                <div class="ml-6">
-                  <BIconTrash variant="danger" font-scale=".95" />
-                </div>
-                <div class="ml-8">
-                  {{ T.problemCreatorDeleteGroup }}
-                </div>
-              </b-row>
-            </b-dropdown-item>
-            <b-dropdown-item @click="deleteUngroupedCases()"
-              ><b-row>
-                <div class="ml-6">
-                  <BIconTrash variant="danger" font-scale=".95" />
-                </div>
-                <div class="ml-8">
-                  {{ T.problemCreatorDeleteCases }}
-                </div>
-              </b-row>
-            </b-dropdown-item>
-          </b-dropdown>
+            </b-button>
+            <b-dropdown variant="light" size="sm" right no-caret>
+              <template #button-content>
+                <BIconThreeDotsVertical />
+              </template>
+              <b-dropdown-item disabled
+                ><b-row>
+                  <div class="ml-6">
+                    <BIconTrash variant="danger" font-scale=".95" />
+                  </div>
+                  <div class="ml-8">
+                    {{ T.problemCreatorDeleteGroup }}
+                  </div>
+                </b-row>
+              </b-dropdown-item>
+              <b-dropdown-item @click="deleteUngroupedCases()"
+                ><b-row>
+                  <div class="ml-6">
+                    <BIconTrash variant="danger" font-scale=".95" />
+                  </div>
+                  <div class="ml-8">
+                    {{ T.problemCreatorDeleteCases }}
+                  </div>
+                </b-row>
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
           <b-collapse v-model="showUngroupedCases" class="w-100">
             <b-card class="border-0 w-100">
               <b-row
