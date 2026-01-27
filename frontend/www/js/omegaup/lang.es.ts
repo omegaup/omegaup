@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder del mes general",
   navCoderOfTheMonthFemale: "Coder del mes para ellas",
+  navCompetitiveProgrammingDataStructuresBook: "Estructuras de Datos para Programaci\u00f3n Competitiva por Hugo Humberto Morales Pe\u00f1a",
   navContests: "Concursos",
   navContestsEnrolled: "Concursos inscrito",
   navCourses: "Cursos",
