@@ -78,7 +78,21 @@ export default class GlobalNotifications extends Vue {
     if (!currentMessage) {
       return null;
     }
-    const match = currentMessage.match(/:\s+(\S+)\s*$/);
+
+    const template = (this as any).T?.apiTokenSuccessfullyCreated;
+    if (!template || typeof template !== 'string') {
+      return null;
+    }
+
+    const placeholder = '%(token)';
+    if (!template.includes(placeholder)) {
+      return null;
+    }
+
+    const parts = template.split(placeholder);
+    const esc = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const re = new RegExp('^' + esc(parts[0]) + '(.+?)' + esc(parts[1]) + '$');
+    const match = currentMessage.match(re);
     if (!match) {
       return null;
     }

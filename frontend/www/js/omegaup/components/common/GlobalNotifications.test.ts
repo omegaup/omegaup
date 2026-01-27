@@ -6,6 +6,8 @@ import {
   NotificationsState,
 } from '../../notificationsStore';
 import GlobalNotifications from './GlobalNotifications.vue';
+import T from '../../lang';
+import * as ui from '../../ui';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -150,5 +152,59 @@ describe('GlobalNotifications.vue', () => {
     (wrapper.vm as any).dismiss();
 
     expect(mockState.dispatch).toHaveBeenCalledWith('dismissNotifications');
+  });
+
+  it('shows copy button only for API token notifications', () => {
+    const token = 'secret-token-123';
+    mockStore.dispatch('displayStatus', {
+      message: T.apiTokenSuccessfullyCreated.replace('%(token)', token),
+      type: MessageType.Success,
+    });
+
+    const wrapper = shallowMount(GlobalNotifications, {
+      localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
+    });
+
+    const buttons = wrapper.findAll('button');
+    const copyButton = buttons.wrappers.find(
+      (w) => w.text() === T.wordsCopyToClipboard,
+    );
+    expect(copyButton).toBeTruthy();
+  });
+
+  it('copies token and shows success when copy button is clicked', async () => {
+    const token = 'another-secret-456';
+    mockStore.dispatch('displayStatus', {
+      message: T.apiTokenSuccessfullyCreated.replace('%(token)', token),
+      type: MessageType.Success,
+    });
+
+    const copySpy = jest
+      .spyOn(ui, 'copyToClipboard')
+      .mockImplementation(() => {});
+    const successSpy = jest.spyOn(ui, 'success').mockImplementation(() => {});
+
+    const wrapper = shallowMount(GlobalNotifications, {
+      localVue,
+      stubs: {
+        'omegaup-markdown': MarkdownStub,
+      },
+    });
+
+    const buttons = wrapper.findAll('button');
+    const copyButton = buttons.wrappers.find(
+      (w) => w.text() === T.wordsCopyToClipboard,
+    );
+    expect(copyButton).toBeTruthy();
+
+    await (copyButton as any).trigger('click');
+
+    expect(copySpy).toHaveBeenCalledWith(token);
+    expect(successSpy).toHaveBeenCalledWith(
+      T.passwordResetLinkCopiedToClipboard,
+    );
   });
 });
