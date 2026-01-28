@@ -34,7 +34,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
       <button
-        v-if="userLoggedIn"
+        v-if="userLoggedIn && !inContestOrCourse && problem.accepts_submissions"
         data-bookmark-button
         class="btn btn-link p-0 ml-2"
         :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"
@@ -119,6 +119,7 @@ export default class ProblemSettingsSummary extends Vue {
   @Prop({ default: false }) showEditLink!: boolean;
   @Prop({ default: false }) userLoggedIn!: boolean;
   @Prop({ default: false }) isBookmarked!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
 
   T = T;
 
