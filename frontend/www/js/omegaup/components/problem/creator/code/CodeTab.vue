@@ -43,11 +43,13 @@
         <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden">
+        <div
+          class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden"
+        >
           <input
             data-problem-creator-code-input
             class="text-truncate"
-            style="max-width: 100%;"
+            style="max-width: 100%"
             type="file"
             name="file"
             @change="handleInputFile"
