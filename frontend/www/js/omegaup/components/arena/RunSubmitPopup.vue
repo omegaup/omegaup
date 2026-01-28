@@ -89,6 +89,7 @@ import {
   supportedExtensions,
   supportedLanguages,
 } from '../../grader/util';
+import { sourceTemplates } from '../../grader/GraderTemplates';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -109,8 +110,51 @@ export default class ArenaRunSubmitPopup extends Vue {
   code = '';
   now: number = Date.now();
 
+  getLanguageExtension(language: string): string {
+    if (!language || language === 'cat') {
+      return '';
+    }
+    const languageInfo = supportedLanguages[language];
+    if (languageInfo) {
+      return languageInfo.extension;
+    }
+    // Fallback logic
+    if (language.startsWith('cpp')) {
+      return 'cpp';
+    }
+    if (language.startsWith('c11-')) {
+      return 'c';
+    }
+    if (language.startsWith('py')) {
+      return 'py';
+    }
+    return language;
+  }
+
+  loadBoilerplateForLanguage(language: string): void {
+    if (!language || language === 'cat') {
+      this.code = '';
+      return;
+    }
+    const extension = this.getLanguageExtension(language);
+    if (extension && sourceTemplates[extension]) {
+      this.code = sourceTemplates[extension];
+    } else {
+      // If no template found, keep current code or set empty
+      this.code = '';
+    }
+  }
+
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
+    this.loadBoilerplateForLanguage(language);
+  }
+
+  @Watch('selectedLanguage')
+  onSelectedLanguageChanged(newLanguage: string, oldLanguage: string): void {
+    if (newLanguage && newLanguage !== oldLanguage) {
+      this.loadBoilerplateForLanguage(newLanguage);
+    }
   }
 
   get canSubmit(): boolean {
@@ -161,7 +205,17 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   @Watch('preferredLanguage')
   onPreferredLanguageChanged(newValue: string): void {
-    this.selectedLanguage = newValue;
+    if (newValue) {
+      this.selectedLanguage = newValue;
+      this.loadBoilerplateForLanguage(newValue);
+    }
+  }
+
+  mounted(): void {
+    // Load initial boilerplate if selectedLanguage is set
+    if (this.selectedLanguage) {
+      this.loadBoilerplateForLanguage(this.selectedLanguage);
+    }
   }
 
   onSubmit(): void {
