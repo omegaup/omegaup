@@ -542,6 +542,10 @@ nav.navbar {
   }
 }
 
+.navbar-brand {
+  padding-bottom: 1.25rem !important;
+}
+
 @media (min-width: 992px) {
   .dropdown {
     position: relative;
