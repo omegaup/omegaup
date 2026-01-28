@@ -43,7 +43,15 @@
                 class="nav-link nav-login-text"
                 :href="formattedLoginURL"
                 data-login-button
-                >{{ T.navLogIn }}</a
+                >{{ T.omegaupTitleLogin }}</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link nav-login-text"
+                :href="formattedSignupURL"
+                data-signup-button
+                >{{ T.loginSignUp }}</a
               >
             </li>
           </ul>
@@ -412,9 +420,15 @@ export default class Navbar extends Vue {
   );
 
   get formattedLoginURL(): string {
-    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+    return `/login/?redirect=${encodeURIComponent(
+      window.location.pathname,
+    )}#login`;
   }
-
+  get formattedSignupURL(): string {
+    return `/login/?redirect=${encodeURIComponent(
+      window.location.pathname,
+    )}#signup`;
+  }
   get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
     return this.associatedIdentities.filter(
       (identity) => identity.username !== this.currentUsername,
