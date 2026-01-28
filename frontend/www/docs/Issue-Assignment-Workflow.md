@@ -15,9 +15,9 @@ This repository uses the [`takanome-dev/assign-issue-action`](https://github.com
 
 ### Experienced Issue Creators
 
-- Contributors who create an issue and have at least **15 approved PRs** may self-assign the issue without any assignment limit.
-- The existing **5-day inactivity auto-unassign rule** remains unchanged.
-- When assigning themselves to issues created by others, the standard maximum of **3 active assignments** still applies.
+- Contributors who create an issue and have at least **10 merged PRs** may self-assign the issue without any assignment limit.
+- The existing **7-day inactivity auto-unassign rule** remains unchanged.
+- When assigning themselves to issues created by others, the standard maximum of **5 active assignments** still applies.
 
 ### Tips for New Contributors
 

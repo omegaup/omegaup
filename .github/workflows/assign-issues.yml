@@ -4,6 +4,7 @@ on:
     issue_comment:
         types: [created]
     schedule:
+        # Run daily to handle reminders and automatic unassignments
         - cron: "0 3 * * *"
     workflow_dispatch:
 
@@ -48,25 +49,27 @@ jobs:
                           return;
                       }
                       
-                      const REQUIRED_APPROVED_PRS = 15;
+                      const REQUIRED_APPROVED_PRS = 10;
                       let approvedPRCount = 0;
                       let cursor = null;
                       let hasNextPage = true;
+                      const MAX_PRS_TO_QUERY = 200;
+                      let totalPRsQueried = 0;
                       
-                      while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS) {
+                      while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS && totalPRsQueried < MAX_PRS_TO_QUERY) {
                           const result = await github.graphql(`
                               query($owner: String!, $repo: String!, $author: String!, $cursor: String) {
                                   repository(owner: $owner, name: $repo) {
                                       pullRequests(
                                           first: 50
                                           author: $author
-                                          states: [MERGED, CLOSED]
+                                          states: [MERGED]
                                           after: $cursor
                                           orderBy: {field: UPDATED_AT, direction: DESC}
                                       ) {
                                           pageInfo { hasNextPage endCursor }
                                           nodes {
-                                              reviews(first: 1, states: APPROVED) { totalCount }
+                                              id
                                           }
                                       }
                                   }
@@ -79,7 +82,8 @@ jobs:
                           });
                           
                           const prs = result.repository.pullRequests;
-                          approvedPRCount += prs.nodes.filter(pr => pr.reviews.totalCount > 0).length;
+                          totalPRsQueried += prs.nodes.length;
+                          approvedPRCount += prs.nodes.length;
                           hasNextPage = prs.pageInfo.hasNextPage;
                           cursor = prs.pageInfo.endCursor;
                       }
@@ -98,8 +102,8 @@ jobs:
                                   repo: context.repo.repo,
                                   issue_number: issue.number,
                                   body: `Assigned to @${commenter}!\n\n` +
-                                        `As an experienced contributor (${approvedPRCount} approved PRs) working on your own issue, ` +
-                                        `you're exempt from the standard 3-assignment limit. Please open a pull request within 7 days. ` +
+                                        `As an experienced contributor (${approvedPRCount} merged PRs) working on your own issue, ` +
+                                        `you're exempt from the standard 5-assignment limit. Please open a pull request within 7 days. ` +
                                         `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
                               });
                               
@@ -120,6 +124,7 @@ jobs:
                   maintainers: ""
                   self_assign_cmd: /assign
                   self_unassign_cmd: /unassign
+                  # Unassign after 7 days if no PR is opened
                   days_until_unassign: 7
                   enable_auto_suggestion: true
                   allow_self_assign_author: true
