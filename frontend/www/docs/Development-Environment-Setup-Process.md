@@ -165,7 +165,7 @@ Before you start making changes to the code, you should update the code to its l
 
 ## How To Make Changes To The Code
 
-When you have made changes that you wish to propose to omegaUp repository, follow [these steps](<https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md>).
+When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md).
 
 ## The Web App Is Not Showing My Changes!
 
