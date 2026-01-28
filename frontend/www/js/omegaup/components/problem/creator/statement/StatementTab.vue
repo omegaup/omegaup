@@ -95,8 +95,13 @@ export default class StatementTab extends Vue {
     this.markdownEditor.run();
   }
 
+  created(): void {
+    this.currentMarkdown = this.currentMarkdownProp;
+  }
+
   updateMarkdown() {
     this.$store.commit('updateMarkdown', this.currentMarkdown);
+    this.$store.commit('persistDraft');
     this.$emit('show-update-success-message');
   }
 
