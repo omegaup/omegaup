@@ -227,6 +227,13 @@
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://hdl.handle.net/11059/16567"
+            target="_blank"
+          >
+            Estructura de Datos y sus aplicaciones en Programación Competitiva
+          </a>
         </div>
       </li>
     </ul>
