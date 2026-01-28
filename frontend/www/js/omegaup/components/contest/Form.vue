@@ -133,7 +133,8 @@
                   ><br />
                   <div
                     :class="{
-                      'is-invalid-wrapper': invalidParameterName === 'languages',
+                      'is-invalid-wrapper':
+                        invalidParameterName === 'languages',
                     }"
                   >
                     <multiselect
