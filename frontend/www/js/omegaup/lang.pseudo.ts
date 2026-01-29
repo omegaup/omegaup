@@ -920,6 +920,7 @@ const translations: { [key: string]: string; } = {
   navCoderOfTheMonth: "(C0d3r 0f 7h3 m0n7h 0v3ra11)",
   navCoderOfTheMonthFemale: "(C0d3r 0f 7h3 m0n7h f0r h3r)",
   navCompareUsers: "(C0mpar3 U53r5)",
+  navCompetitiveProgrammingDataStructuresBook: "(C0mp37i7iv3 Pr0gramming Da7a S7ruc7ur35 by Hug0 Humb3r70 M0ra135 P3\u00f1a)",
   navContests: "(C0n73575)",
   navContestsEnrolled: "(C0n73575 3nr0113d)",
   navCourses: "(C0ur535)",
