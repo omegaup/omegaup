@@ -40,13 +40,16 @@
         </div>
       </div>
       <div class="form-group row mt-3 align-items-center">
-        <label class="col-sm-3 col-form-label">
+        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div class="col-sm-7">
+        <div
+          class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden"
+        >
           <input
             data-problem-creator-code-input
-            class="w-100"
+            class="text-truncate"
+            style="max-width: 100%"
             type="file"
             name="file"
             @change="handleInputFile"
