@@ -22,7 +22,7 @@
       @click="togglePasswordVisibility"
     >
       <font-awesome-icon
-        :icon="showPassword ? ['fas', 'eye-slash'] : ['fas', 'eye']"
+        :icon="['fas', showPassword ? 'eye-slash' : 'eye']"
       />
     </button>
   </div>
@@ -78,18 +78,18 @@ export default class PasswordInput extends Vue {
     border: none;
     cursor: pointer;
     padding: 4px 8px;
-    color: #6c757d;
+    color: var(--password-toggle-btn-color);
     display: flex;
     align-items: center;
     justify-content: center;
 
     &:hover {
-      color: #495057;
+      color: var(--password-toggle-btn-color--hover);
     }
 
     &:focus {
       outline: none;
-      color: #495057;
+      color: var(--password-toggle-btn-color--hover);
     }
   }
 }
