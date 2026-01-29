@@ -170,6 +170,9 @@
               data-course-problem-level
               class="form-control introjs-level"
             >
+              <option value="" disabled>
+                {{ T.courseNewFormLevelPlaceholder }}
+              </option>
               <option
                 v-for="levelOption in levelOptions"
                 :key="levelOption.value"
@@ -323,7 +326,7 @@ export default class CourseDetails extends Vue {
   showScoreboard = this.course.show_scoreboard;
   startTime = this.course.start_time;
   name = this.course.name;
-  level = this.course.level;
+  level = this.course.level ?? '';
   objective = this.course.objective;
   school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   needsBasicInformation = this.course.needs_basic_information;
@@ -456,7 +459,9 @@ export default class CourseDetails extends Vue {
       objective: this.objective,
       start_time: this.startTime,
       alias: this.alias,
-      level: this.level,
+      // Only include level if it has a valid value (not empty string)
+      // This prevents sending an empty string which is not a valid level option
+      ...(this.level ? { level: this.level } : {}),
       languages: this.selectedLanguages,
       show_scoreboard: this.showScoreboard,
       needs_basic_information: this.needsBasicInformation,
