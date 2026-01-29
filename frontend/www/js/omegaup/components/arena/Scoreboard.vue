@@ -33,22 +33,49 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <label class="float-right"
-      >{{ T.scoreboardShowParticipantsNames }}:
-      <select
-        v-model="nameDisplayOptions"
-        class="form-control"
-        data-scoreboard-options
-      >
-        <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
-        <option :value="ui.NameDisplayOptions.Username">
-          {{ T.scoreboardAccountName }}
-        </option>
-        <option :value="ui.NameDisplayOptions.NameAndUsername">
-          {{ T.scoreboardNameAndAccountName }}
-        </option>
-      </select>
-    </label>
+    <div class="float-right">
+      <div v-if="showDownloadButton" class="btn-group mr-2">
+        <button
+          type="button"
+          class="btn btn-primary dropdown-toggle scoreboard-download-btn"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <span class="download-text">{{ T.scoreboardDownload }}</span>
+        </button>
+        <div class="dropdown-menu">
+          <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="downloadScoreboard(ScoreboardDownloadFormat.Csv)"
+            >{{ T.scoreboardDownloadCsv }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="downloadScoreboard(ScoreboardDownloadFormat.Xlsx)"
+            >{{ T.scoreboardDownloadXlsx }}</a
+          >
+        </div>
+      </div>
+      <label
+        >{{ T.scoreboardShowParticipantsNames }}:
+        <select
+          v-model="nameDisplayOptions"
+          class="form-control"
+          data-scoreboard-options
+        >
+          <option :value="ui.NameDisplayOptions.Name">{{ T.wordsName }}</option>
+          <option :value="ui.NameDisplayOptions.Username">
+            {{ T.scoreboardAccountName }}
+          </option>
+          <option :value="ui.NameDisplayOptions.NameAndUsername">
+            {{ T.scoreboardNameAndAccountName }}
+          </option>
+        </select>
+      </label>
+    </div>
     <div class="table-responsive">
       <table data-table-scoreboard class="table">
         <thead>
@@ -136,6 +163,11 @@ import * as time from '../../time';
 import omegaup_Countdown from '../Countdown.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
+export enum ScoreboardDownloadFormat {
+  Csv = 'csv',
+  Xlsx = 'xlsx',
+}
+
 @Component({
   components: {
     highcharts: Chart,
@@ -155,10 +187,12 @@ export default class ArenaScoreboard extends Vue {
   @Prop() title!: string;
   @Prop({ default: null }) finishTime!: null | Date;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
+  @Prop({ default: false }) showDownloadButton!: boolean;
 
   T = T;
   ui = ui;
   INF = '∞';
+  ScoreboardDownloadFormat = ScoreboardDownloadFormat;
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
   nameDisplayOptions: ui.NameDisplayOptions =
@@ -225,6 +259,11 @@ export default class ArenaScoreboard extends Vue {
     // are visible in scoreboard.
     if (!this.showInvitedUsersFilter) return true;
     return userIsInvited || !this.onlyShowExplicitlyInvited;
+  }
+
+  downloadScoreboard(format: ScoreboardDownloadFormat): void {
+    // This will be overridden by parent components to handle the actual download
+    this.$emit('download-scoreboard', format);
   }
 }
 </script>
@@ -358,6 +397,52 @@ export default class ArenaScoreboard extends Vue {
   .clock {
     font-size: 3em;
     line-height: 0.4em;
+  }
+
+  /* Download button styling */
+  .scoreboard-download-btn {
+    background-color: var(--arena-button-background-color) !important;
+    border-color: var(--arena-button-border-color) !important;
+    color: var(--arena-button-text-color) !important;
+    font-weight: bold;
+    padding: 0.5rem 1rem !important;
+    min-width: 100px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .scoreboard-download-btn:hover {
+    background-color: var(--arena-button-hover-background-color) !important;
+    border-color: var(--arena-button-hover-border-color) !important;
+  }
+
+  .download-text {
+    color: var(--arena-button-text-color) !important;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .dropdown-menu {
+    min-width: 140px;
+    box-shadow: 0 2px 8px var(--arena-dropdown-menu-shadow);
+  }
+
+  .dropdown-item {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    color: var(--arena-dropdown-item-text-color) !important;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background-color: var(
+      --arena-dropdown-item-hover-background-color
+    ) !important;
+    color: var(--arena-dropdown-item-hover-text-color) !important;
   }
 }
 </style>

@@ -34,7 +34,7 @@ describe('ranking', () => {
     }
   });
 
-  const scoreboard: types.Scoreboard = {
+  const getScoreboard = (): types.Scoreboard => ({
     problems: [
       {
         alias: 'problem_alias',
@@ -68,8 +68,8 @@ describe('ranking', () => {
           },
         ],
         total: {
-          points: 0,
-          penalty: 0,
+          points: 200,
+          penalty: 8,
         },
       },
     ],
@@ -78,7 +78,7 @@ describe('ranking', () => {
     start_time: new Date(now - 30 * 1000),
     time: new Date(now),
     title: 'contest',
-  };
+  });
   const scoreboardEvents: types.ScoreboardEvent[] = [
     {
       classname: 'user-rank-unranked',
@@ -119,7 +119,7 @@ describe('ranking', () => {
       username: 'omegaUp_virtual',
       name: 'omegaUp [virtual]',
       country: 'MX',
-      delta: 0.0001,
+      delta: 0,
       is_invited: true,
       problem: {
         alias: 'problem_alias',
@@ -171,7 +171,7 @@ describe('ranking', () => {
   describe('mergeRankings', () => {
     it('Should merge original ranking with current scoreboard', () => {
       const { mergedScoreboard, originalContestEvents } = mergeRankings({
-        scoreboard,
+        scoreboard: getScoreboard(),
         originalScoreboardEvents,
         navbarProblems,
       });
@@ -179,7 +179,7 @@ describe('ranking', () => {
         {
           classname: 'user-rank-unranked',
           country: 'MX',
-          delta: 0.0001,
+          delta: 0,
           is_invited: true,
           name: 'omegaUp [virtual]',
           problem: { alias: 'problem_alias', penalty: 3, points: 100 },
@@ -197,8 +197,36 @@ describe('ranking', () => {
             classname: 'user-rank-unranked',
             country: 'MX',
             is_invited: true,
-            name: 'omegaUp [virtual]',
             place: 1,
+            problems: [
+              {
+                alias: 'problem_alias',
+                penalty: 3,
+                percent: 0,
+                points: 100,
+                runs: 1,
+              },
+              {
+                alias: 'problem_alias_2',
+                penalty: 5,
+                percent: 0,
+                points: 100,
+                runs: 1,
+              },
+            ],
+            total: {
+              penalty: 8,
+              points: 200,
+            },
+            username: 'omegaUp',
+            virtual: true,
+          },
+          {
+            classname: 'user-rank-unranked',
+            country: 'MX',
+            is_invited: true,
+            name: 'omegaUp [virtual]',
+            place: 2,
             problems: [
               {
                 alias: 'problem_alias',
@@ -221,34 +249,6 @@ describe('ranking', () => {
             },
             username: 'omegaUp_virtual',
           },
-          {
-            classname: 'user-rank-unranked',
-            country: 'MX',
-            is_invited: true,
-            place: 2,
-            problems: [
-              {
-                alias: 'problem_alias',
-                penalty: 3,
-                percent: 0,
-                points: 100,
-                runs: 1,
-              },
-              {
-                alias: 'problem_alias_2',
-                penalty: 5,
-                percent: 0,
-                points: 100,
-                runs: 1,
-              },
-            ],
-            total: {
-              penalty: 0,
-              points: 0,
-            },
-            username: 'omegaUp',
-            virtual: true,
-          },
         ],
         start_time: expect.any(String),
         time: expect.any(String),
@@ -262,7 +262,7 @@ describe('ranking', () => {
       const store = new Vuex.Store(rankingStoreConfig);
 
       onVirtualRankingChanged({
-        scoreboard,
+        scoreboard: getScoreboard(),
         scoreboardEvents: originalScoreboardEvents,
         problems: navbarProblems,
         startTime: new Date(0),
@@ -272,6 +272,31 @@ describe('ranking', () => {
       });
 
       expect(store.state.ranking).toEqual([
+        {
+          classname: 'user-rank-unranked',
+          username: 'omegaUp',
+          country: 'MX',
+          is_invited: true,
+          problems: [
+            {
+              alias: 'problem_alias',
+              penalty: 3,
+              percent: 0,
+              points: 100,
+              runs: 1,
+            },
+            {
+              alias: 'problem_alias_2',
+              penalty: 5,
+              percent: 0,
+              points: 100,
+              runs: 1,
+            },
+          ],
+          total: { points: 200, penalty: 8 },
+          virtual: true,
+          place: 1,
+        },
         {
           country: 'MX',
           name: 'omegaUp [virtual]',
@@ -295,50 +320,25 @@ describe('ranking', () => {
             },
           ],
           total: { points: 100, penalty: 3 },
-          place: 1,
-        },
-        {
-          classname: 'user-rank-unranked',
-          username: 'omegaUp',
-          country: 'MX',
-          is_invited: true,
-          problems: [
-            {
-              alias: 'problem_alias',
-              penalty: 3,
-              percent: 0,
-              points: 100,
-              runs: 1,
-            },
-            {
-              alias: 'problem_alias_2',
-              penalty: 5,
-              percent: 0,
-              points: 100,
-              runs: 1,
-            },
-          ],
-          total: { points: 0, penalty: 0 },
-          virtual: true,
           place: 2,
         },
       ]);
       expect(store.state.miniRankingUsers).toEqual([
         {
           position: 1,
+          username: 'omegaUp [virtual]',
+          country: 'MX',
+          classname: 'user-rank-unranked',
+          points: 200,
+          penalty: 8,
+        },
+        {
+          position: 2,
           username: 'omegaUp_virtual (omegaUp [virtual])',
           country: 'MX',
           classname: 'user-rank-unranked',
           points: 100,
           penalty: 3,
-        },
-        {
-          position: 2,
-          username: 'omegaUp [virtual]',
-          country: 'MX',
-          classname: 'user-rank-unranked',
-          points: 0,
-          penalty: 0,
         },
       ]);
       expect(store.state.rankingChartOptions.series).toBeTruthy();
@@ -351,7 +351,7 @@ describe('ranking', () => {
         alias: 'problem_alias',
         previousScore: 100,
         username: 'omegaUp',
-        scoreboard,
+        scoreboard: getScoreboard(),
       };
       const scoreboardRanking = updateProblemScore(params);
       expect(scoreboardRanking).toEqual([
@@ -376,7 +376,7 @@ describe('ranking', () => {
             },
           ],
           total: {
-            penalty: 0,
+            penalty: 8,
             points: 200,
           },
           username: 'omegaUp',
@@ -387,7 +387,7 @@ describe('ranking', () => {
     it('Should update problem when ranking change', () => {
       const params = {
         currentUsername: 'omegaUp',
-        scoreboard: scoreboard,
+        scoreboard: getScoreboard(),
         navbarProblems: navbarProblems,
         scoreMode: ScoreMode.Partial,
       };
@@ -399,7 +399,7 @@ describe('ranking', () => {
     it('Should get ranking events for charts', () => {
       const { currentRanking, maxPoints } = onRankingChanged({
         currentUsername: 'omegaUp',
-        scoreboard: scoreboard,
+        scoreboard: getScoreboard(),
         navbarProblems: navbarProblems,
         scoreMode: ScoreMode.Partial,
       });
@@ -431,7 +431,7 @@ describe('ranking', () => {
       const finishTimestamp = Date.now() + 10000;
       const { currentRanking, maxPoints } = onRankingChanged({
         currentUsername: 'omegaUp',
-        scoreboard: scoreboard,
+        scoreboard: getScoreboard(),
         navbarProblems: navbarProblems,
         scoreMode: ScoreMode.Partial,
       });

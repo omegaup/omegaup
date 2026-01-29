@@ -5,6 +5,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
+import { ScoreboardDownloadFormat } from '../components/arena/Scoreboard.vue';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import problemsStore from './problemStore';
 import {
@@ -434,6 +435,18 @@ OmegaUp.on('ready', async () => {
               runsStore.commit('removeFilter', filter);
             }
             refreshRuns();
+          },
+          'download-scoreboard': ({
+            contestAlias,
+            format,
+          }: {
+            contestAlias: string;
+            format: ScoreboardDownloadFormat;
+          }) => {
+            const url = `/api/contest/scoreboardDownload/?contest_alias=${encodeURIComponent(
+              contestAlias,
+            )}&format=${encodeURIComponent(format)}`;
+            window.location.href = url;
           },
         },
       });
