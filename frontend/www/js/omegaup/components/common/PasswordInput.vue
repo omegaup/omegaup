@@ -21,9 +21,7 @@
       :title="showPassword ? T.passwordHidePassword : T.passwordShowPassword"
       @click="togglePasswordVisibility"
     >
-      <font-awesome-icon
-        :icon="['fas', showPassword ? 'eye-slash' : 'eye']"
-      />
+      <font-awesome-icon :icon="['fas', showPassword ? 'eye-slash' : 'eye']" />
     </button>
   </div>
 </template>
