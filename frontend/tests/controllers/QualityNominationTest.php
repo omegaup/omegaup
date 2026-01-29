@@ -2222,7 +2222,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $syntheticProblems[1]['problem']->problem_id,
             $problemOfTheWeek[0]->problem_id
         );
-        // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
+        // TODO(heduenas): Make assertion for hard problem of the week when that gets implemented.
     }
 
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {

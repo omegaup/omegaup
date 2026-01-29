@@ -178,7 +178,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Add a course and send several requests, some of them will be accepted and
-     * the others wil be rejected
+     * the others will be rejected
      */
     public function testRegisterUsersIntoCourse() {
         [
@@ -247,7 +247,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         ];
 
         // In the first round, 2 students will be accepted, 2 will be rejected
-        // and the last one wil be ignored.
+        // and the last one will be ignored.
         foreach ($expectedRequestResult as $id => $expectedRequest) {
             if ($expectedRequest['admin'] === 'main') {
                 $request = $courseRequestMainAdmin;
@@ -356,13 +356,13 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $invited] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
 
-        // The first one is explictly invited
+        // The first one is explicitly invited
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $invited
         );
 
-        // Invited users can join the course , they don't need to requset access
+        // Invited users can join the course , they don't need to request access
         $invitedLogin = self::login($invited);
 
         $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
