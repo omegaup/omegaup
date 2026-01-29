@@ -1,4 +1,6 @@
 -- Merge duplicate Universidad Fidélitas school profiles (#8417)
+START TRANSACTION;
+
 SET @target_school_id = 11741; -- Official Universidad Fidélitas
 SET @duplicate_ids = '10230,11464,11479,11499,11522,11530,11586,11727,11732,11745,11747,11779,11805,11862,11904,12028,12041,12048';
 
@@ -31,3 +33,5 @@ AND `school_id` NOT IN (
     UNION
     SELECT DISTINCT `school_id` FROM `Schools_Problems_Solved_Per_Month` WHERE FIND_IN_SET(`school_id`, @duplicate_ids)
 );
+
+COMMIT;
