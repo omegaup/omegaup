@@ -4,11 +4,12 @@
       <h3 class="card-title mb-0">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
+      <div class="required-fields-legend">{{ T.wordsRequiredField }}</div>
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-course-name"
-              >{{ T.wordsName }}
+            <label class="font-weight-bold w-100 introjs-course-name">
+              <span class="field-required">{{ T.wordsName }}</span>
               <input
                 v-model="name"
                 :disabled="readOnly"
@@ -20,8 +21,10 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-short-title"
-              >{{ T.courseNewFormShortTitleAlias }}
+            <label class="font-weight-bold w-100 introjs-short-title">
+              <span class="field-required">{{
+                T.courseNewFormShortTitleAlias
+              }}</span>
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
                 icon="info-circle" />
@@ -101,8 +104,8 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-school"
-              >{{ T.profileSchool }}
+            <label class="font-weight-bold w-100 introjs-school">
+              <span class="field-required">{{ T.profileSchool }}</span>
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
@@ -180,7 +183,9 @@
             </select>
           </div>
           <div class="form-group col-md-6 introjs-language">
-            <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
+            <label class="font-weight-bold w-100">
+              <span class="field-required">{{ T.wordsLanguages }}</span>
+            </label>
             <div
               :class="{
                 'is-invalid-wrapper': invalidParameterName === 'languages',
@@ -193,7 +198,6 @@
                 :multiple="true"
                 :placeholder="T.courseNewFormLanguages"
                 :close-on-select="false"
-                :allow-empty="true"
               >
               </vue-multiselect>
             </div>
@@ -221,8 +225,10 @@
             </label>
           </div>
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-description"
-              >{{ T.courseNewFormDescription }}
+            <label class="font-weight-bold w-100 introjs-description">
+              <span class="field-required">{{
+                T.courseNewFormDescription
+              }}</span>
               <textarea
                 v-model="description"
                 :disabled="readOnly"

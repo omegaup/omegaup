@@ -126,6 +126,20 @@ pre > code {
   }
 }
 
+// Required field indicator - red asterisk after label text
+.field-required::after {
+  content: ' *';
+  color: #dc3545; // Bootstrap danger red
+  font-weight: bold;
+}
+
+// Required fields legend text
+.required-fields-legend {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
 .twitter-typeahead {
   width: 100%;
 }
