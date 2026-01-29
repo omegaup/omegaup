@@ -3,7 +3,7 @@
 namespace OmegaUp\Exceptions;
 
 class ExitException extends \OmegaUp\Exceptions\ApiException {
-    public function __construct() {
-        parent::__construct('', 'HTTP/1.1 200 OK', 200);
+    public function __construct(string $message = '') {
+        parent::__construct($message, 'HTTP/1.1 200 OK', 200);
     }
 }
