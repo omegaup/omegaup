@@ -142,8 +142,8 @@ OmegaUp.on('ready', async () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           nextExecutionTimestamp: this.nextExecutionTimestamp,
           socketStatus: socketStore.state.socketStatus,
-          shouldShowFirstAssociatedIdentityRunWarning: this
-            .shouldShowFirstAssociatedIdentityRunWarning,
+          shouldShowFirstAssociatedIdentityRunWarning:
+            this.shouldShowFirstAssociatedIdentityRunWarning,
           feedbackMap: this.feedbackMap,
           feedbackThreadMap: this.feedbackThreadMap,
           currentUsername: commonPayload.currentUsername,
@@ -581,9 +581,7 @@ OmegaUp.on('ready', async () => {
       .catch(ui.apiError);
   }
 
-  function getFeedbackMap(
-    runDetailsFeedback: types.SubmissionFeedback[],
-  ): {
+  function getFeedbackMap(runDetailsFeedback: types.SubmissionFeedback[]): {
     feedbackMap: Map<number, ArenaCourseFeedback>;
     feedbackThreadMap: Map<number, ArenaCourseFeedback>;
   } {

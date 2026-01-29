@@ -303,7 +303,8 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    target.selectedRevision = target.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision =
+                      revision;
                     break;
                   }
                 }
