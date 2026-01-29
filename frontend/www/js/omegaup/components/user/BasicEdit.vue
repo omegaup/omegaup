@@ -24,12 +24,11 @@
             T.userEditChangePasswordNewPassword
           }}</label>
           <div class="col-md-7">
-            <input
+            <omegaup-password-input
               v-model="newPassword1"
-              class="form-control"
               name="new-password-1"
-              size="30"
-              type="password"
+              :size="30"
+              autocomplete="new-password"
             />
           </div>
         </div>
@@ -38,12 +37,11 @@
             T.userEditChangePasswordRepeatNewPassword
           }}</label>
           <div class="col-md-7">
-            <input
+            <omegaup-password-input
               v-model="newPassword2"
-              class="form-control"
               name="new-password-2"
-              size="30"
-              type="password"
+              :size="30"
+              autocomplete="new-password"
             />
           </div>
         </div>
@@ -63,8 +61,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-password-input': omegaup_PasswordInput,
+  },
+})
 export default class UserBasicEdit extends Vue {
   @Prop() username!: string;
 

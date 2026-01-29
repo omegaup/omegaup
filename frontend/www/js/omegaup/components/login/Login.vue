@@ -53,13 +53,11 @@
                 }}</a
                 >)</label
               >
-              <input
+              <omegaup-password-input
                 v-model="password"
                 data-login-password
                 name="login_password"
-                type="password"
-                class="form-control"
-                tabindex="2"
+                :tabindex="2"
                 autocomplete="current-password"
               />
             </div>
@@ -84,8 +82,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-password-input': omegaup_PasswordInput,
+  },
+})
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
   @Prop() googleClientId!: string;

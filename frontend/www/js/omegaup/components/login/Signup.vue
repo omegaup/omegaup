@@ -36,12 +36,10 @@
           <div class="col-md-4 col-md-offset-2 introjs-password">
             <div class="form-group">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
-              <input
+              <omegaup-password-input
                 v-model="password"
                 data-signup-password
                 name="reg_password"
-                type="password"
-                class="form-control"
                 autocomplete="new-password"
               />
             </div>
@@ -49,12 +47,10 @@
           <div class="col-md-4 introjs-confirmpassword">
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
-              <input
+              <omegaup-password-input
                 v-model="passwordConfirmation"
                 data-signup-repeat-password
                 name="reg_password_confirmation"
-                type="password"
-                class="form-control"
                 autocomplete="new-password"
               />
             </div>
@@ -186,12 +182,10 @@
           <div class="col-md-4 col-md-offset-2 introjs-password">
             <div class="form-group">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
-              <input
+              <omegaup-password-input
                 v-model="password"
                 data-signup-password
                 name="reg_password"
-                type="password"
-                class="form-control"
                 autocomplete="new-password"
               />
             </div>
@@ -199,12 +193,10 @@
           <div class="col-md-4 introjs-confirmpassword">
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
-              <input
+              <omegaup-password-input
                 v-model="passwordConfirmation"
                 data-signup-repeat-password
                 name="reg_password_confirmation"
-                type="password"
-                class="form-control"
                 autocomplete="new-password"
               />
             </div>
@@ -273,11 +265,13 @@ import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import { getBlogUrl } from '../../urlHelper';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-password-input': omegaup_PasswordInput,
   },
 })
 export default class Signup extends Vue {
