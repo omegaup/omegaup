@@ -27,7 +27,9 @@ from database.school_of_the_month import (
     get_school_of_the_month_candidates,
     insert_school_of_the_month_candidates,
     School,
-    update_schools_solved_problems
+    delete_problems_solved_per_month,
+    get_current_problems_solved_per_month,
+    insert_updated_problems_solved_per_month,
 )
 
 
@@ -37,6 +39,12 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+logging.basicConfig(
+    filename='update_ranks.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
 
 
 class Cutoff(NamedTuple):
@@ -349,6 +357,7 @@ def update_user_rank_classname(
         );
     ''')
 
+
 def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Updates the school rank'''
 
@@ -529,6 +538,16 @@ def compute_points_for_user(
     updated_users_sorted = sorted(
         updated_users, key=lambda user: user.score, reverse=True)
     return updated_users_sorted[:coder_list_count]
+
+
+def update_schools_solved_problems(
+    cur: mysql.connector.cursor.MySQLCursorDict) -> None:
+    '''Updates the solved problems count by each school the last 6 months'''
+
+    logging.info('Updating schools solved problems...')
+    delete_problems_solved_per_month(cur)
+    problems = get_current_problems_solved_per_month(cur, 6)
+    insert_updated_problems_solved_per_month(cur, problems)
 
 
 def update_coder_of_the_month_candidates(
