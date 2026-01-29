@@ -339,7 +339,7 @@ const translations: { [key: string]: string; } = {
   contestEditCatLanguageAddedWarning: "Adicionado \"cat\" aos idiomas do concurso porque o problema adicionado exige",
   contestEditCertificates: "Diplomas",
   contestEditContestClonedSuccessfully: "Seu concurso foi clonado com sucesso",
-  contestEditContestEdited: "O concurso foi editado! <a href=\"/arena/%(alias)/\">Exibir concurso</a>",
+  contestEditContestEdited: "O concurso foi editado! [Exibir concurso](/arena/%(alias)/)",
   contestEditContestLinkCopiedToClipboard: "Link da competi\u00e7\u00e3o copiado para a \u00e1rea de transfer\u00eancia com sucesso",
   contestEditCopyContestLink: "Copiar link da competi\u00e7\u00e3o",
   contestEditRegisteredAdminDelete: "Remover",

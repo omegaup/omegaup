@@ -337,7 +337,7 @@ contestEditCannotReplaceTeamsGroupWithSubmissions = "Você não pode substituir 
 contestEditCatLanguageAddedWarning = "Adicionado \"cat\" aos idiomas do concurso porque o problema adicionado exige"
 contestEditCertificates = "Diplomas"
 contestEditContestClonedSuccessfully = "Seu concurso foi clonado com sucesso"
-contestEditContestEdited = "O concurso foi editado! <a href=\"/arena/%(alias)/\">Exibir concurso</a>"
+contestEditContestEdited = "O concurso foi editado! [Exibir concurso](/arena/%(alias)/)"
 contestEditContestLinkCopiedToClipboard = "Link da competição copiado para a área de transferência com sucesso"
 contestEditCopyContestLink = "Copiar link da competição"
 contestEditRegisteredAdminDelete = "Remover"
