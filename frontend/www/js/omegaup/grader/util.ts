@@ -151,6 +151,7 @@ export enum MonacoThemes {
 }
 export const DUMMY_PROBLEM: types.ProblemInfo = {
   alias: 'dummy-problem',
+  ephemeralGraderEnabled: true,
   settings: {
     cases: {
       sample: {

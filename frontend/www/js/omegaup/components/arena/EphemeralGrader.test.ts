@@ -23,6 +23,7 @@ describe('EphemeralGrader.vue', () => {
     accepts_submissions: true,
     karel_problem: false,
     commit: 'abc',
+    ephemeralGraderEnabled: true,
     languages: ['py3'],
     limits: {
       input_limit: '10 KiB',

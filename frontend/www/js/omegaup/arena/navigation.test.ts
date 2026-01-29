@@ -59,6 +59,7 @@ const problemDetails: types.ProblemDetails = {
   allow_user_add_tags: true,
   creation_date: new Date(),
   email_clarifications: true,
+  ephemeralGraderEnabled: true,
   nominationStatus: {
     alreadyReviewed: true,
     canNominateProblem: true,

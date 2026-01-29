@@ -126,6 +126,7 @@ describe('Course.vue', () => {
     commit: '123',
     creation_date: new Date(),
     email_clarifications: true,
+    ephemeralGraderEnabled: true,
     input_limit: 10240,
     karel_problem: false,
     languages: ['py2', 'py3'],
