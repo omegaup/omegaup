@@ -920,6 +920,7 @@ const translations: { [key: string]: string; } = {
   navCoderOfTheMonth: "Coder del mes general",
   navCoderOfTheMonthFemale: "Coder del mes para ellas",
   navCompareUsers: "Comparar Coders",
+  navCompetitiveProgrammingDataStructuresBook: "Estructuras de Datos para Programaci\u00f3n Competitiva por Hugo Humberto Morales Pe\u00f1a",
   navContests: "Concursos",
   navContestsEnrolled: "Concursos inscrito",
   navCourses: "Cursos",
