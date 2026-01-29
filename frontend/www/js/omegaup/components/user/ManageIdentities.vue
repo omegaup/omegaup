@@ -29,13 +29,12 @@
       <div class="form-group">
         <label class="w-100">
           {{ T.loginPassword }}
-          <input
+          <omegaup-password-input
             v-model="password"
             data-identity-password
             autocomplete="off"
-            class="form-control password-input"
-            size="20"
-            type="password"
+            input-class="password-input"
+            :size="20"
           />
         </label>
       </div>
@@ -81,6 +80,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 library.add(fas);
 
 @Component({
@@ -88,6 +88,7 @@ library.add(fas);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-password-input': omegaup_PasswordInput,
   },
 })
 export default class ManageIdentities extends Vue {
