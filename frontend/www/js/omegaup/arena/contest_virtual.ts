@@ -98,8 +98,9 @@ OmegaUp.on('ready', async () => {
   }
 
   // Cache scoreboard data for virtual contest
-  let virtualContestRefreshInterval: ReturnType<typeof setInterval> | null =
-    null;
+  let virtualContestRefreshInterval: ReturnType<
+    typeof setInterval
+  > | null = null;
   if (
     payload.scoreboard &&
     payload.scoreboardEvents &&

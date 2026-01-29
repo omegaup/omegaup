@@ -655,27 +655,27 @@ class ArenaContestList extends Vue {
   }
 
   scrollLeft(tab: ContestTab) {
-    const container = (
-      this.$refs[`scrollContainer_${tab}`] as HTMLElement[]
-    )[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       container.scrollBy({ left: -600, behavior: 'smooth' });
     }
   }
 
   scrollRight(tab: ContestTab) {
-    const container = (
-      this.$refs[`scrollContainer_${tab}`] as HTMLElement[]
-    )[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       container.scrollBy({ left: 600, behavior: 'smooth' });
     }
   }
 
   onScroll(tab: ContestTab) {
-    const container = (
-      this.$refs[`scrollContainer_${tab}`] as HTMLElement[]
-    )[0];
+    const container = (this.$refs[
+      `scrollContainer_${tab}`
+    ] as HTMLElement[])[0];
     if (container) {
       this.$set(this.scrollPositions, tab, container.scrollLeft);
       this.$set(

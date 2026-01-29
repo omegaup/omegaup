@@ -279,8 +279,9 @@ export default class Ephemeral extends Vue {
         store.commit('updatingSettings', false);
         this.$nextTick(() => {
           if (!this.isEmbedded || !this.goldenLayout?.isInitialised) return;
-          let mainColumn =
-            this.goldenLayout.root.getItemsById('main-column')[0];
+          let mainColumn = this.goldenLayout.root.getItemsById(
+            'main-column',
+          )[0];
           mainColumn.parent.setActiveContentItem(mainColumn);
         });
       })

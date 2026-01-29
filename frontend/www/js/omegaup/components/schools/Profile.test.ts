@@ -23,7 +23,8 @@ describe('Profile.vue', () => {
             type: 'line',
           },
           title: {
-            text: 'Total de problemas resueltos mensualmente por los coders de omegaUp school',
+            text:
+              'Total de problemas resueltos mensualmente por los coders de omegaUp school',
           },
           yAxis: {
             min: 0,

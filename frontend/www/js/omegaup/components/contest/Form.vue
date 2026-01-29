@@ -794,8 +794,8 @@ export default class Form extends Vue {
       penalty: this.penalty,
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
-      default_show_all_contestants_in_scoreboard:
-        this.defaultShowAllContestantsInScoreboard,
+      default_show_all_contestants_in_scoreboard: this
+        .defaultShowAllContestantsInScoreboard,
       show_scoreboard_after: this.showScoreboardAfter,
       score_mode: this.currentScoreMode,
       needs_basic_information: this.needsBasicInformation,
