@@ -263,7 +263,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { types, messages } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
@@ -453,15 +453,12 @@ export default class CourseDetails extends Vue {
       this.$emit('invalid-languages');
       return;
     }
-    this.$emit('submit', {
+    const request: messages.CourseUpdateRequest = {
       name: this.name,
       description: this.description,
       objective: this.objective,
       start_time: this.startTime,
       alias: this.alias,
-      // Only include level if it has a valid value (not empty string)
-      // This prevents sending an empty string which is not a valid level option
-      ...(this.level ? { level: this.level } : {}),
       languages: this.selectedLanguages,
       show_scoreboard: this.showScoreboard,
       needs_basic_information: this.needsBasicInformation,
@@ -471,7 +468,12 @@ export default class CourseDetails extends Vue {
       finish_time: !this.unlimitedDuration
         ? new Date(this.finishTime).setHours(23, 59, 59, 999) / 1000
         : null,
-    });
+    };
+    // Only include level if the user selected a value
+    if (this.level) {
+      request.level = this.level;
+    }
+    this.$emit('submit', request);
   }
 
   @Emit('emit-cancel')
