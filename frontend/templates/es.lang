@@ -404,6 +404,7 @@ contestNewFormImmediateFeedbackDesc = "Después de evaluar cada envío, se mostr
 contestNewFormImmediateSummaryFeedbackDesc = "Después de evaluar cada envío, se mostrará el resumen de puntajes y veredictos para cada grupo de casos."
 contestNewFormLanguageRemoveBlockedWarning = "No se puede quitar \"%(language)\" de los lenguajes porque hay por lo menos un problema que lo requiere"
 contestNewFormLanguages = "Establecer lenguajes para el concurso actual"
+contestNewFormLanguagesRequired = "Por favor selecciona al menos un lenguaje"
 contestNewFormLogistics = "Logística (opcional)"
 contestNewFormNoPenalty = "Coders con el mismo puntaje quedarán en empate, sin importar el tiempo que le haya tomado a cada coder."
 contestNewFormNumberOfContestants = "Número de concursantes"
