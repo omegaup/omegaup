@@ -37,6 +37,7 @@ OmegaUp.on('ready', () => {
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
       certificatesDetails: payload.certificatesDetails,
+      invalidParameterName: null as null | string,
     }),
     methods: {
       arbitrateRequest: (
@@ -172,6 +173,7 @@ OmegaUp.on('ready', () => {
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
           certificatesDetails: this.certificatesDetails,
+          invalidParameterName: this.invalidParameterName,
         },
         on: {
           'update-search-result-problems': ({
@@ -291,6 +293,16 @@ OmegaUp.on('ready', () => {
                 );
               })
               .catch(ui.apiError);
+          },
+          'invalid-languages': () => {
+            ui.error(T.contestNewFormLanguagesRequired);
+            this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
           'add-problem': ({
             problem,
