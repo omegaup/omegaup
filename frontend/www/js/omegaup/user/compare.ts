@@ -17,6 +17,8 @@ OmegaUp.on('ready', () => {
       user1: payload.user1,
       user2: payload.user2,
       isLoading: false,
+      searchResultUsers1: [] as types.ListItem[],
+      searchResultUsers2: [] as types.ListItem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-user-compare', {
@@ -26,6 +28,8 @@ OmegaUp.on('ready', () => {
           initialUsername1: payload.username1,
           initialUsername2: payload.username2,
           isLoading: this.isLoading,
+          searchResultUsers1: this.searchResultUsers1,
+          searchResultUsers2: this.searchResultUsers2,
         },
         on: {
           compare: ({
@@ -63,6 +67,31 @@ OmegaUp.on('ready', () => {
               .finally(() => {
                 this.isLoading = false;
               });
+          },
+          'update-search-result-users': ({
+            query,
+            field,
+          }: {
+            query: string;
+            field: 'user1' | 'user2';
+          }) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                const formattedResults = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+                if (field === 'user1') {
+                  this.searchResultUsers1 = formattedResults;
+                } else {
+                  this.searchResultUsers2 = formattedResults;
+                }
+              })
+              .catch(ui.apiError);
           },
         },
       });

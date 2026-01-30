@@ -9,26 +9,32 @@
         <div class="row mb-4">
           <div class="col-md-5">
             <label class="form-label">{{ T.compareUser1Label }}</label>
-            <input
-              v-model="inputUsername1"
-              type="text"
-              class="form-control"
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers1"
+              :value.sync="selectedUser1"
+              :max-results="10"
               :placeholder="T.compareEnterUsername"
-              @keyup.enter="fetchComparison"
-            />
+              @update-existing-options="
+                (query) =>
+                  $emit('update-search-result-users', { query, field: 'user1' })
+              "
+            ></omegaup-common-typeahead>
           </div>
           <div class="col-md-2 d-flex align-items-end justify-content-center">
             <span class="h4 mb-2 text-muted" aria-hidden="true">VS</span>
           </div>
           <div class="col-md-5">
             <label class="form-label">{{ T.compareUser2Label }}</label>
-            <input
-              v-model="inputUsername2"
-              type="text"
-              class="form-control"
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers2"
+              :value.sync="selectedUser2"
+              :max-results="10"
               :placeholder="T.compareEnterUsername"
-              @keyup.enter="fetchComparison"
-            />
+              @update-existing-options="
+                (query) =>
+                  $emit('update-search-result-users', { query, field: 'user2' })
+              "
+            ></omegaup-common-typeahead>
           </div>
         </div>
         <div class="text-center mb-4">
@@ -96,6 +102,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_CompareCard from './CompareCard.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 interface UserCompareData {
   profile: types.UserProfileInfo;
@@ -106,6 +113,7 @@ interface UserCompareData {
 @Component({
   components: {
     'omegaup-user-compare-card': user_CompareCard,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class CompareUsers extends Vue {
@@ -114,26 +122,22 @@ export default class CompareUsers extends Vue {
   @Prop({ default: null }) username1!: string | null;
   @Prop({ default: null }) username2!: string | null;
   @Prop({ default: false }) isLoading!: boolean;
+  @Prop({ default: () => [] }) searchResultUsers1!: types.ListItem[];
+  @Prop({ default: () => [] }) searchResultUsers2!: types.ListItem[];
 
   T = T;
-  inputUsername1: string = this.username1 ?? '';
-  inputUsername2: string = this.username2 ?? '';
+  selectedUser1: types.ListItem | null = null;
+  selectedUser2: types.ListItem | null = null;
 
   get canCompare(): boolean {
-    return (
-      this.inputUsername1.trim() !== '' || this.inputUsername2.trim() !== ''
-    );
+    return this.selectedUser1 !== null && this.selectedUser2 !== null;
   }
 
   fetchComparison(): void {
     if (!this.canCompare) return;
-
-    const trimmedUsername1 = this.inputUsername1.trim();
-    const trimmedUsername2 = this.inputUsername2.trim();
-
     this.$emit('compare', {
-      username1: trimmedUsername1 || undefined,
-      username2: trimmedUsername2 || undefined,
+      username1: this.selectedUser1?.key,
+      username2: this.selectedUser2?.key,
     });
   }
 
