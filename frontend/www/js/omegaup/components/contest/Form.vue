@@ -40,31 +40,6 @@
         </button>
       </div>
 
-      <!-- Validation Summary -->
-      <div
-        v-if="validationErrors.length > 0"
-        class="alert alert-danger alert-dismissible fade show"
-        role="alert"
-      >
-        <strong>{{ T.formValidationSummaryTitle }}</strong>
-        <ul class="mb-0 mt-2">
-          <li
-            v-for="(error, index) in validationErrors"
-            :key="`error-${index}`"
-          >
-            {{ error }}
-          </li>
-        </ul>
-        <button
-          type="button"
-          class="close"
-          aria-label="Close"
-          @click="localErrors = {}"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
       <form class="contest-form" novalidate @submit.prevent="onSubmit">
         <div class="accordion mb-3">
           <!-- Basic Info Section -->
@@ -876,6 +851,8 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { displayStatus, MessageType } from '../../ui';
+import { isValidAlias } from '../../validators';
 library.add(fas);
 
 Vue.use(VueCookies, { expire: -1 });
@@ -916,6 +893,113 @@ export enum SectionName {
 interface LocalErrors {
   [key: string]: string;
 }
+
+/**
+ * Field mapping for error checking by section
+ * Used to determine which fields belong to which accordion section
+ */
+const SECTION_FIELDS: Record<SectionName, string[]> = {
+  [SectionName.Basic]: [
+    FieldName.Title,
+    FieldName.Alias,
+    FieldName.FinishTime,
+    FieldName.Description,
+    FieldName.Languages,
+  ],
+  [SectionName.Logistics]: [
+    FieldName.WindowLength,
+    FieldName.Scoreboard,
+    FieldName.TeamsGroup,
+  ],
+  [SectionName.Scoring]: [
+    FieldName.SubmissionsGap,
+    FieldName.Penalty,
+    FieldName.PointsDecayFactor,
+  ],
+};
+
+/**
+ * Preset configurations for different contest types
+ */
+interface PresetConfig {
+  languages?: boolean; // Whether to set all languages
+  titlePlaceHolder: string;
+  windowLengthEnabled: boolean;
+  windowLength: number | null;
+  scoreboard: number;
+  pointsDecayFactor: number;
+  submissionsGap: number;
+  feedback: string;
+  penalty: number;
+  penaltyType: string;
+  showScoreboardAfter: boolean;
+  currentScoreMode: ScoreMode;
+  languageFilter?: (lang: string) => boolean;
+}
+
+const CONTEST_PRESETS: Record<PresetType, PresetConfig> = {
+  [PresetType.OMI]: {
+    languages: true,
+    titlePlaceHolder: T.contestNewFormTitlePlaceholderOmiStyle,
+    windowLengthEnabled: false,
+    windowLength: 0,
+    scoreboard: 0,
+    pointsDecayFactor: 0,
+    submissionsGap: 1,
+    feedback: 'detailed',
+    penalty: 0,
+    penaltyType: 'none',
+    showScoreboardAfter: true,
+    currentScoreMode: ScoreMode.Partial,
+  },
+  [PresetType.PreIOI]: {
+    languages: true,
+    titlePlaceHolder: T.contestNewFormTitlePlaceholderIoiStyle,
+    windowLengthEnabled: true,
+    windowLength: 180,
+    scoreboard: 0,
+    pointsDecayFactor: 0,
+    submissionsGap: 0,
+    feedback: 'detailed',
+    penalty: 0,
+    penaltyType: 'none',
+    showScoreboardAfter: true,
+    currentScoreMode: ScoreMode.Partial,
+  },
+  [PresetType.Conacup]: {
+    languages: true,
+    titlePlaceHolder: T.contestNewFormTitlePlaceholderConacupStyle,
+    windowLengthEnabled: false,
+    windowLength: 0,
+    scoreboard: 75,
+    pointsDecayFactor: 0,
+    submissionsGap: 1,
+    feedback: 'detailed',
+    penalty: 20,
+    penaltyType: 'none',
+    showScoreboardAfter: true,
+    currentScoreMode: ScoreMode.Partial,
+  },
+  [PresetType.ICPC]: {
+    languages: true,
+    titlePlaceHolder: T.contestNewFormTitlePlaceholderICPCStyle,
+    windowLengthEnabled: false,
+    windowLength: null,
+    scoreboard: 80,
+    pointsDecayFactor: 0,
+    submissionsGap: 1,
+    feedback: 'none',
+    penalty: 20,
+    penaltyType: 'contest_start',
+    showScoreboardAfter: true,
+    currentScoreMode: ScoreMode.AllOrNothing,
+    languageFilter: (lang: string) =>
+      lang.includes('c11') ||
+      lang.includes('cpp') ||
+      lang.includes('py') ||
+      lang.includes('java'),
+  },
+};
 
 @Component({
   components: {
@@ -1068,31 +1152,8 @@ export default class Form extends Vue {
     });
   }
 
-  get validationErrors(): string[] {
-    return Object.values(this.localErrors).filter(Boolean);
-  }
-
   hasErrorsInSection(section: SectionName): boolean {
-    const sectionFields: Record<SectionName, string[]> = {
-      [SectionName.Basic]: [
-        FieldName.Title,
-        FieldName.Alias,
-        FieldName.FinishTime,
-        FieldName.Description,
-        FieldName.Languages,
-      ],
-      [SectionName.Logistics]: [
-        FieldName.WindowLength,
-        FieldName.Scoreboard,
-        FieldName.TeamsGroup,
-      ],
-      [SectionName.Scoring]: [
-        FieldName.SubmissionsGap,
-        FieldName.Penalty,
-        FieldName.PointsDecayFactor,
-      ],
-    };
-    const fields = sectionFields[section] || [];
+    const fields = SECTION_FIELDS[section] || [];
     return fields.some((field) => this.localErrors[field]);
   }
 
@@ -1109,7 +1170,7 @@ export default class Form extends Vue {
           this.localErrors[fieldName] = T.contestNewFormShortTitleRequired;
           return false;
         }
-        if (!/^[a-z0-9-]+$/.test(this.alias)) {
+        if (!isValidAlias(this.alias)) {
           this.localErrors[fieldName] = T.contestNewFormAliasInvalid;
           return false;
         }
@@ -1210,97 +1271,45 @@ export default class Form extends Vue {
       }
     }
 
-    switch (presetType) {
-      case PresetType.OMI:
-        this.fillOmi();
-        break;
-      case PresetType.PreIOI:
-        this.fillPreIoi();
-        break;
-      case PresetType.Conacup:
-        this.fillConacup();
-        break;
-      case PresetType.ICPC:
-        this.fillIcpc();
-        break;
-    }
-
+    this.applyPreset(presetType);
     this.hasFormChanged = true;
   }
 
-  fillOmi(): void {
-    this.languages = Object.keys(this.allLanguages);
-    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
-    this.windowLengthEnabled = false;
-    this.windowLength = 0;
-    this.scoreboard = 0;
-    this.pointsDecayFactor = 0;
-    this.submissionsGap = 1;
-    this.feedback = 'detailed';
-    this.penalty = 0;
-    this.penaltyType = 'none';
-    this.showScoreboardAfter = true;
-    this.currentScoreMode = ScoreMode.Partial;
-    this.localErrors = {};
-  }
+  applyPreset(presetType: PresetType): void {
+    const preset = CONTEST_PRESETS[presetType];
 
-  fillPreIoi(): void {
-    this.languages = Object.keys(this.allLanguages);
-    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
-    this.windowLengthEnabled = true;
-    this.windowLength = 180;
-    this.scoreboard = 0;
-    this.pointsDecayFactor = 0;
-    this.submissionsGap = 0;
-    this.feedback = 'detailed';
-    this.penalty = 0;
-    this.penaltyType = 'none';
-    this.showScoreboardAfter = true;
-    this.currentScoreMode = ScoreMode.Partial;
-    this.localErrors = {};
-  }
+    if (preset.languages) {
+      const allLangs = Object.keys(this.allLanguages);
+      this.languages = preset.languageFilter
+        ? allLangs.filter(preset.languageFilter)
+        : allLangs;
+    }
 
-  fillConacup(): void {
-    this.languages = Object.keys(this.allLanguages);
-    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
-    this.windowLengthEnabled = false;
-    this.windowLength = 0;
-    this.scoreboard = 75;
-    this.pointsDecayFactor = 0;
-    this.submissionsGap = 1;
-    this.feedback = 'detailed';
-    this.penalty = 20;
-    this.penaltyType = 'none';
-    this.showScoreboardAfter = true;
-    this.currentScoreMode = ScoreMode.Partial;
-    this.localErrors = {};
-  }
-
-  fillIcpc(): void {
-    const languagesKeys = Object.keys(this.allLanguages);
-    this.languages = languagesKeys.filter(
-      (lang) =>
-        lang.includes('c11') ||
-        lang.includes('cpp') ||
-        lang.includes('py') ||
-        lang.includes('java'),
-    );
-    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderICPCStyle;
-    this.windowLengthEnabled = false;
-    this.windowLength = null;
-    this.scoreboard = 80;
-    this.pointsDecayFactor = 0;
-    this.submissionsGap = 1;
-    this.feedback = 'none';
-    this.penalty = 20;
-    this.penaltyType = 'contest_start';
-    this.showScoreboardAfter = true;
-    this.currentScoreMode = ScoreMode.AllOrNothing;
+    this.titlePlaceHolder = preset.titlePlaceHolder;
+    this.windowLengthEnabled = preset.windowLengthEnabled;
+    this.windowLength = preset.windowLength;
+    this.scoreboard = preset.scoreboard;
+    this.pointsDecayFactor = preset.pointsDecayFactor;
+    this.submissionsGap = preset.submissionsGap;
+    this.feedback = preset.feedback;
+    this.penalty = preset.penalty;
+    this.penaltyType = preset.penaltyType;
+    this.showScoreboardAfter = preset.showScoreboardAfter;
+    this.currentScoreMode = preset.currentScoreMode;
     this.localErrors = {};
   }
 
   onSubmit() {
     if (!this.validateForm()) {
+      const errorsList = Object.values(this.localErrors)
+        .filter(Boolean)
+        .map((error) => `- ${error}`)
+        .join('\n');
+      displayStatus({
+        message: `**${T.formValidationSummaryTitle}**\n${errorsList}`,
+        type: MessageType.Danger,
+      });
+
       this.$nextTick(() => {
         const firstInvalid = document.querySelector('.is-invalid');
         if (firstInvalid) {
