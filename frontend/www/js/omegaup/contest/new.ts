@@ -1,6 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
+import T from '../lang';
 import contest_NewForm from '../components/contest/Form.vue';
 import * as ui from '../ui';
 import * as api from '../api';
@@ -70,6 +71,16 @@ OmegaUp.on('ready', () => {
                 );
               })
               .catch(ui.apiError);
+          },
+          'invalid-languages': () => {
+            ui.error(T.contestNewFormLanguagesRequired);
+            this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
         },
       });

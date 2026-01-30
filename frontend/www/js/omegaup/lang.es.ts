@@ -406,6 +406,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormImmediateSummaryFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el resumen de puntajes y veredictos para cada grupo de casos.",
   contestNewFormLanguageRemoveBlockedWarning: "No se puede quitar \"%(language)\" de los lenguajes porque hay por lo menos un problema que lo requiere",
   contestNewFormLanguages: "Establecer lenguajes para el concurso actual",
+  contestNewFormLanguagesRequired: "Por favor selecciona al menos un lenguaje",
   contestNewFormLogistics: "Log\u00edstica (opcional)",
   contestNewFormNoPenalty: "Coders con el mismo puntaje quedar\u00e1n en empate, sin importar el tiempo que le haya tomado a cada coder.",
   contestNewFormNumberOfContestants: "N\u00famero de concursantes",
