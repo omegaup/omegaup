@@ -298,6 +298,12 @@ OmegaUp.on('ready', () => {
             ui.error(T.contestNewFormLanguagesRequired);
             this.invalidParameterName = 'languages';
           },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
+          },
           'add-problem': ({
             problem,
             isUpdate = false,

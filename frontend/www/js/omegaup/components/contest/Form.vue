@@ -867,6 +867,8 @@ export default class Form extends Vue {
 
   onSelect(language: string) {
     this.languages.push(language);
+    // Clear the languages validation error when a language is selected
+    this.$emit('clear-language-error');
   }
 
   updateTeamsGroups(query: string) {
