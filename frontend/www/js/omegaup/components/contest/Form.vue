@@ -131,17 +131,24 @@
                 <div class="form-group col-md-6">
                   <label>{{ T.wordsLanguages }}</label
                   ><br />
-                  <multiselect
-                    :value="languages"
-                    :options="Object.keys(allLanguages)"
-                    :multiple="true"
-                    :placeholder="T.contestNewFormLanguages"
-                    :close-on-select="false"
-                    :allow-empty="false"
-                    @remove="onRemove"
-                    @select="onSelect"
+                  <div
+                    :class="{
+                      'is-invalid-wrapper':
+                        invalidParameterName === 'languages',
+                    }"
                   >
-                  </multiselect>
+                    <multiselect
+                      :value="languages"
+                      :options="Object.keys(allLanguages)"
+                      :multiple="true"
+                      :placeholder="T.contestNewFormLanguages"
+                      :close-on-select="false"
+                      :allow-empty="true"
+                      @remove="onRemove"
+                      @select="onSelect"
+                    >
+                    </multiselect>
+                  </div>
                 </div>
               </div>
             </div>
@@ -770,6 +777,10 @@ export default class Form extends Vue {
   }
 
   onSubmit() {
+    if (!this.languages || this.languages.length === 0) {
+      this.$emit('invalid-languages');
+      return;
+    }
     const contest: types.ContestAdminDetails = {
       admin: true,
       admission_mode: this.update ? this.admissionMode : 'private',
@@ -856,6 +867,8 @@ export default class Form extends Vue {
 
   onSelect(language: string) {
     this.languages.push(language);
+    // Clear the languages validation error when a language is selected
+    this.$emit('clear-language-error');
   }
 
   updateTeamsGroups(query: string) {
@@ -925,5 +938,10 @@ export default class Form extends Vue {
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
 }
 </style>
