@@ -236,8 +236,6 @@ export default class ProblemStatementEdit extends Vue {
     min-height: 400px;
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
-    padding: 10px;
-    margin-bottom: 10px;
   }
 
   hr,
