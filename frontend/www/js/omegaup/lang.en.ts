@@ -977,7 +977,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCourseNew: "New course",
   omegaupTitleCourseScoreboard: "Course scoreboard",
   omegaupTitleCourseStatistics: "Course statistics",
-  omegaupTitleCourses: "Coursos",
+  omegaupTitleCourses: "Courses",
   omegaupTitleDocs: "Documentation index",
   omegaupTitleGroupScoreboardDetails: "Group scoreboard details",
   omegaupTitleGroups: "Groups",
@@ -2162,4 +2162,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };
