@@ -161,7 +161,7 @@ module.exports = {
         },
       },
       formatter: 'codeframe',
-      async: true,
+      async: false,
     }),
   ],
 
