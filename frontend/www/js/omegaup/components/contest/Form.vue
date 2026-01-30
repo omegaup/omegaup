@@ -208,7 +208,7 @@
                   ></omegaup-datetimepicker>
                   <div
                     v-if="localErrors[FieldName.FinishTime]"
-                    class="invalid-feedback d-block"
+                    class="invalid-feedback"
                   >
                     {{ localErrors[FieldName.FinishTime] }}
                   </div>
@@ -281,7 +281,7 @@
                   ></multiselect>
                   <div
                     v-if="localErrors[FieldName.Languages]"
-                    class="invalid-feedback d-block"
+                    class="invalid-feedback"
                   >
                     {{ localErrors[FieldName.Languages] }}
                   </div>
@@ -1445,13 +1445,14 @@ export default class Form extends Vue {
 }
 
 .form-control:disabled,
-.custom-control-input:disabled ~ .custom-control-label {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
+.custom-control-input:disabled ~ .custom-control-label,
 .btn:disabled {
   cursor: not-allowed;
+}
+
+.form-control:disabled,
+.custom-control-input:disabled ~ .custom-control-label {
+  opacity: 0.6;
 }
 
 .invalid-feedback {
@@ -1460,5 +1461,10 @@ export default class Form extends Vue {
 
 .alert-dismissible .close {
   padding: 0.75rem 1.25rem;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
 }
 </style>
