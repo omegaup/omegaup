@@ -1,11 +1,11 @@
 <template>
   <div class="card code-edit">
     <div class="card-body">
-      <div class="row">
-        <label class="col-sm-2 col-form-label">
+      <div class="form-group row align-items-center">
+        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
           {{ T.wordsLanguage }}
         </label>
-        <div class="col-sm-4">
+        <div class="col-12 col-sm-auto pl-sm-0">
           <select
             v-model="selectedLanguage"
             data-problem-creator-code-language
@@ -48,8 +48,7 @@
         >
           <input
             data-problem-creator-code-input
-            class="text-truncate"
-            style="max-width: 100%"
+            class="text-truncate mw-100"
             type="file"
             name="file"
             @change="handleInputFile"
