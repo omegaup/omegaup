@@ -18,6 +18,7 @@
                 (query) =>
                   $emit('update-search-result-users', { query, field: 'user1' })
               "
+              @update:value="(user) => $emit('update:selectedUser1', user)"
             ></omegaup-common-typeahead>
           </div>
           <div class="col-md-2 d-flex align-items-end justify-content-center">
@@ -34,6 +35,7 @@
                 (query) =>
                   $emit('update-search-result-users', { query, field: 'user2' })
               "
+              @update:value="(user) => $emit('update:selectedUser2', user)"
             ></omegaup-common-typeahead>
           </div>
         </div>
@@ -124,10 +126,10 @@ export default class CompareUsers extends Vue {
   @Prop({ default: false }) isLoading!: boolean;
   @Prop({ default: () => [] }) searchResultUsers1!: types.ListItem[];
   @Prop({ default: () => [] }) searchResultUsers2!: types.ListItem[];
+  @Prop({ default: null }) selectedUser1!: types.ListItem | null;
+  @Prop({ default: null }) selectedUser2!: types.ListItem | null;
 
   T = T;
-  selectedUser1: types.ListItem | null = null;
-  selectedUser2: types.ListItem | null = null;
 
   get canCompare(): boolean {
     return this.selectedUser1 !== null && this.selectedUser2 !== null;

@@ -16,20 +16,60 @@ OmegaUp.on('ready', () => {
     data: () => ({
       user1: payload.user1,
       user2: payload.user2,
+      username1: payload.username1,
+      username2: payload.username2,
       isLoading: false,
       searchResultUsers1: [] as types.ListItem[],
       searchResultUsers2: [] as types.ListItem[],
+      selectedUser1: null as types.ListItem | null,
+      selectedUser2: null as types.ListItem | null,
     }),
+    mounted() {
+      // Preload usernames from URL params to show them as chips
+      // Fetch user info to get proper name formatting (same as manual search)
+      if (this.username1) {
+        api.User.list({ query: this.username1 })
+          .then(({ results }) => {
+            const user = results.find((u) => u.key === this.username1);
+            if (user) {
+              this.selectedUser1 = {
+                key: user.key,
+                value: `${ui.escape(user.key)} (<strong>${ui.escape(
+                  user.value,
+                )}</strong>)`,
+              };
+            }
+          })
+          .catch(ui.apiError);
+      }
+      if (this.username2) {
+        api.User.list({ query: this.username2 })
+          .then(({ results }) => {
+            const user = results.find((u) => u.key === this.username2);
+            if (user) {
+              this.selectedUser2 = {
+                key: user.key,
+                value: `${ui.escape(user.key)} (<strong>${ui.escape(
+                  user.value,
+                )}</strong>)`,
+              };
+            }
+          })
+          .catch(ui.apiError);
+      }
+    },
     render: function (createElement) {
       return createElement('omegaup-user-compare', {
         props: {
           user1: this.user1,
           user2: this.user2,
-          initialUsername1: payload.username1,
-          initialUsername2: payload.username2,
+          username1: this.username1,
+          username2: this.username2,
           isLoading: this.isLoading,
           searchResultUsers1: this.searchResultUsers1,
           searchResultUsers2: this.searchResultUsers2,
+          selectedUser1: this.selectedUser1,
+          selectedUser2: this.selectedUser2,
         },
         on: {
           compare: ({
@@ -85,13 +125,31 @@ OmegaUp.on('ready', () => {
                     )}</strong>)`,
                   }),
                 );
+
+                // Exclude the user that is already selected in the other field
+                // to avoid comparing a user against themselves
+                const otherSelectedUserKey =
+                  field === 'user1'
+                    ? this.selectedUser2?.key
+                    : this.selectedUser1?.key;
+
+                const filteredResults = formattedResults.filter(
+                  (user) => user.key !== otherSelectedUserKey,
+                );
+
                 if (field === 'user1') {
-                  this.searchResultUsers1 = formattedResults;
+                  this.searchResultUsers1 = filteredResults;
                 } else {
-                  this.searchResultUsers2 = formattedResults;
+                  this.searchResultUsers2 = filteredResults;
                 }
               })
               .catch(ui.apiError);
+          },
+          'update:selectedUser1': (user: types.ListItem | null) => {
+            this.selectedUser1 = user;
+          },
+          'update:selectedUser2': (user: types.ListItem | null) => {
+            this.selectedUser2 = user;
           },
         },
       });
