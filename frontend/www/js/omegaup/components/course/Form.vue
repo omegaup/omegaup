@@ -566,7 +566,7 @@ export default class CourseDetails extends Vue {
 .character-counter {
   display: block;
   text-align: right;
-  color: var(--arena-problems-best-score-font-color, #6c757d);
+  color: var(--form-character-counter-color, #6c757d);
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
