@@ -710,7 +710,7 @@ const translations: { [key: string]: string; } = {
   createProblemInteractiveGuideType: "Choose the problem type.",
   createProblemInteractiveGuideValidator: "Select the output validator type.",
   createProblemInteractiveGuideWelcome: "Welcome, let's create a problem.",
-  createZipFileForProblem: "Create a zip file for the problem.",
+  createZipFileForProblem: "Use the Problem Creator tool",
   csrfException: "Cross-site Request Forgery attempt",
   currentStatus: "Current state",
   datePickerFormat: "mm/dd/yyyy",
