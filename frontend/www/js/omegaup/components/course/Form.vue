@@ -22,7 +22,13 @@
                 data-course-new-name
                 type="text"
                 required="required"
+                maxlength="100"
             /></label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': name.length > 90 }"
+              >{{ name.length }}/100</small
+            >
           </div>
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-short-title">
@@ -44,7 +50,13 @@
                 data-course-new-alias
                 :disabled="update || readOnly"
                 required="required"
+                maxlength="32"
             /></label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': alias.length > 28 }"
+              >{{ alias.length }}/32</small
+            >
           </div>
           <div class="form-group col-md-4 introjs-scoreboard">
             <span class="font-weight-bold"
@@ -238,8 +250,14 @@
                 }"
                 cols="30"
                 rows="5"
+                maxlength="500"
               ></textarea>
             </label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': (objective || '').length > 450 }"
+              >{{ (objective || '').length }}/500</small
+            >
           </div>
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100 introjs-description">
@@ -259,8 +277,14 @@
                 cols="30"
                 rows="5"
                 required="required"
+                maxlength="255"
               ></textarea>
             </label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': description.length > 230 }"
+              >{{ description.length }}/255</small
+            >
           </div>
         </div>
         <div v-if="!readOnly" class="row">
@@ -537,5 +561,13 @@ export default class CourseDetails extends Vue {
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
   border-color: var(--form-input-error-color);
+}
+
+.character-counter {
+  display: block;
+  text-align: right;
+  color: var(--arena-problems-best-score-font-color, #6c757d);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 </style>
