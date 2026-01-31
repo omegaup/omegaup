@@ -154,9 +154,6 @@
                       T.contestNewFormShortTitleRequired
                     }}
                   </div>
-                  <small v-if="!update" class="form-text text-muted">
-                    {{ T.contestNewFormAliasHelp }}
-                  </small>
                 </div>
               </div>
               <div class="row">
@@ -268,17 +265,23 @@
                       >*</span
                     >
                   </label>
-                  <multiselect
-                    :value="languages"
-                    :options="Object.keys(allLanguages)"
-                    :multiple="true"
-                    :placeholder="T.contestNewFormLanguages"
-                    :close-on-select="false"
-                    :allow-empty="false"
-                    :disabled="isSubmitting"
-                    @remove="onRemove"
-                    @select="onSelect"
-                  ></multiselect>
+                  <div
+                    :class="{
+                      'is-invalid-wrapper': localErrors[FieldName.Languages],
+                    }"
+                  >
+                    <multiselect
+                      :value="languages"
+                      :options="Object.keys(allLanguages)"
+                      :multiple="true"
+                      :placeholder="T.contestNewFormLanguages"
+                      :close-on-select="false"
+                      :allow-empty="false"
+                      :disabled="isSubmitting"
+                      @remove="onRemove"
+                      @select="onSelect"
+                    ></multiselect>
+                  </div>
                   <div
                     v-if="localErrors[FieldName.Languages]"
                     class="invalid-feedback"
@@ -327,15 +330,14 @@
                       class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="custom-control custom-checkbox mb-2">
-                    <input
-                      v-model="windowLengthEnabled"
-                      data-different-start-check
-                      type="checkbox"
-                      class="custom-control-input"
-                      :disabled="isSubmitting"
-                    />
-                    <label class="custom-control-label">
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="windowLengthEnabled"
+                        data-different-start-check
+                        type="checkbox"
+                        :disabled="isSubmitting"
+                      />
                       {{ T.wordsEnable }}
                     </label>
                   </div>
@@ -354,6 +356,7 @@
                     :disabled="!windowLengthEnabled || isSubmitting"
                     :placeholder="T.contestNewFormWindowLengthPlaceholder"
                     @blur="validateField(FieldName.WindowLength)"
+                    @input="clearFieldError(FieldName.WindowLength)"
                   />
                   <div
                     v-if="localErrors[FieldName.WindowLength]"
@@ -371,15 +374,14 @@
                       class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="custom-control custom-checkbox mb-2">
-                    <input
-                      v-model="currentContestForTeams"
-                      data-contest-for-teams
-                      type="checkbox"
-                      class="custom-control-input"
-                      :disabled="update || isSubmitting"
-                    />
-                    <label class="custom-control-label">
+                  <div class="checkbox">
+                    <label>
+                      <input
+                        v-model="currentContestForTeams"
+                        data-contest-for-teams
+                        type="checkbox"
+                        :disabled="update || isSubmitting"
+                      />
                       {{ T.wordsEnable }}
                     </label>
                   </div>
@@ -452,7 +454,7 @@
                   <input
                     v-model.number="scoreboard"
                     data-score-board-visible-time
-                    class="form-control"
+                    class="form-control scoreboard-time-percent"
                     :class="{
                       'is-invalid':
                         invalidParameterName === FieldName.Scoreboard ||
@@ -465,6 +467,7 @@
                     required
                     :disabled="isSubmitting"
                     @blur="validateField(FieldName.Scoreboard)"
+                    @input="clearFieldError(FieldName.Scoreboard)"
                   />
                   <div
                     v-if="localErrors[FieldName.Scoreboard]"
@@ -477,27 +480,29 @@
                   }}</small>
                 </div>
               </div>
-              <div v-if="canSetRecommended" class="row">
+              <div class="row">
                 <div class="form-group col-md-6">
                   <label>
                     {{ T.contestNewFormRecommended }}
                     <font-awesome-icon
-                      :title="T.contestNewFormRecommendedTextAdmin"
+                      :title="
+                        canSetRecommended
+                          ? T.contestNewFormRecommendedTextAdmin
+                          : T.contestNewFormRecommendedTextNonAdmin
+                      "
                       icon="info-circle"
                       class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="custom-control custom-checkbox">
+                  <div v-if="canSetRecommended" class="checkbox form-check">
                     <input
                       v-model="recommended"
                       data-recommended
-                      class="custom-control-input"
+                      class="form-check-input"
                       type="checkbox"
                       :disabled="isSubmitting"
                     />
-                    <label class="custom-control-label">
-                      {{ T.wordsEnable }}
-                    </label>
+                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
                   </div>
                 </div>
               </div>
@@ -607,6 +612,7 @@
                     required
                     :disabled="isSubmitting"
                     @blur="validateField(FieldName.SubmissionsGap)"
+                    @input="clearFieldError(FieldName.SubmissionsGap)"
                   />
                   <div
                     v-if="localErrors[FieldName.SubmissionsGap]"
@@ -681,6 +687,7 @@
                     required
                     :disabled="isSubmitting"
                     @blur="validateField(FieldName.Penalty)"
+                    @input="clearFieldError(FieldName.Penalty)"
                   />
                   <div
                     v-if="localErrors[FieldName.Penalty]"
@@ -690,7 +697,7 @@
                   </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="decay-factor">
+                  <label>
                     {{ T.contestNewFormPointDecrementFactor }}
                     <span
                       class="required-asterisk"
@@ -723,6 +730,7 @@
                     required
                     :disabled="isSubmitting"
                     @blur="validateField(FieldName.PointsDecayFactor)"
+                    @input="clearFieldError(FieldName.PointsDecayFactor)"
                   />
                   <div
                     v-if="localErrors[FieldName.PointsDecayFactor]"
@@ -765,21 +773,21 @@
                       class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="custom-control custom-checkbox">
+                  <div class="checkbox form-check">
                     <input
                       v-model="needsBasicInformation"
                       data-basic-information-required
-                      class="custom-control-input"
+                      class="form-check-input"
                       type="checkbox"
                       :disabled="isSubmitting"
                     />
-                    <label class="custom-control-label" for="needs-basic-info">
+                    <label class="form-check-label">
                       {{ T.wordsEnable }}
                     </label>
                   </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="user-info">
+                  <label>
                     {{ T.contestNewFormUserInformationRequired }}
                     <font-awesome-icon
                       :title="T.contestNewFormUserInformationRequiredDesc"
@@ -838,6 +846,7 @@ import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
@@ -851,7 +860,6 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { displayStatus, MessageType } from '../../ui';
 import { isValidAlias } from '../../validators';
 library.add(fas);
 
@@ -876,12 +884,12 @@ export enum FieldName {
   Description = 'description',
   Languages = 'languages',
   Scoreboard = 'scoreboard',
-  SubmissionsGap = 'submissionsGap',
+  SubmissionsGap = 'submissions_gap',
   Penalty = 'penalty',
-  PointsDecayFactor = 'pointsDecayFactor',
-  WindowLength = 'windowLength',
-  FinishTime = 'finishTime',
-  TeamsGroup = 'teamsGroup',
+  PointsDecayFactor = 'points_decay_factor',
+  WindowLength = 'window_length',
+  FinishTime = 'finish_time',
+  TeamsGroup = 'teams_group_alias',
 }
 
 export enum SectionName {
@@ -1303,12 +1311,9 @@ export default class Form extends Vue {
     if (!this.validateForm()) {
       const errorsList = Object.values(this.localErrors)
         .filter(Boolean)
-        .map((error) => `- ${error}`)
-        .join('\n');
-      displayStatus({
-        message: `**${T.formValidationSummaryTitle}**\n${errorsList}`,
-        type: MessageType.Danger,
-      });
+        .map((error) => `<li>${error}</li>`)
+        .join('');
+      ui.error(`**${T.formValidationSummaryTitle}**<ul>${errorsList}</ul>`);
 
       this.$nextTick(() => {
         const firstInvalid = document.querySelector('.is-invalid');
@@ -1321,6 +1326,11 @@ export default class Form extends Vue {
 
     this.isSubmitting = true;
 
+    if (!this.languages || this.languages.length === 0) {
+      this.$emit('invalid-languages');
+      this.isSubmitting = false;
+      return;
+    }
     const contest: types.ContestAdminDetails = {
       admin: true,
       admission_mode: this.update ? this.admissionMode : 'private',
@@ -1414,6 +1424,8 @@ export default class Form extends Vue {
   onSelect(language: string) {
     this.languages.push(language);
     this.hasFormChanged = true;
+    this.clearFieldError(FieldName.Languages);
+    this.$emit('clear-language-error');
   }
 
   updateTeamsGroups(query: string) {
@@ -1457,10 +1469,6 @@ export default class Form extends Vue {
 
 .invalid-feedback {
   display: block;
-}
-
-.alert-dismissible .close {
-  padding: 0.75rem 1.25rem;
 }
 
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
