@@ -37,6 +37,7 @@ OmegaUp.on('ready', () => {
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
       certificatesDetails: payload.certificatesDetails,
+      invalidParameterName: null as null | string,
     }),
     methods: {
       arbitrateRequest: (
@@ -172,6 +173,7 @@ OmegaUp.on('ready', () => {
           teamsGroup: this.teamsGroup,
           originalContestAdmissionMode: payload.original_contest_admission_mode,
           certificatesDetails: this.certificatesDetails,
+          invalidParameterName: this.invalidParameterName,
         },
         on: {
           'update-search-result-problems': ({
@@ -284,11 +286,23 @@ OmegaUp.on('ready', () => {
                   };
                 }
                 this.details.title = data.title;
-                ui.success(`
-                  ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
-                `);
+                ui.success(
+                  ui.formatString(T.contestEditContestEdited, {
+                    alias: contest.alias,
+                  }),
+                );
               })
               .catch(ui.apiError);
+          },
+          'invalid-languages': () => {
+            ui.error(T.contestNewFormLanguagesRequired);
+            this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
           'add-problem': ({
             problem,
@@ -401,9 +415,11 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 contestEdit.details.admission_mode = admissionMode;
                 contestEdit.details.default_show_all_contestants_in_scoreboard = defaultShowAllContestantsInScoreboard;
-                ui.success(`
-                  ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
-                `);
+                ui.success(
+                  ui.formatString(T.contestEditContestEdited, {
+                    alias: payload.details.alias,
+                  }),
+                );
                 this.refreshDetails();
                 if (admissionMode === 'registration') {
                   this.refreshRequests();

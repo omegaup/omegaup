@@ -125,20 +125,17 @@
             </template>
             <template v-else>
               <form class="collapse-submenu">
-                <div class="btn-group d-flex">
-                  <span class="dropdown-item">
-                    {{ T.myproblemsListCreateProblem }}
-                  </span>
-                  <button
-                    type="button"
-                    class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
-                    data-toggle="collapse"
-                    data-target=".collapse-links"
-                    data-nav-problems-create-options
-                    aria-expanded="false"
-                    aria-controls="collapse-links"
-                  ></button>
-                </div>
+                <button
+                  type="button"
+                  class="dropdown-item dropdown-toggle"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
+                  data-nav-problems-create-options
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
+                >
+                  {{ T.myproblemsListCreateProblem }}
+                </button>
                 <div class="collapse collapse-links pl-3">
                   <a class="dropdown-item" href="/problem/creator/">{{
                     T.myproblemsListCreateZipFileProblem
@@ -174,6 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>
@@ -202,7 +202,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
@@ -227,6 +227,14 @@
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://hdl.handle.net/11059/16567"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navCompetitiveProgrammingDataStructuresBook }}
+          </a>
         </div>
       </li>
     </ul>

@@ -106,8 +106,6 @@ abstract class CacheAdapter {
             }
             return $returnValue;
         }
-        $log = \Monolog\Registry::omegaup()->withName('cache');
-
         // Get a lock to prevent multiple requests from trying to create the
         // same cache entry. The name of the lockfile is derived from the
         // provided lock group, not the full key, since it is still preferred
@@ -116,7 +114,7 @@ abstract class CacheAdapter {
         // independent caches can still make progress.
         //
         // This is preferred over apcu_entry() because that function grabs a
-        // *global* lock that blocks evey single APCu function call!
+        // *global* lock that blocks every single APCu function call!
         $lockFile = '/tmp/omegaup-cache-' . sha1($lockGroup) . '.lock';
 
         $f = fopen($lockFile, 'w');
@@ -135,11 +133,9 @@ abstract class CacheAdapter {
             }
 
             // Get the value from the function provided
-            $log->info('Calling $setFunc');
             /** @var T */
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
-            $log->info('Committed value');
 
             if (!is_null($cacheUsed)) {
                 $cacheUsed = false;
@@ -534,6 +530,7 @@ class Cache {
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SOLUTION = 'solution-';
+    const PROBLEM_CDP_DATA = 'problem-cdp-data-';
     const PROBLEM_SOLUTION_EXISTS = 'solution-exists-';
     const PROBLEM_STATS = 'problem-stats-';
     const PROBLEMS_LIST = 'problems-list-';
@@ -541,6 +538,7 @@ class Cache {
     const RUN_COUNTS = 'run-counts-';
     const RUN_TOTAL_COUNTS = 'run-total-counts';
     const USER_PROFILE = 'profile-';
+    const USER_COMPARE_DATA = 'user-compare-data-';
     const PROBLEMS_SOLVED_RANK = 'problems-solved-rank-';
     const CONTESTS_LIST_PUBLIC = 'contest-list-public';
     const CONTESTS_CONTESTANTS_LIST = 'contest-contestants-list';
@@ -618,7 +616,7 @@ class Cache {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
-            $this->log->warning(
+            $this->log->debug(
                 "Failed to invalidate cache for key: {$this->key}"
             );
             return false;
@@ -640,7 +638,7 @@ class Cache {
         /** @var false|mixed */
         $result = CacheAdapter::getInstance()->fetch($this->key);
         if ($result === false) {
-            $this->log->info("Cache miss for key: {$this->key}");
+            $this->log->debug("Cache miss for key: {$this->key}");
             return null;
         }
         $this->log->debug("Cache hit for key: {$this->key}");
