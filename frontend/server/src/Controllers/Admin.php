@@ -146,9 +146,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: AdminSettingsPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @psalm-type AdminSettingsPayload=array{}
+     * @return array{entrypoint: string, templateProperties: array{payload: array<string, mixed>, title: \OmegaUp\TranslationString}}
      */
     public static function getSettingsForTypeScript(
         \OmegaUp\Request $r

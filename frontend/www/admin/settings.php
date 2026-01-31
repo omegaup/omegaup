@@ -5,7 +5,7 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectIfNoAdmin();
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Admin::getSettingsForTypeScript(
-        $r
-    )
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\Admin::getSettingsForTypeScript($r);
+    }
 );
