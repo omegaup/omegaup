@@ -1,6 +1,9 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
+    <nav
+      class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right"
+      data-enable-hover-dropdown
+    >
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
@@ -42,7 +45,7 @@
                 data-login-button
                 @click.prevent="emitActiveTab(AvailableTabs.Login)"
               >
-                {{ T.omegaupTitleLogin }}
+                {{ T.navbarLogin }}
               </a>
               <span class="nav-link nav-login-text px-1">/</span>
               <a
@@ -51,7 +54,7 @@
                 data-signup-button
                 @click.prevent="emitActiveTab(AvailableTabs.Signup)"
               >
-                {{ T.loginSignUp }}
+                {{ T.navbarRegister }}
               </a>
             </li>
           </ul>
@@ -150,7 +153,10 @@
                     >
                       <font-awesome-icon :icon="['fas', 'user']" />
                       {{ T.navViewProfile }}
-                      <div v-if="profileProgress !== 0" class="progress mt-2">
+                      <div
+                        v-if="profileProgress !== 0"
+                        class="progress mt-2 position-relative"
+                      >
                         <div
                           class="progress-bar progress-bar-striped bg-info"
                           role="progressbar"
@@ -159,6 +165,9 @@
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
+                        <small class="progress-text">
+                          {{ profileProgress.toFixed(1) }}%
+                        </small>
                       </div>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -410,6 +419,7 @@ export default class Navbar extends Vue {
 
   T = T;
   ui = ui;
+  AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>

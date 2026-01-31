@@ -940,6 +940,8 @@ const translations: { [key: string]: string; } = {
   navViewProblems: "Procurar Problemas",
   navViewProblemsAll: "Lista de Problemas",
   navViewProfile: "Meu perfil",
+  navbarLogin: "Entrar",
+  navbarRegister: "Inscrever-se",
   newPublicTagsNotAllowed: "N\u00e3o \u00e9 permitido adicionar novos tags p\u00fablicos",
   noChangesDetected: "Nenhuma altera\u00e7\u00e3o foi detectada",
   noCoders: "Nenhum programador.",
