@@ -17,7 +17,7 @@
         </p>
         <p>
           <span class="font-weight-bold">{{ T.wordsDescription }}: </span>
-          <omegaup-markdown :markdown="course.description"></omegaup-markdown>
+          <span>{{ course.description }}</span>
         </p>
         <li
           v-for="assignment of course.assignments"
