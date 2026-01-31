@@ -186,7 +186,7 @@
         <template v-if="problem.accepts_submissions">
           <div class="d-none d-sm-block">
             <omegaup-arena-ephemeral-grader
-              v-if="!problem.karel_problem"
+              v-if="!problem.karel_problem && problem.ephemeralGraderEnabled"
               :problem="problem"
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"

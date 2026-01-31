@@ -3016,6 +3016,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 intval($loggedIdentity->identity_id)
             );
         }
+
+        // Add ephemeral grader enabled status
+        $response['ephemeralGraderEnabled'] = \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+            'ephemeral_grader_enabled',
+            true
+        );
+
         return $response;
     }
 

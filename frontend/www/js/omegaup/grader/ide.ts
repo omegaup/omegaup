@@ -14,6 +14,13 @@ OmegaUp.on('ready', () => {
   main.style.flex = '1 1 auto';
 
   const payload = types.payloadParsers.FullIDEPayload();
+
+  if (!payload.ephemeralGraderEnabled) {
+    main.innerHTML =
+      '<div class="alert alert-danger" role="alert">Ephemeral Grader is currently disabled.</div>';
+    return;
+  }
+
   const acceptedLanguages = payload.acceptedLanguages;
   const preferredLanguage = payload.preferredLanguage || acceptedLanguages[0];
 

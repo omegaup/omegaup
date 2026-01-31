@@ -79,7 +79,7 @@
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
           <omegaup-arena-ephemeral-grader
-            v-if="!problem.karel_problem"
+            v-if="!problem.karel_problem && problem.ephemeralGraderEnabled"
             :problem="problem"
             :can-submit="false"
             :accepted-languages="filteredLanguages"

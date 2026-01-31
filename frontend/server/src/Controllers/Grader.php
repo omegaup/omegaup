@@ -6,7 +6,7 @@
  * Description of GraderController
  *
  * @psalm-type GraderStatus=array{status: string, broadcaster_sockets: int, embedded_runner: bool, queue: array{running: list<array{name: string, id: int}>, run_queue_length: int, runner_queue_length: int, runners: list<string>}}
- * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string}
+ * @psalm-type FullIDEPayload=array{acceptedLanguages: list<string>, preferredLanguage: null | string, ephemeralGraderEnabled: bool}
  */
 class Grader extends \OmegaUp\Controllers\Controller {
     /**
@@ -38,6 +38,16 @@ class Grader extends \OmegaUp\Controllers\Controller {
             // do nothing
         }
 
+        // Check if ephemeral grader is enabled
+        $ephemeralGraderEnabled = \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+            'ephemeral_grader_enabled',
+            true
+        );
+
+        if (!$ephemeralGraderEnabled) {
+            throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
+        }
+
         $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
             $r->user?->user_id
         );
@@ -52,6 +62,7 @@ class Grader extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'acceptedLanguages' => \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES(),
                     'preferredLanguage' => $preferredLanguage,
+                    'ephemeralGraderEnabled' => $ephemeralGraderEnabled,
                 ],
             ],
             'entrypoint' => 'grader_ide',
