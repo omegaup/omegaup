@@ -1,7 +1,9 @@
 - [ACL](#acl)
   - [`/api/aCL/userOwnedAclReport/`](#apiacluserownedaclreport)
 - [Admin](#admin)
+  - [`/api/admin/getSystemSettings/`](#apiadmingetsystemsettings)
   - [`/api/admin/platformReportStats/`](#apiadminplatformreportstats)
+  - [`/api/admin/updateSystemSettings/`](#apiadminupdatesystemsettings)
 - [AiEditorial](#aieditorial)
   - [`/api/aiEditorial/generate/`](#apiaieditorialgenerate)
   - [`/api/aiEditorial/review/`](#apiaieditorialreview)
@@ -304,6 +306,18 @@ Returns all ACLs owned by the current user along with assigned roles for each.
 
 # Admin
 
+## `/api/admin/getSystemSettings/`
+
+### Description
+
+Get system settings for admins
+
+### Returns
+
+| Name       | Type                                   |
+| ---------- | -------------------------------------- |
+| `settings` | `{ ephemeralGraderEnabled: boolean; }` |
+
 ## `/api/admin/platformReportStats/`
 
 ### Description
@@ -322,6 +336,22 @@ Get stats for an overall platform report.
 | Name     | Type                                                                                                                                                                                                     |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `report` | `{ acceptedSubmissions: number; activeSchools: number; activeUsers: { [key: string]: number; }; courses: number; omiCourse: { attemptedUsers: number; completedUsers: number; passedUsers: number; }; }` |
+
+## `/api/admin/updateSystemSettings/`
+
+### Description
+
+Update system settings
+
+### Parameters
+
+| Name                       | Type         | Description | Required |
+| -------------------------- | ------------ | ----------- | -------- |
+| `ephemeral_grader_enabled` | `bool\|null` |             |          |
+
+### Returns
+
+_Nothing_
 
 # AiEditorial
 
