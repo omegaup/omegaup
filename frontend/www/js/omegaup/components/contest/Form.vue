@@ -1308,6 +1308,9 @@ export default class Form extends Vue {
   }
 
   onSubmit() {
+    if (this.update) {
+      this.$emit('update-contest');
+    }
     if (!this.validateForm()) {
       const errorsList = Object.values(this.localErrors)
         .filter(Boolean)

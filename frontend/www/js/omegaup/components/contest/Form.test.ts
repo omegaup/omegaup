@@ -1,7 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
+
 import T from '../../lang';
-import contest_Form, { ScoreMode } from './Form.vue';
+
+import contest_Form from './Form.vue';
+
 import { Multiselect } from 'vue-multiselect';
+
 import { types } from '../../api_types';
 
 describe('Form.vue', () => {
@@ -14,7 +18,7 @@ describe('Form.vue', () => {
   afterAll(() => {
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
-      document.body.removeChild(rootDiv);
+      document.removeChild(rootDiv);
     }
   });
 
@@ -34,11 +38,12 @@ describe('Form.vue', () => {
       T.contestNew,
     );
 
-    await wrapper.setData({
+    const contest = {
       alias: 'contestAlias',
       title: 'Contest Title',
       description: 'Contest description.',
-    });
+    };
+    await wrapper.setData(contest);
 
     expect(wrapper.find('form button[type="submit"]').text()).toBe(
       T.contestNewFormScheduleContest,
@@ -46,16 +51,14 @@ describe('Form.vue', () => {
   });
 
   it('Should handle edit contest form', async () => {
-    const start = new Date();
-    const finish = new Date(start.getTime() + 60 * 60 * 1000); // +1 hour
     const wrapper = shallowMount(contest_Form, {
       attachTo: '#root',
       propsData: {
         update: true,
         allLanguages: [{ py2: 'Python 2' }, { py3: 'Python 3' }],
         initialLanguages: ['py2'],
-        initialStartTime: start,
-        initialFinishTime: finish,
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
         initialSubmissionsGap: 1,
         initialAlias: 'contestAlias',
         initialTitle: 'Contest Title',
@@ -120,10 +123,7 @@ describe('Form.vue', () => {
     wrapper.destroy();
   });
 
-  it('Should update score mode when presets change', async () => {
-    const start = new Date();
-    const finish = new Date(start.getTime() + 60 * 60 * 1000);
-
+  it('Should update score mode when', async () => {
     const wrapper = shallowMount(contest_Form, {
       propsData: {
         update: true,
@@ -133,8 +133,8 @@ describe('Form.vue', () => {
           { cat: 'cat' },
         ],
         initialLanguages: ['py2', 'cat'],
-        initialStartTime: start,
-        initialFinishTime: finish,
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
         initialSubmissionsGap: 1,
         initialAlias: 'contestAlias',
         initialTitle: 'Contest Title',
@@ -143,14 +143,14 @@ describe('Form.vue', () => {
       },
     });
 
-    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
     await wrapper.find('[data-contest-icpc]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.AllOrNothing);
+    expect(wrapper.vm.currentScoreMode).toBe('all_or_nothing');
     await wrapper.find('[data-contest-preioi]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
     await wrapper.find('[data-contest-omi]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
     await wrapper.find('[data-contest-conacup]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
+    expect(wrapper.vm.currentScoreMode).toBe('partial');
   });
 });
