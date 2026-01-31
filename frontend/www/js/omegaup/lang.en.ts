@@ -617,6 +617,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormLanguagesRequired: "Please select at least one language",
   courseNewFormLevel: "Level",
   courseNewFormLevelDesc: "The course's difficulty level.",
+  courseNewFormLevelPlaceholder: "Select a level",
   courseNewFormObjective: "Objective",
   courseNewFormObjectiveDesc: "Describe what your students will learn in this course.",
   courseNewFormScheduleCourse: "Schedule course",
