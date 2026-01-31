@@ -20,7 +20,7 @@
     <div v-if="!isIndex" class="card-body">
       <div class="form-row mb-2">
         <omegaup-common-typeahead
-          class="col col-md-3 pl-0 pr-2"
+          class="col col-md-4 pl-0 pr-2"
           :existing-options="searchResultUsers"
           :value.sync="searchedUsername"
           :max-results="10"
@@ -38,7 +38,7 @@
         <template v-if="Object.keys(availableFilters).length > 0">
           <select
             v-model="currentFilter"
-            class="filter form-control col-12 col-md-5 mt-2 mt-md-0"
+            class="filter form-control col-12 col-md-4 mt-2 mt-md-0"
           >
             <option value="">
               {{ T.wordsSelectFilter }}
@@ -370,6 +370,7 @@ export default class UserRank extends Vue {
 
 [data-user-rank] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
+  overflow: hidden;
 }
 
 [data-user-rank] {
