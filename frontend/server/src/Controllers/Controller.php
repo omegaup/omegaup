@@ -142,38 +142,102 @@ class Controller {
         array $properties
     ): bool {
         $importantChange = false;
+
         foreach ($properties as $source => $info) {
-            /** @var null|callable(mixed):mixed */
-            $transform = null;
-            $important = false;
-            if (is_int($source)) {
-                $fieldName = $info;
-            } else {
-                $fieldName = $source;
-                if (isset($info['transform'])) {
-                    $transform = $info['transform'];
-                }
-                if (isset($info['important']) && $info['important'] === true) {
-                    $important = $info['important'];
-                }
-            }
-            if (is_null($request[$fieldName])) {
+            $propertyConfig = self::parsePropertyConfiguration($source, $info);
+
+            if (is_null($request[$propertyConfig['fieldName']])) {
                 continue;
             }
-            // Get or calculate new value.
-            /** @var null|mixed */
-            $value = $request[$fieldName];
-            if (!is_null($transform)) {
-                /** @var mixed */
-                $value = $transform($value);
+
+            $value = self::getTransformedValue(
+                $request[$propertyConfig['fieldName']],
+                $propertyConfig['transform']
+            );
+
+            if (
+                self::isImportantChange(
+                    $propertyConfig['important'],
+                    $importantChange,
+                    $value,
+                    $object,
+                    $propertyConfig['fieldName']
+                )
+            ) {
+                $importantChange = true;
             }
-            // Important property, so check if it changes.
-            if ($important && !$importantChange) {
-                $importantChange = ($value != $object->$fieldName);
-            }
-            $object->$fieldName = $value;
+
+            $object->{$propertyConfig['fieldName']} = $value;
         }
+
         return $importantChange;
+    }
+
+    /**
+     * Parse property configuration from properties array
+     *
+     * @param int|string $source
+     * @param string|array{transform?: callable(mixed):mixed, important?: bool} $info
+     * @return array{fieldName: string, transform: null|callable(mixed):mixed, important: bool}
+     */
+    private static function parsePropertyConfiguration($source, $info): array {
+        $transform = null;
+        $important = false;
+
+        if (is_int($source)) {
+            $fieldName = $info;
+        } else {
+            $fieldName = $source;
+            if (isset($info['transform'])) {
+                $transform = $info['transform'];
+            }
+            if (isset($info['important']) && $info['important'] === true) {
+                $important = $info['important'];
+            }
+        }
+
+        return [
+            'fieldName' => $fieldName,
+            'transform' => $transform,
+            'important' => $important,
+        ];
+    }
+
+    /**
+     * Get transformed value using transform function if provided
+     *
+     * @param mixed $value
+     * @param null|callable(mixed):mixed $transform
+     * @return mixed
+     */
+    private static function getTransformedValue($value, ?callable $transform) {
+        if (is_null($transform)) {
+            return $value;
+        }
+        return $transform($value);
+    }
+
+    /**
+     * Check if this is an important property change
+     *
+     * @param bool $important
+     * @param bool $importantChange
+     * @param mixed $value
+     * @param object $object
+     * @param string $fieldName
+     * @return bool
+     */
+    private static function isImportantChange(
+        bool $important,
+        bool $importantChange,
+        $value,
+        object $object,
+        string $fieldName
+    ): bool {
+        if (!$important || $importantChange) {
+            return false;
+        }
+        return $value != $object->$fieldName;
     }
 
     public static function ensureNotInLockdown(): void {
