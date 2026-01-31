@@ -477,7 +477,7 @@ export default class CourseDetails extends Vue {
     this.$emit('submit', request);
   }
 
-  onSelect(_language: string): void {
+  onSelect(): void {
     // Clear the languages validation error when a language is selected
     this.$emit('clear-language-error');
   }
