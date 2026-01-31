@@ -36,7 +36,7 @@ OmegaUp.on('ready', () => {
       initialTab: window.location.hash
         ? window.location.hash.substring(1)
         : 'course',
-      invalidParameterName: '',
+      invalidParameterName: null as null | string,
       token: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
@@ -634,6 +634,12 @@ OmegaUp.on('ready', () => {
           'invalid-languages': () => {
             ui.error(T.courseNewFormLanguagesRequired);
             this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
         },
         ref: 'component',

@@ -197,6 +197,7 @@
                 :placeholder="T.courseNewFormLanguages"
                 :close-on-select="false"
                 :allow-empty="true"
+                @select="onSelect"
               >
               </vue-multiselect>
             </div>
@@ -474,6 +475,11 @@ export default class CourseDetails extends Vue {
       request.level = this.level;
     }
     this.$emit('submit', request);
+  }
+
+  onSelect(language: string): void {
+    // Clear the languages validation error when a language is selected
+    this.$emit('clear-language-error');
   }
 
   @Emit('emit-cancel')
