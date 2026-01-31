@@ -20,7 +20,109 @@ jobs:
             issues: write
             pull-requests: write
         steps:
-            - name: Assign or unassign issues
+            - name: Check for experienced issue creator exception
+              id: pre_check
+              if: github.event_name == 'issue_comment'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const comment = context.payload.comment.body.trim();
+                      const commenter = context.payload.comment.user.login;
+                      const issue = context.payload.issue;
+                      
+                      if (comment !== '/assign') {
+                          core.setOutput('handled', 'false');
+                          return;
+                      }
+                      
+                      const isIssueCreator = issue.user.login === commenter;
+                      if (!isIssueCreator) {
+                          core.setOutput('handled', 'false');
+                          return;
+                      }
+                      
+                      const currentAssignees = issue.assignees.map(a => a.login);
+                      if (currentAssignees.includes(commenter)) {
+                          await github.rest.issues.createComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: issue.number,
+                              body: `@${commenter} You are already assigned to this issue.`
+                          });
+                          core.setOutput('handled', 'true');
+                          return;
+                      }
+                      
+                      const REQUIRED_APPROVED_PRS = 10;
+                      let approvedPRCount = 0;
+                      let cursor = null;
+                      let hasNextPage = true;
+                      const MAX_PRS_TO_QUERY = 200;
+                      let totalPRsQueried = 0;
+                      
+                      while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS && totalPRsQueried < MAX_PRS_TO_QUERY) {
+                          const result = await github.graphql(`
+                              query($owner: String!, $repo: String!, $author: String!, $cursor: String) {
+                                  repository(owner: $owner, name: $repo) {
+                                      pullRequests(
+                                          first: 50
+                                          author: $author
+                                          states: [MERGED]
+                                          after: $cursor
+                                          orderBy: {field: UPDATED_AT, direction: DESC}
+                                      ) {
+                                          pageInfo { hasNextPage endCursor }
+                                          nodes {
+                                              id
+                                          }
+                                      }
+                                  }
+                              }
+                          `, {
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              author: commenter,
+                              cursor
+                          });
+                          
+                          const prs = result.repository.pullRequests;
+                          totalPRsQueried += prs.nodes.length;
+                          approvedPRCount += prs.nodes.length;
+                          hasNextPage = prs.pageInfo.hasNextPage;
+                          cursor = prs.pageInfo.endCursor;
+                      }
+                      
+                      if (approvedPRCount >= REQUIRED_APPROVED_PRS) {
+                          try {
+                              await github.rest.issues.addAssignees({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  assignees: [commenter]
+                              });
+                              
+                              await github.rest.issues.createComment({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  body: `Assigned to @${commenter}!\n\n` +
+                                        `As an experienced contributor (${approvedPRCount} merged PRs) working on your own issue, ` +
+                                        `you're exempt from the standard 5-assignment limit. Please open a pull request within 7 days. ` +
+                                        `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
+                              });
+                              
+                              core.setOutput('handled', 'true');
+                          } catch (error) {
+                              core.setOutput('handled', 'false');
+                          }
+                          return;
+                      }
+                      
+                      core.setOutput('handled', 'false');
+
+            - name: Assign or unassign issues (standard flow)
+              if: github.event_name != 'issue_comment' || steps.pre_check.outputs.handled != 'true'
               uses: takanome-dev/assign-issue-action@beta
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
