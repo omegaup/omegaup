@@ -1,6 +1,7 @@
 <template>
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <form
+      ref="submitForm"
       data-run-submit
       class="d-flex flex-column h-100"
       @submit.prevent="onSubmit"
@@ -11,8 +12,9 @@
         </label>
         <div class="col-sm-4">
           <select
+            ref="languageSelector"
             v-model="selectedLanguage"
-            class="form-control"
+            class="form-control introjs-language-selector"
             name="language"
           >
             <option
@@ -36,7 +38,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="h-100">
+      <div ref="codeEditorWrapper" class="h-100 introjs-code-editor">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -49,12 +51,18 @@
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" class="w-100" type="file" name="file" />
+          <input
+            ref="inputFile"
+            class="w-100 introjs-file-upload"
+            type="file"
+            name="file"
+          />
         </div>
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
           <button
+            ref="submitButton"
             type="submit"
             class="btn btn-primary"
             data-submit-run
@@ -89,6 +97,8 @@ import {
   supportedExtensions,
   supportedLanguages,
 } from '../../grader/util';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -98,6 +108,10 @@ import {
 })
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
+  @Ref() submitForm!: HTMLFormElement;
+  @Ref() languageSelector!: HTMLSelectElement;
+  @Ref() codeEditorWrapper!: HTMLDivElement;
+  @Ref() submitButton!: HTMLButtonElement;
   @Prop() languages!: string[];
   @Prop({ required: true }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
@@ -108,6 +122,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+  private introJsInstance: introJs.IntroJs | null = null;
 
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
@@ -230,6 +245,216 @@ export default class ArenaRunSubmitPopup extends Vue {
     this.code = '';
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
+  }
+
+  private hasTutorialBeenDismissed(): boolean {
+    try {
+      return (
+        localStorage.getItem('omegaup.submission.tutorial.dismissed') === 'true'
+      );
+    } catch (e) {
+      // Private browsing mode or localStorage disabled
+      return false;
+    }
+  }
+
+  private markTutorialAsDismissed(): void {
+    try {
+      localStorage.setItem('omegaup.submission.tutorial.dismissed', 'true');
+    } catch (e) {
+      // Private browsing mode or localStorage disabled
+    }
+  }
+
+  private isElementVisible(element: Element | null): boolean {
+    if (!element) {
+      return false;
+    }
+    const rect = element.getBoundingClientRect();
+    return (
+      rect.width > 0 &&
+      rect.height > 0 &&
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+
+  private launchTutorial(): void {
+    if (this.hasTutorialBeenDismissed() || this.introJsInstance !== null) {
+      return;
+    }
+
+    // Wait for DOM and async editor mount - use multiple attempts
+    const attemptLaunch = (attempt: number, maxAttempts: number = 15): void => {
+      if (this.hasTutorialBeenDismissed() || this.introJsInstance !== null) {
+        return;
+      }
+
+      // Try to get elements using refs first (most reliable)
+      let languageSelectorEl: Element | null = this.languageSelector || null;
+      let codeEditorEl: Element | null = this.codeEditorWrapper || null;
+      let fileUploadEl: Element | null = this.inputFile || null;
+      let submitButtonEl: Element | null = this.submitButton || null;
+
+      // If refs are not available, try querySelector within form
+      if (!languageSelectorEl && this.submitForm) {
+        languageSelectorEl = this.submitForm.querySelector(
+          '.introjs-language-selector',
+        );
+      }
+      if (!codeEditorEl && this.submitForm) {
+        codeEditorEl =
+          this.submitForm.querySelector('.introjs-code-editor') ||
+          this.submitForm.querySelector('[data-code-mirror]');
+      }
+      if (!fileUploadEl && this.submitForm) {
+        fileUploadEl = this.submitForm.querySelector('.introjs-file-upload');
+      }
+      if (!submitButtonEl && this.submitForm) {
+        submitButtonEl = this.submitForm.querySelector('[data-submit-run]');
+      }
+
+      // Final fallback: document-wide search (for overlay popups in portal)
+      // Search within overlay popup container first
+      const overlayPopup = document.querySelector('[data-overlay-popup]');
+      if (overlayPopup) {
+        if (!languageSelectorEl) {
+          languageSelectorEl = overlayPopup.querySelector(
+            '.introjs-language-selector',
+          );
+        }
+        if (!codeEditorEl) {
+          codeEditorEl =
+            overlayPopup.querySelector('.introjs-code-editor') ||
+            overlayPopup.querySelector('[data-code-mirror]');
+        }
+        if (!fileUploadEl) {
+          fileUploadEl = overlayPopup.querySelector('.introjs-file-upload');
+        }
+        if (!submitButtonEl) {
+          submitButtonEl = overlayPopup.querySelector('[data-submit-run]');
+        }
+      }
+
+      // Last resort: document-wide search
+      if (!languageSelectorEl) {
+        languageSelectorEl = document.querySelector(
+          '.introjs-language-selector',
+        );
+      }
+      if (!codeEditorEl) {
+        codeEditorEl =
+          document.querySelector('.introjs-code-editor') ||
+          document.querySelector('[data-code-mirror]');
+      }
+      if (!fileUploadEl) {
+        fileUploadEl = document.querySelector('.introjs-file-upload');
+      }
+      if (!submitButtonEl) {
+        submitButtonEl = document.querySelector('[data-submit-run]');
+      }
+
+      // Check if overlay popup is visible
+      const overlayVisible =
+        overlayPopup &&
+        this.isElementVisible(overlayPopup) &&
+        window.getComputedStyle(overlayPopup).display !== 'none';
+
+      // If all elements are found and visible, or we've exhausted attempts, proceed
+      if (
+        (languageSelectorEl &&
+          codeEditorEl &&
+          fileUploadEl &&
+          submitButtonEl &&
+          overlayVisible) ||
+        attempt >= maxAttempts
+      ) {
+        const steps: introJs.Step[] = [
+          {
+            title: T.arenaRunSubmitTutorialTitle,
+            intro: T.arenaRunSubmitTutorialWelcome,
+          },
+          {
+            element: languageSelectorEl || undefined,
+            title: T.arenaRunSubmitTutorialLanguageTitle,
+            intro: T.arenaRunSubmitTutorialLanguageIntro,
+          },
+          {
+            element: codeEditorEl || undefined,
+            title: T.arenaRunSubmitTutorialEditorTitle,
+            intro: T.arenaRunSubmitTutorialEditorIntro,
+          },
+          {
+            element: fileUploadEl || undefined,
+            title: T.arenaRunSubmitTutorialUploadTitle,
+            intro: T.arenaRunSubmitTutorialUploadIntro,
+          },
+          {
+            element: submitButtonEl || undefined,
+            title: T.arenaRunSubmitTutorialSubmitTitle,
+            intro: T.arenaRunSubmitTutorialSubmitIntro,
+          },
+        ];
+
+        // Filter out steps if target DOM element is missing
+        const validSteps = steps.filter((step) => {
+          if (!step.element) {
+            return true; // Keep steps without element (welcome step)
+          }
+          return step.element !== null;
+        });
+
+        if (validSteps.length <= 1) {
+          // Only welcome step, skip tutorial
+          return;
+        }
+
+        this.introJsInstance = introJs()
+          .setOptions({
+            nextLabel: T.interactiveGuideNextButton,
+            prevLabel: T.interactiveGuidePreviousButton,
+            doneLabel: T.interactiveGuideDoneButton,
+            steps: validSteps,
+            exitOnOverlayClick: true,
+            exitOnEsc: true,
+          })
+          .onexit(() => {
+            this.markTutorialAsDismissed();
+            this.introJsInstance = null;
+          })
+          .oncomplete(() => {
+            this.markTutorialAsDismissed();
+            this.introJsInstance = null;
+          })
+          .start();
+      } else {
+        // Retry after a short delay
+        setTimeout(() => {
+          attemptLaunch(attempt + 1, maxAttempts);
+        }, 300);
+      }
+    };
+
+    // Wait for overlay to be visible and DOM to be ready
+    this.$nextTick(() => {
+      // Additional delay to ensure overlay popup is fully rendered
+      setTimeout(() => {
+        attemptLaunch(1);
+      }, 500);
+    });
+  }
+
+  mounted(): void {
+    this.launchTutorial();
+  }
+
+  beforeDestroy(): void {
+    if (this.introJsInstance !== null) {
+      this.introJsInstance.exit();
+      this.introJsInstance = null;
+    }
   }
 }
 </script>
