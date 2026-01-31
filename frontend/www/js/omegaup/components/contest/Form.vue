@@ -4,30 +4,70 @@
       <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
+      <!-- Style Presets -->
       <div class="btn-group d-block mb-3 text-center introjs-style">
-        <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
+        <button
+          class="btn btn-secondary"
+          data-contest-omi
+          type="button"
+          @click="confirmPresetChange(PresetType.OMI)"
+        >
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
           class="btn btn-secondary"
           data-contest-preioi
-          @click="fillPreIoi"
+          type="button"
+          @click="confirmPresetChange(PresetType.PreIOI)"
         >
           {{ T.contestNewForm }}
         </button>
         <button
           class="btn btn-secondary"
           data-contest-conacup
-          @click="fillConacup"
+          type="button"
+          @click="confirmPresetChange(PresetType.Conacup)"
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button class="btn btn-secondary" data-contest-icpc @click="fillIcpc">
+        <button
+          class="btn btn-secondary"
+          data-contest-icpc
+          type="button"
+          @click="confirmPresetChange(PresetType.ICPC)"
+        >
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
-      <form class="contest-form" @submit.prevent="onSubmit">
+
+      <!-- Validation Summary -->
+      <div
+        v-if="validationErrors.length > 0"
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+      >
+        <strong>{{ T.formValidationSummaryTitle }}</strong>
+        <ul class="mb-0 mt-2">
+          <li
+            v-for="(error, index) in validationErrors"
+            :key="`error-${index}`"
+          >
+            {{ error }}
+          </li>
+        </ul>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          @click="localErrors = {}"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form class="contest-form" novalidate @submit.prevent="onSubmit">
         <div class="accordion mb-3">
+          <!-- Basic Info Section -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -38,122 +78,247 @@
                   data-toggle="collapse"
                   data-target=".basic-info"
                   aria-expanded="true"
+                  aria-controls="basic-info-collapse"
                 >
                   {{ T.contestNewFormBasicInfo }}
+                  <font-awesome-icon
+                    v-if="hasErrorsInSection(SectionName.Basic)"
+                    icon="exclamation-circle"
+                    class="text-danger ml-2"
+                  />
                 </button>
               </h2>
             </div>
             <div class="collapse show card-body basic-info">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label>{{ T.wordsTitle }}</label>
+                  <label>
+                    {{ T.wordsTitle }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.Title] ||
+                          invalidParameterName === FieldName.Title,
+                      }"
+                      >*</span
+                    >
+                  </label>
                   <input
                     v-model="title"
                     class="form-control introjs-contest-title"
                     :class="{
-                      'is-invalid': invalidParameterName === 'title',
+                      'is-invalid':
+                        invalidParameterName === FieldName.Title ||
+                        localErrors[FieldName.Title],
                     }"
                     name="title"
                     data-title
                     :placeholder="titlePlaceHolder"
-                    size="30"
                     type="text"
-                    required="required"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.Title)"
+                    @input="clearFieldError(FieldName.Title)"
                   />
+                  <div
+                    v-if="
+                      invalidParameterName === FieldName.Title ||
+                      localErrors[FieldName.Title]
+                    "
+                    class="invalid-feedback"
+                  >
+                    {{
+                      localErrors[FieldName.Title] ||
+                      T.contestNewFormTitleRequired
+                    }}
+                  </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormShortTitleAlias }}
+                  <label>
+                    {{ T.contestNewFormShortTitleAlias }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.Alias] ||
+                          invalidParameterName === FieldName.Alias,
+                      }"
+                      >*</span
+                    >
                     <font-awesome-icon
                       :title="T.contestNewFormShortTitleAliasDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <input
                     v-model="alias"
                     class="form-control introjs-short-title"
                     :class="{
-                      'is-invalid': invalidParameterName === 'alias',
+                      'is-invalid':
+                        invalidParameterName === FieldName.Alias ||
+                        localErrors[FieldName.Alias],
                     }"
                     name="alias"
-                    :disabled="update"
+                    :disabled="update || isSubmitting"
                     type="text"
-                    required="required"
+                    required
+                    @blur="validateField(FieldName.Alias)"
+                    @input="clearFieldError(FieldName.Alias)"
                   />
+                  <div
+                    v-if="
+                      invalidParameterName === FieldName.Alias ||
+                      localErrors[FieldName.Alias]
+                    "
+                    class="invalid-feedback"
+                  >
+                    {{
+                      localErrors[FieldName.Alias] ||
+                      T.contestNewFormShortTitleRequired
+                    }}
+                  </div>
+                  <small v-if="!update" class="form-text text-muted">
+                    {{ T.contestNewFormAliasHelp }}
+                  </small>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormStartDate }}
+                  <label>
+                    {{ T.contestNewFormStartDate }}
+                    <span class="required-asterisk">*</span>
                     <font-awesome-icon
                       :title="T.contestNewFormStartDateDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <omegaup-datetimepicker
                     v-model="startTime"
                     data-start-date
                     :start="minDateTimeForContest"
+                    :disabled="isSubmitting"
+                    @input="validateDates"
                   ></omegaup-datetimepicker>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormEndDate }}
+                  <label>
+                    {{ T.contestNewFormEndDate }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.FinishTime] ||
+                          invalidParameterName === FieldName.FinishTime,
+                      }"
+                      >*</span
+                    >
                     <font-awesome-icon
                       :title="T.contestNewFormEndDateDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <omegaup-datetimepicker
                     v-model="finishTime"
                     data-end-date
-                    :is-invalid="invalidParameterName === 'finish_time'"
+                    :is-invalid="
+                      invalidParameterName === FieldName.FinishTime ||
+                      !!localErrors[FieldName.FinishTime]
+                    "
+                    :disabled="isSubmitting"
+                    @input="validateDates"
                   ></omegaup-datetimepicker>
+                  <div
+                    v-if="localErrors[FieldName.FinishTime]"
+                    class="invalid-feedback d-block"
+                  >
+                    {{ localErrors[FieldName.FinishTime] }}
+                  </div>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group col-md-6 introjs-description">
-                  <label>{{ T.contestNewFormDescription }}</label>
+                  <label>
+                    {{ T.contestNewFormDescription }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.Description] ||
+                          invalidParameterName === FieldName.Description,
+                      }"
+                      >*</span
+                    >
+                  </label>
                   <textarea
                     v-model="description"
                     class="form-control"
                     :class="{
-                      'is-invalid': invalidParameterName === 'description',
+                      'is-invalid':
+                        invalidParameterName === FieldName.Description ||
+                        localErrors[FieldName.Description],
                     }"
                     data-description
                     name="description"
-                    cols="30"
                     rows="10"
-                    required="required"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.Description)"
+                    @input="clearFieldError(FieldName.Description)"
                   ></textarea>
+                  <div
+                    v-if="
+                      invalidParameterName === FieldName.Description ||
+                      localErrors[FieldName.Description]
+                    "
+                    class="invalid-feedback"
+                  >
+                    {{
+                      localErrors[FieldName.Description] ||
+                      T.contestNewFormDescriptionRequired
+                    }}
+                  </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label>{{ T.wordsLanguages }}</label
-                  ><br />
-                  <div
-                    :class="{
-                      'is-invalid-wrapper':
-                        invalidParameterName === 'languages',
-                    }"
-                  >
-                    <multiselect
-                      :value="languages"
-                      :options="Object.keys(allLanguages)"
-                      :multiple="true"
-                      :placeholder="T.contestNewFormLanguages"
-                      :close-on-select="false"
-                      :allow-empty="true"
-                      @remove="onRemove"
-                      @select="onSelect"
+                  <label>
+                    {{ T.wordsLanguages }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger': localErrors[FieldName.Languages],
+                      }"
+                      >*</span
                     >
-                    </multiselect>
+                  </label>
+                  <multiselect
+                    :value="languages"
+                    :options="Object.keys(allLanguages)"
+                    :multiple="true"
+                    :placeholder="T.contestNewFormLanguages"
+                    :close-on-select="false"
+                    :allow-empty="false"
+                    :disabled="isSubmitting"
+                    @remove="onRemove"
+                    @select="onSelect"
+                  ></multiselect>
+                  <div
+                    v-if="localErrors[FieldName.Languages]"
+                    class="invalid-feedback d-block"
+                  >
+                    {{ localErrors[FieldName.Languages] }}
                   </div>
+                  <small class="form-text text-muted">
+                    {{ T.contestNewFormLanguagesHelp }}
+                  </small>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Logistics Section -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -164,61 +329,82 @@
                   data-toggle="collapse"
                   data-target=".logistics"
                   aria-expanded="false"
+                  aria-controls="logistics-collapse"
                   @click.prevent
                 >
                   {{ T.contestNewFormLogistics }}
+                  <font-awesome-icon
+                    v-if="hasErrorsInSection(SectionName.Logistics)"
+                    icon="exclamation-circle"
+                    class="text-danger ml-2"
+                  />
                 </button>
               </h2>
             </div>
             <div class="collapse card-body logistics">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormDifferentStarts }}
+                  <label>
+                    {{ T.contestNewFormDifferentStarts }}
                     <font-awesome-icon
                       :title="T.contestNewFormDifferentStartsDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="checkbox">
-                    <label
-                      ><input
-                        v-model="windowLengthEnabled"
-                        data-different-start-check
-                        type="checkbox"
-                      />
-                      {{ T.wordsEnable }}</label
-                    >
+                  <div class="custom-control custom-checkbox mb-2">
+                    <input
+                      v-model="windowLengthEnabled"
+                      data-different-start-check
+                      type="checkbox"
+                      class="custom-control-input"
+                      :disabled="isSubmitting"
+                    />
+                    <label class="custom-control-label">
+                      {{ T.wordsEnable }}
+                    </label>
                   </div>
                   <input
-                    v-model="windowLength"
+                    v-model.number="windowLength"
                     class="form-control"
                     data-different-start-time-input
                     :class="{
-                      'is-invalid': invalidParameterName === 'window_length',
+                      'is-invalid':
+                        invalidParameterName === FieldName.WindowLength ||
+                        localErrors[FieldName.WindowLength],
                     }"
                     name="window_length"
-                    size="3"
-                    type="text"
-                    :disabled="!windowLengthEnabled"
+                    type="number"
+                    min="0"
+                    :disabled="!windowLengthEnabled || isSubmitting"
+                    :placeholder="T.contestNewFormWindowLengthPlaceholder"
+                    @blur="validateField(FieldName.WindowLength)"
                   />
+                  <div
+                    v-if="localErrors[FieldName.WindowLength]"
+                    class="invalid-feedback"
+                  >
+                    {{ localErrors[FieldName.WindowLength] }}
+                  </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormForTeams }}
+                  <label>
+                    {{ T.contestNewFormForTeams }}
                     <font-awesome-icon
                       :title="T.contestNewFormForTeamsDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="checkbox">
-                    <label>
-                      <input
-                        v-model="currentContestForTeams"
-                        data-contest-for-teams
-                        type="checkbox"
-                        :disabled="update"
-                      />
+                  <div class="custom-control custom-checkbox mb-2">
+                    <input
+                      v-model="currentContestForTeams"
+                      data-contest-for-teams
+                      type="checkbox"
+                      class="custom-control-input"
+                      :disabled="update || isSubmitting"
+                    />
+                    <label class="custom-control-label">
                       {{ T.wordsEnable }}
                     </label>
                   </div>
@@ -227,93 +413,123 @@
                     v-if="currentContestForTeams && !hasSubmissions"
                     :class="{
                       'is-invalid':
-                        invalidParameterName === 'teams_group_alias',
+                        invalidParameterName === FieldName.TeamsGroup ||
+                        localErrors[FieldName.TeamsGroup],
                     }"
                     :existing-options="searchResultTeamsGroups"
                     :options="searchResultTeamsGroups"
                     :value.sync="currentTeamsGroupAlias"
+                    :disabled="isSubmitting"
                     @update-existing-options="updateTeamsGroups"
-                  >
-                  </omegaup-common-typeahead>
+                  ></omegaup-common-typeahead>
                   <input
-                    v-else
+                    v-else-if="currentContestForTeams"
                     class="form-control"
                     disabled
                     :value="teamsGroupName"
                   />
+                  <small
+                    v-if="hasSubmissions && currentContestForTeams"
+                    class="form-text text-muted"
+                  >
+                    {{ T.contestNewFormTeamsGroupLocked }}
+                  </small>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormScoreboardAtEnd }}
+                  <label>
+                    {{ T.contestNewFormScoreboardAtEnd }}
                     <font-awesome-icon
                       :title="T.contestNewFormScoreboardAtEndDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <select
                     v-model="showScoreboardAfter"
                     data-show-scoreboard-at-end
                     class="form-control"
+                    :disabled="isSubmitting"
                   >
-                    <option :value="true">
-                      {{ T.wordsYes }}
-                    </option>
-                    <option :value="false">
-                      {{ T.wordsNo }}
-                    </option>
+                    <option :value="true">{{ T.wordsYes }}</option>
+                    <option :value="false">{{ T.wordsNo }}</option>
                   </select>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormScoreboardTimePercent }}
+                  <label>
+                    {{ T.contestNewFormScoreboardTimePercent }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.Scoreboard] ||
+                          invalidParameterName === FieldName.Scoreboard,
+                      }"
+                      >*</span
+                    >
                     <font-awesome-icon
                       :title="T.contestNewFormScoreboardTimePercentDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <input
-                    v-model="scoreboard"
+                    v-model.number="scoreboard"
                     data-score-board-visible-time
-                    class="form-control scoreboard-time-percent"
+                    class="form-control"
                     :class="{
-                      'is-invalid': invalidParameterName === 'scoreboard',
+                      'is-invalid':
+                        invalidParameterName === FieldName.Scoreboard ||
+                        localErrors[FieldName.Scoreboard],
                     }"
                     name="scoreboard"
-                    size="3"
-                    type="text"
-                    required="required"
+                    type="number"
+                    min="0"
+                    max="100"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.Scoreboard)"
                   />
+                  <div
+                    v-if="localErrors[FieldName.Scoreboard]"
+                    class="invalid-feedback"
+                  >
+                    {{ localErrors[FieldName.Scoreboard] }}
+                  </div>
+                  <small class="form-text text-muted">{{
+                    T.contestNewFormScoreboardPercentRange
+                  }}</small>
                 </div>
               </div>
-              <div class="row">
+              <div v-if="canSetRecommended" class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormRecommended }}
+                  <label>
+                    {{ T.contestNewFormRecommended }}
                     <font-awesome-icon
-                      :title="
-                        canSetRecommended
-                          ? T.contestNewFormRecommendedTextAdmin
-                          : T.contestNewFormRecommendedTextNonAdmin
-                      "
+                      :title="T.contestNewFormRecommendedTextAdmin"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <div v-if="canSetRecommended" class="checkbox form-check">
+                  <div class="custom-control custom-checkbox">
                     <input
                       v-model="recommended"
                       data-recommended
-                      class="form-check-input"
+                      class="custom-control-input"
                       type="checkbox"
+                      :disabled="isSubmitting"
                     />
-                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
+                    <label class="custom-control-label">
+                      {{ T.wordsEnable }}
+                    </label>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Scoring Rules Section -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -326,23 +542,30 @@
                   aria-expanded="false"
                 >
                   {{ T.contestNewFormScoringRules }}
+                  <font-awesome-icon
+                    v-if="hasErrorsInSection(SectionName.Scoring)"
+                    icon="exclamation-circle"
+                    class="text-danger ml-2"
+                  />
                 </button>
               </h2>
             </div>
             <div class="collapse card-body scoring-rules">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormScoreMode }}
+                  <label>
+                    {{ T.contestNewFormScoreMode }}
                     <font-awesome-icon
                       :title="T.contestNewFormScoreModeDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <select
                     v-model="currentScoreMode"
                     data-score-mode
                     class="form-control"
+                    :disabled="isSubmitting"
                   >
                     <option :value="ScoreMode.Partial">
                       {{ T.contestNewFormScoreModePartial }}
@@ -356,56 +579,84 @@
                   </select>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.wordsFeedback }}
+                  <label>
+                    {{ T.wordsFeedback }}
                     <font-awesome-icon
                       :title="T.contestNewFormImmediateFeedbackDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <select v-model="feedback" class="form-control">
-                    <option value="none">
-                      {{ T.wordsNone }}
-                    </option>
-                    <option value="summary">
-                      {{ T.wordsSummary }}
-                    </option>
-                    <option value="detailed">
-                      {{ T.wordsDetailed }}
-                    </option>
+                  <select
+                    v-model="feedback"
+                    class="form-control"
+                    :disabled="isSubmitting"
+                  >
+                    <option value="none">{{ T.wordsNone }}</option>
+                    <option value="summary">{{ T.wordsSummary }}</option>
+                    <option value="detailed">{{ T.wordsDetailed }}</option>
                   </select>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormSubmissionsSeparation }}
+                  <label>
+                    {{ T.contestNewFormSubmissionsSeparation }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.SubmissionsGap] ||
+                          invalidParameterName === FieldName.SubmissionsGap,
+                      }"
+                      >*</span
+                    >
                     <font-awesome-icon
                       :title="T.contestNewFormSubmissionsSeparationDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <input
-                    v-model="submissionsGap"
+                    v-model.number="submissionsGap"
                     class="form-control"
                     :class="{
-                      'is-invalid': invalidParameterName === 'submissions_gap',
+                      'is-invalid':
+                        invalidParameterName === FieldName.SubmissionsGap ||
+                        localErrors[FieldName.SubmissionsGap],
                     }"
                     name="submissions_gap"
-                    size="2"
-                    type="text"
-                    required="required"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.SubmissionsGap)"
                   />
+                  <div
+                    v-if="localErrors[FieldName.SubmissionsGap]"
+                    class="invalid-feedback"
+                  >
+                    {{ localErrors[FieldName.SubmissionsGap] }}
+                  </div>
+                  <small class="form-text text-muted">{{
+                    T.contestNewFormSubmissionsGapHelp
+                  }}</small>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormPenaltyType }}
+                  <label>
+                    {{ T.contestNewFormPenaltyType }}
                     <font-awesome-icon
                       :title="T.contestNewFormPenaltyTypeDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <select v-model="penaltyType" class="form-control">
+                  <select
+                    v-model="penaltyType"
+                    class="form-control"
+                    :disabled="isSubmitting"
+                  >
                     <option value="none">
                       {{ T.contestNewFormNoPenalty }}
                     </option>
@@ -423,50 +674,96 @@
               </div>
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.wordsPenalty }}
+                  <label>
+                    {{ T.wordsPenalty }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.Penalty] ||
+                          invalidParameterName === FieldName.Penalty,
+                      }"
+                      >*</span
+                    >
                     <font-awesome-icon
                       :title="T.contestNewFormPenaltyDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <input
-                    v-model="penalty"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': invalidParameterName === 'penalty',
-                    }"
-                    name="penalty"
-                    size="2"
-                    type="text"
-                    required="required"
-                  />
-                </div>
-                <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormPointDecrementFactor }}
-                    <font-awesome-icon
-                      :title="T.contestNewFormPointDecrementFactorDesc"
-                      icon="info-circle"
-                    />
-                  </label>
-                  <input
-                    v-model="pointsDecayFactor"
+                    v-model.number="penalty"
                     class="form-control"
                     :class="{
                       'is-invalid':
-                        invalidParameterName === 'points_decay_factor',
+                        invalidParameterName === FieldName.Penalty ||
+                        localErrors[FieldName.Penalty],
+                    }"
+                    name="penalty"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.Penalty)"
+                  />
+                  <div
+                    v-if="localErrors[FieldName.Penalty]"
+                    class="invalid-feedback"
+                  >
+                    {{ localErrors[FieldName.Penalty] }}
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="decay-factor">
+                    {{ T.contestNewFormPointDecrementFactor }}
+                    <span
+                      class="required-asterisk"
+                      :class="{
+                        'text-danger':
+                          localErrors[FieldName.PointsDecayFactor] ||
+                          invalidParameterName === FieldName.PointsDecayFactor,
+                      }"
+                      >*</span
+                    >
+                    <font-awesome-icon
+                      :title="T.contestNewFormPointDecrementFactorDesc"
+                      icon="info-circle"
+                      class="ml-1 text-muted"
+                    />
+                  </label>
+                  <input
+                    v-model.number="pointsDecayFactor"
+                    class="form-control"
+                    :class="{
+                      'is-invalid':
+                        invalidParameterName === FieldName.PointsDecayFactor ||
+                        localErrors[FieldName.PointsDecayFactor],
                     }"
                     name="points_decay_factor"
-                    size="4"
-                    type="text"
-                    required="required"
+                    type="number"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    required
+                    :disabled="isSubmitting"
+                    @blur="validateField(FieldName.PointsDecayFactor)"
                   />
+                  <div
+                    v-if="localErrors[FieldName.PointsDecayFactor]"
+                    class="invalid-feedback"
+                  >
+                    {{ localErrors[FieldName.PointsDecayFactor] }}
+                  </div>
+                  <small class="form-text text-muted">{{
+                    T.contestNewFormDecayFactorRange
+                  }}</small>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Privacy Section -->
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
@@ -485,45 +782,45 @@
             <div class="collapse card-body privacy">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormBasicInformationRequired }}
+                  <label>
+                    {{ T.contestNewFormBasicInformationRequired }}
                     <font-awesome-icon
                       :title="T.contestNewFormBasicInformationRequiredDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
-                  <div class="checkbox form-check">
+                  <div class="custom-control custom-checkbox">
                     <input
                       v-model="needsBasicInformation"
                       data-basic-information-required
-                      class="form-check-input"
+                      class="custom-control-input"
                       type="checkbox"
+                      :disabled="isSubmitting"
                     />
-                    <label class="form-check-label"> {{ T.wordsEnable }}</label>
+                    <label class="custom-control-label" for="needs-basic-info">
+                      {{ T.wordsEnable }}
+                    </label>
                   </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label
-                    >{{ T.contestNewFormUserInformationRequired }}
+                  <label for="user-info">
+                    {{ T.contestNewFormUserInformationRequired }}
                     <font-awesome-icon
                       :title="T.contestNewFormUserInformationRequiredDesc"
                       icon="info-circle"
+                      class="ml-1 text-muted"
                     />
                   </label>
                   <select
                     v-model="requestsUserInformation"
                     data-request-user-information
                     class="form-control"
+                    :disabled="isSubmitting"
                   >
-                    <option value="no">
-                      {{ T.wordsNo }}
-                    </option>
-                    <option value="optional">
-                      {{ T.wordsOptional }}
-                    </option>
-                    <option value="required">
-                      {{ T.wordsRequired }}
-                    </option>
+                    <option value="no">{{ T.wordsNo }}</option>
+                    <option value="optional">{{ T.wordsOptional }}</option>
+                    <option value="required">{{ T.wordsRequired }}</option>
                   </select>
                 </div>
               </div>
@@ -535,13 +832,23 @@
           <button
             class="btn btn-primary introjs-schedule"
             type="submit"
-            @click="openCollapsedIfRequired()"
+            :disabled="isSubmitting"
           >
-            {{
-              update
-                ? T.contestNewFormUpdateContest
-                : T.contestNewFormScheduleContest
-            }}
+            <span v-if="isSubmitting">
+              <span
+                class="spinner-border spinner-border-sm mr-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              {{ T.contestNewFormProcessing }}
+            </span>
+            <span v-else>
+              {{
+                update
+                  ? T.contestNewFormUpdateContest
+                  : T.contestNewFormScheduleContest
+              }}
+            </span>
           </button>
         </div>
       </form>
@@ -579,6 +886,37 @@ export enum ScoreMode {
   MaxPerGroup = 'max_per_group',
 }
 
+export enum PresetType {
+  OMI = 'omi',
+  PreIOI = 'preioi',
+  Conacup = 'conacup',
+  ICPC = 'icpc',
+}
+
+export enum FieldName {
+  Title = 'title',
+  Alias = 'alias',
+  Description = 'description',
+  Languages = 'languages',
+  Scoreboard = 'scoreboard',
+  SubmissionsGap = 'submissionsGap',
+  Penalty = 'penalty',
+  PointsDecayFactor = 'pointsDecayFactor',
+  WindowLength = 'windowLength',
+  FinishTime = 'finishTime',
+  TeamsGroup = 'teamsGroup',
+}
+
+export enum SectionName {
+  Basic = 'basic',
+  Logistics = 'logistics',
+  Scoring = 'scoring',
+}
+
+interface LocalErrors {
+  [key: string]: string;
+}
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -593,6 +931,12 @@ export enum ScoreMode {
   },
 })
 export default class Form extends Vue {
+  T = T;
+  ScoreMode = ScoreMode;
+  PresetType = PresetType;
+  FieldName = FieldName;
+  SectionName = SectionName;
+
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
   @Prop({ default: 'private' }) admissionMode!: string;
@@ -624,8 +968,6 @@ export default class Form extends Vue {
   @Prop({ default: false }) canSetRecommended!: boolean;
   @Prop({ default: false }) initialRecommended!: boolean;
 
-  T = T;
-  ScoreMode = ScoreMode;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
@@ -650,6 +992,9 @@ export default class Form extends Vue {
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
   recommended = this.initialRecommended;
+  isSubmitting = false;
+  localErrors: LocalErrors = {};
+  hasFormChanged = false;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -706,7 +1051,181 @@ export default class Form extends Vue {
   onPropertyChange(newValue: boolean): void {
     if (!newValue) {
       this.windowLength = null;
+      this.clearFieldError(FieldName.WindowLength);
     }
+  }
+
+  @Watch('invalidParameterName')
+  onInvalidParameterChange(newValue: string | null): void {
+    if (!newValue) {
+      return;
+    }
+    this.$nextTick(() => {
+      const invalidElement = document.querySelector('.is-invalid');
+      if (invalidElement) {
+        invalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+
+  get validationErrors(): string[] {
+    return Object.values(this.localErrors).filter(Boolean);
+  }
+
+  hasErrorsInSection(section: SectionName): boolean {
+    const sectionFields: Record<SectionName, string[]> = {
+      [SectionName.Basic]: [
+        FieldName.Title,
+        FieldName.Alias,
+        FieldName.FinishTime,
+        FieldName.Description,
+        FieldName.Languages,
+      ],
+      [SectionName.Logistics]: [
+        FieldName.WindowLength,
+        FieldName.Scoreboard,
+        FieldName.TeamsGroup,
+      ],
+      [SectionName.Scoring]: [
+        FieldName.SubmissionsGap,
+        FieldName.Penalty,
+        FieldName.PointsDecayFactor,
+      ],
+    };
+    const fields = sectionFields[section] || [];
+    return fields.some((field) => this.localErrors[field]);
+  }
+
+  validateField(fieldName: FieldName): boolean {
+    switch (fieldName) {
+      case FieldName.Title:
+        if (!this.title || this.title.trim().length === 0) {
+          this.localErrors[fieldName] = T.contestNewFormTitleRequired;
+          return false;
+        }
+        break;
+      case FieldName.Alias:
+        if (!this.alias || this.alias.trim().length === 0) {
+          this.localErrors[fieldName] = T.contestNewFormShortTitleRequired;
+          return false;
+        }
+        if (!/^[a-z0-9-]+$/.test(this.alias)) {
+          this.localErrors[fieldName] = T.contestNewFormAliasInvalid;
+          return false;
+        }
+        break;
+      case FieldName.Description:
+        if (!this.description || this.description.trim().length === 0) {
+          this.localErrors[fieldName] = T.contestNewFormDescriptionRequired;
+          return false;
+        }
+        break;
+      case FieldName.Scoreboard:
+        if (this.scoreboard < 0 || this.scoreboard > 100) {
+          this.localErrors[fieldName] = T.contestNewFormScoreboardInvalid;
+          return false;
+        }
+        break;
+      case FieldName.SubmissionsGap:
+        if (this.submissionsGap < 0) {
+          this.localErrors[fieldName] = T.contestNewFormSubmissionsGapInvalid;
+          return false;
+        }
+        break;
+      case FieldName.Penalty:
+        if (this.penalty < 0) {
+          this.localErrors[fieldName] = T.contestNewFormPenaltyInvalid;
+          return false;
+        }
+        break;
+      case FieldName.PointsDecayFactor:
+        if (this.pointsDecayFactor < 0 || this.pointsDecayFactor > 1) {
+          this.localErrors[fieldName] =
+            T.contestNewFormPointsDecayFactorInvalid;
+          return false;
+        }
+        break;
+      case FieldName.WindowLength:
+        if (
+          this.windowLengthEnabled &&
+          (!this.windowLength || this.windowLength <= 0)
+        ) {
+          this.localErrors[fieldName] = T.contestNewFormWindowLengthInvalid;
+          return false;
+        }
+        break;
+    }
+    return true;
+  }
+
+  validateDates(): void {
+    this.clearFieldError(FieldName.FinishTime);
+    if (
+      this.startTime &&
+      this.finishTime &&
+      this.finishTime <= this.startTime
+    ) {
+      this.localErrors[FieldName.FinishTime] =
+        T.contestNewFormFinishTimeInvalid;
+    }
+  }
+
+  clearFieldError(fieldName: FieldName | string): void {
+    delete this.localErrors[fieldName];
+    this.$forceUpdate();
+  }
+
+  validateForm(): boolean {
+    this.localErrors = {};
+
+    const fields = [
+      FieldName.Title,
+      FieldName.Alias,
+      FieldName.Description,
+      FieldName.Scoreboard,
+      FieldName.SubmissionsGap,
+      FieldName.Penalty,
+      FieldName.PointsDecayFactor,
+    ];
+
+    fields.forEach((field) => this.validateField(field));
+    this.validateDates();
+
+    if (this.languages.length === 0) {
+      this.localErrors[FieldName.Languages] = T.contestNewFormLanguagesRequired;
+    }
+
+    if (this.currentContestForTeams && !this.currentTeamsGroupAlias) {
+      this.localErrors[FieldName.TeamsGroup] =
+        T.contestNewFormTeamsGroupRequired;
+    }
+
+    return Object.keys(this.localErrors).length === 0;
+  }
+
+  confirmPresetChange(presetType: PresetType): void {
+    if (this.hasFormChanged && !this.update) {
+      if (!confirm(T.contestNewFormPresetOverwriteWarning)) {
+        return;
+      }
+    }
+
+    switch (presetType) {
+      case PresetType.OMI:
+        this.fillOmi();
+        break;
+      case PresetType.PreIOI:
+        this.fillPreIoi();
+        break;
+      case PresetType.Conacup:
+        this.fillConacup();
+        break;
+      case PresetType.ICPC:
+        this.fillIcpc();
+        break;
+    }
+
+    this.hasFormChanged = true;
   }
 
   fillOmi(): void {
@@ -722,6 +1241,7 @@ export default class Form extends Vue {
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
     this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
   }
 
   fillPreIoi(): void {
@@ -737,6 +1257,7 @@ export default class Form extends Vue {
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
     this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
   }
 
   fillConacup(): void {
@@ -752,6 +1273,7 @@ export default class Form extends Vue {
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
     this.currentScoreMode = ScoreMode.Partial;
+    this.localErrors = {};
   }
 
   fillIcpc(): void {
@@ -774,13 +1296,22 @@ export default class Form extends Vue {
     this.penaltyType = 'contest_start';
     this.showScoreboardAfter = true;
     this.currentScoreMode = ScoreMode.AllOrNothing;
+    this.localErrors = {};
   }
 
   onSubmit() {
-    if (!this.languages || this.languages.length === 0) {
-      this.$emit('invalid-languages');
+    if (!this.validateForm()) {
+      this.$nextTick(() => {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+          firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
       return;
     }
+
+    this.isSubmitting = true;
+
     const contest: types.ContestAdminDetails = {
       admin: true,
       admission_mode: this.update ? this.admissionMode : 'private',
@@ -814,7 +1345,6 @@ export default class Form extends Vue {
       contest_for_teams: this.currentContestForTeams,
     };
 
-    // Only include recommended field if user has permission
     if (this.canSetRecommended) {
       contest.recommended = this.recommended;
     }
@@ -822,10 +1352,16 @@ export default class Form extends Vue {
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
+
     const request = {
       contest,
       teamsGroupAlias: this.currentTeamsGroupAlias?.key,
     };
+
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 1000);
+
     if (this.update) {
       this.$emit('update-contest', request);
       return;
@@ -863,71 +1399,16 @@ export default class Form extends Vue {
     }
     const index = this.languages.indexOf(language);
     this.languages.splice(index, 1);
+    this.hasFormChanged = true;
   }
 
   onSelect(language: string) {
     this.languages.push(language);
-    // Clear the languages validation error when a language is selected
-    this.$emit('clear-language-error');
+    this.hasFormChanged = true;
   }
 
   updateTeamsGroups(query: string) {
     this.$emit('update-search-result-teams-groups', query);
-  }
-
-  openCollapsedIfRequired() {
-    const formData = new FormData(
-      this.$el.querySelector('form') as HTMLFormElement,
-    );
-
-    let basicInfoCollapsed = true;
-    let logisticsCollapsed = true;
-    let scoringRulesCollapsed = true;
-    let privacyCollapsed = true;
-
-    for (const [key, value] of formData.entries()) {
-      const isEmpty = value === '';
-      if (isEmpty) {
-        if (
-          basicInfoCollapsed &&
-          (key === 'title' ||
-            key === 'alias' ||
-            key === 'start_time' ||
-            key === 'finish_time' ||
-            key === 'description')
-        ) {
-          (this.$refs.basicInfo as HTMLElement).click();
-          basicInfoCollapsed = false;
-          continue;
-        }
-
-        if (
-          logisticsCollapsed &&
-          (key === 'window_length' || key === 'scoreboard')
-        ) {
-          (this.$refs.logistics as HTMLElement).click();
-          logisticsCollapsed = false;
-          continue;
-        }
-
-        if (
-          scoringRulesCollapsed &&
-          (key === 'submissions_gap' ||
-            key === 'penalty' ||
-            key === 'points_decay_factor')
-        ) {
-          (this.$refs.scoringRules as HTMLElement).click();
-          scoringRulesCollapsed = false;
-          continue;
-        }
-
-        if (privacyCollapsed && key === 'requests_user_information') {
-          (this.$refs.privacy as HTMLElement).click();
-          privacyCollapsed = false;
-          continue;
-        }
-      }
-    }
   }
 }
 </script>
@@ -940,8 +1421,35 @@ export default class Form extends Vue {
   background: var(--multiselect-tag-background-color);
 }
 
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.is-invalid-wrapper ::v-deep .multiselect__tags {
-  border-color: var(--form-input-error-color);
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+.required-asterisk {
+  transition: color 0.2s ease;
+}
+
+.text-muted {
+  cursor: help;
+}
+
+.form-control:disabled,
+.custom-control-input:disabled ~ .custom-control-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.alert-dismissible .close {
+  padding: 0.75rem 1.25rem;
 }
 </style>

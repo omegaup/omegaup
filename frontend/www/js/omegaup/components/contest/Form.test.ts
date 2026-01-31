@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import contest_Form from './Form.vue';
+import contest_Form, { ScoreMode } from './Form.vue';
 
 import { Multiselect } from 'vue-multiselect';
 
@@ -143,14 +143,14 @@ describe('Form.vue', () => {
       },
     });
 
-    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
     await wrapper.find('[data-contest-icpc]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe('all_or_nothing');
+    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.AllOrNothing);
     await wrapper.find('[data-contest-preioi]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
     await wrapper.find('[data-contest-omi]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
     await wrapper.find('[data-contest-conacup]').trigger('click');
-    expect(wrapper.vm.currentScoreMode).toBe('partial');
+    expect(wrapper.vm.currentScoreMode).toBe(ScoreMode.Partial);
   });
 });
