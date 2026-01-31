@@ -28,8 +28,9 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentMarkdown"
+            v-model="currentMarkdown"
             class="wmd-input"
+            @change="currentMarkdown = $event.target.value"
           ></textarea>
         </div>
         <div class="col-md-6 d-flex flex-column">
@@ -108,7 +109,6 @@ import * as ui from '../../ui';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../markdown';
 
-import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import user_Username from '../user/Username.vue';
 
 const markdownConverter = new markdown.Converter({
@@ -118,7 +118,7 @@ const markdownConverter = new markdown.Converter({
 @Component({
   components: {
     'omegaup-user-username': user_Username,
-    'omegaup-markdown': omegaup_problemMarkdown,
+    'omegaup-markdown': () => import('./ProblemMarkdown.vue'),
   },
 })
 export default class ProblemStatementEdit extends Vue {
