@@ -276,7 +276,7 @@
                       :multiple="true"
                       :placeholder="T.contestNewFormLanguages"
                       :close-on-select="false"
-                      :allow-empty="false"
+                      :allow-empty="true"
                       :disabled="isSubmitting"
                       @remove="onRemove"
                       @select="onSelect"
@@ -1308,10 +1308,6 @@ export default class Form extends Vue {
   }
 
   onSubmit() {
-    if (this.update) {
-      this.$emit('update-contest');
-    }
-
     if (!this.validateForm()) {
       const errorsList = Object.values(this.localErrors)
         .filter(Boolean)
@@ -1330,11 +1326,6 @@ export default class Form extends Vue {
 
     this.isSubmitting = true;
 
-    if (!this.languages || this.languages.length === 0) {
-      this.$emit('invalid-languages');
-      this.isSubmitting = false;
-      return;
-    }
     const contest: types.ContestAdminDetails = {
       admin: true,
       admission_mode: this.update ? this.admissionMode : 'private',
@@ -1429,7 +1420,6 @@ export default class Form extends Vue {
     this.languages.push(language);
     this.hasFormChanged = true;
     this.clearFieldError(FieldName.Languages);
-    this.$emit('clear-language-error');
   }
 
   updateTeamsGroups(query: string) {
