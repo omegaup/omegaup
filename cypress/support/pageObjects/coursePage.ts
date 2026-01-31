@@ -138,20 +138,6 @@ export class CoursePage {
     cy.get('form[data-course-admission-mode-form]').submit();
   }
 
-  // createInvalidSubmission(
-  //   problemOptions: ProblemOptions,
-  //   runOptions: RunOptions,
-  // ): void {
-  //   cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-  //   cy.get('[data-new-run]').click();
-  //   cy.get('[name="language"]').select(runOptions.language);
-  //   cy.fixture(runOptions.fixturePath).then((fileContent) => {
-  //     cy.get('.CodeMirror-line').first().type(fileContent);
-  //     cy.get('[data-submit-run]').click();
-  //   });
-  //   cy.get('.alert-danger').should('be.visible');
-  // }
-
   createInvalidSubmission(
     problemOptions: ProblemOptions,
     runOptions: RunOptions,
