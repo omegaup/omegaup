@@ -108,23 +108,20 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     private static function getMonthName(int $month): string {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $monthKeys = [
-            1 => 'certificatePdfMonth1',
-            2 => 'certificatePdfMonth2',
-            3 => 'certificatePdfMonth3',
-            4 => 'certificatePdfMonth4',
-            5 => 'certificatePdfMonth5',
-            6 => 'certificatePdfMonth6',
-            7 => 'certificatePdfMonth7',
-            8 => 'certificatePdfMonth8',
-            9 => 'certificatePdfMonth9',
-            10 => 'certificatePdfMonth10',
-            11 => 'certificatePdfMonth11',
-            12 => 'certificatePdfMonth12',
-        ];
-
-        $key = $monthKeys[$month] ?? 'certificatePdfMonth12';
-        return $translator->get($key);
+        return match ($month) {
+            1 => $translator->get('certificatePdfMonth1'),
+            2 => $translator->get('certificatePdfMonth2'),
+            3 => $translator->get('certificatePdfMonth3'),
+            4 => $translator->get('certificatePdfMonth4'),
+            5 => $translator->get('certificatePdfMonth5'),
+            6 => $translator->get('certificatePdfMonth6'),
+            7 => $translator->get('certificatePdfMonth7'),
+            8 => $translator->get('certificatePdfMonth8'),
+            9 => $translator->get('certificatePdfMonth9'),
+            10 => $translator->get('certificatePdfMonth10'),
+            11 => $translator->get('certificatePdfMonth11'),
+            default => $translator->get('certificatePdfMonth12'),
+        };
     }
 
     private static function printCertificateHeader(FPDI $pdf): void {
@@ -384,19 +381,16 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function getPlaceSuffix(int $n): string {
         $translator = \OmegaUp\Translations::getInstance();
 
-        $suffixKey = 'certificatePdfContestPlaceTh'; // default
-
         if ($n >= 11 && $n <= 13) {
-            $suffixKey = 'certificatePdfContestPlaceTh';
-        } elseif (($n % 10) == 1) {
-            $suffixKey = 'certificatePdfContestPlaceSt';
-        } elseif (($n % 10) == 2) {
-            $suffixKey = 'certificatePdfContestPlaceNd';
-        } elseif (($n % 10) == 3) {
-            $suffixKey = 'certificatePdfContestPlaceRd';
+            return $translator->get('certificatePdfContestPlaceTh');
         }
 
-        return $translator->get($suffixKey);
+        return match ($n % 10) {
+            1 => $translator->get('certificatePdfContestPlaceSt'),
+            2 => $translator->get('certificatePdfContestPlaceNd'),
+            3 => $translator->get('certificatePdfContestPlaceRd'),
+            default => $translator->get('certificatePdfContestPlaceTh'),
+        };
     }
 
     private static function getContestCertificate(string $verificationCode): ?string {

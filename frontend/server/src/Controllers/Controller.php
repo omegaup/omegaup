@@ -181,18 +181,24 @@ class Controller {
      * @return array{fieldName: string, transform: null|callable(mixed):mixed, important: bool}
      */
     private static function parsePropertyConfiguration($source, $info): array {
+        /** @var null|callable(mixed):mixed */
         $transform = null;
         $important = false;
+        /** @var string */
+        $fieldName = '';
 
         if (is_int($source)) {
+            assert(is_string($info));
             $fieldName = $info;
         } else {
             $fieldName = $source;
-            if (isset($info['transform'])) {
-                $transform = $info['transform'];
-            }
-            if (isset($info['important']) && $info['important'] === true) {
-                $important = $info['important'];
+            if (is_array($info)) {
+                if (isset($info['transform'])) {
+                    $transform = $info['transform'];
+                }
+                if (isset($info['important']) && $info['important'] === true) {
+                    $important = $info['important'];
+                }
             }
         }
 
