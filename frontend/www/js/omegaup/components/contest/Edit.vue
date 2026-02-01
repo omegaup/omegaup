@@ -164,8 +164,6 @@
           @language-remove-blocked="
             (language) => $emit('language-remove-blocked', language)
           "
-          @invalid-languages="$emit('invalid-languages')"
-          @clear-language-error="$emit('clear-language-error')"
         ></omegaup-contest-new-form>
       </div>
       <div v-if="showTab === 'problems'" class="tab-pane active">
