@@ -126,16 +126,22 @@ pre > code {
   }
 }
 
-// Required field indicator - red asterisk after label text
+// Required field indicator - dynamic asterisk color
+// Starts red (needs attention), turns black when field is completed
 .field-required::after {
   content: ' *';
-  color: #dc3545; // Bootstrap danger red
+  color: var(--field-required-incomplete-color);
   font-weight: bold;
+}
+
+// Completed state - asterisk turns black
+.field-required.is-complete::after {
+  color: var(--field-required-complete-color);
 }
 
 // Required fields legend text
 .required-fields-legend {
-  color: #dc3545;
+  color: var(--field-required-incomplete-color);
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }

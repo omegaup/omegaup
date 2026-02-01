@@ -9,7 +9,10 @@
         <div class="row">
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-course-name">
-              <span class="field-required">{{ T.wordsName }}</span>
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isNameComplete }"
+              >{{ T.wordsName }}</span>
               <input
                 v-model="name"
                 :disabled="readOnly"
@@ -22,7 +25,10 @@
           </div>
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-short-title">
-              <span class="field-required">{{
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isAliasComplete }"
+              >{{
                 T.courseNewFormShortTitleAlias
               }}</span>
               <font-awesome-icon
@@ -105,7 +111,10 @@
         <div class="row">
           <div class="form-group col-md-4">
             <label class="font-weight-bold w-100 introjs-school">
-              <span class="field-required">{{ T.profileSchool }}</span>
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isSchoolComplete }"
+              >{{ T.profileSchool }}</span>
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
@@ -187,7 +196,10 @@
           </div>
           <div class="form-group col-md-6 introjs-language">
             <label class="font-weight-bold w-100">
-              <span class="field-required">{{ T.wordsLanguages }}</span>
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isLanguagesComplete }"
+              >{{ T.wordsLanguages }}</span>
             </label>
             <div
               :class="{
@@ -229,7 +241,10 @@
           </div>
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100 introjs-description">
-              <span class="field-required">{{
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isDescriptionComplete }"
+              >{{
                 T.courseNewFormDescription
               }}</span>
               <textarea
@@ -340,6 +355,29 @@ export default class CourseDetails extends Vue {
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
   levelOptions = levelOptions;
+
+  // Computed properties to track if required fields are complete
+  get isNameComplete(): boolean {
+    return this.name !== null && this.name.trim().length > 0;
+  }
+
+  get isAliasComplete(): boolean {
+    return this.alias !== null && this.alias.trim().length > 0;
+  }
+
+  get isSchoolComplete(): boolean {
+    return this.school !== null && this.school.key !== undefined;
+  }
+
+  get isLanguagesComplete(): boolean {
+    return (
+      this.selectedLanguages !== null && this.selectedLanguages.length > 0
+    );
+  }
+
+  get isDescriptionComplete(): boolean {
+    return this.description !== null && this.description.trim().length > 0;
+  }
 
   mounted() {
     const title = T.createCourseInteractiveGuideTitle;
