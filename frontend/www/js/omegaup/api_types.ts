@@ -79,6 +79,7 @@ export namespace dao {
     deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
+    github_url?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
     has_scholar_objective?: boolean;
@@ -86,6 +87,7 @@ export namespace dao {
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
+    linkedin_url?: string;
     main_email_id?: number;
     main_identity_id?: number;
     parent_email_id?: number;
@@ -100,6 +102,7 @@ export namespace dao {
     user_id?: number;
     verification_id?: string;
     verified?: boolean;
+    x_url?: string;
   }
 }
 
