@@ -370,9 +370,7 @@ export default class CourseDetails extends Vue {
   }
 
   get isLanguagesComplete(): boolean {
-    return (
-      this.selectedLanguages !== null && this.selectedLanguages.length > 0
-    );
+    return (this.selectedLanguages?.length ?? 0) > 0;
   }
 
   get isDescriptionComplete(): boolean {
