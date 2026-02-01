@@ -40,6 +40,10 @@
   --password-toggle-btn-color: #6c757d;
   --password-toggle-btn-color--hover: #495057;
 
+  // REQUIRED FIELD INDICATORS
+  --field-required-incomplete-color: #dc3545; // Red - needs attention
+  --field-required-complete-color: #000000; // Black - completed
+
   // MARKDOWN
   --markdown-pre-background-color: #eee;
   --markdown-details-border-color: #eee;
