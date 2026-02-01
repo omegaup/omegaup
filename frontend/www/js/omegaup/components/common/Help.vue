@@ -14,10 +14,6 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">
-                <font-awesome-icon
-                  :icon="getIcon(resource.icon)"
-                  :style="{ color: '#007bff', marginRight: '10px' }"
-                />
                 {{ T[`helpResource${capitalizeFirst(resource.name)}`] }}
               </h5>
               <p class="card-text">
@@ -34,11 +30,7 @@
                 class="btn btn-primary btn-sm"
               >
                 {{ T.helpVisitResource }}
-                <font-awesome-icon
-                  v-if="resource.external"
-                  icon="external-link-alt"
-                  class="ml-1"
-                />
+                <span v-if="resource.external"> ↗</span>
               </a>
             </div>
           </div>
@@ -73,39 +65,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
-library.add(fas);
 
-@Component({
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
-  },
-})
+@Component
 export default class CommonHelp extends Vue {
   @Prop() helpResources!: types.HelpResource[];
 
   T = T;
   ui = ui;
-
-  getIcon(iconName: string): string[] {
-    const iconMap: { [key: string]: string } = {
-      video: 'video',
-      comments: 'comments',
-      blog: 'blog',
-      book: 'book',
-      'file-text': 'file-alt',
-      github: 'code-branch',
-    };
-    return ['fas', iconMap[iconName] || 'question-circle'];
-  }
 
   capitalizeFirst(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
