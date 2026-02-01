@@ -3846,6 +3846,7 @@ export namespace types {
 
   export interface FullIDEPayload {
     acceptedLanguages: string[];
+    ephemeralGraderEnabled: boolean;
     preferredLanguage?: string;
   }
 
@@ -4223,6 +4224,7 @@ export namespace types {
     creation_date: Date;
     difficulty?: number;
     email_clarifications: boolean;
+    ephemeralGraderEnabled?: boolean;
     input_limit: number;
     karel_problem: boolean;
     languages: string[];
@@ -5339,6 +5341,10 @@ export namespace messages {
   // Admin
   export type AdminGetMaintenanceModeRequest = { [key: string]: any };
   export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
+  export type AdminGetSystemSettingsRequest = { [key: string]: any };
+  export type AdminGetSystemSettingsResponse = {
+    settings: { ephemeralGraderEnabled: boolean };
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5355,6 +5361,8 @@ export namespace messages {
   };
   export type AdminSetMaintenanceModeRequest = { [key: string]: any };
   export type AdminSetMaintenanceModeResponse = {};
+  export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
+  export type AdminUpdateSystemSettingsResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6355,12 +6363,18 @@ export namespace controllers {
     getMaintenanceMode: (
       params?: messages.AdminGetMaintenanceModeRequest,
     ) => Promise<messages.AdminGetMaintenanceModeResponse>;
+    getSystemSettings: (
+      params?: messages.AdminGetSystemSettingsRequest,
+    ) => Promise<messages.AdminGetSystemSettingsResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
     setMaintenanceMode: (
       params?: messages.AdminSetMaintenanceModeRequest,
     ) => Promise<messages.AdminSetMaintenanceModeResponse>;
+    updateSystemSettings: (
+      params?: messages.AdminUpdateSystemSettingsRequest,
+    ) => Promise<messages.AdminUpdateSystemSettingsResponse>;
   }
 
   export interface AiEditorial {
