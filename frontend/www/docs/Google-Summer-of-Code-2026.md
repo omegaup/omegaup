@@ -9,11 +9,7 @@
 
 > We encourage you to visit omegaup.org and omegaup.com to learn about our platform and features. And remember, this is an **Ideas List** we expect you complete most of the details in your proposal and you are also welcome to propose your own project idea. Don't hesitate to reach out for any questions or new ideas in our [Discord channel](https://discord.gg/gMEMX7Mrwe)!
 
-Here is the final list of projects formatted to your specifications.
 
-I have mapped the mentors to their GitHub profiles where possible, based on the context of the `omegaUp` organization (e.g., Hugo as `heduenas`, Juan Pablo as `pabo99`, and Carlos as `carlosabcs`).
-
----
 
 ## Query Optimization and Performance Benchmarking
 
@@ -85,7 +81,7 @@ The monitoring and alerting allows us to catch and debug production issues befor
 
 Medium
 
----
+
 
 ## Migrating from Vue 2 to Vue 3
 
@@ -116,7 +112,7 @@ omegaup.com runs fully on Vue.js 3 and has no dependency on Vue.js 2.
 
 Medium
 
----
+
 
 ## Migrating Bootstrap 4 to 5
 
@@ -147,7 +143,7 @@ The omegaUp UI runs fully on bootstrap 5 and has no dependency on boostrap 4.
 
 Medium
 
----
+
 
 ## Cronjob Optimization
 
@@ -178,7 +174,7 @@ Cronjobs become much leaner, faster and easier to maintain.
 
 High
 
----
+
 
 ## Integrate Problem Creator
 
