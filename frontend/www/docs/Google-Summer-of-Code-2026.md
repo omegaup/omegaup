@@ -46,7 +46,7 @@ Significant reduction in execution time for queries that have already been ident
 
 **Possible mentor**:
 
-[heduenas](https://github.com/Ankitsinghsisodya), [pabo99](https://github.com/pabo99), [carlosabcs](https://github.com/carlosabcs)
+[Ankitsinghsisodya](https://github.com/Ankitsinghsisodya), [pabo99](https://github.com/pabo99), [carlosabcs](https://github.com/carlosabcs)
 
 ## Performance Monitoring and Alerting Dashboard
 
