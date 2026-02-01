@@ -20,6 +20,7 @@ module.exports = {
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.ts',
+    admin_settings: './frontend/www/js/omegaup/admin/settings.ts',
     admin_support: './frontend/www/js/omegaup/admin/support.ts',
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena_contest_contestant:
