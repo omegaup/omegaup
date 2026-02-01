@@ -573,6 +573,14 @@ nav.navbar {
     > .dropdown-menu {
     display: none !important;
   }
+
+  .nav-problems .collapse-links {
+    display: none;
+  }
+
+  .nav-problems .collapse-submenu:hover .collapse-links {
+    display: block;
+  }
 }
 
 .progress {
