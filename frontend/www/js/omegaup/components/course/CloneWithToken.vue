@@ -94,14 +94,15 @@ export default class CourseCloneWithToken extends Vue {
   min-width: 0;
 }
 
-/* Remove default paragraph margins for inline alignment */
-:deep([data-markdown-statement]) {
+/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+::v-deep [data-markdown-statement] {
   word-break: break-word;
   overflow-wrap: break-word;
+}
 
-  p {
-    margin-bottom: 0;
-    margin-top: 0;
-  }
+/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+::v-deep [data-markdown-statement] p {
+  margin-bottom: 0;
+  margin-top: 0;
 }
 </style>
