@@ -48,6 +48,14 @@ Significant reduction in execution time for queries that have already been ident
 
 [Ankitsinghsisodya](https://github.com/Ankitsinghsisodya), [pabo99](https://github.com/pabo99), [carlosabcs](https://github.com/carlosabcs)
 
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
 ## Performance Monitoring and Alerting Dashboard
 
 **Brief Description**:
@@ -68,6 +76,14 @@ The monitoring and alerting allows us to catch and debug production issues befor
 **Possible mentor**:
 
 [heduenas](https://github.com/heduenas), [iqbalcodes6602](https://github.com/iqbalcodes6602)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
 
 ---
 
@@ -92,6 +108,14 @@ omegaup.com runs fully on Vue.js 3 and has no dependency on Vue.js 2.
 
 [pabo99](https://github.com/pabo99), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
 
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
 ---
 
 ## Migrating Bootstrap 4 to 5
@@ -114,6 +138,14 @@ The omegaUp UI runs fully on bootstrap 5 and has no dependency on boostrap 4.
 **Possible mentor**:
 
 [pabo99](https://github.com/pabo99), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
 
 ---
 
@@ -138,6 +170,14 @@ Cronjobs become much leaner, faster and easier to maintain.
 
 [Ankitsinghsisodya](https://github.com/Ankitsinghsisodya), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
 
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+High
+
 ---
 
 ## Integrate Problem Creator
@@ -145,6 +185,21 @@ Cronjobs become much leaner, faster and easier to maintain.
 **Brief Description**:
 
 A project from last year's GSoC introduced the Problem Creator, a visual editor that helps problem authors create and edit problems more easily. However, the Problem Creator isn't yet fully integrated with omegaUp. Currently, authors must write their problem in the Creator, download a .zip, and upload it manually. This project aims to streamline these workflows by fully integrating the Problem Creator with omegaUp's native create and edit features.
+
+**Current Status**:
+
+* A technical [pdesign doc](https://docs.google.com/document/d/1qpBwJQ6QIiIXgWpb_qa6OJ8KpJPcd11x3qKiefdgPAw/edit?tab=t.0) has been written for this project. 
+* Completed backend changes:
+  * #8470 CDP classes and validations, added core CDP classes and validation logic.
+  * #8479 New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
+  * #8554 CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
+  * #8606 Language support in CDPBuilder, added multi-language support with priority based on languagePreference
+  * #8613 Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
+  * Initial UI change completed: #8593 CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases 
+* Pending work (mostly UI-related)
+  * #8471 Integrate CDP into the problem form and handle external ZIPs
+  * #8492 UI implementation for the editing interface
+  * #8595 UI integration: Edit view, CaseEdit, and Sidebar
 
 **Expected results**:
 
@@ -160,6 +215,14 @@ A seamless end-to-end user experience where authors can create or edit problems 
 **Possible mentor**:
 
 [pabo99](https://github.com/pabo99), [heduenas](https://github.com/heduenas), Ankitsinghsisodya](https://github.com/Ankitsinghsisodya)
+
+**Estimated size of project:**
+
+175 hours
+
+**Skill level**:
+
+High
 
 # How to Ramp Up
 
