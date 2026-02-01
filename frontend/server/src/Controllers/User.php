@@ -5292,6 +5292,52 @@ class User extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'user_compare',
         ];
     }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: UserHelpPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getHelpForTypeScript(\OmegaUp\Request $r) {
+        $helpResources = [
+            [
+                'name' => 'tutorials',
+                'url' => 'https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4',
+                'external' => true,
+            ],
+            [
+                'name' => 'discord',
+                'url' => 'https://discord.com/invite/K3JFd9d3wk',
+                'external' => true,
+            ],
+            [
+                'name' => 'blog',
+                'url' => 'https://blog.omegaup.com/',
+                'external' => true,
+            ],
+            [
+                'name' => 'algorithmsBook',
+                'url' => 'https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view',
+                'external' => true,
+            ],
+            [
+                'name' => 'documentation',
+                'url' => '/docs/',
+                'external' => false,
+            ],
+            [
+                'name' => 'github',
+                'url' => 'https://github.com/omegaup/omegaup',
+                'external' => true,
+            ],
+        ];
+
+        return [
+            'templateProperties' => [
+                'payload' => ['helpResources' => $helpResources],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleHelp'),
+            ],
+            'entrypoint' => 'common_help',
+        ];
+    }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
