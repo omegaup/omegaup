@@ -94,13 +94,13 @@ export default class CourseCloneWithToken extends Vue {
   min-width: 0;
 }
 
-/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::v-deep [data-markdown-statement] {
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-/* stylelint-disable-next-line selector-pseudo-class-no-unknown */
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::v-deep [data-markdown-statement] p {
   margin-bottom: 0;
   margin-top: 0;
