@@ -12,7 +12,8 @@
               <span
                 class="field-required"
                 :class="{ 'is-complete': isNameComplete }"
-              >{{ T.wordsName }}</span>
+                >{{ T.wordsName }}</span
+              >
               <input
                 v-model="name"
                 :disabled="readOnly"
@@ -28,9 +29,8 @@
               <span
                 class="field-required"
                 :class="{ 'is-complete': isAliasComplete }"
-              >{{
-                T.courseNewFormShortTitleAlias
-              }}</span>
+                >{{ T.courseNewFormShortTitleAlias }}</span
+              >
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
                 icon="info-circle" />
@@ -114,7 +114,8 @@
               <span
                 class="field-required"
                 :class="{ 'is-complete': isSchoolComplete }"
-              >{{ T.profileSchool }}</span>
+                >{{ T.profileSchool }}</span
+              >
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
@@ -199,7 +200,8 @@
               <span
                 class="field-required"
                 :class="{ 'is-complete': isLanguagesComplete }"
-              >{{ T.wordsLanguages }}</span>
+                >{{ T.wordsLanguages }}</span
+              >
             </label>
             <div
               :class="{
@@ -244,9 +246,8 @@
               <span
                 class="field-required"
                 :class="{ 'is-complete': isDescriptionComplete }"
-              >{{
-                T.courseNewFormDescription
-              }}</span>
+                >{{ T.courseNewFormDescription }}</span
+              >
               <textarea
                 v-model="description"
                 :disabled="readOnly"
