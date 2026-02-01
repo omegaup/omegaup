@@ -368,9 +368,83 @@ export default class UserRank extends Vue {
   color: var(--arena-contest-list-empty-category-font-color);
 }
 
+/* Fix for username overflow - targeting actual vue-tagsinput structure */
 [data-user-rank] .tags-input-wrapper-default {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
   overflow: hidden;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+[data-user-rank] .tags-input {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Target the actual badge structure */
+[data-user-rank] .tags-input-badge {
+  color: black !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  margin: 2px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  max-width: calc(100% - 20px) !important;
+  overflow: hidden !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+}
+
+/* Target the inner span that contains the text */
+[data-user-rank] .tags-input-badge > span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+  display: block !important;
+  margin-right: 8px !important;
+  color: black !important;
+}
+
+/* Target the remove button */
+[data-user-rank] .tags-input-remove {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: black !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  width: 16px !important;
+  height: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 8px !important;
+  flex-shrink: 0 !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+}
+
+[data-user-rank] .tags-input-remove:hover {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure input field doesn't overflow */
+[data-user-rank] .tags-input input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
 }
 
 [data-user-rank] {
