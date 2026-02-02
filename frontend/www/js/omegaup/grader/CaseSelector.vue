@@ -1,8 +1,43 @@
 <template>
   <div class="root d-flex flex-column h-100" :class="theme">
+    <div class="case-header">
+      <h6 class="case-title mb-0">{{ T.wordsCases }}</h6>
+    </div>
     <div class="summary">
       {{ summary }}
     </div>
+    <form class="case-form" @submit.prevent="createCase()">
+      <div class="input-group">
+        <input
+          v-model="newCaseWeight"
+          class="form-control case-weight"
+          type="text"
+          :placeholder="'1'"
+        />
+        <input
+          v-model="newCaseName"
+          class="form-control"
+          type="text"
+          data-case-name
+          :placeholder="T.wordsCase + ' name'"
+        />
+        <div class="input-group-append">
+          <button
+            class="btn btn-sm btn-add-case"
+            :class="{
+              'btn-primary': theme == 'vs',
+              'btn-secondary': theme == 'vs-dark',
+            }"
+            type="submit"
+            :disabled="!newCaseName.length"
+            data-add-button
+            @click="createCase()"
+          >
+            + {{ T.wordsCase }}
+          </button>
+        </div>
+      </div>
+    </form>
     <div class="filenames">
       <div class="list-group">
         <button
@@ -66,36 +101,6 @@
         </template>
       </div>
     </div>
-    <form @submit.prevent="createCase()">
-      <div class="input-group">
-        <input
-          v-model="newCaseWeight"
-          class="form-control case-weight"
-          type="text"
-        />
-        <input
-          v-model="newCaseName"
-          class="form-control"
-          type="text"
-          data-case-name
-        />
-        <div class="input-group-append">
-          <button
-            class="btn"
-            :class="{
-              'btn-primary': theme == 'vs',
-              'btn-secondary': theme == 'vs-dark',
-            }"
-            type="submit"
-            :disabled="!newCaseName.length"
-            data-add-button
-            @click="createCase()"
-          >
-            +
-          </button>
-        </div>
-      </div>
-    </form>
   </div>
 </template>
 
@@ -228,13 +233,31 @@ export default class CaseSelector extends Vue {
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
 
+.case-header {
+  padding: 0.5em 0.75em 0;
+  border-bottom: 1px solid $omegaup-grey--lighter;
+}
+
+.case-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  color: $omegaup-grey;
+}
+
+.case-form {
+  padding: 0.5em 0.75em 0.25em;
+  border-bottom: 1px solid $omegaup-grey--lighter;
+}
+
+.btn-add-case {
+  padding: 0.375rem 0.75rem;
+  white-space: nowrap;
+}
+
 button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
-}
-
-button[type='submit'] {
-  width: 2em;
 }
 
 div.summary {
@@ -260,8 +283,8 @@ div.filenames {
   flex: 1;
 }
 
-input[type='number'].case-weight {
-  width: 3em;
+.case-weight {
+  width: 3.5em;
 }
 
 .list-group-item-secondary {
