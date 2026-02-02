@@ -188,6 +188,9 @@ export default class SolutionTab extends Vue {
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
+    width: 100%;
+    margin-top: 35px;
+    overflow-wrap: anywhere;
   }
 }
 </style>
