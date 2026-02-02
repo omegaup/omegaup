@@ -39,13 +39,13 @@ jobs:
 
       - name: Install cspell with dictionaries
         run: |
-          npm install -g cspell@8.17.1 \
-            @cspell/dict-es-es@3.0.5 \
-            @cspell/dict-pt-br@2.3.1 \
-            @cspell/dict-software-terms@4.1.17 \
-            @cspell/dict-typescript@3.1.11 \
-            @cspell/dict-php@4.0.13 \
-            @cspell/dict-python@4.2.12
+          npm install -g cspell@latest \
+            @cspell/dict-es-es \
+            @cspell/dict-pt-br \
+            @cspell/dict-software-terms \
+            @cspell/dict-typescript \
+            @cspell/dict-php \
+            @cspell/dict-python
 
       - name: Get changed files
         id: changed-files
