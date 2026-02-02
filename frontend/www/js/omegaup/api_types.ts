@@ -5088,7 +5088,6 @@ export namespace types {
   export interface HelpResource {
     name: string;
     url: string;
-    icon: string;
     external: boolean;
   }
 
