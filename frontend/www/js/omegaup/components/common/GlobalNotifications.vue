@@ -17,14 +17,6 @@
       </button>
       <span v-if="message" class="message">
         <omegaup-markdown :markdown="message"></omegaup-markdown>
-        <button
-          v-if="isApiTokenNotification"
-          type="button"
-          class="btn btn-light btn-sm ml-2"
-          @click="onCopyToken"
-        >
-          {{ copyButtonLabel }}
-        </button>
       </span>
     </div>
   </transition>
@@ -34,8 +26,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 import notificationsStore from '../../notificationsStore';
 import omegaup_Markdown from '../Markdown.vue';
-import * as ui from '../../ui';
-import T from '../../lang';
 
 @Component({
   components: {
@@ -43,8 +33,6 @@ import T from '../../lang';
   },
 })
 export default class GlobalNotifications extends Vue {
-  T = T;
-
   get visible(): boolean {
     return notificationsStore.getters.isVisible;
   }
@@ -61,53 +49,8 @@ export default class GlobalNotifications extends Vue {
     return notificationsStore.getters.positionClass;
   }
 
-  get isApiTokenNotification(): boolean {
-    return this.extractApiTokenFromMessage() !== null;
-  }
-
-  get copyButtonLabel(): string {
-    return this.T.wordsCopyToClipboard;
-  }
-
   dismiss(): void {
     notificationsStore.dispatch('dismissNotifications');
-  }
-
-  private extractApiTokenFromMessage(): string | null {
-    const currentMessage = this.message;
-    if (!currentMessage) {
-      return null;
-    }
-
-    const template = (this as any).T?.apiTokenSuccessfullyCreated;
-    if (!template || typeof template !== 'string') {
-      return null;
-    }
-
-    const placeholder = '%(token)';
-    if (!template.includes(placeholder)) {
-      return null;
-    }
-
-    const parts = template.split(placeholder);
-    const esc = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const re = new RegExp('^' + esc(parts[0]) + '(.+?)' + esc(parts[1]) + '$');
-    const match = currentMessage.match(re);
-    if (!match) {
-      return null;
-    }
-
-    return match[1];
-  }
-
-  onCopyToken(): void {
-    const token = this.extractApiTokenFromMessage();
-    if (!token) {
-      return;
-    }
-
-    ui.copyToClipboard(token);
-    ui.success(this.T.passwordResetLinkCopiedToClipboard);
   }
 }
 </script>
