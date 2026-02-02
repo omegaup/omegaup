@@ -109,10 +109,10 @@ def get_current_problems_solved_per_month(
                         FROM
                             `Submissions` AS `s3`
                         INNER JOIN
-                            `Runs` AS `r3` 
+                            `Runs` AS `r3`
                             ON `r3`.`run_id` = `s3`.`current_run_id`
                         WHERE
-                            `s3`.`time` >= CURDATE() - 
+                            `s3`.`time` >= CURDATE() -
                             INTERVAL %(months)s MONTH
                             AND `r3`.`verdict` = "AC"
                     ) AS `pairs`
