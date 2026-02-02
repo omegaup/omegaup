@@ -121,7 +121,119 @@ jobs:
                       
                       core.setOutput('handled', 'false');
 
+            - name: Count user self-assignments
+              id: count_assignments
+              if: github.event_name == 'issue_comment' && steps.pre_check.outputs.handled != 'true'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const comment = context.payload.comment.body.trim();
+                      if (comment !== '/assign') {
+                          core.setOutput('current_count', '0');
+                          return;
+                      }
+                      
+                      const commenter = context.payload.comment.user.login;
+                      const MAX_ASSIGNMENTS = 5;
+                      
+                      // Search for ALL issues where this user ever commented "/assign"
+                      const searchQuery = `repo:${context.repo.owner}/${context.repo.repo} is:issue commenter:${commenter} "/assign" in:comments`;
+                      
+                      let potentialSelfAssignedIssues = [];
+                      try {
+                          const { data: searchResults } = await github.rest.search.issuesAndPullRequests({
+                              q: searchQuery,
+                              per_page: 100
+                          });
+                          // Filter out PRs
+                          potentialSelfAssignedIssues = searchResults.items.filter(item => !item.pull_request);
+                      } catch (error) {
+                          console.log(`Search error: ${error.message}`);
+                      }
+                      
+                      // Count self-assignments, but subtract those where user used /unassign
+                      let selfAssignCount = 0;
+                      
+                      for (const issue of potentialSelfAssignedIssues) {
+                          try {
+                              // Use timeline API to get both comments and events in chronological order
+                              const { data: timeline } = await github.rest.issues.listEventsForTimeline({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  per_page: 100
+                              });
+                              
+                              // Find all /assign comments from this user
+                              const assignComments = timeline.filter(e => {
+                                  if (e.event !== 'commented') return false;
+                                  const commentAuthor = e.actor?.login || e.user?.login;
+                                  if (commentAuthor !== commenter) return false;
+                                  return e.body?.trim() === '/assign';
+                              });
+                              
+                              // Check if any /assign resulted in a successful assignment
+                              let wasSuccessfullyAssigned = false;
+                              let lastAssignTime = 0;
+                              
+                              for (const assignComment of assignComments) {
+                                  const commentTime = new Date(assignComment.created_at).getTime();
+                                  
+                                  const wasAssigned = timeline.some(e => {
+                                      if (e.event !== 'assigned') return false;
+                                      if (e.assignee?.login !== commenter) return false;
+                                      
+                                      const assignTime = new Date(e.created_at).getTime();
+                                      return assignTime >= commentTime && (assignTime - commentTime) < 60000;
+                                  });
+                                  
+                                  if (wasAssigned) {
+                                      wasSuccessfullyAssigned = true;
+                                      lastAssignTime = Math.max(lastAssignTime, commentTime);
+                                  }
+                              }
+                              
+                              if (!wasSuccessfullyAssigned) continue;
+                              
+                              // Check if user voluntarily unassigned using /unassign AFTER the assignment
+                              const voluntaryUnassign = timeline.some(e => {
+                                  if (e.event !== 'commented') return false;
+                                  const commentAuthor = e.actor?.login || e.user?.login;
+                                  if (commentAuthor !== commenter) return false;
+                                  if (e.body?.trim() !== '/unassign') return false;
+                                  
+                                  const unassignCommentTime = new Date(e.created_at).getTime();
+                                  if (unassignCommentTime <= lastAssignTime) return false;
+                                  
+                                  // Check if this /unassign resulted in actual unassignment
+                                  return timeline.some(ue => {
+                                      if (ue.event !== 'unassigned') return false;
+                                      if (ue.assignee?.login !== commenter) return false;
+                                      
+                                      const unassignTime = new Date(ue.created_at).getTime();
+                                      return unassignTime >= unassignCommentTime && (unassignTime - unassignCommentTime) < 60000;
+                                  });
+                              });
+                              
+                              // Only count if user did NOT voluntarily unassign
+                              if (!voluntaryUnassign) {
+                                  selfAssignCount++;
+                              }
+                          } catch (error) {
+                              console.log(`Error checking timeline for issue #${issue.number}: ${error.message}`);
+                          }
+                      }
+                      
+                      // Remaining after this assignment = max - current self-assigns - 1
+                      const remainingAfterAssignment = MAX_ASSIGNMENTS - selfAssignCount - 1;
+                      
+                      core.setOutput('current_count', selfAssignCount.toString());
+                      core.setOutput('remaining_count', Math.max(0, remainingAfterAssignment).toString());
+                      core.setOutput('max_assignments', MAX_ASSIGNMENTS.toString());
+
             - name: Assign or unassign issues (standard flow)
+              id: assign_action
               if: github.event_name != 'issue_comment' || steps.pre_check.outputs.handled != 'true'
               uses: takanome-dev/assign-issue-action@beta
               with:
@@ -147,10 +259,7 @@ jobs:
                   block_assignment: true
                   block_assignment_comment: >
                       Kindly ask the maintainers to assign this issue to you again.
-                  assigned_comment: >
-                      Assigned! Please open a pull request within 7 days. If no
-                      PR is opened, this issue will be automatically unassigned
-                      to keep the queue moving.
+                  assigned_comment: ""
                   unassigned_comment: >
                       Unassigned because no pull request was opened within 7
                       days. If you want to be assigned to this issue again,
@@ -158,3 +267,27 @@ jobs:
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
                       Please note the 7-day PR expectation.
+
+            - name: Post assignment message with remaining count
+              if: github.event_name == 'issue_comment' && steps.assign_action.outputs.assigned == 'yes'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const commenter = context.payload.comment.user.login;
+                      const remaining = '${{ steps.count_assignments.outputs.remaining_count }}';
+                      const maxAssignments = '${{ steps.count_assignments.outputs.max_assignments }}';
+                      
+                      let remainingMessage = '';
+                      if (remaining === '0') {
+                          remainingMessage = `\n\nYou have reached your maximum of ${maxAssignments} assigned issues. Please complete or unassign an issue before taking another.`;
+                      } else {
+                          remainingMessage = `\n\nYou have **${remaining}** self-assign${remaining === '1' ? '' : 's'} remaining out of ${maxAssignments}.`;
+                      }
+                      
+                      await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          body: `Assigned! Please open a pull request within 7 days. If no PR is opened, this issue will be automatically unassigned to keep the queue moving.${remainingMessage}`
+                      });
