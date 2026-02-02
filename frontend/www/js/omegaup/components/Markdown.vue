@@ -10,6 +10,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
+import * as ui from '../ui';
+import T from '../lang';
 
 declare global {
   interface Window {
@@ -42,11 +44,80 @@ export default class Markdown extends Vue {
 
   mounted(): void {
     this.root.innerHTML = this.html;
+    this.injectApiTokenCopyButton();
   }
 
   @Watch('markdown')
   onMarkdownChanged(): void {
     this.root.innerHTML = this.html;
+    this.injectApiTokenCopyButton();
+  }
+
+  private injectApiTokenCopyButton(): void {
+    const template = (T as any).apiTokenSuccessfullyCreated as
+      | string
+      | undefined;
+    const tokenPlaceholder = '%(token)';
+
+    if (!template || template.indexOf(tokenPlaceholder) === -1) {
+      return;
+    }
+
+    const paragraph = this.root.querySelector('p');
+    if (!paragraph) {
+      return;
+    }
+
+    const textContent = (paragraph.textContent || '').trim();
+    const escapeRegExp = (value: string): string =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const pattern =
+      '^' +
+      escapeRegExp(template).replace(escapeRegExp(tokenPlaceholder), '(.+?)') +
+      '$';
+
+    const regex = new RegExp(pattern);
+    const match = textContent.match(regex);
+    if (!match) {
+      return;
+    }
+
+    const tokenValue = match[1].trim();
+    const [beforeText, afterText] = template.split(tokenPlaceholder);
+
+    while (paragraph.firstChild) {
+      paragraph.removeChild(paragraph.firstChild);
+    }
+
+    paragraph.appendChild(document.createTextNode(beforeText));
+
+    const tokenSpan = document.createElement('span');
+    tokenSpan.textContent = tokenValue;
+    paragraph.appendChild(tokenSpan);
+
+    const copyButton = document.createElement('button');
+    copyButton.type = 'button';
+    copyButton.className = 'btn btn-light btn-sm ml-2';
+    copyButton.appendChild(document.createTextNode('📋'));
+    copyButton.title = (T as any).wordsCopyToClipboard || '';
+    copyButton.setAttribute('aria-label', copyButton.title);
+
+    const successHint = document.createElement('span');
+    successHint.className =
+      'api-token-copy-hint text-success small ml-2 d-none';
+    successHint.textContent = '✓';
+
+    copyButton.addEventListener('click', (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      ui.copyToClipboard(tokenValue);
+      successHint.classList.remove('d-none');
+    });
+
+    paragraph.appendChild(copyButton);
+    paragraph.appendChild(successHint);
+    paragraph.appendChild(document.createTextNode(afterText));
   }
 }
 </script>
