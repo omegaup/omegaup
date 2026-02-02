@@ -940,7 +940,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         int $visibility
     ) {
         // Create a problem with a known author
-        ['identity' => $author, 'user' => $authorUser] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'public',
             'author' => $author,
