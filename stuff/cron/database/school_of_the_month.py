@@ -73,7 +73,7 @@ def get_current_problems_solved_per_month(
         cur_readonly: mysql.connector.cursor.MySQLCursorDict,
         months: int
 ) -> List[ProblemSolved]:
-    '''Get current problems solved per month'''
+    '''Gets current problems solved per month'''
     logging.info("Getting current problems solved per month")
     sql = '''
         SELECT
@@ -112,8 +112,9 @@ def get_current_problems_solved_per_month(
                             `Runs` AS `r3`
                             ON `r3`.`run_id` = `s3`.`current_run_id`
                         WHERE
-                            `s3`.`time` >= CURDATE() -
-                            INTERVAL %(months)s MONTH
+                            `s3`.`time` >= (
+                                CURDATE() - INTERVAL %(months)s MONTH
+                            )
                             AND `r3`.`verdict` = "AC"
                     ) AS `pairs`
                 ON
@@ -160,9 +161,14 @@ def insert_updated_problems_solved_per_month(
     Insert updated problems solved per month
     '''
     logging.info("Inserting updated problems solved per month")
-    for problem in problems:
-        cur.execute(
-            '''
+
+    values = [
+        (problem.school_id, problem.time, problem.problems_solved)
+        for problem in problems
+    ]
+
+    cur.executemany(
+        '''
         INSERT INTO
             `Schools_Problems_Solved_Per_Month` (
                 `school_id`,
@@ -174,7 +180,8 @@ def insert_updated_problems_solved_per_month(
             %s,
             %s
         );
-        ''', (problem.school_id, problem.time, problem.problems_solved))
+        ''', values)
+
     logging.info("Successfully inserted updated problems solved per month")
 
 
