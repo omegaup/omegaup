@@ -4751,28 +4751,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $timestampsPayload
         );
 
-        // Add warning reasons for problem owners when problem has warning/banned visibility
-        $isWarningOrBanned = in_array(
-            $problem->visibility,
-            [
-                \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
-                \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
-                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            ],
-            strict: true
-        );
-        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-        $isOwner = (
-            !is_null($acl) &&
-            !is_null($r->identity->user_id) &&
-            $r->identity->user_id === $acl->owner_id
-        );
-        if ($isWarningOrBanned && $isOwner) {
+        // Reuse warning reasons already computed in getProblemDetails() if available
+        if (isset($details['warningReasons'])) {
             $response['templateProperties']['payload']['problem']['warningReasons'] =
-                \OmegaUp\DAO\QualityNominations::getDemotionRationales(
-                    intval($problem->problem_id)
-                );
+                $details['warningReasons'];
         }
 
         if ($isAdmin) {
