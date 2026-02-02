@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, group_score_policy?: string, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
- * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextExecutionTimestamp?: \OmegaUp\Timestamp, nextSubmissionTimestamp?: \OmegaUp\Timestamp, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int, warningReasons?: list<string>}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -4750,6 +4750,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['templateProperties']['payload']['problem'],
             $timestampsPayload
         );
+
+        // Add warning reasons for problem owners when problem has warning/banned visibility
+        $isWarningOrBanned = in_array(
+            $problem->visibility,
+            [
+                \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            ],
+            strict: true
+        );
+        $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
+        $isOwner = (
+            !is_null($acl) &&
+            !is_null($r->identity->user_id) &&
+            $r->identity->user_id === $acl->owner_id
+        );
+        if ($isWarningOrBanned && $isOwner) {
+            $response['templateProperties']['payload']['problem']['warningReasons'] =
+                \OmegaUp\DAO\QualityNominations::getDemotionRationales(
+                    intval($problem->problem_id)
+                );
+        }
 
         if ($isAdmin) {
             $adminPayload  = self::getAdminPayload(
