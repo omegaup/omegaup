@@ -1,0 +1,150 @@
+name: Spell Check
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '**/*.ts'
+      - '**/*.js'
+      - '**/*.vue'
+      - '**/*.php'
+      - '**/*.py'
+      - '**/*.scss'
+      - '**/*.css'
+      - 'frontend/templates/*.lang'
+      - '.cspell-words.txt'
+      - 'cspell.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.cspell-words.txt'
+      - 'cspell.json'
+
+jobs:
+  spell-check:
+    name: Spell Check (Docs & Comments)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install cspell with dictionaries
+        run: |
+          npm install -g cspell@8.17.1 \
+            @cspell/dict-es-es@3.0.5 \
+            @cspell/dict-pt-br@2.3.1 \
+            @cspell/dict-software-terms@4.1.17 \
+            @cspell/dict-typescript@3.1.11 \
+            @cspell/dict-php@4.0.13 \
+            @cspell/dict-python@4.2.12
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # For PRs, get files changed compared to base branch
+            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }}...HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang)$' || true)
+          else
+            # For push to main, check files changed in the commit
+            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT HEAD~1 HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang)$' || true)
+          fi
+
+          # Filter out ignored paths
+          CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '^(node_modules|vendor|frontend/www/js/libs|frontend/server/libs/third_party)/' || true)
+
+          # Remove empty lines
+          CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v '^$' || true)
+
+          # Save to file for later use
+          echo "$CHANGED_FILES" > changed_files.txt
+
+          # Count files (handle empty case)
+          if [ -s changed_files.txt ]; then
+            FILE_COUNT=$(wc -l < changed_files.txt | tr -d ' ')
+          else
+            FILE_COUNT=0
+          fi
+          echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
+
+          echo "Files to check ($FILE_COUNT):"
+          cat changed_files.txt || echo "(none)"
+
+      - name: Run spell check on changed files
+        if: steps.changed-files.outputs.file_count != '0'
+        continue-on-error: true
+        run: |
+          echo "## Spell Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Files Checked (${{ steps.changed-files.outputs.file_count }} files)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to see file list</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat changed_files.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Run cspell only on changed files
+          # cspell automatically checks only comments in code files
+          # Using xargs -d to handle filenames with spaces correctly
+          SPELL_OUTPUT=$(xargs -d '\n' cspell \
+            --show-suggestions \
+            --show-context \
+            --no-must-find-files \
+            --unique \
+            --no-progress \
+            < changed_files.txt 2>&1) || true
+
+          echo "$SPELL_OUTPUT" > spell-check-results.txt
+
+          # Check if there were any issues
+          if echo "$SPELL_OUTPUT" | grep -q "Unknown word"; then
+            ISSUE_COUNT=$(echo "$SPELL_OUTPUT" | grep -c "Unknown word" || echo "0")
+
+            echo "### Spelling Issues Found ($ISSUE_COUNT)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The following spelling issues were detected in your changes:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details open>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary>Spell check output</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat spell-check-results.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### How to Fix" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "1. **Fix the typo** - Correct the spelling in your file" >> $GITHUB_STEP_SUMMARY
+            echo "2. **Add to dictionary** - If it's a valid technical term, add it to \`.cspell-words.txt\`" >> $GITHUB_STEP_SUMMARY
+            echo "3. **Inline ignore** - Use \`// cspell:ignore word\` in comments or \`<!-- cspell:ignore word -->\` in markdown" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> **Note:** This check is currently **non-blocking** (warning only)." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### No Spelling Issues Found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All checked files passed spell checking." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Skip message
+        if: steps.changed-files.outputs.file_count == '0'
+        run: |
+          echo "## Spell Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No documentation, translation, or code files were changed in this PR." >> $GITHUB_STEP_SUMMARY
