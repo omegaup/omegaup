@@ -39,6 +39,7 @@
           :show-edit-link="user.admin"
           :user-logged-in="user.loggedIn"
           :is-bookmarked="bookmarkedStatus"
+          :in-contest-or-course="inContestOrCourse"
           @toggle-bookmark="
             (problemAlias) => $emit('toggle-bookmark', problemAlias)
           "

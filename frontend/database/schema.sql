@@ -1155,6 +1155,19 @@ CREATE TABLE `Submissions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `System_Settings` (
+  `setting_id` int NOT NULL AUTO_INCREMENT,
+  `setting_key` varchar(255) NOT NULL,
+  `setting_value` text,
+  `setting_description` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`setting_id`),
+  UNIQUE KEY `unique_setting_key` (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Sistema de configuración global del sitio';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Tags` (
   `tag_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(75) NOT NULL,
@@ -1332,6 +1345,9 @@ CREATE TABLE `Users` (
   `parent_email_verification_initial` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora en que se envió el correo electrónico de verificación',
   `parent_email_verification_deadline` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años',
   `parent_email_id` int DEFAULT NULL,
+  `x_url` varchar(255) DEFAULT NULL COMMENT 'URL del perfil en X (antes Twitter)',
+  `linkedin_url` varchar(255) DEFAULT NULL COMMENT 'URL de perfil en LinkedIn',
+  `github_url` varchar(255) DEFAULT NULL COMMENT 'URL de perfil en GitHub',
   PRIMARY KEY (`user_id`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
