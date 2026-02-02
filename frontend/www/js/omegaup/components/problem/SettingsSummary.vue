@@ -50,6 +50,29 @@
         />
       </button>
     </h3>
+
+    <!-- Warning/Ban Reasons Banner -->
+    <div
+      v-if="showWarningReasons && warningReasons.length"
+      :class="[
+        'alert',
+        'mx-auto',
+        'w-75',
+        'mb-3',
+        isBanned ? 'alert-danger' : 'alert-warning',
+      ]"
+      role="alert"
+    >
+      <strong>{{
+        isBanned ? T.problemBannedBecause : T.problemWarningBecause
+      }}</strong>
+      <ul class="warning-reasons-list mb-0 mt-2">
+        <li v-for="(reason, index) in warningReasons" :key="index">
+          {{ reason }}
+        </li>
+      </ul>
+    </div>
+
     <table
       v-if="problem.accepts_submissions"
       class="table table-bordered mx-auto w-75 mb-0"
@@ -184,6 +207,21 @@ export default class ProblemSettingsSummary extends Vue {
     }
     return `${this.problem.input_limit / 1024} KiB`;
   }
+
+  get warningReasons(): string[] {
+    return this.problem.warningReasons ?? [];
+  }
+
+  get showWarningReasons(): boolean {
+    // Only show warning reasons when visibility indicators are active
+    // (which means the user is viewing their own problem details)
+    return this.showVisibilityIndicators;
+  }
+
+  get isBanned(): boolean {
+    // visibility <= -2 indicates banned status
+    return this.problem.visibility <= -2;
+  }
 }
 </script>
 
@@ -205,5 +243,11 @@ table td {
 .bookmark-inactive {
   color: $omegaup-grey--lighter;
   opacity: 0.5;
+}
+
+.warning-reasons-list {
+  max-height: 100px;
+  overflow-y: auto;
+  padding-left: 1.5rem;
 }
 </style>

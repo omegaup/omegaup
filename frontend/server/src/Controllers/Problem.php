@@ -2824,6 +2824,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $response['creation_date']
                 ),
             ];
+
+            // If problem has warning/banned status and user is the owner,
+            // show the warning reasons so they can fix the issue
+            $isWarningOrBanned = in_array(
+                $problem->visibility,
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                ],
+                strict: true
+            );
+            $isOwner = (
+                !is_null($loggedIdentity) &&
+                !is_null($loggedIdentity->user_id) &&
+                $loggedIdentity->user_id === $acl->owner_id
+            );
+            if ($isWarningOrBanned && $isOwner) {
+                $response['warningReasons'] = \OmegaUp\DAO\QualityNominations::getDemotionRationales(
+                    $problem->problem_id
+                );
+            }
         } else {
             unset($response['source']);
         }
