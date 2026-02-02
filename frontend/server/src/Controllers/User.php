@@ -5294,7 +5294,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, templateProperties: array{payload: UserHelpPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: array<string, mixed>, title: \OmegaUp\TranslationString}}
      */
     public static function getHelpForTypeScript(\OmegaUp\Request $r) {
         $helpResources = [
