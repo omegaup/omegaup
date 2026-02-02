@@ -4753,8 +4753,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Reuse warning reasons already computed in getProblemDetails() if available
         if (isset($details['warningReasons'])) {
+            /** @var list<string> */
+            $warningReasons = $details['warningReasons'];
             $response['templateProperties']['payload']['problem']['warningReasons'] =
-                $details['warningReasons'];
+                $warningReasons;
         }
 
         if ($isAdmin) {
