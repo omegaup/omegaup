@@ -422,11 +422,17 @@ export default class CourseDetails extends Vue {
   }
 
   get isExceedingDescription(): boolean {
-    return this.description.length > MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE;
+    return (
+      this.description.length >
+      MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE
+    );
   }
 
   get isExceedingObjective(): boolean {
-    return (this.objective || '').length > MAX_LENGTH.objective * DANGER_THRESHOLD_PERCENTAGE;
+    return (
+      (this.objective || '').length >
+      MAX_LENGTH.objective * DANGER_THRESHOLD_PERCENTAGE
+    );
   }
 
   mounted() {
