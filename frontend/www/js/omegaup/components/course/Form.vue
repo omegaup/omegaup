@@ -215,7 +215,6 @@
                 :multiple="true"
                 :placeholder="T.courseNewFormLanguages"
                 :close-on-select="false"
-                :close-on-select="false"
                 @select="onSelect"
               >
               </vue-multiselect>
