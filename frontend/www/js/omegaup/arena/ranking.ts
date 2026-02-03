@@ -75,7 +75,7 @@ export function onRankingEvents({
     }
   }
 
-  // convert datas to series
+  // convert data to series
   for (const name of Object.keys(dataInSeries)) {
     dataInSeries[name].push([
       finishTimestamp,
@@ -294,7 +294,7 @@ export function mergeRankings({
   originalContestEvents: types.ScoreboardEvent[];
 } {
   // This clones virtualContestData to data so that virtualContestData values
-  // won't be overriden by processes below
+  // won't be overridden by processes below
   const data = JSON.parse(JSON.stringify(scoreboard)) as types.Scoreboard;
   const dataRanking: (types.ScoreboardRankingEntry & {
     virtual?: boolean;

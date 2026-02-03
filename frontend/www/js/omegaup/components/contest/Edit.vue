@@ -156,6 +156,7 @@
           :problems="problems"
           :can-set-recommended="details.canSetRecommended"
           :initial-recommended="details.recommended"
+          :invalid-parameter-name="invalidParameterName"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
@@ -359,6 +360,7 @@ export default class Edit extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
   @Prop({ default: null }) originalContestAdmissionMode!: null | string;
   @Prop() certificatesDetails!: types.ContestCertificatesAdminDetails;
+  @Prop({ default: null }) invalidParameterName!: null | string;
 
   T = T;
   ui = ui;
