@@ -22,12 +22,12 @@
                 data-course-new-name
                 type="text"
                 required="required"
-                maxlength="100"
+                :maxlength="MAX_LENGTH.name"
             /></label>
             <small
               class="character-counter"
-              :class="{ 'text-danger': name.length > 90 }"
-              >{{ name.length }}/100</small
+              :class="{ 'text-danger': isExceedingName }"
+              >{{ name.length }}/{{ MAX_LENGTH.name }}</small
             >
           </div>
           <div class="form-group col-md-4">
@@ -50,12 +50,12 @@
                 data-course-new-alias
                 :disabled="update || readOnly"
                 required="required"
-                maxlength="32"
+                :maxlength="MAX_LENGTH.alias"
             /></label>
             <small
               class="character-counter"
-              :class="{ 'text-danger': alias.length > 28 }"
-              >{{ alias.length }}/32</small
+              :class="{ 'text-danger': isExceedingAlias }"
+              >{{ alias.length }}/{{ MAX_LENGTH.alias }}</small
             >
           </div>
           <div class="form-group col-md-4 introjs-scoreboard">
@@ -250,13 +250,13 @@
                 }"
                 cols="30"
                 rows="5"
-                maxlength="500"
+                :maxlength="MAX_LENGTH.objective"
               ></textarea>
             </label>
             <small
               class="character-counter"
-              :class="{ 'text-danger': (objective || '').length > 450 }"
-              >{{ (objective || '').length }}/500</small
+              :class="{ 'text-danger': isExceedingObjective }"
+              >{{ (objective || '').length }}/{{ MAX_LENGTH.objective }}</small
             >
           </div>
           <div class="form-group container-fluid col-md-6">
@@ -277,13 +277,13 @@
                 cols="30"
                 rows="5"
                 required="required"
-                maxlength="255"
+                :maxlength="MAX_LENGTH.description"
               ></textarea>
             </label>
             <small
               class="character-counter"
-              :class="{ 'text-danger': description.length > 230 }"
-              >{{ description.length }}/255</small
+              :class="{ 'text-danger': isExceedingDescription }"
+              >{{ description.length }}/{{ MAX_LENGTH.description }}</small
             >
           </div>
         </div>
@@ -345,6 +345,15 @@ const levelOptions = [
   },
 ];
 
+const MAX_LENGTH = {
+  name: 100,
+  alias: 32,
+  description: 255,
+  objective: 500,
+};
+
+const DANGER_THRESHOLD_PERCENTAGE = 0.9;
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -380,6 +389,7 @@ export default class CourseDetails extends Vue {
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
   levelOptions = levelOptions;
+  MAX_LENGTH = MAX_LENGTH;
 
   // Computed properties to track if required fields are complete
   get isNameComplete(): boolean {
@@ -400,6 +410,23 @@ export default class CourseDetails extends Vue {
 
   get isDescriptionComplete(): boolean {
     return this.description !== null && this.description.trim().length > 0;
+  }
+
+  // Computed properties for character limit danger thresholds
+  get isExceedingName(): boolean {
+    return this.name.length > MAX_LENGTH.name * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingAlias(): boolean {
+    return this.alias.length > MAX_LENGTH.alias * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingDescription(): boolean {
+    return this.description.length > MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingObjective(): boolean {
+    return (this.objective || '').length > MAX_LENGTH.objective * DANGER_THRESHOLD_PERCENTAGE;
   }
 
   mounted() {
