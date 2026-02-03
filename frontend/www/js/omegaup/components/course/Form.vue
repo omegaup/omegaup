@@ -170,6 +170,9 @@
               data-course-problem-level
               class="form-control introjs-level"
             >
+              <option value="" disabled>
+                {{ T.courseNewFormLevelPlaceholder }}
+              </option>
               <option
                 v-for="levelOption in levelOptions"
                 :key="levelOption.value"
@@ -181,16 +184,22 @@
           </div>
           <div class="form-group col-md-6 introjs-language">
             <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
-            <vue-multiselect
-              v-model="selectedLanguages"
-              :disabled="readOnly"
-              :options="Object.keys(allLanguages)"
-              :multiple="true"
-              :placeholder="T.courseNewFormLanguages"
-              :close-on-select="false"
-              :allow-empty="false"
+            <div
+              :class="{
+                'is-invalid-wrapper': invalidParameterName === 'languages',
+              }"
             >
-            </vue-multiselect>
+              <vue-multiselect
+                v-model="selectedLanguages"
+                :disabled="readOnly"
+                :options="Object.keys(allLanguages)"
+                :multiple="true"
+                :placeholder="T.courseNewFormLanguages"
+                :close-on-select="false"
+                :allow-empty="true"
+              >
+              </vue-multiselect>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -254,7 +263,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { types, messages } from '../../api_types';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
 import DatePicker from '../DatePicker.vue';
@@ -317,7 +326,7 @@ export default class CourseDetails extends Vue {
   showScoreboard = this.course.show_scoreboard;
   startTime = this.course.start_time;
   name = this.course.name;
-  level = this.course.level;
+  level = this.course.level ?? '';
   objective = this.course.objective;
   school: null | types.SchoolListItem = this.searchResultSchools[0] ?? null;
   needsBasicInformation = this.course.needs_basic_information;
@@ -440,13 +449,16 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', {
+    if (!this.selectedLanguages || this.selectedLanguages.length === 0) {
+      this.$emit('invalid-languages');
+      return;
+    }
+    const request: messages.CourseUpdateRequest = {
       name: this.name,
       description: this.description,
       objective: this.objective,
       start_time: this.startTime,
       alias: this.alias,
-      level: this.level,
       languages: this.selectedLanguages,
       show_scoreboard: this.showScoreboard,
       needs_basic_information: this.needsBasicInformation,
@@ -456,7 +468,12 @@ export default class CourseDetails extends Vue {
       finish_time: !this.unlimitedDuration
         ? new Date(this.finishTime).setHours(23, 59, 59, 999) / 1000
         : null,
-    });
+    };
+    // Only include level if the user selected a value
+    if (this.level) {
+      request.level = this.level;
+    }
+    this.$emit('submit', request);
   }
 
   @Emit('emit-cancel')
@@ -472,5 +489,10 @@ export default class CourseDetails extends Vue {
 
 .multiselect__tag {
   background: var(--multiselect-tag-background-color);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
 }
 </style>
