@@ -10,7 +10,215 @@
 > We encourage you to visit omegaup.org and omegaup.com to learn about our platform and features. And remember, this is an **Ideas List** we expect you complete most of the details in your proposal and you are also welcome to propose your own project idea. Don't hesitate to reach out for any questions or new ideas in our [Discord channel](https://discord.gg/gMEMX7Mrwe)!
 
 
-## Project ideas coming soon
+
+## Query Optimization and Performance Benchmarking
+
+**Brief Description**:
+
+This project aims to improve the platform’s performance by optimizing SQL queries that currently have to do full table scans and implementing 2 integration tests: 
+
+* One Integration test that analyzes the EXPLAIN of all queries to determine if it's efficient or not.
+* One integration test that analyzes the performance of all queries by running them on a synthetic dataset with dimensions comparable to those of production. 
+
+The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in [this doc](https://docs.google.com/document/d/1X_fAm97L6_v9P8_R0S_Lp7X6e7x7j7z-X5z5-x5z5z5).
+
+**Current status**:
+
+* Slow queries have been identified and documented in a [query tracker](https://docs.google.com/spreadsheets/d/1z5EZlGRY5MXUBYn5VoSX3c7Wqt14mI_iH-IY266bf_Y/edit?gid=0#gid=0).
+* Progress is tracked in the master issue [#8277](https://github.com/omegaup/omegaup/issues/8277), which lists created and merged PRs.
+* Key PRs: [#8450](https://github.com/omegaup/omegaup/pull/8450) (Script to populate database) and [#8423](https://github.com/omegaup/omegaup/pull/8423) (Inefficient query detection script).
+
+**Expected results**:
+
+Significant reduction in execution time for queries that have already been identified to be inefficient. A reproducible benchmarking system to evaluate performance improvements. Integration tests prevent introduction of new inefficient queries in the future.
+
+**Preferred skills**:
+
+* SQL query optimization
+* MySQL
+* Python
+* PHP
+* YML
+
+**Possible mentor**:
+
+[Ankitsinghsisodya](https://github.com/Ankitsinghsisodya), [pabo99](https://github.com/pabo99), [carlosabcs](https://github.com/carlosabcs)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
+## Performance Monitoring and Alerting Dashboard
+
+**Brief Description**:
+
+Define and implement meaningful performance metrics for the services that omegaUp runs, including: front end server, grader, gitserver, MySQL server. On top of that monitoring, some thresholds should be defined to alert us to our email and/or slack. Some basic monitoring and alerting is already in place, this project calls for a big improvement on top of that.
+
+**Expected results**:
+
+The monitoring and alerting allows us to catch and debug production issues before users start being significantly affected.
+
+**Preferred skills**:
+
+* New relic
+* SQL
+* PHP
+* Python
+
+**Possible mentor**:
+
+[heduenas](https://github.com/heduenas), [iqbalcodes6602](https://github.com/iqbalcodes6602)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
+
+
+## Migrating from Vue 2 to Vue 3
+
+**Brief Description**:
+
+Vue.js 2 has officially reached its EOF (End of Life) in favor of Vue.js 3. We need to migrate in order to avoid security risk and dependency deprecation and to take advantage of Vue 3's improved performance.
+
+**Expected results**:
+
+omegaup.com runs fully on Vue.js 3 and has no dependency on Vue.js 2.
+
+**Preferred skills**:
+
+* Vue.js
+* Typescript
+* PHP
+* REST APIs
+
+**Possible mentor**:
+
+[pabo99](https://github.com/pabo99), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
+
+
+## Migrating Bootstrap 4 to 5
+
+**Brief Description**:
+
+Migrate the UI to Bootstrap 5 to modernize the UI by replacing jQuery with Vanilla JavaScript, resulting in a lighter and faster codebase. This upgrade will enable easier theming through CSS variables and drop legacy IE support to embrace modern web standards. Ultimately, it reduces technical debt while providing a more responsive grid system tailored for high-resolution displays.
+
+**Expected results**:
+
+The omegaUp UI runs fully on bootstrap 5 and has no dependency on boostrap 4.
+
+**Preferred skills**:
+
+* Vue.js
+* Typescript
+* PHP
+* REST APIs
+
+**Possible mentor**:
+
+[pabo99](https://github.com/pabo99), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+Medium
+
+
+
+## Cronjob Optimization
+
+**Brief Description**:
+
+We have a number of cronjobs responsible for things such as updating student/school rankings, awarding badges to students, etc. Over the time they have become inefficient, error prone and hard to debug. We want to make them more efficient, increase their test coverage and improve their debug-ability.
+
+**Expected results**:
+
+Cronjobs become much leaner, faster and easier to maintain.
+
+**Preferred skills**:
+
+* Python
+* SQL query optimization
+* PHP
+* REST APIs
+
+**Possible mentor**:
+
+[Ankitsinghsisodya](https://github.com/Ankitsinghsisodya), [iqbalcodes6602](https://github.com/iqbalcodes6602), [carlosabcs](https://github.com/carlosabcs)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+High
+
+
+
+## Integrate Problem Creator
+
+**Brief Description**:
+
+A project from last year's GSoC introduced the Problem Creator, a visual editor that helps problem authors create and edit problems more easily. However, the Problem Creator isn't yet fully integrated with omegaUp. Currently, authors must write their problem in the Creator, download a .zip, and upload it manually. This project aims to streamline these workflows by fully integrating the Problem Creator with omegaUp's native create and edit features.
+
+**Current Status**:
+
+* A technical [pdesign doc](https://docs.google.com/document/d/1qpBwJQ6QIiIXgWpb_qa6OJ8KpJPcd11x3qKiefdgPAw/edit?tab=t.0) has been written for this project. 
+* Completed backend changes:
+  * #8470 CDP classes and validations, added core CDP classes and validation logic.
+  * #8479 New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
+  * #8554 CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
+  * #8606 Language support in CDPBuilder, added multi-language support with priority based on languagePreference
+  * #8613 Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
+  * Initial UI change completed: #8593 CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases 
+* Pending work (mostly UI-related)
+  * #8471 Integrate CDP into the problem form and handle external ZIPs
+  * #8492 UI implementation for the editing interface
+  * #8595 UI integration: Edit view, CaseEdit, and Sidebar
+
+**Expected results**:
+
+A seamless end-to-end user experience where authors can create or edit problems directly via the Problem Creator without manual file transfers.
+
+**Preferred skills**:
+
+* Vue.js
+* TypeScript
+* PHP
+* Integration Testing
+
+**Possible mentor**:
+
+[pabo99](https://github.com/pabo99), [heduenas](https://github.com/heduenas), Ankitsinghsisodya](https://github.com/Ankitsinghsisodya)
+
+**Estimated size of project:**
+
+175 hours
+
+**Skill level**:
+
+High
 
 # How to Ramp Up
 
