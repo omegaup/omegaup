@@ -2188,6 +2188,7 @@ const translations: { [key: string]: string; } = {
   wordsRemoveFilter: "Quitar filtros",
   wordsReportProblem: "Reportar problema",
   wordsRequired: "Requerido",
+  wordsRequiredField: "* Campo obligatorio",
   wordsReset: "omegaUp: Restablecer contrase\u00f1a.",
   wordsResetMessage: "Da clic en el siguiente enlace para restablecer tu contrase\u00f1a: <a href=\"[link]\">[link]</a><br><br>Si tu no solicitaste esta operaci\u00f3n no hagas clic y verifica que tu cuenta este a salvo.",
   wordsResult: "Respuesta",
