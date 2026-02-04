@@ -68,6 +68,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
+import { SafeStorage } from '../../safe_storage';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -128,13 +129,15 @@ export default class Clarifications extends Vue {
     this.unreadClarifications = this.unreadClarifications.filter(
       (element) => element.clarification_id !== clarification.clarification_id,
     );
-    localStorage.setItem(id, Date.now().toString());
+    if (!SafeStorage.setItem(id, Date.now().toString())) {
+      console.warn('Could not persist clarification state');
+    }
   }
 
   onMarkAllAsRead(): void {
     for (const clarification of this.unreadClarifications) {
       const id = `clarification-${clarification.clarification_id}`;
-      localStorage.setItem(id, Date.now().toString());
+      SafeStorage.setItem(id, Date.now().toString());
     }
     this.unreadClarifications = [];
   }
