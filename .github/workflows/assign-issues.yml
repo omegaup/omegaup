@@ -261,9 +261,9 @@ jobs:
                       Kindly ask the maintainers to assign this issue to you again.
                   assigned_comment: ""
                   unassigned_comment: >
-                      Unassigned because no pull request was opened within 7
-                      days. If you want to be assigned to this issue again,
-                      kindly ask the maintainers to assign it to you again.
+                      You have been unassigned from this issue. If you want to
+                      be assigned to this issue again, kindly ask the
+                      maintainers to assign it to you again.
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
                       Please note the 7-day PR expectation.
