@@ -145,7 +145,7 @@ def regudge_all_ce_submissions() -> None:
     with logging_redirect_tqdm():
         for run_id in tqdm(run_ids_list):
             process_rejudge_for_single_run(run_id)
-        print("Total of rejudged submissions: %s" % len(run_ids_list))
+        print(f"Total of rejudged submissions: {len(run_ids_list)}")
 
 
 def handle_input() -> None:

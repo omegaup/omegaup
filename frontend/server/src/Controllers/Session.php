@@ -506,7 +506,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $suffix = '';
         for (;;) {
             // Maybe we can bring all records from db
-            // with prefix $username, beacuse this:
+            // with prefix $username, because this:
             $userexists = \OmegaUp\DAO\Users::FindByUsername(
                 "{$username}{$suffix}"
             );

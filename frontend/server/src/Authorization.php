@@ -76,7 +76,7 @@ class Authorization {
     // Certificate generator.
     const CERTIFICATE_GENERATOR_ROLE = 8;
 
-    // Teaching assitant.
+    // Teaching assistant.
     const TEACHING_ASSISTANT_ROLE = 9;
 
     // System-level ACL.
@@ -100,7 +100,7 @@ class Authorization {
     // Group for certificate generators.
     const CERTIFICATE_GENERATOR_GROUP_ALIAS = 'omegaup:certificate-generator';
 
-    // Group for teaching assitants.
+    // Group for teaching assistants.
     const TEACHING_ASSISTANT_GROUP_ALIAS = 'omegaup:teaching-assistant';
 
     public static function canViewSubmission(

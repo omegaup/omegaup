@@ -109,6 +109,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'invalid-languages': () => {
+            ui.error(T.courseNewFormLanguagesRequired);
+            this.invalidParameterName = 'languages';
+          },
         },
       });
     },

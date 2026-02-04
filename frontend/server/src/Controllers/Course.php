@@ -796,7 +796,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visibility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -2909,7 +2909,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -5538,7 +5538,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates and authenticate token for operations when user can be logged
      * in or not. This is the only private function that receives Request as a
-     * parameter because it needs authenticate it wheter there is no token.
+     * parameter because it needs authenticate it whether there is no token.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -5604,7 +5604,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // hasToken is true, it means we do not autenticate request user
+        // hasToken is true, it means we do not authenticate request user
         return [
             'courseAdmin' => $courseAdmin,
             'hasToken' => true,

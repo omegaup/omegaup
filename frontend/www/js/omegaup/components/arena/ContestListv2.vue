@@ -508,23 +508,20 @@ class ArenaContestList extends Vue {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
+      tab_name: this.currentTab,
       query: this.currentQuery,
-      sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
-      filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
     };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
     this.currentPage = 1;
     this.hasMore = true;
     this.fetchPage(params, urlObj);
   }
   onReset() {
     this.currentQuery = '';
+    this.onSearchQuery();
   }
   fetchInitialContests() {
     const urlObj = new URL(window.location.href);

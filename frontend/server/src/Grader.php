@@ -82,7 +82,7 @@ class Grader {
                     $runs
                 ),
                 'rejudge' => true,
-                'debug' => false, // TODO(lhchavez): Reenable with ACLs.
+                'debug' => false, // TODO(lhchavez): Re-enable with ACLs.
             ]
         );
     }
