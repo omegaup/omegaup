@@ -244,6 +244,7 @@ import common_TablePaginator from '../common/TablePaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
+import { setMetaDescription, setMetaTitle } from '../../meta';
 import {
   Problem,
   ContestResult,
@@ -308,6 +309,17 @@ export default class ViewProfile extends Vue {
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+
+  mounted(): void {
+    if (this.profile) {
+      setMetaTitle(`${this.profile.username} - omegaUp`);
+      setMetaDescription(
+        `${this.profile.username} (${this.profile.name || ''}). ${
+          T.profileRank
+        }: ${this.rank}. ${this.profile.country_id || ''}`,
+      );
+    }
+  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];

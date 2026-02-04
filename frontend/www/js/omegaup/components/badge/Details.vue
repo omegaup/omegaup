@@ -56,6 +56,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import omegaup_Markdown from '../Markdown.vue';
 import Badge3D from './Badge3D.vue';
+import { setMetaDescription, setMetaTitle } from '../../meta';
 
 @Component({
   components: {
@@ -67,6 +68,13 @@ export default class BadgeDetails extends Vue {
   @Prop() badge!: types.Badge;
 
   T = T;
+
+  mounted(): void {
+    if (this.badge) {
+      setMetaTitle(`${this.name} - omegaUp`);
+      setMetaDescription(`${this.name}. ${this.description}`);
+    }
+  }
 
   get name(): string {
     return T[`badge_${this.badge.badge_alias}_name`];

@@ -14,6 +14,11 @@
 
     <script type="text/javascript" src="{% versionHash '/js/error_handler.js' %}"></script>
     <title>{{ title }} &ndash; omegaUp</title>
+    <meta name="description" content="omegaUp - Competitive Programming Platform. Practice algorithms, participate in contests, and improve your coding skills.">
+    <meta property="og:description" content="omegaUp - Competitive Programming Platform. Practice algorithms, participate in contests, and improve your coding skills.">
+    <meta name="twitter:description" content="omegaUp - Competitive Programming Platform. Practice algorithms, participate in contests, and improve your coding skills.">
+    <meta property="og:title" content="{{ title }} &ndash; omegaUp">
+    <meta name="twitter:title" content="{{ title }} &ndash; omegaUp">
     <script type="text/javascript" src="{% versionHash '/third_party/js/jquery-3.5.1.min.js' %}"></script>
     <script type="text/javascript" src="{% versionHash '/js/jquery_error_handler.js' %}"></script>
     <script type="text/javascript" src="{% versionHash '/third_party/js/highstock.js' %}" defer></script>

@@ -332,6 +332,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
+import { setMetaDescription, setMetaTitle } from '../../meta';
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_AssignmentCard from './AssignmentCard.vue';
@@ -371,6 +372,17 @@ export default class CourseDetails extends Vue {
     [Tab.Content]: T.courseDetailsTabContent,
   };
   selectedTab = Tab.Content;
+
+  mounted(): void {
+    if (this.course) {
+      setMetaTitle(`${this.course.name} - omegaUp`);
+      setMetaDescription(
+        `${T.wordsCourse} ${
+          this.course.name
+        }. ${this.course.description.substring(0, 150)}...`,
+      );
+    }
+  }
 
   get overallCompletedPercentage(): number {
     let score = 0;

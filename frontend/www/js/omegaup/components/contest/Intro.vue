@@ -193,6 +193,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { setMetaDescription, setMetaTitle } from '../../meta';
 import { omegaup } from '../../omegaup';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
@@ -229,6 +230,18 @@ export default class ContestIntro extends Vue {
   };
   shareUserInformation = null;
   now = Date.now();
+
+  mounted(): void {
+    if (this.contest) {
+      setMetaTitle(`${ui.contestTitle(this.contest)} - omegaUp`);
+      setMetaDescription(
+        `${ui.contestTitle(this.contest)}. ${this.contest.description.substring(
+          0,
+          150,
+        )}...`,
+      );
+    }
+  }
 
   get redirectURL(): string {
     const url = encodeURIComponent(window.location.pathname);
