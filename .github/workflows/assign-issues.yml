@@ -4,8 +4,8 @@ on:
     issue_comment:
         types: [created]
     schedule:
-        # Run daily to handle reminders and automatic unassignments
-        - cron: "0 3 * * *"
+        # Run daily to handle automatic unassignments
+        - cron: "0 0 * * *"
     workflow_dispatch:
 
 jobs:
@@ -13,41 +13,29 @@ jobs:
         runs-on: ubuntu-22.04
         permissions:
             issues: write
-            pull-requests: write
+            pull-requests: read
         steps:
-            - name: Assign or unassign issues
-              uses: takanome-dev/assign-issue-action@beta
+            - uses: actions/checkout@v4
+
+            - name: Assign / unassign
+              uses: actions/github-script@v7
+              env:
+                  ASSIGN_CMD: /assign
+                  UNASSIGN_CMD: /unassign
+
+                  # Configurable limits
+                  MAX_ASSIGNMENTS_PER_USER: "5"
+                  MAX_ASSIGNEES_PER_ISSUE: "1"
+
+                  # If a user has >= N merged PRs in the repo, they bypass the per-user assignment limit.
+                  BYPASS_MERGED_PR_THRESHOLD: "10"
+
+                  # Auto-unassign if no PR is raised within N days of assignment.
+                  DEADLINE_DAYS: "7"
+
+                  ENABLE_SUGGESTION: "true"
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  maintainers: ""
-                  self_assign_cmd: /assign
-                  self_unassign_cmd: /unassign
-                  # Unassign after 5 days if no PR is opened
-                  days_until_unassign: 7
-                  enable_auto_suggestion: true
-                  allow_self_assign_author: true
-                  enable_reminder: true
-                  reminder_days: auto
-                  reminder_comment: >
-                      Quick reminder: please open a pull request within 2.5 days
-                      or this issue will be unassigned so others can pick it up.
-                  assigned_label: ""
-                  pin_label: ""
-                  max_assignments: 3
-                  max_assignments_message: >
-                      You already have the maximum number of assigned issues (3).
-                      Please wrap up or unassign one before taking another.
-                  block_assignment: true
-                  block_assignment_comment: >
-                      Kindly ask the maintainers to assign this issue to you again.
-                  assigned_comment: >
-                      Assigned! Please open a pull request within 5 days. If no
-                      PR is opened, this issue will be automatically unassigned
-                      to keep the queue moving.
-                  unassigned_comment: >
-                      Unassigned because no pull request was opened within 5
-                      days. If you want to be assigned to this issue again,
-                      kindly ask the maintainers to assign it to you again.
-                  assignment_suggestion_comment: >
-                      If you'd like to take this issue, comment with /assign.
-                      Please note the 5-day PR expectation.
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const main = require('./.github/scripts/assign-issues/index.js');
+                      await main({ github, context, core });
