@@ -54,13 +54,8 @@
     <!-- Warning/Ban Reasons Banner -->
     <div
       v-if="showWarningReasons && warningReasons.length"
-      :class="[
-        'alert',
-        'mx-auto',
-        'w-75',
-        'mb-3',
-        isBanned ? 'alert-danger' : 'alert-warning',
-      ]"
+      class="alert mx-auto w-75 mb-3"
+      :class="isBanned ? 'alert-danger' : 'alert-warning'"
       role="alert"
     >
       <strong>{{
@@ -106,21 +101,21 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
+  faBan,
+  faBookmark,
   faEdit,
   faExclamationTriangle,
-  faEyeSlash,
-  faBan,
   faExternalLinkAlt,
-  faBookmark,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(
   faExclamationTriangle,
   faEdit,
