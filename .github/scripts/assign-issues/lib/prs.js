@@ -1,7 +1,9 @@
 const { searchCount } = require('./github');
+const { formatQualifierValue, normalizeLogin } = require('./search');
 
 async function getMergedPrCount({ github, owner, repo, author }) {
-  const q = `repo:${owner}/${repo} is:pr is:merged author:${author}`;
+  const login = normalizeLogin(author);
+  const q = `repo:${owner}/${repo} is:pr is:merged author:${formatQualifierValue(login)}`;
   return await searchCount({ github, q });
 }
 
@@ -66,4 +68,3 @@ async function hasLinkedPrByAuthorSince({ github, owner, repo, issueNumber, auth
 }
 
 module.exports = { getMergedPrCount, hasLinkedPrByAuthorSince };
-

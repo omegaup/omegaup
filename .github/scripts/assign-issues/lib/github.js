@@ -36,6 +36,15 @@ async function searchAllIssues({ github, q }) {
   return await github.paginate(github.rest.search.issuesAndPullRequests, { q, per_page: 100 });
 }
 
+async function listRepoIssues({ github, owner, repo, state = 'open' }) {
+  return await github.paginate(github.rest.issues.listForRepo, {
+    owner,
+    repo,
+    state,
+    per_page: 100,
+  });
+}
+
 module.exports = {
   createIssueComment,
   addIssueAssignees,
@@ -44,5 +53,5 @@ module.exports = {
   listIssueComments,
   searchCount,
   searchAllIssues,
+  listRepoIssues,
 };
-
