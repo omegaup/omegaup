@@ -678,7 +678,7 @@ CREATE TABLE `Problem_Viewed` (
 CREATE TABLE `Problems` (
   `problem_id` int NOT NULL AUTO_INCREMENT,
   `acl_id` int NOT NULL,
-  `visibility` int NOT NULL DEFAULT '1' COMMENT '-1 banned, 0 private, 1 public, 2 recommended',
+  `visibility` enum('-10','-3','-2','-1','0','1','2','3') NOT NULL DEFAULT '2' COMMENT '-10 deleted, -3 private_banned, -2 public_banned, -1 private_warning, 0 private, 1 public_warning, 2 public, 3 promoted',
   `title` varchar(256) NOT NULL,
   `alias` varchar(32) NOT NULL,
   `commit` char(40) NOT NULL DEFAULT 'published' COMMENT 'El hash SHA1 del commit en la rama master del problema.',
