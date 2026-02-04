@@ -445,14 +445,46 @@ class User extends \OmegaUp\Controllers\Controller {
             return;
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get(
-            'verificationEmailSubject'
+        $identity = null;
+        if (!is_null($user->main_identity_id)) {
+            $identity = \OmegaUp\DAO\Identities::getByPK(
+                $user->main_identity_id
+            );
+        }
+        $translator = \OmegaUp\Translations::getInstance($identity);
+        $subject = $translator->get('verificationEmailSubject');
+
+        // Build verification link and generate HTML email
+        $verificationLink = OMEGAUP_URL . '/user/verifyemail/' . strval(
+            $user->verification_id
+        ) . '/';
+        $messages = [
+            'welcome_title' => $translator->get(
+                'emailVerificationWelcomeTitle'
+            ),
+            'welcome_intro' => $translator->get(
+                'emailVerificationWelcomeIntro'
+            ),
+            'verify_section_title' => $translator->get(
+                'emailVerificationSectionTitle'
+            ),
+            'verify_instruction' => $translator->get(
+                'emailVerificationInstruction'
+            ),
+            'verify_button' => $translator->get('emailVerificationButton'),
+            'verify_subtext' => $translator->get('emailVerificationSubtext'),
+            'security_notice' => $translator->get(
+                'emailVerificationSecurityNotice'
+            ),
+            'closing' => $translator->get('emailVerificationClosing'),
+        ];
+        $emailContent = \OmegaUp\Email\EmailTemplate::getVerificationEmailContent(
+            $verificationLink,
+            $messages
         );
-        $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
-            [
-                'verification_id' => strval($user->verification_id),
-            ]
+        $body = \OmegaUp\Email\EmailTemplate::wrapWithBranding(
+            $subject,
+            $emailContent
         );
 
         \OmegaUp\Email::sendEmail([$email->email], $subject, $body);
@@ -849,7 +881,7 @@ class User extends \OmegaUp\Controllers\Controller {
             if (!$user->verified) {
                 self::apiVerifyEmail(new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
-                    'usernameOrEmail' => $username
+                    'usernameOrEmail' => $username,
                 ]));
             }
             \OmegaUp\Validators::validateStringNonEmpty(
