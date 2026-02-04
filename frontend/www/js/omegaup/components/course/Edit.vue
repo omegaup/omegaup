@@ -97,11 +97,13 @@
           :all-languages="data.allLanguages"
           :search-result-schools="searchResultSchools"
           :read-only="readOnly"
+          :invalid-parameter-name="invalidParameterName"
           @emit-cancel="onCancel"
           @submit="(request) => $emit('submit-edit-course', request)"
           @update-search-result-schools="
             (query) => $emit('update-search-result-schools', query)
           "
+          @invalid-languages="$emit('invalid-languages')"
         ></omegaup-course-form>
       </div>
 
