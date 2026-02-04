@@ -2188,6 +2188,7 @@ const translations: { [key: string]: string; } = {
   wordsRemoveFilter: "Remove filters",
   wordsReportProblem: "Report problem",
   wordsRequired: "Required",
+  wordsRequiredField: "* Required field",
   wordsReset: "omegaUp: Reset password.",
   wordsResetMessage: "Click the following link to reset your password: <a href=\"[link]\">[link]</a><br><br>If you didn't request this operation please do not click the link and make sure your account is safe.",
   wordsResult: "Answer",
