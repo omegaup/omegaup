@@ -17,7 +17,7 @@ If you're new to omegaUp, we recommend:
 
 The first step is setting up the development environment. We use Docker for this, and the main operating systems used are Windows and Ubuntu. It can run on macOS, but additional configurations are needed.  
 
-- [Development Environment Installation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Set-Up-Your-Development-Environment-(English).md).  
+- [Development Environment Installation](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md).  
 
 ## Architecture (Overview)  
 
@@ -75,6 +75,6 @@ These are the main directories actively used in development:
 
 | Topic | Description |  
 | ---------------------------- | ------------------------------------------------------------ |  
-| [How to Start Developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md) | Git configuration and how to submit a PR. |  
-| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md) | Software architecture of omegaUp.com. |  
-| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md) | How and when deployments occur. |  
+| [How to Start Developing](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md) | Git configuration and how to submit a PR. |  
+| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture.md) | Software architecture of omegaUp.com. |  
+| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment.md) | How and when deployments occur. |  
