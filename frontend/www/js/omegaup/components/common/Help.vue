@@ -18,9 +18,7 @@
               </h5>
               <p class="card-text">
                 {{
-                  T[
-                    `helpResource${capitalizeFirst(resource.name)}Description`
-                  ]
+                  T[`helpResource${capitalizeFirst(resource.name)}Description`]
                 }}
               </p>
               <a
@@ -63,7 +61,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { types } from '../../api_types';
 
 @Component
@@ -71,7 +68,6 @@ export default class CommonHelp extends Vue {
   @Prop() helpResources!: types.HelpResource[];
 
   T = T;
-  ui = ui;
 
   capitalizeFirst(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
