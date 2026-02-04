@@ -2653,13 +2653,6 @@ export namespace types {
       );
     }
 
-    export function UserHelpPayload(
-      elementId: string = 'payload',
-    ): types.UserHelpPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
-      );
-    }
   }
 
   export interface ActivityEvent {
@@ -5094,15 +5087,7 @@ export namespace types {
     external: boolean;
   }
 
-  export interface UserHelpPayload {
-    helpResources: types.HelpResource[];
-  }
 
-  export interface HelpResource {
-    name: string;
-    url: string;
-    external: boolean;
-  }
 
   export interface UserDocument {
     name: string;
