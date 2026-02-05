@@ -750,6 +750,7 @@
 	"dependentsTitle": "Parental access",
 	"dependentsUser": "User",
 	"dependentsVerified": "Dependent's account has been verified successfully",
+	"dependentsEmptyState": "You don’t have any dependents yet.",
 	"downloadError": "Error while downloading the problem",
 	"downloadZip": "Download zip",
 	"duplicateTagsNotAllowed": "Duplicated tags are not allowed. There is at least one duplicated tag in the list: %(tags) <br> Please fix the information.",

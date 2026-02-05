@@ -750,6 +750,7 @@
 	"dependentsTitle": "Acceso parental",
 	"dependentsUser": "Usuario",
 	"dependentsVerified": "La cuenta del dependiente ha sido verificada correctamente",
+	"dependentsEmptyState": "Todavía no tienes dependientes.",
 	"downloadError": "Error al descargar el problema",
 	"downloadZip": "Descargar zip",
 	"duplicateTagsNotAllowed": "No se permiten etiquetas duplicadas. Hay al menos una etiqueta duplicada en la lista: %(tags) <br> Corrija la informaci\u00f3n.",
