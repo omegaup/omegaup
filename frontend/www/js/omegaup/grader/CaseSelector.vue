@@ -11,32 +11,29 @@
         <input
           v-model="newCaseWeight"
           class="form-control case-weight"
-          type="text"
-          :placeholder="'1'"
+          type="number"
+          :placeholder="T.wordsCaseWeight"
         />
         <input
           v-model="newCaseName"
           class="form-control"
           type="text"
           data-case-name
-          :placeholder="T.wordsCase + ' name'"
+          :placeholder="T.wordsCaseName"
         />
-        <div class="input-group-append">
-          <button
-            class="btn btn-sm btn-add-case"
-            :class="{
-              'btn-primary': theme == 'vs',
-              'btn-secondary': theme == 'vs-dark',
-            }"
-            type="submit"
-            :disabled="!newCaseName.length"
-            data-add-button
-            @click="createCase()"
-          >
-            + {{ T.wordsCase }}
-          </button>
-        </div>
       </div>
+      <button
+        class="btn btn-sm text-nowrap w-100 mt-2"
+        :class="{
+          'btn-primary': theme == 'vs',
+          'btn-secondary': theme == 'vs-dark',
+        }"
+        type="submit"
+        :disabled="!newCaseName.length"
+        data-add-button
+      >
+        {{ T.wordsAddCase }}
+      </button>
     </form>
     <div class="filenames">
       <div class="list-group">
@@ -113,7 +110,7 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  newCaseWeight: number = 1;
+  newCaseWeight: any = '';
   newCaseName: string = '';
   T = T;
 
@@ -217,10 +214,10 @@ export default class CaseSelector extends Vue {
 
     store.dispatch('createCase', {
       name: this.newCaseName,
-      weight: parseFloat(this.newCaseWeight.toString()),
+      weight: parseFloat(this.newCaseWeight.toString()) || 1,
     });
 
-    this.newCaseWeight = 1;
+    this.newCaseWeight = '';
     this.newCaseName = '';
   }
 
@@ -246,13 +243,8 @@ export default class CaseSelector extends Vue {
 }
 
 .case-form {
-  padding: 0.5em 0.75em 0.25em;
+  padding: 0.5em 0.75em 0.5em;
   border-bottom: 1px solid $omegaup-grey--lighter;
-}
-
-.btn-add-case {
-  padding: 0.375rem 0.75rem;
-  white-space: nowrap;
 }
 
 button.in-group {
@@ -284,7 +276,15 @@ div.filenames {
 }
 
 .case-weight {
-  width: 3.5em;
+  flex: 1 1 auto;
+}
+
+.input-group [data-case-name] {
+  flex: 1 1 auto;
+}
+
+.case-form .btn {
+  font-weight: 600;
 }
 
 .list-group-item-secondary {
