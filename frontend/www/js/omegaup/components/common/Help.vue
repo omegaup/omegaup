@@ -50,7 +50,7 @@
             >
           </li>
           <li class="list-group-item">
-            <a href="/privacypolicy/">{{ T.wordsPrivacyPolicyAccepted }}</a>
+            <a href="/privacypolicy/">{{ T.wordsPrivacyPolicy }}</a>
           </li>
         </ul>
       </div>
