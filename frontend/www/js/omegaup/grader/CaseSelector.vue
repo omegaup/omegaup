@@ -277,14 +277,24 @@ div.filenames {
 
 .case-weight {
   flex: 1 1 auto;
+  font-weight: 600;
+  align-items: center;
+  display: flex;
 }
 
 .input-group [data-case-name] {
   flex: 1 1 auto;
+  font-weight: 500;
 }
 
 .case-form .btn {
   font-weight: 600;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  font-size: 10px;
+  margin-left: 2px;
 }
 
 .list-group-item-secondary {
@@ -342,6 +352,14 @@ div.filenames {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
   border-color: var(--vs-dark-border-color-medium);
+}
+
+.vs-dark input[type='number']::-webkit-inner-spin-button,
+.vs-dark input[type='number']::-webkit-outer-spin-button {
+  opacity: 0.6;
+  filter: invert(1);
+  font-size: 10px;
+  margin-left: 2px;
 }
 
 .vs-dark .btn-secondary {
