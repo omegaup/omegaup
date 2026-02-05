@@ -32,6 +32,7 @@ from database.school_of_the_month import (
     delete_problems_solved_per_month,
     get_current_problems_solved_per_month,
     insert_updated_problems_solved_per_month,
+    get_last_12_schools_of_the_month,
 )
 
 
@@ -469,11 +470,14 @@ def compute_points_for_school(
 ) -> List[School]:
     '''Computes the points for each eligible school'''
 
-    # TODO: Exclude last 12 schools of the month winners in eligible schools
-    # last_12_schools = get_last_12_schools_of_the_month(
-    #     cur_readonly,
-    #     first_day_of_current_month
-    # )
+    # Exclude last 12 schools of the month winners in eligible schools
+    last_12_schools = get_last_12_schools_of_the_month(
+        cur_readonly,
+        first_day_of_current_month
+    )
+
+    last_12_schools_ids = {school.school_id for school in last_12_schools}
+
     eligible_schools = get_school_of_the_month_candidates(
         cur_readonly,
         first_day_of_next_month,
@@ -484,6 +488,21 @@ def compute_points_for_school(
         first_day_of_current_month,
         first_day_of_next_month
     )
+
+    if last_12_schools_ids:
+        eligible_schools = [
+            s for s in eligible_schools
+            if s.school_id not in last_12_schools_ids
+        ]
+        eligible_users = [
+            u for u in eligible_users
+            if u.school_id is None or u.school_id not in last_12_schools_ids
+        ]
+
+    # Debug
+    if not eligible_schools:
+        logging.info('No eligible schools founds.')
+        return []
 
     eligible_problems = get_eligible_problems(cur_readonly)
 

@@ -424,7 +424,7 @@ def get_sot_eligible_users(
     first_day_of_current_month: datetime.date,
     first_day_of_next_month: datetime.date
 ) -> List[UserRank]:
-    '''Returns the list of eligible users for coder of the month'''
+    '''Returns the list of eligible users for school of the month'''
     # Verificar que seleccione bien los usuarios elegibles
     logging.info(
         'Getting the list of eligible users for school of the month '
