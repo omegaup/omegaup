@@ -20,7 +20,7 @@ OmegaUp.on('ready', () => {
       'omegaup-course-form': course_Form,
     },
     data: () => ({
-      invalidParameterName: '',
+      invalidParameterName: null as null | string,
       searchResultSchools: searchResultSchools,
     }),
     render: function (createElement) {
@@ -112,6 +112,12 @@ OmegaUp.on('ready', () => {
           'invalid-languages': () => {
             ui.error(T.courseNewFormLanguagesRequired);
             this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
         },
       });
