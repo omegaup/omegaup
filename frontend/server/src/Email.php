@@ -77,8 +77,8 @@ class Email {
         $mail->SMTPAuth = true;
         $mail->Password = OMEGAUP_EMAIL_SMTP_PASSWORD;
         $mail->From = OMEGAUP_EMAIL_SMTP_FROM;
-        $mail->Port = OMEGAUP_EMAIL_SMTP_PORT;
-        $mail->SMTPSecure = false;
+        $mail->Port = intval(OMEGAUP_EMAIL_SMTP_PORT);
+        $mail->SMTPSecure = '';
         $mail->Username = OMEGAUP_EMAIL_SMTP_USER;
         $mail->Timeout = 30;
         $mail->SMTPKeepAlive = true;
