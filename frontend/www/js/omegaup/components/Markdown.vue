@@ -44,80 +44,61 @@ export default class Markdown extends Vue {
 
   mounted(): void {
     this.root.innerHTML = this.html;
-    this.injectApiTokenCopyButton();
+    this.injectCopyButtons();
   }
 
   @Watch('markdown')
   onMarkdownChanged(): void {
     this.root.innerHTML = this.html;
-    this.injectApiTokenCopyButton();
+    this.injectCopyButtons();
   }
 
-  private injectApiTokenCopyButton(): void {
-    const template = (T as any).apiTokenSuccessfullyCreated as
-      | string
-      | undefined;
-    const tokenPlaceholder = '%(token)';
-
-    if (!template || template.indexOf(tokenPlaceholder) === -1) {
+  private injectCopyButtons(): void {
+    if (!this.root) {
       return;
     }
 
-    const paragraph = this.root.querySelector('p');
-    if (!paragraph) {
+    const codeElements = this.root.querySelectorAll('span > code');
+    if (!codeElements.length) {
       return;
     }
 
-    const textContent = (paragraph.textContent || '').trim();
-    const escapeRegExp = (value: string): string =>
-      value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    codeElements.forEach((element) => {
+      const codeElement = element as HTMLElement;
+      const parentSpan = codeElement.parentElement;
+      if (!parentSpan) {
+        return;
+      }
 
-    const pattern =
-      '^' +
-      escapeRegExp(template).replace(escapeRegExp(tokenPlaceholder), '(.+?)') +
-      '$';
+      if (parentSpan.querySelector('.copy-btn')) {
+        return;
+      }
 
-    const regex = new RegExp(pattern);
-    const match = textContent.match(regex);
-    if (!match) {
-      return;
-    }
+      const copyButton = document.createElement('button');
+      copyButton.type = 'button';
+      copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
+      copyButton.textContent = T.wordsCopyToClipboard;
 
-    const tokenValue = match[1].trim();
-    const [beforeText, afterText] = template.split(tokenPlaceholder);
+      const copyHint = document.createElement('span');
+      copyHint.className = 'copy-hint';
+      copyHint.textContent = T.wordsCopiedToClipboard || 'Copied';
 
-    while (paragraph.firstChild) {
-      paragraph.removeChild(paragraph.firstChild);
-    }
+      copyButton.addEventListener('click', () => {
+        const codeText = (codeElement.textContent || '').trim();
+        ui.copyToClipboard(codeText);
 
-    paragraph.appendChild(document.createTextNode(beforeText));
+        copyHint.classList.remove('fade-out');
+        copyHint.classList.add('fade-in');
 
-    const tokenSpan = document.createElement('span');
-    tokenSpan.textContent = tokenValue;
-    paragraph.appendChild(tokenSpan);
+        window.setTimeout(() => {
+          copyHint.classList.remove('fade-in');
+          copyHint.classList.add('fade-out');
+        }, 1500);
+      });
 
-    const copyButton = document.createElement('button');
-    copyButton.type = 'button';
-    copyButton.className = 'btn btn-light btn-sm ml-2';
-    copyButton.appendChild(document.createTextNode('📋'));
-    copyButton.title = (T as any).wordsCopyToClipboard || '';
-    copyButton.setAttribute('aria-label', copyButton.title);
-
-    const successHint = document.createElement('span');
-    successHint.className =
-      'api-token-copy-hint text-success small ml-2 d-none';
-    successHint.textContent = '✓';
-
-    copyButton.addEventListener('click', (event: Event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      ui.copyToClipboard(tokenValue);
-      successHint.classList.remove('d-none');
+      parentSpan.appendChild(copyButton);
+      parentSpan.appendChild(copyHint);
     });
-
-    paragraph.appendChild(copyButton);
-    paragraph.appendChild(successHint);
-    paragraph.appendChild(document.createTextNode(afterText));
   }
 }
 </script>
@@ -312,6 +293,32 @@ export default class Markdown extends Vue {
   img {
     max-width: 100%;
     page-break-inside: avoid;
+  }
+
+  span > code {
+    padding: 0.2em 0.4em;
+    margin: 0 0.25em 0 0;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .copy-hint {
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .copy-hint.fade-in {
+    opacity: 1;
+  }
+
+  .copy-hint.fade-out {
+    opacity: 0;
   }
 }
 </style>

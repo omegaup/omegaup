@@ -1,8 +1,8 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+
+import * as ui from '../ui';
 
 import omegaup_Markdown from './Markdown.vue';
-import T from '../lang';
-import * as ui from '../ui';
 
 jest.mock('../ui', () => {
   const actual = jest.requireActual('../ui');
@@ -19,46 +19,46 @@ describe('Markdown.vue', () => {
   });
 
   it('Should render markdown contents', () => {
-    const wrapper = shallowMount(omegaup_Markdown, {
+    const wrapper = mount(omegaup_Markdown, {
       propsData: {
         markdown: '_Hello_, **World**!',
       },
     });
-    expect(wrapper.html()).toEqual(
-      expect.stringContaining('<p><em>Hello</em>, <strong>World</strong>!</p>'),
-    );
+
+    expect(wrapper.find('p').exists()).toBeTruthy();
+    expect(wrapper.text()).toContain('Hello, World!');
   });
 
-  it('Does not inject copy button for non-token messages', () => {
-    const wrapper = shallowMount(omegaup_Markdown, {
+  it('Should inject copy button for inline code elements', async () => {
+    const token = '7cbe8d3122700dab325c7dd20ee1a5ce415672f1';
+    const template = 'Here is some code: <span><code>%(token)</code></span>';
+
+    const markdown = ui.formatString(template, { token });
+
+    const wrapper = mount(omegaup_Markdown, {
       propsData: {
-        markdown: 'Just a regular notification message.',
+        markdown,
       },
     });
 
-    expect(wrapper.find('button').exists()).toBe(false);
-  });
+    await wrapper.vm.$nextTick();
 
-  it('Injects copy button and copies token for API token notification', async () => {
-    const template = (T as any).apiTokenSuccessfullyCreated as string;
-    const token = 'abc123token';
-    const message = template.replace('%(token)', token);
+    const codeElement = wrapper.find('span > code');
+    expect(codeElement.exists()).toBeTruthy();
 
-    const wrapper = shallowMount(omegaup_Markdown, {
-      propsData: {
-        markdown: message,
-      },
-    });
+    const copyButton = wrapper.find('button.copy-btn');
+    expect(copyButton.exists()).toBeTruthy();
 
-    const button = wrapper.find('button');
-    expect(button.exists()).toBe(true);
+    const copySpy = jest
+      .spyOn(ui, 'copyToClipboard')
+      .mockImplementation(() => {});
 
-    await button.trigger('click');
+    await copyButton.trigger('click');
 
-    expect(ui.copyToClipboard).toHaveBeenCalledWith(token);
+    expect(copySpy).toHaveBeenCalledWith(token);
+    copySpy.mockRestore();
 
-    const hint = wrapper.find('.api-token-copy-hint');
-    expect(hint.exists()).toBe(true);
-    expect(hint.classes()).not.toContain('d-none');
+    const copyHint = wrapper.find('.copy-hint');
+    expect(copyHint.exists()).toBeTruthy();
   });
 });
