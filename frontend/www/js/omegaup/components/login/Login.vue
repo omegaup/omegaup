@@ -31,7 +31,7 @@
                 class="btn btn-block btn-outline-secondary mt-3 github-login-btn"
                 type="button"
                 :disabled="!githubClientId"
-                aria-label="Sign in with GitHub"
+                :aria-label="T.loginGithub"
                 @click.prevent="loginWithGithub"
               >
                 <img
