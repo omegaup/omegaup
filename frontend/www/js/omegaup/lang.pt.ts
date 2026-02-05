@@ -2190,6 +2190,7 @@ const translations: { [key: string]: string; } = {
   wordsRemoveFilter: "Remover filtros",
   wordsReportProblem: "Relatar problema",
   wordsRequired: "Obrigat\u00f3rio",
+  wordsRequiredField: "* Campo obrigat\u00f3rio",
   wordsReset: "omegaUp: Redefini\u00e7\u00e3o de senha.",
   wordsResetMessage: "Clique no link abaixo para redefinir sua senha: <a href=\"[link]\">[link]</a><br><br> Se voc\u00ea n\u00e3o solicitou esta opera\u00e7\u00e3o por favor, n\u00e3o clique no link e certifique-se a sua conta est\u00e1 a salvo.",
   wordsResult: "Resposta",

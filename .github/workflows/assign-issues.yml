@@ -61,36 +61,36 @@ jobs:
                       const MAX_PRS_TO_QUERY = 200;
                       let totalPRsQueried = 0;
                       
+                      const searchQuery = `is:pr is:merged author:${commenter} repo:${context.repo.owner}/${context.repo.repo}`;
+                      
                       while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS && totalPRsQueried < MAX_PRS_TO_QUERY) {
                           const result = await github.graphql(`
-                              query($owner: String!, $repo: String!, $author: String!, $cursor: String) {
-                                  repository(owner: $owner, name: $repo) {
-                                      pullRequests(
-                                          first: 50
-                                          author: $author
-                                          states: [MERGED]
-                                          after: $cursor
-                                          orderBy: {field: UPDATED_AT, direction: DESC}
-                                      ) {
-                                          pageInfo { hasNextPage endCursor }
-                                          nodes {
+                              query($searchQuery: String!, $cursor: String) {
+                                  search(
+                                      query: $searchQuery
+                                      type: ISSUE
+                                      first: 50
+                                      after: $cursor
+                                  ) {
+                                      issueCount
+                                      pageInfo { hasNextPage endCursor }
+                                      nodes {
+                                          ... on PullRequest {
                                               id
                                           }
                                       }
                                   }
                               }
                           `, {
-                              owner: context.repo.owner,
-                              repo: context.repo.repo,
-                              author: commenter,
+                              searchQuery,
                               cursor
                           });
                           
-                          const prs = result.repository.pullRequests;
-                          totalPRsQueried += prs.nodes.length;
-                          approvedPRCount += prs.nodes.length;
-                          hasNextPage = prs.pageInfo.hasNextPage;
-                          cursor = prs.pageInfo.endCursor;
+                          const searchResults = result.search;
+                          totalPRsQueried += searchResults.nodes.length;
+                          approvedPRCount += searchResults.nodes.length;
+                          hasNextPage = searchResults.pageInfo.hasNextPage;
+                          cursor = searchResults.pageInfo.endCursor;
                       }
                       
                       if (approvedPRCount >= REQUIRED_APPROVED_PRS) {
@@ -152,9 +152,9 @@ jobs:
                       PR is opened, this issue will be automatically unassigned
                       to keep the queue moving.
                   unassigned_comment: >
-                      Unassigned because no pull request was opened within 7
-                      days. If you want to be assigned to this issue again,
-                      kindly ask the maintainers to assign it to you again.
+                      You have been unassigned from this issue. If you want to
+                      be assigned to this issue again, kindly ask the
+                      maintainers to assign it to you again.
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
                       Please note the 7-day PR expectation.
