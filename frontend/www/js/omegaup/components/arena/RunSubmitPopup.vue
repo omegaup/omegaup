@@ -106,7 +106,7 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage = this.preferredLanguage;
+  selectedLanguage: null | string = this.preferredLanguage;
   code = '';
   now: number = Date.now();
 
@@ -147,14 +147,15 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   handleChangeLanguage(language: string): void {
     this.selectedLanguage = language;
-    this.loadBoilerplateForLanguage(language);
   }
 
-  @Watch('selectedLanguage')
-  onSelectedLanguageChanged(newLanguage: string, oldLanguage: string): void {
-    if (newLanguage && newLanguage !== oldLanguage) {
-      this.loadBoilerplateForLanguage(newLanguage);
-    }
+  @Watch('selectedLanguage', { immediate: true })
+  onSelectedLanguageChanged(
+    newLanguage: null | string,
+    oldLanguage: null | string | undefined,
+  ): void {
+    if (!newLanguage || newLanguage === oldLanguage) return;
+    this.loadBoilerplateForLanguage(newLanguage);
   }
 
   get canSubmit(): boolean {
@@ -204,17 +205,9 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 
   @Watch('preferredLanguage')
-  onPreferredLanguageChanged(newValue: string): void {
+  onPreferredLanguageChanged(newValue: null | string): void {
     if (newValue) {
       this.selectedLanguage = newValue;
-      this.loadBoilerplateForLanguage(newValue);
-    }
-  }
-
-  mounted(): void {
-    // Load initial boilerplate if selectedLanguage is set
-    if (this.selectedLanguage) {
-      this.loadBoilerplateForLanguage(this.selectedLanguage);
     }
   }
 
