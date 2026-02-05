@@ -6146,4 +6146,68 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function isPublic(string $admissionMode): bool {
         return $admissionMode !== \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE;
     }
+
+    /**
+     * Returns an iCalendar (.ics) file for a contest.
+     *
+     * @return void Outputs ICS content directly
+     *
+     * @omegaup-request-param string $contest_alias
+     */
+    public static function apiIcal(\OmegaUp\Request $r): void {
+        // Validate contest alias
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn(string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
+        if (is_null($contest) || is_null($contest->contest_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        // Public contests are accessible anonymously
+        // Private and registration-mode contests require authentication and access check
+        if ($contest->admission_mode !== 'public') {
+            // Require authentication for non-public contests
+            $r->ensureIdentity();
+
+            // Check if user has access to the contest
+            if (!self::canAccessContest($contest, $r->identity)) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+        }
+
+        // Generate the contest URL
+        $contestUrl = OMEGAUP_URL . '/arena/' . urlencode($contestAlias) . '/';
+
+        // Generate ICS content
+        $icsContent = \OmegaUp\IcsFormatter::formatContest(
+            $contest,
+            $contestUrl
+        );
+
+        // Set headers for file download - comprehensive for Chrome/Firefox compatibility
+        header('HTTP/1.1 200 OK', true, 200);
+        header('Content-Type: text/calendar; charset=utf-8');
+        header(
+            'Content-Disposition: attachment; filename="contest-' .
+                $contestAlias . '.ics"'
+        );
+        header('Content-Description: File Transfer');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: ' . strlen($icsContent));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+
+        // Output the ICS content
+        echo $icsContent;
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
+    }
 }
