@@ -86,7 +86,13 @@ def _main() -> None:
                 continue
 
             # Dynamic strings or specific exceptions
-            if translation_string_name in ('wordsResetMessage', 'wordsYes', 'wordsVerdictsOf', 'zipPrepare', 'wordsUpload'):
+            if translation_string_name in (
+                'wordsResetMessage',
+                'wordsYes',
+                'wordsVerdictsOf',
+                'zipPrepare',
+                'wordsUpload'
+            ):
                 continue
 
             if translation_string_name not in expected_strings:
