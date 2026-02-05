@@ -48,7 +48,7 @@ and then, only needed the first time, or when the following command complains in
 
 ```shell
 docker-compose pull
-docker-compose up --no-build
+docker-compose up 
 ```
 
 After a few minutes (2-10 minutes), you should be able to access your local omegaUp instance [http://localhost:8001](http://localhost:8001). Normally the signal that indicates that the container is ready is that the previous command shows something similar to:
@@ -165,7 +165,7 @@ Before you start making changes to the code, you should update the code to its l
 
 ## How To Make Changes To The Code
 
-When you have made changes that you wish to propose to omegaUp repository, follow [these steps](<https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md>).
+When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md).
 
 ## The Web App Is Not Showing My Changes!
 
@@ -253,6 +253,107 @@ password=omegaup
 EOF
 ln -sf ~/.mysql.docker.cnf .my.cnf
 ```
+---
+### Issue : `phpminiadmin` / `venv` Permission denied during `docker compose up`
+
+#### Symptoms
+
+During startup, logs repeatedly show:
+
+```text
+mkdir: cannot create directory '/opt/omegaup/frontend/www/phpminiadmin': Permission denied
+Error: [Errno 1] Operation not permitted: '/opt/omegaup/stuff/venv/bin/activate.fish'
+exited: developer-environment (exit status 1; not expected)
+```
+
+#### Example error logs
+
+```text
+frontend-1 | warning " > vuex-class@0.3.2" has unmet peer dependency "vue-class-component@^6.0.0 || ^7.0.0".
+frontend-1 | Error: [Errno 1] Operation not permitted: '/opt/omegaup/stuff/venv/bin/activate.fish'
+frontend-1 | 2026-01-30 08:03:01,911 INFO exited: developer-environment (exit status 1; not expected)
+frontend-1 | 2026-01-30 08:03:02,915 INFO spawned: 'developer-environment' with pid 1050
+frontend-1 | 2026-01-30 08:03:02,917 INFO success: developer-environment entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+frontend-1 | Error: [Errno 1] Operation not permitted: '/opt/omegaup/stuff/venv/bin/activate.fish'
+frontend-1 | 2026-01-30 08:03:07,289 INFO exited: developer-environment (exit status 1; not expected)
+frontend-1 | 2026-01-30 08:03:08,293 INFO spawned: 'developer-environment' with pid 1073
+frontend-1 | 2026-01-30 08:03:09,295 INFO success: developer-environment entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+```
+
+```text
+frontend-1 | mkdir: cannot create directory '/opt/omegaup/frontend/www/phpminiadmin': Permission denied
+frontend-1 | 2026-01-31 06:20:53,839 INFO success: developer-environment entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+frontend-1 | 2026-01-31 06:20:53,840 INFO exited: developer-environment (exit status 1; not expected)
+frontend-1 | [2/4] Fetching packages...
+frontend-1 | 2026-01-31 06:20:54,391 INFO spawned: 'developer-environment' with pid 1161
+frontend-1 | mkdir: cannot create directory '/opt/omegaup/frontend/www/phpminiadmin': Permission denied
+frontend-1 | 2026-01-31 06:20:54,401 INFO success: developer-environment entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+frontend-1 | 2026-01-31 06:20:54,402 INFO exited: developer-environment (exit status 1; not expected)
+frontend-1 | 2026-01-31 06:20:55,402 INFO spawned: 'developer-environment' with pid 1163
+frontend-1 | 2026-01-31 06:20:55,403 INFO success: yarn-run entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+```
+
+
+The developer environment restarts continuously and omegaUp never becomes available at `http://localhost:8001`.
+
+---
+
+#### Cause
+
+The repository was cloned or executed as the **root user** (e.g., inside `/root/...`) or the project directory is owned by `root`.
+
+omegaUp uses Docker bind mounts:
+
+```
+<local project directory>  →  /opt/omegaup (inside container)
+```
+
+If the local directory is owned by `root`, the container cannot create required folders and virtual environment files.
+
+---
+
+#### Fix (Recommended – Clean Setup)
+
+> Do **not** try to repair the root-owned folder. Delete it and re-clone properly.
+> *(Example used here: username `userdev` and workspace `~/dev` — you may use any names you prefer.)*
+
+1. Delete the incorrect clone (run as root):
+
+```bash
+rm -rf /root/omegaup
+rm -rf /root/<any-folder-containing-omegaup>
+```
+
+2. Create / switch to a normal user:
+
+```bash
+adduser <your-username>      # e.g. userdev
+usermod -aG sudo,docker <your-username>
+su - <your-username>
+```
+
+3. Clone omegaUp as the normal user:
+
+```bash
+mkdir -p ~/workspace         # e.g. ~/dev
+cd ~/workspace
+git clone --recurse-submodules https://github.com/YOURUSERNAME/omegaup
+cd omegaup
+```
+
+4. Start the environment:
+
+```bash
+docker compose up
+```
+
+---
+
+#### Prevention
+
+* Do not run `git clone` with `sudo`
+* Do not run `docker compose` as `root`
+* Always work from a normal user’s home directory (e.g., `/home/userdev/...`)
 
 ---
 

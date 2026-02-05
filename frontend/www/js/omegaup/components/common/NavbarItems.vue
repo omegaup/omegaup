@@ -171,6 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>
@@ -199,7 +202,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
@@ -224,6 +227,14 @@
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://hdl.handle.net/11059/16567"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navCompetitiveProgrammingDataStructuresBook }}
+          </a>
         </div>
       </li>
     </ul>

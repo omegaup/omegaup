@@ -585,6 +585,10 @@ nav.navbar {
   }
 }
 
+.navbar-brand {
+  padding-bottom: 1.25rem !important;
+}
+
 @media (min-width: 992px) {
   .dropdown {
     position: relative;
@@ -615,6 +619,22 @@ nav.navbar {
     .dropdown:not(.show):hover
     > .dropdown-menu {
     display: none !important;
+  }
+
+  .nav-problems .collapse-links {
+    display: none;
+  }
+
+  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
+  }
+
+  .nav-user .collapse-links {
+    display: none;
+  }
+
+  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
   }
 }
 
