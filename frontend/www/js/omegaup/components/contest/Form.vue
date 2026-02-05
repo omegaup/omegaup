@@ -93,9 +93,16 @@
                     type="text"
                     required
                     :disabled="isSubmitting"
+                    :maxlength="MAX_LENGTH.title"
                     @blur="validateField(FieldName.Title)"
                     @input="clearFieldError(FieldName.Title)"
                   />
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingTitle }"
+                  >
+                    {{ title.length }}/{{ MAX_LENGTH.title }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Title ||
@@ -139,9 +146,16 @@
                     :disabled="update || isSubmitting"
                     type="text"
                     required
+                    :maxlength="MAX_LENGTH.alias"
                     @blur="validateField(FieldName.Alias)"
                     @input="clearFieldError(FieldName.Alias)"
                   />
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingAlias }"
+                  >
+                    {{ alias.length }}/{{ MAX_LENGTH.alias }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Alias ||
@@ -238,9 +252,16 @@
                     rows="10"
                     required
                     :disabled="isSubmitting"
+                    :maxlength="MAX_LENGTH.description"
                     @blur="validateField(FieldName.Description)"
                     @input="clearFieldError(FieldName.Description)"
                   ></textarea>
+                  <small
+                    class="character-counter"
+                    :class="{ 'text-danger': isExceedingDescription }"
+                  >
+                    {{ description.length }}/{{ MAX_LENGTH.description }}
+                  </small>
                   <div
                     v-if="
                       invalidParameterName === FieldName.Description ||
@@ -1009,6 +1030,14 @@ const CONTEST_PRESETS: Record<PresetType, PresetConfig> = {
   },
 };
 
+const MAX_LENGTH = {
+  title: 256,
+  alias: 32,
+  description: 255,
+};
+
+const DANGER_THRESHOLD_PERCENTAGE = 0.8;
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -1028,6 +1057,7 @@ export default class Form extends Vue {
   PresetType = PresetType;
   FieldName = FieldName;
   SectionName = SectionName;
+  MAX_LENGTH = MAX_LENGTH;
 
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
@@ -1406,6 +1436,22 @@ export default class Form extends Vue {
     return false;
   }
 
+  // Computed properties for character limit danger thresholds
+  get isExceedingTitle(): boolean {
+    return this.title.length > MAX_LENGTH.title * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingAlias(): boolean {
+    return this.alias.length > MAX_LENGTH.alias * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingDescription(): boolean {
+    return (
+      this.description.length >
+      MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE
+    );
+  }
+
   onRemove(language: string) {
     if (this.catLanguageBlocked && language == 'cat') {
       this.$emit('language-remove-blocked', language);
@@ -1468,5 +1514,13 @@ export default class Form extends Vue {
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
   border-color: var(--form-input-error-color);
+}
+
+.character-counter {
+  display: block;
+  text-align: right;
+  color: var(--form-character-counter-color, #6c757d);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 </style>
