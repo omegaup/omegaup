@@ -1,6 +1,9 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right">
+    <nav
+      class="navbar navbar-expand-lg navbar-color fixed-top p-0 text-right"
+      data-enable-hover-dropdown
+    >
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
@@ -35,13 +38,24 @@
             ></omegaup-notification-list>
           </div>
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
-            <li class="nav-item">
+            <li class="nav-item d-flex align-items-center">
               <a
-                class="nav-link nav-login-text"
+                class="nav-link nav-login-text pr-0"
                 :href="formattedLoginURL"
                 data-login-button
-                >{{ T.navLogIn }}</a
+                @click.prevent="emitActiveTab(AvailableTabs.Login)"
               >
+                {{ T.navbarLogin }}
+              </a>
+              <span class="nav-link nav-login-text px-1">/</span>
+              <a
+                class="nav-link nav-login-text pl-0"
+                :href="formattedSignupURL"
+                data-signup-button
+                @click.prevent="emitActiveTab(AvailableTabs.Signup)"
+              >
+                {{ T.navbarRegister }}
+              </a>
             </li>
           </ul>
           <button
@@ -139,7 +153,10 @@
                     >
                       <font-awesome-icon :icon="['fas', 'user']" />
                       {{ T.navViewProfile }}
-                      <div v-if="profileProgress !== 0" class="progress mt-2">
+                      <div
+                        v-if="profileProgress !== 0"
+                        class="progress mt-2 position-relative"
+                      >
                         <div
                           class="progress-bar progress-bar-striped bg-info"
                           role="progressbar"
@@ -148,6 +165,9 @@
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
+                        <small class="progress-text">
+                          {{ profileProgress.toFixed(1) }}%
+                        </small>
                       </div>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -284,12 +304,12 @@
         <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
-          class="navbar justify-content-end d-none d-lg-block order-1"
+          class="navbar justify-content-end d-none d-lg-block order-1 align-items-center"
           href="#"
+          :title="T.omegaupTitleLogout"
           @click.prevent="logoutModalVisible = true"
         >
           <font-awesome-icon :icon="['fas', 'power-off']" />
-          {{ T.omegaupTitleLogout }}
         </a>
       </div>
     </nav>
@@ -345,12 +365,15 @@ import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
+import { AvailableTabs } from '../login/Signin.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
 library.add(faSignOutAlt, faUser);
+
+export const EventBus = new Vue();
 
 @Component({
   components: {
@@ -396,6 +419,7 @@ export default class Navbar extends Vue {
 
   T = T;
   ui = ui;
+  AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
@@ -403,7 +427,19 @@ export default class Navbar extends Vue {
   );
 
   get formattedLoginURL(): string {
-    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+    let path = window.location.pathname;
+    if (path === '/login' || path === '/login/') {
+      path = '/';
+    }
+    return `/login/?redirect=${encodeURIComponent(path)}#login`;
+  }
+
+  get formattedSignupURL(): string {
+    let path = window.location.pathname;
+    if (path === '/login' || path === '/login/') {
+      path = '/';
+    }
+    return `/login/?redirect=${encodeURIComponent(path)}#signup`;
   }
 
   get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
@@ -435,6 +471,21 @@ export default class Navbar extends Vue {
       return 'bg-danger';
     }
     return 'bg-warning';
+  }
+
+  emitActiveTab(tab: AvailableTabs): void {
+    EventBus.$emit('update:activeTab', tab);
+    if (
+      window.location.pathname === '/login' ||
+      window.location.pathname === '/login/'
+    ) {
+      window.location.hash = `#${tab}`;
+    } else {
+      window.location.href =
+        tab === AvailableTabs.Login
+          ? this.formattedLoginURL
+          : this.formattedSignupURL;
+    }
   }
 }
 </script>
@@ -468,11 +519,44 @@ nav.navbar {
     background-color: var(--header-navbar-brand-background-color);
   }
 
+  .navbar-brand img {
+    transition: transform 0.3s ease;
+  }
+
+  .navbar-brand:hover img {
+    transform: scale(1.08);
+  }
+
+  .navbar-nav .nav-link {
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+  }
+
+  .navbar-nav .nav-link:hover {
+    background-color: var(--header-navbar-hover-background-color);
+    text-decoration: none;
+  }
+
+  .navbar-nav .nav-link:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .nav-user-link img {
+    border-radius: 4px;
+    transition: transform 0.25s ease;
+  }
+
+  .nav-user-link:hover img {
+    transform: scale(1.05);
+  }
+
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
   }
 
-  a {
+  a,
+  span.nav-link {
     color: var(--header-navbar-primary-link-color);
   }
 
@@ -485,12 +569,94 @@ nav.navbar {
     max-height: 75vh;
     scrollbar-width: none;
   }
+
+  a[data-logout-button] {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 4px;
+  }
+
+  a[data-logout-button]:hover {
+    background-color: rgba($omegaup-pink, 0.2);
+    color: $omegaup-pink !important;
+  }
+
+  a[data-logout-button]:hover svg {
+    color: $omegaup-pink !important;
+  }
+}
+
+.navbar-brand {
+  padding-bottom: 1.25rem !important;
+}
+
+@media (min-width: 992px) {
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    height: 10px;
+    width: 100%;
+  }
+
+  .navbar-nav:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+
+  .navbar-right:not(:has(.dropdown.show)) .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown.show > .dropdown-menu {
+    display: block !important;
+  }
+
+  .navbar-collapse:has(.dropdown.show)
+    .dropdown:not(.show):hover
+    > .dropdown-menu {
+    display: none !important;
+  }
+
+  .nav-problems .collapse-links {
+    display: none;
+  }
+
+  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
+  }
+
+  .nav-user .collapse-links {
+    display: none;
+  }
+
+  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
+  }
+}
+
+.progress {
+  position: relative;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--header-navbar-dropdown-item-font-color);
+  pointer-events: none;
 }
 
 .allow-overflow {
-  overflow-y: scroll;
-  height: 65vh;
-  max-width: 40vw;
+  overflow-y: auto;
+  max-height: 65vh;
+  max-width: min(90vw, 420px);
 }
 
 .nav-login-text {
@@ -532,7 +698,7 @@ nav.navbar {
 
 @media only screen and (max-width: 992px) {
   .allow-overflow {
-    height: 45vh;
+    max-height: 45vh;
     max-width: 80vw;
   }
 }
