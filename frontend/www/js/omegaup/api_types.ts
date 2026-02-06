@@ -2774,6 +2774,7 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ArenaProblemset {
@@ -4295,6 +4296,7 @@ export namespace types {
     statement: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ProblemListCollectionPayload {
