@@ -19,10 +19,6 @@ from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from utils import (
-    UserRank,
-    get_first_day_of_next_month,
-)
 from database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
@@ -33,6 +29,10 @@ from database.school_of_the_month import (
     get_current_problems_solved_per_month,
     insert_updated_problems_solved_per_month,
     get_last_12_schools_of_the_month,
+)
+from utils import (
+    UserRank,
+    get_first_day_of_next_month,
 )
 
 
