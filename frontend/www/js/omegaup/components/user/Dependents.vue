@@ -14,14 +14,13 @@
         </tr>
       </thead>
       <tbody>
-        <tbody>
+        
             <!-- Empty-state -->
-       <tr v-if="!dependents || dependents.length === 0">
-        <td colspan="3" class="text-center text-muted py-4">
-           {{ T.dependentsEmptyState }}
-
-      </td>
-        </tr>
+          <tr v-if="!dependents || dependents.length === 0">
+      <td colspan="3" class="empty-category text-center text-muted py-4">
+        {{ T.dependentsEmptyState }}
+       </td>
+      </tr>
 
         <!-- Normal rows -->
       <tr v-else v-for="(dependent, index) in dependents" :key="index">
