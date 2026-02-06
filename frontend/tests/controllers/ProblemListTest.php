@@ -1551,6 +1551,69 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(1, $apiListResponse['total']);
     }
 
+    public function testProblemListForUnder13User() {
+        // Create three problems, but just the first two will have a quality seal
+        $n = 3;
+        $problemData = [];
+        foreach (range(0, $n) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'alias' => "testproblem{$n - $i}",
+                    'title' => "Test problem {$n - $i}",
+                ])
+            );
+        }
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[0]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[1]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'birthDate' => strtotime('-10 year', \OmegaUp\Time::get()),
+            ])
+        );
+        $login = self::login($identity);
+
+        $response = \OmegaUp\Controllers\Problem::getProblemListForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => false, // Should igore this because is U13User
+            ])
+        )['templateProperties']['payload'];
+        $this->assertCount($n - 1, $response['problems']);
+        $this->assertEquals(
+            $problemData[0]['problem']->alias,
+            $response['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemData[1]['problem']->alias,
+            $response['problems'][1]['alias']
+        );
+    }
+
     /**
      * A PHPUnit data provider for the test with search type values.
      *

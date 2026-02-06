@@ -224,9 +224,9 @@ class Authorization {
                 )));
     }
 
-    public static function isUnderThirteenUser(\OmegaUp\DAO\VO\Users $user): bool {
+    public static function isUnderThirteenUser(\OmegaUp\DAO\VO\Users|null $user): bool {
         // This is mostly for users who hasn't give us their birth day
-        if (is_null($user->birth_date)) {
+        if (is_null($user) || is_null($user->birth_date)) {
             return false;
         }
         // User's age is U13? $user->birth_date - current date then return true, otherwise return false
