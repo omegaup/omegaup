@@ -71,12 +71,6 @@ HTML . htmlspecialchars($title) . <<<HTML
             margin: 0 0 15px 0;
             font-weight: 700;
         }
-        .email-body h2 {
-            color: $white;
-            font-size: 16px;
-            margin: 20px 0 12px 0;
-            font-weight: 700;
-        }
         .email-body p {
             color: $white;
             font-size: 14px;
