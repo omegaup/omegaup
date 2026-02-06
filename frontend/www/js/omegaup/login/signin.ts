@@ -4,7 +4,8 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import login_Signin from '../components/login/Signin.vue';
+import login_Signin, { AvailableTabs } from '../components/login/Signin.vue';
+import { EventBus } from '../components/common/Navbar.vue';
 import VueRecaptcha from 'vue-recaptcha';
 
 OmegaUp.on('ready', () => {
@@ -58,12 +59,22 @@ OmegaUp.on('ready', () => {
   } else if (payload.verifyEmailSuccessfully) {
     ui.success(payload.verifyEmailSuccessfully);
   }
-  new Vue({
+
+  const locationHash = window.location.hash.substring(1);
+  let initialActiveTab: AvailableTabs = AvailableTabs.Login;
+  if (locationHash === AvailableTabs.Signup) {
+    initialActiveTab = AvailableTabs.Signup;
+  }
+
+  const userSignin = new Vue({
     el: '#main-container',
     components: {
       'omegaup-login-signin': login_Signin,
       'vue-recaptcha': VueRecaptcha,
     },
+    data: () => ({
+      initialActiveTab,
+    }),
     render: function (createElement) {
       return createElement('omegaup-login-signin', {
         props: {
@@ -72,6 +83,7 @@ OmegaUp.on('ready', () => {
           googleClientId,
           hasVisitedSection: payload.hasVisitedSection,
           useSignupFormWithBirthDate,
+          initialActiveTab: this.initialActiveTab,
         },
         on: {
           'register-and-login': ({
@@ -164,4 +176,10 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  const onActiveTab = (tab: AvailableTabs): void => {
+    userSignin.initialActiveTab = tab;
+    window.location.hash = `#${tab}`;
+  };
+  EventBus.$on('update:activeTab', onActiveTab);
 });
