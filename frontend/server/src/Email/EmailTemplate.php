@@ -5,13 +5,12 @@ namespace OmegaUp\Email;
 class EmailTemplate {
     const OMEGAUP_DARK_GREY = '#353a40';
     const OMEGAUP_GREEN = '#35b835';
+    const OMEGAUP_GREEN_DARK = '#2d9a2d';
     const OMEGAUP_BLUE = '#5588dd';
-    const OMEGAUP_PRIMARY_ACCENT = '#0275d8';
     const OMEGAUP_GREY_LIGHTER = '#bbbbbb';
     const OMEGAUP_WHITE = '#ffffff';
     const OMEGAUP_LIGHT_GREY_BG = '#f5f5f5';
-    const OMEGAUP_GREEN_DARK = '#2d9a2d';
-    const OMEGAUP_ACCENT_LIGHT_BG = '#f0f8ff';
+    const OMEGAUP_INFO_BG = 'rgba(255, 255, 255, 0.12)';
     const LOGO_URL = 'https://omegaup.com/media/omegaup_curves.png';
 
     public static function wrapWithBranding(
@@ -20,10 +19,11 @@ class EmailTemplate {
     ): string {
         $darkGrey = self::OMEGAUP_DARK_GREY;
         $blue = self::OMEGAUP_BLUE;
-        $accentBlue = self::OMEGAUP_PRIMARY_ACCENT;
         $white = self::OMEGAUP_WHITE;
+        $green = self::OMEGAUP_GREEN;
+        $greenDark = self::OMEGAUP_GREEN_DARK;
         $lightGreyBg = self::OMEGAUP_LIGHT_GREY_BG;
-        $lightBg = self::OMEGAUP_LIGHT_GREY_BG;
+        $infoBg = self::OMEGAUP_INFO_BG;
         $border = self::OMEGAUP_GREY_LIGHTER;
         $logoUrl = self::LOGO_URL;
 
@@ -51,9 +51,10 @@ HTML . htmlspecialchars($title) . <<<HTML
             border-radius: 4px;
         }
         .email-header {
-            background: linear-gradient(135deg, $blue 0%, $accentBlue 100%);
-            padding: 30px;
+            background: $white;
+            padding: 20px 30px;
             text-align: center;
+            border-bottom: 1px solid $border;
         }
         .email-header img {
             max-width: 120px;
@@ -61,73 +62,94 @@ HTML . htmlspecialchars($title) . <<<HTML
         }
         .email-body {
             padding: 30px;
+            background-color: $blue;
+            color: $white;
         }
         .email-body h1 {
-            color: $darkGrey;
+            color: $white;
             font-size: 24px;
             margin: 0 0 15px 0;
-            font-weight: 600;
+            font-weight: 700;
         }
         .email-body h2 {
-            color: $blue;
+            color: $white;
             font-size: 16px;
             margin: 20px 0 12px 0;
-            font-weight: 600;
+            font-weight: 700;
         }
         .email-body p {
-            color: $darkGrey;
+            color: $white;
             font-size: 14px;
             line-height: 1.6;
             margin: 0 0 15px 0;
+            font-weight: 600;
         }
         .btn-primary {
             display: inline-block;
-            background-color: $blue;
+            background-color: $green;
             color: $white;
             padding: 12px 25px;
             border-radius: 4px;
             text-decoration: none;
             font-weight: 600;
-            margin: 20px 0;
+            margin: 10px 0;
         }
         .btn-primary:hover {
-            background-color: $accentBlue;
+            background-color: $greenDark;
             text-decoration: none;
         }
         .text-center {
             text-align: center;
         }
         .link-box {
-            background-color: $white;
-            border: 2px solid $blue;
+            word-break: break-all;
+        }
+        .info-box {
+            background-color: $infoBg;
+            border: 1px solid $white;
             border-radius: 4px;
             padding: 15px;
             margin: 20px 0;
-            word-break: break-all;
             font-size: 12px;
-            color: $darkGrey;
+            color: $white;
         }
-        .link-box a {
-            color: $blue;
+        .info-box a {
+            color: $white;
             text-decoration: none;
             font-weight: 600;
         }
+        .link-box a {
+            color: $white;
+        }
         .security-notice {
-            background-color: $white;
-            border: 2px solid $blue;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 12px;
-            color: $darkGrey;
+            color: $white;
+            font-size: 14px;
+            font-weight: 600;
         }
         .email-footer {
-            background-color: $lightBg;
+            background-color: $lightGreyBg;
             padding: 20px;
             text-align: center;
             border-top: 1px solid $border;
             font-size: 12px;
             color: $darkGrey;
+        }
+        .email-footer strong {
+            font-weight: 700;
+        }
+        .email-social {
+            margin: 0 0 10px 0;
+        }
+        .email-social a {
+            display: inline-block;
+            margin: 0 6px;
+        }
+        .email-social img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid $border;
+            background: $white;
         }
         .email-footer a {
             color: $blue;
@@ -162,7 +184,15 @@ HTML . htmlspecialchars($title) . <<<HTML
 HTML . $content . <<<'HTML'
         </div>
         <div class="email-footer">
-            <p style="margin: 0 0 8px 0;">© 2026 omegaUp. All rights reserved.</p>
+            <div class="email-social">
+                <a href="https://discord.com/invite/K3JFd9d3wk" target="_blank" rel="noreferrer">
+                    <img src="https://omegaup.com/media/homepage/discord_logo.svg" alt="Discord">
+                </a>
+                <a href="https://www.facebook.com/omegaup/" target="_blank" rel="noreferrer">
+                    <img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook">
+                </a>
+            </div>
+            <p style="margin: 0 0 8px 0;"><strong>© 2026 omegaUp. All rights reserved.</strong></p>
             <p style="margin: 0 0 8px 0;">
                 <a href="https://omegaup.com">Visit omegaUp</a> |
                 <a href="https://blog.omegaup.com">Blog</a>
@@ -189,7 +219,6 @@ HTML;
 <h1>{$messages['welcome_title']}</h1>
 <p>{$messages['welcome_intro']}</p>
 
-<h2>{$messages['verify_section_title']}</h2>
 <p>{$messages['verify_instruction']}</p>
 
 <div class="text-center">
@@ -197,13 +226,11 @@ HTML;
 </div>
 
 <p>{$messages['verify_subtext']}</p>
-<div class="link-box">
-    <div style="word-break: break-all;">
-        <a href="$verificationLink">$verificationLink</a>
-    </div>
+<div class="info-box link-box">
+    <a href="$verificationLink">$verificationLink</a>
 </div>
 
-<div class="security-notice">
+<div class="info-box security-notice">
     {$messages['security_notice']}
 </div>
 

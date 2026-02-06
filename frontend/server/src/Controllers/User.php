@@ -465,9 +465,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'welcome_intro' => $translator->get(
                 'emailVerificationWelcomeIntro'
             ),
-            'verify_section_title' => $translator->get(
-                'emailVerificationSectionTitle'
-            ),
             'verify_instruction' => $translator->get(
                 'emailVerificationInstruction'
             ),

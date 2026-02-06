@@ -141,13 +141,13 @@ try_define('OMEGAUP_VALIDATE_CAPTCHA', false);
 # ####################################
 # EMAIL CONFIG
 # ####################################
-try_define('OMEGAUP_EMAIL_SEND_EMAILS', false);
-try_define('OMEGAUP_FORCE_EMAIL_VERIFICATION', false);
-try_define('OMEGAUP_EMAIL_SMTP_HOST', 'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_USER', 'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_PASSWORD', 'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_PORT', 'xxxx');
-try_define('OMEGAUP_EMAIL_SMTP_FROM', 'xxxx');
+try_define('OMEGAUP_EMAIL_SEND_EMAILS', true);
+try_define('OMEGAUP_FORCE_EMAIL_VERIFICATION', true);
+try_define('OMEGAUP_EMAIL_SMTP_HOST', 'mailhog');
+try_define('OMEGAUP_EMAIL_SMTP_USER', 'test');
+try_define('OMEGAUP_EMAIL_SMTP_PASSWORD', 'test');
+try_define('OMEGAUP_EMAIL_SMTP_PORT', '1025');
+try_define('OMEGAUP_EMAIL_SMTP_FROM', 'noreply@omegaup.com');
 try_define('OMEGAUP_EMAIL_SENDY_ENABLE', true);
 try_define('OMEGAUP_EMAIL_SENDY_SUBSCRIBE_URL', 'xxx');
 try_define('OMEGAUP_EMAIL_SENDY_LIST', 'xxx');
