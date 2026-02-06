@@ -79,4 +79,93 @@ class Admin extends \OmegaUp\Controllers\Controller {
             ],
         ];
     }
+
+    /**
+     * Get system settings for admins
+     *
+     * @return array{status: string, settings: array{ephemeralGraderEnabled: bool}}
+     */
+    public static function apiGetSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        return [
+            'status' => 'ok',
+            'settings' => [
+                'ephemeralGraderEnabled' => \OmegaUp\DAO\SystemSettings::getBooleanSetting(
+                    'ephemeral_grader_enabled',
+                    true
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * Update system settings
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param bool|null $ephemeral_grader_enabled
+     */
+    public static function apiUpdateSystemSettings(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (isset($r['ephemeral_grader_enabled'])) {
+            $rawValue = $r['ephemeral_grader_enabled'];
+
+            if (is_string($rawValue)) {
+                $ephemeralGraderEnabled = in_array(
+                    strtolower($rawValue),
+                    ['1', 'true', 'yes', 'on'],
+                    true
+                );
+            } elseif (is_numeric($rawValue)) {
+                $ephemeralGraderEnabled = intval($rawValue) === 1;
+            } else {
+                $ephemeralGraderEnabled = boolval($rawValue);
+            }
+
+            \OmegaUp\DAO\SystemSettings::setBooleanSetting(
+                'ephemeral_grader_enabled',
+                $ephemeralGraderEnabled
+            );
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, templateProperties: array{payload: AdminSettingsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @psalm-type AdminSettingsPayload=array{}
+     */
+    public static function getSettingsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'entrypoint' => 'admin_settings',
+            'templateProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminUsers'
+                ),
+                'payload' => [],
+            ],
+        ];
+    }
 }
