@@ -1,0 +1,37 @@
+name: Greetings
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request_target:
+    types:
+      - opened
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    name: Greet First-Time Contributors
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/first-interaction@v3.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Hi @${{ github.actor }} — thanks for opening your first issue!
+
+            1. Discord Link: https://discord.com/invite/K3JFd9d3wk
+            2. Documentation (GitHub Wiki): https://github.com/omegaup/omegaup/wiki
+
+            Most contributor discussion happens in the `dev-training` channel.
+
+          pr-message: |
+            Hi @${{ github.actor }} — thanks for your first pull request!
+
+            1. Discord Link: https://discord.com/invite/K3JFd9d3wk
+            2. Documentation (GitHub Wiki): https://github.com/omegaup/omegaup/wiki
+
+            Most contributor discussion happens in the `dev-training` channel.
