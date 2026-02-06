@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Execute the pre-push validations
+exec "${OMEGAUP_ROOT:-$(git rev-parse --show-toplevel)}/stuff/git-hooks/pre-push" "$@"
