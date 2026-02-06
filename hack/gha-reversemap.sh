@@ -246,6 +246,10 @@ run_verify_mapusage() {
     for file in $files; do
         for ref in $(yq '.jobs.[].steps.[].uses?' "$file"); do
             if [ "$ref" == null ]; then continue; fi
+            # Local actions are referenced by path and cannot be pinned to a commit hash.
+            if [[ "$ref" =~ ^\./ ]] || [[ "$ref" =~ ^\.github/ ]]; then
+                continue
+            fi
             action=$( echo "$ref" | cut -d@ -f1)
             version=$(echo "$ref" | cut -d@ -f2)
             if ! [[ "$version" =~ [0-9a-f]{40} ]]; then
