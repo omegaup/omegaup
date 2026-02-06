@@ -3797,6 +3797,7 @@ export namespace types {
 
   export interface FullIDEPayload {
     acceptedLanguages: string[];
+    ephemeralGraderEnabled: boolean;
     preferredLanguage?: string;
   }
 
@@ -5242,6 +5243,10 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetSystemSettingsRequest = { [key: string]: any };
+  export type AdminGetSystemSettingsResponse = {
+    settings: { ephemeralGraderEnabled: boolean };
+  };
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5256,6 +5261,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminUpdateSystemSettingsRequest = { [key: string]: any };
+  export type AdminUpdateSystemSettingsResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6246,9 +6253,15 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getSystemSettings: (
+      params?: messages.AdminGetSystemSettingsRequest,
+    ) => Promise<messages.AdminGetSystemSettingsResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    updateSystemSettings: (
+      params?: messages.AdminUpdateSystemSettingsRequest,
+    ) => Promise<messages.AdminUpdateSystemSettingsResponse>;
   }
 
   export interface AiEditorial {
