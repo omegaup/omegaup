@@ -59,7 +59,7 @@ jobs:
           create_or_update_label "size/XL" "b60205" "Extra large PR (>200 lines)"
 
       - name: Remove existing PR size labels
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         with:
           script: |
             const sizeLabels = ['size/XS', 'size/S', 'size/M', 'size/L', 'size/XL'];
@@ -82,7 +82,7 @@ jobs:
               }
             }
 
-      - uses: codelytv/pr-size-labeler@v1
+      - uses: codelytv/pr-size-labeler@0b7f116f59d1830881bc1cc88be32b005ab09ffa
         with:
           xs_label: "size/XS"
           xs_max_size: "10"

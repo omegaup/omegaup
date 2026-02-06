@@ -24,3 +24,32 @@ cirrus-actions/rebase:
   sha: b87d48154a87a85666003575337e27b8cd65f691
   sha-url: https://github.com/cirrus-actions/rebase/commit/b87d48154a87a85666003575337e27b8cd65f691
   tag-url: https://github.com/cirrus-actions/rebase/tree/1.8
+actions/github-script:
+  sha: f28e40c7f34bde8b3046d885e986cb6290c5673b
+  sha-url: https://github.com/actions/github-script/commit/f28e40c7f34bde8b3046d885e986cb6290c5673b
+  tag: v7
+  tag-url: https://github.com/actions/github-script/tree/v7
+
+takanome-dev/assign-issue-action:
+  sha: d9515870cda43f62505e7c3617f16965f1d40df0
+  sha-url: https://github.com/takanome-dev/assign-issue-action/commit/d9515870cda43f62505e7c3617f16965f1d40df0
+  tag: beta
+  tag-url: https://github.com/takanome-dev/assign-issue-action/tree/beta
+
+actions/labeler:
+  sha: 634933edcd8ababfe52f92936142cc22ac488b1b
+  sha-url: https://github.com/actions/labeler/commit/634933edcd8ababfe52f92936142cc22ac488b1b
+  tag: v6
+  tag-url: https://github.com/actions/labeler/tree/v6
+
+codelytv/pr-size-labeler:
+  sha: 0b7f116f59d1830881bc1cc88be32b005ab09ffa
+  sha-url: https://github.com/codelytv/pr-size-labeler/commit/0b7f116f59d1830881bc1cc88be32b005ab09ffa
+  tag: v1
+  tag-url: https://github.com/codelytv/pr-size-labeler/tree/v1
+
+actions/stale:
+  sha: 997185467fa4f803885201cee163a9f38240193d
+  sha-url: https://github.com/actions/stale/commit/997185467fa4f803885201cee163a9f38240193d
+  tag: v10
+  tag-url: https://github.com/actions/stale/tree/v10
