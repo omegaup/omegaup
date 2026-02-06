@@ -12,14 +12,14 @@
           v-model="newCaseWeight"
           class="form-control case-weight"
           type="number"
-          :placeholder="T.caseWeight"
+          :placeholder="T.caseSelectorCaseWeight"
         />
         <input
           v-model="newCaseName"
           class="form-control"
           type="text"
           data-case-name
-          :placeholder="T.caseName"
+          :placeholder="T.caseSelectorCaseName"
         />
       </div>
       <button
@@ -32,7 +32,7 @@
         :disabled="!newCaseName.length"
         data-add-button
       >
-        {{ T.addCase }}
+        {{ T.caseSelectorAddCase }}
       </button>
     </form>
     <div class="filenames">
