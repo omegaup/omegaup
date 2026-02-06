@@ -12,14 +12,14 @@
           v-model="newCaseWeight"
           class="form-control case-weight"
           type="number"
-          :placeholder="T.wordsCaseWeight"
+          :placeholder="T.caseWeight"
         />
         <input
           v-model="newCaseName"
           class="form-control"
           type="text"
           data-case-name
-          :placeholder="T.wordsCaseName"
+          :placeholder="T.caseName"
         />
       </div>
       <button
@@ -32,7 +32,7 @@
         :disabled="!newCaseName.length"
         data-add-button
       >
-        {{ T.wordsAddCase }}
+        {{ T.addCase }}
       </button>
     </form>
     <div class="filenames">
@@ -110,7 +110,7 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  newCaseWeight: any = '';
+  newCaseWeight: null | number = null;
   newCaseName: string = '';
   T = T;
 
@@ -214,10 +214,10 @@ export default class CaseSelector extends Vue {
 
     store.dispatch('createCase', {
       name: this.newCaseName,
-      weight: parseFloat(this.newCaseWeight.toString()) || 1,
+      weight: this.newCaseWeight ?? 1,
     });
 
-    this.newCaseWeight = '';
+    this.newCaseWeight = null;
     this.newCaseName = '';
   }
 
