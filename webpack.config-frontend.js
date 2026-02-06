@@ -81,6 +81,7 @@ module.exports = {
       './frontend/www/js/omegaup/group/scoreboard_contests.ts',
     group_scoreboard_details:
       './frontend/www/js/omegaup/group/scoreboard_details.ts',
+    gsoc_ideas: './frontend/www/js/omegaup/gsoc/ideas.ts',
     libinteractive_gen: './frontend/www/js/omegaup/libinteractive/gen.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
