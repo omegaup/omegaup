@@ -81,7 +81,7 @@ export default class Markdown extends Vue {
 
       const copyHint = document.createElement('span');
       copyHint.className = 'copy-hint';
-      copyHint.textContent = T.wordsCopiedToClipboard || 'Copied';
+      copyHint.textContent = T.wordsCopiedToClipboard;
 
       copyButton.addEventListener('click', () => {
         const codeText = (codeElement.textContent || '').trim();
