@@ -118,11 +118,6 @@ class ProblemCreateFiles(TypedDict):
     problem_contents: str
 
 
-class IdentityBulkCreateFiles(TypedDict):
-    """Files for /identity/bulkCreate/ (CSV with identities)."""
-    identities: str
-
-
 @dataclass
 class ResourceCheck:
     """Resolved existence-check rule (built from settings.yml)."""

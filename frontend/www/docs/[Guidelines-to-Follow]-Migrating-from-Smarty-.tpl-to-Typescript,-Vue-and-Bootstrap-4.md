@@ -31,7 +31,7 @@ Thanks to our [new unified template](https://github.com/omegaup/omegaup/pull/385
 3. Don't forget to avoid using `id` attributes inside the `.vue` file, but in case you necessarily must use them, add a flag [like this](https://github.com/omegaup/omegaup/blob/33cbfefe358627dd4815bababea944ee49461e6b/frontend/www/js/omegaup/grader/SettingsComponent.vue#L6)
 
 ### Testing vue components in Jest
-Once you have modified a vue component or even when you have created another one, it is important to add its corrsponding tests. Often, [Codecov](https://about.codecov.io/) will help you to identify which lines in the code are missing in the coverage.
+Once you have modified a vue component or even when you have created another one, it is important to add its corresponding tests. Often, [Codecov](https://about.codecov.io/) will help you to identify which lines in the code are missing in the coverage.
 
 [Here](https://github.com/omegaup/omegaup/blob/main/frontend/www/js/omegaup/components/arena/Arena.test.ts) you can find a simple test for a vue component. You can copy and paste it, or if you wish, you can use a basic snippet to create a new one from scratch:
 ```json

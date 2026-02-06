@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" data-schools-rank>
     <h5
       class="card-header d-flex justify-content-between align-items-center school-rank-title"
     >
@@ -19,6 +19,24 @@
         {{ T.wordsRankingMeasurement }}
       </a>
     </h5>
+    <div v-if="!showHeader" class="card-body form-row">
+      <omegaup-common-typeahead
+        class="col col-md-4 pl-0 pr-2"
+        :existing-options="searchResultSchools"
+        :value.sync="searchedSchool"
+        :max-results="10"
+        @update-existing-options="
+          (query) => $emit('update-search-result-schools', query)
+        "
+      ></omegaup-common-typeahead>
+      <button
+        class="btn btn-primary form-control col-4 col-md-2"
+        type="button"
+        @click="onSubmit"
+      >
+        {{ T.searchSchool }}
+      </button>
+    </div>
     <table class="table mb-0">
       <thead>
         <tr>
@@ -47,7 +65,7 @@
       </tbody>
     </table>
     <div v-if="showHeader" class="card-footer">
-      <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
+      <a href="/rank/schools/">{{ T.rankSeeGeneralRanking }}</a>
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator
@@ -66,6 +84,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginator.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { getBlogUrl } from '../../urlHelper';
 
@@ -74,6 +93,7 @@ import { getBlogUrl } from '../../urlHelper';
     FontAwesomeIcon,
     'omegaup-countryflag': CountryFlag,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class SchoolRank extends Vue {
@@ -83,13 +103,22 @@ export default class SchoolRank extends Vue {
   @Prop() totalRows!: number;
   @Prop() rank!: omegaup.SchoolsRank[];
   @Prop() pagerItems!: types.PageItem[];
+  @Prop({ default: () => [] }) searchResultSchools!: types.SchoolListItem[];
 
   T = T;
   ui = ui;
+  searchedSchool: null | types.SchoolListItem = null;
 
   get SchoolRankingFeatureGuideURL(): string {
     // Use the key defined in blog-links-config.json
     return getBlogUrl('SchoolRankingFeatureGuideURL');
+  }
+
+  onSubmit(): void {
+    if (!this.searchedSchool) return;
+    window.location.href = `/schools/profile/${encodeURIComponent(
+      this.searchedSchool.key,
+    )}/`;
   }
 }
 </script>
@@ -110,5 +139,14 @@ export default class SchoolRank extends Vue {
 
 .school-rank-title {
   font-size: 1.25rem;
+}
+
+[data-schools-rank] {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+[data-schools-rank] .tags-input-wrapper-default {
+  padding: 0.35rem 0.25rem 0.7rem 0.25rem;
 }
 </style>

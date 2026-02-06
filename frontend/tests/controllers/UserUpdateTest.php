@@ -103,7 +103,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($graduationDate);
         $this->assertSame($locale->language_id, $identityDb['language_id']);
 
-        // Double check language update with the appropiate API
+        // Double check language update with the appropriate API
         $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $token
         )['loginIdentity'];
@@ -289,7 +289,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame($school->name, $schoolName);
 
         // Update user, adding a new school with null value in school_id should
-        // thow an exception
+        // throw an exception
         try {
             \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -397,7 +397,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * https://github.com/omegaup/omegaup/issues/997
-     * Superceded by https://github.com/omegaup/omegaup/issues/1228
+     * Superseded by https://github.com/omegaup/omegaup/issues/1228
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
