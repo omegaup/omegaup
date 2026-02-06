@@ -17,18 +17,18 @@ from database.coder_of_the_month import get_cotm_eligible_users
 from database.coder_of_the_month import get_eligible_problems
 from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
-from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from database.coder_of_the_month import UserRank
+from utils import (
+    UserRank,
+    get_first_day_of_next_month,
+)
 from database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
     get_school_of_the_month_candidates,
     insert_school_of_the_month_candidates,
     School,
-    get_sot_user_problems,
-    get_sot_eligible_users,
     delete_problems_solved_per_month,
     get_current_problems_solved_per_month,
     insert_updated_problems_solved_per_month,
@@ -42,6 +42,12 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+logging.basicConfig(
+    filename='update_ranks.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
 
 
 class Cutoff(NamedTuple):
@@ -470,7 +476,7 @@ def compute_points_for_school(
 ) -> List[School]:
     '''Computes the points for each eligible school'''
 
-    # Exclude last 12 schools of the month winners in eligible schools
+    # Get the last 12 schools of the month winners
     last_12_schools = get_last_12_schools_of_the_month(
         cur_readonly,
         first_day_of_current_month
@@ -483,10 +489,12 @@ def compute_points_for_school(
         first_day_of_next_month,
         first_day_of_current_month
     )
-    eligible_users = get_sot_eligible_users(
+    eligible_users = get_cotm_eligible_users(
         cur_readonly,
         first_day_of_current_month,
-        first_day_of_next_month
+        first_day_of_next_month,
+        'all',
+        []
     )
 
     if last_12_schools_ids:
@@ -526,12 +534,12 @@ def compute_points_for_school(
     # Convert the list of problem IDs to a comma-separated string
     problem_ids_str = ', '.join(map(str, problem_ids))
 
-    user_problems = get_sot_user_problems(cur_readonly,
-                                          identity_ids_str,
-                                          problem_ids_str,
-                                          eligible_users,
-                                          first_day_of_current_month,
-                                          )
+    user_problems = get_user_problems(cur_readonly,
+                                      identity_ids_str,
+                                      problem_ids_str,
+                                      eligible_users,
+                                      first_day_of_current_month,
+                                      )
     # Calculate the score for each school based on the problems solved by its
     # users
     for _, points in user_problems.items():
@@ -633,7 +641,7 @@ def compute_points_for_user(
         updated_users.append(updated_user)
     # Sort the updated users by score in descending order
     updated_users_sorted = sorted(
-        updated_users, key=lambda user: user.score, reverse=True)
+        updated_users, key=lambda user: float(user.score), reverse=True)
     return updated_users_sorted[:coder_list_count]
 
 

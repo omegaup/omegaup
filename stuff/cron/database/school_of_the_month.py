@@ -1,16 +1,10 @@
 '''Helper functions for School of the Month cron job'''
 import datetime
 import logging
-from typing import NamedTuple, List, Dict
+from typing import NamedTuple, List
 
 import mysql.connector
 import mysql.connector.cursor
-from database.coder_of_the_month import (
-    UserProblems,
-    UserRank,
-    get_first_day_of_next_month,
-    get_problems_admins
-)
 
 
 class School(NamedTuple):
@@ -282,82 +276,6 @@ def get_school_of_the_month_candidates(
     return candidates
 
 
-def get_sot_user_problems(
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    identity_ids_str: str,
-    problem_ids_str: str,
-    eligible_users: List[UserRank],
-    first_day_of_current_month: datetime.date,
-) -> Dict[int, UserProblems]:
-    '''Returns the problems solved by a user'''
-
-    # Initialize a dictionary to store the problems solved and the score for
-    # each user
-    user_problems: Dict[int, UserProblems] = {
-        user.identity_id:
-            {'solved': [], 'score': 0.0} for user in eligible_users}
-
-    first_day_of_next_month = get_first_day_of_next_month(
-        first_day_of_current_month)
-
-    problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
-
-    logging.info(
-        'Getting problems solved by eligible users for school of the month')
-
-    cur_readonly.execute(f'''
-            WITH
-                ProblemsForfeitedByUser AS (
-                    SELECT
-                        pf.user_id,
-                        pf.problem_id,
-                        pf.forfeited_date
-                    FROM
-                        Problems_Forfeited pf
-                    WHERE
-                        forfeited_date IS NULL
-                )
-            SELECT
-                s.identity_id,
-                s.problem_id,
-                MIN(s.time) AS first_time_solved
-            FROM
-                Submissions s
-            INNER JOIN
-                Identities i
-            ON
-                i.identity_id = s.identity_id
-            LEFT JOIN
-                ProblemsForfeitedByUser pfbu
-            ON
-                pfbu.user_id = i.user_id
-                AND pfbu.problem_id = s.problem_id
-            WHERE
-                s.identity_id IN ({identity_ids_str})
-                AND s.problem_id IN ({problem_ids_str})
-                AND s.verdict = 'AC'
-                AND s.type = 'normal'
-                AND pfbu.forfeited_date IS NULL
-            GROUP BY
-                s.identity_id, s.problem_id;
-    ''')
-
-    # Populate user_problems dictionary with the problems solved by each user
-    for row in cur_readonly.fetchall():
-        identity_id = row['identity_id']
-        problem_id = row['problem_id']
-        solved = row['first_time_solved'].date()
-        assert identity_id in user_problems, (
-            'Identity %s not found in user_problems', identity_id)
-        # Filter the problems solved for the first time in the selected month
-        if first_day_of_current_month <= solved < first_day_of_next_month:
-            # Filter the problems that are not administred by the user
-            if identity_id not in problems_admins.get(problem_id, []):
-                user_problems[identity_id]['solved'].append(problem_id)
-
-    return user_problems
-
-
 def insert_school_of_the_month_candidates(
     cur: mysql.connector.cursor.MySQLCursorDict,
     first_day_of_next_month: datetime.date,
@@ -400,13 +318,30 @@ def get_last_12_schools_of_the_month(
         INNER JOIN
             `Schools` AS `sch` ON `sch`.`school_id` = `sotm`.`school_id`
         WHERE
-            `sotm`.`time` < %s
-            AND `sotm`.`selected_by` IS NOT NULL
+            (
+                `sotm`.`selected_by` IS NOT NULL
+                OR (
+                    `sotm`.`ranking` = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            `School_Of_The_Month`
+                        WHERE
+                            `time` = `sotm`.`time` AND
+                            `selected_by` IS NOT NULL
+                    )
+                )
+            )
+            AND `sotm`.`time` <= %s
+            AND `sotm`.`time` > DATE_SUB(%s, INTERVAL 12 MONTH)
         ORDER BY
             `sotm`.`time` DESC
-        LIMIT 12;
+        LIMIT
+            0, 12;
     '''
-    cur_readonly.execute(sql, (first_day_of_current_month, ))
+    cur_readonly.execute(sql, (first_day_of_current_month,
+                               first_day_of_current_month))
     schools: List[School] = []
     for row in cur_readonly.fetchall():
         schools.append(
@@ -417,90 +352,3 @@ def get_last_12_schools_of_the_month(
             )
         )
     return schools
-
-
-def get_sot_eligible_users(
-    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    first_day_of_current_month: datetime.date,
-    first_day_of_next_month: datetime.date
-) -> List[UserRank]:
-    '''Returns the list of eligible users for school of the month'''
-    # Verificar que seleccione bien los usuarios elegibles
-    logging.info(
-        'Getting the list of eligible users for school of the month '
-    )
-    sql = '''
-            SELECT DISTINCT
-                IFNULL(i.user_id, 0) AS user_id,
-                i.identity_id,
-                i.username,
-                IFNULL(i.country_id, 'xx') AS country_id,
-                isc.school_id,
-                IFNULL(
-                    (
-                        SELECT urc.classname FROM
-                            User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    'user-rank-unranked'
-                ) AS classname
-            FROM
-                Identities i
-            INNER JOIN
-                Submissions s
-            ON
-                s.identity_id = i.identity_id
-            INNER JOIN
-                Problems p
-            ON
-                p.problem_id = s.problem_id
-            LEFT JOIN
-                Identities_Schools isc
-            ON
-                isc.identity_school_id = i.current_identity_school_id
-            WHERE
-                s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
-                s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
-                i.user_id IS NOT NULL
-                -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
-                -- role_id = 1 is ADMIN_ROLE)
-                -- TODO: Replace magic numbers with constants
-                AND i.user_id NOT IN (
-                    SELECT ur.user_id
-                    FROM User_Roles ur
-                    WHERE ur.acl_id = 1 AND ur.role_id = 1
-                )
-            GROUP BY
-                i.identity_id;
-            '''
-    cur_readonly.execute(sql, (
-        first_day_of_current_month,
-        first_day_of_next_month,
-    ))
-
-    usernames: List[UserRank] = []
-    for row in cur_readonly.fetchall():
-        usernames.append(UserRank(
-            user_id=row['user_id'],
-            identity_id=row['identity_id'],
-            username=row['username'],
-            country_id=row['country_id'],
-            school_id=row['school_id'],
-            classname=row['classname'],
-            problems_solved=0,
-            score=0.0,
-        ))
-
-    return usernames
