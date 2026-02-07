@@ -121,6 +121,22 @@ jobs:
           if [[ "$SPELL_OUTPUT" == *"Unknown word"* ]]; then
             ISSUE_COUNT=$(grep -c "Unknown word" spell-check-results.txt || echo "0")
 
+            # Create GitHub workflow annotations for each spelling issue
+            # These will appear as warnings on the PR "Files changed" tab
+            echo "::warning::Found $ISSUE_COUNT spelling issue(s) in comments. See Summary tab for details."
+            
+            # Parse each spelling issue and create individual annotations
+            while IFS= read -r line; do
+              if [[ "$line" == *"Unknown word"* ]]; then
+                # Extract file, line number, and word from cspell output
+                # Format: file.ext:line:col - Unknown word (word) -- context
+                FILE=$(echo "$line" | cut -d':' -f1)
+                LINE_NUM=$(echo "$line" | cut -d':' -f2)
+                WORD=$(echo "$line" | grep -oP '\(([^)]+)\)' | head -1 | tr -d '()')
+                echo "::warning file=$FILE,line=$LINE_NUM::Spelling: '$WORD' may be misspelled"
+              fi
+            done < spell-check-results.txt
+
             echo "### Spelling Issues Found ($ISSUE_COUNT)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "The following spelling issues were detected in your changes:" >> $GITHUB_STEP_SUMMARY
