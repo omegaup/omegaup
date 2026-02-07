@@ -64,8 +64,8 @@ CLIENT: LLMWrapper | None = None
 
 
 def get_login_endpoint(username: str, password: str) -> str:
-    """endpoint for logging in"""
-    return f"api/user/login?usernameOrEmail={username}&password={password}"
+    """endpoint for logging in (use POST with usernameOrEmail and password)"""
+    return "api/user/login/"
 
 
 def get_problem_details_endpoint(problem_alias: str) -> str:
@@ -167,8 +167,17 @@ def get_contents_from_url(  # pylint: disable=R0912
 
         if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
             COOKIES = None
-
-        if COOKIES is None:
+            response = requests.post(
+                url,
+                data={
+                    "usernameOrEmail": args["username"],
+                    "password": args["password"],
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+            COOKIES = response.cookies
+        elif COOKIES is None:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies

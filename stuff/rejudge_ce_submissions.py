@@ -26,8 +26,8 @@ COOKIES = None
 
 
 def get_login_endpoint(username: str, password: str) -> str:
-    """endpoint for logging in"""
-    return f"api/user/login?usernameOrEmail={username}&password={password}"
+    """endpoint for logging in (use POST with usernameOrEmail and password)"""
+    return "api/user/login/"
 
 
 def rejudge_submission_endpoint(  # pylint: disable=R0913
@@ -70,11 +70,20 @@ def get_contents_from_url(
     endpoint = get_endpoint_fn(**args)
     url = f"{BASE_URL}/{endpoint}"
 
-    if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
-        COOKIES = None
-
     try:
-        if COOKIES is None:
+        if get_endpoint_fn == get_login_endpoint:  # pylint: disable=W0143
+            COOKIES = None
+            response = requests.post(
+                url,
+                data={
+                    "usernameOrEmail": args["username"],
+                    "password": args["password"],
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+            COOKIES = response.cookies
+        elif COOKIES is None:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies

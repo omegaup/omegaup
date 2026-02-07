@@ -86,7 +86,14 @@ def extract_submission_id() -> Any:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -118,7 +125,14 @@ def extract_feedback_id(
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -155,7 +169,14 @@ def add_student_feedback(
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": STUDENT_USERNAME,
+            "password": STUDENT_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -234,7 +255,14 @@ def test_teaching_assistant_submission_mode(
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
