@@ -54,6 +54,8 @@ OmegaUp.on('ready', () => {
   const googleClientId = document
     .querySelector('meta[name="google-signin-client_id"]')
     ?.getAttribute('content');
+  const githubClientId = payload.githubClientId;
+  const githubState = payload.githubState;
   if (payload.statusError) {
     ui.warning(payload.statusError);
   } else if (payload.verifyEmailSuccessfully) {
@@ -80,6 +82,8 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
+          githubClientId,
+          githubState,
           googleClientId,
           hasVisitedSection: payload.hasVisitedSection,
           useSignupFormWithBirthDate,
