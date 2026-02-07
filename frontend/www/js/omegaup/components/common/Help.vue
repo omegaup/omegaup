@@ -1,32 +1,54 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">{{ T.omegaupTitleHelp }}</h2>
+  <div class="container py-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h1 class="mb-3">{{ T.omegaupTitleHelp }}</h1>
+        <p class="text-muted">{{ T.helpWelcomeMessage }}</p>
+      </div>
     </div>
-    <div class="card-body">
-      <p>{{ T.helpDescription }}</p>
-      <ul class="list-unstyled">
-        <li v-for="resource in helpResources" :key="resource.name" class="mb-3">
-          <a
-            :href="resource.url"
-            :target="resource.external ? '_blank' : '_self'"
-            :rel="resource.external ? 'noopener noreferrer' : ''"
-          >
-            <font-awesome-icon
-              :icon="getIcon(resource.name)"
-              class="mr-2"
-            />
-            {{ getResourceLabel(resource.name) }}
-            <font-awesome-icon
-              v-if="resource.external"
-              :icon="['fas', 'external-link-alt']"
-              class="ml-1"
-              size="xs"
-            />
-          </a>
-        </li>
-      </ul>
+
+    <div class="row">
+      <div
+        v-for="resource in helpResources"
+        :key="resource.name"
+        class="col-md-4 mb-4"
+      >
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ getResourceLabel(resource.name) }}</h5>
+            <p class="card-text text-muted flex-grow-1">
+              {{ getResourceDescription(resource.name) }}
+            </p>
+            <a
+              :href="resource.url"
+              :target="resource.external ? '_blank' : '_self'"
+              :rel="resource.external ? 'noopener noreferrer' : ''"
+              class="btn btn-primary"
+            >
+              {{ T.helpVisit }}
+              <font-awesome-icon
+                v-if="resource.external"
+                :icon="['fas', 'external-link-alt']"
+                class="ml-1"
+                size="xs"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <hr class="my-4" />
+
+    <h4>{{ T.helpAdditionalResources }}</h4>
+    <ul class="list-unstyled">
+      <li class="mb-2">
+        <a href="/privacypolicy/">{{ T.wordsPrivacyPolicy }}</a>
+      </li>
+      <li class="mb-2">
+        <a href="/docs/">{{ T.helpDocumentation }}</a>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -55,18 +77,6 @@ export default class CommonHelp extends Vue {
 
   T = T;
 
-  getIcon(name: string): string[] {
-    const iconMap: { [key: string]: string } = {
-      tutorials: 'video',
-      discord: 'comments',
-      omegaUpBlog: 'blog',
-      algorithmsBook: 'book',
-      documentation: 'file-alt',
-      github: 'code-branch',
-    };
-    return ['fas', iconMap[name] || 'link'];
-  }
-
   getResourceLabel(name: string): string {
     const labelMap: { [key: string]: string } = {
       tutorials: T.helpTutorials,
@@ -77,6 +87,18 @@ export default class CommonHelp extends Vue {
       github: T.helpGitHub,
     };
     return labelMap[name] || name;
+  }
+
+  getResourceDescription(name: string): string {
+    const descMap: { [key: string]: string } = {
+      tutorials: T.helpTutorialsDesc,
+      discord: T.helpDiscordDesc,
+      omegaUpBlog: T.helpBlogDesc,
+      algorithmsBook: T.helpAlgorithmsBookDesc,
+      documentation: T.helpDocumentationDesc,
+      github: T.helpGitHubDesc,
+    };
+    return descMap[name] || '';
   }
 }
 </script>
