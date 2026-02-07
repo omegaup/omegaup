@@ -33,15 +33,15 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
             WHERE
                 `user_id` = ?
             LIMIT 1;';
-        
+
         $params = [$userId];
         /** @var array{content: string, is_disabled: bool, is_visible: bool, last_edit_time: \OmegaUp\Timestamp, readme_id: int, report_count: int, user_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        
+
         if (empty($row)) {
             return null;
         }
-        
+
         return new \OmegaUp\DAO\VO\UserReadmes($row);
     }
 
@@ -84,7 +84,7 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
                 `report_count` = `report_count` + 1
             WHERE
                 `readme_id` = ?;';
-        
+
         $params = [$readmeId];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
     }
@@ -98,7 +98,10 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
      * @param bool $isDisabled True para deshabilitar, false para habilitar
      * @return void
      */
-    final public static function setDisabled(int $readmeId, bool $isDisabled): void {
+    final public static function setDisabled(
+        int $readmeId,
+        bool $isDisabled
+    ): void {
         $sql = '
             UPDATE
                 `User_Readmes`
@@ -106,7 +109,7 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
                 `is_disabled` = ?
             WHERE
                 `readme_id` = ?;';
-        
+
         $params = [
             intval($isDisabled),
             $readmeId
