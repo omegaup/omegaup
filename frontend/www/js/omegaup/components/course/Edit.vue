@@ -104,6 +104,7 @@
             (query) => $emit('update-search-result-schools', query)
           "
           @invalid-languages="$emit('invalid-languages')"
+          @clear-language-error="$emit('clear-language-error')"
         ></omegaup-course-form>
       </div>
 
