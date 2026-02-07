@@ -170,10 +170,10 @@ export default class ProblemSolvingProgress extends Vue {
   private readonly circumference = 2 * Math.PI * 50; // r=50
 
   private readonly segmentColors: Record<string, string> = {
-    easy: '#00b8a3',
-    medium: '#ffc01e',
-    hard: '#ef4743',
-    unlabelled: '#999999',
+    easy: 'var(--problem-progress-easy-color)',
+    medium: 'var(--problem-progress-medium-color)',
+    hard: 'var(--problem-progress-hard-color)',
+    unlabelled: 'var(--problem-progress-unlabelled-color)',
   };
 
   get displayCount(): number {
@@ -273,22 +273,8 @@ export default class ProblemSolvingProgress extends Vue {
 </script>
 
 <style lang="scss" scoped>
-// Color variables
-$color-white: #fff;
-$color-text-primary: #333;
-$color-text-secondary: #666;
-$color-text-muted: #999;
-$color-bg-light: #f7f7f7;
-$color-border-light: #e8e8e8;
-
-// Difficulty colors
-$color-easy: #00b8a3;
-$color-medium: #ffc01e;
-$color-hard: #ef4743;
-$color-unlabelled: #999999;
-
 .problem-solving-progress {
-  background-color: $color-white;
+  background-color: var(--problem-progress-background-color);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -300,7 +286,7 @@ $color-unlabelled: #999999;
 .chart-title {
   font-size: 1rem;
   font-weight: 600;
-  color: $color-text-primary;
+  color: var(--problem-progress-text-primary-color);
   margin-bottom: 15px;
 }
 
@@ -323,7 +309,7 @@ $color-unlabelled: #999999;
 }
 
 .circle-bg {
-  stroke: $color-border-light;
+  stroke: var(--problem-progress-border-light-color);
 }
 
 .circle-segment {
@@ -331,19 +317,19 @@ $color-unlabelled: #999999;
   cursor: pointer;
 
   &.easy {
-    stroke: $color-easy;
+    stroke: var(--problem-progress-easy-color);
   }
 
   &.medium {
-    stroke: $color-medium;
+    stroke: var(--problem-progress-medium-color);
   }
 
   &.hard {
-    stroke: $color-hard;
+    stroke: var(--problem-progress-hard-color);
   }
 
   &.unlabelled {
-    stroke: $color-unlabelled;
+    stroke: var(--problem-progress-unlabelled-color);
   }
 }
 
@@ -370,19 +356,19 @@ $color-unlabelled: #999999;
 .solved-count {
   font-size: 2.8rem;
   font-weight: 700;
-  color: $color-text-primary;
+  color: var(--problem-progress-text-primary-color);
   transition: color 0.1s ease;
 }
 
 .total-count {
   font-size: 1.4rem;
   font-weight: 500;
-  color: $color-text-muted;
+  color: var(--problem-progress-text-muted-color);
 }
 
 .attempting-label {
   font-size: 0.8rem;
-  color: $color-text-secondary;
+  color: var(--problem-progress-text-secondary-color);
   margin-top: 6px;
 }
 
@@ -403,7 +389,7 @@ $color-unlabelled: #999999;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: $color-bg-light;
+  background-color: var(--problem-progress-bg-light-color);
   border-radius: 8px;
   padding: 12px 20px;
   min-width: 100px;
@@ -417,28 +403,28 @@ $color-unlabelled: #999999;
 .difficulty-count {
   font-size: 0.8rem;
   font-weight: 500;
-  color: $color-text-secondary;
+  color: var(--problem-progress-text-secondary-color);
   margin-top: 2px;
 }
 
 /* Easy - Green text */
 .difficulty-item.easy .difficulty-label {
-  color: $color-easy;
+  color: var(--problem-progress-easy-color);
 }
 
 /* Medium - Orange/Yellow text */
 .difficulty-item.medium .difficulty-label {
-  color: $color-medium;
+  color: var(--problem-progress-medium-color);
 }
 
 /* Hard - Red text */
 .difficulty-item.hard .difficulty-label {
-  color: $color-hard;
+  color: var(--problem-progress-hard-color);
 }
 
 /* Unlabelled - Gray text */
 .difficulty-item.unlabelled .difficulty-label {
-  color: $color-unlabelled;
+  color: var(--problem-progress-unlabelled-color);
 }
 
 @media (max-width: 768px) {
