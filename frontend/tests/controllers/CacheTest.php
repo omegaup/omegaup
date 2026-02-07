@@ -115,10 +115,26 @@ class CacheTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame(false, $cache->fetch($key));
 
-        $this->assertSame('computed', $cache->getOrSet($key, $lockGroup, $callback, 60));
+        $this->assertSame(
+            'computed',
+            $cache->getOrSet(
+                $key,
+                $lockGroup,
+                $callback,
+                60
+            )
+        );
         $this->assertSame(1, $invocations);
 
-        $this->assertSame('computed', $cache->getOrSet($key, $lockGroup, $callback, 60));
+        $this->assertSame(
+            'computed',
+            $cache->getOrSet(
+                $key,
+                $lockGroup,
+                $callback,
+                60
+            )
+        );
         $this->assertSame(1, $invocations);
     }
 }
