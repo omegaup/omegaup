@@ -4,6 +4,13 @@ namespace OmegaUp;
 
 /**
  * SEO Helper class for generating SEO metadata
+ *
+ * @psalm-type OpenGraph=array{type: string, title: string, description: string, url: string, image: string, imageWidth: string, imageHeight: string, siteName: string, locale: string}
+ * @psalm-type TwitterCard=array{card: string, title: string, description: string, image: string, site: string, creator?: string}
+ * @psalm-type SeoMeta=array{description: string, canonical: string, robots: string, og: OpenGraph, twitter: TwitterCard, keywords?: string, author?: string, structuredData?: list<OrganizationSchema|WebSiteSchema|ProblemSchema>, hreflang?: array<string, string>, appleTouchIcon?: string}
+ * @psalm-type OrganizationSchema=array{'@context': string, '@type': string, name: string, url: string, logo: string, description: string, sameAs: list<string>}
+ * @psalm-type WebSiteSchema=array{'@context': string, '@type': string, name: string, url: string, potentialAction: array{'@type': string, target: array{'@type': string, urlTemplate: string}, 'query-input': string}}
+ * @psalm-type ProblemSchema=array{'@context': string, '@type': string, name: string, description: string, url: string, educationalLevel: string, learningResourceType: string}
  */
 class SEOHelper {
     /**
@@ -14,7 +21,7 @@ class SEOHelper {
      * @param string $url Canonical URL (optional)
      * @param string $image Social share image URL (optional)
      * @param string $type Open Graph type (default: 'website')
-     * @return array<string, mixed> SEO metadata array
+     * @return SeoMeta SEO metadata array
      */
     public static function generateMetadata(
         string $title,
@@ -36,8 +43,9 @@ class SEOHelper {
             $image = self::ensureAbsoluteUrl($image, $baseUrl);
         }
 
+        $session = \OmegaUp\Controllers\Session::getCurrentSession();
         $locale = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            \OmegaUp\Controllers\Session::getCurrentSession()['identity']
+            $session['identity'] ?? null
         );
 
         return [
@@ -69,7 +77,7 @@ class SEOHelper {
      * Generates structured data (JSON-LD) for Organization
      *
      * @param string $url Base URL
-     * @return array<string, mixed> Structured data array
+     * @return OrganizationSchema Structured data array
      */
     public static function generateOrganizationSchema(string $url): array {
         return [
@@ -80,7 +88,7 @@ class SEOHelper {
             'logo' => self::ensureAbsoluteUrl('/media/omegaup.png', $url),
             'description' => 'Free educational platform that helps improve programming skills, used by tens of thousands of students and teachers in Latin America. Planning a better future. For everyone.',
             'sameAs' => [
-                'https://twitter.com/omegaup',
+                'https://x.com/omegaup',
                 'https://github.com/omegaup/omegaup',
             ],
         ];
@@ -90,7 +98,7 @@ class SEOHelper {
      * Generates structured data (JSON-LD) for WebSite
      *
      * @param string $url Base URL
-     * @return array<string, mixed> Structured data array
+     * @return WebSiteSchema Structured data array
      */
     public static function generateWebSiteSchema(string $url): array {
         return [
@@ -116,7 +124,7 @@ class SEOHelper {
      * @param string $description Problem description
      * @param string $url Problem URL
      * @param string $baseUrl Base URL
-     * @return array<string, mixed> Structured data array
+     * @return ProblemSchema Structured data array
      */
     public static function generateProblemSchema(
         string $title,
@@ -207,7 +215,11 @@ class SEOHelper {
         $locales = ['en', 'es', 'pt'];
         $hreflang = [];
         foreach ($locales as $locale) {
-            $hreflang[$locale] = rtrim($baseUrl, '/') . $path;
+            $url = rtrim($baseUrl, '/') . $path;
+            $hreflang[$locale] = $url . (strpos(
+                $url,
+                '?'
+            ) !== false ? '&' : '?') . 'lang=' . $locale;
         }
         return $hreflang;
     }

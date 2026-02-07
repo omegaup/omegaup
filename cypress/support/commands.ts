@@ -10,13 +10,39 @@ import {
   Status,
 } from './types';
 
+function baseUrlWithTrailingSlash(): string {
+  const baseUrl = Cypress.config('baseUrl') as string | undefined;
+  if (!baseUrl) return '/';
+  return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+}
+
+function setAuthCookieFromLoginResponse(
+  response: Cypress.Response<unknown>,
+): void {
+  const setCookieHeader = response.headers['set-cookie'];
+  const setCookies = Array.isArray(setCookieHeader)
+    ? setCookieHeader
+    : typeof setCookieHeader === 'string'
+    ? [setCookieHeader]
+    : [];
+
+  for (const cookie of setCookies) {
+    const match = /^ouat=([^;]+)/.exec(cookie);
+    if (match) {
+      cy.setCookie('ouat', match[1]);
+      return;
+    }
+  }
+}
+
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
   const URL =
     '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
   cy.request(URL).then((response) => {
     expect(response.status).to.equal(200);
-    cy.reload();
+    setAuthCookieFromLoginResponse(response);
+    cy.visit('/');
   });
 });
 
@@ -29,16 +55,15 @@ Cypress.Commands.add('loginAdmin', () => {
     '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
   cy.request(URL).then((response) => {
     expect(response.status).to.equal(200);
-    cy.reload();
+    setAuthCookieFromLoginResponse(response);
+    cy.visit('/');
   });
 });
 
 // Logouts the user
 Cypress.Commands.add('logout', () => {
-  cy.get('a[data-nav-user]').click();
-  cy.get('a[data-logout-button]').click({ force: true });
-  cy.get('footer.logout-confirmation-modal>button.btn-primary').click();
-  cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
+  cy.logoutUsingApi();
+  cy.waitUntil(() => cy.url().should('eq', baseUrlWithTrailingSlash()));
 });
 
 // Logouts the user
@@ -46,7 +71,8 @@ Cypress.Commands.add('logoutUsingApi', () => {
   const URL = '/logout/?redirect=/';
   cy.request(URL).then((response) => {
     expect(response.status).to.equal(200);
-    cy.reload();
+    cy.clearCookies();
+    cy.visit('/');
   });
 });
 
@@ -298,16 +324,20 @@ Cypress.Commands.add(
         break;
       }
 
-      cy.fixture(runs[idx].fixturePath).then((fileContent) => {
-        cy.get('.CodeMirror-line').first().type(fileContent);
-        cy.get('[data-submit-run]').click();
-      });
-
       if (statusCheck) {
+        cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+          cy.get('.CodeMirror-line').first().type(fileContent);
+          cy.get('[data-submit-run]').click();
+        });
         continue;
       }
       const expectedStatus: Status = runs[idx].status;
       cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+
+      cy.fixture(runs[idx].fixturePath).then((fileContent) => {
+        cy.get('.CodeMirror-line').first().type(fileContent);
+        cy.get('[data-submit-run]').click();
+      });
 
       cy.wait(['@runStatus'], { timeout: 10000 })
         .its('response.statusCode')
