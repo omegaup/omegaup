@@ -261,7 +261,7 @@ class ApiCaller {
         }
 
         // Create request
-        $request = new \OmegaUp\Request($_REQUEST ?? []);
+        $request = new \OmegaUp\Request($_REQUEST);
 
         // Prepend api
         $apiMethodName = "api{$methodName}";

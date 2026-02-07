@@ -60,9 +60,10 @@ def get_runs_list_endpoint(
 
 def get_contents_from_url(
     get_endpoint_fn: Callable[..., str],
-    args: dict[str, Any] | None = None
+    args: dict[str, Any] | None = None,
+    use_post: bool = False,
 ) -> Any:
-    """hit the endpoint with GET request"""
+    """hit the endpoint with a request (POST for mutating, GET otherwise)"""
     global COOKIES  # pylint: disable=W0603
 
     if args is None:
@@ -84,11 +85,21 @@ def get_contents_from_url(
             response.raise_for_status()
             COOKIES = response.cookies
         elif COOKIES is None:
-            response = requests.get(url, timeout=10)
+            if use_post:
+                response = requests.post(url, timeout=10)
+            else:
+                response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies
         else:
-            response = requests.get(url, COOKIES, timeout=10)
+            if use_post:
+                response = requests.post(
+                    url, cookies=COOKIES, timeout=10
+                )
+            else:
+                response = requests.get(
+                    url, cookies=COOKIES, timeout=10
+                )
             response.raise_for_status()
         data = response.json()
         return data
@@ -137,7 +148,8 @@ def process_rejudge_for_single_run(run_id: str) -> None:
         rejudge_submission_endpoint,
         {
             "run_alias": run_id,
-        }
+        },
+        use_post=True,
     )
 
 

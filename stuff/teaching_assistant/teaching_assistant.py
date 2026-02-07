@@ -151,11 +151,12 @@ def get_course_assignments_endpoint(course_alias: str) -> str:
     return f"api/course/listAssignments?course_alias={course_alias}"
 
 
-def get_contents_from_url(  # pylint: disable=R0912
+def get_contents_from_url(  # pylint: disable=R0912,R0915
     get_endpoint_fn: Callable[..., str],
-    args: dict[str, Any] | None = None
+    args: dict[str, Any] | None = None,
+    use_post: bool = False,
 ) -> Any:
-    """hit the endpoint with GET request"""
+    """hit the endpoint with a request (POST for mutating, GET otherwise)"""
     global COOKIES  # pylint: disable=W0603
 
     if args is None:
@@ -178,11 +179,21 @@ def get_contents_from_url(  # pylint: disable=R0912
             response.raise_for_status()
             COOKIES = response.cookies
         elif COOKIES is None:
-            response = requests.get(url, timeout=10)
+            if use_post:
+                response = requests.post(url, timeout=10)
+            else:
+                response = requests.get(url, timeout=10)
             response.raise_for_status()
             COOKIES = response.cookies
         else:
-            response = requests.get(url, cookies=COOKIES, timeout=10)
+            if use_post:
+                response = requests.post(
+                    url, cookies=COOKIES, timeout=10
+                )
+            else:
+                response = requests.get(
+                    url, cookies=COOKIES, timeout=10
+                )
             response.raise_for_status()
 
         try:
@@ -608,6 +619,7 @@ def process_initial_feedback(
                         "assignment_alias": assignment_alias,
                         "feedback_list": feedback_list,
                     },
+                    use_post=True,
                 )
             except (KeyError, TypeError) as e:
                 LOG.warning("Skipping malformed feedback item: %s", e)
@@ -735,7 +747,8 @@ def handle_feedbacks(  # pylint: disable=R0913,R0912,R0915
                             ),
                             "line_number": line_number,
                             "submission_feedback_id": feedback_id,
-                        }
+                        },
+                        use_post=True,
                     )
                     LOG.info(
                         "Request %s out of %s from user %s on %s: DONE",
