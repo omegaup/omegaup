@@ -262,8 +262,22 @@ export default class ProblemSolvingProgress extends Vue {
 </script>
 
 <style lang="scss" scoped>
+// Color variables
+$color-white: #fff;
+$color-text-primary: #333;
+$color-text-secondary: #666;
+$color-text-muted: #999;
+$color-bg-light: #f7f7f7;
+$color-border-light: #e8e8e8;
+
+// Difficulty colors
+$color-easy: #00b8a3;
+$color-medium: #ffc01e;
+$color-hard: #ef4743;
+$color-unlabelled: #999999;
+
 .problem-solving-progress {
-  background-color: #fff;
+  background-color: $color-white;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -275,7 +289,7 @@ export default class ProblemSolvingProgress extends Vue {
 .chart-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: $color-text-primary;
   margin-bottom: 15px;
 }
 
@@ -325,19 +339,19 @@ export default class ProblemSolvingProgress extends Vue {
 .solved-count {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #333;
+  color: $color-text-primary;
   transition: color 0.1s ease;
 }
 
 .total-count {
   font-size: 1.4rem;
   font-weight: 500;
-  color: #999;
+  color: $color-text-muted;
 }
 
 .attempting-label {
   font-size: 0.8rem;
-  color: #666;
+  color: $color-text-secondary;
   margin-top: 6px;
 }
 
@@ -358,7 +372,7 @@ export default class ProblemSolvingProgress extends Vue {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f7f7f7;
+  background-color: $color-bg-light;
   border-radius: 8px;
   padding: 12px 20px;
   min-width: 100px;
@@ -372,28 +386,28 @@ export default class ProblemSolvingProgress extends Vue {
 .difficulty-count {
   font-size: 0.8rem;
   font-weight: 500;
-  color: #666;
+  color: $color-text-secondary;
   margin-top: 2px;
 }
 
 /* Easy - Green text */
 .difficulty-item.easy .difficulty-label {
-  color: #00b8a3;
+  color: $color-easy;
 }
 
 /* Medium - Orange/Yellow text */
 .difficulty-item.medium .difficulty-label {
-  color: #ffc01e;
+  color: $color-medium;
 }
 
 /* Hard - Red text */
 .difficulty-item.hard .difficulty-label {
-  color: #ef4743;
+  color: $color-hard;
 }
 
 /* Unlabelled - Gray text */
 .difficulty-item.unlabelled .difficulty-label {
-  color: #999999;
+  color: $color-unlabelled;
 }
 
 @media (max-width: 576px) {
