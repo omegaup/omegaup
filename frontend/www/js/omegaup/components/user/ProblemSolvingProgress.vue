@@ -33,7 +33,7 @@
             @mouseleave="hoveredSegment = null"
           >
             <title>
-              {{ T.profileEasy }}: {{ difficulty.easy }}/{{ total }}
+              {{ getProgressTitle('easy') }}
             </title>
           </circle>
           <!-- Medium segment (yellow) -->
@@ -51,7 +51,7 @@
             @mouseleave="hoveredSegment = null"
           >
             <title>
-              {{ T.profileMedium }}: {{ difficulty.medium }}/{{ total }}
+              {{ getProgressTitle('medium') }}
             </title>
           </circle>
           <!-- Hard segment (red) -->
@@ -69,7 +69,7 @@
             @mouseleave="hoveredSegment = null"
           >
             <title>
-              {{ T.profileHard }}: {{ difficulty.hard }}/{{ total }}
+              {{ getProgressTitle('hard') }}
             </title>
           </circle>
           <!-- Unlabelled segment (gray) -->
@@ -87,7 +87,7 @@
             @mouseleave="hoveredSegment = null"
           >
             <title>
-              {{ T.profileUnlabelled }}: {{ difficulty.unlabelled }}/{{ total }}
+              {{ getProgressTitle('unlabelled') }}
             </title>
           </circle>
         </svg>
@@ -148,6 +148,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 interface DifficultyStats {
   easy: number;
@@ -162,6 +163,7 @@ export default class ProblemSolvingProgress extends Vue {
   @Prop({ default: 0 }) attempting!: number;
 
   T = T;
+  ui = ui;
 
   hoveredSegment: 'easy' | 'medium' | 'hard' | 'unlabelled' | null = null;
 
@@ -188,6 +190,20 @@ export default class ProblemSolvingProgress extends Vue {
       unlabelled: this.T.profileUnlabelled,
     };
     return labels[this.hoveredSegment];
+  }
+
+  getProgressTitle(segment: 'easy' | 'medium' | 'hard' | 'unlabelled'): string {
+    const labels: Record<string, string> = {
+      easy: this.T.profileEasy,
+      medium: this.T.profileMedium,
+      hard: this.T.profileHard,
+      unlabelled: this.T.profileUnlabelled,
+    };
+    return this.ui.formatString(this.T.profileDifficultyProgress, {
+      difficulty: labels[segment],
+      count: this.difficulty[segment].toString(),
+      total: this.total.toString(),
+    });
   }
 
   get hoveredCountStyle(): Record<string, string> {
