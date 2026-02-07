@@ -13,6 +13,8 @@ on:
       - '**/*.py'
       - '**/*.scss'
       - '**/*.css'
+      - '**/*.yml'
+      - '**/*.yaml'
       - 'frontend/templates/*.lang'
       - '.cspell-words.txt'
       - 'cspell.json'
