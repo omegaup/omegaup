@@ -2457,6 +2457,14 @@ export namespace types {
       );
     }
 
+    export function UserHelpPayload(
+      elementId: string = 'payload',
+    ): types.UserHelpPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3865,6 +3873,12 @@ export namespace types {
     scoreboardAlias: string;
   }
 
+  export interface HelpResource {
+    external: boolean;
+    name: string;
+    url: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -5073,6 +5087,10 @@ export namespace types {
   export interface UserDocument {
     name: string;
     url: string;
+  }
+
+  export interface UserHelpPayload {
+    helpResources: types.HelpResource[];
   }
 
   export interface UserInfoForProblem {

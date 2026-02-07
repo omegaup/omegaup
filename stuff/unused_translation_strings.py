@@ -28,7 +28,7 @@ def _get_expected_strings() -> Set[str]:
     # and Vue.
     for root, _, filenames in os.walk('frontend'):
         for filename in filenames:
-            path = os.path.join(root, filename)
+            path = os.path.join(root, filename).replace(os.sep, '/')
             if not _ALLOWLIST_RE.match(path):
                 continue
             if filename.endswith('.tpl'):
@@ -79,6 +79,20 @@ def _main() -> None:
             # public / student course information description
             if translation_string_name.endswith(
                     'CourseInformationDescription'):
+                continue
+
+            # Dynamically constructed strings in Help.vue
+            if translation_string_name.startswith('helpResource'):
+                continue
+
+            # Dynamic strings or specific exceptions
+            if translation_string_name in (
+                'wordsResetMessage',
+                'wordsYes',
+                'wordsVerdictsOf',
+                'zipPrepare',
+                'wordsUpload'
+            ):
                 continue
 
             if translation_string_name not in expected_strings:

@@ -44,7 +44,7 @@ define('TEMPLATE_CACHE_DIR', '/tmp/templates');
 define('OMEGAUP_GITSERVER_URL', 'http://omegaup-gitserver-1:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
+define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1', 'bookish-adventure-x5q4xw69qjw9hvv4p-8001.app.github.dev']);
 EOF
 ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"
 

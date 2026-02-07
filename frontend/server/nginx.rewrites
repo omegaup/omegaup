@@ -68,6 +68,7 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z
 rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /course/students.php?course=$1 last;
 rewrite ^/dependents/?$ /profile/dependents.php last;
 rewrite ^/docs/?$ /docs.php last;
+rewrite ^/help/?$ /help.php last;
 rewrite ^/grader/ephemeral/$ /grader/grader.php last;
 rewrite ^/group/?$ /group/list.php last;
 rewrite ^/group/new/?$ /group/new.php last;
