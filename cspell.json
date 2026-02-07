@@ -45,7 +45,6 @@
     ".husky/**",
     ".psalm/**",
     ".storybook/**",
-    ".github/**",
     "cypress/fixtures/**",
     "**/*.json",
     "**/*.sql"
