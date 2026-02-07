@@ -150,7 +150,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-interface DifficultyStats {
+export interface DifficultyStats {
   easy: number;
   medium: number;
   hard: number;
