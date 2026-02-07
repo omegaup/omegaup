@@ -8,6 +8,11 @@ on:
         - cron: "0 3 * * *"
     workflow_dispatch:
 
+# Prevent race condition when multiple users comment /assign simultaneously
+concurrency:
+    group: assign-issue-${{ github.event.issue.number || 'scheduled' }}
+    cancel-in-progress: false
+
 jobs:
     assign:
         runs-on: ubuntu-22.04
@@ -15,39 +20,141 @@ jobs:
             issues: write
             pull-requests: write
         steps:
-            - name: Assign or unassign issues
+            - name: Check for experienced issue creator exception
+              id: pre_check
+              if: github.event_name == 'issue_comment'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const comment = context.payload.comment.body.trim();
+                      const commenter = context.payload.comment.user.login;
+                      const issue = context.payload.issue;
+                      
+                      if (comment !== '/assign') {
+                          core.setOutput('handled', 'false');
+                          return;
+                      }
+                      
+                      const isIssueCreator = issue.user.login === commenter;
+                      if (!isIssueCreator) {
+                          core.setOutput('handled', 'false');
+                          return;
+                      }
+                      
+                      const currentAssignees = issue.assignees.map(a => a.login);
+                      if (currentAssignees.includes(commenter)) {
+                          await github.rest.issues.createComment({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: issue.number,
+                              body: `@${commenter} You are already assigned to this issue.`
+                          });
+                          core.setOutput('handled', 'true');
+                          return;
+                      }
+                      
+                      const REQUIRED_APPROVED_PRS = 10;
+                      let approvedPRCount = 0;
+                      let cursor = null;
+                      let hasNextPage = true;
+                      const MAX_PRS_TO_QUERY = 200;
+                      let totalPRsQueried = 0;
+                      
+                      const searchQuery = `is:pr is:merged author:${commenter} repo:${context.repo.owner}/${context.repo.repo}`;
+                      
+                      while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS && totalPRsQueried < MAX_PRS_TO_QUERY) {
+                          const result = await github.graphql(`
+                              query($searchQuery: String!, $cursor: String) {
+                                  search(
+                                      query: $searchQuery
+                                      type: ISSUE
+                                      first: 50
+                                      after: $cursor
+                                  ) {
+                                      issueCount
+                                      pageInfo { hasNextPage endCursor }
+                                      nodes {
+                                          ... on PullRequest {
+                                              id
+                                          }
+                                      }
+                                  }
+                              }
+                          `, {
+                              searchQuery,
+                              cursor
+                          });
+                          
+                          const searchResults = result.search;
+                          totalPRsQueried += searchResults.nodes.length;
+                          approvedPRCount += searchResults.nodes.length;
+                          hasNextPage = searchResults.pageInfo.hasNextPage;
+                          cursor = searchResults.pageInfo.endCursor;
+                      }
+                      
+                      if (approvedPRCount >= REQUIRED_APPROVED_PRS) {
+                          try {
+                              await github.rest.issues.addAssignees({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  assignees: [commenter]
+                              });
+                              
+                              await github.rest.issues.createComment({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: issue.number,
+                                  body: `Assigned to @${commenter}!\n\n` +
+                                        `As an experienced contributor (${approvedPRCount} merged PRs) working on your own issue, ` +
+                                        `you're exempt from the standard 5-assignment limit. Please open a pull request within 7 days. ` +
+                                        `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
+                              });
+                              
+                              core.setOutput('handled', 'true');
+                          } catch (error) {
+                              core.setOutput('handled', 'false');
+                          }
+                          return;
+                      }
+                      
+                      core.setOutput('handled', 'false');
+
+            - name: Assign or unassign issues (standard flow)
+              if: github.event_name != 'issue_comment' || steps.pre_check.outputs.handled != 'true'
               uses: takanome-dev/assign-issue-action@beta
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   maintainers: ""
                   self_assign_cmd: /assign
                   self_unassign_cmd: /unassign
-                  # Unassign after 5 days if no PR is opened
+                  # Unassign after 7 days if no PR is opened
                   days_until_unassign: 7
                   enable_auto_suggestion: true
                   allow_self_assign_author: true
                   enable_reminder: true
                   reminder_days: auto
                   reminder_comment: >
-                      Quick reminder: please open a pull request within 2.5 days
+                      Quick reminder: please open a pull request within 3.5 days
                       or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
-                  max_assignments: 3
+                  max_assignments: 5
                   max_assignments_message: >
-                      You already have the maximum number of assigned issues (3).
+                      You already have the maximum number of assigned issues (5).
                       Please wrap up or unassign one before taking another.
                   block_assignment: true
                   block_assignment_comment: >
                       Kindly ask the maintainers to assign this issue to you again.
                   assigned_comment: >
-                      Assigned! Please open a pull request within 5 days. If no
+                      Assigned! Please open a pull request within 7 days. If no
                       PR is opened, this issue will be automatically unassigned
                       to keep the queue moving.
                   unassigned_comment: >
-                      Unassigned because no pull request was opened within 5
-                      days. If you want to be assigned to this issue again,
-                      kindly ask the maintainers to assign it to you again.
+                      You have been unassigned from this issue. If you want to
+                      be assigned to this issue again, kindly ask the
+                      maintainers to assign it to you again.
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
-                      Please note the 5-day PR expectation.
+                      Please note the 7-day PR expectation.

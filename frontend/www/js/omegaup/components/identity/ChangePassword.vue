@@ -24,20 +24,18 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditChangePasswordNewPassword }}
-              <input
+              <omegaup-password-input
                 v-model="newPassword"
-                class="form-control"
-                type="password"
+                autocomplete="new-password"
               />
             </label>
           </div>
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditChangePasswordRepeatNewPassword }}
-              <input
+              <omegaup-password-input
                 v-model="newPasswordRepeat"
-                class="form-control"
-                type="password"
+                autocomplete="new-password"
               />
             </label>
           </div>
@@ -67,8 +65,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-password-input': omegaup_PasswordInput,
+  },
+})
 export default class IdentityChangePassword extends Vue {
   @Prop() username!: string;
 

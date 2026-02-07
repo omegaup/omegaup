@@ -150,7 +150,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
 
         {
@@ -420,7 +420,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -488,7 +488,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -2269,7 +2269,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(0, $response['visibility']);
 
-        // Updated problem setttings and visibility
+        // Updated problem settings and visibility
         $newTimeLimit = 3000.0;
         $newExtraWallTime = 200.0;
         $newMemoryLimit = 8000;

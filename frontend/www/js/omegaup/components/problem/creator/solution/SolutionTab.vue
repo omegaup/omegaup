@@ -54,7 +54,7 @@ import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
 Vue.use(VueCookies, { expire: -1 });
 
-import omegaup_problemMarkdown from '../../Markdown.vue';
+import omegaup_problemMarkdown from '../../ProblemMarkdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -188,6 +188,9 @@ export default class SolutionTab extends Vue {
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
+    width: 100%;
+    margin-top: 35px;
+    overflow-wrap: anywhere;
   }
 }
 </style>
