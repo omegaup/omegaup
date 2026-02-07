@@ -46,30 +46,6 @@ class UserReadmes extends \OmegaUp\DAO\Base\UserReadmes {
     }
 
     /**
-     * Crear un nuevo README de usuario.
-     *
-     * @param \OmegaUp\DAO\VO\UserReadmes $readme El objeto README a crear
-     * @return void
-     */
-    final public static function create(
-        \OmegaUp\DAO\VO\UserReadmes $readme
-    ): void {
-        parent::create($readme);
-    }
-
-    /**
-     * Actualizar un README de usuario existente.
-     *
-     * @param \OmegaUp\DAO\VO\UserReadmes $readme El objeto README a actualizar
-     * @return void
-     */
-    final public static function update(
-        \OmegaUp\DAO\VO\UserReadmes $readme
-    ): void {
-        parent::update($readme);
-    }
-
-    /**
      * Incrementar el contador de reportes para un README.
      * Esta operación es atómica y segura para actualizaciones concurrentes.
      *
