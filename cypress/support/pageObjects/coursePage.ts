@@ -165,12 +165,13 @@ export class CoursePage {
     cy.waitUntil(() => cy.get('[data-new-run] a').should('be.visible'));
     cy.get('[data-new-run] a').click();
     cy.get('[name="language"]').select(runOptions.language);
+    const expectedStatus: Status = runOptions.status;
+    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
+
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
       cy.get('.CodeMirror-line').first().type(fileContent);
       cy.get('[data-submit-run]').click();
     });
-    const expectedStatus: Status = runOptions.status;
-    cy.intercept({ method: 'POST', url: '/api/run/status/' }).as('runStatus');
 
     cy.wait(['@runStatus'], { timeout: 10000 })
       .its('response.statusCode')

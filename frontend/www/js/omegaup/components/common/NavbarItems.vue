@@ -217,7 +217,7 @@
           >
           <a
             class="dropdown-item"
-            href="http://blog.omegaup.com/"
+            href="https://blog.omegaup.com/"
             target="_blank"
             >{{ T.navBlog }}</a
           >
