@@ -7,7 +7,9 @@ import mainStore from '../mainStore';
 import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 
-import user_Profile from '../components/user/Profile.vue';
+import user_Profile, {
+  ProfileStatistics,
+} from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 // Heatmap utility interfaces and functions
@@ -242,17 +244,7 @@ OmegaUp.on('ready', () => {
         searchResultSchools: searchResultSchools,
         availableYears: [currentYear] as number[],
         isLoading: true,
-        profileStatistics: null as {
-          solved: number;
-          attempting: number;
-          difficulty: {
-            easy: number;
-            medium: number;
-            hard: number;
-            unlabelled: number;
-          };
-          tags: Array<{ name: string; count: number }>;
-        } | null,
+        profileStatistics: null as ProfileStatistics | null,
       };
     },
     mounted: function () {
