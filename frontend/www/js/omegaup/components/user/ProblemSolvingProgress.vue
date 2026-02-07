@@ -441,22 +441,48 @@ $color-unlabelled: #999999;
   color: $color-unlabelled;
 }
 
+@media (max-width: 768px) {
+  .progress-container {
+    justify-content: space-around;
+    gap: 16px;
+  }
+
+  .circular-chart-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .difficulty-item {
+    min-width: 90px;
+    padding: 10px 16px;
+  }
+}
+
 @media (max-width: 576px) {
   .progress-container {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+  }
+
+  .circular-chart-container {
+    width: 160px;
+    height: 160px;
   }
 
   .difficulty-list {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
+    width: 100%;
   }
 
   .difficulty-item {
-    min-width: 80px;
-    padding: 10px 16px;
+    flex: 1 1 calc(50% - 10px);
+    min-width: 0;
+    max-width: calc(50% - 5px);
+    padding: 10px 12px;
   }
 }
 </style>
