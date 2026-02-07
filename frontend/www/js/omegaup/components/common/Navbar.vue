@@ -37,7 +37,7 @@
               @read="readNotifications"
             ></omegaup-notification-list>
           </div>
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex mr-2">
             <li class="nav-item d-flex align-items-center">
               <a
                 class="nav-link nav-login-text pr-0"
@@ -304,12 +304,12 @@
         <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
-          class="navbar justify-content-end d-none d-lg-block order-1"
+          class="navbar justify-content-end d-none d-lg-block order-1 align-items-center"
           href="#"
+          :title="T.omegaupTitleLogout"
           @click.prevent="logoutModalVisible = true"
         >
           <font-awesome-icon :icon="['fas', 'power-off']" />
-          {{ T.omegaupTitleLogout }}
         </a>
       </div>
     </nav>
