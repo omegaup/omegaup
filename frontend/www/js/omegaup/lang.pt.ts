@@ -745,6 +745,7 @@ const translations: { [key: string]: string; } = {
   demotionProblemNotificationBanned: "O problema [%(problem_name)] foi relatado como inadequado. Para mais detalhes, verifique seu e-mail.",
   demotionProblemNotificationWarning: "O problema [%(problem_name)] foi marcado com um aviso. Para mais detalhes, verifique seu e-mail.",
   dependentsBlockedMessage: "Conta bloqueada. Para validar o dependente, \u00e9 necess\u00e1rio entrar em contato com a nossa equipe de soporte.",
+  dependentsEmptyState: "Voc\u00ea ainda n\u00e3o tem dependentes.",
   dependentsMessage: "\u00c9 necess\u00e1rio aprovar a conta do seu dependente dentro de %(days) dias. Caso contr\u00e1rio, a conta ser\u00e1 exclu\u00edda.",
   dependentsOneDayUntilVerificationDeadline: "Aten\u00e7\u00e3o! Resta apenas 1 dia para aprovar a conta do seu dependente. Caso contr\u00e1rio, a conta ser\u00e1 exclu\u00edda.",
   dependentsStatus: "Status",

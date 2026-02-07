@@ -14,17 +14,15 @@
         </tr>
       </thead>
       <tbody>
-        
-            <!-- Empty-state -->
-          <tr v-if="!dependents || dependents.length === 0">
-      <td colspan="3" class="empty-category text-center text-muted py-4">
-        {{ T.dependentsEmptyState }}
-       </td>
-      </tr>
+        <!-- Empty-state -->
+        <tr v-if="!dependents || dependents.length === 0">
+          <td colspan="3" class="empty-category text-center text-muted py-4">
+            {{ T.dependentsEmptyState }}
+          </td>
+        </tr>
 
         <!-- Normal rows -->
-      <tr v-else v-for="(dependent, index) in dependents" :key="index">
-
+        <tr v-for="(dependent, index) in dependents" v-else :key="index">
           <th scope="row" class="text-center">{{ index + 1 }}</th>
           <td class="text-center">
             <omegaup-user-username
