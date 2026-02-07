@@ -113,11 +113,17 @@ def _parse(text: str) -> Sequence[Table]:
                    | (Suppress(CaselessKeyword('ON UPDATE')) +
                       reference_option('on_update'))))
 
+    # Support for ASC/DESC ordering in index definitions
+    index_column = (
+        identifier +
+        Opt(Suppress(CaselessKeyword('ASC') | CaselessKeyword('DESC')))
+    ).set_parse_action(lambda toks: toks[0])
+
     constraint_definition = (
         (((CaselessKeyword('PRIMARY KEY')('type')) |
           ((CaselessKeyword('FULLTEXT KEY') | CaselessKeyword('UNIQUE KEY')
             | CaselessKeyword('KEY'))('type') + identifier('index_name'))) +
-         '(' + delimited_list(identifier)('key_part') + ')') |
+         '(' + delimited_list(index_column)('key_part') + ')') |
         (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') +
          ((CaselessKeyword('FOREIGN KEY')
            ('type') + '(' + delimited_list(identifier)
