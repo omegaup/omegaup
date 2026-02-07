@@ -1572,6 +1572,7 @@ const translations: { [key: string]: string; } = {
   profileCreatedContests: "Concursos creados",
   profileCreatedCourses: "Cursos creados",
   profileCreatedProblems: "Problemas creados",
+  profileDifficultyProgress: "%(difficulty)s: %(count)s/%(total)s",
   profileEasy: "F\u00e1cil",
   profileEdit: "Editar perfil",
   profileEmail: "Correo",
