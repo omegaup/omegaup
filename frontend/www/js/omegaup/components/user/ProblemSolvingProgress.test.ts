@@ -200,19 +200,27 @@ describe('ProblemSolvingProgress.vue', () => {
 
     // Hover on easy - green
     vm.hoveredSegment = 'easy';
-    expect(vm.hoveredCountStyle).toEqual({ color: '#00b8a3' });
+    expect(vm.hoveredCountStyle).toEqual({
+      color: 'var(--problem-progress-easy-color)',
+    });
 
     // Hover on medium - yellow
     vm.hoveredSegment = 'medium';
-    expect(vm.hoveredCountStyle).toEqual({ color: '#ffc01e' });
+    expect(vm.hoveredCountStyle).toEqual({
+      color: 'var(--problem-progress-medium-color)',
+    });
 
     // Hover on hard - red
     vm.hoveredSegment = 'hard';
-    expect(vm.hoveredCountStyle).toEqual({ color: '#ef4743' });
+    expect(vm.hoveredCountStyle).toEqual({
+      color: 'var(--problem-progress-hard-color)',
+    });
 
     // Hover on unlabelled - gray
     vm.hoveredSegment = 'unlabelled';
-    expect(vm.hoveredCountStyle).toEqual({ color: '#999999' });
+    expect(vm.hoveredCountStyle).toEqual({
+      color: 'var(--problem-progress-unlabelled-color)',
+    });
   });
 
   it('should display hover label with correct text', () => {
