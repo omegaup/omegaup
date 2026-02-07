@@ -1,0 +1,239 @@
+{
+  "version": "0.2",
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "name": "omegaUp Spell Checker Configuration",
+  "description": "Spell checking configuration for omegaUp documentation, translation files, and code comments",
+  "language": "en",
+  "dictionaries": [
+    "custom-words"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "custom-words",
+      "path": ".cspell-words.txt",
+      "addWords": true
+    }
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "vendor/**",
+    ".git/**",
+    "*.min.js",
+    "*.min.css",
+    "*.lock",
+    "package-lock.json",
+    "yarn.lock",
+    "composer.lock",
+    "frontend/www/js/libs/**",
+    "frontend/server/libs/third_party/**",
+    "**/*.svg",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.woff",
+    "**/*.woff2",
+    "**/*.ttf",
+    "**/*.eot",
+    "**/*.map",
+    "**/*.snap",
+    "**/__snapshots__/**",
+    "coverage/**",
+    "dist/**",
+    "build/**",
+    ".husky/**",
+    ".psalm/**",
+    ".storybook/**",
+    "cypress/fixtures/**",
+    "**/*.json",
+    "**/*.sql"
+  ],
+  "files": [
+    "**/*.md",
+    "**/*.ts",
+    "**/*.js",
+    "**/*.vue",
+    "**/*.php",
+    "**/*.py",
+    "**/*.scss",
+    "**/*.css",
+    "**/*.yml",
+    "**/*.yaml",
+    "frontend/templates/*.lang"
+  ],
+  "enableFiletypes": [
+    "markdown",
+    "typescript",
+    "javascript",
+    "vue",
+    "php",
+    "python",
+    "scss",
+    "css",
+    "yaml"
+  ],
+  "languageSettings": [
+    {
+      "languageId": "typescript,javascript,vue",
+      "locale": "en",
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "CStyleComment",
+        "string"
+      ]
+    },
+    {
+      "languageId": "php",
+      "locale": "en",
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "CStyleComment",
+        "string",
+        "PhpHereDoc"
+      ]
+    },
+    {
+      "languageId": "python",
+      "locale": "en",
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "hash-comment",
+        "string"
+      ]
+    },
+    {
+      "languageId": "yaml",
+      "locale": "en",
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "hash-comment"
+      ]
+    },
+    {
+      "languageId": "markdown",
+      "locale": "en,es",
+      "caseSensitive": false
+    }
+  ],
+  "overrides": [
+    {
+      "filename": "**/*.lang",
+      "languageId": "plaintext"
+    },
+    {
+      "filename": "**/es.lang",
+      "language": "es",
+      "languageId": "plaintext",
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
+    },
+    {
+      "filename": "**/en.lang",
+      "language": "en",
+      "languageId": "plaintext",
+      "dictionaries": [
+        "custom-words"
+      ]
+    },
+    {
+      "filename": "**/pt.lang",
+      "language": "pt,pt_BR",
+      "languageId": "plaintext",
+      "dictionaries": [
+        "custom-words",
+        "pt-br"
+      ]
+    },
+    {
+      "filename": "**/pseudo.lang",
+      "enabled": false
+    },
+    {
+      "filename": "**/Cómo-*.md",
+      "language": "es",
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
+    },
+    {
+      "filename": "**/Como-*.md",
+      "language": "es",
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
+    }
+  ],
+  "patterns": [
+    {
+      "name": "hash-comment",
+      "pattern": "#.*",
+      "description": "Match # style comments (Python, YAML, Shell)"
+    },
+    {
+      "name": "lang-file-keys",
+      "pattern": "/^[a-zA-Z0-9_]+ = /gm",
+      "description": "Ignore .lang file keys (left side of = sign)"
+    },
+    {
+      "name": "template-placeholders",
+      "pattern": "%\\([a-zA-Z0-9_]+\\)",
+      "description": "Ignore template placeholders like %(username)"
+    },
+    {
+      "name": "html-entities",
+      "pattern": "&[a-zA-Z]+;",
+      "description": "Ignore HTML entities"
+    },
+    {
+      "name": "urls",
+      "pattern": "https?://[^\\s]+",
+      "description": "Ignore URLs"
+    },
+    {
+      "name": "email-addresses",
+      "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+      "description": "Ignore email addresses"
+    },
+    {
+      "name": "markdown-code-fence",
+      "pattern": "/^```[\\s\\S]*?^```/gm",
+      "description": "Ignore fenced code blocks in markdown"
+    },
+    {
+      "name": "markdown-inline-code",
+      "pattern": "`[^`]+`",
+      "description": "Ignore inline code in markdown"
+    },
+    {
+      "name": "markdown-links",
+      "pattern": "\\]\\([^)]+\\)",
+      "description": "Ignore markdown link URLs"
+    }
+  ],
+  "ignoreRegExpList": [
+    "lang-file-keys",
+    "template-placeholders",
+    "html-entities",
+    "urls",
+    "email-addresses",
+    "markdown-code-fence",
+    "markdown-inline-code",
+    "markdown-links"
+  ],
+  "flagWords": [],
+  "minWordLength": 4,
+  "allowCompoundWords": true,
+  "import": [
+    "@cspell/dict-software-terms",
+    "@cspell/dict-typescript",
+    "@cspell/dict-php",
+    "@cspell/dict-python",
+    "@cspell/dict-es-es",
+    "@cspell/dict-pt-br"
+  ]
+}
