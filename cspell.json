@@ -3,13 +3,10 @@
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "name": "omegaUp Spell Checker Configuration",
   "description": "Spell checking configuration for omegaUp documentation, translation files, and code comments",
-
   "language": "en",
-
   "dictionaries": [
     "custom-words"
   ],
-
   "dictionaryDefinitions": [
     {
       "name": "custom-words",
@@ -17,7 +14,6 @@
       "addWords": true
     }
   ],
-
   "ignorePaths": [
     "node_modules/**",
     "vendor/**",
@@ -54,7 +50,6 @@
     "**/*.json",
     "**/*.sql"
   ],
-
   "files": [
     "**/*.md",
     "**/*.ts",
@@ -66,7 +61,6 @@
     "**/*.css",
     "frontend/templates/*.lang"
   ],
-
   "enableFiletypes": [
     "markdown",
     "typescript",
@@ -77,22 +71,42 @@
     "scss",
     "css"
   ],
-
   "languageSettings": [
     {
       "languageId": "typescript,javascript,vue",
       "locale": "en",
-      "caseSensitive": false
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "CStyleComment",
+        "string"
+      ]
     },
     {
       "languageId": "php",
       "locale": "en",
-      "caseSensitive": false
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "CStyleComment",
+        "string",
+        "PhpHereDoc"
+      ]
     },
     {
       "languageId": "python",
       "locale": "en",
-      "caseSensitive": false
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "hash-comment",
+        "string"
+      ]
+    },
+    {
+      "languageId": "yaml",
+      "locale": "en",
+      "caseSensitive": false,
+      "includeRegExpList": [
+        "hash-comment"
+      ]
     },
     {
       "languageId": "markdown",
@@ -100,7 +114,6 @@
       "caseSensitive": false
     }
   ],
-
   "overrides": [
     {
       "filename": "**/*.lang",
@@ -110,19 +123,27 @@
       "filename": "**/es.lang",
       "language": "es",
       "languageId": "plaintext",
-      "dictionaries": ["custom-words", "es-es"]
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
     },
     {
       "filename": "**/en.lang",
       "language": "en",
       "languageId": "plaintext",
-      "dictionaries": ["custom-words"]
+      "dictionaries": [
+        "custom-words"
+      ]
     },
     {
       "filename": "**/pt.lang",
       "language": "pt,pt_BR",
       "languageId": "plaintext",
-      "dictionaries": ["custom-words", "pt-br"]
+      "dictionaries": [
+        "custom-words",
+        "pt-br"
+      ]
     },
     {
       "filename": "**/pseudo.lang",
@@ -131,16 +152,26 @@
     {
       "filename": "**/Cómo-*.md",
       "language": "es",
-      "dictionaries": ["custom-words", "es-es"]
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
     },
     {
       "filename": "**/Como-*.md",
       "language": "es",
-      "dictionaries": ["custom-words", "es-es"]
+      "dictionaries": [
+        "custom-words",
+        "es-es"
+      ]
     }
   ],
-
   "patterns": [
+    {
+      "name": "hash-comment",
+      "pattern": "#.*",
+      "description": "Match # style comments (Python, YAML, Shell)"
+    },
     {
       "name": "lang-file-keys",
       "pattern": "/^[a-zA-Z0-9_]+ = /gm",
@@ -182,7 +213,6 @@
       "description": "Ignore markdown link URLs"
     }
   ],
-
   "ignoreRegExpList": [
     "lang-file-keys",
     "template-placeholders",
@@ -193,13 +223,9 @@
     "markdown-inline-code",
     "markdown-links"
   ],
-
   "flagWords": [],
-
   "minWordLength": 4,
-
   "allowCompoundWords": true,
-
   "import": [
     "@cspell/dict-software-terms",
     "@cspell/dict-typescript",

@@ -1,3 +1,5 @@
+# This workfow checks spellig mistaces in documentaiton and coments
+# TODO: Remove this test commet after verificaton
 name: Spell Check
 
 on:
@@ -52,26 +54,28 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             # For PRs, get files changed compared to base branch
-            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }}...HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang)$' || true)
+            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }}...HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang|yml|yaml)$' || true)
           else
             # For push to main, check files changed in the commit
-            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT HEAD~1 HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang)$' || true)
+            CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT HEAD~1 HEAD 2>/dev/null | grep -E '\.(md|ts|js|vue|php|py|scss|css|lang|yml|yaml)$' || true)
           fi
 
           # Filter out ignored paths
           CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '^(node_modules|vendor|frontend/www/js/libs|frontend/server/libs/third_party)/' || true)
 
+          # Exclude lock files
+          CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v -E '(package-lock\.json|yarn\.lock|composer\.lock)$' || true)
+
           # Remove empty lines
           CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v '^$' || true)
 
-          # Save to file for later use
-          echo "$CHANGED_FILES" > changed_files.txt
-
-          # Count files (handle empty case)
-          if [ -s changed_files.txt ]; then
-            FILE_COUNT=$(wc -l < changed_files.txt | tr -d ' ')
-          else
+          # Handle empty case (fix ghost file bug)
+          if [ -z "$CHANGED_FILES" ]; then
             FILE_COUNT=0
+            echo "" > changed_files.txt
+          else
+            echo "$CHANGED_FILES" > changed_files.txt
+            FILE_COUNT=$(wc -l < changed_files.txt | tr -d ' ')
           fi
           echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
 
