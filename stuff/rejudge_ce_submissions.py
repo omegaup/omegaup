@@ -25,7 +25,10 @@ BASE_URL = None
 COOKIES = None
 
 
-def get_login_endpoint(_username: str, _password: str) -> str:
+def get_login_endpoint(  # pylint: disable=unused-argument
+    username: str,
+    password: str,
+) -> str:
     """endpoint for logging in (use POST with usernameOrEmail and password)"""
     return "api/user/login/"
 
