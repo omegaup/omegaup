@@ -277,7 +277,7 @@ class ApiCaller {
         // Reject GET for mutating endpoints
         $requestMethod = \OmegaUp\Request::getServerVar('REQUEST_METHOD');
         if (
-            $requestMethod !== null &&
+            !is_null($requestMethod) &&
             strtoupper($requestMethod) === 'GET' &&
             self::isMutatingMethod($methodName)
         ) {
