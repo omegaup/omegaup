@@ -747,6 +747,7 @@
 	"demotionProblemNotificationBanned": "Problem [%(problem_name)] has been reported as inappropriate. For more details check your email.",
 	"demotionProblemNotificationWarning": "A warning has been put on your problem %(problem_name). For more details check your email.",
 	"dependentsBlockedMessage": "Account locked. To validate the dependent, it is necessary to contact our support team.",
+	"dependentsEmptyState": "You don\u2019t have any dependents yet.",
 	"dependentsMessage": "It is necessary to approve your dependent's account within %(days) days. Otherwise, the account will be deleted.",
 	"dependentsOneDayUntilVerificationDeadline": "Attention! You only have 1 day left to approve your dependent's account. Otherwise, the account will be deleted.",
 	"dependentsStatus": "Status",
