@@ -37,6 +37,7 @@ aliasAlreadyInUse = "(A1ia5 \"%(alias)\" a1r3ady 3xi575. P13a53 ch0053 a diff3r3
 aliasInUse = "(a1ia5 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 a1ia5.)"
 allowedSolutionsLimitReached = "(Y0u hav3 r3ach3d 7h3 1imi7 0f a110w3d 501u7i0n5)"
 apiNotFound = "(R3qu3573d API 3ndp0in7 n07 f0und.)"
+methodNotAllowed = "(7hi5 API 3ndp0in7 d035 n07 a110w G37 r3qu3575. U53 P057, PU7, 0r PA7CH.)"
 apiTokenAdd = "(Add API 70k3n)"
 apiTokenDescription = "(If y0u wan7 70 u53 7h3 0m3gaup API, y0u can cr3a73 an API 70k3n, 3ach API 70k3n can mak3 up 70 1000 r3qu3575 p3r h0ur and y0u can hav3 up 70 5 API 70k3n5.)"
 apiTokenLastTimeUsed = "(La57 7im3 u53d)"

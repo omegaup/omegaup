@@ -37,6 +37,7 @@ aliasAlreadyInUse = "El alias \"%(alias)\" ya está siendo usado. Por favor elig
 aliasInUse = "El alias (título corto) ya está siendo usado. Por favor elige un alias distinto."
 allowedSolutionsLimitReached = "Has alcanzado el límite de soluciones permitidas"
 apiNotFound = "El API solicitada no fue encontrada."
+methodNotAllowed = "Este endpoint del API no permite peticiones GET. Usa POST, PUT o PATCH."
 apiTokenAdd = "Agregar token de API"
 apiTokenDescription = "Si quieres usar la API de omegaup, puedes crear un token de API, cada token puede hacer hasta 1000 peticiones por hora y puedes tener hasta 5 tokens de API."
 apiTokenLastTimeUsed = "Última vez usado"

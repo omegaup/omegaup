@@ -37,6 +37,7 @@ aliasAlreadyInUse = "Alias \"%(alias)\" já existe. Por favor, escolha um nome d
 aliasInUse = "Alias já existe. Por favor, escolha um alias diferente."
 allowedSolutionsLimitReached = "Você tem alcançado o limite de soluções permitidas"
 apiNotFound = "Endpoint API solicitada não foi encontrado."
+methodNotAllowed = "Este endpoint da API não permite requisições GET. Use POST, PUT ou PATCH."
 apiTokenAdd = "Adicionar token de API"
 apiTokenDescription = "Se quiser utilizar a API omegaup, pode criar um token API, cada token API pode fazer até 1000 pedidos por hora e pode ter até 5 tokens API."
 apiTokenLastTimeUsed = "Última utilização"
