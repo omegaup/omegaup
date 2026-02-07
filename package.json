@@ -146,9 +146,9 @@
     "wrapper-webpack-plugin": "^2.1"
   },
   "scripts": {
-    "test": "cross-env TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
-    "test:watch": "cross-env TZ=UTC jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
-    "test:coverage": "cross-env TZ=UTC jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
+    "test": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest 'frontend/www/js/.*test\\.ts$'",
+    "test:watch": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
+    "test:coverage": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
     "dev": "cross-env webpack --config-name=frontend --mode=development --stats=minimal --color",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --stats=minimal --color",
     "dev-all": "cross-env webpack --mode=development --stats=minimal --color",
