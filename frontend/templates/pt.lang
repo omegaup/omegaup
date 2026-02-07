@@ -746,6 +746,7 @@ demotionProblemMultipleQuestion = "Deseja fazer isso para todos os relatórios d
 demotionProblemNotificationBanned = "O problema [%(problem_name)] foi relatado como inadequado. Para mais detalhes, verifique seu e-mail."
 demotionProblemNotificationWarning = "O problema [%(problem_name)] foi marcado com um aviso. Para mais detalhes, verifique seu e-mail."
 dependentsBlockedMessage = "Conta bloqueada. Para validar o dependente, é necessário entrar em contato com a nossa equipe de soporte."
+dependentsEmptyState = "Você ainda não tem dependentes."
 dependentsMessage = "É necessário aprovar a conta do seu dependente dentro de %(days) dias. Caso contrário, a conta será excluída."
 dependentsOneDayUntilVerificationDeadline = "Atenção! Resta apenas 1 dia para aprovar a conta do seu dependente. Caso contrário, a conta será excluída."
 dependentsStatus = "Status"
