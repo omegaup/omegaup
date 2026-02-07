@@ -58,6 +58,8 @@
     "**/*.py",
     "**/*.scss",
     "**/*.css",
+    "**/*.yml",
+    "**/*.yaml",
     "frontend/templates/*.lang"
   ],
   "enableFiletypes": [
@@ -68,7 +70,8 @@
     "php",
     "python",
     "scss",
-    "css"
+    "css",
+    "yaml"
   ],
   "languageSettings": [
     {
