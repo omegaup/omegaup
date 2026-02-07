@@ -6,6 +6,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats for an overall platform report.
      *
+     * @param \OmegaUp\Request $r
      * @return array{report: array{acceptedSubmissions: int, activeSchools: int, activeUsers: array<string, int>, courses: int, omiCourse: array{attemptedUsers: int, completedUsers: int, passedUsers: int}}}
      *
      * @omegaup-request-param int|null $end_time
@@ -39,7 +40,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
                      * @param array{gender: string, users: int} $row
                      * @return array<string, int>
                      */
-                    fn (array $row) => [$row['gender'] => $row['users']],
+                    fn (array $row): array => [$row['gender'] => $row['users']],
                     \OmegaUp\DAO\Identities::countActiveUsersByGender(
                         $startTime,
                         $endTime

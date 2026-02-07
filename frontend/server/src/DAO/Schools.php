@@ -18,7 +18,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
      * @param string $name
      * @return list<\OmegaUp\DAO\VO\Schools>
      */
-    public static function findByName($name) {
+    public static function findByName(string $name): array {
         // Note: We've added an index on the name column (idx_schools_name), but using
         // LIKE '%term%' prevents MySQL from utilizing this index effectively.
         // We maintain this pattern for compatibility with existing tests and functionality,
