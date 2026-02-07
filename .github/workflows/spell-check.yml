@@ -98,20 +98,22 @@ jobs:
 
           # Run cspell only on changed files
           # cspell automatically checks only comments in code files
-          # Using xargs -d to handle filenames with spaces correctly
-          SPELL_OUTPUT=$(xargs -d '\n' cspell \
+          # Using mapfile to safely read files into an array
+          mapfile -t FILES < changed_files.txt
+          SPELL_OUTPUT=$(cspell \
             --show-suggestions \
             --show-context \
             --no-must-find-files \
             --unique \
             --no-progress \
-            < changed_files.txt 2>&1) || true
+            "${FILES[@]}" 2>&1) || true
 
           echo "$SPELL_OUTPUT" > spell-check-results.txt
 
           # Check if there were any issues
-          if echo "$SPELL_OUTPUT" | grep -q "Unknown word"; then
-            ISSUE_COUNT=$(echo "$SPELL_OUTPUT" | grep -c "Unknown word" || echo "0")
+          # Using native bash string comparison to avoid broken pipe from grep -q
+          if [[ "$SPELL_OUTPUT" == *"Unknown word"* ]]; then
+            ISSUE_COUNT=$(grep -c "Unknown word" spell-check-results.txt || echo "0")
 
             echo "### Spelling Issues Found ($ISSUE_COUNT)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
