@@ -42,7 +42,7 @@ try_define('OMEGAUP_DB_NAME', 'omegaup');
 # ####################################
 # EXPERIMENTS
 # ####################################
-try_define('OMEGAUP_EXPERIMENT_SECRET', 'omegaup');
+try_define('OMEGAUP_EXPERIMENT_SECRET', 'CHANGE_ME');
 
 # ####################################
 # LOG CONFIG
@@ -64,16 +64,10 @@ try_define(
     'OMEGAUP_GITSERVER_URL',
     'http://localhost:' . OMEGAUP_GITSERVER_PORT
 );
-try_define(
-    'OMEGAUP_GITSERVER_SECRET_KEY',
-    'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA=='
-);
-try_define(
-    'OMEGAUP_GITSERVER_PUBLIC_KEY',
-    'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw='
-);
+try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'CHANGE_ME');
+try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'CHANGE_ME');
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
-try_define('OMEGAUP_GRADER_SECRET', 'secret');
+try_define('OMEGAUP_GRADER_SECRET', 'CHANGE_ME');
 /** @psalm-suppress MixedArgument OMEGAUP_ROOT is really a string... */
 try_define(
     'IMAGES_PATH',
@@ -98,10 +92,7 @@ try_define('OMEGAUP_GRADER_FAKE', false);
 # ####################################
 # COURSE CLONE CONFIG
 # ####################################
-try_define(
-    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
-    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
-);
+try_define('OMEGAUP_COURSE_CLONE_SECRET_KEY', 'CHANGE_ME');
 
 # ####################################
 # RABBITMQ CONFIG
@@ -120,11 +111,8 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # ####################################
 # GOOGLE LOGIN CONFIG
 # ####################################
-try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
-try_define(
-    'OMEGAUP_GOOGLE_CLIENTID',
-    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
-);
+try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
+try_define('OMEGAUP_GOOGLE_CLIENTID', 'xxxxx');
 
 # ####################################
 # GOOGLE ANALYTICS
