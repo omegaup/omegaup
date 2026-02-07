@@ -16,7 +16,9 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2025, true, null);
 
         // Call API without authentication (public endpoint)
-        $response = \OmegaUp\Controllers\GSoC::apiListEditions(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\GSoC::apiListEditions(
+            new \OmegaUp\Request()
+        );
 
         $this->assertArrayHasKey('editions', $response);
         $this->assertIsArray($response['editions']);
@@ -59,7 +61,9 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Call API without authentication (public endpoint)
-        $response = \OmegaUp\Controllers\GSoC::apiListIdeas(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\GSoC::apiListIdeas(
+            new \OmegaUp\Request()
+        );
 
         $this->assertArrayHasKey('ideas', $response);
         $this->assertIsArray($response['ideas']);
@@ -88,8 +92,32 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         $edition2025 = \OmegaUp\DAO\GSoC::createEdition(2025, true, null);
         $edition2024 = \OmegaUp\DAO\GSoC::createEdition(2024, true, null);
 
-        $idea2025 = \OmegaUp\DAO\GSoC::createIdea($edition2025, 'Idea 2025', null, null, null, null, null, null, 'Proposed', null, null);
-        $idea2024 = \OmegaUp\DAO\GSoC::createIdea($edition2024, 'Idea 2024', null, null, null, null, null, null, 'Proposed', null, null);
+        $idea2025 = \OmegaUp\DAO\GSoC::createIdea(
+            $edition2025,
+            'Idea 2025',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
+        $idea2024 = \OmegaUp\DAO\GSoC::createIdea(
+            $edition2024,
+            'Idea 2024',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
 
         // Filter by 2025 edition
         $response = \OmegaUp\Controllers\GSoC::apiListIdeas(new \OmegaUp\Request([
@@ -107,8 +135,14 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
                 $found2024 = true;
             }
         }
-        $this->assertTrue($found2025, 'Idea from 2025 should be in filtered results');
-        $this->assertFalse($found2024, 'Idea from 2024 should not be in filtered results');
+        $this->assertTrue(
+            $found2025,
+            'Idea from 2025 should be in filtered results'
+        );
+        $this->assertFalse(
+            $found2024,
+            'Idea from 2024 should not be in filtered results'
+        );
     }
 
     /**
@@ -119,8 +153,32 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($adminIdentity);
 
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2025, true, null);
-        $proposedIdea = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Proposed Idea', null, null, null, null, null, null, 'Proposed', null, null);
-        $acceptedIdea = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Accepted Idea', null, null, null, null, null, null, 'Accepted', null, null);
+        $proposedIdea = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Proposed Idea',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
+        $acceptedIdea = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Accepted Idea',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Accepted',
+            null,
+            null
+        );
 
         // Filter by Accepted status
         $response = \OmegaUp\Controllers\GSoC::apiListIdeas(new \OmegaUp\Request([
@@ -138,8 +196,14 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
                 $foundAccepted = true;
             }
         }
-        $this->assertTrue($foundAccepted, 'Accepted idea should be in filtered results');
-        $this->assertFalse($foundProposed, 'Proposed idea should not be in filtered results');
+        $this->assertTrue(
+            $foundAccepted,
+            'Accepted idea should be in filtered results'
+        );
+        $this->assertFalse(
+            $foundProposed,
+            'Proposed idea should not be in filtered results'
+        );
     }
 
     /**
@@ -247,7 +311,9 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $adminLogin->auth_token,
                 'year' => 2027,
             ]));
-            $this->fail('Should have thrown DuplicatedEntryInDatabaseException');
+            $this->fail(
+                'Should have thrown DuplicatedEntryInDatabaseException'
+            );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertSame('editionAlreadyExists', $e->getMessage());
         }
@@ -502,7 +568,19 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($adminIdentity);
 
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2037, true, null);
-        $ideaId = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Original Title', null, null, null, null, null, null, 'Proposed', null, null);
+        $ideaId = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Original Title',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
 
         $response = \OmegaUp\Controllers\GSoC::apiUpdateIdea(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -530,7 +608,19 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $admin, 'identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $adminLogin = self::login($adminIdentity);
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2038, true, null);
-        $ideaId = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Test Idea', null, null, null, null, null, null, 'Proposed', null, null);
+        $ideaId = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Test Idea',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
 
         try {
             \OmegaUp\Controllers\GSoC::apiUpdateIdea(new \OmegaUp\Request([
@@ -571,7 +661,19 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($adminIdentity);
 
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2039, true, null);
-        $ideaId = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Idea to Delete', null, null, null, null, null, null, 'Proposed', null, null);
+        $ideaId = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Idea to Delete',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
 
         $response = \OmegaUp\Controllers\GSoC::apiDeleteIdea(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -596,7 +698,19 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $admin, 'identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
         $adminLogin = self::login($adminIdentity);
         $editionId = \OmegaUp\DAO\GSoC::createEdition(2040, true, null);
-        $ideaId = \OmegaUp\DAO\GSoC::createIdea($editionId, 'Test Idea', null, null, null, null, null, null, 'Proposed', null, null);
+        $ideaId = \OmegaUp\DAO\GSoC::createIdea(
+            $editionId,
+            'Test Idea',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'Proposed',
+            null,
+            null
+        );
 
         try {
             \OmegaUp\Controllers\GSoC::apiDeleteIdea(new \OmegaUp\Request([
@@ -631,12 +745,17 @@ class GSoCTest extends \OmegaUp\Test\ControllerTestCase {
      * Test getIdeasForTypeScript entry point
      */
     public function testGetIdeasForTypeScript() {
-        $response = \OmegaUp\Controllers\GSoC::getIdeasForTypeScript(new \OmegaUp\Request());
+        $response = \OmegaUp\Controllers\GSoC::getIdeasForTypeScript(
+            new \OmegaUp\Request()
+        );
 
         $this->assertArrayHasKey('entrypoint', $response);
         $this->assertSame('gsoc_ideas', $response['entrypoint']);
         $this->assertArrayHasKey('templateProperties', $response);
         $this->assertArrayHasKey('title', $response['templateProperties']);
-        $this->assertInstanceOf(\OmegaUp\TranslationString::class, $response['templateProperties']['title']);
+        $this->assertInstanceOf(
+            \OmegaUp\TranslationString::class,
+            $response['templateProperties']['title']
+        );
     }
 }
