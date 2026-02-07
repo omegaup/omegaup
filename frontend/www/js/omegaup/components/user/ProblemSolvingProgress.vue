@@ -16,7 +16,6 @@
             cy="60"
             r="50"
             fill="none"
-            stroke="#e8e8e8"
             stroke-width="14"
           />
           <!-- Easy segment (green) -->
@@ -26,7 +25,6 @@
             cy="60"
             r="50"
             fill="none"
-            stroke="#00b8a3"
             stroke-width="14"
             :stroke-dasharray="easyDash"
             :stroke-dashoffset="0"
@@ -45,7 +43,6 @@
             cy="60"
             r="50"
             fill="none"
-            stroke="#ffc01e"
             stroke-width="14"
             :stroke-dasharray="mediumDash"
             :stroke-dashoffset="mediumOffset"
@@ -64,7 +61,6 @@
             cy="60"
             r="50"
             fill="none"
-            stroke="#ef4743"
             stroke-width="14"
             :stroke-dasharray="hardDash"
             :stroke-dashoffset="hardOffset"
@@ -83,7 +79,6 @@
             cy="60"
             r="50"
             fill="none"
-            stroke="#999999"
             stroke-width="14"
             :stroke-dasharray="unlabelledDash"
             :stroke-dashoffset="unlabelledOffset"
@@ -311,9 +306,29 @@ $color-unlabelled: #999999;
   height: 100%;
 }
 
+.circle-bg {
+  stroke: $color-border-light;
+}
+
 .circle-segment {
   transition: stroke-dasharray 0.1s ease;
   cursor: pointer;
+
+  &.easy {
+    stroke: $color-easy;
+  }
+
+  &.medium {
+    stroke: $color-medium;
+  }
+
+  &.hard {
+    stroke: $color-hard;
+  }
+
+  &.unlabelled {
+    stroke: $color-unlabelled;
+  }
 }
 
 .circle-segment:hover {
