@@ -364,6 +364,14 @@ export default class UserRank extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+
+:root {
+  --rank-badge-text-color: black;
+  --rank-wrapper-border-color: #ccc;
+  --rank-wrapper-background-color: #fff;
+  --rank-remove-button-bg-color: rgba(0, 0, 0, 0.3);
+}
+
 .empty-category {
   color: var(--arena-contest-list-empty-category-font-color);
 }
@@ -373,9 +381,9 @@ export default class UserRank extends Vue {
   padding: 0.35rem 0.25rem 0.7rem 0.25rem;
   overflow: hidden;
   max-width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--rank-wrapper-border-color);
   border-radius: 4px;
-  background: #fff;
+  background: var(--rank-wrapper-background-color);
   min-height: 38px;
   box-sizing: border-box;
 }
@@ -390,7 +398,7 @@ export default class UserRank extends Vue {
 
 /* Target the actual badge structure */
 [data-user-rank] .tags-input-badge {
-  color: black !important;
+  color: var(--rank-badge-text-color) !important;
   border-radius: 4px !important;
   padding: 4px 8px !important;
   margin: 2px !important;
@@ -412,15 +420,15 @@ export default class UserRank extends Vue {
   line-height: 1.2 !important;
   display: block !important;
   margin-right: 8px !important;
-  color: black !important;
+  color: var(--rank-badge-text-color) !important;
 }
 
 /* Target the remove button */
 [data-user-rank] .tags-input-remove {
-  background: rgba(0, 0, 0, 0.3) !important;
+  background: var(--rank-remove-button-bg-color) !important;
   border: none !important;
   border-radius: 50% !important;
-  color: black !important;
+  color: var(--rank-badge-text-color) !important;
   cursor: pointer !important;
   font-size: 12px !important;
   width: 16px !important;
