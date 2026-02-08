@@ -122,6 +122,12 @@ OmegaUp.on('ready', () => {
     vueInstance.filter = state.filter;
   };
 
+  // Handle hash changes (popstate doesn't always fire for hash-only changes)
+  const onHashChange = () => {
+    const state = parseUrlState();
+    vueInstance.tab = state.tab;
+  };
+
   const vueInstance = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
@@ -135,6 +141,7 @@ OmegaUp.on('ready', () => {
     // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
     beforeDestroy() {
       window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('hashchange', onHashChange);
     },
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
@@ -176,4 +183,5 @@ OmegaUp.on('ready', () => {
   });
 
   window.addEventListener('popstate', onPopState);
+  window.addEventListener('hashchange', onHashChange);
 });
