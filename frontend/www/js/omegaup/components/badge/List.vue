@@ -22,7 +22,7 @@
         T.wordsBadgesSeeAll
       }}</a>
     </div>
-    <div v-show="!badges"><img src="/media/wait.gif" alt="Loading" /></div>
+    <div v-show="!allBadges"><img src="/media/wait.gif" alt="Loading" /></div>
   </div>
 </template>
 

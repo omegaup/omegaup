@@ -4,7 +4,8 @@
       height="11"
       :src="flagUrl"
       :title="displayTitle"
-      :alt="displayTitle"
+      alt=""
+      aria-hidden="true"
       width="16"
     />
   </span>

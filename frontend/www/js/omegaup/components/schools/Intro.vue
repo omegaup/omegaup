@@ -11,7 +11,7 @@
     <div class="row">
       <div class="col-sm-6 col-md-4">
         <div class="thumbnail">
-          <img src="/media/u30.png" alt="Create your course" />
+          <img src="/media/u30.png" :alt="T.schoolsCreateYourCourse" />
           <div class="caption">
             <h3>{{ T.schoolsCreateYourCourse }}</h3>
             <p>{{ T.schoolsCreateCoursesThatMeetNeeds }}</p>
@@ -20,7 +20,7 @@
       </div>
       <div class="col-sm-6 col-md-4">
         <div class="thumbnail">
-          <img src="/media/u35.png" alt="Manage student progress" />
+          <img src="/media/u35.png" :alt="T.schoolsManageProgressOfStudents" />
           <div class="caption">
             <h3>{{ T.schoolsManageProgressOfStudents }}</h3>
             <p>{{ T.schoolsCreateCoursesThatMeetNeeds }}</p>
@@ -29,7 +29,7 @@
       </div>
       <div class="col-sm-6 col-md-4">
         <div class="thumbnail">
-          <img src="/media/u30.png" alt="Create your problems" />
+          <img src="/media/u30.png" :alt="T.schoolsCreateYourProblems" />
           <div class="caption">
             <h3>{{ T.schoolsCreateYourProblems }}</h3>
             <p>{{ T.schoolsCreateCoursesThatMeetNeeds }}</p>

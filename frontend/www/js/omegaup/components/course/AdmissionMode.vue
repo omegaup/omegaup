@@ -13,7 +13,10 @@
             rel="tooltip"
             :title="T.courseEditAdmissionModeDescription"
           >
-            <img src="/media/question.png" alt="Help" />
+            <img
+              src="/media/question.png"
+              :alt="T.courseEditAdmissionModeDescription"
+            />
           </a>
           <div class="form-group">
             <select
