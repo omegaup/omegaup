@@ -125,6 +125,14 @@
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
   - [`/api/course/updateProblemsOrder/`](#apicourseupdateproblemsorder)
+- [GSoC](#gsoc)
+  - [`/api/gSoC/createEdition/`](#apigsoccreateedition)
+  - [`/api/gSoC/createIdea/`](#apigsoccreateidea)
+  - [`/api/gSoC/deleteIdea/`](#apigsocdeleteidea)
+  - [`/api/gSoC/listEditions/`](#apigsoclisteditions)
+  - [`/api/gSoC/listIdeas/`](#apigsoclistideas)
+  - [`/api/gSoC/updateEdition/`](#apigsocupdateedition)
+  - [`/api/gSoC/updateIdea/`](#apigsocupdateidea)
 - [Grader](#grader)
   - [`/api/grader/status/`](#apigraderstatus)
 - [Group](#group)
@@ -2631,6 +2639,157 @@ _Nothing_
 ### Returns
 
 _Nothing_
+
+# GSoC
+
+GSoC Controller
+
+## `/api/gSoC/createEdition/`
+
+### Description
+
+Creates a new GSoC edition (admin only)
+
+### Parameters
+
+| Name                   | Type           | Description | Required |
+| ---------------------- | -------------- | ----------- | -------- |
+| `year`                 | `int`          |             | ✓        |
+| `application_deadline` | `null\|string` |             |          |
+| `is_active`            | `bool\|null`   |             |          |
+
+### Returns
+
+| Name         | Type     |
+| ------------ | -------- |
+| `edition_id` | `number` |
+
+## `/api/gSoC/createIdea/`
+
+### Description
+
+Creates a new GSoC idea (admin only)
+
+### Parameters
+
+| Name                   | Type           | Description | Required |
+| ---------------------- | -------------- | ----------- | -------- |
+| `edition_id`           | `int`          |             | ✓        |
+| `title`                | `string`       |             | ✓        |
+| `blog_link`            | `null\|string` |             |          |
+| `brief_description`    | `null\|string` |             |          |
+| `contributor_username` | `null\|string` |             |          |
+| `estimated_hours`      | `int\|null`    |             |          |
+| `expected_results`     | `null\|string` |             |          |
+| `possible_mentors`     | `null\|string` |             |          |
+| `preferred_skills`     | `null\|string` |             |          |
+| `skill_level`          | `null\|string` |             |          |
+| `status`               | `null\|string` |             |          |
+
+### Returns
+
+| Name      | Type     |
+| --------- | -------- |
+| `idea_id` | `number` |
+
+## `/api/gSoC/deleteIdea/`
+
+### Description
+
+Deletes a GSoC idea (admin only)
+
+### Parameters
+
+| Name      | Type  | Description | Required |
+| --------- | ----- | ----------- | -------- |
+| `idea_id` | `int` |             | ✓        |
+
+### Returns
+
+| Name      | Type      |
+| --------- | --------- |
+| `deleted` | `boolean` |
+
+## `/api/gSoC/listEditions/`
+
+### Description
+
+Returns a list of all GSoC editions
+
+### Returns
+
+```typescript
+types.GSoCEditionListPayload;
+```
+
+## `/api/gSoC/listIdeas/`
+
+### Description
+
+Returns a list of GSoC ideas, optionally filtered by edition and status
+
+### Parameters
+
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `edition_id` | `int\|null`    |             |          |
+| `status`     | `null\|string` |             |          |
+
+### Returns
+
+```typescript
+types.GSoCIdeaListPayload;
+```
+
+## `/api/gSoC/updateEdition/`
+
+### Description
+
+Updates a GSoC edition (admin only)
+
+### Parameters
+
+| Name                   | Type           | Description | Required |
+| ---------------------- | -------------- | ----------- | -------- |
+| `edition_id`           | `int`          |             | ✓        |
+| `application_deadline` | `null\|string` |             |          |
+| `is_active`            | `bool\|null`   |             |          |
+| `year`                 | `int\|null`    |             |          |
+
+### Returns
+
+| Name      | Type      |
+| --------- | --------- |
+| `updated` | `boolean` |
+
+## `/api/gSoC/updateIdea/`
+
+### Description
+
+Updates a GSoC idea (admin only)
+
+### Parameters
+
+| Name                   | Type           | Description | Required |
+| ---------------------- | -------------- | ----------- | -------- |
+| `idea_id`              | `int`          |             | ✓        |
+| `blog_link`            | `null\|string` |             |          |
+| `brief_description`    | `null\|string` |             |          |
+| `contributor_username` | `null\|string` |             |          |
+| `edition_id`           | `int\|null`    |             |          |
+| `estimated_hours`      | `int\|null`    |             |          |
+| `expected_results`     | `null\|string` |             |          |
+| `possible_mentors`     | `null\|string` |             |          |
+| `preferred_skills`     | `null\|string` |             |          |
+| `skill_level`          | `null\|string` |             |          |
+| `status`               | `null\|string` |             |          |
+| `title`                | `null\|string` |             |          |
+
+### Returns
+
+| Name      | Type      |
+| --------- | --------- |
+| `updated` | `boolean` |
 
 # Grader
 
