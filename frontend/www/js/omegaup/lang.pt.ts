@@ -1681,6 +1681,7 @@ const translations: { [key: string]: string; } = {
   requestFeedback: "A solicita\u00e7\u00e3o de feedback foi enviada a todos os administradores",
   requestFeedbackConfirm: "Deseja solicitar feedback ao seu professor para este envio?",
   requestFeedbackMessage: "Preciso de sua ajuda nesta submiss\u00e3o.",
+  resetToDefault: "Redefinir para a defini\u00e7\u00e3o de c\u00f3digo padr\u00e3o",
   resourceNotFound: "Recurso n\u00e3o encontrado.",
   reviewerNomination: "Qualificar o problema como revisor",
   reviewerNominationFormTitle: "Qualifica esse problema!",
