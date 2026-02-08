@@ -24,7 +24,9 @@
             </tr>
           </tbody>
         </table>
-        <div v-show="!solvedProblems"><img src="/media/wait.gif" /></div>
+        <div v-show="!solvedProblems">
+          <img src="/media/wait.gif" alt="Loading" />
+        </div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -49,7 +51,9 @@
             </tr>
           </tbody>
         </table>
-        <div v-show="!unsolvedProblems"><img src="/media/wait.gif" /></div>
+        <div v-show="!unsolvedProblems">
+          <img src="/media/wait.gif" alt="Loading" />
+        </div>
       </div>
     </div>
   </div>

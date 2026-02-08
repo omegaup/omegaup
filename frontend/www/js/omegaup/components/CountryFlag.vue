@@ -1,6 +1,12 @@
 <template>
   <span v-if="country && country !== ''" class="pr-1">
-    <img height="11" :src="flagUrl" :title="displayTitle" width="16" />
+    <img
+      height="11"
+      :src="flagUrl"
+      :title="displayTitle"
+      :alt="displayTitle"
+      width="16"
+    />
   </span>
 </template>
 
