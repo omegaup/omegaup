@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-4">
+  <div class="card">
     <div class="card-header">
       <h2 class="card-title">{{ T.loginSignupHeader }}</h2>
     </div>
@@ -355,12 +355,10 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 
-  // ADD Computed property to format the markdown string
   get formattedAcceptPolicyMarkdown(): string {
     const policyUrl = getBlogUrl('PrivacyPolicyURL');
     const conductUrl = getBlogUrl('CodeofConductPolicyURL');
 
-    // Use ui.formatString to inject the fetched URLs into the translation string
     const formattedstring = ui.formatString(T.acceptPrivacyPolicy, {
       PrivacyPolicyURL: policyUrl,
       CodeofConductPolicyURL: conductUrl,

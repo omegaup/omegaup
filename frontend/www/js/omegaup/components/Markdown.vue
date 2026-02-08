@@ -10,6 +10,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
+import * as ui from '../ui';
+import T from '../lang';
 
 declare global {
   interface Window {
@@ -42,11 +44,61 @@ export default class Markdown extends Vue {
 
   mounted(): void {
     this.root.innerHTML = this.html;
+    this.injectCopyButtons();
   }
 
   @Watch('markdown')
   onMarkdownChanged(): void {
     this.root.innerHTML = this.html;
+    this.injectCopyButtons();
+  }
+
+  private injectCopyButtons(): void {
+    if (!this.root) {
+      return;
+    }
+
+    const codeElements = this.root.querySelectorAll('span > code');
+    if (!codeElements.length) {
+      return;
+    }
+
+    codeElements.forEach((element) => {
+      const codeElement = element as HTMLElement;
+      const parentSpan = codeElement.parentElement;
+      if (!parentSpan) {
+        return;
+      }
+
+      if (parentSpan.querySelector('.copy-btn')) {
+        return;
+      }
+
+      const copyButton = document.createElement('button');
+      copyButton.type = 'button';
+      copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
+      copyButton.textContent = T.wordsCopyToClipboard;
+
+      const copyHint = document.createElement('span');
+      copyHint.className = 'copy-hint';
+      copyHint.textContent = T.wordsCopiedToClipboard;
+
+      copyButton.addEventListener('click', () => {
+        const codeText = (codeElement.textContent || '').trim();
+        ui.copyToClipboard(codeText);
+
+        copyHint.classList.remove('fade-out');
+        copyHint.classList.add('fade-in');
+
+        window.setTimeout(() => {
+          copyHint.classList.remove('fade-in');
+          copyHint.classList.add('fade-out');
+        }, 1500);
+      });
+
+      parentSpan.appendChild(copyButton);
+      parentSpan.appendChild(copyHint);
+    });
   }
 }
 </script>
@@ -241,6 +293,32 @@ export default class Markdown extends Vue {
   img {
     max-width: 100%;
     page-break-inside: avoid;
+  }
+
+  span > code {
+    padding: 0.2em 0.4em;
+    margin: 0 0.25em 0 0;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .copy-hint {
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .copy-hint.fade-in {
+    opacity: 1;
+  }
+
+  .copy-hint.fade-out {
+    opacity: 0;
   }
 }
 </style>
