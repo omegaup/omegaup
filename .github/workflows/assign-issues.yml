@@ -19,6 +19,8 @@ jobs:
         permissions:
             issues: write
             pull-requests: write
+        env:
+            MAX_ASSIGNMENTS: 5
         steps:
             - name: Check for experienced issue creator exception
               id: pre_check
@@ -108,7 +110,7 @@ jobs:
                                   issue_number: issue.number,
                                   body: `Assigned to @${commenter}!\n\n` +
                                         `As an experienced contributor (${approvedPRCount} merged PRs) working on your own issue, ` +
-                                        `you're exempt from the standard 5-assignment limit. Please open a pull request within 7 days. ` +
+                                        `you're exempt from the standard ${process.env.MAX_ASSIGNMENTS}-assignment limit. Please open a pull request within 7 days. ` +
                                         `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
                               });
                               
@@ -135,7 +137,7 @@ jobs:
                       }
                       
                       const commenter = context.payload.comment.user.login;
-                      const MAX_ASSIGNMENTS = 5;
+                      const MAX_ASSIGNMENTS = parseInt(process.env.MAX_ASSIGNMENTS || '5');
                       
                       // Count all open issues currently assigned to this user
                       const { data: assignedIssues } = await github.rest.issues.listForRepo({
@@ -174,9 +176,9 @@ jobs:
                       or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
-                  max_assignments: 5
+                  max_assignments: ${{ env.MAX_ASSIGNMENTS }}
                   max_assignments_message: >
-                      You already have the maximum number of assigned issues (5).
+                      You already have the maximum number of assigned issues (${{ env.MAX_ASSIGNMENTS }}).
                       Please wrap up or unassign one before taking another.
                   block_assignment: true
                   block_assignment_comment: >
