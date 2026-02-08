@@ -839,7 +839,6 @@ const translations: { [key: string]: string; } = {
   helpAlgorithmsBookDesc: "Acesse nosso guia completo de algoritmos e estruturas de dados.",
   helpBlog: "Blog do omegaUp",
   helpBlogDesc: "Leia as \u00faltimas not\u00edcias, atualiza\u00e7\u00f5es e artigos da equipe do omegaUp.",
-  helpDescription: "Encontre recursos para ajud\u00e1-lo a come\u00e7ar com o omegaUp e a programa\u00e7\u00e3o competitiva.",
   helpDiscord: "Comunidade Discord",
   helpDiscordDesc: "Junte-se ao nosso servidor Discord para conversar com outros usu\u00e1rios e obter ajuda.",
   helpDocumentation: "Documenta\u00e7\u00e3o",

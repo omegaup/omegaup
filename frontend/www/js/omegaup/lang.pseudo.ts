@@ -839,7 +839,6 @@ const translations: { [key: string]: string; } = {
   helpAlgorithmsBookDesc: "(Acc355 0ur c0mpr3h3n5iv3 guid3 70 a1g0ri7hm5 and da7a 57ruc7ur35.)",
   helpBlog: "(0m3gaUp B10g)",
   helpBlogDesc: "(R3ad 7h3 1a7357 n3w5, upda735, and ar7ic135 fr0m 7h3 0m3gaUp 73am.)",
-  helpDescription: "(Find r350urc35 70 h31p y0u g37 57ar73d wi7h 0m3gaUp and c0mp37i7iv3 pr0gramming.)",
   helpDiscord: "(Di5c0rd C0mmuni7y)",
   helpDiscordDesc: "(J0in 0ur Di5c0rd 53rv3r 70 cha7 wi7h 07h3r u53r5 and g37 h31p.)",
   helpDocumentation: "(D0cum3n7a7i0n)",
