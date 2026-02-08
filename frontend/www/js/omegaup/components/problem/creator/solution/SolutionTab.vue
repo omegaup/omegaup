@@ -53,6 +53,7 @@ import { TabIndex } from '../Tabs.vue';
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
+import ProblemMarkdown from '../../ProblemMarkdown.vue';
 Vue.use(VueCookies, { expire: -1 });
 
 const markdownConverter = new markdown.Converter({
@@ -61,7 +62,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': () => import('../../ProblemMarkdown.vue'),
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class SolutionTab extends Vue {

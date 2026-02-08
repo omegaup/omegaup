@@ -110,6 +110,7 @@ import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../markdown';
 
 import user_Username from '../user/Username.vue';
+import ProblemMarkdown from './ProblemMarkdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -118,7 +119,7 @@ const markdownConverter = new markdown.Converter({
 @Component({
   components: {
     'omegaup-user-username': user_Username,
-    'omegaup-markdown': () => import('./ProblemMarkdown.vue'),
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class ProblemStatementEdit extends Vue {
