@@ -171,6 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>
@@ -199,7 +202,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
@@ -224,6 +227,14 @@
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://hdl.handle.net/11059/16567"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navCompetitiveProgrammingDataStructuresBook }}
+          </a>
         </div>
       </li>
     </ul>
@@ -249,3 +260,26 @@ export default class NavbarItems extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@media only screen and (max-width: 992px) {
+  .help-dropdown {
+    min-width: auto !important;
+    width: auto !important;
+    max-width: 85vw !important;
+    left: auto !important;
+    right: 0 !important;
+
+    .dropdown-item {
+      white-space: normal !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      line-height: 1.4 !important;
+      padding: 0.5rem 1rem !important;
+      max-width: 100% !important;
+      display: block !important;
+    }
+  }
+}
+</style>
