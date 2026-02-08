@@ -27,6 +27,9 @@ from database.school_of_the_month import (
     get_school_of_the_month_candidates,
     insert_school_of_the_month_candidates,
     School,
+    delete_problems_solved_per_month,
+    get_current_problems_solved_per_month,
+    insert_updated_problems_solved_per_month,
 )
 
 
@@ -349,62 +352,6 @@ def update_user_rank_classname(
     ''')
 
 
-def update_schools_solved_problems(
-        cur: mysql.connector.cursor.MySQLCursorDict) -> None:
-    '''Updates the solved problems count by each school the last 6 months'''
-
-    logging.info('Updating schools solved problems...')
-
-    months = 6  # in case this parameter requires adjustments
-    cur.execute('DELETE FROM `Schools_Problems_Solved_Per_Month`')
-    cur.execute(
-        '''
-        INSERT INTO
-            `Schools_Problems_Solved_Per_Month` (
-                `school_id`,
-                `time`,
-                `problems_solved`
-            )
-        SELECT
-            `sc`.`school_id`,
-            STR_TO_DATE(
-                CONCAT (
-                    YEAR(`su`.`time`), '-', MONTH(`su`.`time`), '-01'
-                ),
-                "%Y-%m-%d"
-            ) AS `time`,
-            COUNT(DISTINCT `su`.`problem_id`) AS `problems_solved`
-        FROM
-            `Submissions` AS `su`
-        INNER JOIN
-            `Runs` AS `r` ON `r`.run_id = `su`.current_run_id
-        INNER JOIN
-            `Schools` AS `sc` ON `sc`.`school_id` = `su`.`school_id`
-        INNER JOIN
-            `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
-        WHERE
-            `su`.`time` >= CURDATE() - INTERVAL %(months)s MONTH
-            AND `r`.`verdict` = "AC"
-            AND `p`.`visibility` >= 1
-            AND NOT EXISTS (
-                SELECT
-                    *
-                FROM
-                    `Submissions` AS `sub`
-                WHERE
-                    `sub`.`problem_id` = `su`.`problem_id`
-                    AND `sub`.`identity_id` = `su`.`identity_id`
-                    AND `sub`.`verdict` = "AC"
-                    AND `sub`.`time` < `su`.`time`
-            )
-        GROUP BY
-            `sc`.`school_id`,
-            `time`
-        ORDER BY
-            `time` ASC;
-    ''', {'months': months})
-
-
 def update_school_rank(cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Updates the school rank'''
 
@@ -585,6 +532,16 @@ def compute_points_for_user(
     updated_users_sorted = sorted(
         updated_users, key=lambda user: user.score, reverse=True)
     return updated_users_sorted[:coder_list_count]
+
+
+def update_schools_solved_problems(
+    cur: mysql.connector.cursor.MySQLCursorDict) -> None:
+    '''Updates the solved problems count by each school the last 6 months'''
+
+    logging.info('Updating schools solved problems...')
+    delete_problems_solved_per_month(cur)
+    problems = get_current_problems_solved_per_month(cur, 6)
+    insert_updated_problems_solved_per_month(cur, problems)
 
 
 def update_coder_of_the_month_candidates(

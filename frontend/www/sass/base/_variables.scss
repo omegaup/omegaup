@@ -40,6 +40,10 @@
   --password-toggle-btn-color: #6c757d;
   --password-toggle-btn-color--hover: #495057;
 
+  // REQUIRED FIELD INDICATORS
+  --field-required-incomplete-color: #dc3545; // Red - needs attention
+  --field-required-complete-color: #000000; // Black - completed
+
   // MARKDOWN
   --markdown-pre-background-color: #eee;
   --markdown-details-border-color: #eee;
@@ -166,6 +170,18 @@
   --user-chart-section-background-color: #ffffff;
   --user-chart-section-heatmap-background-color: #ffffff;
   --user-chart-title-color: #333333;
+
+  // PROBLEM SOLVING PROGRESS
+  --problem-progress-background-color: #ffffff;
+  --problem-progress-text-primary-color: #333333;
+  --problem-progress-text-secondary-color: #666666;
+  --problem-progress-text-muted-color: #999999;
+  --problem-progress-bg-light-color: #f7f7f7;
+  --problem-progress-border-light-color: #e8e8e8;
+  --problem-progress-easy-color: #00b8a3;
+  --problem-progress-medium-color: #ffc01e;
+  --problem-progress-hard-color: #ef4743;
+  --problem-progress-unlabelled-color: #999999;
 
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
@@ -299,6 +315,7 @@
   // FORM INPUT
   --form-input-error-color: #dc3545;
   --form-input-box-shadow-error-color: rgba(220, 53, 69, 0.25);
+  --form-character-counter-color: #6c757d;
 
   // PAGINATOR
   --table-paginator-background-color: #fff;
@@ -330,4 +347,13 @@
   // CONTEST CARD
   --contest-card-border-color: rgba(0, 0, 0, 0.125);
   --contest-card-hover-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  // SIGNIN
+  --signin-nav-tabs-border-color: #dee2e6;
+  --signin-nav-link-color: #6c757d;
+  --signin-nav-link-background-color: #e9ecef;
+  --signin-nav-link-hover-background-color: #d6d9dc;
+  --signin-nav-link-hover-color: #495057;
+  --signin-nav-link-active-color: #212529;
+  --signin-nav-link-active-background-color: #fff;
 }
