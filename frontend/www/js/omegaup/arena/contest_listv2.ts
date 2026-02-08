@@ -1,13 +1,13 @@
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import { types } from '../api_types';
 import Vue from 'vue';
+import { types } from '../api_types';
 import arena_ContestList, {
-  ContestTab,
-  ContestOrder,
   ContestFilter,
+  ContestOrder,
+  ContestTab,
   UrlParams,
 } from '../components/arena/ContestListv2.vue';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
 import contestStore from './contestStore';
 
 /**
@@ -165,13 +165,19 @@ OmegaUp.on('ready', () => {
             urlObj: URL;
           }) => {
             for (const [key, value] of Object.entries(params)) {
+              if (key === 'replaceState') continue; // Don't add flag to URL
               if (value) {
                 urlObj.searchParams.set(key, value.toString());
               } else {
                 urlObj.searchParams.delete(key);
               }
             }
-            window.history.pushState({}, '', urlObj);
+            // Use replaceState for browser navigation to avoid corrupting history
+            if (params.replaceState) {
+              window.history.replaceState({}, '', urlObj);
+            } else {
+              window.history.pushState({}, '', urlObj);
+            }
             await contestStore.dispatch('fetchContestList', {
               requestParams: params,
               name: params.tab_name,
