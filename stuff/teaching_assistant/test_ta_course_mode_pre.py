@@ -68,6 +68,11 @@ def get_assignment_details_endpoint() -> str:
     return "api/course/assignmentDetails/"
 
 
+def get_course_admin_details_endpoint() -> str:
+    """endpoint for getting course admin details"""
+    return "api/course/adminDetails/"
+
+
 @pytest.fixture
 def create_test_course() -> None:
     """test creating a course"""
@@ -113,15 +118,80 @@ def create_test_assignment() -> None:
     response.raise_for_status()
     COOKIES = response.cookies
 
-    create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
+    # Fetch course details to get valid time bounds
+    course_details_url = f"{BASE_URL}/{get_course_admin_details_endpoint()}"
+    course_response = requests.get(
+        course_details_url,
+        params={"alias": COURSE_ALIAS},
+        cookies=COOKIES,
+        timeout=30
+    )
+    course_response.raise_for_status()
+    course_data = course_response.json()
+
+    # Minimum assignment duration in seconds (1 hour)
+    min_assignment_duration = 3600
+
+    # Validate and convert course_start
+    raw_course_start = course_data.get('start_time')
+    if raw_course_start is None:
+        raise AssertionError(
+            f"Course API response missing 'start_time'. "
+            f"Response: {course_data}"
+        )
+    try:
+        course_start = int(raw_course_start)
+    except (ValueError, TypeError) as exc:
+        raise AssertionError(
+            f"Invalid 'start_time' value: {raw_course_start!r} "
+            f"(expected integer or numeric string). Response: {course_data}"
+        ) from exc
+
+    # Validate and convert course_finish (optional field)
+    raw_course_finish = course_data.get('finish_time')
+    course_finish: int | None = None
+    if raw_course_finish is not None:
+        try:
+            course_finish = int(raw_course_finish)
+        except (ValueError, TypeError) as exc:
+            raise AssertionError(
+                f"Invalid 'finish_time' value: {raw_course_finish!r} "
+                "(expected integer or numeric string). "
+                f"Response: {course_data}"
+            ) from exc
+
+    # Validate course time ordering
+    if course_finish is not None and course_finish <= course_start:
+        raise AssertionError(
+            f"Course finish_time ({course_finish}) must be greater than "
+            f"start_time ({course_start}). Response: {course_data}"
+        )
+
+    # Ensure assignment times fall within course time bounds
     now = int(time.time())
+    start_time = max(now, course_start)
+
+    if course_finish is not None:
+        finish_time = min(start_time + 18000, course_finish)
+    else:
+        finish_time = start_time + 18000
+
+    # Ensure finish_time > start_time with minimum duration
+    if finish_time <= start_time:
+        finish_time = start_time + min_assignment_duration
+        print(
+            f"Warning: Adjusted finish_time to {finish_time} to ensure "
+            f"minimum duration of {min_assignment_duration} seconds"
+        )
+
+    create_assignment_url = f"{BASE_URL}/{get_create_assignment_endpoint()}"
     data = {
         "course_alias": COURSE_ALIAS,
         "name": ASSIGNMENT_NAME,
         "alias": ASSIGNMENT_ALIAS,
         "description": ASSIGNMENT_DESCRIPTION,
-        "start_time": now,
-        "finish_time": now + 18000,
+        "start_time": start_time,
+        "finish_time": finish_time,
         "assignment_type": "homework",
         "max_points": 0,
         "order": 1,
