@@ -146,15 +146,6 @@ describe.each(rankingMapping)(`A user:`, (rank) => {
 });
 
 describe('Profile Picture Edit Feature', () => {
-  beforeEach(() => {
-    // Mock window.open
-    window.open = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('Should display profile edit overlay when viewing own profile', () => {
     const wrapper = mount(user_SidebarMainInfo, {
       propsData: { profile, data },
@@ -163,12 +154,10 @@ describe('Profile Picture Edit Feature', () => {
     const profileContainer = wrapper.find('.profile-picture-container');
     const editOverlay = wrapper.find('.profile-edit-overlay');
     const pencilIcon = wrapper.find('.edit-icon');
-    const svgIcon = wrapper.find('.edit-icon svg');
 
     expect(profileContainer.exists()).toBeTruthy();
     expect(editOverlay.exists()).toBeTruthy();
     expect(pencilIcon.exists()).toBeTruthy();
-    expect(svgIcon.exists()).toBeTruthy();
   });
 
   it('Should not display profile edit overlay when viewing other user profile', () => {
@@ -195,32 +184,26 @@ describe('Profile Picture Edit Feature', () => {
     expect(profilePicture.attributes('class')).toContain('rounded-circle');
   });
 
-  it('Should call redirectToGravatar when clicking edit overlay', async () => {
+  it('Should have edit overlay as anchor link to Gravatar', () => {
     const wrapper = mount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
 
     const editOverlay = wrapper.find('.profile-edit-overlay');
-    await editOverlay.trigger('click');
-
-    expect(window.open).toHaveBeenCalledWith(
-      'https://www.gravatar.com',
-      '_blank',
-    );
+    expect(editOverlay.element.tagName).toBe('A');
+    expect(editOverlay.attributes('href')).toBe('https://www.gravatar.com');
+    expect(editOverlay.attributes('target')).toBe('_blank');
   });
 
-  it('Should call redirectToGravatar when clicking profile picture', async () => {
+  it('Should not have click handler on profile picture', () => {
     const wrapper = mount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
 
     const profilePicture = wrapper.find('.profile-picture');
-    await profilePicture.trigger('click');
-
-    expect(window.open).toHaveBeenCalledWith(
-      'https://www.gravatar.com',
-      '_blank',
-    );
+    expect(profilePicture.exists()).toBeTruthy();
+    // Verify there is no click handler on the image itself
+    expect(profilePicture.element.onclick).toBeNull();
   });
 
   it('Should have correct tooltip text', () => {
@@ -251,18 +234,18 @@ describe('Profile Picture Edit Feature', () => {
     expect(pencilIcon.classes()).toContain('edit-icon');
   });
 
-  it('Should display pencil SVG icon', () => {
+  it('Should display FontAwesome pencil icon', () => {
     const wrapper = mount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
 
-    const pencilIcon = wrapper.find('.edit-icon');
-    const svgIcon = wrapper.find('.edit-icon svg');
+    const editIconContainer = wrapper.find('.edit-icon');
+    const faIcon = wrapper.find('i.fa.fa-pencil-alt');
 
-    expect(pencilIcon.exists()).toBeTruthy();
-    expect(svgIcon.exists()).toBeTruthy();
-    expect(svgIcon.attributes('width')).toBe('20');
-    expect(svgIcon.attributes('height')).toBe('20');
+    expect(editIconContainer.exists()).toBeTruthy();
+    expect(faIcon.exists()).toBeTruthy();
+    expect(faIcon.classes()).toContain('fa');
+    expect(faIcon.classes()).toContain('fa-pencil-alt');
   });
 
   it('Should not show edit overlay for non-own profile even if clicked', async () => {

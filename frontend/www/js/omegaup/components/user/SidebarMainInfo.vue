@@ -6,28 +6,15 @@
           <img
             class="rounded-circle profile-picture"
             :src="profile.gravatar_92"
-            @click="redirectToGravatar"
           />
-          <div
+          <a
             class="profile-edit-overlay"
             :title="T.userEditProfileImage"
-            @click="redirectToGravatar"
+            href="https://www.gravatar.com"
+            target="_blank"
           >
-            <div class="edit-icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                  fill="white"
-                />
-              </svg>
-            </div>
-          </div>
+            <i class="fa fa-pencil-alt edit-icon"></i>
+          </a>
         </div>
         <img v-else class="rounded-circle" :src="profile.gravatar_92" />
       </div>
@@ -226,14 +213,18 @@ export default class UserSidebarMainInfo extends Vue {
       this.$emit('update:selectedTab', validTab);
     }
   }
-
-  redirectToGravatar(): void {
-    window.open('https://www.gravatar.com', '_blank');
-  }
 }
 </script>
 
 <style scoped>
+:root {
+  --overlay-bg-color: rgba(0, 0, 0, 0.6);
+  --icon-color: white;
+  --icon-font-size: 16px;
+  --image-opacity-hover: 0.8;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
 .profile-picture-container {
   position: relative;
   display: inline-block;
@@ -253,13 +244,14 @@ export default class UserSidebarMainInfo extends Vue {
   left: 0;
   width: 92px;
   height: 92px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--overlay-bg-color);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
+  text-decoration: none;
 }
 
 .profile-picture-container:hover .profile-edit-overlay {
@@ -267,21 +259,13 @@ export default class UserSidebarMainInfo extends Vue {
 }
 
 .profile-picture-container:hover .profile-picture {
-  opacity: 0.8;
+  opacity: var(--image-opacity-hover);
 }
 
 .edit-icon {
-  color: white;
-  font-size: 16px;
+  color: var(--icon-color);
+  font-size: var(--icon-font-size);
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.edit-icon svg {
-  width: 20px;
-  height: 20px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  text-shadow: 0 1px 2px var(--shadow-color);
 }
 </style>
