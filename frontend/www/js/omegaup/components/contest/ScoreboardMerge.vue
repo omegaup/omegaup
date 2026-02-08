@@ -4,7 +4,7 @@
       <h3 class="card-title mb-0">{{ T.omegaupTitleScoreboardmerge }}</h3>
     </div>
     <div class="card-body">
-      <div class="row align-items-center">
+      <div class="row align-items-end">
         <div class="form-group col-md-9" data-merge-contest-name>
           <label>{{ T.wordsContest }}:</label>
           <multiselect
