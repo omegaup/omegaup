@@ -48,8 +48,22 @@ try_define('OMEGAUP_LOG_LEVEL', 'debug');
 try_define('DUMP_MYSQL_QUERY_RESULT_TYPES', true);
 
 # ####################################
-# GRADER CONFIG
+# GRADER CONFIG (test-only secrets - do not use in production)
 # ####################################
+try_define(
+    'OMEGAUP_GITSERVER_SECRET_KEY',
+    'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA=='
+);
+try_define(
+    'OMEGAUP_GITSERVER_PUBLIC_KEY',
+    'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw='
+);
+try_define('OMEGAUP_GRADER_SECRET', 'secret');
+try_define(
+    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
+);
+try_define('OMEGAUP_EXPERIMENT_SECRET', 'omegaup');
 try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('OMEGAUP_GITSERVER_PORT', 33863 + $_testShard);
