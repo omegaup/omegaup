@@ -611,57 +611,42 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     i.username,
                     i.name,
                     i.country_id,
-                    pr.assignment_alias,
-                    pr.problem_alias,
-                    pr.problem_title,
-                    problem_points,
+                    a.alias AS assignment_alias,
+                    p.alias AS problem_alias,
+                    p.title AS problem_title,
+                    psp.points AS problem_points,
                     MAX(r.contest_score) AS problem_score,
                     IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
-                    Groups_Identities AS gi
-                CROSS JOIN
-                    (
-                        SELECT
-                            a.assignment_id,
-                            a.alias AS assignment_alias,
-                            a.problemset_id,
-                            p.problem_id,
-                            p.title AS problem_title,
-                            p.alias AS problem_alias,
-                            `psp`.`order`,
-                            psp.points AS problem_points
-                        FROM Assignments a
-                        INNER JOIN Problemsets ps
-                        ON a.problemset_id = ps.problemset_id
-                        INNER JOIN Problemset_Problems psp
-                        ON psp.problemset_id = ps.problemset_id
-                        INNER JOIN Problems p
-                        ON p.problem_id = psp.problem_id
-                        WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, p.problem_id
-                    ) AS pr
-                INNER JOIN Identities i
-                    ON i.identity_id = gi.identity_id
+                    Assignments a
+                INNER JOIN
+                    Problemset_Problems psp ON psp.problemset_id = a.problemset_id
+                INNER JOIN
+                    Problems p ON p.problem_id = psp.problem_id
+                INNER JOIN
+                    Groups_Identities gi ON gi.group_id = ?
+                        AND gi.identity_id = ?
+                INNER JOIN
+                    Identities i ON i.identity_id = gi.identity_id
                 LEFT JOIN
                     User_Rank ur ON ur.user_id = i.user_id
-                LEFT JOIN Submissions s
-                    ON s.problem_id = pr.problem_id
-                    AND s.identity_id = i.identity_id
-                    AND s.problemset_id = pr.problemset_id
-                LEFT JOIN Runs r
-                    ON r.run_id = s.current_run_id
+                LEFT JOIN
+                    Submissions s ON s.problem_id = p.problem_id
+                        AND s.identity_id = i.identity_id
+                        AND s.problemset_id = a.problemset_id
+                LEFT JOIN
+                    Runs r ON r.run_id = s.current_run_id
                 WHERE
-                    gi.group_id = ?
-                    AND gi.identity_id = ?
+                    a.course_id = ?
                 GROUP BY
-                    pr.assignment_id, pr.problem_id
+                    a.assignment_id, p.problem_id
                 ORDER BY
-                    `pr`.`order`';
+                    psp.`order`';
 
         /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$courseId, $groupId, $identityId]
+            [$groupId, $identityId, $courseId]
         );
 
         $allProgress = [];
