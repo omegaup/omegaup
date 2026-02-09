@@ -924,6 +924,7 @@
 	"matrixModalSave": "Guardar",
 	"messageMakeYourContestsPublic": "Tienes concursos privados que ya han terminado. Por favor considera hacerlos p\u00fablicos y as\u00ed contribuir a la comunidad.",
 	"messageMakeYourProblemsPublic": "Tienes problemas privados que ya han sido utilizados. Por favor considera hacerlos p\u00fablicos y as\u00ed contribuir a la comunidad.",
+	"methodNotAllowed": "Este endpoint del API no permite peticiones GET. Usa POST, PUT o PATCH.",
 	"missingCase": "No se encontr\u00f3 informaci\u00f3n del caso",
 	"missingCaseField": "Falta un campo requerido en la informaci\u00f3n del caso",
 	"missingCaseFiles": "No se localizaron los archivos originales del caso solicitado",
