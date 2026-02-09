@@ -55,7 +55,6 @@
     "babel-core": "^7.0.0-beta.3",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2",
-    "babel-plugin-dynamic-import-node": "^2.3.3",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "buffer": "^6.0.3",
@@ -147,9 +146,9 @@
     "wrapper-webpack-plugin": "^2.1"
   },
   "scripts": {
-    "test": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest 'frontend/www/js/.*test\\.ts$'",
-    "test:watch": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
-    "test:coverage": "cross-env TZ=UTC NODE_OPTIONS=--experimental-vm-modules jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
+    "test": "cross-env TZ=UTC jest 'frontend/www/js/.*test\\.ts$'",
+    "test:watch": "cross-env TZ=UTC jest --watchAll --notify 'frontend/www/js/.*test\\.ts$'",
+    "test:coverage": "cross-env TZ=UTC jest --coverage=true 'frontend/www/js/.*test\\.ts$'",
     "dev": "cross-env webpack --config-name=frontend --mode=development --stats=minimal --color",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --stats=minimal --color",
     "dev-all": "cross-env webpack --mode=development --stats=minimal --color",
