@@ -119,6 +119,7 @@ module.exports = {
       './frontend/www/js/omegaup/user/verification_parental_token.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
     user_compare: './frontend/www/js/omegaup/user/compare.ts',
+    code_tester: './frontend/www/js/omegaup/code_tester/index.ts',
   },
 
   output: {
