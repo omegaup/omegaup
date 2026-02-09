@@ -52,6 +52,18 @@
             </div>
 
             <div v-if="activeTab === 'output'" class="tab-panel">
+              <div v-if="resultVerdict" class="verdict-summary">
+                <span
+                  :class="[
+                    'verdict-badge',
+                    resultVerdict === 'AC' ? 'verdict-ac' : 'verdict-other',
+                  ]"
+                  >{{ resultVerdict }}</span
+                >
+                <span class="verdict-score"
+                  >Score: {{ resultScore }}/{{ resultMaxScore }}</span
+                >
+              </div>
               <pre class="io-output">{{ outputValue || '(no output)' }}</pre>
             </div>
 
@@ -199,6 +211,18 @@ export default class CodeTesterMain extends Vue {
 
   get resultMemory(): number {
     return store.state.results?.memory || 0;
+  }
+
+  get resultVerdict(): string {
+    return store.state.results?.verdict || '';
+  }
+
+  get resultScore(): number {
+    return store.state.results?.score || 0;
+  }
+
+  get resultMaxScore(): number {
+    return store.state.results?.max_score || 0;
   }
 
   formatTime(value: number): string {
@@ -511,6 +535,40 @@ export default class CodeTesterMain extends Vue {
 
 .io-error {
   color: var(--badges-grader-error-font-color);
+}
+
+.verdict-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--problem-progress-bg-light-color);
+  border: 1px solid var(--problem-progress-border-light-color);
+  border-radius: 0.25rem;
+
+  .verdict-badge {
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+  }
+
+  .verdict-ac {
+    background-color: var(--btn-ok-background-color);
+    color: var(--arena-problem-background-color);
+  }
+
+  .verdict-other {
+    background-color: var(--badges-grader-error-background-color);
+    color: var(--badges-grader-error-font-color);
+  }
+
+  .verdict-score {
+    font-size: 0.875rem;
+    color: var(--btn-intro-js-font-color);
+  }
 }
 
 /* Metrics Section */
