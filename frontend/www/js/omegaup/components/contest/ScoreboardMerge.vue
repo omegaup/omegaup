@@ -5,8 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row align-items-end">
-        <div class="form-group col-md-9" data-merge-contest-name>
-          <label>{{ T.wordsContest }}:</label>
+        <div class="form-group col-md-8" data-merge-contest-name>
           <multiselect
             :value="selectedContests"
             :options="contestAliases"
@@ -18,7 +17,7 @@
             @select="onSelect"
           ></multiselect>
         </div>
-        <div class="form-group col-md-3 text-right">
+        <div class="form-group col-md-4 text-right w-100">
           <button
             data-merge-contest-button
             class="btn btn-primary"
