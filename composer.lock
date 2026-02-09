@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "266f4d0094558988a4b698d21e915aa8",
+    "content-hash": "600e9df9b4218417ad8c19f12bf1f0c9",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -691,6 +691,72 @@
                 "source": "https://github.com/thephpleague/oauth2-facebook/tree/2.2.0"
             },
             "time": "2022-02-24T18:45:07+00:00"
+        },
+        {
+            "name": "league/oauth2-github",
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/oauth2-github.git",
+                "reference": "84211f62b757f7266fe605a0aa874a32f52c24fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/oauth2-github/zipball/84211f62b757f7266fe605a0aa874a32f52c24fd",
+                "reference": "84211f62b757f7266fe605a0aa874a32f52c24fd",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "league/oauth2-client": "^2.0",
+                "php": "^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.4",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\OAuth2\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steven Maguire",
+                    "email": "stevenmaguire@gmail.com",
+                    "homepage": "https://github.com/stevenmaguire"
+                },
+                {
+                    "name": "Woody Gilk",
+                    "email": "woody.gilk@gmail.com",
+                    "homepage": "https://github.com/shadowhand"
+                }
+            ],
+            "description": "Github OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+            "keywords": [
+                "authorisation",
+                "authorization",
+                "client",
+                "github",
+                "oauth",
+                "oauth2"
+            ],
+            "support": {
+                "issues": "https://github.com/thephpleague/oauth2-github/issues",
+                "source": "https://github.com/thephpleague/oauth2-github/tree/3.1.1"
+            },
+            "time": "2024-09-03T10:42:10+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -6057,13 +6123,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.1.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }
