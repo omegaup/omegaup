@@ -557,6 +557,8 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[1],
             $student
         );
+        // Refresh login after helper methods that create their own sessions
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($student);
         $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'problemset_id' => $courseData['assignment_problemset_ids'][0],
@@ -583,6 +585,8 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $student
         );
 
+        // Refresh login after helper methods that create their own sessions
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($student);
         $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'problemset_id' => $courseData['assignment_problemset_ids'][1],
