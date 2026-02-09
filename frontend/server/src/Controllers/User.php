@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, githubClientId?: string, githubState?: null|string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string, description: null|string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
@@ -4855,10 +4855,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $code
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
-     * @omegaup-request-param null|string $third_party_login
      * @omegaup-request-param null|string $redirect
+     * @omegaup-request-param null|string $state
+     * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4867,7 +4869,7 @@ class User extends \OmegaUp\Controllers\Controller {
             header('Location: /');
             throw new \OmegaUp\Exceptions\ExitException();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing.
+            // Do nothing - user is not logged in, continue to login page.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
@@ -4877,11 +4879,25 @@ class User extends \OmegaUp\Controllers\Controller {
             $thirdPartyLogin = 'facebook';
         }
 
+        $sessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        $githubState = $sessionManager->getCookie('github_oauth_state');
+        if (is_null($githubState) && !$r->offsetExists('code')) {
+            $githubState = \OmegaUp\SecurityTools::randomString(16);
+            $sessionManager->setCookie(
+                'github_oauth_state',
+                $githubState,
+                \OmegaUp\Time::get() + APC_USER_CACHE_SESSION_TIMEOUT,
+                '/'
+            );
+        }
+
         $response = [
             'templateProperties' => [
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'githubClientId' => OMEGAUP_GITHUB_CLIENT_ID,
+                    'githubState' => $githubState,
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-signup'
                     ),
@@ -4893,6 +4909,8 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif ($thirdPartyLogin === 'github') {
+                \OmegaUp\Controllers\Session::loginViaGithubCallback($r);
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
