@@ -69,10 +69,10 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     private static function isAuthTokenValid(string $authToken): bool {
         // Token format: {entropy}-{identity_id}-{sha256_hash}
-        // entropy: 30 hex chars (15 bytes via bin2hex)
+        // entropy: 2 * AUTH_TOKEN_ENTROPY_SIZE hex chars via bin2hex
         // identity_id: numeric string
         // hash: 64 hex chars (SHA-256)
-        $parts = explode('-', $authToken);
+        $parts = explode('-', $authToken, 3);
         if (count($parts) !== 3) {
             return false;
         }
