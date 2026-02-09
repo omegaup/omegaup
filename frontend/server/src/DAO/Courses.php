@@ -654,7 +654,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     gi.group_id = ?
                     AND gi.identity_id = ?
                 GROUP BY
-                    i.identity_id, pr.assignment_id, pr.problem_id
+                    pr.assignment_id, pr.problem_id
                 ORDER BY
                     `pr`.`order`';
 
