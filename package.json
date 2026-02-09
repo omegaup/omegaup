@@ -162,4 +162,5 @@
     "storybook": "storybook dev -p 6006",
     "prepare": "husky"
   }
+
 }
