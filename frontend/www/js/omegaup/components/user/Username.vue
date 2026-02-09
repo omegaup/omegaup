@@ -61,7 +61,16 @@ export default class Username extends Vue {
 @import '../../../../sass/main.scss';
 
 span {
-  text-wrap: balance;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+span a {
+  display: inline-block;
+  max-width: 100%;
+  white-space: normal;
 }
 
 .user-rank-unranked,
