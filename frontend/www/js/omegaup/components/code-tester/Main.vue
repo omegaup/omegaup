@@ -94,7 +94,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as Util from '../../grader/util';
-import store from '../../grader/GraderStore';
+import store, { GraderResults } from '../../grader/GraderStore';
 import MonacoEditor from '../../grader/MonacoEditor.vue';
 
 @Component({
@@ -241,7 +241,7 @@ export default class CodeTesterMain extends Vue {
       }
 
       const formData = await response.formData();
-      let results = {
+      let results: GraderResults = {
         contest_score: 0,
         judged_by: 'runner',
         max_score: 0,

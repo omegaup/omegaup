@@ -26,7 +26,7 @@ services:
         protocol: tcp
         mode: host
     environment:
-      CI: "${CI:-false}"
+      CI: "${CI:-true}"
       MYSQL_TCP_PORT: 13306
       OPENAI_API_KEY: ""
       DEEPSEEK_API_KEY: ""
