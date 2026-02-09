@@ -140,7 +140,7 @@
                     <p>{{ T.submissionFeedbackAnimationButton }}</p>
                     <img
                       src="/media/submission_feedback_demo.gif"
-                      alt="Submission feedback demo"
+                      :alt="T.submissionFeedbackDemoAlt"
                     />
                   </div>
                 </div>

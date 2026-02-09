@@ -25,7 +25,7 @@
           </tbody>
         </table>
         <div v-show="!solvedProblems">
-          <img src="/media/wait.gif" alt="Loading" />
+          <img src="/media/wait.gif" :alt="T.wordsLoading" />
         </div>
       </div>
       <div class="card">
@@ -52,7 +52,7 @@
           </tbody>
         </table>
         <div v-show="!unsolvedProblems">
-          <img src="/media/wait.gif" alt="Loading" />
+          <img src="/media/wait.gif" :alt="T.wordsLoading" />
         </div>
       </div>
     </div>
