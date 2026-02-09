@@ -466,4 +466,273 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $response['problems'][0]['runs'][0]['feedback']['feedback']
         );
     }
+
+    /**
+     * Test getStudentProgressForTypeScript returns correct progress data
+     * for a single student.
+     */
+    public function testGetStudentProgressForTypeScript() {
+        // Create 3 problems
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Create course with two assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            nAssignments: 2
+        );
+        $courseAlias = $courseData['course_alias'];
+
+        // Create admin login
+        $login = self::login($courseData['admin']);
+
+        // Add problems to first assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $courseData['assignment_aliases'][0],
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        // Add problem to second assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $courseData['assignment_aliases'][1],
+            [$problemsData[2]]
+        );
+
+        // Create one student for the course
+        [
+            'user' => $user,
+            'identity' => $student
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student
+        );
+
+        // Student solves problem0 with 100%, problem1 with 50%
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $student
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.5, 'PA');
+
+        // Student solves problem2 in second assignment with 100%
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($student);
+
+        // First, we need to open the course and assignment
+        \OmegaUp\Test\Factories\Course::openCourse(
+            $courseAlias,
+            $student
+        );
+        \OmegaUp\Test\Factories\Course::openAssignmentCourse(
+            $courseAlias,
+            $courseData['assignment_aliases'][1],
+            $student
+        );
+        \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
+            $courseAlias,
+            $courseData['assignment_aliases'][1],
+            $problemsData[2],
+            $student
+        );
+
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $courseData['assignment_problemset_ids'][1],
+            'problem_alias' => $problemsData[2]['problem']->alias,
+            'language' => 'c11-gcc',
+            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            points: 1,
+            verdict: 'AC',
+            runGuid: $runResponse['guid']
+        );
+
+        // Call getStudentProgressForTypeScript
+        $login = self::login($courseData['admin']);
+        $response = \OmegaUp\Controllers\Course::getStudentProgressForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseAlias,
+                'student' => $student->username,
+            ])
+        );
+
+        // Verify the response structure
+        $this->assertArrayHasKey('templateProperties', $response);
+        $this->assertArrayHasKey('payload', $response['templateProperties']);
+        $payload = $response['templateProperties']['payload'];
+
+        $this->assertArrayHasKey('students', $payload);
+        $this->assertArrayHasKey('student', $payload);
+        $this->assertArrayHasKey('course', $payload);
+
+        // Verify we get only one student
+        $this->assertCount(1, $payload['students']);
+        $this->assertSame(
+            $student->username,
+            $payload['students'][0]['username']
+        );
+
+        // Verify progress for first assignment
+        $firstAssignment = $courseData['assignment_aliases'][0];
+        $this->assertArrayHasKey(
+            $firstAssignment,
+            $payload['students'][0]['progress']
+        );
+
+        // problem0 should have 100% progress
+        $this->assertSame(
+            100.0,
+            $payload['students'][0]['progress'][$firstAssignment][$problemsData[0]['problem']->alias]
+        );
+
+        // problem1 should have 50% progress
+        $this->assertSame(
+            50.0,
+            $payload['students'][0]['progress'][$firstAssignment][$problemsData[1]['problem']->alias]
+        );
+
+        // Verify progress for second assignment
+        $secondAssignment = $courseData['assignment_aliases'][1];
+        $this->assertArrayHasKey(
+            $secondAssignment,
+            $payload['students'][0]['progress']
+        );
+
+        // problem2 should have 100% progress
+        $this->assertSame(
+            100.0,
+            $payload['students'][0]['progress'][$secondAssignment][$problemsData[2]['problem']->alias]
+        );
+    }
+
+    /**
+     * Test getStudentProgressByAssignmentForTypeScript with multiple students
+     * to verify the query correctly filters to a single student.
+     */
+    public function testStudentProgressByAssignmentMultipleStudents() {
+        // Create 2 problems
+        $problemsData = [];
+        for ($i = 0; $i < 2; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Create course with one assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Create admin login
+        $login = self::login($courseData['admin']);
+
+        // Add problems to assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        // Create two students for the course
+        $students = [];
+        for ($i = 0; $i < 2; $i++) {
+            [
+                'user' => $user,
+                'identity' => $students[]
+            ] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $students[$i]
+            );
+        }
+
+        // Student 0 solves problem0 with 100%
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $students[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Student 1 solves problem1 with 80%
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $students[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.8, 'PA');
+
+        // Request progress for student 0 only
+        $login = self::login($courseData['admin']);
+        $response = \OmegaUp\Controllers\Course::getStudentProgressByAssignmentForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'student' => $students[0]->username,
+            ])
+        );
+
+        $payload = $response['templateProperties']['payload'];
+
+        // Verify we get only student 0's data
+        $this->assertCount(1, $payload['students']);
+        $this->assertSame(
+            $students[0]->username,
+            $payload['students'][0]['username']
+        );
+
+        // Verify student 0's progress: problem0 = 100%, problem1 = 0% (didn't attempt)
+        $this->assertSame(
+            100.0,
+            $payload['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias]
+        );
+        $this->assertSame(
+            0.0,
+            $payload['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias]
+        );
+
+        // Now request progress for student 1
+        $response = \OmegaUp\Controllers\Course::getStudentProgressByAssignmentForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'student' => $students[1]->username,
+            ])
+        );
+
+        $payload = $response['templateProperties']['payload'];
+
+        // Verify we get only student 1's data
+        $this->assertCount(1, $payload['students']);
+        $this->assertSame(
+            $students[1]->username,
+            $payload['students'][0]['username']
+        );
+
+        // Verify student 1's progress: problem0 = 0% (didn't attempt), problem1 = 80%
+        $this->assertSame(
+            0.0,
+            $payload['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias]
+        );
+        $this->assertSame(
+            80.0,
+            $payload['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias]
+        );
+    }
 }
