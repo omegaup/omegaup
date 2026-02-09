@@ -141,7 +141,7 @@
     "vuedraggable": "^2.24.3",
     "vuex": "^3.0.1",
     "vuex-class": "^0.3.2",
-    "webpack": "^5.94",
+    "webpack": "^5.104",
     "webpack-cli": "^4.2",
     "wrapper-webpack-plugin": "^2.1"
   },
