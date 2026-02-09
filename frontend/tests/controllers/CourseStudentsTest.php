@@ -513,29 +513,62 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $student
         );
 
-        // Student solves problem0 with 100%, problem1 with 50%
-        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
-            $problemsData[0],
-            $courseData,
-            $student
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData);
-
-        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
-            $problemsData[1],
-            $courseData,
-            $student
-        );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.5, 'PA');
-
-        // Student solves problem2 in second assignment with 100%
+        // Set up student login and open course/assignments
         $studentLogin = \OmegaUp\Test\ControllerTestCase::login($student);
+        $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
 
-        // First, we need to open the course and assignment
+        // Open course and first assignment
         \OmegaUp\Test\Factories\Course::openCourse(
             $courseAlias,
             $student
         );
+        \OmegaUp\Test\Factories\Course::openAssignmentCourse(
+            $courseAlias,
+            $courseData['assignment_aliases'][0],
+            $student
+        );
+
+        // Student solves problem0 with 100%
+        \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
+            $courseAlias,
+            $courseData['assignment_aliases'][0],
+            $problemsData[0],
+            $student
+        );
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $courseData['assignment_problemset_ids'][0],
+            'problem_alias' => $problemsData[0]['problem']->alias,
+            'language' => 'c11-gcc',
+            'source' => $submissionSource,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            points: 1,
+            verdict: 'AC',
+            runGuid: $runResponse['guid']
+        );
+
+        // Student solves problem1 with 50%
+        \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
+            $courseAlias,
+            $courseData['assignment_aliases'][0],
+            $problemsData[1],
+            $student
+        );
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $courseData['assignment_problemset_ids'][0],
+            'problem_alias' => $problemsData[1]['problem']->alias,
+            'language' => 'c11-gcc',
+            'source' => $submissionSource,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            points: 0.5,
+            verdict: 'PA',
+            runGuid: $runResponse['guid']
+        );
+
+        // Student solves problem2 in second assignment with 100%
         \OmegaUp\Test\Factories\Course::openAssignmentCourse(
             $courseAlias,
             $courseData['assignment_aliases'][1],
@@ -553,7 +586,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             'problemset_id' => $courseData['assignment_problemset_ids'][1],
             'problem_alias' => $problemsData[2]['problem']->alias,
             'language' => 'c11-gcc',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            'source' => $submissionSource,
         ]));
         \OmegaUp\Test\Factories\Run::gradeRun(
             points: 1,
