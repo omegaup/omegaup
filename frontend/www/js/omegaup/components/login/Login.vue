@@ -26,6 +26,23 @@
                 data-logo_alignment="left"
               ></div>
               <!-- id-lint on -->
+              <button
+                data-login-github
+                class="btn btn-block btn-outline-secondary mt-3 github-login-btn"
+                type="button"
+                :disabled="!githubClientId"
+                :aria-label="T.loginGithub"
+                @click.prevent="loginWithGithub"
+              >
+                <img
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub"
+                  class="github-icon"
+                  height="20"
+                  width="20"
+                />
+                {{ T.loginGithub }}
+              </button>
             </div>
           </div>
         </div>
@@ -91,11 +108,14 @@ import omegaup_PasswordInput from '../common/PasswordInput.vue';
 })
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
+  @Prop({ default: '' }) githubClientId!: string;
+  @Prop({ default: null }) githubState!: string | null;
   @Prop() googleClientId!: string;
 
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
+  githubCsrfState: string | null = null;
 
   mounted() {
     // The reason for loading the script here instead of the `template.tpl` file
@@ -104,10 +124,110 @@ export default class Login extends Vue {
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     document.body.appendChild(script);
+
+    this.initializeGithubCsrfToken();
   }
 
   get loginUri(): string {
     return document.location.href;
   }
+
+  initializeGithubCsrfToken(): void {
+    const storedState = sessionStorage.getItem('github_oauth_state');
+    if (storedState) {
+      this.githubCsrfState = storedState;
+    } else if (this.githubState) {
+      this.githubCsrfState = this.githubState;
+      sessionStorage.setItem('github_oauth_state', this.githubState);
+    } else {
+      const generatedState = this.generateSecureRandomString();
+      this.githubCsrfState = generatedState;
+      sessionStorage.setItem('github_oauth_state', generatedState);
+    }
+
+    if (this.githubCsrfState) {
+      document.cookie = `github_oauth_state=${this.githubCsrfState};path=/;SameSite=Lax`;
+    }
+  }
+
+  loginWithGithub(): void {
+    if (!this.githubClientId) {
+      return;
+    }
+
+    const state =
+      sessionStorage.getItem('github_oauth_state') ||
+      this.githubCsrfState ||
+      this.generateSecureRandomString();
+    sessionStorage.setItem('github_oauth_state', state);
+    document.cookie = `github_oauth_state=${state};path=/;SameSite=Lax`;
+
+    const redirectUri = new URL('/login', window.location.origin);
+    redirectUri.searchParams.set('third_party_login', 'github');
+
+    const currentParams = new URLSearchParams(window.location.search);
+    const redirectParam = currentParams.get('redirect');
+    if (redirectParam) {
+      redirectUri.searchParams.set('redirect', redirectParam);
+    }
+
+    const params = new URLSearchParams({
+      client_id: this.githubClientId,
+      redirect_uri: redirectUri.toString(),
+      scope: 'read:user user:email',
+      state,
+      allow_signup: 'true',
+    });
+
+    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+  }
+
+  generateSecureRandomString(): string {
+    const validChars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const len = 16;
+
+    if (typeof window.crypto === 'object') {
+      const arr = new Uint8Array(len);
+      window.crypto.getRandomValues(arr);
+      return Array.from(
+        arr,
+        (value) => validChars[value % validChars.length],
+      ).join('');
+    }
+
+    // Without window.crypto
+    let result = '';
+    for (let i = 0; i < len; i++) {
+      result += validChars.charAt(
+        Math.floor(Math.random() * validChars.length),
+      );
+    }
+    return result;
+  }
 }
 </script>
+
+<style scoped>
+.github-login-btn {
+  background-color: var(--btn-github-background-color);
+  border: 1px solid var(--btn-github-border-color);
+  color: var(--btn-github-font-color);
+}
+
+.github-login-btn:hover:not(:disabled) {
+  background-color: var(--btn-github-background-color--hover);
+  border-color: var(--btn-github-border-color--hover);
+}
+
+.github-login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.github-icon {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+</style>

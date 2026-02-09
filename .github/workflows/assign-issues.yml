@@ -19,6 +19,8 @@ jobs:
         permissions:
             issues: write
             pull-requests: write
+        env:
+            MAX_ASSIGNMENTS: 5
         steps:
             - name: Check for experienced issue creator exception
               id: pre_check
@@ -108,7 +110,7 @@ jobs:
                                   issue_number: issue.number,
                                   body: `Assigned to @${commenter}!\n\n` +
                                         `As an experienced contributor (${approvedPRCount} merged PRs) working on your own issue, ` +
-                                        `you're exempt from the standard 5-assignment limit. Please open a pull request within 7 days. ` +
+                                        `you're exempt from the standard ${process.env.MAX_ASSIGNMENTS}-assignment limit. Please open a pull request within 7 days. ` +
                                         `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
                               });
                               
@@ -121,7 +123,41 @@ jobs:
                       
                       core.setOutput('handled', 'false');
 
+            - name: Count current assignments
+              id: count_assignments
+              if: github.event_name == 'issue_comment' && steps.pre_check.outputs.handled != 'true'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const comment = context.payload.comment.body.trim();
+                      if (comment !== '/assign') {
+                          core.setOutput('current_count', '0');
+                          return;
+                      }
+                      
+                      const commenter = context.payload.comment.user.login;
+                      const MAX_ASSIGNMENTS = parseInt(process.env.MAX_ASSIGNMENTS || '5');
+                      
+                      // Count all open issues currently assigned to this user
+                      const { data: assignedIssues } = await github.rest.issues.listForRepo({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          assignee: commenter,
+                          state: 'open',
+                          per_page: 100
+                      });
+                      
+                      const currentCount = assignedIssues.length;
+                      // Remaining after this assignment = max - current - 1 (for the new assignment)
+                      const remainingAfterAssignment = Math.max(0, MAX_ASSIGNMENTS - currentCount - 1);
+                      
+                      core.setOutput('current_count', currentCount.toString());
+                      core.setOutput('remaining_count', remainingAfterAssignment.toString());
+                      core.setOutput('max_assignments', MAX_ASSIGNMENTS.toString());
+
             - name: Assign or unassign issues (standard flow)
+              id: assign_action
               if: github.event_name != 'issue_comment' || steps.pre_check.outputs.handled != 'true'
               uses: takanome-dev/assign-issue-action@beta
               with:
@@ -140,17 +176,14 @@ jobs:
                       or this issue will be unassigned so others can pick it up.
                   assigned_label: ""
                   pin_label: ""
-                  max_assignments: 5
+                  max_assignments: ${{ env.MAX_ASSIGNMENTS }}
                   max_assignments_message: >
-                      You already have the maximum number of assigned issues (5).
+                      You already have the maximum number of assigned issues (${{ env.MAX_ASSIGNMENTS }}).
                       Please wrap up or unassign one before taking another.
                   block_assignment: true
                   block_assignment_comment: >
                       Kindly ask the maintainers to assign this issue to you again.
-                  assigned_comment: >
-                      Assigned! Please open a pull request within 7 days. If no
-                      PR is opened, this issue will be automatically unassigned
-                      to keep the queue moving.
+                  assigned_comment: ""
                   unassigned_comment: >
                       You have been unassigned from this issue. If you want to
                       be assigned to this issue again, kindly ask the
@@ -158,3 +191,31 @@ jobs:
                   assignment_suggestion_comment: >
                       If you'd like to take this issue, comment with /assign.
                       Please note the 7-day PR expectation.
+
+            - name: Post assignment message with remaining count
+              if: github.event_name == 'issue_comment' && steps.assign_action.outputs.assigned == 'yes'
+              uses: actions/github-script@v8
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const commenter = context.payload.comment.user.login;
+                      const currentCount = '${{ steps.count_assignments.outputs.current_count }}';
+                      const remaining = '${{ steps.count_assignments.outputs.remaining_count }}';
+                      const maxAssignments = '${{ steps.count_assignments.outputs.max_assignments }}';
+                      
+                      // Calculate total after this new assignment
+                      const totalAfterAssignment = parseInt(currentCount) + 1;
+                      
+                      let remainingMessage = '';
+                      if (remaining === '0') {
+                          remainingMessage = `\n\nYou have reached the maximum of ${maxAssignments} concurrent assignments.`;
+                      } else {
+                          remainingMessage = `\n\nYou have **${totalAfterAssignment}** issue${totalAfterAssignment === 1 ? '' : 's'} assigned. You can self-assign **${remaining}** more.`;
+                      }
+                      
+                      await github.rest.issues.createComment({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: context.payload.issue.number,
+                          body: `Assigned! Please open a pull request within 7 days. If no PR is opened, this issue will be automatically unassigned to keep the queue moving.${remainingMessage}`
+                      });
