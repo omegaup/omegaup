@@ -64,7 +64,7 @@ class UserParams {
         $emailBase = \OmegaUp\Test\Utils::CreateRandomString();
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->name = $params['name'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
+        $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomPassword();
         $this->email = $params['email'] ?? "{$emailBase}@mail.com";
         $this->parentEmail = $params['email'] ?? "parent_{$emailBase}@mail.com";
         $this->isPrivate = $params['isPrivate'] ?? false;
@@ -153,7 +153,7 @@ class User {
      */
     public static function generateUser(bool $verify = true): array {
         $username = \OmegaUp\Test\Utils::createRandomString();
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
         self::createUser(new UserParams([
             'username' => $username,

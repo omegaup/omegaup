@@ -17,6 +17,10 @@ class Utils {
     }
 
     public static function createRandomString(): string {
+        return md5(uniqid(strval(rand()), true));
+    }
+
+    public static function createRandomPassword(): string {
         return 'P@s5' . md5(uniqid(strval(rand()), true));
     }
 

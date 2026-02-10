@@ -1137,7 +1137,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -1224,7 +1224,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identities = [];
 
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         foreach ($submissionsMapping as $index => $submissionsByUser) {
             $identityName = $submissionsByUser['username'];
             $identityPassword = $submissionsByUser['password'];

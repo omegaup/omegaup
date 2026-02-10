@@ -14,7 +14,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => \OmegaUp\Test\Utils::createRandomString(),
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             'birth_date' => 946684800, // 01-01-2000
@@ -48,7 +48,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => \OmegaUp\Test\Utils::createRandomString(),
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             'birth_date' => 946684800, // 01-01-2000
@@ -78,7 +78,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $r = new \OmegaUp\Request([
             'username' => \OmegaUp\Test\Utils::createRandomString(),
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             'birth_date' => 946684800, // 01-01-2000
@@ -107,7 +107,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Inflate request
         $r = new \OmegaUp\Request([
             'username' => \OmegaUp\Test\Utils::createRandomString(),
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             'birth_date' => 946684800, // 01-01-2000
@@ -156,7 +156,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => \OmegaUp\Test\Utils::createRandomString(),
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
                 'birth_date' => 946684800, // 01-01-2000
             ]));
@@ -175,7 +175,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey
             ]));
@@ -194,7 +194,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Set context
         $_REQUEST['username'] = \OmegaUp\Test\Utils::createRandomString();
-        $_REQUEST['password'] = \OmegaUp\Test\Utils::createRandomString();
+        $_REQUEST['password'] = \OmegaUp\Test\Utils::createRandomPassword();
         $_REQUEST['email'] = \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com';
         $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
         $_REQUEST['birth_date'] = 946684800; // 01-01-2000
@@ -226,7 +226,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => 'ínvalid username',
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey
             ]));
@@ -246,7 +246,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\User::apiCreate(new \OmegaUp\Request([
                 'username' => 'invalid:username',
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
                 'email' => \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com',
                 'permission_key' => \OmegaUp\Controllers\User::$permissionKey,
             ]));

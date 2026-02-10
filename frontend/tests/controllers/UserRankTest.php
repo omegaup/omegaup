@@ -688,7 +688,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $creator,
             login: $creatorLogin
         );
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([

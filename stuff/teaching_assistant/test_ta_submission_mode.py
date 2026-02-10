@@ -28,9 +28,9 @@ BASE_URL = "http://localhost:8001"
 COOKIES = None
 
 TEACHER_USERNAME = "teacher"
-TEACHER_PASSWORD = "teacher123"
+TEACHER_PASSWORD = "Teacher_123!"
 STUDENT_USERNAME = "student"
-STUDENT_PASSWORD = "student123"
+STUDENT_PASSWORD = "Student_123!"
 
 
 def get_signup_endpoint() -> str:
