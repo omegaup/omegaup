@@ -304,7 +304,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $originalPassword;
         $identityLogin = self::login($identity);
-        $newPassword = 'anypassword';
+        $newPassword = 'AnyP@ssw0rd!';
 
         try {
             \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([

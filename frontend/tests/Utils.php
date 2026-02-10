@@ -17,7 +17,7 @@ class Utils {
     }
 
     public static function createRandomString(): string {
-        return md5(uniqid(strval(rand()), true));
+        return 'P@s5' . md5(uniqid(strval(rand()), true));
     }
 
     /**
@@ -161,7 +161,7 @@ class Utils {
         ['user' => $admin] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'username' => 'admintest',
-                'password' => 'testtesttest',
+                'password' => 'T3stt3st!',
             ])
         );
         \OmegaUp\DAO\ACLs::create(new \OmegaUp\DAO\VO\ACLs([
@@ -175,7 +175,7 @@ class Utils {
         ]));
         \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'test',
-            'password' => 'testtesttest',
+            'password' => 'T3stt3st!',
         ]));
         \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 
