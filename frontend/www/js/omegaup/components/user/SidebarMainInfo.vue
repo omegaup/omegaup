@@ -2,7 +2,21 @@
   <div class="card">
     <div class="card-header">
       <div class="text-center rounded-circle bottom-margin mt-3">
-        <img class="rounded-circle" :src="profile.gravatar_92" />
+        <div v-if="profile.is_own_profile" class="profile-picture-container">
+          <img
+            class="rounded-circle profile-picture"
+            :src="profile.gravatar_92"
+          />
+          <a
+            class="profile-edit-overlay"
+            :title="T.userEditProfileImage"
+            href="https://www.gravatar.com"
+            target="_blank"
+          >
+            <i class="fa fa-pencil-alt edit-icon"></i>
+          </a>
+        </div>
+        <img v-else class="rounded-circle" :src="profile.gravatar_92" />
       </div>
       <div class="mb-3 text-center mt-2">
         <omegaup-countryflag
@@ -201,3 +215,57 @@ export default class UserSidebarMainInfo extends Vue {
   }
 }
 </script>
+
+<style scoped>
+:root {
+  --overlay-bg-color: rgba(0, 0, 0, 0.6);
+  --icon-color: white;
+  --icon-font-size: 16px;
+  --image-opacity-hover: 0.8;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.profile-picture {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.profile-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 92px;
+  height: 92px;
+  background-color: var(--overlay-bg-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.profile-picture-container:hover .profile-edit-overlay {
+  opacity: 1;
+}
+
+.profile-picture-container:hover .profile-picture {
+  opacity: var(--image-opacity-hover);
+}
+
+.edit-icon {
+  color: var(--icon-color);
+  font-size: var(--icon-font-size);
+  z-index: 1;
+  text-shadow: 0 1px 2px var(--shadow-color);
+}
+</style>

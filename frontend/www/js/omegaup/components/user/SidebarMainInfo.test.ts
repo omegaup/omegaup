@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -142,5 +142,134 @@ describe.each(rankingMapping)(`A user:`, (rank) => {
       },
     });
     expect(wrapper.text()).toContain(rank.rank);
+  });
+});
+
+describe('Profile Picture Edit Feature', () => {
+  it('Should display profile edit overlay when viewing own profile', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const profileContainer = wrapper.find('.profile-picture-container');
+    const editOverlay = wrapper.find('.profile-edit-overlay');
+    const pencilIcon = wrapper.find('.edit-icon');
+
+    expect(profileContainer.exists()).toBeTruthy();
+    expect(editOverlay.exists()).toBeTruthy();
+    expect(pencilIcon.exists()).toBeTruthy();
+  });
+
+  it('Should not display profile edit overlay when viewing other user profile', () => {
+    const otherUserProfile = { ...profile, is_own_profile: false };
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile: otherUserProfile, data },
+    });
+
+    const profileContainer = wrapper.find('.profile-picture-container');
+    const editOverlay = wrapper.find('.profile-edit-overlay');
+
+    expect(profileContainer.exists()).toBeFalsy();
+    expect(editOverlay.exists()).toBeFalsy();
+  });
+
+  it('Should have correct profile picture source', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const profilePicture = wrapper.find('.profile-picture');
+    expect(profilePicture.exists()).toBeTruthy();
+    expect(profilePicture.attributes('src')).toBe(profile.gravatar_92);
+    expect(profilePicture.attributes('class')).toContain('rounded-circle');
+  });
+
+  it('Should have edit overlay as anchor link to Gravatar', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const editOverlay = wrapper.find('.profile-edit-overlay');
+    expect(editOverlay.element.tagName).toBe('A');
+    expect(editOverlay.attributes('href')).toBe('https://www.gravatar.com');
+    expect(editOverlay.attributes('target')).toBe('_blank');
+  });
+
+  it('Should not have click handler on profile picture', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const profilePicture = wrapper.find('.profile-picture');
+    expect(profilePicture.exists()).toBeTruthy();
+    // Verify there is no click handler on the image itself
+    expect(profilePicture.element.onclick).toBeNull();
+  });
+
+  it('Should have correct tooltip text', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const editOverlay = wrapper.find('.profile-edit-overlay');
+    expect(editOverlay.attributes('title')).toBe(T.userEditProfileImage);
+  });
+
+  it('Should have correct CSS classes for styling', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const profileContainer = wrapper.find('.profile-picture-container');
+    const editOverlay = wrapper.find('.profile-edit-overlay');
+    const pencilIcon = wrapper.find('.edit-icon');
+
+    // Check container classes
+    expect(profileContainer.classes()).toContain('profile-picture-container');
+
+    // Check overlay classes
+    expect(editOverlay.classes()).toContain('profile-edit-overlay');
+
+    // Check icon classes
+    expect(pencilIcon.classes()).toContain('edit-icon');
+  });
+
+  it('Should display FontAwesome pencil icon', () => {
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile, data },
+    });
+
+    const editIconContainer = wrapper.find('.edit-icon');
+    const faIcon = wrapper.find('i.fa.fa-pencil-alt');
+
+    expect(editIconContainer.exists()).toBeTruthy();
+    expect(faIcon.exists()).toBeTruthy();
+    expect(faIcon.classes()).toContain('fa');
+    expect(faIcon.classes()).toContain('fa-pencil-alt');
+  });
+
+  it('Should not show edit overlay for non-own profile even if clicked', async () => {
+    const otherUserProfile = { ...profile, is_own_profile: false };
+    const wrapper = mount(user_SidebarMainInfo, {
+      propsData: { profile: otherUserProfile, data },
+    });
+
+    // Should not have the edit elements
+    expect(wrapper.find('.profile-edit-overlay').exists()).toBeFalsy();
+    expect(wrapper.find('.profile-picture-container').exists()).toBeFalsy();
+
+    // Should have regular profile picture - check all rounded-circle elements
+    const regularProfilePictures = wrapper.findAll('.rounded-circle');
+    let foundGravatarPicture = false;
+
+    for (let i = 0; i < regularProfilePictures.length; i++) {
+      const img = regularProfilePictures.at(i);
+      if (img.attributes('src') === profile.gravatar_92) {
+        foundGravatarPicture = true;
+        break;
+      }
+    }
+
+    expect(foundGravatarPicture).toBeTruthy();
   });
 });
