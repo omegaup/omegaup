@@ -46,8 +46,8 @@ function validateCriticalSecrets(): void {
         'OMEGAUP_ENVIRONMENT'
     ) ? OMEGAUP_ENVIRONMENT : 'production';
 
-    /** @psalm-suppress TypeDoesNotContainType this can change depending on environment */
     $strictEnvironments = ['sandbox', 'production'];
+    /** @psalm-suppress TypeDoesNotContainType this can change depending on environment */
     if (!in_array($environment, $strictEnvironments, true)) {
         return;
     }
