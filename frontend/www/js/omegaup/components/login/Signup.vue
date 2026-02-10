@@ -42,6 +42,9 @@
                 name="reg_password"
                 autocomplete="new-password"
               />
+              <omegaup-password-strength-feedback
+                :password="password"
+              />
             </div>
           </div>
           <div class="col-md-4 introjs-confirmpassword">
@@ -266,12 +269,14 @@ import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
 import { getBlogUrl } from '../../urlHelper';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
+import omegaup_PasswordStrengthFeedback from '../common/PasswordStrengthFeedback.vue';
 Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-password-input': omegaup_PasswordInput,
+    'omegaup-password-strength-feedback': omegaup_PasswordStrengthFeedback,
   },
 })
 export default class Signup extends Vue {

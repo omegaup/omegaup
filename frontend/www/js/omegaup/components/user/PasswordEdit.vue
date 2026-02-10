@@ -22,6 +22,9 @@
           :required="true"
           autocomplete="new-password"
         />
+        <omegaup-password-strength-feedback
+          :password="newPassword"
+        />
       </div>
     </div>
     <div class="form-group">
@@ -58,10 +61,12 @@
 import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
+import omegaup_PasswordStrengthFeedback from '../common/PasswordStrengthFeedback.vue';
 
 @Component({
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
+    'omegaup-password-strength-feedback': omegaup_PasswordStrengthFeedback,
   },
 })
 export default class UserPasswordEdit extends Vue {

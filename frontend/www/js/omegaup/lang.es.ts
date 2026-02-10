@@ -1136,6 +1136,15 @@ const translations: { [key: string]: string; } = {
   passwordResetResetTitle: "Restablecer contrase\u00f1a",
   passwordResetTokenWasGeneratedSuccessfully: "El token fue generado exitosamente",
   passwordShowPassword: "Mostrar contrase\u00f1a",
+  passwordMustContainDigit: "La contrase\u00f1a debe contener al menos un d\u00edgito",
+  passwordMustContainLowercase: "La contrase\u00f1a debe contener al menos una letra min\u00fascula",
+  passwordMustContainSpecialChar: "La contrase\u00f1a debe contener al menos un car\u00e1cter especial",
+  passwordMustContainUppercase: "La contrase\u00f1a debe contener al menos una letra may\u00fascula",
+  passwordRequirementDigit: "Al menos un d\u00edgito (0-9)",
+  passwordRequirementLowercase: "Al menos una letra min\u00fascula",
+  passwordRequirementMinLength: "Al menos 8 caracteres",
+  passwordRequirementSpecialChar: "Al menos un car\u00e1cter especial (!@#$%^&*(),.?\":{}|<>)",
+  passwordRequirementUppercase: "Al menos una letra may\u00fascula",
   pendingRegistrations: "Solicitudes pendientes",
   pendingRegistrationsShowAll: "Mostrar todas las solicitudes",
   privacyPolicyNotAccepted: "Por favor lea y acepte la Pol\u00edtica de Uso y Privacidad del sitio, as\u00ed como el C\u00f3digo de Conducta.",
@@ -2266,4 +2275,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };
