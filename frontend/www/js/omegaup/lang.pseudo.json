@@ -924,6 +924,7 @@
 	"matrixModalSave": "(Sav3)",
 	"messageMakeYourContestsPublic": "(Y0u hav3 priva73 c0n73575 7ha7 hav3 a1r3ady 3nd3d. P13a53 c0n5id3r making 7h3m pub1ic 70 c0n7ribu73 70 7h3 c0mmuni7y.)",
 	"messageMakeYourProblemsPublic": "(Y0u hav3 priva73 pr0b13m5 7ha7 hav3 a1r3ady b33n u53d. P13a53 c0n5id3r making 7h3m pub1ic 70 c0n7ribu73 70 7h3 c0mmuni7y.)",
+	"methodNotAllowed": "(Thi5 API 3ndp0in7 d035 n07 a110w GET r3qu3575. U53 POST, PUT, 0r PATCH.)",
 	"missingCase": "(Ca53 inf0rma7i0n wa5 n07 f0und)",
 	"missingCaseField": "(A r3quir3d fi31d i5 mi55ing in 7h3 ca53 inf0rma7i0n)",
 	"missingCaseFiles": "(Th3 0rigina1 inpu7 0r 0u7pu7 fi135 f0r 7h3 r3qu3573d ca53 w3r3 n07 f0und)",
