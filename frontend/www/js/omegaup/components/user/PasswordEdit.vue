@@ -22,9 +22,7 @@
           :required="true"
           autocomplete="new-password"
         />
-        <omegaup-password-strength-feedback
-          :password="newPassword"
-        />
+        <omegaup-password-strength-feedback :password="newPassword" />
       </div>
     </div>
     <div class="form-group">

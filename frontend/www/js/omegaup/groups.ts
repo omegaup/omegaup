@@ -198,7 +198,6 @@ export function generateHumanReadablePassword() {
     password += Math.floor(Math.random() * 10); // random numbers
   }
   // Add a special character to meet password strength requirements
-  password +=
-    specialChars[Math.floor(Math.random() * specialChars.length)];
+  password += specialChars[Math.floor(Math.random() * specialChars.length)];
   return password;
 }

@@ -1127,6 +1127,15 @@ const translations: { [key: string]: string; } = {
   passwordHidePassword: "Hide password",
   passwordHumanReadable: "Include human-readable passwords",
   passwordMismatch: "Password mismatch.",
+  passwordMustContainDigit: "Password must contain at least one digit",
+  passwordMustContainLowercase: "Password must contain at least one lowercase letter",
+  passwordMustContainSpecialChar: "Password must contain at least one special character",
+  passwordMustContainUppercase: "Password must contain at least one uppercase letter",
+  passwordRequirementDigit: "At least one digit (0-9)",
+  passwordRequirementLowercase: "At least one lowercase letter",
+  passwordRequirementMinLength: "At least 8 characters",
+  passwordRequirementSpecialChar: "At least one special character (!@#$%^&*(),.?\":{}|<>)",
+  passwordRequirementUppercase: "At least one uppercase letter",
   passwordResetLinkCopiedToClipboard: "Link was copied to the clipboard",
   passwordResetMinWait: "You should wait a few minutes before another request.",
   passwordResetPassword: "New password",
@@ -1138,15 +1147,6 @@ const translations: { [key: string]: string; } = {
   passwordResetResetTitle: "Reset password",
   passwordResetTokenWasGeneratedSuccessfully: "Token was generated successfully",
   passwordShowPassword: "Show password",
-  passwordMustContainDigit: "Password must contain at least one digit",
-  passwordMustContainLowercase: "Password must contain at least one lowercase letter",
-  passwordMustContainSpecialChar: "Password must contain at least one special character",
-  passwordMustContainUppercase: "Password must contain at least one uppercase letter",
-  passwordRequirementDigit: "At least one digit (0-9)",
-  passwordRequirementLowercase: "At least one lowercase letter",
-  passwordRequirementMinLength: "At least 8 characters",
-  passwordRequirementSpecialChar: "At least one special character (!@#$%^&*(),.?\":{}|<>)",
-  passwordRequirementUppercase: "At least one uppercase letter",
   pendingRegistrations: "Pending requests",
   pendingRegistrationsShowAll: "Show all requests",
   privacyPolicyNotAccepted: "Please read and accept the site's Use and Privacy Policy, as well as the Code of Conduct.",
@@ -2277,4 +2277,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export { translations as default };
+export {translations as default};

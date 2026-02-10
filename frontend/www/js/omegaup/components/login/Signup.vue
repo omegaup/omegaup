@@ -42,9 +42,7 @@
                 name="reg_password"
                 autocomplete="new-password"
               />
-              <omegaup-password-strength-feedback
-                :password="password"
-              />
+              <omegaup-password-strength-feedback :password="password" />
             </div>
           </div>
           <div class="col-md-4 introjs-confirmpassword">

@@ -10,9 +10,7 @@
             name="password"
             autocomplete="new-password"
           />
-          <omegaup-password-strength-feedback
-            :password="password"
-          />
+          <omegaup-password-strength-feedback :password="password" />
         </div>
         <div class="form-group">
           <h5>{{ T.passwordResetPasswordConfirmation }}</h5>
