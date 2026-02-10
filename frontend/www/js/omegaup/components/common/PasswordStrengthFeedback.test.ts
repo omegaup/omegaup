@@ -90,12 +90,13 @@ describe('PasswordStrengthFeedback.vue', () => {
     });
 
     // Initial emit with false
-    expect(wrapper.emitted('validity-change')).toBeDefined();
-    expect(wrapper.emitted('validity-change')![0]).toEqual([false]);
+    const emitted = wrapper.emitted('validity-change');
+    expect(emitted).toBeDefined();
+    expect(emitted?.[0]).toEqual([false]);
 
     // Update to valid password
     await wrapper.setProps({ password: 'Password1!' });
-    expect(wrapper.emitted('validity-change')![1]).toEqual([true]);
+    expect(emitted?.[1]).toEqual([true]);
   });
 
   it('renders requirement elements with correct classes', () => {
