@@ -57,7 +57,7 @@ class Identity {
                 'gender' => strval($data[4]),
                 'password' => is_null(
                     $password
-                ) ? \OmegaUp\Test\Utils::createRandomString() : $password,
+                ) ? \OmegaUp\Test\Utils::createRandomPassword() : $password,
                 'usernames' => $members,
             ];
             if (isset($data[5])) {
