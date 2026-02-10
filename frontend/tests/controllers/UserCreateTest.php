@@ -61,7 +61,7 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiCreate($r);
         $this->assertSame($r['username'], $response['username']);
 
-        $r['password'] = 'a wrong password';
+        $r['password'] = 'Wr0ng!Pass';
         try {
             \OmegaUp\Controllers\User::apiCreate($r);
             $this->fail('User creation should have failed');

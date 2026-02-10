@@ -73,7 +73,7 @@ describe('Contest Test', () => {
       username:
         groupOptions.groupTitle.split('-').slice(0, -1).join('-') +
         ':identity_1',
-      password: '12345678',
+      password: 'P@55w0rd',
     };
 
     loginPage.giveAdminPrivilege(
@@ -84,7 +84,7 @@ describe('Contest Test', () => {
     cy.login(loginOptions[0]);
     groupPage.createGroup(groupOptions);
     groupPage.addIdentitiesGroup();
-    contestPage.setPasswordForIdentity(identityLogin.username, '12345678');
+    contestPage.setPasswordForIdentity(identityLogin.username, 'P@55w0rd');
     contestPage.createContest(contestOptions, [identityLogin.username]);
     cy.logout();
 

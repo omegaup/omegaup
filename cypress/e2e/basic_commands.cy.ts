@@ -36,7 +36,7 @@ describe('Basic Commands Test', () => {
   it('Should register a user using the API', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
-      password: uuid(),
+      password: 'P@55w0rd',
     };
 
     cy.register(loginOptions);
@@ -46,7 +46,7 @@ describe('Basic Commands Test', () => {
   it('Should register a user', () => {
     const loginOptions: LoginOptions = {
       username: uuid(),
-      password: uuid(),
+      password: 'P@55w0rd',
     };
 
     loginPage.registerSingleUser(loginOptions);
