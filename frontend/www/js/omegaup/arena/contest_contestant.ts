@@ -1,12 +1,13 @@
+import Vue from 'vue';
+import * as api from '../api';
+import { types } from '../api_types';
+import arena_Contest from '../components/arena/Contest.vue';
+import { DisqualificationType } from '../components/arena/Runs.vue';
+import { PopupDisplayed } from '../components/problem/Details.vue';
+import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { types } from '../api_types';
-import * as api from '../api';
 import * as ui from '../ui';
-import Vue from 'vue';
-import arena_Contest from '../components/arena/Contest.vue';
-import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
-import problemsStore from './problemStore';
 import {
   ContestClarification,
   ContestClarificationRequest,
@@ -14,12 +15,20 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
+import clarificationStore from './clarificationsStore';
+import { EventsSocket } from './events_socket';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
 } from './navigation';
-import clarificationStore from './clarificationsStore';
+import problemsStore from './problemStore';
+import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import rankingStore from './rankingStore';
+import { myRunsStore, RunFilters, runsStore } from './runsStore';
+import { enforceSingleTab } from './singleTabEnforcer';
+import socketStore from './socketStore';
 import {
   onRefreshRuns,
   showSubmission,
@@ -29,15 +38,6 @@ import {
   trackRun,
   updateRunFallback,
 } from './submissions';
-import { PopupDisplayed } from '../components/problem/Details.vue';
-import { createChart, onRankingChanged, onRankingEvents } from './ranking';
-import { EventsSocket } from './events_socket';
-import rankingStore from './rankingStore';
-import socketStore from './socketStore';
-import { myRunsStore, RunFilters, runsStore } from './runsStore';
-import T from '../lang';
-import { DisqualificationType } from '../components/arena/Runs.vue';
-import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -50,15 +50,8 @@ OmegaUp.on('ready', async () => {
   let isBlocked = false;
   let blockedMessage: string | null = null;
 
-  console.log('[SingleTabEnforcer] contestAdmin:', contestAdmin);
-
   if (!contestAdmin) {
     const TAB_ENFORCER_TIMEOUT_MS = 1000;
-
-    console.log(
-      '[SingleTabEnforcer] Starting enforcement for contest:',
-      payload.contest.alias,
-    );
 
     await new Promise<void>((resolve) => {
       let settled = false;
@@ -67,20 +60,12 @@ OmegaUp.on('ready', async () => {
         if (settled) {
           return;
         }
-        console.log(
-          '[SingleTabEnforcer] Timeout expired, no other tab detected',
-        );
         settled = true;
         resolve();
       }, TAB_ENFORCER_TIMEOUT_MS);
 
       enforceSingleTab(payload.contest.alias, (message: string) => {
-        console.log(
-          '[SingleTabEnforcer] Blocked! Another tab detected. Message:',
-          message,
-        );
         if (settled) {
-          console.log('[SingleTabEnforcer] But already settled, ignoring');
           return;
         }
         settled = true;
@@ -90,15 +75,6 @@ OmegaUp.on('ready', async () => {
         resolve();
       });
     });
-
-    console.log(
-      '[SingleTabEnforcer] Final state - isBlocked:',
-      isBlocked,
-      'blockedMessage:',
-      blockedMessage,
-    );
-  } else {
-    console.log('[SingleTabEnforcer] Skipping enforcement (user is admin)');
   }
 
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
