@@ -32,18 +32,18 @@ jobs:
                       const comment = context.payload.comment.body.trim();
                       const commenter = context.payload.comment.user.login;
                       const issue = context.payload.issue;
-
+                      
                       if (comment !== '/assign') {
                           core.setOutput('handled', 'false');
                           return;
                       }
-
+                      
                       const isIssueCreator = issue.user.login === commenter;
                       if (!isIssueCreator) {
                           core.setOutput('handled', 'false');
                           return;
                       }
-
+                      
                       const currentAssignees = issue.assignees.map(a => a.login);
                       if (currentAssignees.includes(commenter)) {
                           await github.rest.issues.createComment({
@@ -55,16 +55,16 @@ jobs:
                           core.setOutput('handled', 'true');
                           return;
                       }
-
+                      
                       const REQUIRED_APPROVED_PRS = 10;
                       let approvedPRCount = 0;
                       let cursor = null;
                       let hasNextPage = true;
                       const MAX_PRS_TO_QUERY = 200;
                       let totalPRsQueried = 0;
-
+                      
                       const searchQuery = `is:pr is:merged author:${commenter} repo:${context.repo.owner}/${context.repo.repo}`;
-
+                      
                       while (hasNextPage && approvedPRCount < REQUIRED_APPROVED_PRS && totalPRsQueried < MAX_PRS_TO_QUERY) {
                           const result = await github.graphql(`
                               query($searchQuery: String!, $cursor: String) {
@@ -87,14 +87,14 @@ jobs:
                               searchQuery,
                               cursor
                           });
-
+                          
                           const searchResults = result.search;
                           totalPRsQueried += searchResults.nodes.length;
                           approvedPRCount += searchResults.nodes.length;
                           hasNextPage = searchResults.pageInfo.hasNextPage;
                           cursor = searchResults.pageInfo.endCursor;
                       }
-
+                      
                       if (approvedPRCount >= REQUIRED_APPROVED_PRS) {
                           try {
                               await github.rest.issues.addAssignees({
@@ -103,7 +103,7 @@ jobs:
                                   issue_number: issue.number,
                                   assignees: [commenter]
                               });
-
+                              
                               await github.rest.issues.createComment({
                                   owner: context.repo.owner,
                                   repo: context.repo.repo,
@@ -113,20 +113,20 @@ jobs:
                                         `you're exempt from the standard ${process.env.MAX_ASSIGNMENTS}-assignment limit. Please open a pull request within 7 days. ` +
                                         `If no PR is opened, this issue will be automatically unassigned to keep the queue moving.`
                               });
-
+                              
                               core.setOutput('handled', 'true');
                           } catch (error) {
                               core.setOutput('handled', 'false');
                           }
                           return;
                       }
-
+                      
                       core.setOutput('handled', 'false');
 
             - name: Count current assignments
               id: count_assignments
               if: github.event_name == 'issue_comment' && steps.pre_check.outputs.handled != 'true'
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -135,10 +135,10 @@ jobs:
                           core.setOutput('current_count', '0');
                           return;
                       }
-
+                      
                       const commenter = context.payload.comment.user.login;
                       const MAX_ASSIGNMENTS = parseInt(process.env.MAX_ASSIGNMENTS || '5');
-
+                      
                       // Count all open issues currently assigned to this user
                       const { data: assignedIssues } = await github.rest.issues.listForRepo({
                           owner: context.repo.owner,
@@ -147,11 +147,11 @@ jobs:
                           state: 'open',
                           per_page: 100
                       });
-
+                      
                       const currentCount = assignedIssues.length;
                       // Remaining after this assignment = max - current - 1 (for the new assignment)
                       const remainingAfterAssignment = Math.max(0, MAX_ASSIGNMENTS - currentCount - 1);
-
+                      
                       core.setOutput('current_count', currentCount.toString());
                       core.setOutput('remaining_count', remainingAfterAssignment.toString());
                       core.setOutput('max_assignments', MAX_ASSIGNMENTS.toString());
@@ -194,7 +194,7 @@ jobs:
 
             - name: Post assignment message with remaining count
               if: github.event_name == 'issue_comment' && steps.assign_action.outputs.assigned == 'yes'
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -202,20 +202,21 @@ jobs:
                       const currentCount = '${{ steps.count_assignments.outputs.current_count }}';
                       const remaining = '${{ steps.count_assignments.outputs.remaining_count }}';
                       const maxAssignments = '${{ steps.count_assignments.outputs.max_assignments }}';
-
+                      
                       // Calculate total after this new assignment
                       const totalAfterAssignment = parseInt(currentCount) + 1;
-
+                      
                       let remainingMessage = '';
                       if (remaining === '0') {
                           remainingMessage = `\n\nYou have reached the maximum of ${maxAssignments} concurrent assignments.`;
                       } else {
                           remainingMessage = `\n\nYou have **${totalAfterAssignment}** issue${totalAfterAssignment === 1 ? '' : 's'} assigned. You can self-assign **${remaining}** more.`;
                       }
-
+                      
                       await github.rest.issues.createComment({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           issue_number: context.payload.issue.number,
                           body: `Assigned! Please open a pull request within 7 days. If no PR is opened, this issue will be automatically unassigned to keep the queue moving.${remainingMessage}`
                       });
+# Re-applying fix to resolve GitHub conflict cache
