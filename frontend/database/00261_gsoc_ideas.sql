@@ -12,7 +12,6 @@ CREATE TABLE `GSoC_Edition` (
   UNIQUE KEY `unique_year` (`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ediciones de Google Summer of Code';
 
-
 CREATE TABLE `GSoC_Idea` (
   `idea_id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -29,20 +28,20 @@ CREATE TABLE `GSoC_Idea` (
   PRIMARY KEY (`idea_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ideas de proyectos de Google Summer of Code (independientes de edición)';
 
-
 CREATE TABLE `GSoC_Idea_Edition` (
   `idea_edition_id` int NOT NULL AUTO_INCREMENT,
   `idea_id` int NOT NULL,
   `edition_id` int NOT NULL,
-  `status` enum('Proposed', 'Accepted', 'Archived') DEFAULT 'Proposed',
+  `status` enum('Proposed', 'Accepted', 'Archived', 'Completed') DEFAULT 'Proposed',
+  `decision_notes` text DEFAULT NULL COMMENT 'Notas explicando la decisión tomada para este proyecto en esta edición',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`idea_edition_id`),
   UNIQUE KEY `unique_idea_edition` (`idea_id`, `edition_id`),
-  KEY `fk_idea` (`idea_id`),
-  KEY `fk_edition` (`edition_id`),
-  CONSTRAINT `fk_gsoc_idea_edition_idea` FOREIGN KEY (`idea_id`) REFERENCES `GSoC_Idea` (`idea_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_gsoc_idea_edition_edition` FOREIGN KEY (`edition_id`) REFERENCES `GSoC_Edition` (`edition_id`) ON DELETE CASCADE
+  KEY `idea_id` (`idea_id`),
+  KEY `edition_id` (`edition_id`),
+  CONSTRAINT `gsoc_idea_edition_idea` FOREIGN KEY (`idea_id`) REFERENCES `GSoC_Idea` (`idea_id`) ON DELETE CASCADE,
+  CONSTRAINT `gsoc_idea_edition_edition` FOREIGN KEY (`edition_id`) REFERENCES `GSoC_Edition` (`edition_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Vincula ideas de GSoC a ediciones con estado por edición';
 
 COMMIT;
