@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Greet first-time assignees
         if: ${{ github.event.action == 'assigned' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         with:
           script: |
             const assignee = context.payload.assignee;
@@ -62,7 +62,7 @@ jobs:
               body,
             });
 
-      - uses: actions/first-interaction@v3.1.0
+      - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d
         if: ${{ github.event.action == 'opened' }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
