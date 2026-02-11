@@ -126,7 +126,7 @@ jobs:
             - name: Count current assignments
               id: count_assignments
               if: github.event_name == 'issue_comment' && steps.pre_check.outputs.handled != 'true'
-              uses: actions/github-script@v8
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -195,7 +195,7 @@ jobs:
 
             - name: Post assignment message with remaining count
               if: github.event_name == 'issue_comment' && steps.assign_action.outputs.assigned == 'yes'
-              uses: actions/github-script@v8
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
