@@ -64,8 +64,6 @@ export default class ProblemMarkdown extends Vue {
     this.renderMathJax();
     this.injectTemplates();
     this.renderMermaid();
-    // NOTE: When binding markdown input via <textarea>, use v-model.lazy to ensure
-    // changes from pagedown controls are reflected correctly
   }
 
   @Watch('markdown')
@@ -76,7 +74,6 @@ export default class ProblemMarkdown extends Vue {
 
   @Emit('rendered')
   private renderMathJax(): void {
-    // console.log('[Markdown.vue] Rendered HTML:', this.html);
     this.root.innerHTML = this.html;
     this.root
       .querySelectorAll(
