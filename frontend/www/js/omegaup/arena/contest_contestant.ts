@@ -1,12 +1,13 @@
+import Vue from 'vue';
+import * as api from '../api';
+import { types } from '../api_types';
+import arena_Contest from '../components/arena/Contest.vue';
+import { DisqualificationType } from '../components/arena/Runs.vue';
+import { PopupDisplayed } from '../components/problem/Details.vue';
+import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { types } from '../api_types';
-import * as api from '../api';
 import * as ui from '../ui';
-import Vue from 'vue';
-import arena_Contest from '../components/arena/Contest.vue';
-import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
-import problemsStore from './problemStore';
 import {
   ContestClarification,
   ContestClarificationRequest,
@@ -14,12 +15,20 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
+import clarificationStore from './clarificationsStore';
+import { EventsSocket } from './events_socket';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   getScoreModeEnum,
   navigateToProblem,
   NavigationType,
 } from './navigation';
-import clarificationStore from './clarificationsStore';
+import problemsStore from './problemStore';
+import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import rankingStore from './rankingStore';
+import { myRunsStore, RunFilters, runsStore } from './runsStore';
+import { enforceSingleTab } from './singleTabEnforcer';
+import socketStore from './socketStore';
 import {
   onRefreshRuns,
   showSubmission,
@@ -29,14 +38,6 @@ import {
   trackRun,
   updateRunFallback,
 } from './submissions';
-import { PopupDisplayed } from '../components/problem/Details.vue';
-import { createChart, onRankingChanged, onRankingEvents } from './ranking';
-import { EventsSocket } from './events_socket';
-import rankingStore from './rankingStore';
-import socketStore from './socketStore';
-import { myRunsStore, RunFilters, runsStore } from './runsStore';
-import T from '../lang';
-import { DisqualificationType } from '../components/arena/Runs.vue';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
@@ -44,6 +45,38 @@ OmegaUp.on('ready', async () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
+
+  // Enforce single tab for non-admin contestants
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+
+  if (!contestAdmin) {
+    const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+
+      const timeoutId = window.setTimeout(() => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve();
+      }, TAB_ENFORCER_TIMEOUT_MS);
+
+      enforceSingleTab(payload.contest.alias, (message: string) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        isBlocked = true;
+        blockedMessage = message;
+        window.clearTimeout(timeoutId);
+        resolve();
+      });
+    });
+  }
+
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
@@ -137,6 +170,8 @@ OmegaUp.on('ready', async () => {
       runDetailsData: runDetails,
       shouldShowFirstAssociatedIdentityRunWarning:
         payload.shouldShowFirstAssociatedIdentityRunWarning,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -171,6 +206,8 @@ OmegaUp.on('ready', async () => {
           shouldShowFirstAssociatedIdentityRunWarning: this
             .shouldShowFirstAssociatedIdentityRunWarning,
           submissionDeadline: payload.submissionDeadline,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({
