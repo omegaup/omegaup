@@ -195,7 +195,7 @@ After design documents are submitted, we will select a short list of candidates 
 We will only consider candidates that completed all 4 phases of the application.
 
 # Communications
-## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
+## If you have questions about the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
 
 **Our main communication medium with GSoC candidates is our [Discord channel](https://discord.gg/gMEMX7Mrwe). We invited you to join!**
 

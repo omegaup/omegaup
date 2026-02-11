@@ -28,6 +28,15 @@ runs:
         docker compose down -v || true
         docker volume rm -f omegaup_omegaupdata omegaup_dbdata omegaup_rabbitmq omegaup_redis || true
 
+    - name: Pre-create shared volume directories
+      shell: bash
+      run: |
+        # Create the volume and initialize the problems.git directory to prevent race conditions
+        # when multiple containers try to create it simultaneously
+        docker volume create omegaup_omegaupdata
+        # Set ownership to UID/GID used by containers (matches UID_GID env var, typically 1000:1000 on Linux CI)
+        docker run --rm -v omegaup_omegaupdata:/var/lib/omegaup alpine sh -c "mkdir -p /var/lib/omegaup/problems.git && chown -R 1000:1000 /var/lib/omegaup"
+
     - name: Start the Docker containers
       shell: bash
       run: |
@@ -68,6 +77,12 @@ runs:
         define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
         define('OMEGAUP_GRADER_URL', 'https://grader:21680');
         define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+        define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
+        define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
+        define('OMEGAUP_GRADER_SECRET', 'secret');
+        define('OMEGAUP_COURSE_CLONE_SECRET_KEY', '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE');
+        define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+        define('OMEGAUP_GOOGLE_CLIENTID', '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com');
         define('REDIS_HOST', 'redis');
         define('REDIS_PASS', '');
         define('TEMPLATE_CACHE_DIR', '/tmp');

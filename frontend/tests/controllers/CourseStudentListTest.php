@@ -33,7 +33,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * List can only be retreived by an admin
+     * List can only be retrieved by an admin
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();

@@ -128,28 +128,19 @@ class Admin extends \OmegaUp\Controllers\Controller {
             self::MAINTENANCE_MESSAGE_TYPES
         ) ?? self::MAINTENANCE_MESSAGE_TYPES[self::INFO];
 
+        $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
+        $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
+        $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
+        $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
+        $cacheMessageType = new \OmegaUp\Cache(
+            self::MAINTENANCE_MESSAGE_TYPE_KEY
+        );
         if ($enabled) {
-            $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
             $cacheEnabled->set(true, 0); // No expiration
-
-            $cacheMessageEs = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_ES_KEY
-            );
             $cacheMessageEs->set($messageEs, timeout: 0);
-
-            $cacheMessageEn = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_EN_KEY
-            );
             $cacheMessageEn->set($messageEn, timeout: 0);
-
-            $cacheMessagePt = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_PT_KEY
-            );
             $cacheMessagePt->set($messagePt, 0);
 
-            $cacheMessageType = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_TYPE_KEY
-            );
             // Store the index, not the string value
             $typeIndex = array_search(
                 $type,
@@ -161,27 +152,10 @@ class Admin extends \OmegaUp\Controllers\Controller {
                 0
             );
         } else {
-            $cacheEnabled = new \OmegaUp\Cache(self::MAINTENANCE_ENABLED_KEY);
             $cacheEnabled->delete();
-
-            $cacheMessageEs = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_ES_KEY
-            );
             $cacheMessageEs->delete();
-
-            $cacheMessageEn = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_EN_KEY
-            );
             $cacheMessageEn->delete();
-
-            $cacheMessagePt = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_PT_KEY
-            );
             $cacheMessagePt->delete();
-
-            $cacheMessageType = new \OmegaUp\Cache(
-                self::MAINTENANCE_MESSAGE_TYPE_KEY
-            );
             $cacheMessageType->delete();
         }
 
