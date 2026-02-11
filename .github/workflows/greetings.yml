@@ -1,0 +1,77 @@
+name: Greetings
+
+on:
+  issues:
+    types:
+      - opened
+      - assigned
+  pull_request_target:
+    types:
+      - opened
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    name: Greet First-Time Contributors
+    runs-on: ubuntu-22.04
+    env:
+      COMMON_MESSAGE: |
+        1. Discord Link: https://discord.com/invite/K3JFd9d3wk
+        2. Documentation (GitHub Wiki): https://github.com/omegaup/omegaup/wiki
+
+        Most contributor discussion happens in the `dev-training` channel.
+    steps:
+      - name: Greet first-time assignees
+        if: ${{ github.event.action == 'assigned' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const assignee = context.payload.assignee;
+            if (!assignee) {
+              core.info('No assignee in payload; skipping.');
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const login = assignee.login;
+            const issueNumber = context.issue.number;
+
+            const { data: assignedIssues } =
+              await github.rest.search.issuesAndPullRequests({
+                q: `repo:${owner}/${repo} assignee:${login} is:issue`,
+              });
+
+            if (assignedIssues.total_count !== 1) {
+              core.info(
+                `Assignee ${login} has ${assignedIssues.total_count} assigned issues; not a first assignment.`,
+              );
+              return;
+            }
+
+            const body =
+              `Hi @${login} — thanks for taking your first issue!\n\n` +
+              process.env.COMMON_MESSAGE;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+      - uses: actions/first-interaction@v3.1.0
+        if: ${{ github.event.action == 'opened' }}
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Hi @${{ github.actor }} — thanks for opening your first issue!
+
+            ${{ env.COMMON_MESSAGE }}
+
+          pr-message: |
+            Hi @${{ github.actor }} — thanks for your first pull request!
+
+            ${{ env.COMMON_MESSAGE }}

@@ -260,3 +260,26 @@ export default class NavbarItems extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@media only screen and (max-width: 992px) {
+  .help-dropdown {
+    min-width: auto !important;
+    width: auto !important;
+    max-width: 85vw !important;
+    left: auto !important;
+    right: 0 !important;
+
+    .dropdown-item {
+      white-space: normal !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      line-height: 1.4 !important;
+      padding: 0.5rem 1rem !important;
+      max-width: 100% !important;
+      display: block !important;
+    }
+  }
+}
+</style>

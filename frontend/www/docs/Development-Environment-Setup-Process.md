@@ -159,10 +159,6 @@ These are the directories that we are actively using in the development:
 
 For more details, see [here](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Frontend.md).
 
-## How To Update Your Copy of omegaUp
-
-Before you start making changes to the code, you should update the code to its latest version, that can be done by following [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md).
-
 ## How To Make Changes To The Code
 
 When you have made changes that you wish to propose to omegaUp repository, follow [these steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md).

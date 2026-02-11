@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
       contents: read
       issues: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Label the PR size
     steps:
       - name: Create PR size labels if they don't exist

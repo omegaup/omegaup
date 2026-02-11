@@ -1,13 +1,15 @@
+import * as Highcharts from 'highcharts/highstock';
 import Vue from 'vue';
-import { OmegaUp } from '../omegaup';
-import { types } from '../api_types';
 import * as api from '../api';
-import * as ui from '../ui';
+import { types } from '../api_types';
 import T from '../lang';
 import mainStore from '../mainStore';
-import * as Highcharts from 'highcharts/highstock';
+import { OmegaUp } from '../omegaup';
+import * as ui from '../ui';
 
-import user_Profile from '../components/user/Profile.vue';
+import user_Profile, {
+  ProfileStatistics,
+} from '../components/user/Profile.vue';
 import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 // Heatmap utility interfaces and functions
@@ -242,6 +244,7 @@ OmegaUp.on('ready', () => {
         searchResultSchools: searchResultSchools,
         availableYears: [currentYear] as number[],
         isLoading: true,
+        profileStatistics: null as ProfileStatistics | null,
       };
     },
     mounted: function () {
@@ -286,6 +289,16 @@ OmegaUp.on('ready', () => {
           .catch((error) => {
             ui.apiError(error);
             this.isLoading = false;
+          });
+
+        // Also fetch profile statistics for the charts
+        api.User.profileStatistics({ username })
+          .then((response) => {
+            this.profileStatistics = response;
+          })
+          .catch((error) => {
+            // Non-blocking error - just log it
+            console.error('Failed to load profile statistics:', error);
           });
       },
 
@@ -334,6 +347,7 @@ OmegaUp.on('ready', () => {
           searchResultSchools: this.searchResultSchools,
           availableYears: this.availableYears,
           isLoading: this.isLoading,
+          profileStatistics: this.profileStatistics,
         },
         on: {
           'update-user-basic-information': (

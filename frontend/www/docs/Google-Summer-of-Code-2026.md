@@ -210,7 +210,7 @@ A seamless end-to-end user experience where authors can create or edit problems 
 
 **Possible mentor**:
 
-[pabo99](https://github.com/pabo99), [heduenas](https://github.com/heduenas), Ankitsinghsisodya](https://github.com/Ankitsinghsisodya)
+[pabo99](https://github.com/pabo99), [heduenas](https://github.com/heduenas), [Ankitsinghsisodya](https://github.com/Ankitsinghsisodya)
 
 **Estimated size of project:**
 
