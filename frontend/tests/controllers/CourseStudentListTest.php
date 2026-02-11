@@ -483,6 +483,8 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        $login = self::login($courseData['admin']);
+
         $resultsBefore = \OmegaUp\Controllers\Course::apiStudentsProgress(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -517,6 +519,8 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $participant
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($courseData['admin']);
 
         $resultsAfter = \OmegaUp\Controllers\Course::apiStudentsProgress(
             new \OmegaUp\Request([
