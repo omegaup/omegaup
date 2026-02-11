@@ -11,11 +11,27 @@ endpoints:
   course_add_student: "/course/addStudent/"
   group_create: "/group/create/"
 
+generic_group:
+  name: "Grupo Genérico"
+  description: "Grupo para identidades sintéticas"
+  alias: "grupo_1_generico"
+
+workers:
+  user_create: 32
+  identity_bulk_create: 1
+  school_create: 16
+  problem_create: 16
+  contest_create: 16
+  run_create: 4
+  course_create: 16
+  default: 16
+
 environtment:
   development:
     counts:
       users: 1000
-      identities: 1000
+      identities: 100
+      identities_bulk: 200
       schools: 1000
       problems_public: 500
       problems_private: 500
@@ -31,6 +47,7 @@ environtment:
     counts:
       users: 10
       identities: 10
+      identities_bulk: 2
       schools: 10
       problems_public: 10
       problems_private: 10
@@ -71,6 +88,7 @@ selected_tags:
 
 paths:
   - test_zip: "frontend/tests/resources/testproblem.zip"
+  - identities_csv: "frontend/tests/resources/identities.csv"
 
 resource_checks:
   - create: user_create

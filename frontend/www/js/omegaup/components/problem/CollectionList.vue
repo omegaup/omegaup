@@ -10,8 +10,11 @@
         <h1 class="title-font p-0">{{ title }}</h1>
       </div>
     </div>
-    <div class="row">
-      <div class="col col-md-3">
+    <div class="d-flex flex-row">
+      <div
+        class="filters-sidebar"
+        :class="{ 'filters-hidden': !filtersVisible }"
+      >
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
@@ -28,6 +31,7 @@
               )
           "
         ></omegaup-problem-filter-tags>
+
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
@@ -42,6 +46,7 @@
               )
           "
         ></omegaup-problem-filter-difficulty>
+
         <omegaup-problem-filter-quality
           :quality="quality"
           @change-quality="
@@ -57,12 +62,29 @@
           "
         ></omegaup-problem-filter-quality>
       </div>
-      <div class="col p-0">
+
+      <button
+        class="btn btn-outline-secondary btn-sm filter-toggle"
+        :title="
+          filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+        "
+        :aria-label="
+          filtersVisible ? T.collectionHideFilters : T.collectionShowFilters
+        "
+        @click="filtersVisible = !filtersVisible"
+      >
+        <font-awesome-icon
+          :icon="filtersVisible ? 'chevron-left' : 'chevron-right'"
+        />
+      </button>
+
+      <div class="flex-grow-1 main-content-wrapper">
         <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
           </div>
         </div>
+
         <omegaup-problem-base-list
           v-else
           :problems="problems"
@@ -71,7 +93,7 @@
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
-          :languges="languages"
+          :languages="languages"
           :keyword="keyword"
           :modes="modes"
           :columns="columns"
@@ -92,8 +114,7 @@
                 selectedTags,
               )
           "
-        >
-        </omegaup-problem-base-list>
+        />
       </div>
     </div>
   </div>
@@ -108,6 +129,14 @@ import problem_FilterDifficulty from './FilterDifficulty.vue';
 import problem_FilterQuality from './FilterQuality.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faChevronLeft, faChevronRight);
 
 @Component({
   components: {
@@ -115,6 +144,7 @@ import { types } from '../../api_types';
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
     'omegaup-problem-filter-quality': problem_FilterQuality,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class CollectionList extends Vue {
@@ -139,6 +169,7 @@ export default class CollectionList extends Vue {
 
   T = T;
   level = this.data.level;
+  filtersVisible = true;
 
   get publicQualityTags(): types.TagWithProblemCount[] {
     const tagNames: Set<string> = new Set(
@@ -186,5 +217,33 @@ export default class CollectionList extends Vue {
 
 .max-width {
   max-width: 75rem;
+}
+
+.filters-sidebar {
+  width: 250px;
+  min-width: 250px;
+  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s ease;
+  overflow: hidden;
+  padding-right: 1rem;
+}
+
+.filters-sidebar.filters-hidden {
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+  padding-right: 0;
+}
+
+.filter-toggle {
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+  line-height: 1;
+  padding: 0.25rem 0.35rem;
+}
+
+.main-content-wrapper {
+  min-width: 0;
+  flex: 1;
 }
 </style>

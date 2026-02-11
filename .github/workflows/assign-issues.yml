@@ -8,6 +8,7 @@ on:
         - cron: "0 3 * * *"
     workflow_dispatch:
 
+# Prevent race condition when multiple users comment /assign simultaneously
 concurrency:
     group: assign-issue-${{ github.event.issue.number || 'scheduled' }}
     cancel-in-progress: false
