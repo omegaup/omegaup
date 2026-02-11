@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row justify-content-md-center">
-        <div class="col-md-5 mx-3 login-section">
+        <div class="col-md-5 mx-2 login-section">
           <h4>{{ T.loginFederated }}</h4>
           <div class="row">
             <div class="col-xs-12 text-left py-2 pl-3">
@@ -30,7 +30,7 @@
           </div>
         </div>
 
-        <div class="col-md-5 mx-3 login-section">
+        <div class="col-md-5 mx-2 login-section">
           <h4>{{ T.loginNative }}</h4>
           <form class="form-horizontal">
             <div class="form-group">
@@ -120,7 +120,7 @@ export default class Login extends Vue {
 
 .login-section:hover {
   border-color: #adb5bd;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
