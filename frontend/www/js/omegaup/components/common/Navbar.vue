@@ -37,7 +37,7 @@
               @read="readNotifications"
             ></omegaup-notification-list>
           </div>
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex mr-2">
             <li class="nav-item d-flex align-items-center">
               <a
                 class="nav-link nav-login-text pr-0"
