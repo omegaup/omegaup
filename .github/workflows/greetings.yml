@@ -65,13 +65,13 @@ jobs:
       - uses: actions/first-interaction@v3.1.0
         if: ${{ github.event.action == 'opened' }}
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
             Hi @${{ github.actor }} — thanks for opening your first issue!
 
             ${{ env.COMMON_MESSAGE }}
 
-          pr-message: |
+          pr_message: |
             Hi @${{ github.actor }} — thanks for your first pull request!
 
             ${{ env.COMMON_MESSAGE }}
