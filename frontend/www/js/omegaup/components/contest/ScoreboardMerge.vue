@@ -17,10 +17,10 @@
             @select="onSelect"
           ></multiselect>
         </div>
-        <div class="form-group col-md-4 text-right w-100">
+        <div class="form-group col-md-4 text-right">
           <button
             data-merge-contest-button
-            class="btn btn-primary"
+            class="btn btn-primary w-100"
             type="button"
             :disabled="!selectedContests.length"
             @click.prevent="onDisplayTable"
