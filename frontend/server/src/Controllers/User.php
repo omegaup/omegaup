@@ -34,14 +34,15 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, score_mode: string, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
  * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
- * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
- * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
+ * @psalm-type BookmarkProblem=array{alias: string, title: string}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
+ * @psalm-type CachedExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, bookmarkedProblems: list<BookmarkProblem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>}
  * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, githubClientId?: string, githubState?: null|string, hasVisitedSection?: bool, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string, description: null|string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
@@ -52,6 +53,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type VerificationParentalTokenDetailsPayload=array{hasParentalVerificationToken: bool, message: string}
  * @psalm-type UserDocument=array{name: string, url: string}
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
+ * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int|null, contestsCount: int|null}
+ * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -198,7 +201,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
             && !is_null($createUserParams->parentEmail)
         ) {
-            // Fill all the columns refering to user's parent
+            // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
                 25
             );
@@ -437,7 +440,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!self::$sendEmailOnVerify) {
             self::$log->info(
-                'Not sending email beacause sendEmailOnVerify = FALSE'
+                'Not sending email because sendEmailOnVerify = FALSE'
             );
             return;
         }
@@ -858,7 +861,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'permission_key'
             );
 
-            // Pwd changes are by default unless explictly disabled
+            // Pwd changes are by default unless explicitly disabled
             $resetRequest = new \OmegaUp\Request();
             $resetRequest['auth_token'] = $r['auth_token'];
             $resetRequest['username'] = $username;
@@ -2334,6 +2337,57 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get profile statistics including solved problems by difficulty and tags distribution.
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{solved: int, attempting: int, difficulty: array{easy: int, medium: int, hard: int, unlabelled: int}, tags: list<array{name: string, count: int}>}
+     *
+     * @omegaup-request-param null|string $username
+     */
+    public static function apiProfileStatistics(\OmegaUp\Request $r): array {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = null;
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        if (
+            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userProfileIsPrivate'
+            );
+        }
+
+        $difficultyStats = \OmegaUp\DAO\Problems::getSolvedCountByDifficulty(
+            $identity->identity_id
+        );
+        $attemptingCount = \OmegaUp\DAO\Problems::getAttemptingCount(
+            $identity->identity_id
+        );
+        $tagsDistribution = \OmegaUp\DAO\ProblemsTags::getTagsDistributionForSolvedProblems(
+            $identity->identity_id
+        );
+
+        return [
+            'solved' => $difficultyStats['total'],
+            'attempting' => $attemptingCount,
+            'difficulty' => [
+                'easy' => $difficultyStats['easy'],
+                'medium' => $difficultyStats['medium'],
+                'hard' => $difficultyStats['hard'],
+                'unlabelled' => $difficultyStats['unlabelled'],
+            ],
+            'tags' => $tagsDistribution,
+        ];
+    }
+
+    /**
      * It will return a boolean value indicating whether user can see
      * information of the given identity. There are three scenarios where this
      * function returns false:
@@ -2726,7 +2780,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get full rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRankInfo
      */
@@ -2782,7 +2836,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return UserRank
      */
@@ -2848,7 +2902,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Get rank by problems solved logic. It has its own func so it can be
-     * accesed internally without authentication.
+     * accessed internally without authentication.
      *
      * @return array{pager: list<PageItem>, ranking: UserRank}
      */
@@ -2955,6 +3009,21 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX
+        );
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::USER_COMPARE_DATA
+        );
+    }
+
+    /**
+     * Invalidate user compare data cache for a specific user.
+     * This should be called when a user's compare data changes,
+     * such as when they join a contest.
+     */
+    public static function invalidateUserCompareDataCache(string $username): void {
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_COMPARE_DATA,
+            $username
         );
     }
 
@@ -4469,6 +4538,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     'createdProblems' => self::getCreatedProblems(
                         $targetIdentityId
                     ),
+                    'bookmarkedProblems' => \OmegaUp\DAO\ProblemBookmarks::getAllBookmarkedProblems(
+                        $targetIdentityId
+                    ),
                     'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
                         $targetIdentityId
                     ),
@@ -4783,10 +4855,12 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
+     * @omegaup-request-param null|string $code
      * @omegaup-request-param null|string $credential
      * @omegaup-request-param null|string $g_csrf_token
-     * @omegaup-request-param null|string $third_party_login
      * @omegaup-request-param null|string $redirect
+     * @omegaup-request-param null|string $state
+     * @omegaup-request-param null|string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -4795,7 +4869,7 @@ class User extends \OmegaUp\Controllers\Controller {
             header('Location: /');
             throw new \OmegaUp\Exceptions\ExitException();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing.
+            // Do nothing - user is not logged in, continue to login page.
         }
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         $gCsrfToken = $r->ensureOptionalString('g_csrf_token');
@@ -4805,11 +4879,25 @@ class User extends \OmegaUp\Controllers\Controller {
             $thirdPartyLogin = 'facebook';
         }
 
+        $sessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
+        $githubState = $sessionManager->getCookie('github_oauth_state');
+        if (is_null($githubState) && !$r->offsetExists('code')) {
+            $githubState = \OmegaUp\SecurityTools::randomString(16);
+            $sessionManager->setCookie(
+                'github_oauth_state',
+                $githubState,
+                \OmegaUp\Time::get() + APC_USER_CACHE_SESSION_TIMEOUT,
+                '/'
+            );
+        }
+
         $response = [
             'templateProperties' => [
                 'payload' => [
                     'validateRecaptcha' => boolval(OMEGAUP_VALIDATE_CAPTCHA),
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'githubClientId' => OMEGAUP_GITHUB_CLIENT_ID,
+                    'githubState' => $githubState,
                     'hasVisitedSection' => \OmegaUp\UITools::hasVisitedSection(
                         'has-visited-signup'
                     ),
@@ -4821,6 +4909,8 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
+            } elseif ($thirdPartyLogin === 'github') {
+                \OmegaUp\Controllers\Session::loginViaGithubCallback($r);
             } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
@@ -5065,6 +5155,159 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
             ],
             'entrypoint' => 'common_docs',
+        ];
+    }
+
+    /**
+     * Get comparison data for two users
+     *
+     * @return UserCompareData|null
+     */
+    private static function getUserCompareData(
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
+        ?string $username
+    ): ?array {
+        if (empty($username)) {
+            return null;
+        }
+
+        $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            return null;
+        }
+
+        $targetUser = null;
+        if (!is_null($identity->user_id)) {
+            $targetUser = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+
+        // Check if profile should be hidden
+        if (
+            self::shouldUserInformationBeHidden(
+                $loggedIdentity,
+                $identity,
+                $targetUser
+            )
+        ) {
+            // Return limited profile for private users without counts to avoid leaking info
+            return [
+                'profile' => self::getPrivateUserProfile($identity),
+                'solvedProblemsCount' => null,
+                'contestsCount' => null,
+            ];
+        }
+
+        // Cache the expensive data fetching operations
+        /** @var UserCompareData */
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_COMPARE_DATA,
+            $username,
+            function () use ($loggedIdentity, $identity): array {
+                $profile = self::getUserProfile($loggedIdentity, $identity);
+                $solvedProblemsCount = count(
+                    self::getSolvedProblems($identity->identity_id)
+                );
+                $contestsCount = count(self::getContestStats($identity));
+
+                return [
+                    'profile' => $profile,
+                    'solvedProblemsCount' => $solvedProblemsCount,
+                    'contestsCount' => $contestsCount,
+                ];
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+    }
+
+    /**
+     * Compare two users' profiles and stats
+     *
+     * @return array{user1: UserCompareData|null, user2: UserCompareData|null}
+     *
+     *
+     * @omegaup-request-param null|string $username1
+     * @omegaup-request-param null|string $username2
+     */
+    public static function apiCompare(\OmegaUp\Request $r): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Allow unauthenticated requests
+        }
+
+        $username1 = $r->ensureOptionalString(
+            'username1',
+            required: false,
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        $username2 = $r->ensureOptionalString(
+            'username2',
+            required: false,
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+
+        return [
+            'user1' => self::getUserCompareData($r->identity, $username1),
+            'user2' => self::getUserCompareData($r->identity, $username2),
+        ];
+    }
+
+    /**
+     * Get compare page details for TypeScript frontend
+     *
+     * @return array{entrypoint: string, templateProperties: array{payload: UserComparePayload, title: \OmegaUp\TranslationString}}
+     *
+     *
+     * @omegaup-request-param null|string $username1
+     * @omegaup-request-param null|string $username2
+     */
+    public static function getCompareDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Allow unauthenticated requests
+        }
+
+        $username1 = $r->ensureOptionalString(
+            'username1',
+            required: false,
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+        $username2 = $r->ensureOptionalString(
+            'username2',
+            required: false,
+            validator: fn(string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'user1' => self::getUserCompareData(
+                        $r->identity,
+                        $username1
+                    ),
+                    'user2' => self::getUserCompareData(
+                        $r->identity,
+                        $username2
+                    ),
+                    'username1' => $username1,
+                    'username2' => $username2,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCompareUsers'
+                ),
+            ],
+            'entrypoint' => 'user_compare',
         ];
     }
 }
