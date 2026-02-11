@@ -51,7 +51,10 @@ int main(int argc, char* argv[]) {
 
 export const sourceTemplates: Record<string, string> = {
   c: `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 int main() {
   int t;
@@ -59,36 +62,43 @@ int main() {
   while (t--) {
 
   }
-
   return 0;
 }`,
-  cpp: `#include <iostream>
-
+  cpp: `#include <bits/stdc++.h>
 using namespace std;
 
 int main() {
-  cin.tie(nullptr);
   ios_base::sync_with_stdio(false);
-
+  cin.tie(nullptr);
+  
   int t;
   cin >> t;
   while (t--) {
 
   }
-
+  
   return 0;
 }`,
-  java: `import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+  java: `import java.io.*;
+import java.util.*;
 
 public class Main {
+  static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+  static StringTokenizer st;
+  
+  static String next() throws IOException {
+    while (st == null || !st.hasMoreTokens()) {
+      st = new StringTokenizer(br.readLine());
+    }
+    return st.nextToken();
+  }
+  
+  static int nextInt() throws IOException {
+    return Integer.parseInt(next());
+  }
+  
   public static void main(String[] args) throws IOException {
-    BufferedReader br = new BufferedReader(
-                          new InputStreamReader(System.in));
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    int t = Integer.parseInt(st.nextToken());
+    int t = nextInt();
     while (t-- > 0) {
 
     }
@@ -97,36 +107,36 @@ public class Main {
   kt: `import java.util.*
 
 fun main() {
-  val scanner = Scanner(System.in)
-  val t = scanner.nextInt()
-  repeat(t) {
-
-  }
+    val scanner = Scanner(System.\`in\`)
+    val t = scanner.nextInt()
+    repeat(t) {
+        // Your code here
+    }
 }`,
   py: `#!/usr/bin/python3
+import sys
 
-def _main() -> None:
-  t = int(input())
-  for _ in range(t):
-
-  pass
+def main():
+    t = int(input())
+    for _ in range(t):
+        pass
 
 if __name__ == '__main__':
-  _main()`,
+    main()`,
   rb: `t = gets.to_i
 t.times do
-
+    # Your code here
 end`,
   cs: `using System;
 using System.Collections.Generic;
 
 class Program {
-  static void Main(string[] args) {
-    int t = int.Parse(Console.ReadLine());
-    for (int i = 0; i < t; i++) {
-
+    static void Main(string[] args) {
+        int t = int.Parse(Console.ReadLine());
+        for (int i = 0; i < t; i++) {
+            // Your code here
+        }
     }
-  }
 }`,
   pas: `program CompetitiveProgramming;
 var
@@ -135,53 +145,63 @@ begin
   readln(t);
   for i := 1 to t do
   begin
-
+    // Your code here
   end;
 end.`,
   hs: `main :: IO ()
 main = do
-  t <- readLn
-  mapM_ (\\_ -> do
-
-    return ()) [1..t]`,
-  lua: `local t = io.read("*n")
+    t <- readLn
+    mapM_ (\\_ -> do
+        -- Your code here
+        return ()) [1..t]`,
+  lua: `local t = tonumber(io.read())
 for i = 1, t do
-
+    -- Your code here
 end`,
   go: `package main
 
-import "fmt"
+import (
+    "bufio"
+    "fmt"
+    "os"
+    "strconv"
+)
 
 func main() {
-  var t int
-  fmt.Scan(&t)
-  for i := 0; i < t; i++ {
-
-  }
+    scanner := bufio.NewScanner(os.Stdin)
+    scanner.Scan()
+    t, _ := strconv.Atoi(scanner.Text())
+    for i := 0; i < t; i++ {
+        // Your code here
+    }
 }`,
   rs: `use std::io::{self, BufRead};
 
 fn main() {
-  let stdin = io::stdin();
-  let mut lines = stdin.lock().lines();
-  let t: i32 = lines.next().unwrap().unwrap().trim().parse().unwrap();
-  for _ in 0..t {
-
-  }
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let t: i32 = lines.next().unwrap().unwrap().trim().parse().unwrap();
+    for _ in 0..t {
+        // Your code here
+    }
 }`,
   js: `const readline = require('readline');
 
 const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+    input: process.stdin,
+    output: process.stdout
 });
 
-rl.question('', (t) => {
-  t = parseInt(t);
-  for (let i = 0; i < t; i++) {
+const lines = [];
+rl.on('line', (line) => {
+    lines.push(line);
+});
 
-  }
-  rl.close();
+rl.on('close', () => {
+    const t = parseInt(lines[0]);
+    for (let i = 0; i < t; i++) {
+        // Your code here
+    }
 });`,
   cat: '',
 };
