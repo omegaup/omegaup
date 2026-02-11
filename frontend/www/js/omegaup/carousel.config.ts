@@ -41,8 +41,7 @@ const carouselConfig: {
         es: 'Ver convocatoria',
         pt: 'Ver convocatória',
       },
-      href:
-        'https://ofmi.omegaup.com/convocatoria',
+      href: 'https://ofmi.omegaup.com/convocatoria',
       target: '_blank',
     },
   },
