@@ -528,7 +528,9 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertSame($expectedStudents, count($resultsAfter['progress']));
-        $expectedProgressAllSolved = intval(($numProblems / $numProblems) * 100);
+        $expectedProgressAllSolved = intval(
+            ($numProblems / $numProblems) * 100
+        );
         $this->assertSame(
             $expectedProgressAllSolved,
             intval(
