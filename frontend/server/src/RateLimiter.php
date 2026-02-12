@@ -13,6 +13,12 @@ namespace OmegaUp;
  */
 class RateLimiter {
     /**
+     * Whether rate limiting is enabled.
+     * Can be disabled in tests via setForTesting().
+     */
+    private static bool $isEnabledForTesting = true;
+
+    /**
      * Default window size in seconds (1 hour).
      */
     private const WINDOW_SECONDS = 3600;
@@ -24,21 +30,41 @@ class RateLimiter {
     private const KEY_TTL_SECONDS = 7200;
 
     /**
+     * Enable or disable rate limiting for testing purposes.
+     */
+    public static function setForTesting(bool $enabled): void {
+        self::$isEnabledForTesting = $enabled;
+    }
+
+    /**
      * Asserts that the given identity has not exceeded the rate limit
      * for the specified endpoint within the current time window.
      *
+     * System administrators are exempt from rate limiting.
+     *
      * @param string $endpoint A unique identifier for the endpoint
      *                         (e.g., 'Group::apiCreate')
-     * @param int $identityId  The identity ID of the user making the request
+     * @param \OmegaUp\DAO\VO\Identities $identity The identity making the request
      * @param int $limit       Maximum number of requests allowed per window
      *
      * @throws \OmegaUp\Exceptions\RateLimitExceededException if the limit is exceeded
      */
     public static function assertWithinLimit(
         string $endpoint,
-        int $identityId,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $limit
     ): void {
+        if (!self::$isEnabledForTesting) {
+            return;
+        }
+
+        // System administrators are exempt from rate limiting
+        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
+            return;
+        }
+
+        $identityId = intval($identity->identity_id);
+
         // Calculate the current hourly bucket number.
         // All requests within the same hour share the same bucket.
         $bucket = intdiv(

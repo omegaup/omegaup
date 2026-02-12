@@ -2694,7 +2694,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\RateLimiter::assertWithinLimit(
                 'Contest::apiCreate',
-                $r->identity->identity_id,
+                $r->identity,
                 10
             );
         }

@@ -36,6 +36,9 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         unset($_REQUEST);
 
         \OmegaUp\Test\Utils::cleanupProblemFiles();
+        // Disable rate limiting by default in tests to avoid
+        // interfering with existing tests that create many items.
+        \OmegaUp\RateLimiter::setForTesting(false);
         \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 

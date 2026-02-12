@@ -9,6 +9,10 @@ class RateLimiterTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
 
+        // Re-enable rate limiting for these tests (disabled by default
+        // in ControllerTestCase::setUp to avoid breaking other tests).
+        \OmegaUp\RateLimiter::setForTesting(true);
+
         // Problem tests need the file uploader mock
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
@@ -247,34 +251,35 @@ class RateLimiterTest extends \OmegaUp\Test\ControllerTestCase {
      * Test that Contest::apiCreate is rate limited to 10 per hour.
      */
     public function testContestCreateRateLimit(): void {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
+        ['identity' => $identity, 'user' => $user] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Create 10 contests — all should succeed
+        // Create 10 contests with the same director — all should succeed
         for ($i = 0; $i < 10; $i++) {
-            \OmegaUp\Controllers\Contest::apiCreate(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
+            \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
                     'alias' => "test-contest-rl-{$i}",
                     'title' => "Test Contest RL {$i}",
-                    'description' => "Rate limit test contest {$i}",
-                    'start_time' => \OmegaUp\Time::get() + 60,
-                    'finish_time' => \OmegaUp\Time::get() + 7260,
+                    'contestDirector' => $identity,
+                    'contestDirectorUser' => $user,
                 ])
             );
         }
 
         // The 11th should fail
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'alias' => 'test-contest-rl-excess',
+                'title' => 'Test Contest RL Excess',
+                'contestDirector' => $identity,
+                'contestDirectorUser' => $user,
+            ])
+        );
+        $login = self::login($identity);
+        $contestData['request']['auth_token'] = $login->auth_token;
+
         try {
             \OmegaUp\Controllers\Contest::apiCreate(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'alias' => 'test-contest-rl-excess',
-                    'title' => 'Test Contest RL Excess',
-                    'description' => 'This should fail',
-                    'start_time' => \OmegaUp\Time::get() + 60,
-                    'finish_time' => \OmegaUp\Time::get() + 7260,
-                ])
+                $contestData['request']
             );
             $this->fail('Expected RateLimitExceededException');
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {

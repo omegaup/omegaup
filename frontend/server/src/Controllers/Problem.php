@@ -467,7 +467,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\RateLimiter::assertWithinLimit(
                 'Problem::apiCreate',
-                $r->identity->identity_id,
+                $r->identity,
                 20
             );
         }

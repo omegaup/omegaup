@@ -871,7 +871,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\RateLimiter::assertWithinLimit(
                 'Course::apiCreate',
-                $r->identity->identity_id,
+                $r->identity,
                 5
             );
         }

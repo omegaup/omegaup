@@ -143,7 +143,7 @@ class School extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\RateLimiter::assertWithinLimit(
                 'School::apiCreate',
-                $r->identity->identity_id,
+                $r->identity,
                 5
             );
         }

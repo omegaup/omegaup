@@ -244,7 +244,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\RateLimiter::assertWithinLimit(
                 'TeamsGroup::apiCreate',
-                $r->identity->identity_id,
+                $r->identity,
                 5
             );
         }
