@@ -10,6 +10,7 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SupportDetailsPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const adminSupport = new Vue({
     el: '#main-container',
@@ -51,6 +52,9 @@ OmegaUp.on('ready', () => {
           maintenanceMessageEn: payload.maintenanceMode.message_en || '',
           maintenanceMessagePt: payload.maintenanceMode.message_pt || '',
           maintenanceType: payload.maintenanceMode.type || 'info',
+          preferredLanguage: commonPayload.preferredLanguage,
+          maintenancePredefinedTemplates:
+            payload.maintenancePredefinedTemplates,
         },
         on: {
           'search-username-or-email': (usernameOrEmail: string): void => {

@@ -3115,6 +3115,7 @@ export namespace types {
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
+    preferredLanguage: string;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -4037,6 +4038,12 @@ export namespace types {
     username: string;
   }
 
+  export interface MessageLanguages {
+    en: string;
+    es: string;
+    pt: string;
+  }
+
   export interface NavbarProblemsetProblem {
     acceptsSubmissions: boolean;
     alias: string;
@@ -4121,6 +4128,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PredefinedTemplate {
+    id: string;
+    message: types.MessageLanguages;
+    title: types.MessageLanguages;
+    type: string;
   }
 
   export interface PrivacyPolicyDetailsPayload {
@@ -4990,6 +5004,7 @@ export namespace types {
 
   export interface SupportDetailsPayload {
     maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
     roleNamesWithDescription: types.UserRole[];
   }
 

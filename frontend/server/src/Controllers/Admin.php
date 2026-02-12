@@ -6,6 +6,8 @@
   * Admin Controller
   *
   * @psalm-type MaintenanceMessage=array{message: string, type: string}
+  * @psalm-type MessageLanguages=array{es: string, en: string, pt: string}
+  * @psalm-type PredefinedTemplate=array{id: string, title: MessageLanguages, message: MessageLanguages, type: string}
   * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
@@ -235,6 +237,58 @@ class Admin extends \OmegaUp\Controllers\Controller {
             'message_en' => $messageEn,
             'message_pt' => $messagePt,
             'type' => $type,
+        ];
+    }
+
+    /**
+     * Get predefined maintenance templates for public display
+     *
+     * @return list<PredefinedTemplate>
+     */
+    public static function getMaintenancePredefinedTemplates(): array {
+        return [
+            [
+                'id' => 'scheduled_maintenance',
+                'title' => [
+                    'es' => 'Mantenimiento programado',
+                    'en' => 'Scheduled Maintenance',
+                    'pt' => 'Manutenção Programada',
+                ],
+                'message' => [
+                    'es' => 'Estamos realizando mantenimiento programado. Esperamos volver a estar en línea pronto. Gracias por tu paciencia.',
+                    'en' => 'We are performing scheduled maintenance. We expect to be back online soon. Thank you for your patience.',
+                    'pt' => 'Estamos realizando manutenção programada. Esperamos voltar a ficar online em breve. Obrigado pela sua paciência.',
+                ],
+                'type' => self::MAINTENANCE_MESSAGE_TYPES[self::INFO],
+            ],
+            [
+                'id' => 'grader_unavailable',
+                'title' => [
+                    'es' => 'Sistema de evaluación temporalmente no disponible',
+                    'en' => 'Grader system temporarily unavailable',
+                    'pt' => 'Sistema de avaliação temporariamente indisponível',
+                ],
+                'message' => [
+                    'es' => 'Nuestro equipo técnico ha sido notificado.<br />Por favor, guarda tu código localmente y vuelve a intentarlo más tarde. Gracias por tu comprensión.',
+                    'en' => 'Our technical team has been notified.<br />Please save your code locally and try again later. Thank you for your understanding.',
+                    'pt' => 'Nossa equipe técnica foi notificada.<br />Por favor, salve seu código localmente e tente novamente mais tarde. Obrigado pela sua compreensão.',
+                ],
+                'type' => self::MAINTENANCE_MESSAGE_TYPES[self::WARNING],
+            ],
+            [
+                'id' => 'service_unavailable',
+                'title' => [
+                    'es' => 'Servicio temporalmente no disponible',
+                    'en' => 'Service temporarily unavailable',
+                    'pt' => 'Serviço temporariamente indisponível',
+                ],
+                'message' => [
+                    'es' => 'Estamos experimentando problemas técnicos con nuestros proveedores de infraestructura.',
+                    'en' => 'We are experiencing technical issues with our infrastructure providers.',
+                    'pt' => 'Estamos enfrentando problemas técnicos com nossos provedores de infraestrutura.',
+                ],
+                'type' => self::MAINTENANCE_MESSAGE_TYPES[self::ERROR],
+            ]
         ];
     }
 

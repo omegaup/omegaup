@@ -38,50 +38,99 @@
                 </omegaup-toggle-switch>
               </div>
               <div v-if="currentMaintenanceEnabled" class="form-group">
-                <label
-                  >{{ T.maintenanceModeMessage }} ({{ T.wordsSpanish }})</label
+                <select
+                  v-model="selectedTemplateId"
+                  class="form-control mb-3"
+                  @change="onSelectTemplate"
                 >
-                <textarea
-                  v-model="currentMaintenanceMessageEs"
-                  class="form-control"
-                  rows="3"
-                  :placeholder="T.maintenanceModeMessagePlaceholder"
-                ></textarea>
-
-                <label class="mt-3"
-                  >{{ T.maintenanceModeMessage }} ({{ T.wordsEnglish }})</label
-                >
-                <textarea
-                  v-model="currentMaintenanceMessageEn"
-                  class="form-control"
-                  rows="3"
-                  :placeholder="T.maintenanceModeMessagePlaceholder"
-                ></textarea>
-
-                <label class="mt-3"
-                  >{{ T.maintenanceModeMessage }} ({{
-                    T.wordsPortuguese
-                  }})</label
-                >
-                <textarea
-                  v-model="currentMaintenanceMessagePt"
-                  class="form-control"
-                  rows="3"
-                  :placeholder="T.maintenanceModeMessagePlaceholder"
-                ></textarea>
-
-                <label class="mt-3">{{ T.maintenanceModeType }}</label>
-                <select v-model="currentMaintenanceType" class="form-control">
-                  <option :value="MaintenanceType.Info">
-                    {{ T.maintenanceModeTypeInfo }}
+                  <option value="">
+                    -- {{ T.maintenanceModeTemplateSelectPlaceholder }} --
                   </option>
-                  <option :value="MaintenanceType.Warning">
-                    {{ T.maintenanceModeTypeWarning }}
+                  <option
+                    v-for="template in maintenancePredefinedTemplates"
+                    :key="template.id"
+                    :value="template.id"
+                  >
+                    {{ template.title[preferredLanguage] }}
                   </option>
-                  <option :value="MaintenanceType.Error">
-                    {{ T.maintenanceModeTypeError }}
+                  <option value="custom">
+                    {{ T.maintenanceModeTemplateCustomOption }}
                   </option>
                 </select>
+
+                <div class="mb-2">
+                  <span
+                    v-for="type in maintenanceTypes"
+                    :key="type.value"
+                    :class="[
+                      'badge',
+                      'mr-3',
+                      'p-2',
+                      badgeClass(type.value),
+                      {
+                        'badge-selected': currentMaintenanceType === type.value,
+                      },
+                    ]"
+                    @click="currentMaintenanceType = type.value"
+                  >
+                    {{ type.label }}
+                  </span>
+                </div>
+                <label>{{ T.maintenanceModeMessage }}</label>
+                <div class="row mb-2">
+                  <div class="col-auto d-flex align-items-center">
+                    <span class="badge badge-secondary w-100">{{
+                      T.wordsSpanish
+                    }}</span>
+                  </div>
+                  <div class="col">
+                    <textarea
+                      v-model="currentMaintenanceMessageEs"
+                      :class="[
+                        'form-control',
+                        badgeClass(currentMaintenanceType),
+                      ]"
+                      :placeholder="T.maintenanceModeMessagePlaceholder"
+                      @input="autoResize($event)"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-auto d-flex align-items-center">
+                    <span class="badge badge-secondary w-100">{{
+                      T.wordsEnglish
+                    }}</span>
+                  </div>
+                  <div class="col">
+                    <textarea
+                      v-model="currentMaintenanceMessageEn"
+                      :class="[
+                        'form-control',
+                        badgeClass(currentMaintenanceType),
+                      ]"
+                      :placeholder="T.maintenanceModeMessagePlaceholder"
+                      @input="autoResize($event)"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-auto d-flex align-items-center">
+                    <span class="badge badge-secondary w-100">{{
+                      T.wordsPortuguese
+                    }}</span>
+                  </div>
+                  <div class="col">
+                    <textarea
+                      v-model="currentMaintenanceMessagePt"
+                      :class="[
+                        'form-control',
+                        badgeClass(currentMaintenanceType),
+                      ]"
+                      :placeholder="T.maintenanceModeMessagePlaceholder"
+                      @input="autoResize($event)"
+                    ></textarea>
+                  </div>
+                </div>
               </div>
               <button
                 v-if="currentMaintenanceEnabled"
@@ -197,7 +246,7 @@
                 @click.prevent="onVerifyUser"
               >
                 <template v-if="verified">
-                  <font-awesome-icon icon="check" :style="{ color: 'green' }" />
+                  <font-awesome-icon icon="check" class="alert-success" />
                   {{ T.userVerified }}
                 </template>
                 <template v-else>
@@ -380,6 +429,10 @@ export default class AdminSupport extends Vue {
   @Prop() maintenanceMessageEn!: string;
   @Prop() maintenanceMessagePt!: string;
   @Prop() maintenanceType!: string;
+  @Prop() preferredLanguage!: string;
+  @Prop() maintenancePredefinedTemplates!: types.PredefinedTemplate[];
+
+  selectedTemplateId: string = '';
 
   currentContestAlias = this.contestAlias;
   currentIsContestRecommended = this.isContestRecommended;
@@ -395,6 +448,33 @@ export default class AdminSupport extends Vue {
   MaintenanceType = MaintenanceType;
   usernameOrEmail: null | string = null;
   newEmail: null | string = null;
+
+  maintenanceTypes = [
+    { value: MaintenanceType.Info, label: this.T.maintenanceModeTypeInfo },
+    {
+      value: MaintenanceType.Warning,
+      label: this.T.maintenanceModeTypeWarning,
+    },
+    { value: MaintenanceType.Error, label: this.T.maintenanceModeTypeError },
+  ];
+
+  badgeClass(type: string) {
+    switch (type) {
+      case 'warning':
+        return 'alert-warning';
+      case 'danger':
+        return 'alert-danger';
+      default:
+        return 'alert-info';
+    }
+  }
+
+  autoResize(event: Event) {
+    console.log(event);
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
 
   hasRole(role: string): boolean {
     return this.roles.indexOf(role) !== -1;
@@ -499,6 +579,7 @@ export default class AdminSupport extends Vue {
       this.currentMaintenanceMessageEs = '';
       this.currentMaintenanceMessageEn = '';
       this.currentMaintenanceMessagePt = '';
+      this.currentMaintenanceType = 'info';
     }
     return newValue;
   }
@@ -519,5 +600,56 @@ export default class AdminSupport extends Vue {
       type: this.currentMaintenanceType,
     };
   }
+
+  onSelectTemplate() {
+    const template = this.maintenancePredefinedTemplates.find(
+      (t) => t.id === this.selectedTemplateId,
+    );
+    if (template && template.id !== 'custom') {
+      this.currentMaintenanceMessageEs = `${template.title.es}<br>${template.message.es}`;
+      this.currentMaintenanceMessageEn = `${template.title.en}<br>${template.message.en}`;
+      this.currentMaintenanceMessagePt = `${template.title.pt}<br>${template.message.pt}`;
+      this.currentMaintenanceType = template.type;
+      return;
+    }
+    this.currentMaintenanceMessageEs = '';
+    this.currentMaintenanceMessageEn = '';
+    this.currentMaintenanceMessagePt = '';
+    this.currentMaintenanceType = 'info';
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+.badge {
+  cursor: pointer;
+}
+
+.row.mb-2 {
+  .col-auto {
+    display: flex;
+    align-items: stretch;
+    .badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-width: 100px;
+      font-size: 1rem;
+      border-radius: 0.25rem;
+    }
+  }
+  .col {
+    display: flex;
+    align-items: stretch;
+    textarea {
+      height: 100%;
+      min-height: 40px;
+      font-size: 1rem;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      border-radius: 0.25rem;
+    }
+  }
+}
+</style>

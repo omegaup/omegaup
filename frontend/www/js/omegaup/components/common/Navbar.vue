@@ -336,7 +336,7 @@
       ></omegaup-user-next-registered-contest>
       <div
         v-if="mentorCanChooseCoder"
-        class="alert alert-info alert-dismissible fade show"
+        class="alert alert-info alert-dismissible fade show mentor-can-choose-coder"
         role="alert"
       >
         <button type="button" class="close" data-dismiss="alert">
@@ -493,7 +493,7 @@ export default class Navbar extends Vue {
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.alert-info {
+.mentor-can-choose-coder {
   margin: 1rem;
 }
 
