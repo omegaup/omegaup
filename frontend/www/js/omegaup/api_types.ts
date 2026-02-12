@@ -79,6 +79,7 @@ export namespace dao {
     deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
+    github_url?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
     has_scholar_objective?: boolean;
@@ -86,6 +87,7 @@ export namespace dao {
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
+    linkedin_url?: string;
     main_email_id?: number;
     main_identity_id?: number;
     parent_email_id?: number;
@@ -100,6 +102,7 @@ export namespace dao {
     user_id?: number;
     verification_id?: string;
     verified?: boolean;
+    x_url?: string;
   }
 }
 
@@ -401,6 +404,33 @@ export namespace types {
             return x;
           });
         })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CarouselItemListPayload(
+      elementId: string = 'payload',
+    ): types.CarouselItemListPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
         return x;
       })(
         JSON.parse(
@@ -2340,6 +2370,54 @@ export namespace types {
       );
     }
 
+    export function UserComparePayload(
+      elementId: string = 'payload',
+    ): types.UserComparePayload {
+      return ((x) => {
+        if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+          x.user1 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user1);
+        if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+          x.user2 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user2);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
@@ -2699,6 +2777,7 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ArenaProblemset {
@@ -2820,6 +2899,11 @@ export namespace types {
     username: string;
   }
 
+  export interface BookmarkProblem {
+    alias: string;
+    title: string;
+  }
+
   export interface CDP {
     casesStore: types.CDPCasesStore;
     problemCodeContent: string;
@@ -2864,6 +2948,7 @@ export namespace types {
 
   export interface CachedExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -2871,6 +2956,21 @@ export namespace types {
     solvedProblems: types.Problem[];
     stats: types.UserProfileStats[];
     unsolvedProblems: types.Problem[];
+  }
+
+  export interface CarouselItem {
+    button_title: string;
+    carousel_item_id: number;
+    excerpt: string;
+    expiration_date?: Date;
+    image_url: string;
+    link: string;
+    status: boolean;
+    title: string;
+  }
+
+  export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
   }
 
   export interface CaseResult {
@@ -3671,6 +3771,7 @@ export namespace types {
 
   export interface ExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -3906,6 +4007,8 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    githubClientId?: string;
+    githubState?: string;
     hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
@@ -4082,6 +4185,7 @@ export namespace types {
     clarifications?: types.Clarification[];
     hasVisitedSection?: boolean;
     histogram: types.Histogram;
+    isBookmarked?: boolean;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
@@ -4197,6 +4301,7 @@ export namespace types {
     statement: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ProblemListCollectionPayload {
@@ -4931,6 +5036,19 @@ export namespace types {
     state?: string;
   }
 
+  export interface UserCompareData {
+    contestsCount?: number;
+    profile: types.UserProfileInfo;
+    solvedProblemsCount?: number;
+  }
+
+  export interface UserComparePayload {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+    username1?: string;
+    username2?: string;
+  }
+
   export interface UserDependent {
     classname: string;
     name?: string;
@@ -5111,6 +5229,23 @@ export namespace types {
 
 // API messages
 export namespace messages {
+  // ACL
+  export type ACLUserOwnedAclReportRequest = { [key: string]: any };
+  export type ACLUserOwnedAclReportResponse = {
+    acls: {
+      acl_id: number;
+      alias: string;
+      type: string;
+      users: {
+        role_description: string;
+        role_id: number;
+        role_name: string;
+        user_id: number;
+        username: string;
+      }[];
+    }[];
+  };
+
   // Admin
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
@@ -5162,6 +5297,20 @@ export namespace messages {
   export type BadgeUserListRequest = { [key: string]: any };
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
+
+  // CarouselItems
+  export type CarouselItemsCreateRequest = { [key: string]: any };
+  export type CarouselItemsCreateResponse = {};
+  export type CarouselItemsDeleteRequest = { [key: string]: any };
+  export type CarouselItemsDeleteResponse = {};
+  export type CarouselItemsListRequest = { [key: string]: any };
+  export type _CarouselItemsListServerResponse = any;
+  export type CarouselItemsListResponse = types.CarouselItemListPayload;
+  export type CarouselItemsListActiveRequest = { [key: string]: any };
+  export type _CarouselItemsListActiveServerResponse = any;
+  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
+  export type CarouselItemsUpdateRequest = { [key: string]: any };
+  export type CarouselItemsUpdateResponse = {};
 
   // Certificate
   export type CertificateGenerateContestCertificatesRequest = {
@@ -5708,6 +5857,17 @@ export namespace messages {
     published: string;
   };
 
+  // ProblemBookmark
+  export type ProblemBookmarkExistsRequest = { [key: string]: any };
+  export type ProblemBookmarkExistsResponse = { bookmarked: boolean };
+  export type ProblemBookmarkListRequest = { [key: string]: any };
+  export type ProblemBookmarkListResponse = {
+    problems: types.BookmarkProblem[];
+    total: number;
+  };
+  export type ProblemBookmarkToggleRequest = { [key: string]: any };
+  export type ProblemBookmarkToggleResponse = { bookmarked: boolean };
+
   // ProblemForfeited
   export type ProblemForfeitedGetCountsRequest = { [key: string]: any };
   export type ProblemForfeitedGetCountsResponse = {
@@ -5972,6 +6132,12 @@ export namespace messages {
   export type UserCoderOfTheMonthListResponse = {
     coders: types.CoderOfTheMonthList;
   };
+  export type UserCompareRequest = { [key: string]: any };
+  export type _UserCompareServerResponse = any;
+  export type UserCompareResponse = {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+  };
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
@@ -6026,6 +6192,18 @@ export namespace messages {
   export type UserProfileRequest = { [key: string]: any };
   export type _UserProfileServerResponse = any;
   export type UserProfileResponse = types.UserProfileInfo;
+  export type UserProfileStatisticsRequest = { [key: string]: any };
+  export type UserProfileStatisticsResponse = {
+    attempting: number;
+    difficulty: {
+      easy: number;
+      hard: number;
+      medium: number;
+      unlabelled: number;
+    };
+    solved: number;
+    tags: { count: number; name: string }[];
+  };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -6066,6 +6244,12 @@ export namespace messages {
 
 // Controller interfaces
 export namespace controllers {
+  export interface ACL {
+    userOwnedAclReport: (
+      params?: messages.ACLUserOwnedAclReportRequest,
+    ) => Promise<messages.ACLUserOwnedAclReportResponse>;
+  }
+
   export interface Admin {
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
@@ -6109,6 +6293,24 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface CarouselItems {
+    create: (
+      params?: messages.CarouselItemsCreateRequest,
+    ) => Promise<messages.CarouselItemsCreateResponse>;
+    delete: (
+      params?: messages.CarouselItemsDeleteRequest,
+    ) => Promise<messages.CarouselItemsDeleteResponse>;
+    list: (
+      params?: messages.CarouselItemsListRequest,
+    ) => Promise<messages.CarouselItemsListResponse>;
+    listActive: (
+      params?: messages.CarouselItemsListActiveRequest,
+    ) => Promise<messages.CarouselItemsListActiveResponse>;
+    update: (
+      params?: messages.CarouselItemsUpdateRequest,
+    ) => Promise<messages.CarouselItemsUpdateResponse>;
   }
 
   export interface Certificate {
@@ -6603,6 +6805,18 @@ export namespace controllers {
     ) => Promise<messages.ProblemVersionsResponse>;
   }
 
+  export interface ProblemBookmark {
+    exists: (
+      params?: messages.ProblemBookmarkExistsRequest,
+    ) => Promise<messages.ProblemBookmarkExistsResponse>;
+    list: (
+      params?: messages.ProblemBookmarkListRequest,
+    ) => Promise<messages.ProblemBookmarkListResponse>;
+    toggle: (
+      params?: messages.ProblemBookmarkToggleRequest,
+    ) => Promise<messages.ProblemBookmarkToggleResponse>;
+  }
+
   export interface ProblemForfeited {
     getCounts: (
       params?: messages.ProblemForfeitedGetCountsRequest,
@@ -6799,6 +7013,9 @@ export namespace controllers {
     coderOfTheMonthList: (
       params?: messages.UserCoderOfTheMonthListRequest,
     ) => Promise<messages.UserCoderOfTheMonthListResponse>;
+    compare: (
+      params?: messages.UserCompareRequest,
+    ) => Promise<messages.UserCompareResponse>;
     contestStats: (
       params?: messages.UserContestStatsRequest,
     ) => Promise<messages.UserContestStatsResponse>;
@@ -6853,6 +7070,9 @@ export namespace controllers {
     profile: (
       params?: messages.UserProfileRequest,
     ) => Promise<messages.UserProfileResponse>;
+    profileStatistics: (
+      params?: messages.UserProfileStatisticsRequest,
+    ) => Promise<messages.UserProfileStatisticsResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;

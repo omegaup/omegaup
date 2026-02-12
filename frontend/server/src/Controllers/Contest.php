@@ -78,7 +78,8 @@ namespace OmegaUp\Controllers;
 
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
-    const MAX_CONTEST_LENGTH_SECONDS = 2678400; // 31 days
+    const MAX_CONTEST_LENGTH_SECONDS = 60 * 60 * 24 * 31; // 31 days
+    const MAX_CONTEST_LENGTH_SYSADMIN_SECONDS = 60 * 60 * 24 * 60; // 60 days
     const CONTEST_LIST_PAGE_SIZE = 10;
 
     /**
@@ -1898,6 +1899,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User '{$r->identity->username}' joined contest '{$response['contest']->alias}'"
         );
+
+        // Invalidate user compare data cache since contest count changed
+        \OmegaUp\Controllers\User::invalidateUserCompareDataCache(
+            strval($r->identity->username)
+        );
+
         return ['status' => 'ok'];
     }
 
@@ -2835,11 +2842,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contestLength = $finishTime->time - $startTime->time;
         }
 
-        // Validate max contest length
-        if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
+        // Validate max contest length (sys-admins get an extended limit)
+        $isSystemAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
+        $maxContestLength = $isSystemAdmin
+            ? \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SYSADMIN_SECONDS
+            : \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS;
+
+        if ($contestLength > $maxContestLength) {
+            $maxDays = intval($maxContestLength / (60 * 60 * 24)); // Convert seconds to days
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestLengthTooLong',
-                'finish_time'
+                'finish_time',
+                ['max_days' => strval($maxDays)]
             );
         }
 
@@ -5175,7 +5189,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * This function reviews changes in penalty type, admission mode, finish
-     * time and window length to recalcualte information previously stored
+     * time and window length to recalculate information previously stored
      */
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,

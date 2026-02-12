@@ -1,8 +1,40 @@
 <template>
   <div class="root d-flex flex-column h-100" :class="theme">
+    <div class="case-header">
+      <h6 class="case-title mb-0">{{ T.wordsCases }}</h6>
+    </div>
     <div class="summary">
       {{ summary }}
     </div>
+    <form class="case-form" @submit.prevent="createCase()">
+      <div class="input-group">
+        <input
+          v-model="newCaseWeight"
+          class="form-control case-weight"
+          type="number"
+          :placeholder="T.caseSelectorCaseWeight"
+        />
+        <input
+          v-model="newCaseName"
+          class="form-control"
+          type="text"
+          data-case-name
+          :placeholder="T.caseSelectorCaseName"
+        />
+      </div>
+      <button
+        class="btn btn-sm text-nowrap w-100 mt-2"
+        :class="{
+          'btn-primary': theme == 'vs',
+          'btn-secondary': theme == 'vs-dark',
+        }"
+        type="submit"
+        :disabled="!newCaseName.length"
+        data-add-button
+      >
+        {{ T.caseSelectorAddCase }}
+      </button>
+    </form>
     <div class="filenames">
       <div class="list-group">
         <button
@@ -66,36 +98,6 @@
         </template>
       </div>
     </div>
-    <form @submit.prevent="createCase()">
-      <div class="input-group">
-        <input
-          v-model="newCaseWeight"
-          class="form-control case-weight"
-          type="text"
-        />
-        <input
-          v-model="newCaseName"
-          class="form-control"
-          type="text"
-          data-case-name
-        />
-        <div class="input-group-append">
-          <button
-            class="btn"
-            :class="{
-              'btn-primary': theme == 'vs',
-              'btn-secondary': theme == 'vs-dark',
-            }"
-            type="submit"
-            :disabled="!newCaseName.length"
-            data-add-button
-            @click="createCase()"
-          >
-            +
-          </button>
-        </div>
-      </div>
-    </form>
   </div>
 </template>
 
@@ -108,7 +110,7 @@ import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  newCaseWeight: number = 1;
+  newCaseWeight: null | number = null;
   newCaseName: string = '';
   T = T;
 
@@ -212,10 +214,10 @@ export default class CaseSelector extends Vue {
 
     store.dispatch('createCase', {
       name: this.newCaseName,
-      weight: parseFloat(this.newCaseWeight.toString()),
+      weight: this.newCaseWeight ?? 1,
     });
 
-    this.newCaseWeight = 1;
+    this.newCaseWeight = null;
     this.newCaseName = '';
   }
 
@@ -228,13 +230,26 @@ export default class CaseSelector extends Vue {
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
 
+.case-header {
+  padding: 0.5em 0.75em 0;
+  border-bottom: 1px solid $omegaup-grey--lighter;
+}
+
+.case-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  color: $omegaup-grey;
+}
+
+.case-form {
+  padding: 0.5em 0.75em 0.5em;
+  border-bottom: 1px solid $omegaup-grey--lighter;
+}
+
 button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
-}
-
-button[type='submit'] {
-  width: 2em;
 }
 
 div.summary {
@@ -260,8 +275,26 @@ div.filenames {
   flex: 1;
 }
 
-input[type='number'].case-weight {
-  width: 3em;
+.case-weight {
+  flex: 1 1 auto;
+  font-weight: 600;
+  align-items: center;
+  display: flex;
+}
+
+.input-group [data-case-name] {
+  flex: 1 1 auto;
+  font-weight: 500;
+}
+
+.case-form .btn {
+  font-weight: 600;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  font-size: 10px;
+  margin-left: 2px;
 }
 
 .list-group-item-secondary {
@@ -319,6 +352,14 @@ input[type='number'].case-weight {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
   border-color: var(--vs-dark-border-color-medium);
+}
+
+.vs-dark input[type='number']::-webkit-inner-spin-button,
+.vs-dark input[type='number']::-webkit-outer-spin-button {
+  opacity: 0.6;
+  filter: invert(1);
+  font-size: 10px;
+  margin-left: 2px;
 }
 
 .vs-dark .btn-secondary {

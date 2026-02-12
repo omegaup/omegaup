@@ -20,6 +20,22 @@ class ScopedFacebook {
     }
 }
 
+class ScopedGitHub {
+    /** @var \OmegaUp\ScopedSession */
+    public $scopedSession;
+    /** @var \League\OAuth2\Client\Provider\Github */
+    public $github;
+
+    public function __construct() {
+        $this->scopedSession = new \OmegaUp\ScopedSession();
+        $this->github = new \League\OAuth2\Client\Provider\Github([
+            'clientId' => OMEGAUP_GITHUB_CLIENT_ID,
+            'clientSecret' => OMEGAUP_GITHUB_CLIENT_SECRET,
+            'redirectUri' => OMEGAUP_URL . '/login?third_party_login=github',
+        ]);
+    }
+}
+
 /**
  * Session controller handles sessions.
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
@@ -506,7 +522,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $suffix = '';
         for (;;) {
             // Maybe we can bring all records from db
-            // with prefix $username, beacuse this:
+            // with prefix $username, because this:
             $userexists = \OmegaUp\DAO\Users::FindByUsername(
                 "{$username}{$suffix}"
             );
@@ -635,6 +651,162 @@ class Session extends \OmegaUp\Controllers\Controller {
         );
 
         self::redirect();
+    }
+
+    /**
+     * Logs in via GitHub OAuth.
+     *
+     * @psalm-param non-empty-string $code
+     * @psalm-param non-empty-string $state
+     */
+    public static function loginViaGithub(
+        string $code,
+        string $state,
+        ?string $redirect = null
+    ): void {
+        $sessionManager = self::getSessionManagerInstance();
+        $storedState = $sessionManager->getCookie('github_oauth_state');
+        if (is_null($storedState) || $storedState !== $state) {
+            self::$log->error('Invalid GitHub CSRF token');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGitHubInvalidCSRFToken',
+                'state'
+            );
+        }
+
+        $scopedGithub = new ScopedGitHub();
+
+        try {
+            $accessToken = self::exchangeGitHubCodeForToken(
+                $scopedGithub->github,
+                $code
+            );
+            $githubProfile = self::fetchGitHubUserProfile(
+                $scopedGithub->github,
+                $accessToken
+            );
+            $email = self::fetchGitHubUserEmail(
+                $scopedGithub->github,
+                $accessToken
+            );
+        } catch (\OmegaUp\Exceptions\ApiException $apiException) {
+            throw $apiException;
+        } catch (\Exception $exception) {
+            self::$log->error(
+                'Unable to login via GitHub',
+                ['exception' => $exception]
+            );
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGitHubError',
+                'error'
+            );
+        }
+
+        if (empty($email)) {
+            self::$log->error('GitHub email empty');
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGitHubNoEmail',
+                'error'
+            );
+        }
+
+        self::$log->info('User is logged in via GitHub');
+
+        $name = null;
+        if (
+            isset($githubProfile['name']) &&
+            $githubProfile['name'] !== ''
+        ) {
+            $name = strval($githubProfile['name']);
+        } elseif (isset($githubProfile['login'])) {
+            $name = strval($githubProfile['login']);
+        }
+
+        $result = \OmegaUp\Controllers\Session::thirdPartyLogin(
+            'GitHub',
+            strval($email),
+            $name
+        );
+
+        self::redirect($redirect, $result['isAccountCreation']);
+    }
+
+    public static function loginViaGitHubEmail(
+        string $email,
+        ?string $name = null,
+        ?string $redirect = null
+    ): void {
+        $result = self::thirdPartyLogin('GitHub', $email, $name);
+
+        self::redirect($redirect, $result['isAccountCreation']);
+    }
+
+    /**
+     * Wrapper to login with GitHub OAuth callback.
+     *
+     * @omegaup-request-param string $code
+     * @omegaup-request-param null|string $redirect
+     * @omegaup-request-param string $state
+     */
+    public static function loginViaGithubCallback(\OmegaUp\Request $r): void {
+        $code = $r->ensureString('code');
+        $state = $r->ensureString('state');
+        $redirect = $r->ensureOptionalString('redirect');
+
+        /** @psalm-suppress ArgumentTypeCoercion */
+        self::loginViaGithub($code, $state, $redirect);
+    }
+
+    /**
+     * @return \League\OAuth2\Client\Token\AccessTokenInterface
+     */
+    private static function exchangeGitHubCodeForToken(
+        \League\OAuth2\Client\Provider\Github $github,
+        string $code
+    ) {
+        return $github->getAccessToken('authorization_code', [
+            'code' => $code,
+        ]);
+    }
+
+    /**
+     * @return array{login?: string, name?: string}
+     */
+    private static function fetchGitHubUserProfile(
+        \League\OAuth2\Client\Provider\Github $github,
+        \League\OAuth2\Client\Token\AccessTokenInterface $accessToken
+    ): array {
+        // Type assertion to satisfy Psalm's type requirements
+        if (!$accessToken instanceof \League\OAuth2\Client\Token\AccessToken) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginGitHubError',
+                'error'
+            );
+        }
+        /** @var array{login?: string, name?: string} */
+        $profile = $github->getResourceOwner($accessToken)->toArray();
+        return $profile;
+    }
+
+    private static function fetchGitHubUserEmail(
+        \League\OAuth2\Client\Provider\Github $github,
+        \League\OAuth2\Client\Token\AccessTokenInterface $accessToken
+    ): string {
+        $request = $github->getAuthenticatedRequest(
+            'GET',
+            'https://api.github.com/user/emails',
+            $accessToken
+        );
+        /**
+         * @var list<array{email: string, primary: bool, verified: bool}>
+         */
+        $emails = $github->getParsedResponse($request);
+        foreach ($emails as $email) {
+            if (!empty($email['verified']) && !empty($email['primary'])) {
+                return strval($email['email']);
+            }
+        }
+        return '';
     }
 
     private static function getRedirectUrl(?string $url = null): string {

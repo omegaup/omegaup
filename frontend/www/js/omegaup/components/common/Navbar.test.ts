@@ -64,7 +64,8 @@ describe('Navbar.vue', () => {
     expect(wrapper.find('[data-nav-course]').exists()).toBe(true);
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
     expect(wrapper.find('[data-login-button]').exists()).toBe(true);
-    expect(wrapper.find('.navbar-right').text()).toBe(T.navLogIn);
+    expect(wrapper.find('.navbar-right').text()).toContain(T.navbarLogin);
+    expect(wrapper.find('.navbar-right').text()).toContain(T.navbarRegister);
   });
 
   it('Should show objectives modal only when a main user identity is logged', async () => {
