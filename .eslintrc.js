@@ -15,8 +15,7 @@ module.exports = {
     'plugin:jest-dom/recommended',
     // Vue 2 ruleset. Do NOT mix with vue3-* until we migrate.
     'plugin:vue/recommended',
-    // TODO: when migrating to Vue 3, replace the line above with:
-    // 'plugin:vue/vue3-recommended',
+    // TODO: when migrating to Vue 3, replace the line above with vue3-recommended
     'prettier',
     'prettier/@typescript-eslint',
     'prettier/vue',
