@@ -50,10 +50,12 @@ if [ $GIT_PUSH -eq 1 ]; then
 		ARGS="${MERGE_BASE}"
 		echo "Running validations across all files since ${MERGE_BASE}..."
 	fi
-	if [ "$(/usr/bin/git status --porcelain | grep '^ M' | wc -l)" != "0" ]; then
+	UNSTAGED_COUNT="$(/usr/bin/git status --porcelain | grep '^ M' | wc -l | tr -d ' ')"
+	if [ "${UNSTAGED_COUNT}" != "0" ]; then
 		confirm $'\e[31mYou have unstaged files.\e[0m Do you still want to push? [y/N]'
 	fi
-	if [ "$(/usr/bin/git status --porcelain | grep '^\?\?' | wc -l)" != "0" ]; then
+	UNTRACKED_COUNT="$(/usr/bin/git status --porcelain | grep '^\?\?' | wc -l | tr -d ' ')"
+	if [ "${UNTRACKED_COUNT}" != "0" ]; then
 		confirm $'\e[35mYou have untracked files.\e[0m Do you still want to push? [y/N]'
 	fi
 fi
