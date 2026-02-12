@@ -4086,7 +4086,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['student'], 'student');
+        $student = $r->ensureString('student');
 
         $course = self::validateCourseExists($courseAlias);
 
@@ -4098,13 +4098,35 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $student
+        );
+
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
+        if (
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
+                $course->group_id,
+                $resolvedIdentity->identity_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4116,9 +4138,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
-                    'student' => $r['student']
+                    'student' => $student
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleStudentsProgress'
@@ -4159,6 +4180,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $student
         );
 
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
         if (
             !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
@@ -4191,11 +4218,12 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4207,7 +4235,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
                     'student' => $student,
                     'problems' => $problems,
