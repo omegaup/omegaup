@@ -74,4 +74,29 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
 
         return new \OmegaUp\DAO\VO\IdentitiesSchools($rs);
     }
+    public static function getByIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->identity_id)) {
+            return [];
+        }
+
+        $sql = 'SELECT
+                iss.identity_school_id,
+                iss.graduation_date,
+                s.name AS school_name
+            FROM
+                Identities_Schools iss
+            INNER JOIN
+                Schools s ON s.school_id = iss.school_id
+            WHERE
+                iss.identity_id = ?
+            ORDER BY
+                iss.creation_time DESC';
+
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identity->identity_id]
+        );
+    }
 }

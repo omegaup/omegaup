@@ -1657,13 +1657,17 @@ class User extends \OmegaUp\Controllers\Controller {
             $omitRank,
             $category
         );
+        $schoolHistory = \OmegaUp\DAO\IdentitiesSchools::getByIdentity(
+            $identity
+        );
         return array_merge(
             $response,
             [
                 'classname' => \OmegaUp\DAO\Users::getRankingClassName(
                     $identity->user_id
                 ),
-                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
+                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
+                'school_history' => $schoolHistory,
             ]
         );
     }
