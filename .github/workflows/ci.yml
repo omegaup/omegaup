@@ -13,7 +13,25 @@ concurrency:
 
 jobs:
   verify-action-hashes:
-    uses: ./.github/workflows/verify-action-hashes.yml
+    name: Verify Action Hashes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+
+      - name: Install jq
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run verification
+        run: |
+          ./hack/gha-reversemap.sh verify-mapusage
 
   php:
     runs-on: ubuntu-22.04
