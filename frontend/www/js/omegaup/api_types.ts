@@ -1607,6 +1607,22 @@ export namespace types {
       );
     }
 
+    export function GSoCEditionListPayload(
+      elementId: string = 'payload',
+    ): types.GSoCEditionListPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function GSoCIdeaListPayload(
+      elementId: string = 'payload',
+    ): types.GSoCIdeaListPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -3803,6 +3819,40 @@ export namespace types {
     preferredLanguage?: string;
   }
 
+  export interface GSoCEdition {
+    application_deadline?: string;
+    created_at: string;
+    edition_id: number;
+    is_active: boolean;
+    updated_at: string;
+    year: number;
+  }
+
+  export interface GSoCEditionListPayload {
+    editions: types.GSoCEdition[];
+  }
+
+  export interface GSoCIdea {
+    blog_link?: string;
+    brief_description?: string;
+    contributor_username?: string;
+    created_at: string;
+    edition_id: number;
+    estimated_hours?: number;
+    expected_results?: string;
+    idea_id: number;
+    possible_mentors?: string;
+    preferred_skills?: string;
+    skill_level?: string;
+    status: string;
+    title: string;
+    updated_at: string;
+  }
+
+  export interface GSoCIdeaListPayload {
+    ideas: types.GSoCIdea[];
+  }
+
   export interface GraderStatus {
     broadcaster_sockets: number;
     embedded_runner: boolean;
@@ -5680,6 +5730,22 @@ export namespace messages {
   export type CourseUpdateProblemsOrderRequest = { [key: string]: any };
   export type CourseUpdateProblemsOrderResponse = {};
 
+  // GSoC
+  export type GSoCCreateEditionRequest = { [key: string]: any };
+  export type GSoCCreateEditionResponse = { edition_id: number };
+  export type GSoCCreateIdeaRequest = { [key: string]: any };
+  export type GSoCCreateIdeaResponse = { idea_id: number };
+  export type GSoCDeleteIdeaRequest = { [key: string]: any };
+  export type GSoCDeleteIdeaResponse = { deleted: boolean };
+  export type GSoCListEditionsRequest = { [key: string]: any };
+  export type GSoCListEditionsResponse = types.GSoCEditionListPayload;
+  export type GSoCListIdeasRequest = { [key: string]: any };
+  export type GSoCListIdeasResponse = types.GSoCIdeaListPayload;
+  export type GSoCUpdateEditionRequest = { [key: string]: any };
+  export type GSoCUpdateEditionResponse = { updated: boolean };
+  export type GSoCUpdateIdeaRequest = { [key: string]: any };
+  export type GSoCUpdateIdeaResponse = { updated: boolean };
+
   // Grader
   export type GraderStatusRequest = { [key: string]: any };
   export type GraderStatusResponse = { grader: types.GraderStatus };
@@ -6623,6 +6689,30 @@ export namespace controllers {
     updateProblemsOrder: (
       params?: messages.CourseUpdateProblemsOrderRequest,
     ) => Promise<messages.CourseUpdateProblemsOrderResponse>;
+  }
+
+  export interface GSoC {
+    createEdition: (
+      params?: messages.GSoCCreateEditionRequest,
+    ) => Promise<messages.GSoCCreateEditionResponse>;
+    createIdea: (
+      params?: messages.GSoCCreateIdeaRequest,
+    ) => Promise<messages.GSoCCreateIdeaResponse>;
+    deleteIdea: (
+      params?: messages.GSoCDeleteIdeaRequest,
+    ) => Promise<messages.GSoCDeleteIdeaResponse>;
+    listEditions: (
+      params?: messages.GSoCListEditionsRequest,
+    ) => Promise<messages.GSoCListEditionsResponse>;
+    listIdeas: (
+      params?: messages.GSoCListIdeasRequest,
+    ) => Promise<messages.GSoCListIdeasResponse>;
+    updateEdition: (
+      params?: messages.GSoCUpdateEditionRequest,
+    ) => Promise<messages.GSoCUpdateEditionResponse>;
+    updateIdea: (
+      params?: messages.GSoCUpdateIdeaRequest,
+    ) => Promise<messages.GSoCUpdateIdeaResponse>;
   }
 
   export interface Grader {
