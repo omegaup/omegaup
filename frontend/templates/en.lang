@@ -911,7 +911,6 @@ maintenanceModeMessagePlaceholder = "Enter the message that users will see durin
 maintenanceModeTemplateCustomOption = "Other"
 maintenanceModeTemplateSelectPlaceholder = "Choose one option"
 maintenanceModeTitle = "Maintenance Mode"
-maintenanceModeType = "Alert type"
 maintenanceModeTypeError = "Error"
 maintenanceModeTypeInfo = "Announcement"
 maintenanceModeTypeWarning = "Warning"

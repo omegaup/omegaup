@@ -913,7 +913,6 @@ const translations: { [key: string]: string; } = {
   maintenanceModeTemplateCustomOption: "(O7h3r)",
   maintenanceModeTemplateSelectPlaceholder: "(Ch0053 0n3 0p7i0n)",
   maintenanceModeTitle: "(Main73nanc3 M0d3)",
-  maintenanceModeType: "(A13r7 7yp3)",
   maintenanceModeTypeError: "(Err0r)",
   maintenanceModeTypeInfo: "(Ann0unc3m3n7)",
   maintenanceModeTypeWarning: "(Warning)",

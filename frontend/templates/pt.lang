@@ -911,7 +911,6 @@ maintenanceModeMessagePlaceholder = "Digite a mensagem que os usuários verão d
 maintenanceModeTemplateCustomOption = "Outro"
 maintenanceModeTemplateSelectPlaceholder = "Escolha uma opção"
 maintenanceModeTitle = "Modo de Manutenção"
-maintenanceModeType = "Tipo de alerta"
 maintenanceModeTypeError = "Erro"
 maintenanceModeTypeInfo = "Anúncio"
 maintenanceModeTypeWarning = "Aviso"
