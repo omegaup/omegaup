@@ -1246,6 +1246,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
         );
 
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
+
         return [
             'status' => 'ok',
         ];
@@ -1402,6 +1406,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         return [
             'status' => 'ok',
@@ -1952,6 +1960,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         return [
             'status' => 'ok',
@@ -2606,6 +2618,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
+
         return [
             'status' => 'ok',
         ];
@@ -2700,6 +2716,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
         ]));
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         return [
             'status' => 'ok',
@@ -6165,7 +6185,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
-        // TODO: Expire cache
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
