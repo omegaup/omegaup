@@ -83,7 +83,7 @@ class RateLimiter {
         try {
             $current = $cache->get();
 
-            if ($current !== null && intval($current) >= $limit) {
+            if (!is_null($current) && intval($current) >= $limit) {
                 throw new \OmegaUp\Exceptions\RateLimitExceededException(
                     'contentCreationRateLimitExceeded'
                 );
@@ -91,7 +91,7 @@ class RateLimiter {
 
             // Increment the counter (or initialize to 1).
             $cache->set(
-                $current === null ? 1 : intval($current) + 1,
+                is_null($current) ? 1 : intval($current) + 1,
                 self::KEY_TTL_SECONDS
             );
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {

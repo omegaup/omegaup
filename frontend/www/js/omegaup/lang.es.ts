@@ -291,6 +291,7 @@ const translations: { [key: string]: string; } = {
   compareUserNotFound: "Coder no encontrado",
   compareUsersTitle: "Comparar Coders",
   compareVsMe: "Comparar contra m\u00ed",
+  contentCreationRateLimitExceeded: "Has excedido el n\u00famero m\u00e1ximo de creaciones permitidas por hora. Por favor, int\u00e9ntalo de nuevo m\u00e1s tarde.",
   contentCreator: "Contribuidor",
   contentOrderUpdated: "El orden del contenido se ha actualizado",
   contestAddUserContestant: "Concursante",
