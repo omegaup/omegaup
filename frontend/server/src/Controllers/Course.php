@@ -796,7 +796,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visibility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -2909,7 +2909,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -4066,7 +4066,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['student'], 'student');
+        $student = $r->ensureString('student');
 
         $course = self::validateCourseExists($courseAlias);
 
@@ -4078,13 +4078,35 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $student
+        );
+
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
+        if (
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
+                $course->group_id,
+                $resolvedIdentity->identity_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4096,9 +4118,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
-                    'student' => $r['student']
+                    'student' => $student
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleStudentsProgress'
@@ -4139,6 +4160,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $student
         );
 
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
         if (
             !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
@@ -4171,11 +4198,12 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4187,7 +4215,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
                     'student' => $student,
                     'problems' => $problems,
@@ -5538,7 +5565,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates and authenticate token for operations when user can be logged
      * in or not. This is the only private function that receives Request as a
-     * parameter because it needs authenticate it wheter there is no token.
+     * parameter because it needs authenticate it whether there is no token.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -5604,7 +5631,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // hasToken is true, it means we do not autenticate request user
+        // hasToken is true, it means we do not authenticate request user
         return [
             'courseAdmin' => $courseAdmin,
             'hasToken' => true,

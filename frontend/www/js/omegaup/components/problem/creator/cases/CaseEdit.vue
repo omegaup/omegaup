@@ -125,14 +125,19 @@
     <hr class="border-top my-2" />
     <div>
       <table class="table">
-        <tbody>
-          <tr v-for="line in getLinesFromSelectedCase">
+        <draggable
+          v-model="lines"
+          tag="tbody"
+          :animation="200"
+          handle=".drag-handle"
+        >
+          <tr v-for="line in lines" :key="line.lineID">
             <td>
               <b-container fluid class="bg-light">
                 <b-row class="d-flex justify-content-between" align-v="center">
                   <b-col cols="1">
                     <b-button
-                      class="btn btn-link"
+                      class="btn btn-link drag-handle"
                       type="button"
                       :title="T.problemCreatorLinesReorder"
                       variant="light"
@@ -405,6 +410,8 @@
               </b-container>
             </td>
           </tr>
+        </draggable>
+        <tbody>
           <tr>
             <td>
               <b-container fluid class="bg-light">
@@ -487,6 +494,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { BNavItemDropdown, FormInputPlugin, ModalPlugin } from 'bootstrap-vue';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import draggable from 'vuedraggable';
 library.add(fas);
 Vue.use(FormInputPlugin);
 Vue.use(ModalPlugin);
@@ -499,6 +507,7 @@ const casesStore = namespace('casesStore');
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    draggable: draggable,
   },
 })
 export default class CaseEdit extends Vue {
@@ -539,6 +548,7 @@ export default class CaseEdit extends Vue {
   getStringifiedLinesFromCaseGroupID!: (caseGroupID: CaseGroupID) => string;
 
   @casesStore.Action('addNewLine') addNewLine!: () => void;
+  @casesStore.Action('setLines') setLines!: (lines: CaseLine[]) => void;
   @casesStore.Action('deleteLine') deleteLine!: (line: LineID) => void;
   @casesStore.Action('deleteLinesForSelectedCase')
   deleteLinesForSelectedCase!: () => void;
@@ -572,6 +582,14 @@ export default class CaseEdit extends Vue {
         return this.EditIconDisplayOption.EDIT_ICON;
       }
     };
+  }
+
+  get lines(): CaseLine[] {
+    return this.getLinesFromSelectedCase;
+  }
+
+  set lines(newLines: CaseLine[]) {
+    this.setLines(newLines);
   }
 
   lineKindOptions: {

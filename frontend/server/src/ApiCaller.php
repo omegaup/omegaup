@@ -186,15 +186,52 @@ class ApiCaller {
     }
 
     /**
+     * Returns whether the API method is state-changing (requires POST, not GET).
+     * Method name is lowercased and matched by substring against $mutatingPatterns;
+     * if a read-only method's name matches (e.g. listAssociatedIdentities has "associate"),
+     * add its lowercase name to $readOnlyAllowlist so GET is still allowed.
+     *
+     * @param string $methodName The method name (e.g. "Update", "Create").
+     * @return bool True if the method is considered mutating.
+     */
+    private static function isMutatingMethod(string $methodName): bool {
+        $lower = strtolower($methodName);
+
+        $readOnlyAllowlist = [
+            'listassociatedidentities',
+            'statusverified',
+        ];
+        if (in_array($lower, $readOnlyAllowlist, true)) {
+            return false;
+        }
+
+        $mutatingPatterns = [
+            'add', 'arbitrate', 'archive', 'associate', 'bulkcreate',
+            'change', 'confirm', 'create', 'delete', 'disqualify',
+            'execute', 'expire', 'forfeit', 'generate', 'invalidate',
+            'login', 'logout', 'read', 'refresh', 'register',
+            'rejudge', 'remove', 'requalify', 'resolve', 'revoke',
+            'select', 'set', 'toggle', 'update', 'verify',
+        ];
+        foreach ($mutatingPatterns as $pattern) {
+            if (str_contains($lower, $pattern)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Parses the URI from $_SERVER and determines which controller and
      * function to call in order to build a Request object.
      *
      * @return \OmegaUp\Request
      * @throws \OmegaUp\Exceptions\NotFoundException
+     * @throws \OmegaUp\Exceptions\MethodNotAllowedException
      */
     private static function createRequest() {
         $apiAsUrl = \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/';
-        // Spliting only by '/' results in URIs with parameters like this:
+        // Splitting only by '/' results in URIs with parameters like this:
         //      /api/problem/list/?page=1
         //                       ^^
         // Adding '?' as a separator results in URIs like this:
@@ -238,6 +275,18 @@ class ApiCaller {
                 "Method name was not found: {$controllerFqdn}::{$apiMethodName}"
             );
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
+        }
+
+        // Reject GET for mutating endpoints
+        $requestMethod = \OmegaUp\Request::getServerVar('REQUEST_METHOD');
+        if (
+            !is_null($requestMethod) &&
+            strtoupper($requestMethod) === 'GET' &&
+            self::isMutatingMethod($methodName)
+        ) {
+            throw new \OmegaUp\Exceptions\MethodNotAllowedException(
+                'methodNotAllowed'
+            );
         }
 
         // Get the auth_token and user data from cookies

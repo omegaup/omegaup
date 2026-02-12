@@ -403,28 +403,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  TabsPlugin,
 } from 'bootstrap-vue';
+import infiniteScroll from 'vue-infinite-scroll';
 import ContestCard from './ContestCard.vue';
 import ContestSkeleton from './ContestSkeleton.vue';
-import infiniteScroll from 'vue-infinite-scroll';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
@@ -459,6 +459,7 @@ export interface UrlParams {
   query: string;
   sort_order: ContestOrder;
   filter: ContestFilter;
+  replaceState?: boolean; // When true, use replaceState instead of pushState (for browser navigation)
 }
 
 @Component({
@@ -495,6 +496,9 @@ class ArenaContestList extends Vue {
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
+  // Flag to track if state change came from browser navigation (back/forward button)
+  // When true, we should use replaceState instead of pushState to avoid corrupting history
+  isFromBrowserNavigation: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -508,28 +512,6 @@ class ArenaContestList extends Vue {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
-      tab_name:
-        (urlObj.searchParams.get('tab_name') as ContestTab) ||
-        ContestTab.Current,
-      query: this.currentQuery,
-      sort_order:
-        (urlObj.searchParams.get('sort_order') as ContestOrder) ||
-        ContestOrder.None,
-      filter:
-        (urlObj.searchParams.get('filter') as ContestFilter) ||
-        ContestFilter.All,
-    };
-    this.currentPage = 1;
-    this.hasMore = true;
-    this.fetchPage(params, urlObj);
-  }
-  onReset() {
-    this.currentQuery = '';
-  }
-  fetchInitialContests() {
-    const urlObj = new URL(window.location.href);
-    const params: UrlParams = {
-      page: 1,
       tab_name: this.currentTab,
       query: this.currentQuery,
       sort_order: this.currentOrder,
@@ -539,6 +521,28 @@ class ArenaContestList extends Vue {
     Vue.set(this.contests, this.currentTab, []);
     this.currentPage = 1;
     this.hasMore = true;
+    this.fetchPage(params, urlObj);
+  }
+  onReset() {
+    this.currentQuery = '';
+    this.onSearchQuery();
+  }
+  fetchInitialContests() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
+      replaceState: this.isFromBrowserNavigation,
+    };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
+    this.currentPage = 1;
+    this.hasMore = true;
+    // Reset the navigation flag after using it
+    this.isFromBrowserNavigation = false;
     this.fetchPage(params, urlObj);
   }
   mounted() {
@@ -660,6 +664,34 @@ class ArenaContestList extends Vue {
     if (!this.contestList) return true;
     return this.contestList.length === 0;
   }
+
+  // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
+  // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
+  @Watch('tab')
+  onTabPropChanged(newValue: ContestTab) {
+    this.isFromBrowserNavigation = true;
+    this.currentTab = newValue;
+  }
+
+  @Watch('sortOrder')
+  onSortOrderPropChanged(newValue: ContestOrder) {
+    this.isFromBrowserNavigation = true;
+    this.currentOrder = newValue;
+  }
+
+  @Watch('filter')
+  onFilterPropChanged(newValue: ContestFilter) {
+    this.isFromBrowserNavigation = true;
+    this.currentFilter = newValue;
+  }
+
+  @Watch('page')
+  onPagePropChanged(newValue: number) {
+    this.isFromBrowserNavigation = true;
+    this.currentPage = newValue;
+  }
+
+  // Watchers for internal state - fetch data when user interacts with UI
   @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
     if (typeof oldValue === 'undefined') return;
