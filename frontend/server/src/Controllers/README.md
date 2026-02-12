@@ -347,13 +347,13 @@ Set maintenance mode
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `enabled`    | `null\|bool`   |             |
-| `message_en` | `null\|string` |             |
-| `message_es` | `null\|string` |             |
-| `message_pt` | `null\|string` |             |
-| `type`       | `null\|string` |             |
+| Name         | Type           | Description | Required |
+| ------------ | -------------- | ----------- | -------- |
+| `enabled`    | `null\|bool`   |             |          |
+| `message_en` | `null\|string` |             |          |
+| `message_es` | `null\|string` |             |          |
+| `message_pt` | `null\|string` |             |          |
+| `type`       | `null\|string` |             |          |
 
 ### Returns
 

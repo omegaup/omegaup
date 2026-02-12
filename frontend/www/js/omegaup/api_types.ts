@@ -3110,6 +3110,7 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    maintenanceMessage?: types.MaintenanceMessage;
     mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
@@ -4013,6 +4014,11 @@ export namespace types {
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
+  }
+
+  export interface MaintenanceMessage {
+    message: string;
+    type: string;
   }
 
   export interface MaintenanceModeStatus {

@@ -56,11 +56,6 @@
       {% if fullWidth %}
       <div class="container-lg px-3 px-md-5 pt-3">
       {% endif %}
-      {% if OMEGAUP_MAINTENANCE %}
-        <div id="announcement" class="alert alert-{{ OMEGAUP_MAINTENANCE.type }} mt-0">
-          {{ OMEGAUP_MAINTENANCE.message|raw }}
-        </div>
-      {% endif %}
       {% if fullWidth %}
       </div>
       {% endif %}

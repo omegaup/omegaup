@@ -5,6 +5,7 @@
  /**
   * Admin Controller
   *
+  * @psalm-type MaintenanceMessage=array{message: string, type: string}
   * @psalm-type MaintenanceModeStatus=array{enabled: bool, message_es: null|string, message_en: null|string, message_pt: null|string, type: string}
   */
 class Admin extends \OmegaUp\Controllers\Controller {
@@ -136,20 +137,20 @@ class Admin extends \OmegaUp\Controllers\Controller {
             self::MAINTENANCE_MESSAGE_TYPE_KEY
         );
         if ($enabled) {
-            $cacheEnabled->set(true, 0); // No expiration
+            $cacheEnabled->set(value: true, timeout: 0); // No expiration
             $cacheMessageEs->set($messageEs, timeout: 0);
             $cacheMessageEn->set($messageEn, timeout: 0);
-            $cacheMessagePt->set($messagePt, 0);
+            $cacheMessagePt->set($messagePt, timeout: 0);
 
             // Store the index, not the string value
             $typeIndex = array_search(
                 $type,
                 self::MAINTENANCE_MESSAGE_TYPES,
-                true
+                strict: true
             );
             $cacheMessageType->set(
                 $typeIndex !== false ? $typeIndex : self::INFO,
-                0
+                timeout: 0
             );
         } else {
             $cacheEnabled->delete();
@@ -241,7 +242,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
      * Get maintenance message for public display in specific language
      *
      * @param null|string $lang Language code (es, en, pt). If null, defaults to Spanish.
-     * @return null|array{message: string, type: string}
+     * @return null|MaintenanceMessage
      */
     public static function getMaintenanceMessage(?string $lang = null): ?array {
         $status = self::getMaintenanceModeStatus();
