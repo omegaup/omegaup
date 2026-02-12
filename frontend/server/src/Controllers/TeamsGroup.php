@@ -235,6 +235,20 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentityIsOver13();
 
+        // Rate limit: 5 teams group creations per hour per user.
+        // System admins are exempt.
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            )
+        ) {
+            \OmegaUp\RateLimiter::assertWithinLimit(
+                'TeamsGroup::apiCreate',
+                $r->identity->identity_id,
+                5
+            );
+        }
+
         $teamGroupAlias = $r->ensureString(
             'alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)

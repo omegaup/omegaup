@@ -134,6 +134,20 @@ class School extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
+        // Rate limit: 5 school creations per hour per user.
+        // System admins are exempt.
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin(
+                $r->identity
+            )
+        ) {
+            \OmegaUp\RateLimiter::assertWithinLimit(
+                'School::apiCreate',
+                $r->identity->identity_id,
+                5
+            );
+        }
+
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['country_id'],
