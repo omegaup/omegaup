@@ -87,21 +87,21 @@
           <div class="col-sm-8 text-center">
             <button
               data-ban-problem-button
-              class="btn btn-danger"
+              class="btn btn-danger mx-1"
               :disabled="!rationale"
               @click="showConfirmationDialog('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
-              class="btn btn-success"
+              class="btn btn-success mx-1"
               :disabled="!rationale"
               @click="showConfirmationDialog('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
-              class="btn btn-warning"
+              class="btn btn-warning mx-1"
               :disabled="!rationale"
               @click="showConfirmationDialog('warning')"
             >
