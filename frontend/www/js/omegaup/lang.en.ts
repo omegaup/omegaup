@@ -882,7 +882,7 @@ const translations: { [key: string]: string; } = {
   loginDateOfBirth: "Date of birth",
   loginDisabled: "Your account has been inactive for a long time and has been disabled for your security. Please contact soporte@omegaup.com to login again.",
   loginEmail: "E-mail address",
-  loginEmailUsername: "E-mail or username",
+  loginEmailUsername: "E-mail or user",
   loginFacebookEmptyEmailError: "An email address is needed to use omegaUp. Please grant access to Facebook's email to continue",
   loginFederated: "Login using these sites",
   loginGitHubError: "Failed to sign in with GitHub",
@@ -892,7 +892,7 @@ const translations: { [key: string]: string; } = {
   loginGoogleInvalidCSRFToken: "Invalid CSRF token",
   loginHeader: "Login to omegaUp",
   loginLogIn: "Log in",
-  loginNative: "Login with an omegaUp account",
+  loginNative: "omegaUp account",
   loginParentEmail: "Parent e-mail address",
   loginPassword: "Password",
   loginPasswordCreate: "Password (Min. 8 characters)",
@@ -2268,4 +2268,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export { translations as default };
+export {translations as default};
