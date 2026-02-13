@@ -59,7 +59,7 @@ OmegaUp.on('ready', () => {
                     resolve(data.school_id);
                   })
                   .catch((error) => {
-                    ui.apiError({ error: error.message });
+                    ui.apiError(error);
                   });
               } else {
                 reject(new Error(T.schoolNotSelected));
@@ -77,12 +77,12 @@ OmegaUp.on('ready', () => {
                     );
                   })
                   .catch((error) => {
-                    ui.apiError({ error: error.message });
+                    ui.apiError(error);
                     this.invalidParameterName = error.parameter || '';
                   });
               })
               .catch((error) => {
-                ui.apiError({ error: error.message });
+                ui.apiError(error);
               });
           },
           cancel: () => {
