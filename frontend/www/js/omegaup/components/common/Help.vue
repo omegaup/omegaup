@@ -4,35 +4,37 @@
       <div class="card-body">
         <h1 class="mb-3">{{ T.omegaupTitleHelp }}</h1>
         <p class="text-muted">{{ T.helpWelcomeMessage }}</p>
-      </div>
-    </div>
 
-    <div class="row">
-      <div
-        v-for="resource in helpResources"
-        :key="resource.name"
-        class="col-md-4 mb-4"
-      >
-        <div class="card h-100">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ getResourceLabel(resource.name) }}</h5>
-            <p class="card-text text-muted flex-grow-1">
-              {{ getResourceDescription(resource.name) }}
-            </p>
-            <a
-              :href="resource.url"
-              :target="resource.external ? '_blank' : '_self'"
-              :rel="resource.external ? 'noopener noreferrer' : ''"
-              class="btn btn-primary"
-            >
-              {{ T.helpVisit }}
-              <font-awesome-icon
-                v-if="resource.external"
-                :icon="['fas', 'external-link-alt']"
-                class="ml-1"
-                size="xs"
-              />
-            </a>
+        <div class="row">
+          <div
+            v-for="resource in helpResources"
+            :key="resource.name"
+            class="col-md-4 mb-4"
+          >
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                  {{ getResourceLabel(resource.name) }}
+                </h5>
+                <p class="card-text text-muted flex-grow-1">
+                  {{ getResourceDescription(resource.name) }}
+                </p>
+                <a
+                  :href="resource.url"
+                  :target="resource.external ? '_blank' : '_self'"
+                  :rel="resource.external ? 'noopener noreferrer' : ''"
+                  class="btn btn-primary"
+                >
+                  {{ T.helpVisit }}
+                  <font-awesome-icon
+                    v-if="resource.external"
+                    :icon="['fas', 'external-link-alt']"
+                    class="ml-1"
+                    size="xs"
+                  />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
