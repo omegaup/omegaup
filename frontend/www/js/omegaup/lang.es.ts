@@ -882,7 +882,7 @@ const translations: { [key: string]: string; } = {
   loginDateOfBirth: "Fecha de nacimiento",
   loginDisabled: "Tu cuenta ha estado inactiva por mucho tiempo y por tu seguridad ha sido deshabilitada. Para ingresar de nuevo contacta a soporte@omegaup.com",
   loginEmail: "E-mail",
-  loginEmailUsername: "E-mail o nombre de cuenta",
+  loginEmailUsername: "Nombre de usuario o correo electrónico",
   loginFacebookEmptyEmailError: "Se necesita acceso a tu direcci\u00f3n de correo para utilizar omegaUp. Por favor permite el acceso a tu correo de Facebook para continuar.",
   loginFederated: "Cuenta en otros sitios",
   loginGitHubError: "Error al iniciar sesi\u00f3n con GitHub",
@@ -891,8 +891,8 @@ const translations: { [key: string]: string; } = {
   loginGithub: "Iniciar sesi\u00f3n con GitHub",
   loginGoogleInvalidCSRFToken: "Token CSRF inv\u00e1lido",
   loginHeader: "Inicia sesi\u00f3n en omegaUp",
-  loginLogIn: "Iniciar sesi\u00f3n",
-  loginNative: "Cuenta omegaUp",
+  loginLogIn: "Ingresar",
+  loginNative: "Ingresar con una cuenta de omegaUp",
   loginParentEmail: "Correo electr\u00f3nico de figura parental",
   loginPassword: "Contrase\u00f1a",
   loginPasswordCreate: "Contrase\u00f1a (Min. 8 caracteres)",
@@ -2268,4 +2268,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Preparar archivo zip",
 };
 
-export {translations as default};
+export { translations as default };
