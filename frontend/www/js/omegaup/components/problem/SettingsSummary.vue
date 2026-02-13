@@ -7,6 +7,7 @@
           v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge.png"
           :title="T.wordsHighQualityProblem"
+          :alt="T.wordsHighQualityProblem"
           class="mr-2"
         />
         <font-awesome-icon
