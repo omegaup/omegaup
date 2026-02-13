@@ -56,7 +56,7 @@
           class="form-control form-control-sm mr-sm-2"
           data-language-select
         >
-          <optgroup :label="T.detectLanguage">
+          <optgroup v-if="languages.length > 1" :label="T.detectLanguage">
             <option value="auto-detect">{{ T.detectLanguage }}</option>
           </optgroup>
           <optgroup :label="T.settingsLanguage">
