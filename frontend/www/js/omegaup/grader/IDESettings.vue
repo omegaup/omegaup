@@ -91,6 +91,19 @@
       </div>
     </div>
     <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="autoDetectToggle">{{ T.detectLanguage }}</label>
+        <div>
+          <input
+            id="autoDetectToggle"
+            v-model="autoDetectLanguage"
+            type="checkbox"
+            @change="onAutoDetectChanged"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
       <div class="form-group col-md-4">
         <label for="inputInteractive">{{ T.settingsInteractive }}</label>
         <omegaup-radio-switch
@@ -134,6 +147,33 @@ export default class IDESettings extends Vue {
   @Prop({ required: true }) storeMapping!: { [key: string]: any };
 
   T = T;
+
+  autoDetectLanguage: boolean = true;
+
+  mounted(): void {
+    try {
+      const pref = localStorage.getItem('grader:autoDetectLanguage');
+      if (pref !== null) this.autoDetectLanguage = pref === 'true';
+    } catch (e) {
+      // ignore
+    }
+    this.emitAutoDetectPreference();
+  }
+
+  onAutoDetectChanged(): void {
+    try {
+      localStorage.setItem('grader:autoDetectLanguage', this.autoDetectLanguage ? 'true' : 'false');
+    } catch (e) {
+      // ignore
+    }
+    this.emitAutoDetectPreference();
+  }
+
+  emitAutoDetectPreference(): void {
+    window.dispatchEvent(new CustomEvent('grader:auto-detect-preference', {
+      detail: this.autoDetectLanguage
+    }));
+  }
 
   get theme(): string {
     return store.getters['theme'];
