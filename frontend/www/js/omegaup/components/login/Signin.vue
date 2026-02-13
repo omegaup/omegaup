@@ -121,7 +121,7 @@ export default class Signin extends Vue {
 }
 
 .nav-link {
-  color: #007bff;
+  color: #6c757d;
   background-color: #fff;
   border: 1px solid var(--signin-nav-tabs-border-color);
   border-bottom: none;
