@@ -63,7 +63,7 @@ def _check_mutually_exclusive_schema_modifications(
 
 def get_modified_files(root: str) -> Set[str]:
     '''Get the list of modified files in the current commit.'''
-    merge_base = subprocess.run(
+    upstream_branch = subprocess.run(
         [
             '/usr/bin/git',
             'rev-parse',
@@ -76,6 +76,21 @@ def get_modified_files(root: str) -> Set[str]:
         stdout=subprocess.PIPE,
         cwd=root,
     ).stdout.strip() or 'origin/main'
+    
+    # Compute the merge-base between HEAD and upstream branch
+    merge_base = subprocess.run(
+        [
+            '/usr/bin/git',
+            'merge-base',
+            'HEAD',
+            upstream_branch,
+        ],
+        check=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        cwd=root,
+    ).stdout.strip()
+    
     return set(
         filename.decode('utf-8') for filename in subprocess.run(
             [
