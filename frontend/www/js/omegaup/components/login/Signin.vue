@@ -141,9 +141,9 @@ export default class Signin extends Vue {
 }
 
 .nav-link.active {
-  color: #212529;
-  background-color: #e9ecef;
-  border-color: #dee2e6;
+  color: #fff !important;
+  background-color: #212529 !important;
+  border-color: #212529;
   position: relative;
   z-index: 1;
 }
