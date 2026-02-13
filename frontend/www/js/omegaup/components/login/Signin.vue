@@ -121,7 +121,7 @@ export default class Signin extends Vue {
 }
 
 .nav-link {
-  color: #6c757d !important;
+  color: #007bff;
   background-color: #fff;
   border: 1px solid var(--signin-nav-tabs-border-color);
   border-bottom: none;
@@ -136,14 +136,14 @@ export default class Signin extends Vue {
 }
 
 .nav-link:hover {
-  background-color: #f8f9fa;
-  color: #495057 !important;
+  background-color: var(--signin-nav-link-hover-background-color);
+  color: var(--signin-nav-link-hover-color);
 }
 
 .nav-link.active {
-  color: #fff !important;
-  background-color: #212529 !important;
-  border-color: #212529;
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
   position: relative;
   z-index: 1;
 }
