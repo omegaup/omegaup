@@ -167,6 +167,7 @@ bannerVerifyAccount = "Es necesario que tu padre o tutor apruebe tu cuenta en un
 banningDeclinedByReviewer = "Suspensión denegada por juez."
 banningProblemDueToReport = "Suspendiendo problema por reporte de una cuenta."
 birthdayInTheFuture = "No tienes edad suficiente para usar omegaUp"
+bookmarkedProblems = "Problemas marcados"
 bulkOperationError = "Hubo un error al ejecutar la operación"
 bulkUserAddError = "Se produjo un error al agregar las cuentas. Los siguientes nombres o correos electrónicos no se encontraron en omegaUp:<br><br><b>%(userEmail)</b>.<br><br>Sin embargo, el resto de cuentas se han agregado correctamente."
 bulkUserAddSuccess = "Cuentas exitosamente agregadas."
