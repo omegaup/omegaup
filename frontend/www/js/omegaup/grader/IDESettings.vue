@@ -92,10 +92,9 @@
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <label for="autoDetectToggle">{{ T.detectLanguage }}</label>
+        <label>{{ T.detectLanguage }}</label>
         <div>
           <input
-            id="autoDetectToggle"
             v-model="autoDetectLanguage"
             type="checkbox"
             @change="onAutoDetectChanged"
@@ -162,7 +161,10 @@ export default class IDESettings extends Vue {
 
   onAutoDetectChanged(): void {
     try {
-      localStorage.setItem('grader:autoDetectLanguage', this.autoDetectLanguage ? 'true' : 'false');
+      localStorage.setItem(
+        'grader:autoDetectLanguage',
+        this.autoDetectLanguage ? 'true' : 'false',
+      );
     } catch (e) {
       // ignore
     }
@@ -170,9 +172,11 @@ export default class IDESettings extends Vue {
   }
 
   emitAutoDetectPreference(): void {
-    window.dispatchEvent(new CustomEvent('grader:auto-detect-preference', {
-      detail: this.autoDetectLanguage
-    }));
+    window.dispatchEvent(
+      new CustomEvent('grader:auto-detect-preference', {
+        detail: this.autoDetectLanguage,
+      }),
+    );
   }
 
   get theme(): string {
