@@ -30,6 +30,11 @@
   - [`/api/clarification/create/`](#apiclarificationcreate)
   - [`/api/clarification/details/`](#apiclarificationdetails)
   - [`/api/clarification/update/`](#apiclarificationupdate)
+- [CodeTemplate](#codetemplate)
+  - [`/api/codeTemplate/create/`](#apicodetemplatecreate)
+  - [`/api/codeTemplate/delete/`](#apicodetemplatedelete)
+  - [`/api/codeTemplate/list/`](#apicodetemplatelist)
+  - [`/api/codeTemplate/update/`](#apicodetemplateupdate)
 - [Contest](#contest)
   - [`/api/contest/activityReport/`](#apicontestactivityreport)
   - [`/api/contest/addAdmin/`](#apicontestaddadmin)
@@ -761,6 +766,79 @@ Update a clarification
 | `answer`           | `null\|string` |             |          |
 | `message`          | `null\|string` |             |          |
 | `public`           | `bool\|null`   |             |          |
+
+### Returns
+
+_Nothing_
+
+# CodeTemplate
+
+CodeTemplateController
+
+## `/api/codeTemplate/create/`
+
+### Description
+
+Create or update a code template
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `code`          | `string` |             | ✓        |
+| `language`      | `string` |             | ✓        |
+| `template_name` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/codeTemplate/delete/`
+
+### Description
+
+Delete a code template
+
+### Parameters
+
+| Name          | Type  | Description | Required |
+| ------------- | ----- | ----------- | -------- |
+| `template_id` | `int` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/codeTemplate/list/`
+
+### Description
+
+List all templates for current user
+
+### Parameters
+
+| Name       | Type           | Description | Required |
+| ---------- | -------------- | ----------- | -------- |
+| `language` | `null\|string` |             |          |
+
+### Returns
+
+| Name        | Type                       |
+| ----------- | -------------------------- |
+| `templates` | `List[types.CodeTemplate]` |
+
+## `/api/codeTemplate/update/`
+
+### Description
+
+Update a code template name
+
+### Parameters
+
+| Name          | Type     | Description | Required |
+| ------------- | -------- | ----------- | -------- |
+| `new_name`    | `string` |             | ✓        |
+| `template_id` | `int`    |             | ✓        |
 
 ### Returns
 
