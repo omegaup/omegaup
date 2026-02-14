@@ -98,10 +98,18 @@ export const ACL = {
 };
 
 export const Admin = {
+  getSystemSettings: apiCall<
+    messages.AdminGetSystemSettingsRequest,
+    messages.AdminGetSystemSettingsResponse
+  >('/api/admin/getSystemSettings/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  updateSystemSettings: apiCall<
+    messages.AdminUpdateSystemSettingsRequest,
+    messages.AdminUpdateSystemSettingsResponse
+  >('/api/admin/updateSystemSettings/'),
 };
 
 export const AiEditorial = {

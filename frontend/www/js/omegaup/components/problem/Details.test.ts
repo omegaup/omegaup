@@ -73,6 +73,7 @@ Here we can add code.
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
+    ephemeralGraderEnabled: true,
   };
 
   const runDetailsData: types.RunDetails = {
