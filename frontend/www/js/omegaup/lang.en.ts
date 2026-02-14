@@ -2264,6 +2264,15 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   zipPrepare: "Prepare zip file",
+  keyboardShortcutsTitle: "Keyboard Shortcuts",
+  keyboardShortcutsHelp: "Keyboard shortcuts help",
+  keyboardShortcutsCloseModal: "Close modal",
+  keyboardShortcutsSearchProblems: "Focus on search problems input",
+  keyboardShortcutsNewSubmission: "New submission",
+  keyboardShortcutsNavigateLists: "Navigate through lists",
+  keyboardShortcutsNavigateUp: "Navigate up",
+  keyboardShortcutsNavigateDown: "Navigate down",
+  keyboardShortcutsOpenProblem: "Open selected problem",
 };
 
 export {translations as default};

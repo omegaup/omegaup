@@ -3,6 +3,8 @@ import * as api from './api';
 import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
+import { shortcutManager } from './keyboard-shortcuts';
+import T from './lang';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -441,9 +443,21 @@ export namespace omegaup {
       ready: new EventListenerList([
         () => {
           this.experiments = Experiments.loadGlobal();
+          this._initializeShortcuts();
         },
       ]),
     };
+
+    _initializeShortcuts(): void {
+      shortcutManager.registerShortcut({
+        key: 'q',
+        ctrlKey: true,
+        description: T.keyboardShortcutsSearchProblems,
+        action: () => {
+          window.location.href = '/problem/';
+        },
+      });
+    }
 
     _onDocumentReady(): void {
       this._documentReady = true;

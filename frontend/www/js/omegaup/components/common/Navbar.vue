@@ -80,6 +80,7 @@
             :is-main-user-identity="isMainUserIdentity"
             :is-under13-user="isUnder13User"
             :navbar-section="navbarSection"
+            @show-shortcuts="$refs.help.show = true"
           >
           </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
@@ -349,6 +350,9 @@
     </template>
     <omegaup-logout-confirmation v-model="logoutModalVisible">
     </omegaup-logout-confirmation>
+    <omegaup-keyboard-shortcuts-help
+      ref="help"
+    ></omegaup-keyboard-shortcuts-help>
   </header>
 </template>
 
@@ -365,6 +369,7 @@ import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
+import KeyboardShortcutsHelp from './KeyboardShortcutsHelp.vue';
 import { AvailableTabs } from '../login/Signin.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -387,6 +392,7 @@ export const EventBus = new Vue();
     'omegaup-navbar-items': navbar_items,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-logout-confirmation': LogoutConfirmation,
+    'omegaup-keyboard-shortcuts-help': KeyboardShortcutsHelp,
   },
 })
 export default class Navbar extends Vue {

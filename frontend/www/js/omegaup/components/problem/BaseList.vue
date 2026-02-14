@@ -121,7 +121,11 @@
           </tr>
         </thead>
         <tbody data-problems>
-          <tr v-for="problem in problems" :key="problem.problem_id">
+          <tr
+            v-for="(problem, index) in problems"
+            :key="problem.problem_id"
+            :class="{ 'table-active': index === selectedIndex }"
+          >
             <td class="align-middle">{{ problem.problem_id }}</td>
             <td class="align-middle">
               <a
@@ -228,6 +232,7 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
+import { shortcutManager } from '../../keyboard-shortcuts';
 
 import common_Paginator from '../common/Paginator.vue';
 import common_SortControls from '../common/SortControls.vue';
@@ -273,6 +278,63 @@ export default class BaseList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() path!: string;
+
+  selectedIndex = -1;
+
+  mounted() {
+    shortcutManager.registerShortcut({
+      key: 'ArrowDown',
+      description: T.keyboardShortcutsNavigateDown,
+      action: () => {
+        if (this.selectedIndex < this.problems.length - 1) {
+          this.selectedIndex++;
+          this.scrollToSelected();
+        }
+      },
+    });
+
+    shortcutManager.registerShortcut({
+      key: 'ArrowUp',
+      description: T.keyboardShortcutsNavigateUp,
+      action: () => {
+        if (this.selectedIndex > 0) {
+          this.selectedIndex--;
+          this.scrollToSelected();
+        }
+      },
+    });
+
+    shortcutManager.registerShortcut({
+      key: 'Enter',
+      description: T.keyboardShortcutsOpenProblem,
+      action: () => {
+        if (
+          this.selectedIndex >= 0 &&
+          this.selectedIndex < this.problems.length
+        ) {
+          const problem = this.problems[this.selectedIndex];
+          ui.navigateTo(`/arena/problem/${problem.alias}/`);
+        }
+      },
+    });
+  }
+
+  beforeDestroy() {
+    shortcutManager.unregisterShortcut('ArrowDown');
+    shortcutManager.unregisterShortcut('ArrowUp');
+    shortcutManager.unregisterShortcut('Enter');
+  }
+
+  scrollToSelected() {
+    this.$nextTick(() => {
+      const el = this.$el.querySelector(
+        `tbody tr:nth-child(${this.selectedIndex + 1})`,
+      );
+      if (el) {
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  }
 
   T = T;
   ui = ui;
