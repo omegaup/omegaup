@@ -22,6 +22,7 @@
           height="320"
           :src="imageSrc"
           :alt="title"
+          draggable="false"
         />
       </div>
     </div>

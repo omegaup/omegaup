@@ -5,7 +5,7 @@
       class="p-3 col-md-6 mt-2 mt-md-0"
       :class="{ 'order-md-2': imageToRight }"
     >
-      <img class="img-fluid" :src="imageSrc" :alt="title" />
+      <img class="img-fluid" :src="imageSrc" :alt="title" draggable="false" />
     </div>
     <div class="col-md-6 mt-2 mt-md-0" :class="{ 'order-md-1': imageToRight }">
       <p class="section-description">{{ description }}</p>
