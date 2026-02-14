@@ -157,7 +157,11 @@ export default class Login extends Vue {
         return;
       }
       const title = T.loginFormInteractiveGuideTitle;
-      const steps: Array<{ title: string; intro: string; element?: Element }> = [
+      const steps: Array<{
+        title: string;
+        intro: string;
+        element?: Element;
+      }> = [
         {
           title,
           intro: T.loginFormInteractiveGuideWelcome,

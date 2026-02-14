@@ -318,7 +318,11 @@ export default class Signup extends Vue {
         return;
       }
       const title = T.signUpFormInteractiveGuideTitle;
-      const steps: Array<{ title: string; intro: string; element?: Element }> = [
+      const steps: Array<{
+        title: string;
+        intro: string;
+        element?: Element;
+      }> = [
         {
           title,
           intro: T.signUpFormInteractiveGuideWelcome,
