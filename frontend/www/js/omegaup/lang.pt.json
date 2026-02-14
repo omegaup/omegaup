@@ -2270,5 +2270,15 @@
 	"wordsWallTimeInSeconds": "Tempo-real (Seg)",
 	"wordsWarningProblem": "Mantener com um aviso",
 	"wordsYes": "Sim",
-	"zipPrepare": "Preparar arquivo zip"
+	"zipPrepare": "Preparar arquivo zip",
+	"loginFormInteractiveGuideTitle": "Login",
+  "loginFormInteractiveGuideWelcome": "Bem-vindo de volta! Vamos entrar na sua conta.",
+  "loginFormInteractiveGuideFederated": "Use um login de terceiros, se preferir.",
+  "loginFormInteractiveGuideGoogle": "Faça login com o Google aqui.",
+  "loginFormInteractiveGuideGithub": "Faça login com o GitHub aqui.",
+  "loginFormInteractiveGuideNative": "Ou entre com sua conta omegaUp.",
+  "loginFormInteractiveGuideUsername": "Digite seu nome de usuário ou e-mail.",
+  "loginFormInteractiveGuidePassword": "Digite sua senha.",
+  "loginFormInteractiveGuideRecover": "Esqueceu sua senha? Recupere-a aqui.",
+  "loginFormInteractiveGuideSubmit": "Clique aqui para entrar."
 }
