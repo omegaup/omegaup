@@ -5,10 +5,10 @@
       @mouseenter="showDetails = true"
       @mouseleave="showDetails = false"
     >
-      <font-awesome-icon
-        :icon="isValid ? 'check-circle' : 'times-circle'"
-      />
-      <span>{{ isValid ? T.passwordStrengthStrong : T.passwordStrengthWeak }}</span>
+      <font-awesome-icon :icon="isValid ? 'check-circle' : 'times-circle'" />
+      <span>{{
+        isValid ? T.passwordStrengthStrong : T.passwordStrengthWeak
+      }}</span>
     </div>
     <div v-if="showDetails" class="requirements-tooltip">
       <div :class="['requirement', { met: hasMinLength }]">
@@ -30,9 +30,7 @@
         {{ T.passwordRequirementLowercase }}
       </div>
       <div :class="['requirement', { met: hasDigit }]">
-        <font-awesome-icon
-          :icon="hasDigit ? 'check-circle' : 'times-circle'"
-        />
+        <font-awesome-icon :icon="hasDigit ? 'check-circle' : 'times-circle'" />
         {{ T.passwordRequirementDigit }}
       </div>
       <div :class="['requirement', { met: hasSpecialChar }]">

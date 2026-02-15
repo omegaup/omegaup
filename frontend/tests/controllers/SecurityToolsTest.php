@@ -33,7 +33,10 @@ class SecurityToolsTest extends \OmegaUp\Test\ControllerTestCase {
     public function rejectedPasswordProvider(): array {
         return [
             ['parameterStringTooShort', 'Ab1!xyz', 'testPasswordTooShortRejected'],
-            ['parameterStringTooLong', 'Aa1!' . str_repeat('x', 69), 'testPasswordTooLongRejected'],
+            ['parameterStringTooLong', 'Aa1!' . str_repeat(
+                'x',
+                69
+            ), 'testPasswordTooLongRejected'],
             ['passwordMustContainUppercase', 'password1!', 'testPasswordWithoutUppercaseRejected'],
             ['passwordMustContainLowercase', 'PASSWORD1!', 'testPasswordWithoutLowercaseRejected'],
             ['passwordMustContainDigit', 'Password!@', 'testPasswordWithoutDigitRejected'],

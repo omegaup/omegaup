@@ -85,7 +85,10 @@ describe('Contest Test', () => {
     cy.login(loginOptions[0]);
     groupPage.createGroup(groupOptions);
     groupPage.addIdentitiesGroup();
-    contestPage.setPasswordForIdentity(identityLogin.username, DEFAULT_PASSWORD);
+    contestPage.setPasswordForIdentity(
+      identityLogin.username,
+      DEFAULT_PASSWORD,
+    );
     contestPage.createContest(contestOptions, [identityLogin.username]);
     cy.logout();
 
