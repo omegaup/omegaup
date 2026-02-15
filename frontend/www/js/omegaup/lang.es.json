@@ -1909,6 +1909,8 @@
 	"teamsGroupsCsvHelpMoreInfo": "\u2139\ufe0f M\u00e1s informaci\u00f3n",
 	"teamsGroupsErrorFieldIsNotPresentInCsv": "Algunos campos requeridos no fueron encontrados en el archivo csv: %(missingFields)",
 	"teamsGroupsErrorFieldIsRequired": "El campo %(field) es requerido.",
+	"templateNameAlreadyExists": "Ya existe una plantilla con este nombre",
+	"templateNotFound": "Plantilla no encontrada",
 	"titleInUse": "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
 	"tokenDecodeCorrupted": "Hubo un problema al decodificar el token.",
 	"tokenDecodeExpired": "El token que intentas utilizar ha expirado.",

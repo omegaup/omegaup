@@ -1909,6 +1909,8 @@
 	"teamsGroupsCsvHelpMoreInfo": "\u2139\ufe0f More info",
 	"teamsGroupsErrorFieldIsNotPresentInCsv": "Some required fields were not found in csv file: %(missingFields)",
 	"teamsGroupsErrorFieldIsRequired": "The field %(field) is required.",
+	"templateNameAlreadyExists": "A template with this name already exists",
+	"templateNotFound": "Template not found",
 	"titleInUse": "Title already exists. Please choose a different title.",
 	"tokenDecodeCorrupted": "There was a problem decoding the token.",
 	"tokenDecodeExpired": "The token has already expired.",

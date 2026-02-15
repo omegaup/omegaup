@@ -162,10 +162,9 @@ export function getUserTemplates(): { [extension: string]: string } {
 /**
  * Get a specific user template for an extension from localStorage (legacy support)
  * Note: This is now handled server-side via the CodeTemplate API
- * @param extension - File extension (e.g., 'cpp', 'py')
  * @returns null as templates are now stored server-side
  */
-export function getUserTemplate(extension: string): string | null {
+export function getUserTemplate(): string | null {
   return null;
 }
 
