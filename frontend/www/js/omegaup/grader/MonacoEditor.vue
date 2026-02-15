@@ -33,11 +33,7 @@
             <h5 class="modal-title">
               {{ T.graderManageTemplates }}
             </h5>
-            <button
-              type="button"
-              class="close"
-              @click="closeTemplateManager"
-            >
+            <button type="button" class="close" @click="closeTemplateManager">
               <span>&times;</span>
             </button>
           </div>
@@ -58,7 +54,12 @@
                   v-for="template in userTemplates"
                   :key="template.template_id"
                   class="list-group-item d-flex align-items-center justify-content-between"
-                  :class="{ active: templateManagerModal.selectedTemplate && templateManagerModal.selectedTemplate.template_id === template.template_id }"
+                  :class="{
+                    active:
+                      templateManagerModal.selectedTemplate &&
+                      templateManagerModal.selectedTemplate.template_id ===
+                        template.template_id,
+                  }"
                 >
                   <span>{{ template.template_name }}</span>
                   <span>
@@ -90,13 +91,19 @@
             <!-- Template Editor Form -->
             <div class="template-form">
               <h6 class="section-title">
-                {{ templateManagerModal.selectedTemplate ? T.graderEditTemplate : T.graderCreateNewTemplate }}
+                {{
+                  templateManagerModal.selectedTemplate
+                    ? T.graderEditTemplate
+                    : T.graderCreateNewTemplate
+                }}
               </h6>
 
               <div class="form-group">
                 <label>
                   {{ T.graderTemplateName }}
-                  <span class="text-muted small">({{ T.graderRequired }}, max 100 chars)</span>
+                  <span class="text-muted small"
+                    >({{ T.graderRequired }}, max 100 chars)</span
+                  >
                 </label>
                 <input
                   ref="templateNameInput"
@@ -131,15 +138,19 @@
               class="btn btn-danger mr-auto"
               @click="deleteCurrentTemplate"
             >
-              <font-awesome-icon :icon="['fas', 'trash']" class="mr-1" />{{ T.wordsDelete }}
+              <font-awesome-icon :icon="['fas', 'trash']" class="mr-1" />{{
+                T.wordsDelete
+              }}
             </button>
             <button
               type="button"
               class="btn btn-info"
-              @click="useCurrentCode"
               :title="T.graderUseCurrentCodeTooltip"
+              @click="useCurrentCode"
             >
-              <font-awesome-icon :icon="['fas', 'code']" class="mr-1" />{{ T.graderUseCurrentCode }}
+              <font-awesome-icon :icon="['fas', 'code']" class="mr-1" />{{
+                T.graderUseCurrentCode
+              }}
             </button>
             <button
               v-if="!templateManagerModal.selectedTemplate"
@@ -162,13 +173,16 @@
               @click="saveCurrentTemplate"
             >
               <font-awesome-icon :icon="['fas', 'save']" />
-              <span class="ml-1">{{ T.wordsSave }}</span>
+              <span class="ml-1">{{ T.wordsSaveChanges }}</span>
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="templateManagerModal.visible" class="modal-backdrop fade show"></div>
+    <div
+      v-if="templateManagerModal.visible"
+      class="modal-backdrop fade show"
+    ></div>
 
     <div ref="editorContainer" class="editor flex-grow-1 w-100 h-100"></div>
   </div>

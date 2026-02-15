@@ -17,7 +17,7 @@ class CodeTemplate extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $language = $r->ensureOptionalString(
             'language',
@@ -67,7 +67,7 @@ class CodeTemplate extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $language = $r->ensureString(
             'language',
@@ -125,7 +125,7 @@ class CodeTemplate extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $templateId = $r->ensureInt('template_id');
         $newName = $r->ensureString(
@@ -176,7 +176,7 @@ class CodeTemplate extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDelete(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         $templateId = $r->ensureInt('template_id');
 
