@@ -455,7 +455,7 @@ const storeOptions: StoreOptions<GraderStore> = {
         }
       } else {
         // Check for user-saved template first
-        const userTemplate = Util.getUserTemplate(extension);
+        const userTemplate = Util.getUserTemplate();
         if (userTemplate) {
           state.request.source = userTemplate;
         } else if (state.request.input.interactive) {
