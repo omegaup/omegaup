@@ -1,6 +1,13 @@
 <template>
   <div
-    :class="['h-100', 'd-flex', 'flex-column', 'monaco-root', theme, {'monaco-root--fullscreen': isFullscreen}]"
+    :class="[
+      'h-100',
+      'd-flex',
+      'flex-column',
+      'monaco-root',
+      theme,
+      { 'monaco-root--fullscreen': isFullscreen },
+    ]"
     role="region"
     :aria-label="`Code editor for ${filename}`"
   >
@@ -10,10 +17,12 @@
         {{ filename }}
       </span>
       <div class="toolbar-right">
-        <label for="font-size-select" class="toolbar-label">{{ T.fontSize }}</label>
+        <label for="font-size-select" class="toolbar-label">{{
+          T.fontSize
+        }}</label>
         <select
-          id="font-size-select"
           v-model="selectedFontSize"
+          data-testid="font-size-select"
           class="toolbar-select"
           aria-label="Font size"
           @change="onFontSizeChange"
@@ -27,9 +36,9 @@
           v-if="contents"
           class="toolbar-btn toolbar-btn--copy"
           :class="{ 'toolbar-btn--copied': copied }"
-          @click="copyCode"
           :title="copyButtonText"
           :aria-label="copyButtonText"
+          @click="copyCode"
         >
           <i v-if="!copied" class="far fa-copy" aria-hidden="true"></i>
           <i v-else class="fas fa-check" aria-hidden="true"></i>
@@ -39,9 +48,9 @@
         <button
           v-if="!readOnly && hasChanges"
           class="toolbar-btn toolbar-btn--reset"
-          @click="confirmReset"
           title="Reset to default code (Ctrl+Shift+R)"
           aria-label="Reset to default code"
+          @click="confirmReset"
         >
           <i class="fas fa-undo" aria-hidden="true"></i>
           <span class="sr-only">Reset</span>
@@ -49,10 +58,10 @@
 
         <button
           class="toolbar-btn"
-          @click="toggleFullscreen"
           :title="isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen (F11)'"
           :aria-label="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'"
           :aria-pressed="isFullscreen"
+          @click="toggleFullscreen"
         >
           <i v-if="!isFullscreen" class="fas fa-expand" aria-hidden="true"></i>
           <i v-else class="fas fa-compress" aria-hidden="true"></i>
@@ -69,12 +78,26 @@
     ></div>
 
     <!-- Confirmation Modal -->
-    <div v-if="showResetModal" class="modal-overlay" @click.self="showResetModal = false">
-      <div class="modal-content" role="dialog" aria-labelledby="reset-modal-title" aria-modal="true">
-        <h3 id="reset-modal-title">Reset Code</h3>
-        <p>Are you sure you want to reset the code to its default state? All changes will be lost.</p>
+    <div
+      v-if="showResetModal"
+      class="modal-overlay"
+      @click.self="showResetModal = false"
+    >
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-labelledby="reset-modal-title"
+        aria-modal="true"
+      >
+        <h3 aria-label="Reset Code">Reset Code</h3>
+        <p>
+          Are you sure you want to reset the code to its default state? All
+          changes will be lost.
+        </p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="showResetModal = false">Cancel</button>
+          <button class="btn btn-secondary" @click="showResetModal = false">
+            Cancel
+          </button>
           <button class="btn btn-danger" @click="resetToDefault">Reset</button>
         </div>
       </div>
@@ -90,11 +113,9 @@ import * as monaco from 'monaco-editor';
 // Constants
 import T from '../lang';
 import { debounce } from 'lodash';
-import { EDITOR, TIMING, KEYBOARD_SHORTCUTS } from './constants';
+import { EDITOR, TIMING } from './constants';
 const FONT_SIZES = EDITOR.FONT_SIZES;
 const DEFAULT_FONT_SIZE = EDITOR.DEFAULT_FONT_SIZE;
-const COPY_FEEDBACK_DURATION_MS = TIMING.COPY_FEEDBACK_DURATION_MS;
-const EDITOR_CHANGE_DEBOUNCE_MS = TIMING.DEBOUNCE_EDITOR_CHANGE_MS;
 
 // Types
 interface EditorStoreMapping {
@@ -139,7 +160,9 @@ export default class MonacoEditor extends Vue {
   }
 
   get hasChanges(): boolean {
-    return this.defaultContents !== '' && this.contents !== this.defaultContents;
+    return (
+      this.defaultContents !== '' && this.contents !== this.defaultContents
+    );
   }
 
   get language(): string {
@@ -306,7 +329,8 @@ export default class MonacoEditor extends Vue {
       value: this.contents,
       fontSize: this.selectedFontSize,
       lineHeight: 20,
-      fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
+      fontFamily:
+        "'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
       minimap: { enabled: true },
       scrollBeyondLastLine: false,
       smoothScrolling: true,
@@ -347,7 +371,10 @@ export default class MonacoEditor extends Vue {
     this.clearCopyTimeout();
 
     // Remove event listeners
-    window.removeEventListener('code-and-language-set', this.onCodeAndLanguageSet);
+    window.removeEventListener(
+      'code-and-language-set',
+      this.onCodeAndLanguageSet,
+    );
     document.removeEventListener('keydown', this.handleKeydown);
 
     // Disconnect resize observer
@@ -364,7 +391,7 @@ export default class MonacoEditor extends Vue {
     }
 
     // Dispose Monaco resources
-    this.disposables.forEach(d => d.dispose());
+    this.disposables.forEach((d) => d.dispose());
     this.disposables = [];
 
     if (this._editor) {
@@ -670,7 +697,8 @@ export default class MonacoEditor extends Vue {
   padding: 24px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: scaleIn 0.2s ease;
 
   .vs-dark & {

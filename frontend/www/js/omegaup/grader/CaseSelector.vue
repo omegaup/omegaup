@@ -1,30 +1,48 @@
 <template>
-  <div class="case-selector" :class="theme" role="region" aria-label="Test cases">
+  <div
+    class="case-selector"
+    :class="theme"
+    role="region"
+    aria-label="Test cases"
+  >
     <!-- Header with summary -->
     <div class="case-header">
       <div class="header-left">
         <span class="header-title">Test Cases</span>
-        <span v-if="groups && groups.length > 0" class="case-count">{{ totalCaseCount }}</span>
+        <span v-if="groups && groups.length > 0" class="case-count">{{
+          totalCaseCount
+        }}</span>
       </div>
       <div v-if="summaryVerdict" class="header-right">
-        <span class="summary-badge" :class="summaryClass" role="status" :aria-label="`Overall verdict: ${summaryVerdict}`">
+        <span
+          class="summary-badge"
+          :class="summaryClass"
+          role="status"
+          :aria-label="`Overall verdict: ${summaryVerdict}`"
+        >
           <span class="verdict-dot" aria-hidden="true"></span>
           <span class="verdict-text">{{ summaryVerdict }}</span>
           <span class="sr-only">{{ verdictScreenReaderText }}</span>
         </span>
-        <span class="summary-score" aria-label="Overall score">{{ summaryScore }}</span>
+        <span class="summary-score" aria-label="Overall score">{{
+          summaryScore
+        }}</span>
       </div>
     </div>
 
     <!-- Add case form -->
     <div class="add-case-section">
-      <form class="add-case-form" @submit.prevent="createCase()" aria-label="Add test case form">
+      <form
+        class="add-case-form"
+        aria-label="Add test case form"
+        @submit.prevent="createCase()"
+      >
         <div class="form-row">
           <div class="input-group">
             <label for="case-weight" class="input-label">Weight</label>
             <input
-              id="case-weight"
               v-model.number="newCaseWeight"
+              data-testid="case-weight"
               class="input-weight"
               type="number"
               placeholder="1.0"
@@ -32,14 +50,16 @@
               step="0.1"
               aria-describedby="weight-help"
             />
-            <span id="weight-help" class="sr-only">Weight for scoring this test case</span>
+            <span class="sr-only" aria-label="Weight for scoring this test case"
+              >Weight for scoring this test case</span
+            >
           </div>
           <div class="input-group input-group--flex">
             <label for="case-name" class="input-label">Case Name</label>
             <input
-              id="case-name"
               ref="caseNameInput"
               v-model="newCaseName"
+              data-testid="case-name"
               class="input-name"
               type="text"
               placeholder="e.g., sample, edge-case-1"
@@ -47,7 +67,9 @@
               aria-describedby="name-help"
               @keydown="handleInputKeydown"
             />
-            <span id="name-help" class="sr-only">Name for the test case</span>
+            <span class="sr-only" aria-label="Name for the test case"
+              >Name for the test case</span
+            >
           </div>
           <button
             class="btn-add"
@@ -56,13 +78,23 @@
             data-add-button
             :aria-label="addButtonLabel"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"
+              />
             </svg>
             <span class="sr-only">Add test case</span>
           </button>
         </div>
-        <p v-if="addCaseError" class="error-message" role="alert">{{ addCaseError }}</p>
+        <p v-if="addCaseError" class="error-message" role="alert">
+          {{ addCaseError }}
+        </p>
       </form>
     </div>
 
@@ -75,25 +107,52 @@
       tabindex="0"
       @keydown="handleListKeydown"
     >
-      <div v-if="!groups || groups.length === 0" class="empty-state" role="status">
-        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <rect x="12" y="12" width="32" height="32" rx="4"/>
-          <line x1="20" y1="24" x2="36" y2="24"/>
-          <line x1="20" y1="32" x2="32" y2="32"/>
+      <div
+        v-if="!groups || groups.length === 0"
+        class="empty-state"
+        role="status"
+      >
+        <svg
+          width="56"
+          height="56"
+          viewBox="0 0 56 56"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <rect x="12" y="12" width="32" height="32" rx="4" />
+          <line x1="20" y1="24" x2="36" y2="24" />
+          <line x1="20" y1="32" x2="32" y2="32" />
         </svg>
         <p class="empty-title">No test cases yet</p>
         <p class="empty-subtitle">Add your first test case above</p>
       </div>
 
       <template v-else>
-        <div v-for="(group, groupIndex) in groups" :key="group.name" class="group-container">
+        <div
+          v-for="(group, groupIndex) in groups"
+          :key="group.name"
+          class="group-container"
+        >
           <!-- Group header (if explicit) -->
-          <div v-if="group.explicit" class="group-header" role="group" :aria-label="`Group: ${group.name}`">
-            <span class="verdict-icon" :class="verdictIconClass(groupResult(group.name))" aria-hidden="true">
+          <div
+            v-if="group.explicit"
+            class="group-header"
+            role="group"
+            :aria-label="`Group: ${group.name}`"
+          >
+            <span
+              class="verdict-icon"
+              :class="verdictIconClass(groupResult(group.name))"
+              aria-hidden="true"
+            >
               {{ verdictLabel(groupResult(group.name)) }}
             </span>
             <span class="group-name">{{ group.name }}</span>
-            <span class="group-score" aria-label="Group score">{{ score(groupResult(group.name)) }}</span>
+            <span class="group-score" aria-label="Group score">{{
+              score(groupResult(group.name))
+            }}</span>
           </div>
 
           <!-- Cases in group -->
@@ -114,19 +173,32 @@
             :data-group-index="groupIndex"
             :data-item-index="itemIndex"
             @click="selectCase(item.name)"
-            @keydown="handleCaseKeydown($event, item.name, groupIndex, itemIndex)"
+            @keydown="
+              handleCaseKeydown($event, item.name, groupIndex, itemIndex)
+            "
           >
             <div class="case-item-left">
-              <span class="verdict-icon" :class="verdictIconClass(caseResult(item.name))" aria-hidden="true">
+              <span
+                class="verdict-icon"
+                :class="verdictIconClass(caseResult(item.name))"
+                aria-hidden="true"
+              >
                 {{ verdictLabel(caseResult(item.name)) }}
               </span>
               <span class="case-name">{{ item.name }}</span>
-              <span v-if="item.weight && item.weight !== 1" class="case-weight" aria-label="`Weight ${formatWeight(item.weight)}`">
+              <span
+                v-if="item.weight && item.weight !== 1"
+                class="case-weight"
+                aria-label="`Weight ${formatWeight(item.weight)}`"
+              >
                 ×{{ formatWeight(item.weight) }}
               </span>
             </div>
             <div class="case-item-right">
-              <span class="case-score" :aria-label="`Score: ${score(caseResult(item.name))}`">
+              <span
+                class="case-score"
+                :aria-label="`Score: ${score(caseResult(item.name))}`"
+              >
                 {{ score(caseResult(item.name)) }}
               </span>
               <button
@@ -134,11 +206,19 @@
                 class="btn-remove"
                 type="button"
                 :aria-label="`Remove test case ${item.name}`"
-                @click.prevent.stop="confirmRemoveCase(item.name)"
                 :title="`Remove test case ${item.name}`"
+                @click.prevent.stop="confirmRemoveCase(item.name)"
               >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
-                  <path d="M7 5.586L11.293 1.293a1 1 0 111.414 1.414L8.414 7l4.293 4.293a1 1 0 01-1.414 1.414L7 8.414l-4.293 4.293a1 1 0 01-1.414-1.414L5.586 7 1.293 2.707A1 1 0 012.707 1.293L7 5.586z"/>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M7 5.586L11.293 1.293a1 1 0 111.414 1.414L8.414 7l4.293 4.293a1 1 0 01-1.414 1.414L7 8.414l-4.293 4.293a1 1 0 01-1.414-1.414L5.586 7 1.293 2.707A1 1 0 012.707 1.293L7 5.586z"
+                  />
                 </svg>
               </button>
             </div>
@@ -148,19 +228,41 @@
     </div>
 
     <!-- Loading indicator -->
-    <div v-if="isLoading" class="loading-overlay" role="status" aria-live="polite">
+    <div
+      v-if="isLoading"
+      class="loading-overlay"
+      role="status"
+      aria-live="polite"
+    >
       <div class="spinner"></div>
       <span class="sr-only">Loading test cases...</span>
     </div>
 
     <!-- Delete confirmation modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
-      <div class="modal-content" role="dialog" aria-labelledby="delete-modal-title" aria-modal="true">
-        <h3 id="delete-modal-title">Remove Test Case</h3>
-        <p>Are you sure you want to remove the test case <strong>{{ caseToDelete }}</strong>?</p>
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click.self="showDeleteModal = false"
+    >
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-labelledby="delete-modal-title"
+        aria-modal="true"
+      >
+        <h3 aria-label="Remove Test Case">Remove Test Case</h3>
+        <p>
+          Are you sure you want to remove the test case
+          <strong>{{ caseToDelete }}</strong
+          >?
+        </p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="showDeleteModal = false">Cancel</button>
-          <button class="btn btn-danger" @click="removeCase(caseToDelete)">Remove</button>
+          <button class="btn btn-secondary" @click="showDeleteModal = false">
+            Cancel
+          </button>
+          <button class="btn btn-danger" @click="removeCase(caseToDelete)">
+            Remove
+          </button>
         </div>
       </div>
     </div>
@@ -229,7 +331,10 @@ export default class CaseSelector extends Vue {
 
   get totalCaseCount(): string {
     if (!this.groups) return '0 cases';
-    const count = this.groups.reduce((sum, group) => sum + group.cases.length, 0);
+    const count = this.groups.reduce(
+      (sum, group) => sum + group.cases.length,
+      0,
+    );
     return `${count} ${count === 1 ? 'case' : 'cases'}`;
   }
 
@@ -242,7 +347,10 @@ export default class CaseSelector extends Vue {
   }
 
   get canAddCase(): boolean {
-    return this.newCaseName.length > 0 && this.newCaseName.length <= CASE_NAME_MAX_LENGTH;
+    return (
+      this.newCaseName.length > 0 &&
+      this.newCaseName.length <= CASE_NAME_MAX_LENGTH
+    );
   }
 
   get addButtonLabel(): string {
@@ -272,27 +380,39 @@ export default class CaseSelector extends Vue {
     return null;
   }
 
-  verdictLabel(result: null | types.RunDetailsGroup | types.CaseResult): string {
+  verdictLabel(
+    result: null | types.RunDetailsGroup | types.CaseResult,
+  ): string {
     if (!result) return '○';
     if (typeof result.verdict === 'undefined') {
       if (result.contest_score == result.max_score) return '✓';
       return '✗';
     }
     switch (result.verdict) {
-      case 'CE': return '○';
-      case 'AC': return '✓';
-      case 'PA': return '½';
-      case 'WA': return '✗';
-      case 'TLE': return '⌚';
+      case 'CE':
+        return '○';
+      case 'AC':
+        return '✓';
+      case 'PA':
+        return '½';
+      case 'WA':
+        return '✗';
+      case 'TLE':
+        return '⌚';
     }
     return '○';
   }
 
-  verdictIconClass(result: null | types.RunDetailsGroup | types.CaseResult): string {
+  verdictIconClass(
+    result: null | types.RunDetailsGroup | types.CaseResult,
+  ): string {
     if (!result) return 'verdict-pending';
-    const v = typeof result.verdict !== 'undefined'
-      ? result.verdict
-      : (result.contest_score == result.max_score ? 'AC' : 'WA');
+    const v =
+      typeof result.verdict !== 'undefined'
+        ? result.verdict
+        : result.contest_score == result.max_score
+        ? 'AC'
+        : 'WA';
     if (v === 'AC') return 'verdict-ac';
     if (v === 'PA') return 'verdict-pa';
     if (v === 'CE') return 'verdict-pending';
@@ -300,7 +420,9 @@ export default class CaseSelector extends Vue {
     return 'verdict-wa';
   }
 
-  score(result: null | types.RunDetailsGroup | types.CaseResult | GraderResults): string {
+  score(
+    result: null | types.RunDetailsGroup | types.CaseResult | GraderResults,
+  ): string {
     if (!result) return '—';
     const score = this.formatNumber(result.contest_score);
     const max = this.formatNumber(result.max_score || 0);
@@ -321,7 +443,10 @@ export default class CaseSelector extends Vue {
     const result = this.caseResult(item.name);
     const verdict = result ? this.verdictLabel(result) : 'Not run';
     const scoreText = this.score(result);
-    const weightText = item.weight && item.weight !== 1 ? `, weight ${this.formatWeight(item.weight)}` : '';
+    const weightText =
+      item.weight && item.weight !== 1
+        ? `, weight ${this.formatWeight(item.weight)}`
+        : '';
     return `Test case ${item.name}${weightText}, ${verdict}, score ${scoreText}`;
   }
 
@@ -332,12 +457,15 @@ export default class CaseSelector extends Vue {
 
   validateCaseName(name: string): string | null {
     if (!name) return 'Case name is required';
-    if (name.length > CASE_NAME_MAX_LENGTH) return `Case name must be ${CASE_NAME_MAX_LENGTH} characters or less`;
-    if (!CASE_NAME_PATTERN.test(name)) return 'Case name can only contain letters, numbers, hyphens, and underscores';
+    if (name.length > CASE_NAME_MAX_LENGTH)
+      return `Case name must be ${CASE_NAME_MAX_LENGTH} characters or less`;
+    if (!CASE_NAME_PATTERN.test(name))
+      return 'Case name can only contain letters, numbers, hyphens, and underscores';
 
     // Check for duplicates
-    const existingCases = this.groups.flatMap(g => g.cases);
-    if (existingCases.some(c => c.name === name)) return 'A test case with this name already exists';
+    const existingCases = this.groups.flatMap((g) => g.cases);
+    if (existingCases.some((c) => c.name === name))
+      return 'A test case with this name already exists';
 
     return null;
   }
@@ -353,10 +481,11 @@ export default class CaseSelector extends Vue {
 
     this.isLoading = true;
 
-    store.dispatch('createCase', {
-      name: this.newCaseName,
-      weight: this.newCaseWeight ?? 1,
-    })
+    store
+      .dispatch('createCase', {
+        name: this.newCaseName,
+        weight: this.newCaseWeight ?? 1,
+      })
       .then(() => {
         this.announceToScreenReader(`Test case ${this.newCaseName} added`);
         this.newCaseWeight = null;
@@ -384,7 +513,8 @@ export default class CaseSelector extends Vue {
   removeCase(name: string): void {
     this.isLoading = true;
 
-    store.dispatch('removeCase', name)
+    store
+      .dispatch('removeCase', name)
       .then(() => {
         this.announceToScreenReader(`Test case ${name} removed`);
         this.showDeleteModal = false;
@@ -409,11 +539,16 @@ export default class CaseSelector extends Vue {
 
   handleListKeydown(e: KeyboardEvent): void {
     const focusedElement = document.activeElement;
-    if (!focusedElement || !focusedElement.hasAttribute('data-case-name')) return;
+    if (!focusedElement || !focusedElement.hasAttribute('data-case-name'))
+      return;
 
     const currentName = focusedElement.getAttribute('data-case-name');
-    const groupIndex = parseInt(focusedElement.getAttribute('data-group-index') || '0');
-    const itemIndex = parseInt(focusedElement.getAttribute('data-item-index') || '0');
+    const groupIndex = parseInt(
+      focusedElement.getAttribute('data-group-index') || '0',
+    );
+    const itemIndex = parseInt(
+      focusedElement.getAttribute('data-item-index') || '0',
+    );
 
     let nextElement: Element | null = null;
 
@@ -452,7 +587,7 @@ export default class CaseSelector extends Vue {
     }
   }
 
-  handleCaseKeydown(e: KeyboardEvent, name: string, groupIndex: number, itemIndex: number): void {
+  handleCaseKeydown(): void {
     // Handled by list keydown
   }
 
@@ -988,7 +1123,8 @@ export default class CaseSelector extends Vue {
 .case-score {
   font-size: 12px;
   font-weight: 600;
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas,
+    'Courier New', monospace;
   color: #6b7280;
 
   .vs-dark & {
@@ -1135,7 +1271,9 @@ export default class CaseSelector extends Vue {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Modal */
@@ -1159,7 +1297,8 @@ export default class CaseSelector extends Vue {
   padding: 24px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: scaleIn 0.2s ease;
 
   .vs-dark & {
@@ -1200,8 +1339,12 @@ export default class CaseSelector extends Vue {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {

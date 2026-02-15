@@ -13,8 +13,8 @@
           v-if="contents"
           class="action-btn action-btn--copy"
           :class="{ 'action-btn--copied': copied }"
-          @click="copyCode"
           :title="copyButtonText"
+          @click="copyCode"
         >
           <i v-if="!copied" class="far fa-copy"></i>
           <i v-else class="fas fa-check"></i>
@@ -22,15 +22,15 @@
         <button
           v-if="!readOnly && contents"
           class="action-btn"
-          @click="clearContents"
           title="Clear"
+          @click="clearContents"
         >
           <i class="fas fa-trash-alt"></i>
         </button>
         <button
           class="action-btn"
-          @click="toggleFullscreen"
           :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+          @click="toggleFullscreen"
         >
           <i v-if="!isFullscreen" class="fas fa-expand"></i>
           <i v-else class="fas fa-compress"></i>
@@ -103,7 +103,7 @@ export default class TextEditor extends Vue {
   }
 
   @Watch('contents', { immediate: true })
-  onContentsChange(value: string): void {
+  onContentsChange(): void {
     this.updateLineCount();
   }
 
@@ -486,14 +486,6 @@ export default class TextEditor extends Vue {
 }
 
 /* Firefox scrollbar */
-.editor-content {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-
-  .vs-dark & {
-    scrollbar-color: #404040 transparent;
-  }
-}
 
 /* Selection styling */
 .editor-content::selection {

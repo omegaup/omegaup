@@ -15,12 +15,13 @@
               d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 14.5v-9l6 4.5-6 4.5z"
             />
           </svg>
-          <span class="brand-name">omegaUp</span>
-          <span class="brand-subtitle">grader</span>
+          <span class="brand-name">{{ T.ephemeralBrandName }}</span>
+          <span class="brand-subtitle">{{ T.ephemeralBrandSubtitle }}</span>
         </div>
+      </div>
 
-        <div class="navbar-divider"></div>
-
+      <div class="navbar-right">
+        <!-- Language selector moved to the right -->
         <select
           v-model="selectedLanguage"
           class="language-select"
@@ -34,9 +35,7 @@
             {{ getLanguageName(language) }}
           </option>
         </select>
-      </div>
 
-      <div class="navbar-right">
         <template v-if="!isEmbedded">
           <button class="icon-btn" :title="T.wordsUpload">
             <label class="icon-btn-label">
@@ -301,9 +300,9 @@
         <button
           v-if="isRunButton"
           class="action-button run-button"
-          :class="{ 'action-button--disabled': !canExecute }"
-          :disabled="!canExecute"
-          title="Run Code (Ctrl+')"
+          :class="{ 'action-button--disabled': !canExecute || isRunLoading }"
+          :disabled="!canExecute || isRunLoading"
+          title="Run (Ctrl+')"
           data-run-button
           @click.prevent="handleRun"
         >
@@ -321,7 +320,7 @@
               fill="currentColor"
               class="button-icon"
             >
-              <path d="M2 1v12l10-6L2 1z" />
+              <path d="M0 0v14l12-7L0 0z" />
             </svg>
             <span>Run</span>
             <span v-if="isRunLoading" class="spinner"></span>
@@ -329,10 +328,10 @@
         </button>
 
         <button
-          v-if="true"
+          v-if="isSubmitButton"
           class="action-button submit-button"
-          :class="{ 'action-button--disabled': !canSubmit }"
-          :disabled="!canSubmit"
+          :class="{ 'action-button--disabled': !canSubmit || isSubmitLoading }"
+          :disabled="!canSubmit || isSubmitLoading"
           title="Submit (Ctrl+Enter)"
           data-submit-button
           @click.prevent="handleSubmit"
@@ -626,7 +625,7 @@ export default class Ephemeral extends Vue {
     this.$nextTick(() => {
       // Use Vue's $refs with correct type assertion for MonacoEditor
       const monacoRef = this.$refs.monacoEditor as
-        | InstanceType<typeof import('./MonacoEditor.vue').default>
+        | InstanceType<typeof import('./MonacoEditor.vue')['default']>
         | undefined;
       if (monacoRef && typeof monacoRef.onResize === 'function')
         monacoRef.onResize();
@@ -1125,6 +1124,7 @@ export default class Ephemeral extends Vue {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
+  width: 100%;
 
   &.vs-dark {
     background: #1e1e1e;
@@ -1187,15 +1187,6 @@ export default class Ephemeral extends Vue {
   }
 }
 
-.navbar-divider {
-  width: 1px;
-  height: 20px;
-  background: #e5e7eb;
-  .vs-dark & {
-    background: #404040;
-  }
-}
-
 .language-select {
   appearance: none;
   -webkit-appearance: none;
@@ -1238,6 +1229,7 @@ export default class Ephemeral extends Vue {
   justify-content: center;
   width: 32px;
   height: 32px;
+  padding: 0;
   border: none;
   border-radius: 6px;
   background: transparent;
@@ -1254,7 +1246,7 @@ export default class Ephemeral extends Vue {
   .vs-dark & {
     color: #9ca3af;
     &:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: #333;
       color: #d4d4d4;
     }
   }

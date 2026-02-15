@@ -105,7 +105,9 @@ export function announceToScreenReader(
   setTimeout(() => {
     try {
       document.body.removeChild(announcement);
-    } catch {}
+    } catch {
+      // Ignored: announcement may already be removed
+    }
   }, 1000);
 }
 
