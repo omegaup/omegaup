@@ -98,7 +98,7 @@ rewrite ^/problem/random/karel/?$ /problems/random/karel.php last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problems/edit.php?problem=$1 last;
 rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problems/stats.php?problem_alias=$1 last;
 rewrite ^/problem/statement/?$ /problems/statement.php last;
-rewrite ^/redaccion\.php/?$ /problems/statement.php permanent;
+rewrite ^/redaccion\.php/?$ /problem/statement/ permanent;
 rewrite ^/profile/?$ /profile/index.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
