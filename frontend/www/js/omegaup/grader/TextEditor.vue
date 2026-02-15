@@ -48,7 +48,7 @@
         class="editor-content"
         :disabled="readOnly"
         :placeholder="
-          readOnly ? 'No output' : 'Type or paste your code here...'
+          readOnly ? 'No output' : 'Enter your custom test case here...'
         "
         spellcheck="false"
         @input="updateLineCount"
