@@ -65,7 +65,7 @@
               type="checkbox"
               required
             />
-            <label for="checkbox">
+            <label for="checkbox" class="pl-1">
               <omegaup-markdown
                 :markdown="formattedAcceptPolicyMarkdown"
               ></omegaup-markdown>
