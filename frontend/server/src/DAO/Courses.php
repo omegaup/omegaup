@@ -596,6 +596,111 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
+     * Returns a single student's score and progress by problem.
+     * This is an optimized version of getStudentsInCourseWithProgressPerAssignment
+     * that filters by identity_id to avoid fetching all students' data.
+     *
+     * @return array{allProgress: list<array{classname: string, country_id: null|string, name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>}
+     */
+    public static function getSingleStudentProgressPerAssignment(
+        int $courseId,
+        int $groupId,
+        int $identityId
+    ): array {
+        $sql = 'SELECT
+                    i.username,
+                    i.name,
+                    i.country_id,
+                    a.alias AS assignment_alias,
+                    p.alias AS problem_alias,
+                    p.title AS problem_title,
+                    psp.points AS problem_points,
+                    MAX(r.contest_score) AS problem_score,
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
+                FROM
+                    Assignments a
+                INNER JOIN
+                    Problemset_Problems psp ON psp.problemset_id = a.problemset_id
+                INNER JOIN
+                    Problems p ON p.problem_id = psp.problem_id
+                INNER JOIN
+                    Groups_Identities gi ON gi.group_id = ?
+                        AND gi.identity_id = ?
+                INNER JOIN
+                    Identities i ON i.identity_id = gi.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
+                LEFT JOIN
+                    Submissions s ON s.problem_id = p.problem_id
+                        AND s.identity_id = i.identity_id
+                        AND s.problemset_id = a.problemset_id
+                LEFT JOIN
+                    Runs r ON r.run_id = s.current_run_id
+                WHERE
+                    a.course_id = ?
+                GROUP BY
+                    a.assignment_id, p.problem_id
+                ORDER BY
+                    psp.`order`';
+
+        /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$groupId, $identityId, $courseId]
+        );
+
+        $allProgress = [];
+        $problemTitles = [];
+        foreach ($rs as $row) {
+            $username = $row['username'];
+            if (!isset($allProgress[$username])) {
+                $allProgress[$username] = [
+                    'classname' => $row['classname'],
+                    'country_id' => $row['country_id'],
+                    'name' => $row['name'],
+                    'progress' => [],
+                    'points' => [],
+                    'score' => [],
+                    'username' => $username,
+                ];
+            }
+
+            $assignmentAlias = $row['assignment_alias'];
+            $problemAlias = $row['problem_alias'];
+
+            if (!isset($problemTitles[$problemAlias])) {
+                $problemTitles[$problemAlias] = $row['problem_title'];
+            }
+
+            if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
+                $allProgress[$username]['progress'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
+                $row['problem_points'] == 0
+            ) ? 0.0 :
+            floatval($row['problem_score']) / $row['problem_points'] * 100;
+
+            if (!isset($allProgress[$username]['points'][$assignmentAlias])) {
+                $allProgress[$username]['points'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['points'][$assignmentAlias][$problemAlias] = $row['problem_points'] ?: 0.0;
+
+            if (!isset($allProgress[$username]['score'][$assignmentAlias])) {
+                $allProgress[$username]['score'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['score'][$assignmentAlias][$problemAlias] = $row['problem_score'] ?: 0.0;
+        }
+
+        return [
+            'allProgress' => array_values($allProgress),
+            'problemTitles' => $problemTitles,
+        ];
+    }
+
+    /**
      * Returns the list of assignments with their problems and points.
      *
      * @return array{assignmentsProblems: list<AssignmentsProblemsPoints>, studentsProgress: list<StudentProgressInCourse>, totalRows: int}

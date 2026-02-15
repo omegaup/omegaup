@@ -2,89 +2,44 @@ name: CI
 
 on:
   workflow_call: # make this workflow reusable
-  pull_request:
-    paths:
-      # Source code
-      - 'frontend/**'
-      - 'stuff/**'
-      - 'cypress/**'
-      - 'bin/**'
-      # Dependencies
-      - 'composer.json'
-      - 'composer.lock'
-      - 'package.json'
-      - 'yarn.lock'
-      # Build & TypeScript config
-      - 'tsconfig.json'
-      - 'webpack.config*.js'
-      - '.babelrc'
-      # Test config
-      - 'jest.config.js'
-      - 'cypress.config.ts'
-      # Linter configs
-      - '.eslintrc.js'
-      - '.prettierrc.json'
-      - '.stylelintrc.yml'
-      - '.flake8'
-      - '.pylintrc'
-      - '.lint.config.json'
-      - 'psalm.xml'
-      - 'setup.cfg'
-      # Docker
-      - 'Dockerfile'
-      - 'docker-compose*.yml'
-      # Git & CI
-      - '.gitmodules'
-      - '.github/workflows/ci.yml'
+  pull_request: {}
   push:
     branches:
       - main
-    paths:
-      # Source code
-      - 'frontend/**'
-      - 'stuff/**'
-      - 'cypress/**'
-      - 'bin/**'
-      # Dependencies
-      - 'composer.json'
-      - 'composer.lock'
-      - 'package.json'
-      - 'yarn.lock'
-      # Build & TypeScript config
-      - 'tsconfig.json'
-      - 'webpack.config*.js'
-      - '.babelrc'
-      # Test config
-      - 'jest.config.js'
-      - 'cypress.config.ts'
-      # Linter configs
-      - '.eslintrc.js'
-      - '.prettierrc.json'
-      - '.stylelintrc.yml'
-      - '.flake8'
-      - '.pylintrc'
-      - '.lint.config.json'
-      - 'psalm.xml'
-      - 'setup.cfg'
-      # Docker
-      - 'Dockerfile'
-      - 'docker-compose*.yml'
-      # Git & CI
-      - '.gitmodules'
-      - '.github/workflows/ci.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  verify-action-hashes:
+    name: Verify Action Hashes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+
+      - name: Install jq
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run verification
+        run: |
+          ./hack/gha-reversemap.sh verify-mapusage
+
   php:
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
+    needs: verify-action-hashes
 
     services:
       mysql:
-        image: mysql:8.0.23
+        image: mysql:8.0.34
         ports:
           - 13306:13306
         env:
@@ -110,14 +65,14 @@ jobs:
           RABBITMQ_DEFAULT_PASS: 'omegaup'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Add mysql as alias to localhost
         run: |
@@ -229,14 +184,14 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: frontend-test-logs-${{ github.run_attempt }}
           path: frontend/tests/runfiles/*/*.log
 
       - name: Upload inefficient queries
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: inefficient-queries
           path: stuff/inefficient_queries.csv
@@ -247,7 +202,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
 
@@ -268,7 +223,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
 
@@ -353,7 +308,7 @@ jobs:
     timeout-minutes: 25
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
 
@@ -387,14 +342,14 @@ jobs:
 
       - name: Upload cypress screenshot artifacts
         if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: cypress-screenshots-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
         if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: cypress-videos-${{ github.run_attempt }}
           path: cypress/videos
@@ -403,7 +358,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
           fetch-depth: 0
@@ -430,7 +385,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: python-test-logs
           path: /tmp/container-logs/*.log
@@ -439,7 +394,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
 
