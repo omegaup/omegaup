@@ -459,7 +459,6 @@ export interface UrlParams {
   query: string;
   sort_order: ContestOrder;
   filter: ContestFilter;
-  replaceState?: boolean; // When true, use replaceState instead of pushState (for browser navigation)
 }
 
 @Component({
@@ -496,9 +495,6 @@ class ArenaContestList extends Vue {
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
-  // Flag to track if state change came from browser navigation (back/forward button)
-  // When true, we should use replaceState instead of pushState to avoid corrupting history
-  isFromBrowserNavigation: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -535,14 +531,11 @@ class ArenaContestList extends Vue {
       query: this.currentQuery,
       sort_order: this.currentOrder,
       filter: this.currentFilter,
-      replaceState: this.isFromBrowserNavigation,
     };
     // Reset the contest list for this tab to avoid stale data
     Vue.set(this.contests, this.currentTab, []);
     this.currentPage = 1;
     this.hasMore = true;
-    // Reset the navigation flag after using it
-    this.isFromBrowserNavigation = false;
     this.fetchPage(params, urlObj);
   }
   mounted() {
@@ -666,28 +659,23 @@ class ArenaContestList extends Vue {
   }
 
   // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
-  // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
   @Watch('tab')
   onTabPropChanged(newValue: ContestTab) {
-    this.isFromBrowserNavigation = true;
     this.currentTab = newValue;
   }
 
   @Watch('sortOrder')
   onSortOrderPropChanged(newValue: ContestOrder) {
-    this.isFromBrowserNavigation = true;
     this.currentOrder = newValue;
   }
 
   @Watch('filter')
   onFilterPropChanged(newValue: ContestFilter) {
-    this.isFromBrowserNavigation = true;
     this.currentFilter = newValue;
   }
 
   @Watch('page')
   onPagePropChanged(newValue: number) {
-    this.isFromBrowserNavigation = true;
     this.currentPage = newValue;
   }
 

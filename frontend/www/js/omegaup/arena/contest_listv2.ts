@@ -165,19 +165,15 @@ OmegaUp.on('ready', () => {
             urlObj: URL;
           }) => {
             for (const [key, value] of Object.entries(params)) {
-              if (key === 'replaceState') continue; // Don't add flag to URL
               if (value) {
                 urlObj.searchParams.set(key, value.toString());
               } else {
                 urlObj.searchParams.delete(key);
               }
             }
-            // Use replaceState for browser navigation to avoid corrupting history
-            if (params.replaceState) {
-              window.history.replaceState({}, '', urlObj);
-            } else {
-              window.history.pushState({}, '', urlObj);
-            }
+            // Always use replaceState to avoid polluting browser history
+            // with in-page state changes (tab switches, filter, sort order)
+            window.history.replaceState({}, '', urlObj);
             await contestStore.dispatch('fetchContestList', {
               requestParams: params,
               name: params.tab_name,
