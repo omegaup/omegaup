@@ -28,6 +28,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $havingClause = $requireAllTags ? 'HAVING (COUNT(pt.tag_id) = ?)' : '';
         $placeholders = array_fill(0, count($tags), '?');
         $placeholders = join(',', $placeholders);
+        // Use direct JOIN on Tags by name to avoid redundant subquery;
+        // Tags.name has UNIQUE index so the lookup is efficient.
         $sql .= "
             INNER JOIN (
                 SELECT
@@ -43,12 +45,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Tags t
                 ON
                     pt.tag_id = t.tag_id
-                WHERE pt.tag_id IN (
-                    SELECT t.tag_id
-                    FROM Tags t
-                    WHERE t.name in ($placeholders)
-                )
-                AND (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
+                    AND t.name IN ($placeholders)
+                WHERE
+                    (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
                 GROUP BY
                     pt.problem_id
                 {$havingClause}
