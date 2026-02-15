@@ -19,7 +19,7 @@
           />
         </a>
 
-        <div class="d-inline-flex d-flex-row order-lg-1">
+        <div class="d-inline-flex flex-row order-lg-1">
           <div
             v-if="isLoggedIn"
             class="navbar-nav navbar-right align-items-end d-lg-none"
@@ -86,10 +86,7 @@
                   @read="readNotifications"
                 ></omegaup-notification-list>
               </li>
-              <li
-                class="nav-item dropdown nav-user nav-item-align"
-                data-nav-right
-              >
+              <li class="nav-item dropdown nav-user" data-nav-right>
                 <a
                   class="nav-link px-2 dropdown-toggle nav-user-link"
                   href="#"
@@ -114,7 +111,7 @@
                   ></omegaup-common-grader-badge>
                 </a>
                 <div
-                  class="dropdown-menu dropdown-menu-right allow-overflow h-auto overflow-auto"
+                  class="dropdown-menu dropdown-menu-right profile-scroll"
                   data-dropdown-menu
                 >
                   <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
@@ -265,19 +262,6 @@
                 </div>
               </li>
             </ul>
-
-            <!-- Logout button for mobile -->
-            <a
-              v-if="isLoggedIn"
-              class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
-              href="#"
-              @click.prevent="logoutModalVisible = true"
-            >
-              <font-awesome-icon :icon="['fas', 'power-off']" />
-              <span class="ml-2">
-                {{ T.omegaupTitleLogout }}
-              </span>
-            </a>
           </div>
         </div>
 
@@ -454,13 +438,11 @@ export default class Navbar extends Vue {
 .navbar-color .navbar-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
-
 .nav-item-align {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-
 nav.navbar {
   background-color: var(--header-primary-color);
 
@@ -478,12 +460,6 @@ nav.navbar {
 
   .collapse-submenu .btn:focus {
     box-shadow: 0 0 0 0;
-  }
-
-  .dropdown-menu {
-    overflow-y: auto;
-    max-height: 75vh;
-    scrollbar-width: none;
   }
 }
 
@@ -512,9 +488,15 @@ nav.navbar {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 20vw;
+  max-width: 140px;
   display: inline-block;
   vertical-align: middle;
+}
+
+@media (min-width: 992px) {
+  .username {
+    max-width: 220px;
+  }
 }
 
 @media (min-width: 992px) {
@@ -534,6 +516,21 @@ nav.navbar {
   .allow-overflow {
     height: 45vh;
     max-width: 80vw;
+  }
+}
+@media (max-width: 992px) {
+  .nav-user .dropdown-menu {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    width: 100%;
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    border-radius: 0;
+    z-index: 3000;
+  }
+  .nav-user .dropdown-menu.show {
+    transform: none;
   }
 }
 </style>
