@@ -36,19 +36,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 FROM
                     Problems_Tags pt
                 INNER JOIN
-                    Problems pp
-                ON
-                    pp.problem_id = pt.problem_id
+                    Tags t ON pt.tag_id = t.tag_id AND t.name IN ($placeholders)
                 INNER JOIN
-                    Tags t
-                ON
-                    pt.tag_id = t.tag_id
-                WHERE pt.tag_id IN (
-                    SELECT t.tag_id
-                    FROM Tags t
-                    WHERE t.name in ($placeholders)
-                )
-                AND (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
+                    Problems pp ON pp.problem_id = pt.problem_id
+                WHERE (pp.allow_user_add_tags = '1' OR pt.source <> 'voted')
                 GROUP BY
                     pt.problem_id
                 {$havingClause}
