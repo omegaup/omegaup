@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     :class="['h-100', 'd-flex', 'flex-column', 'monaco-root', theme, {'monaco-root--fullscreen': isFullscreen}]"
     role="region"
     :aria-label="`Code editor for ${filename}`"
@@ -22,12 +22,12 @@
             {{ size }}px
           </option>
         </select>
-        
-        <button 
-          v-if="contents" 
-          class="toolbar-btn toolbar-btn--copy" 
-          :class="{ 'toolbar-btn--copied': copied }" 
-          @click="copyCode" 
+
+        <button
+          v-if="contents"
+          class="toolbar-btn toolbar-btn--copy"
+          :class="{ 'toolbar-btn--copied': copied }"
+          @click="copyCode"
           :title="copyButtonText"
           :aria-label="copyButtonText"
         >
@@ -35,11 +35,11 @@
           <i v-else class="fas fa-check" aria-hidden="true"></i>
           <span class="sr-only">{{ copyButtonText }}</span>
         </button>
-        
-        <button 
-          v-if="!readOnly && hasChanges" 
-          class="toolbar-btn toolbar-btn--reset" 
-          @click="confirmReset" 
+
+        <button
+          v-if="!readOnly && hasChanges"
+          class="toolbar-btn toolbar-btn--reset"
+          @click="confirmReset"
           title="Reset to default code (Ctrl+Shift+R)"
           aria-label="Reset to default code"
         >
@@ -47,10 +47,9 @@
           <span class="sr-only">Reset</span>
         </button>
 
-        
-        <button 
-          class="toolbar-btn" 
-          @click="toggleFullscreen" 
+        <button
+          class="toolbar-btn"
+          @click="toggleFullscreen"
           :title="isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen (F11)'"
           :aria-label="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'"
           :aria-pressed="isFullscreen"
@@ -60,9 +59,9 @@
         </button>
       </div>
     </div>
-    
-    <div 
-      ref="editorContainer" 
+
+    <div
+      ref="editorContainer"
       class="editor flex-grow-1 w-100 h-100"
       role="textbox"
       :aria-label="`Code editor content`"
@@ -104,7 +103,6 @@ interface EditorStoreMapping {
   module: string;
 }
 
-
 @Component
 export default class MonacoEditor extends Vue {
   @Prop({ required: true }) storeMapping!: EditorStoreMapping;
@@ -125,7 +123,6 @@ export default class MonacoEditor extends Vue {
   private resizeObserver: ResizeObserver | null = null;
   private disposables: monaco.IDisposable[] = [];
 
-  
   // Default content for reset
   defaultContents: string = '';
 
@@ -144,7 +141,6 @@ export default class MonacoEditor extends Vue {
   get hasChanges(): boolean {
     return this.defaultContents !== '' && this.contents !== this.defaultContents;
   }
-
 
   get language(): string {
     return store.getters[this.storeMapping.language];
@@ -165,7 +161,7 @@ export default class MonacoEditor extends Vue {
   get filename(): string {
     return `${this.module}.${Util.supportedLanguages[this.language].extension}`;
   }
-  
+
   // Watchers
   @Watch('language')
   onLanguageChange(value: string): void {
@@ -183,7 +179,7 @@ export default class MonacoEditor extends Vue {
       this._model.setValue(value);
     }
   }
-  
+
   @Watch('theme')
   onThemeChange(value: string): void {
     if (this._editor) {
@@ -207,7 +203,7 @@ export default class MonacoEditor extends Vue {
   private showCopyFeedback(): void {
     this.copied = true;
     this.clearCopyTimeout();
-    
+
     this.copyTimeout = window.setTimeout(() => {
       this.copied = false;
       this.copyTimeout = null;
@@ -250,7 +246,7 @@ export default class MonacoEditor extends Vue {
 
   toggleFullscreen(): void {
     this.isFullscreen = !this.isFullscreen;
-    
+
     if (this.isFullscreen) {
       document.body.style.overflow = 'hidden';
       this.$emit('fullscreen-enter');
@@ -264,8 +260,6 @@ export default class MonacoEditor extends Vue {
       this.onResize();
     }, 100);
   }
-
-  
 
   handleKeydown(e: KeyboardEvent): void {
     // F11 for fullscreen toggle
@@ -322,7 +316,7 @@ export default class MonacoEditor extends Vue {
       accessibilitySupport: 'on',
       screenReaderAnnounceInlineSuggestion: true,
     } as monaco.editor.IStandaloneEditorConstructionOptions);
-    
+
     this._model = this._editor.getModel();
     if (!this._model) return;
 
@@ -332,8 +326,6 @@ export default class MonacoEditor extends Vue {
       this.onContentChange(content);
     });
     this.disposables.push(disposable);
-
-    
 
     // Set up resize observer
     if (window.ResizeObserver) {
@@ -353,11 +345,11 @@ export default class MonacoEditor extends Vue {
   beforeDestroy(): void {
     // Clear all timeouts
     this.clearCopyTimeout();
-    
+
     // Remove event listeners
     window.removeEventListener('code-and-language-set', this.onCodeAndLanguageSet);
     document.removeEventListener('keydown', this.handleKeydown);
-    
+
     // Disconnect resize observer
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
@@ -365,21 +357,21 @@ export default class MonacoEditor extends Vue {
     } else {
       window.removeEventListener('resize', this.onResize);
     }
-    
+
     // Restore body overflow if fullscreen
     if (this.isFullscreen) {
       document.body.style.overflow = '';
     }
-    
+
     // Dispose Monaco resources
     this.disposables.forEach(d => d.dispose());
     this.disposables = [];
-    
+
     if (this._editor) {
       this._editor.dispose();
       this._editor = null;
     }
-    
+
     if (this._model) {
       this._model.dispose();
       this._model = null;

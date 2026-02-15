@@ -3,22 +3,31 @@
     <div class="files-sidebar">
       <div class="sidebar-header">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M12 0H6L4 2H0v10a2 2 0 002 2h10a2 2 0 002-2V2a2 2 0 00-2-2z"/>
+          <path
+            d="M12 0H6L4 2H0v10a2 2 0 002 2h10a2 2 0 002-2V2a2 2 0 00-2-2z"
+          />
         </svg>
         <span>Output Files</span>
       </div>
       <div class="files-list">
         <div v-if="!zip" class="empty-state">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="8" y="6" width="24" height="28" rx="2"/>
-            <line x1="14" y1="14" x2="26" y2="14"/>
-            <line x1="14" y1="20" x2="26" y2="20"/>
-            <line x1="14" y1="26" x2="20" y2="26"/>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="8" y="6" width="24" height="28" rx="2" />
+            <line x1="14" y1="14" x2="26" y2="14" />
+            <line x1="14" y1="20" x2="26" y2="20" />
+            <line x1="14" y1="26" x2="20" y2="26" />
           </svg>
           <p>No output files</p>
         </div>
         <button
-          v-for="(item, name) in (zip ? zip.files : {})"
+          v-for="(item, name) in zip ? zip.files : {}"
           v-else
           :key="name"
           class="file-item"
@@ -27,8 +36,16 @@
           :title="name"
           @click="select(item)"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" class="file-item-icon">
-            <path d="M7 0H2a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3L7 0zm3 10H2V2h4v2h4v6z"/>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="currentColor"
+            class="file-item-icon"
+          >
+            <path
+              d="M7 0H2a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3L7 0zm3 10H2V2h4v2h4v6z"
+            />
           </svg>
           <span class="file-item-name">{{ name }}</span>
         </button>
@@ -36,9 +53,16 @@
     </div>
     <div class="content-area">
       <div v-if="!contents" class="content-empty">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 8h20v4H14zM14 20h20v4H14zM14 32h12v4H14z"/>
-          <rect x="8" y="4" width="32" height="40" rx="2"/>
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M14 8h20v4H14zM14 20h20v4H14zM14 32h12v4H14z" />
+          <rect x="8" y="4" width="32" height="40" rx="2" />
         </svg>
         <p>Select a file to view its contents</p>
       </div>
@@ -264,7 +288,8 @@ export default class ZipViewer extends Vue {
   overflow: auto;
   margin: 0;
   padding: 16px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Courier New',
+    monospace;
   font-size: 12px;
   line-height: 1.6;
   background: #fff;

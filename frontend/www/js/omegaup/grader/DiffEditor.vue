@@ -80,10 +80,11 @@ export default class DiffEditor extends Vue {
         renderSideBySide: true,
         fontSize: 13,
         lineHeight: 20,
-        fontFamily: "'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace",
+        fontFamily:
+          "'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace",
         scrollBeyondLastLine: false,
         minimap: { enabled: false },
-      }
+      },
     );
 
     this._editor.setModel({

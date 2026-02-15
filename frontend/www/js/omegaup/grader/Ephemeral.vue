@@ -4,8 +4,16 @@
     <div class="top-navbar">
       <div class="navbar-left">
         <div class="brand">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="brand-icon">
-            <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 14.5v-9l6 4.5-6 4.5z"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="brand-icon"
+          >
+            <path
+              d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 14.5v-9l6 4.5-6 4.5z"
+            />
           </svg>
           <span class="brand-name">omegaUp</span>
           <span class="brand-subtitle">grader</span>
@@ -32,8 +40,15 @@
         <template v-if="!isEmbedded">
           <button class="icon-btn" :title="T.wordsUpload">
             <label class="icon-btn-label">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 0l-4 4h2.5v5h3V4H12L8 0zM1 12v3h14v-3h-2v1H3v-1H1z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path
+                  d="M8 0l-4 4h2.5v5h3V4H12L8 0zM1 12v3h14v-3h-2v1H3v-1H1z"
+                />
               </svg>
               <input
                 type="file"
@@ -53,11 +68,25 @@
             data-zip-download
             @click="handleDownload"
           >
-            <svg v-if="isDirty" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M14 0H6L4 2H2C.9 2 0 2.9 0 4v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm-4 4.5v2h-4v-2h4zm0 3v2h-4v-2h4zm-4 3h4v2h-4v-2z"/>
+            <svg
+              v-if="isDirty"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <path
+                d="M14 0H6L4 2H2C.9 2 0 2.9 0 4v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm-4 4.5v2h-4v-2h4zm0 3v2h-4v-2h4zm-4 3h4v2h-4v-2z"
+              />
             </svg>
-            <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM1 13v2h14v-2H1z"/>
+            <svg
+              v-else
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <path d="M8 12l-4-4h2.5V3h3v5H12L8 12zM1 13v2h14v-2H1z" />
             </svg>
           </a>
 
@@ -66,26 +95,43 @@
             :title="isDark ? 'Light mode' : 'Dark mode'"
             @click.prevent="toggleTheme"
           >
-            <svg v-if="isDark" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="8" cy="8" r="3"/>
-              <path d="M8 0v2M8 14v2M16 8h-2M2 8H0M13.657 2.343l-1.414 1.414M3.757 12.243l-1.414 1.414M13.657 13.657l-1.414-1.414M3.757 3.757L2.343 2.343"/>
+            <svg
+              v-if="isDark"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <circle cx="8" cy="8" r="3" />
+              <path
+                d="M8 0v2M8 14v2M16 8h-2M2 8H0M13.657 2.343l-1.414 1.414M3.757 12.243l-1.414 1.414M13.657 13.657l-1.414-1.414M3.757 3.757L2.343 2.343"
+              />
             </svg>
-            <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M6 0C2.686 0 0 2.686 0 6c0 3.313 2.686 6 6 6 .537 0 1.058-.072 1.552-.207C5.54 10.727 4.5 8.976 4.5 7c0-2.761 2.239-5 5-5 .34 0 .671.034.99.099A5.973 5.973 0 006 0z"/>
+            <svg
+              v-else
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+            >
+              <path
+                d="M6 0C2.686 0 0 2.686 0 6c0 3.313 2.686 6 6 6 .537 0 1.058-.072 1.552-.207C5.54 10.727 4.5 8.976 4.5 7c0-2.761 2.239-5 5-5 .34 0 .671.034.99.099A5.973 5.973 0 006 0z"
+              />
             </svg>
           </button>
         </template>
       </div>
     </div>
 
-
-
     <!-- Main content: horizontal split -->
     <div class="main-content">
       <!-- Left: Code editor + bottom panels -->
       <div class="left-pane" :style="{ flexBasis: leftPaneWidth + '%' }">
         <!-- Code editor -->
-        <div class="code-editor-section" :style="{ height: editorHeight + 'px' }">
+        <div
+          class="code-editor-section"
+          :style="{ height: editorHeight + 'px' }"
+        >
           <grader-monaco-editor
             ref="monacoEditor"
             :store-mapping="{
@@ -115,7 +161,10 @@
               @click="activeBottomTab = tab.id"
             >
               {{ tab.label }}
-              <span v-if="tab.id === 'compiler' && compilerOutput" class="tab-dot"></span>
+              <span
+                v-if="tab.id === 'compiler' && compilerOutput"
+                class="tab-dot"
+              ></span>
             </button>
           </div>
           <div class="tab-content">
@@ -139,9 +188,7 @@
               v-show="activeBottomTab === 'files'"
               ref="zipviewer"
             />
-            <grader-settings
-              v-show="activeBottomTab === 'settings'"
-            />
+            <grader-settings v-show="activeBottomTab === 'settings'" />
           </div>
         </div>
       </div>
@@ -155,7 +202,7 @@
       </div>
 
       <!-- Right: Cases + Input/Output -->
-      <div class="right-pane" :style="{ flexBasis: (100 - leftPaneWidth) + '%' }">
+      <div class="right-pane" :style="{ flexBasis: 100 - leftPaneWidth + '%' }">
         <!-- Case selector -->
         <grader-case-selector ref="caseSelector" class="case-selector-panel" />
 
@@ -191,7 +238,10 @@
             />
             <grader-text-editor
               v-show="activeIoTab === 'stdout'"
-              :store-mapping="{ contents: 'outputStdout', module: 'currentCase' }"
+              :store-mapping="{
+                contents: 'outputStdout',
+                module: 'currentCase',
+              }"
               :read-only="true"
               :show-header="false"
               extension="out"
@@ -199,7 +249,10 @@
             />
             <grader-text-editor
               v-show="activeIoTab === 'stderr'"
-              :store-mapping="{ contents: 'outputStderr', module: 'currentCase' }"
+              :store-mapping="{
+                contents: 'outputStderr',
+                module: 'currentCase',
+              }"
               :read-only="true"
               :show-header="false"
               extension="err"
@@ -237,8 +290,8 @@
           @click="activeBottomTab = 'compiler'"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-            <path d="M7 0L0 12h14L7 0zm0 3l4 7H3l4-7z"/>
-            <path d="M6 7h2v2H6V7zm0 3h2v2H6v-2z"/>
+            <path d="M7 0L0 12h14L7 0zm0 3l4 7H3l4-7z" />
+            <path d="M6 7h2v2H6V7zm0 3h2v2H6v-2z" />
           </svg>
           <span>Compiler output</span>
         </button>
@@ -261,8 +314,14 @@
             @finish="now = Date.now()"
           />
           <template v-else>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" class="button-icon">
-              <path d="M2 1v12l10-6L2 1z"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="currentColor"
+              class="button-icon"
+            >
+              <path d="M2 1v12l10-6L2 1z" />
             </svg>
             <span>Run</span>
             <span v-if="isRunLoading" class="spinner"></span>
@@ -285,8 +344,14 @@
             @finish="now = Date.now()"
           />
           <template v-else>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" class="button-icon">
-              <path d="M7 0L3 4h3v6h2V4h3L7 0zM0 12v2h14v-2H0z"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="currentColor"
+              class="button-icon"
+            >
+              <path d="M7 0L3 4h3v6h2V4h3L7 0zM0 12v2h14v-2H0z" />
             </svg>
             <span>Submit</span>
             <span v-if="isSubmitLoading" class="spinner"></span>
@@ -515,7 +580,10 @@ export default class Ephemeral extends Vue {
     const container = this.$el as HTMLElement;
     const dx = e.clientX - this._resizeStartX;
     const pct = (dx / container.clientWidth) * 100;
-    this.leftPaneWidth = Math.min(80, Math.max(20, this._resizeStartValue + pct));
+    this.leftPaneWidth = Math.min(
+      80,
+      Math.max(20, this._resizeStartValue + pct),
+    );
   }
   stopPaneResize() {
     this._isResizingPane = false;
@@ -539,7 +607,10 @@ export default class Ephemeral extends Vue {
   onEditorResize(e: MouseEvent) {
     if (!this._isResizingEditor) return;
     const dy = e.clientY - this._resizeStartY;
-    this.editorHeight = Math.min(800, Math.max(100, this._resizeStartValue + dy));
+    this.editorHeight = Math.min(
+      800,
+      Math.max(100, this._resizeStartValue + dy),
+    );
   }
   stopEditorResize() {
     this._isResizingEditor = false;
@@ -554,8 +625,11 @@ export default class Ephemeral extends Vue {
     // Notify Monaco editors to re-layout
     this.$nextTick(() => {
       // Use Vue's $refs with correct type assertion for MonacoEditor
-      const monacoRef = this.$refs.monacoEditor as InstanceType<typeof import('./MonacoEditor.vue').default> | undefined;
-      if (monacoRef && typeof monacoRef.onResize === 'function') monacoRef.onResize();
+      const monacoRef = this.$refs.monacoEditor as
+        | InstanceType<typeof import('./MonacoEditor.vue').default>
+        | undefined;
+      if (monacoRef && typeof monacoRef.onResize === 'function')
+        monacoRef.onResize();
     });
   }
 
@@ -595,7 +669,9 @@ export default class Ephemeral extends Vue {
 
     const score = results.contest_score ?? results.score ?? 0;
     const maxScore = results.max_score ?? 0;
-    const scoreStr = `${this.formatNumber(score)}/${this.formatNumber(maxScore)}`;
+    const scoreStr = `${this.formatNumber(score)}/${this.formatNumber(
+      maxScore,
+    )}`;
 
     switch (results.verdict) {
       case 'AC':
@@ -880,123 +956,127 @@ export default class Ephemeral extends Vue {
     reader.addEventListener('loadend', async (e) => {
       if (e.target?.readyState != FileReader.DONE) return;
 
-      JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
-        await store.dispatch('reset');
-        await store.dispatch('removeCase', 'long');
+      JSZip.loadAsync(reader.result as ArrayBuffer)
+        .then(async (zip) => {
+          await store.dispatch('reset');
+          await store.dispatch('removeCase', 'long');
 
-        const testplanValue = await zip.file('testplan')?.async('string');
-        const casesWeights: { [key: string]: number } = {};
-        if (testplanValue) {
-          for (const line of testplanValue.split('\n')) {
-            if (line.startsWith('#') || line.trim() === '') continue;
-            const tokens = line.split(/\s+/);
+          const testplanValue = await zip.file('testplan')?.async('string');
+          const casesWeights: { [key: string]: number } = {};
+          if (testplanValue) {
+            for (const line of testplanValue.split('\n')) {
+              if (line.startsWith('#') || line.trim() === '') continue;
+              const tokens = line.split(/\s+/);
 
-            if (tokens.length !== 2) continue;
-            const [caseName, weight] = tokens;
-            casesWeights[caseName] = parseFloat(weight);
+              if (tokens.length !== 2) continue;
+              const [caseName, weight] = tokens;
+              casesWeights[caseName] = parseFloat(weight);
+            }
           }
-        }
 
-        for (const fileName in zip.files) {
-          if (!zip.files[fileName]) continue;
+          for (const fileName in zip.files) {
+            if (!zip.files[fileName]) continue;
 
-          if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
-            const caseName = fileName.substring(
-              'cases/'.length,
-              fileName.length - '.in'.length,
-            );
-            const caseInFileName = fileName;
-            const caseOutFileName = `cases/${caseName}.out`;
+            if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
+              const caseName = fileName.substring(
+                'cases/'.length,
+                fileName.length - '.in'.length,
+              );
+              const caseInFileName = fileName;
+              const caseOutFileName = `cases/${caseName}.out`;
 
-            Promise.all([
-              zip.file(caseInFileName)?.async('string'),
-              zip.file(caseOutFileName)?.async('string'),
-            ])
-              .then(([caseIn, caseOut]) => {
-                store.dispatch('createCase', {
-                  name: caseName,
-                  in: caseIn,
-                  out: caseOut,
-                  weight: casesWeights[caseName] || 1,
-                });
-              })
-              .catch(Util.asyncError);
-          } else if (fileName.startsWith('validator.')) {
-            const extension = fileName.substring('validator.'.length);
-            if (!Util.supportedExtensions.includes(extension)) continue;
+              Promise.all([
+                zip.file(caseInFileName)?.async('string'),
+                zip.file(caseOutFileName)?.async('string'),
+              ])
+                .then(([caseIn, caseOut]) => {
+                  store.dispatch('createCase', {
+                    name: caseName,
+                    in: caseIn,
+                    out: caseOut,
+                    weight: casesWeights[caseName] || 1,
+                  });
+                })
+                .catch(Util.asyncError);
+            } else if (fileName.startsWith('validator.')) {
+              const extension = fileName.substring('validator.'.length);
+              if (!Util.supportedExtensions.includes(extension)) continue;
 
-            zip
-              .file(fileName)
-              ?.async('string')
-              .then((value) => {
-                store.dispatch('Validator', 'custom').then(() => {
-                  store.dispatch(
-                    'request.input.validator.custom_validator.language',
-                    extension,
-                  );
-                  store.dispatch(
-                    'request.input.validator.custom_validator.source',
-                    value,
-                  );
-                });
-              })
-              .catch(Util.asyncError);
-          } else if (
-            fileName.startsWith('interactive/') &&
-            fileName.endsWith('.idl')
-          ) {
-            const moduleName = fileName.substring(
-              'interactive/'.length,
-              fileName.length - '.idl'.length,
-            );
+              zip
+                .file(fileName)
+                ?.async('string')
+                .then((value) => {
+                  store.dispatch('Validator', 'custom').then(() => {
+                    store.dispatch(
+                      'request.input.validator.custom_validator.language',
+                      extension,
+                    );
+                    store.dispatch(
+                      'request.input.validator.custom_validator.source',
+                      value,
+                    );
+                  });
+                })
+                .catch(Util.asyncError);
+            } else if (
+              fileName.startsWith('interactive/') &&
+              fileName.endsWith('.idl')
+            ) {
+              const moduleName = fileName.substring(
+                'interactive/'.length,
+                fileName.length - '.idl'.length,
+              );
 
-            zip
-              .file(fileName)
-              ?.async('string')
-              .then((value) => {
-                store.dispatch('Interactive', {
-                  idl: value,
-                  module_name: moduleName,
-                });
-              })
-              .catch(Util.asyncError);
-          } else if (fileName.startsWith('interactive/Main.')) {
-            const extension = fileName.substring('interactive/Main.'.length);
-            if (!Util.supportedExtensions.includes(extension)) continue;
+              zip
+                .file(fileName)
+                ?.async('string')
+                .then((value) => {
+                  store.dispatch('Interactive', {
+                    idl: value,
+                    module_name: moduleName,
+                  });
+                })
+                .catch(Util.asyncError);
+            } else if (fileName.startsWith('interactive/Main.')) {
+              const extension = fileName.substring('interactive/Main.'.length);
+              if (!Util.supportedExtensions.includes(extension)) continue;
 
-            zip
-              .file(fileName)
-              ?.async('string')
-              .then((value) => {
-                store.dispatch('Interactive', {
-                  language: extension,
-                  main_source: value,
-                });
-              })
-              .catch(Util.asyncError);
+              zip
+                .file(fileName)
+                ?.async('string')
+                .then((value) => {
+                  store.dispatch('Interactive', {
+                    language: extension,
+                    main_source: value,
+                  });
+                })
+                .catch(Util.asyncError);
+            }
           }
-        }
-        zip
-          .file('settings.json')
-          ?.async('string')
-          .then((value) => {
-            const settings: Partial<types.ProblemSettings> = JSON.parse(value);
-            if (settings.Limits) {
-              store.dispatch('limits', settings.Limits);
-            }
-            if (settings.Validator?.Name) {
-              store.dispatch('Validator', settings.Validator.Name);
-            }
-            if (settings.Validator?.Tolerance) {
-              store.dispatch('Tolerance', settings.Validator.Tolerance);
-            }
-          })
-          .catch(Util.asyncError);
+          zip
+            .file('settings.json')
+            ?.async('string')
+            .then((value) => {
+              const settings: Partial<types.ProblemSettings> = JSON.parse(
+                value,
+              );
+              if (settings.Limits) {
+                store.dispatch('limits', settings.Limits);
+              }
+              if (settings.Validator?.Name) {
+                store.dispatch('Validator', settings.Validator.Name);
+              }
+              if (settings.Validator?.Tolerance) {
+                store.dispatch('Tolerance', settings.Validator.Tolerance);
+              }
+            })
+            .catch(Util.asyncError);
 
-        ui.success(T.wordsUpload || 'Upload successful');
-      }).catch((err: Error) => {
-        ui.error(`Upload error: ${err.message}`);
-      });
+          ui.success(T.wordsUpload || 'Upload successful');
+        })
+        .catch((err: Error) => {
+          ui.error(`Upload error: ${err.message}`);
+        });
     });
     reader.readAsArrayBuffer(files[0]);
   }
@@ -1014,7 +1094,12 @@ export default class Ephemeral extends Vue {
     document.removeEventListener('keydown', this.handleKeyboardShortcut);
   }
   handleKeyboardShortcut(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key === 'Enter' && this.isSubmitButton && this.canSubmit) {
+    if (
+      e.ctrlKey &&
+      e.key === 'Enter' &&
+      this.isSubmitButton &&
+      this.canSubmit
+    ) {
       e.preventDefault();
       this.handleSubmit();
       return;
@@ -1032,13 +1117,15 @@ export default class Ephemeral extends Vue {
   display: flex;
   flex-direction: column;
   max-height: 120vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
   background: #fafafa;
   color: #1a1a1a;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
+
   &.vs-dark {
     background: #1e1e1e;
     color: #d4d4d4;
@@ -1086,21 +1173,27 @@ export default class Ephemeral extends Vue {
   font-size: 15px;
   font-weight: 700;
   color: #1a1a1a;
-  .vs-dark & { color: #e5e5e5; }
+  .vs-dark & {
+    color: #e5e5e5;
+  }
 }
 
 .brand-subtitle {
   font-size: 13px;
   font-weight: 400;
   color: #6b7280;
-  .vs-dark & { color: #9ca3af; }
+  .vs-dark & {
+    color: #9ca3af;
+  }
 }
 
 .navbar-divider {
   width: 1px;
   height: 20px;
   background: #e5e7eb;
-  .vs-dark & { background: #404040; }
+  .vs-dark & {
+    background: #404040;
+  }
 }
 
 .language-select {
@@ -1109,7 +1202,9 @@ export default class Ephemeral extends Vue {
   padding: 5px 28px 5px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%234b5563' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 8px center;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%234b5563' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")
+    no-repeat right 8px center;
   font-size: 13px;
   font-weight: 500;
   color: #1a1a1a;
@@ -1117,7 +1212,10 @@ export default class Ephemeral extends Vue {
   outline: none;
   transition: border-color 0.15s;
 
-  &:hover { border-color: #9ca3af; }
+  &:hover {
+    border-color: #9ca3af;
+  }
+
   &:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
@@ -1128,7 +1226,9 @@ export default class Ephemeral extends Vue {
     border-color: #404040;
     color: #d4d4d4;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239ca3af' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-    &:focus { border-color: #3b82f6; }
+    &:focus {
+      border-color: #3b82f6;
+    }
   }
 }
 
@@ -1150,9 +1250,13 @@ export default class Ephemeral extends Vue {
     background: #f3f4f6;
     color: #1a1a1a;
   }
+
   .vs-dark & {
     color: #9ca3af;
-    &:hover { background: rgba(255, 255, 255, 0.05); color: #d4d4d4; }
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #d4d4d4;
+    }
   }
 }
 
@@ -1166,7 +1270,9 @@ export default class Ephemeral extends Vue {
   margin: 0;
 }
 
-.hidden-input { display: none; }
+.hidden-input {
+  display: none;
+}
 
 /* ========== Result Pill (compact, in action bar) ========== */
 .result-pill {
@@ -1183,30 +1289,48 @@ export default class Ephemeral extends Vue {
 .result-pill--accepted {
   background: rgba(16, 185, 129, 0.1);
   color: #047857;
-  .vs-dark & { background: rgba(52, 211, 153, 0.12); color: #34d399; }
+  .vs-dark & {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+  }
 }
+
 .result-pill--partial {
   background: rgba(245, 158, 11, 0.1);
   color: #b45309;
-  .vs-dark & { background: rgba(251, 191, 36, 0.12); color: #fbbf24; }
+  .vs-dark & {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+  }
 }
+
 .result-pill--error {
   background: rgba(239, 68, 68, 0.08);
   color: #dc2626;
-  .vs-dark & { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+  .vs-dark & {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+  }
 }
 
 .result-pill__verdict {
   font-weight: 700;
 }
+
 .result-pill__stats {
   font-weight: 500;
   opacity: 0.8;
 }
 
 @keyframes pill-in {
-  from { opacity: 0; transform: translateX(-6px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ========== Main Content Split Layout ========== */
@@ -1243,7 +1367,9 @@ export default class Ephemeral extends Vue {
   min-height: 0;
   overflow: hidden;
   border-top: 1px solid #e5e7eb;
-  .vs-dark & { border-top-color: #333; }
+  .vs-dark & {
+    border-top-color: #333;
+  }
 }
 
 .case-selector-panel {
@@ -1251,7 +1377,9 @@ export default class Ephemeral extends Vue {
   max-height: 55%;
   overflow: auto;
   border-bottom: 1px solid #e5e7eb;
-  .vs-dark & { border-bottom-color: #333; }
+  .vs-dark & {
+    border-bottom-color: #333;
+  }
 }
 
 .io-section {
@@ -1273,8 +1401,11 @@ export default class Ephemeral extends Vue {
 
   &:hover {
     background: rgba(59, 130, 246, 0.08);
-    .resize-handle-bar { background: #3b82f6; }
+    .resize-handle-bar {
+      background: #3b82f6;
+    }
   }
+
   .vs-dark &:hover {
     background: rgba(59, 130, 246, 0.12);
   }
@@ -1290,7 +1421,9 @@ export default class Ephemeral extends Vue {
     border-radius: 1px;
     background: #d1d5db;
     transition: background 0.15s;
-    .vs-dark & { background: #404040; }
+    .vs-dark & {
+      background: #404040;
+    }
   }
 }
 
@@ -1304,7 +1437,9 @@ export default class Ephemeral extends Vue {
     border-radius: 1px;
     background: #d1d5db;
     transition: background 0.15s;
-    .vs-dark & { background: #404040; }
+    .vs-dark & {
+      background: #404040;
+    }
   }
 }
 
@@ -1345,7 +1480,9 @@ export default class Ephemeral extends Vue {
 
   &:hover {
     color: #1a1a1a;
-    .vs-dark & { color: #d4d4d4; }
+    .vs-dark & {
+      color: #d4d4d4;
+    }
   }
 
   &.tab-button--active {
@@ -1366,7 +1503,9 @@ export default class Ephemeral extends Vue {
 
   .vs-dark &.tab-button--active {
     color: #60a5fa;
-    &::after { background: #60a5fa; }
+    &::after {
+      background: #60a5fa;
+    }
   }
 }
 
@@ -1429,11 +1568,16 @@ export default class Ephemeral extends Vue {
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover { background: rgba(245, 158, 11, 0.15); }
+  &:hover {
+    background: rgba(245, 158, 11, 0.15);
+  }
+
   .vs-dark & {
     background: rgba(245, 158, 11, 0.15);
     color: #fbbf24;
-    &:hover { background: rgba(245, 158, 11, 0.2); }
+    &:hover {
+      background: rgba(245, 158, 11, 0.2);
+    }
   }
 }
 
@@ -1456,7 +1600,9 @@ export default class Ephemeral extends Vue {
   }
 }
 
-.button-icon { flex-shrink: 0; }
+.button-icon {
+  flex-shrink: 0;
+}
 
 .run-button {
   background: #fff;
@@ -1468,11 +1614,15 @@ export default class Ephemeral extends Vue {
     background: #f9fafb;
     border-color: #9ca3af;
   }
+
   .vs-dark & {
     background: #2a2a2a;
     border-color: #404040;
     color: #d4d4d4;
-    &:hover:not(.action-button--disabled) { background: #333; border-color: #525252; }
+    &:hover:not(.action-button--disabled) {
+      background: #333;
+      border-color: #525252;
+    }
   }
 }
 
@@ -1498,6 +1648,8 @@ export default class Ephemeral extends Vue {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

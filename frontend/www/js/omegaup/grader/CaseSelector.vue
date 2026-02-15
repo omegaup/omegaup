@@ -67,10 +67,10 @@
     </div>
 
     <!-- Cases list -->
-    <div 
+    <div
       ref="casesList"
-      class="cases-list" 
-      role="list" 
+      class="cases-list"
+      role="list"
       :aria-label="`${totalCaseCount} available`"
       tabindex="0"
       @keydown="handleListKeydown"
@@ -84,7 +84,7 @@
         <p class="empty-title">No test cases yet</p>
         <p class="empty-subtitle">Add your first test case above</p>
       </div>
-      
+
       <template v-else>
         <div v-for="(group, groupIndex) in groups" :key="group.name" class="group-container">
           <!-- Group header (if explicit) -->
@@ -186,7 +186,7 @@ export default class CaseSelector extends Vue {
   isLoading: boolean = false;
   showDeleteModal: boolean = false;
   caseToDelete: string = '';
-  
+
   readonly T = T;
 
   // Computed
@@ -334,17 +334,17 @@ export default class CaseSelector extends Vue {
     if (!name) return 'Case name is required';
     if (name.length > CASE_NAME_MAX_LENGTH) return `Case name must be ${CASE_NAME_MAX_LENGTH} characters or less`;
     if (!CASE_NAME_PATTERN.test(name)) return 'Case name can only contain letters, numbers, hyphens, and underscores';
-    
+
     // Check for duplicates
     const existingCases = this.groups.flatMap(g => g.cases);
     if (existingCases.some(c => c.name === name)) return 'A test case with this name already exists';
-    
+
     return null;
   }
 
   createCase(): void {
     this.addCaseError = '';
-    
+
     const error = this.validateCaseName(this.newCaseName);
     if (error) {
       this.addCaseError = error;
@@ -352,7 +352,7 @@ export default class CaseSelector extends Vue {
     }
 
     this.isLoading = true;
-    
+
     store.dispatch('createCase', {
       name: this.newCaseName,
       weight: this.newCaseWeight ?? 1,
@@ -362,7 +362,7 @@ export default class CaseSelector extends Vue {
         this.newCaseWeight = null;
         this.newCaseName = '';
         this.addCaseError = '';
-        
+
         // Focus the input for quick adding
         this.$nextTick(() => {
           (this.$refs.caseNameInput as HTMLInputElement)?.focus();
@@ -383,7 +383,7 @@ export default class CaseSelector extends Vue {
 
   removeCase(name: string): void {
     this.isLoading = true;
-    
+
     store.dispatch('removeCase', name)
       .then(() => {
         this.announceToScreenReader(`Test case ${name} removed`);
@@ -512,7 +512,7 @@ export default class CaseSelector extends Vue {
     announcement.className = 'sr-only';
     announcement.textContent = message;
     document.body.appendChild(announcement);
-    
+
     setTimeout(() => {
       document.body.removeChild(announcement);
     }, 1000);

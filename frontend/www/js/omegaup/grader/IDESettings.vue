@@ -172,7 +172,9 @@ export default class IDESettings extends Vue {
   }
 
   get overallWallTimeLimit(): number {
-    return Util.parseDuration(store.state.request.input.limits.OverallWallTimeLimit);
+    return Util.parseDuration(
+      store.state.request.input.limits.OverallWallTimeLimit,
+    );
   }
 
   set overallWallTimeLimit(value: number) {

@@ -4,17 +4,34 @@
       <div class="file-info">
         <i class="far fa-file-code file-icon"></i>
         <span class="filename">{{ filename }}</span>
-        <span v-if="!readOnly && lineCount > 0" class="line-count">{{ lineCount }} lines</span>
+        <span v-if="!readOnly && lineCount > 0" class="line-count"
+          >{{ lineCount }} lines</span
+        >
       </div>
       <div class="header-actions">
-        <button v-if="contents" class="action-btn action-btn--copy" :class="{ 'action-btn--copied': copied }" @click="copyCode" :title="copyButtonText">
+        <button
+          v-if="contents"
+          class="action-btn action-btn--copy"
+          :class="{ 'action-btn--copied': copied }"
+          @click="copyCode"
+          :title="copyButtonText"
+        >
           <i v-if="!copied" class="far fa-copy"></i>
           <i v-else class="fas fa-check"></i>
         </button>
-        <button v-if="!readOnly && contents" class="action-btn" @click="clearContents" title="Clear">
+        <button
+          v-if="!readOnly && contents"
+          class="action-btn"
+          @click="clearContents"
+          title="Clear"
+        >
           <i class="fas fa-trash-alt"></i>
         </button>
-        <button class="action-btn" @click="toggleFullscreen" :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'">
+        <button
+          class="action-btn"
+          @click="toggleFullscreen"
+          :title="isFullscreen ? 'Exit fullscreen' : 'Fullscreen'"
+        >
           <i v-if="!isFullscreen" class="fas fa-expand"></i>
           <i v-else class="fas fa-compress"></i>
         </button>
@@ -30,7 +47,9 @@
         v-model="contents"
         class="editor-content"
         :disabled="readOnly"
-        :placeholder="readOnly ? 'No output' : 'Type or paste your code here...'"
+        :placeholder="
+          readOnly ? 'No output' : 'Type or paste your code here...'
+        "
         spellcheck="false"
         @input="updateLineCount"
       ></textarea>
@@ -139,7 +158,7 @@ export default class TextEditor extends Vue {
   toggleFullscreen(): void {
     this.isFullscreen = !this.isFullscreen;
     const editorElement = this.$el as HTMLElement;
-    
+
     if (this.isFullscreen) {
       editorElement.classList.add('text-editor--fullscreen');
       document.body.style.overflow = 'hidden';
@@ -209,6 +228,7 @@ export default class TextEditor extends Vue {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -373,7 +393,8 @@ export default class TextEditor extends Vue {
   outline: none;
   resize: none;
   padding: 16px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Courier New', monospace;
   font-size: 13px;
   line-height: 1.6;
   background: #fff;
