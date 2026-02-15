@@ -1,93 +1,47 @@
 <template>
-  <div
-    class="case-selector"
-    :class="theme"
-    role="region"
-    aria-label="Test cases"
-  >
+  <div class="case-selector" :class="theme" role="region" aria-label="Test cases">
     <!-- Header with summary -->
     <div class="case-header">
       <div class="header-left">
         <span class="header-title">Test Cases</span>
         <span v-if="groups && groups.length > 0" class="case-count">{{
           totalCaseCount
-        }}</span>
+          }}</span>
       </div>
       <div v-if="summaryVerdict" class="header-right">
-        <span
-          class="summary-badge"
-          :class="summaryClass"
-          role="status"
-          :aria-label="`Overall verdict: ${summaryVerdict}`"
-        >
+        <span class="summary-badge" :class="summaryClass" role="status"
+          :aria-label="`Overall verdict: ${summaryVerdict}`">
           <span class="verdict-dot" aria-hidden="true"></span>
           <span class="verdict-text">{{ summaryVerdict }}</span>
           <span class="sr-only">{{ verdictScreenReaderText }}</span>
         </span>
         <span class="summary-score" aria-label="Overall score">{{
           summaryScore
-        }}</span>
+          }}</span>
       </div>
     </div>
 
     <!-- Add case form -->
     <div class="add-case-section">
-      <form
-        class="add-case-form"
-        aria-label="Add test case form"
-        @submit.prevent="createCase()"
-      >
+      <form class="add-case-form" aria-label="Add test case form" @submit.prevent="createCase()">
         <div class="form-row">
           <div class="input-group">
             <label for="case-weight" class="input-label">Weight</label>
-            <input
-              v-model.number="newCaseWeight"
-              data-testid="case-weight"
-              class="input-weight"
-              type="number"
-              placeholder="1.0"
-              min="0"
-              step="0.1"
-              aria-describedby="weight-help"
-            />
-            <span class="sr-only" aria-label="Weight for scoring this test case"
-              >Weight for scoring this test case</span
-            >
+            <input v-model.number="newCaseWeight" data-testid="case-weight" class="input-weight" type="number"
+              placeholder="1.0" min="0" step="0.1" aria-describedby="weight-help" />
+            <span class="sr-only" aria-label="Weight for scoring this test case">Weight for scoring this test
+              case</span>
           </div>
           <div class="input-group input-group--flex">
             <label for="case-name" class="input-label">Case Name</label>
-            <input
-              ref="caseNameInput"
-              v-model="newCaseName"
-              data-testid="case-name"
-              class="input-name"
-              type="text"
-              placeholder="e.g., sample, edge-case-1"
-              data-case-name
-              aria-describedby="name-help"
-              @keydown="handleInputKeydown"
-            />
-            <span class="sr-only" aria-label="Name for the test case"
-              >Name for the test case</span
-            >
+            <input ref="caseNameInput" v-model="newCaseName" data-testid="case-name" class="input-name" type="text"
+              placeholder="e.g., sample, edge-case-1" data-case-name aria-describedby="name-help"
+              @keydown="handleInputKeydown" />
+            <span class="sr-only" aria-label="Name for the test case">Name for the test case</span>
           </div>
-          <button
-            class="btn-add"
-            type="submit"
-            :disabled="!canAddCase"
-            data-add-button
-            :aria-label="addButtonLabel"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z"
-              />
+          <button class="btn-add" type="submit" :disabled="!canAddCase" data-add-button :aria-label="addButtonLabel">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 1a1 1 0 011 1v5h5a1 1 0 110 2H9v5a1 1 0 11-2 0V9H2a1 1 0 110-2h5V2a1 1 0 011-1z" />
             </svg>
             <span class="sr-only">Add test case</span>
           </button>
@@ -99,28 +53,11 @@
     </div>
 
     <!-- Cases list -->
-    <div
-      ref="casesList"
-      class="cases-list"
-      role="list"
-      :aria-label="`${totalCaseCount} available`"
-      tabindex="0"
-      @keydown="handleListKeydown"
-    >
-      <div
-        v-if="!groups || groups.length === 0"
-        class="empty-state"
-        role="status"
-      >
-        <svg
-          width="56"
-          height="56"
-          viewBox="0 0 56 56"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          aria-hidden="true"
-        >
+    <div ref="casesList" class="cases-list" role="list" :aria-label="`${totalCaseCount} available`" tabindex="0"
+      @keydown="handleListKeydown">
+      <div v-if="!groups || groups.length === 0" class="empty-state" role="status">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"
+          aria-hidden="true">
           <rect x="12" y="12" width="32" height="32" rx="4" />
           <line x1="20" y1="24" x2="36" y2="24" />
           <line x1="20" y1="32" x2="32" y2="32" />
@@ -130,95 +67,48 @@
       </div>
 
       <template v-else>
-        <div
-          v-for="(group, groupIndex) in groups"
-          :key="group.name"
-          class="group-container"
-        >
+        <div v-for="(group, groupIndex) in groups" :key="group.name" class="group-container">
           <!-- Group header (if explicit) -->
-          <div
-            v-if="group.explicit"
-            class="group-header"
-            role="group"
-            :aria-label="`Group: ${group.name}`"
-          >
-            <span
-              class="verdict-icon"
-              :class="verdictIconClass(groupResult(group.name))"
-              aria-hidden="true"
-            >
+          <div v-if="group.explicit" class="group-header" role="group" :aria-label="`Group: ${group.name}`">
+            <span class="verdict-icon" :class="verdictIconClass(groupResult(group.name))" aria-hidden="true">
               {{ verdictLabel(groupResult(group.name)) }}
             </span>
             <span class="group-name">{{ group.name }}</span>
             <span class="group-score" aria-label="Group score">{{
               score(groupResult(group.name))
-            }}</span>
+              }}</span>
           </div>
 
           <!-- Cases in group -->
-          <button
-            v-for="(item, itemIndex) in group.cases"
-            :key="item.name"
-            :ref="`case-${item.name}`"
-            class="case-item"
+          <button v-for="(item, itemIndex) in group.cases" :key="item.name" :ref="`case-${item.name}`" class="case-item"
             :class="{
               'case-item--grouped': group.explicit,
               'case-item--active': currentCase === item.name,
-            }"
-            type="button"
-            role="listitem"
-            :aria-label="getCaseAriaLabel(item)"
-            :aria-current="currentCase === item.name ? 'true' : 'false'"
-            :data-case-name="item.name"
-            :data-group-index="groupIndex"
-            :data-item-index="itemIndex"
-            @click="selectCase(item.name)"
-            @keydown="
+            }" type="button" role="listitem" :aria-label="getCaseAriaLabel(item)"
+            :aria-current="currentCase === item.name ? 'true' : 'false'" :data-case-name="item.name"
+            :data-group-index="groupIndex" :data-item-index="itemIndex" @click="selectCase(item.name)" @keydown="
               handleCaseKeydown($event, item.name, groupIndex, itemIndex)
-            "
-          >
+              ">
             <div class="case-item-left">
-              <span
-                class="verdict-icon"
-                :class="verdictIconClass(caseResult(item.name))"
-                aria-hidden="true"
-              >
+              <span class="verdict-icon" :class="verdictIconClass(caseResult(item.name))" aria-hidden="true">
                 {{ verdictLabel(caseResult(item.name)) }}
               </span>
               <span class="case-name">{{ item.name }}</span>
-              <span
-                v-if="item.weight && item.weight !== 1"
-                class="case-weight"
-                aria-label="`Weight ${formatWeight(item.weight)}`"
-              >
+              <span v-if="item.weight && item.weight !== 1" class="case-weight"
+                aria-label="`Weight ${formatWeight(item.weight)}`">
                 ×{{ formatWeight(item.weight) }}
               </span>
             </div>
             <div class="case-item-right">
-              <span
-                class="case-score"
-                :aria-label="`Score: ${score(caseResult(item.name))}`"
-              >
+              <span class="case-score" :aria-label="`Score: ${score(caseResult(item.name))}`">
                 {{ score(caseResult(item.name)) }}
               </span>
-              <button
-                v-if="canRemoveCase"
-                class="btn-remove"
-                type="button"
-                :aria-label="`Remove test case ${item.name}`"
-                :title="`Remove test case ${item.name}`"
-                @click.prevent.stop="confirmRemoveCase(item.name)"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
+              <button v-if="canRemoveCase" class="btn-remove" type="button"
+                :aria-label="`Remove test case ${item.name}`" :title="`Remove test case ${item.name}`"
+                @click.prevent.stop="confirmRemoveCase(item.name)">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
                   <path
-                    d="M7 5.586L11.293 1.293a1 1 0 111.414 1.414L8.414 7l4.293 4.293a1 1 0 01-1.414 1.414L7 8.414l-4.293 4.293a1 1 0 01-1.414-1.414L5.586 7 1.293 2.707A1 1 0 012.707 1.293L7 5.586z"
-                  />
+                    d="M7 5.586L11.293 1.293a1 1 0 111.414 1.414L8.414 7l4.293 4.293a1 1 0 01-1.414 1.414L7 8.414l-4.293 4.293a1 1 0 01-1.414-1.414L5.586 7 1.293 2.707A1 1 0 012.707 1.293L7 5.586z" />
                 </svg>
               </button>
             </div>
@@ -228,33 +118,18 @@
     </div>
 
     <!-- Loading indicator -->
-    <div
-      v-if="isLoading"
-      class="loading-overlay"
-      role="status"
-      aria-live="polite"
-    >
+    <div v-if="isLoading" class="loading-overlay" role="status" aria-live="polite">
       <div class="spinner"></div>
       <span class="sr-only">Loading test cases...</span>
     </div>
 
     <!-- Delete confirmation modal -->
-    <div
-      v-if="showDeleteModal"
-      class="modal-overlay"
-      @click.self="showDeleteModal = false"
-    >
-      <div
-        class="modal-content"
-        role="dialog"
-        aria-labelledby="delete-modal-title"
-        aria-modal="true"
-      >
+    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
+      <div class="modal-content" role="dialog" aria-labelledby="delete-modal-title" aria-modal="true">
         <h3 aria-label="Remove Test Case">Remove Test Case</h3>
         <p>
           Are you sure you want to remove the test case
-          <strong>{{ caseToDelete }}</strong
-          >?
+          <strong>{{ caseToDelete }}</strong>?
         </p>
         <div class="modal-actions">
           <button class="btn btn-secondary" @click="showDeleteModal = false">
@@ -411,8 +286,8 @@ export default class CaseSelector extends Vue {
       typeof result.verdict !== 'undefined'
         ? result.verdict
         : result.contest_score == result.max_score
-        ? 'AC'
-        : 'WA';
+          ? 'AC'
+          : 'WA';
     if (v === 'AC') return 'verdict-ac';
     if (v === 'PA') return 'verdict-pa';
     if (v === 'CE') return 'verdict-pending';
@@ -463,9 +338,11 @@ export default class CaseSelector extends Vue {
       return 'Case name can only contain letters, numbers, hyphens, and underscores';
 
     // Check for duplicates
-    const existingCases = this.groups.flatMap((g) => g.cases);
-    if (existingCases.some((c) => c.name === name))
+
+    const existingCases = ([] as { name: string; item: { in: string; out: string; weight?: number } }[]).concat(...this.groups.map((g) => g.cases));
+    if (existingCases.some((c) => c.name === name)) {
       return 'A test case with this name already exists';
+    }
 
     return null;
   }
@@ -758,6 +635,7 @@ export default class CaseSelector extends Vue {
   &.verdict-ac {
     color: #059669;
     background: rgba(16, 185, 129, 0.12);
+
     .vs-dark & {
       color: #34d399;
       background: rgba(52, 211, 153, 0.15);
@@ -767,6 +645,7 @@ export default class CaseSelector extends Vue {
   &.verdict-pa {
     color: #d97706;
     background: rgba(245, 158, 11, 0.12);
+
     .vs-dark & {
       color: #fbbf24;
       background: rgba(251, 191, 36, 0.15);
@@ -776,6 +655,7 @@ export default class CaseSelector extends Vue {
   &.verdict-wa {
     color: #dc2626;
     background: rgba(220, 38, 38, 0.1);
+
     .vs-dark & {
       color: #f87171;
       background: rgba(248, 113, 113, 0.12);
@@ -1342,6 +1222,7 @@ export default class CaseSelector extends Vue {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1352,6 +1233,7 @@ export default class CaseSelector extends Vue {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
