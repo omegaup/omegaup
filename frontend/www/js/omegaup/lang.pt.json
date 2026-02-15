@@ -1139,6 +1139,8 @@
 	"passwordRequirementMinLength": "Pelo menos 8 caracteres",
 	"passwordRequirementSpecialChar": "Pelo menos um caractere especial (!@#$%^&*(),.?\":{}|<>)",
 	"passwordRequirementUppercase": "Pelo menos uma letra mai\u00fascula",
+	"passwordStrengthStrong": "Senha forte",
+	"passwordStrengthWeak": "Senha fraca",
 	"passwordResetLinkCopiedToClipboard": "O link foi copiado para a prancheta",
 	"passwordResetMinWait": "Voc\u00ea deve esperar alguns minutos antes de outro pedido.",
 	"passwordResetPassword": "Nova sehna",

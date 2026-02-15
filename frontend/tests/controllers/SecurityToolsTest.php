@@ -26,120 +26,41 @@ class SecurityToolsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test that passwords shorter than 8 characters are rejected
+     * Data provider for rejected password test cases.
+     *
+     * @return list<array{string, ?string, string}>
      */
-    public function testPasswordTooShortRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        $this->expectExceptionMessage('parameterStringTooShort');
-        \OmegaUp\SecurityTools::testStrongPassword('Ab1!xyz');
+    public function rejectedPasswordProvider(): array {
+        return [
+            ['parameterStringTooShort', 'Ab1!xyz', 'testPasswordTooShortRejected'],
+            ['parameterStringTooLong', 'Aa1!' . str_repeat('x', 69), 'testPasswordTooLongRejected'],
+            ['passwordMustContainUppercase', 'password1!', 'testPasswordWithoutUppercaseRejected'],
+            ['passwordMustContainLowercase', 'PASSWORD1!', 'testPasswordWithoutLowercaseRejected'],
+            ['passwordMustContainDigit', 'Password!@', 'testPasswordWithoutDigitRejected'],
+            ['passwordMustContainSpecialChar', 'Password123', 'testPasswordWithoutSpecialCharRejected'],
+            ['parameterStringTooShort', null, 'testNullPasswordRejected'],
+            ['parameterStringTooShort', '', 'testEmptyPasswordRejected'],
+            ['passwordMustContainUppercase', '12345678', 'testCommonWeakPassword12345678'],
+            ['passwordMustContainUppercase', 'password', 'testCommonWeakPasswordAllLowercase'],
+            ['passwordMustContainLowercase', 'PASSWORD', 'testCommonWeakPasswordAllUppercase'],
+        ];
     }
 
     /**
-     * Test that passwords longer than 72 characters are rejected
+     * @dataProvider rejectedPasswordProvider
+     *
+     * Test that invalid passwords are rejected with the expected error message.
      */
-    public function testPasswordTooLongRejected(): void {
+    public function testPasswordRejected(
+        string $expectedMessage,
+        ?string $password,
+        string $description
+    ): void {
         $this->expectException(
             \OmegaUp\Exceptions\InvalidParameterException::class
         );
-        $this->expectExceptionMessage('parameterStringTooLong');
-        // Create a 73-character password with all requirements
-        $longPassword = 'Aa1!' . str_repeat('x', 69);
-        \OmegaUp\SecurityTools::testStrongPassword($longPassword);
-    }
-
-    /**
-     * Test that password without uppercase letter is rejected
-     */
-    public function testPasswordWithoutUppercaseRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        $this->expectExceptionMessage('passwordMustContainUppercase');
-        \OmegaUp\SecurityTools::testStrongPassword('password1!');
-    }
-
-    /**
-     * Test that password without lowercase letter is rejected
-     */
-    public function testPasswordWithoutLowercaseRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        $this->expectExceptionMessage('passwordMustContainLowercase');
-        \OmegaUp\SecurityTools::testStrongPassword('PASSWORD1!');
-    }
-
-    /**
-     * Test that password without digit is rejected
-     */
-    public function testPasswordWithoutDigitRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        $this->expectExceptionMessage('passwordMustContainDigit');
-        \OmegaUp\SecurityTools::testStrongPassword('Password!@');
-    }
-
-    /**
-     * Test that password without special character is rejected
-     */
-    public function testPasswordWithoutSpecialCharRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        $this->expectExceptionMessage('passwordMustContainSpecialChar');
-        \OmegaUp\SecurityTools::testStrongPassword('Password123');
-    }
-
-    /**
-     * Test that null password is rejected
-     */
-    public function testNullPasswordRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        \OmegaUp\SecurityTools::testStrongPassword(null);
-    }
-
-    /**
-     * Test that empty password is rejected
-     */
-    public function testEmptyPasswordRejected(): void {
-        $this->expectException(
-            \OmegaUp\Exceptions\InvalidParameterException::class
-        );
-        \OmegaUp\SecurityTools::testStrongPassword('');
-    }
-
-    /**
-     * Test that common weak passwords are rejected
-     */
-    public function testCommonWeakPasswordsRejected(): void {
-        // Test '12345678' - has digit but missing uppercase, lowercase, special
-        try {
-            \OmegaUp\SecurityTools::testStrongPassword('12345678');
-            $this->fail('Expected exception for password "12345678"');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('passwordMustContainUppercase', $e->getMessage());
-        }
-
-        // Test 'password' - has lowercase but missing uppercase, digit, special
-        try {
-            \OmegaUp\SecurityTools::testStrongPassword('password');
-            $this->fail('Expected exception for password "password"');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('passwordMustContainUppercase', $e->getMessage());
-        }
-
-        // Test 'PASSWORD' - has uppercase but missing lowercase, digit, special
-        try {
-            \OmegaUp\SecurityTools::testStrongPassword('PASSWORD');
-            $this->fail('Expected exception for password "PASSWORD"');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('passwordMustContainLowercase', $e->getMessage());
-        }
+        $this->expectExceptionMessage($expectedMessage);
+        \OmegaUp\SecurityTools::testStrongPassword($password);
     }
 
     /**

@@ -1139,6 +1139,8 @@
 	"passwordRequirementMinLength": "Al menos 8 caracteres",
 	"passwordRequirementSpecialChar": "Al menos un car\u00e1cter especial (!@#$%^&*(),.?\":{}|<>)",
 	"passwordRequirementUppercase": "Al menos una letra may\u00fascula",
+	"passwordStrengthStrong": "Contrase\u00f1a segura",
+	"passwordStrengthWeak": "Contrase\u00f1a d\u00e9bil",
 	"passwordResetLinkCopiedToClipboard": "La liga fue copiada al portapapeles",
 	"passwordResetMinWait": "Debes esperar unos minutos antes de realizar otra petici\u00f3n.",
 	"passwordResetPassword": "Nueva contrase\u00f1a",

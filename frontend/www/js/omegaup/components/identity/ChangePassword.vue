@@ -27,8 +27,8 @@
               <omegaup-password-input
                 v-model="newPassword"
                 autocomplete="new-password"
+                :show-strength-feedback="true"
               />
-              <omegaup-password-strength-feedback :password="newPassword" />
             </label>
           </div>
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
@@ -67,12 +67,10 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
-import omegaup_PasswordStrengthFeedback from '../common/PasswordStrengthFeedback.vue';
 
 @Component({
   components: {
     'omegaup-password-input': omegaup_PasswordInput,
-    'omegaup-password-strength-feedback': omegaup_PasswordStrengthFeedback,
   },
 })
 export default class IdentityChangePassword extends Vue {

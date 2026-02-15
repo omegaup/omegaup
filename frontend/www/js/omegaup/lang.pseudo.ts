@@ -1140,6 +1140,8 @@ const translations: { [key: string]: string; } = {
   passwordRequirementMinLength: "(A7 13a57 8 charac73r5)",
   passwordRequirementSpecialChar: "(A7 13a57 0n3 5p3cia1 charac73r (!@#$%^&*(),.?\":{}|<>))",
   passwordRequirementUppercase: "(A7 13a57 0n3 upp3rca53 13773r)",
+  passwordStrengthStrong: "(57r0ng pa55w0rd)",
+  passwordStrengthWeak: "(W3ak pa55w0rd)",
   passwordResetLinkCopiedToClipboard: "(Link wa5 c0pi3d 70 7h3 c1ipb0ard)",
   passwordResetMinWait: "(Y0u 5h0u1d wai7 a f3w minu735 b3f0r3 an07h3r r3qu357.)",
   passwordResetPassword: "(N3w pa55w0rd)",

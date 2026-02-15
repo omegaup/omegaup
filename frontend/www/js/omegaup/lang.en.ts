@@ -1140,6 +1140,8 @@ const translations: { [key: string]: string; } = {
   passwordRequirementMinLength: "At least 8 characters",
   passwordRequirementSpecialChar: "At least one special character (!@#$%^&*(),.?\":{}|<>)",
   passwordRequirementUppercase: "At least one uppercase letter",
+  passwordStrengthStrong: "Strong password",
+  passwordStrengthWeak: "Weak password",
   passwordResetLinkCopiedToClipboard: "Link was copied to the clipboard",
   passwordResetMinWait: "You should wait a few minutes before another request.",
   passwordResetPassword: "New password",

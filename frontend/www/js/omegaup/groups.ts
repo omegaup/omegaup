@@ -109,8 +109,18 @@ export function generatePassword(): string {
   const allChars = lowercase + uppercase + digits + special;
   const len = 8;
 
+  // Use cryptographically secure random when available, fallback to Math.random
+  const secureRandom = (max: number): number => {
+    if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] % max;
+    }
+    return Math.floor(Math.random() * max);
+  };
+
   const pickRandom = (chars: string): string =>
-    chars.charAt(Math.floor(Math.random() * chars.length));
+    chars.charAt(secureRandom(chars.length));
 
   // Ensure at least one character from each required category
   const guaranteed = [
@@ -126,10 +136,10 @@ export function generatePassword(): string {
     remaining.push(pickRandom(allChars));
   }
 
-  // Shuffle all characters together
+  // Shuffle all characters together (Fisher-Yates)
   const combined = [...guaranteed, ...remaining];
   for (let i = combined.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = secureRandom(i + 1);
     [combined[i], combined[j]] = [combined[j], combined[i]];
   }
 
