@@ -38,7 +38,7 @@ class SecurityToolsTest extends \OmegaUp\Test\ControllerTestCase {
             ['passwordMustContainLowercase', 'PASSWORD1!', 'testPasswordWithoutLowercaseRejected'],
             ['passwordMustContainDigit', 'Password!@', 'testPasswordWithoutDigitRejected'],
             ['passwordMustContainSpecialChar', 'Password123', 'testPasswordWithoutSpecialCharRejected'],
-            ['parameterStringTooShort', null, 'testNullPasswordRejected'],
+            ['parameterEmpty', null, 'testNullPasswordRejected'],
             ['parameterStringTooShort', '', 'testEmptyPasswordRejected'],
             ['passwordMustContainUppercase', '12345678', 'testCommonWeakPassword12345678'],
             ['passwordMustContainUppercase', 'password', 'testCommonWeakPasswordAllLowercase'],
