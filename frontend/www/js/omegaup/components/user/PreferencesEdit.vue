@@ -3,7 +3,7 @@
     <div class="form-group">
       <label>{{ T.userEditProfileImage }}</label>
       <a
-        href="http://www.gravatar.com"
+        href="https://www.gravatar.com"
         target="_blank"
         data-email
         class="btn btn-link"

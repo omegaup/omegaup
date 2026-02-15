@@ -759,7 +759,7 @@ class ArenaContestList extends Vue {
   }
 
   getTimeLink(time: Date): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+    return `https://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
   }
 
   orderByTitle() {

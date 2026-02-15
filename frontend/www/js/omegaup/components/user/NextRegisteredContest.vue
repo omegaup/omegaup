@@ -138,7 +138,7 @@ export default class UserNextRegisteredContest extends Vue {
   }
 
   get startTimeLink(): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
+    return `https://timeanddate.com/worldclock/fixedtime.html?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
   }
 
   get isContestStarted(): boolean {

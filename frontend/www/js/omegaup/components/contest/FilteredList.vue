@@ -156,7 +156,7 @@ export default class FilteredList extends Vue {
   }
 
   getTimeLink(time: string): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time}`;
+    return `https://timeanddate.com/worldclock/fixedtime.html?iso=${time}`;
   }
 }
 </script>
