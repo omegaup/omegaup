@@ -117,6 +117,7 @@
                     :src="gravatarURL51"
                     height="45"
                     class="pr-1 pt-1"
+                    :alt="T.navUserAvatarAlt"
                   /><span class="username mr-2" :title="currentUsername">{{
                     currentUsername
                   }}</span>
@@ -138,6 +139,7 @@
                         height="70"
                         class="rounded-circle mb-1"
                         :title="currentUsername"
+                        :alt="T.navUserAvatarAlt"
                       />
                       <h5 v-if="currentName !== ''" class="mx-2">
                         {{ currentName }}
@@ -185,6 +187,7 @@
                             height="45"
                             class="rounded-circle mr-3"
                             :title="identity.username"
+                            :alt="identity.username"
                           />{{ identity.username }}
                         </button>
                       </div>
