@@ -1,0 +1,29 @@
+{
+  "ai_control_headers": {
+    "en": "<!-- Change the following line to DENY if you don't want automated AI editorial changes for this problem. -->\n<!-- AI_EDITORIALS: ALLOW -->",
+    "es": "<!-- Cambia la siguiente línea a DENY si no quieres que se hagan cambios automatizados con AI a la editorial de este problema. -->\n<!-- AI_EDITORIALS: ALLOW -->",
+    "pt": "<!-- Mude a linha seguinte para DENY se você não quiser mudanças automáticas de IA na editorial deste problema. -->\n<!-- AI_EDITORIALS: ALLOW -->"
+  },
+  "verification_disclaimers": {
+    "en": {
+      "verified": "\n\n---\n*This editorial was generated using AI assistance and **verified**. The solution approach has been tested and works correctly.*",
+      "not_verified": "\n\n---\n*This editorial was generated using AI assistance but **could not be verified**. Please verify the solution approach and report any issues.*",
+      "error": "\n\n---\n*This editorial was generated using AI assistance but **verification failed** due to technical issues. Please verify the solution approach and report any issues.*"
+    },
+    "es": {
+      "verified": "\n\n---\n*Este editorial fue generado con asistencia de IA y **verificado**. El enfoque de solución ha sido probado y funciona correctamente.*",
+      "not_verified": "\n\n---\n*Este editorial fue generado con asistencia de IA pero **no pudo ser verificado**. Por favor verifica el enfoque de la solución y reporta cualquier problema.*",
+      "error": "\n\n---\n*Este editorial fue generado con asistencia de IA pero **la verificación falló** debido a problemas técnicos. Por favor verifica el enfoque de la solución y reporta cualquier problema.*"
+    },
+    "pt": {
+      "verified": "\n\n---\n*Este editorial foi gerado com assistência de IA e **verificado**. A abordagem da solução foi testada e funciona corretamente.*",
+      "not_verified": "\n\n---\n*Este editorial foi gerado com assistência de IA mas **não pôde ser verificado**. Por favor verifique a abordagem da solução e reporte quaisquer problemas.*",
+      "error": "\n\n---\n*Este editorial foi gerado com assistência de IA mas **a verificação falhou** devido a problemas técnicos. Por favor verifique a abordagem da solução e reporte quaisquer problemas.*"
+    }
+  },
+  "ai_generation_disclaimers": {
+    "en": "\n\n---\n*This editorial was generated using AI assistance. While we strive for accuracy, please verify the solution approach and report any issues.*",
+    "es": "\n\n---\n*Este editorial fue generado con asistencia de IA. Aunque nos esforzamos por la precisión, por favor verifica el enfoque de la solución y reporta cualquier problema.*",
+    "pt": "\n\n---\n*Este editorial foi gerado com assistência de IA. Embora nos esforcemos pela precisão, por favor verifique a abordagem da solução e reporte quaisquer problemas.*"
+  }
+}

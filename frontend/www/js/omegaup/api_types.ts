@@ -79,6 +79,7 @@ export namespace dao {
     deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
+    github_url?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
     has_scholar_objective?: boolean;
@@ -86,6 +87,7 @@ export namespace dao {
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
+    linkedin_url?: string;
     main_email_id?: number;
     main_identity_id?: number;
     parent_email_id?: number;
@@ -100,6 +102,7 @@ export namespace dao {
     user_id?: number;
     verification_id?: string;
     verified?: boolean;
+    x_url?: string;
   }
 }
 
@@ -401,6 +404,33 @@ export namespace types {
             return x;
           });
         })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CarouselItemListPayload(
+      elementId: string = 'payload',
+    ): types.CarouselItemListPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
         return x;
       })(
         JSON.parse(
@@ -2340,6 +2370,54 @@ export namespace types {
       );
     }
 
+    export function UserComparePayload(
+      elementId: string = 'payload',
+    ): types.UserComparePayload {
+      return ((x) => {
+        if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+          x.user1 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user1);
+        if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+          x.user2 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user2);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
@@ -2608,6 +2686,19 @@ export namespace types {
     };
   }
 
+  export interface AiEditorialJobDetails {
+    created_at: Date;
+    error_message?: string;
+    is_retriable: boolean;
+    job_id: string;
+    md_en?: string;
+    md_es?: string;
+    md_pt?: string;
+    problem_alias: string;
+    status: string;
+    validation_verdict?: string;
+  }
+
   export interface ApiToken {
     last_used: Date;
     name: string;
@@ -2686,6 +2777,7 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ArenaProblemset {
@@ -2807,8 +2899,56 @@ export namespace types {
     username: string;
   }
 
+  export interface BookmarkProblem {
+    alias: string;
+    title: string;
+  }
+
+  export interface CDP {
+    casesStore: types.CDPCasesStore;
+    problemCodeContent: string;
+    problemCodeExtension: string;
+    problemMarkdown: string;
+    problemName: string;
+    problemSolutionMarkdown: string;
+  }
+
+  export interface CDPCase {
+    autoPoints: boolean;
+    caseID: string;
+    groupID: string;
+    lines: types.CDPLine[];
+    name: string;
+    output: string;
+    points: number;
+  }
+
+  export interface CDPCasesStore {
+    groups: types.CDPGroup[];
+    hide: boolean;
+    layouts: { [key: string]: string }[];
+    selected: { caseID?: string; groupID?: string };
+  }
+
+  export interface CDPGroup {
+    autoPoints: boolean;
+    cases: types.CDPCase[];
+    groupID: string;
+    name: string;
+    points: number;
+    ungroupedCase: boolean;
+  }
+
+  export interface CDPLine {
+    caseID: string;
+    data: { kind: string | string | string | string; value: string };
+    label: string;
+    lineID: string;
+  }
+
   export interface CachedExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -2816,6 +2956,21 @@ export namespace types {
     solvedProblems: types.Problem[];
     stats: types.UserProfileStats[];
     unsolvedProblems: types.Problem[];
+  }
+
+  export interface CarouselItem {
+    button_title: string;
+    carousel_item_id: number;
+    excerpt: string;
+    expiration_date?: Date;
+    image_url: string;
+    link: string;
+    status: boolean;
+    title: string;
+  }
+
+  export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
   }
 
   export interface CaseResult {
@@ -2955,10 +3110,12 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    maintenanceMessage?: types.MaintenanceMessage;
     mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
+    preferredLanguage: string;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -3014,6 +3171,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    canSetRecommended: boolean;
     contest_for_teams: boolean;
     default_show_all_contestants_in_scoreboard: boolean;
     description: string;
@@ -3032,6 +3190,7 @@ export namespace types {
     points_decay_factor: number;
     problems?: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended?: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3076,6 +3235,7 @@ export namespace types {
     points_decay_factor: number;
     problems: types.ProblemsetProblem[];
     problemset_id: number;
+    recommended: boolean;
     requests_user_information: string;
     rerun_id?: number;
     score_mode: string;
@@ -3192,6 +3352,7 @@ export namespace types {
   }
 
   export interface ContestNewPayload {
+    canSetRecommended?: boolean;
     hasVisitedSection?: boolean;
     languages: { [key: string]: string };
   }
@@ -3412,6 +3573,7 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    teaching_assistant_enabled: boolean;
     unlimited_duration: boolean;
   }
 
@@ -3611,6 +3773,7 @@ export namespace types {
 
   export interface ExtraProfileDetails {
     badges: string[];
+    bookmarkedProblems: types.BookmarkProblem[];
     contests: types.UserProfileContests;
     createdContests: types.Contest[];
     createdCourses: types.Course[];
@@ -3846,10 +4009,25 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    githubClientId?: string;
+    githubState?: string;
     hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
+  }
+
+  export interface MaintenanceMessage {
+    message: string;
+    type: string;
+  }
+
+  export interface MaintenanceModeStatus {
+    enabled: boolean;
+    message_en?: string;
+    message_es?: string;
+    message_pt?: string;
+    type: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -3858,6 +4036,12 @@ export namespace types {
     place?: number;
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface MessageLanguages {
+    en: string;
+    es: string;
+    pt: string;
   }
 
   export interface NavbarProblemsetProblem {
@@ -3946,6 +4130,13 @@ export namespace types {
     username: string;
   }
 
+  export interface PredefinedTemplate {
+    id: string;
+    message: types.MessageLanguages;
+    title: types.MessageLanguages;
+    type: string;
+  }
+
   export interface PrivacyPolicyDetailsPayload {
     git_object_id: string;
     has_accepted: boolean;
@@ -4022,11 +4213,15 @@ export namespace types {
     clarifications?: types.Clarification[];
     hasVisitedSection?: boolean;
     histogram: types.Histogram;
+    isBookmarked?: boolean;
     levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     problemLevel?: string;
     publicTags?: string[];
+    reviewedProblemLevel?: string;
+    reviewedPublicTags?: string[];
+    reviewedQualitySeal?: boolean;
     runs?: types.Run[];
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
@@ -4040,6 +4235,7 @@ export namespace types {
     admins: types.ProblemAdmin[];
     alias: string;
     allowUserAddTags: boolean;
+    cdp?: types.CDP;
     emailClarifications: boolean;
     extraWallTime: number;
     groupAdmins: types.ProblemGroupAdmin[];
@@ -4133,6 +4329,7 @@ export namespace types {
     statement: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ProblemListCollectionPayload {
@@ -4190,6 +4387,14 @@ export namespace types {
     problemAlias: string;
     solved: boolean;
     tried: boolean;
+  }
+
+  export interface ProblemRequestData {
+    contestAlias?: string;
+    preventProblemsetOpen: boolean;
+    problemAlias: string;
+    problemsetId?: number;
+    statementType: string;
   }
 
   export interface ProblemSettings {
@@ -4798,6 +5003,8 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -4857,6 +5064,19 @@ export namespace types {
     country?: string;
     school?: number;
     state?: string;
+  }
+
+  export interface UserCompareData {
+    contestsCount?: number;
+    profile: types.UserProfileInfo;
+    solvedProblemsCount?: number;
+  }
+
+  export interface UserComparePayload {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+    username1?: string;
+    username2?: string;
   }
 
   export interface UserDependent {
@@ -5039,7 +5259,26 @@ export namespace types {
 
 // API messages
 export namespace messages {
+  // ACL
+  export type ACLUserOwnedAclReportRequest = { [key: string]: any };
+  export type ACLUserOwnedAclReportResponse = {
+    acls: {
+      acl_id: number;
+      alias: string;
+      type: string;
+      users: {
+        role_description: string;
+        role_id: number;
+        role_name: string;
+        user_id: number;
+        username: string;
+      }[];
+    }[];
+  };
+
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5054,6 +5293,19 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
+
+  // AiEditorial
+  export type AiEditorialGenerateRequest = { [key: string]: any };
+  export type AiEditorialGenerateResponse = { job_id?: string };
+  export type AiEditorialReviewRequest = { [key: string]: any };
+  export type AiEditorialReviewResponse = {};
+  export type AiEditorialStatusRequest = { [key: string]: any };
+  export type _AiEditorialStatusServerResponse = any;
+  export type AiEditorialStatusResponse = { job?: types.AiEditorialJobDetails };
+  export type AiEditorialUpdateJobRequest = { [key: string]: any };
+  export type AiEditorialUpdateJobResponse = {};
 
   // Authorization
   export type AuthorizationProblemRequest = { [key: string]: any };
@@ -5079,6 +5331,20 @@ export namespace messages {
   export type BadgeUserListRequest = { [key: string]: any };
   export type _BadgeUserListServerResponse = any;
   export type BadgeUserListResponse = { badges: types.Badge[] };
+
+  // CarouselItems
+  export type CarouselItemsCreateRequest = { [key: string]: any };
+  export type CarouselItemsCreateResponse = {};
+  export type CarouselItemsDeleteRequest = { [key: string]: any };
+  export type CarouselItemsDeleteResponse = {};
+  export type CarouselItemsListRequest = { [key: string]: any };
+  export type _CarouselItemsListServerResponse = any;
+  export type CarouselItemsListResponse = types.CarouselItemListPayload;
+  export type CarouselItemsListActiveRequest = { [key: string]: any };
+  export type _CarouselItemsListActiveServerResponse = any;
+  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
+  export type CarouselItemsUpdateRequest = { [key: string]: any };
+  export type CarouselItemsUpdateResponse = {};
 
   // Certificate
   export type CertificateGenerateContestCertificatesRequest = {
@@ -5435,6 +5701,10 @@ export namespace messages {
     nextPage?: number;
     progress: types.StudentProgressInCourse[];
   };
+  export type CourseToggleTeachingAssistantRequest = { [key: string]: any };
+  export type CourseToggleTeachingAssistantResponse = {
+    teaching_assistant_enabled: boolean;
+  };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
   export type CourseUpdateAssignmentRequest = { [key: string]: any };
@@ -5553,6 +5823,8 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: types.Clarification[];
   };
+  export type ProblemConvertZipToCdpRequest = { [key: string]: any };
+  export type ProblemConvertZipToCdpResponse = { cdp: types.CDP };
   export type ProblemCreateRequest = { [key: string]: any };
   export type ProblemCreateResponse = {};
   export type ProblemDeleteRequest = { [key: string]: any };
@@ -5618,6 +5890,17 @@ export namespace messages {
     log: types.ProblemVersion[];
     published: string;
   };
+
+  // ProblemBookmark
+  export type ProblemBookmarkExistsRequest = { [key: string]: any };
+  export type ProblemBookmarkExistsResponse = { bookmarked: boolean };
+  export type ProblemBookmarkListRequest = { [key: string]: any };
+  export type ProblemBookmarkListResponse = {
+    problems: types.BookmarkProblem[];
+    total: number;
+  };
+  export type ProblemBookmarkToggleRequest = { [key: string]: any };
+  export type ProblemBookmarkToggleResponse = { bookmarked: boolean };
 
   // ProblemForfeited
   export type ProblemForfeitedGetCountsRequest = { [key: string]: any };
@@ -5748,6 +6031,9 @@ export namespace messages {
   export type RunExecuteRequest = { [key: string]: any };
   export type _RunExecuteServerResponse = any;
   export type RunExecuteResponse = { nextExecutionTimestamp: Date };
+  export type RunExecuteForIDERequest = { [key: string]: any };
+  export type _RunExecuteForIDEServerResponse = any;
+  export type RunExecuteForIDEResponse = { nextExecutionTimestamp: Date };
   export type RunGetSubmissionFeedbackRequest = { [key: string]: any };
   export type _RunGetSubmissionFeedbackServerResponse = any;
   export type RunGetSubmissionFeedbackResponse = types.SubmissionFeedback[];
@@ -5880,6 +6166,12 @@ export namespace messages {
   export type UserCoderOfTheMonthListResponse = {
     coders: types.CoderOfTheMonthList;
   };
+  export type UserCompareRequest = { [key: string]: any };
+  export type _UserCompareServerResponse = any;
+  export type UserCompareResponse = {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+  };
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
@@ -5934,6 +6226,18 @@ export namespace messages {
   export type UserProfileRequest = { [key: string]: any };
   export type _UserProfileServerResponse = any;
   export type UserProfileResponse = types.UserProfileInfo;
+  export type UserProfileStatisticsRequest = { [key: string]: any };
+  export type UserProfileStatisticsResponse = {
+    attempting: number;
+    difficulty: {
+      easy: number;
+      hard: number;
+      medium: number;
+      unlabelled: number;
+    };
+    solved: number;
+    tags: { count: number; name: string }[];
+  };
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
@@ -5974,10 +6278,37 @@ export namespace messages {
 
 // Controller interfaces
 export namespace controllers {
+  export interface ACL {
+    userOwnedAclReport: (
+      params?: messages.ACLUserOwnedAclReportRequest,
+    ) => Promise<messages.ACLUserOwnedAclReportResponse>;
+  }
+
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
+  }
+
+  export interface AiEditorial {
+    generate: (
+      params?: messages.AiEditorialGenerateRequest,
+    ) => Promise<messages.AiEditorialGenerateResponse>;
+    review: (
+      params?: messages.AiEditorialReviewRequest,
+    ) => Promise<messages.AiEditorialReviewResponse>;
+    status: (
+      params?: messages.AiEditorialStatusRequest,
+    ) => Promise<messages.AiEditorialStatusResponse>;
+    updateJob: (
+      params?: messages.AiEditorialUpdateJobRequest,
+    ) => Promise<messages.AiEditorialUpdateJobResponse>;
   }
 
   export interface Authorization {
@@ -6002,6 +6333,24 @@ export namespace controllers {
     userList: (
       params?: messages.BadgeUserListRequest,
     ) => Promise<messages.BadgeUserListResponse>;
+  }
+
+  export interface CarouselItems {
+    create: (
+      params?: messages.CarouselItemsCreateRequest,
+    ) => Promise<messages.CarouselItemsCreateResponse>;
+    delete: (
+      params?: messages.CarouselItemsDeleteRequest,
+    ) => Promise<messages.CarouselItemsDeleteResponse>;
+    list: (
+      params?: messages.CarouselItemsListRequest,
+    ) => Promise<messages.CarouselItemsListResponse>;
+    listActive: (
+      params?: messages.CarouselItemsListActiveRequest,
+    ) => Promise<messages.CarouselItemsListActiveResponse>;
+    update: (
+      params?: messages.CarouselItemsUpdateRequest,
+    ) => Promise<messages.CarouselItemsUpdateResponse>;
   }
 
   export interface Certificate {
@@ -6299,6 +6648,9 @@ export namespace controllers {
     studentsProgress: (
       params?: messages.CourseStudentsProgressRequest,
     ) => Promise<messages.CourseStudentsProgressResponse>;
+    toggleTeachingAssistant: (
+      params?: messages.CourseToggleTeachingAssistantRequest,
+    ) => Promise<messages.CourseToggleTeachingAssistantResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
@@ -6419,6 +6771,9 @@ export namespace controllers {
     clarifications: (
       params?: messages.ProblemClarificationsRequest,
     ) => Promise<messages.ProblemClarificationsResponse>;
+    convertZipToCdp: (
+      params?: messages.ProblemConvertZipToCdpRequest,
+    ) => Promise<messages.ProblemConvertZipToCdpResponse>;
     create: (
       params?: messages.ProblemCreateRequest,
     ) => Promise<messages.ProblemCreateResponse>;
@@ -6490,6 +6845,18 @@ export namespace controllers {
     ) => Promise<messages.ProblemVersionsResponse>;
   }
 
+  export interface ProblemBookmark {
+    exists: (
+      params?: messages.ProblemBookmarkExistsRequest,
+    ) => Promise<messages.ProblemBookmarkExistsResponse>;
+    list: (
+      params?: messages.ProblemBookmarkListRequest,
+    ) => Promise<messages.ProblemBookmarkListResponse>;
+    toggle: (
+      params?: messages.ProblemBookmarkToggleRequest,
+    ) => Promise<messages.ProblemBookmarkToggleResponse>;
+  }
+
   export interface ProblemForfeited {
     getCounts: (
       params?: messages.ProblemForfeitedGetCountsRequest,
@@ -6557,6 +6924,9 @@ export namespace controllers {
     execute: (
       params?: messages.RunExecuteRequest,
     ) => Promise<messages.RunExecuteResponse>;
+    executeForIDE: (
+      params?: messages.RunExecuteForIDERequest,
+    ) => Promise<messages.RunExecuteForIDEResponse>;
     getSubmissionFeedback: (
       params?: messages.RunGetSubmissionFeedbackRequest,
     ) => Promise<messages.RunGetSubmissionFeedbackResponse>;
@@ -6683,6 +7053,9 @@ export namespace controllers {
     coderOfTheMonthList: (
       params?: messages.UserCoderOfTheMonthListRequest,
     ) => Promise<messages.UserCoderOfTheMonthListResponse>;
+    compare: (
+      params?: messages.UserCompareRequest,
+    ) => Promise<messages.UserCompareResponse>;
     contestStats: (
       params?: messages.UserContestStatsRequest,
     ) => Promise<messages.UserContestStatsResponse>;
@@ -6737,6 +7110,9 @@ export namespace controllers {
     profile: (
       params?: messages.UserProfileRequest,
     ) => Promise<messages.UserProfileResponse>;
+    profileStatistics: (
+      params?: messages.UserProfileStatisticsRequest,
+    ) => Promise<messages.UserProfileStatisticsResponse>;
     removeExperiment: (
       params?: messages.UserRemoveExperimentRequest,
     ) => Promise<messages.UserRemoveExperimentResponse>;

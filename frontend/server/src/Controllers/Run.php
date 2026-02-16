@@ -366,7 +366,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Get the next execution timestamp
+     * Get the next execution timestamp, no user session required, as the IDE
+     * runs independently.
+     *
+     * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
+     */
+    public static function apiExecuteForIDE(\OmegaUp\Request $r): array {
+        return [
+            'nextExecutionTimestamp' => \OmegaUp\DAO\Runs::nextExecutionTimestamp(
+                lastExecutionTime: new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
+            )
+        ];
+    }
+
+    /**
+     * Get the next execution timestamp for a specific problemset:
+     * - Contest
+     * - Virtual contest
+     * - Practice contest
+     * - Course
      *
      * @return array{nextExecutionTimestamp: \OmegaUp\Timestamp}
      */
@@ -460,7 +478,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
                     default:
                         self::$log->error(
-                            'penalty_type for this contests is not a valid option, asuming `none`.'
+                            'penalty_type for this contests is not a valid option, assuming `none`.'
                         );
                         $start = null;
                 }
@@ -525,9 +543,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             'verdict' => 'JE',
         ]);
 
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-
+        // Use TransactionHelper to handle potential deadlocks in submission creation
+        \OmegaUp\TransactionHelper::executeWithRetry(function () use (
+            $submission,
+            $r,
+            $problem,
+            $contest,
+            $run
+        ) {
             // _Now_ that we are in a transaction, we can check whether the run
             // is within the submission gap.
             self::validateWithinSubmissionGap(
@@ -543,11 +566,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Runs::create($run);
             $submission->current_run_id = $run->run_id;
             \OmegaUp\DAO\Submissions::update($submission);
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        });
 
         // Call Grader
         try {
@@ -626,6 +645,17 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Expire rank cache
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+
+        if (!is_null($problemsetId)) {
+            $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+                $problemsetId
+            );
+            if (!is_null($assignment) && !is_null($assignment->course_id)) {
+                \OmegaUp\Cache::invalidateAllKeys(
+                    \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+                );
+            }
+        }
 
         return $response;
     }
@@ -1558,7 +1588,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Given the run resouce path, fetches its contents from S3.
+     * Given the run resource path, fetches its contents from S3.
      *
      * @param  string       $resourcePath The run's resource path.
      * @param  bool         $passthru     Whether to output directly.

@@ -277,18 +277,18 @@ def replace_voted_tags(dbconn: lib.db.Connection,
             try:
                 dbconn.conn.get_warnings = True
                 cur.execute(
-                    """INSERT IGNORE INTO
+                    f"""INSERT IGNORE INTO
                            `Problems_Tags`(`problem_id`, `tag_id`,
                                            `source`)
                        SELECT
-                           %%s AS `problem_id`,
+                           %s AS `problem_id`,
                            `t`.`tag_id` AS `tag_id`,
                            'voted' AS `source`
                        FROM
                            `Tags` AS `t`
                        WHERE
-                           `t`.`name` IN (%s);""" %
-                    ', '.join('%s' for _ in problem_tags),
+                           `t`.`name` IN (
+                               {', '.join('%s' for _ in problem_tags)});""",
                     (problem_id, ) + tuple(problem_tags))
                 for level, code, message in (cur.fetchwarnings() or []):
                     if code == errorcode.ER_DUP_ENTRY:
@@ -436,9 +436,12 @@ def aggregate_reviewers_feedback_for_problem(
 
         # Delete old level and topic tags for problem and add the new ones
         most_voted_level = max(level_tag_votes,
-                               key=lambda x: level_tag_votes.get(x, 0))
-        final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
-                          {(problem_id, most_voted_level)})
+                               key=lambda x: level_tag_votes.get(x, 0),
+                               default=None)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes})
+        # Avoid adding None as a tag
+        if most_voted_level is not None:
+            final_tags.append((problem_id, most_voted_level))
 
         cur.execute("""DELETE FROM
                                `Problems_Tags`

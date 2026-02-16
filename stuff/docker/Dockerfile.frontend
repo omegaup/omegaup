@@ -23,7 +23,7 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
@@ -43,6 +43,9 @@ WORKDIR /opt/omegaup
 ARG BRANCH=release
 ENV BRANCH=$BRANCH
 RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+WORKDIR /opt/omegaup/frontend/www/rekarel
+RUN npm install && npx gulp && npm run build
+WORKDIR /opt/omegaup
 RUN yarn install && yarn build
 RUN composer install --no-dev --classmap-authoritative
 RUN printf "<?php\n\
@@ -54,6 +57,7 @@ FROM alpine:latest AS frontend
 RUN apk add rsync
 RUN mkdir -p /var/lib/omegaup /opt/omegaup
 COPY --from=build /opt/omegaup /opt/omegaup
+COPY --from=build /opt/omegaup/frontend/www/rekarel/. /opt/omegaup/frontend/www/rekarel/
 COPY --from=build /var/lib/omegaup /var/lib/omegaup
 
 FROM ubuntu:jammy AS nginx

@@ -25,13 +25,30 @@
     </ul>
     <div class="tab-content">
       <div class="row m-0 mt-4">
-        <div class="col-md-6 col-lg-3 p-0 ml-4">
+        <div class="col-md-4 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
             class="form-control introjs-search"
             type="text"
             :placeholder="T.courseCardsListSearch"
           />
+        </div>
+        <div
+          v-if="currentSelectedTab === Tab.Public"
+          class="col-md-4 col-lg-3 p-0 ml-3"
+        >
+          <select v-model="levelFilter" class="form-control">
+            <option :value="Level.All">{{ T.courseLevelAllLevels }}</option>
+            <option :value="Level.Introductory">
+              {{ T.courseLevelIntroductoryLevel }}
+            </option>
+            <option :value="Level.Intermediate">
+              {{ T.courseLevelIntermediateLevel }}
+            </option>
+            <option :value="Level.Advanced">
+              {{ T.courseLevelAdvancedLevel }}
+            </option>
+          </select>
         </div>
       </div>
       <div
@@ -133,6 +150,13 @@ export enum Tab {
   Finished = 'finished',
 }
 
+export enum Level {
+  All = 'all',
+  Introductory = 'introductory',
+  Intermediate = 'intermediate',
+  Advanced = 'advanced',
+}
+
 @Component({
   components: {
     'omegaup-course-card-public': course_CardPublic,
@@ -154,8 +178,10 @@ export default class CourseTabs extends Vue {
   T = T;
   ui = ui;
   Tab = Tab;
+  Level = Level;
   currentSelectedTab = this.selectedTab;
   searchText = '';
+  levelFilter = Level.All;
 
   mounted() {
     const title = T.joinCourseInteractiveGuideTitle;
@@ -230,13 +256,19 @@ export default class CourseTabs extends Vue {
             ),
         );
       default:
-        return this.courses.public.filter(
-          (course) =>
+        // Only apply level filter to public courses
+        return this.courses.public.filter((course) => {
+          const matchesText =
             this.searchText === '' ||
             latinize(course.name.toLowerCase()).includes(
               latinize(this.searchText.toLowerCase()),
-            ),
-        );
+            );
+
+          const matchesLevel =
+            this.levelFilter === Level.All || course.level === this.levelFilter;
+
+          return matchesText && matchesLevel;
+        });
     }
   }
 }
@@ -247,8 +279,8 @@ export default class CourseTabs extends Vue {
 
 .card > .row.no-gutters {
   background-color: $omegaup-white;
-  height: 12.5rem;
-  overflow-y: auto;
+  min-height: 13.5rem;
+  overflow-y: visible;
 
   .course-data p {
     font-size: 0.9rem;
@@ -312,6 +344,32 @@ export default class CourseTabs extends Vue {
 @media (max-width: 576px) {
   .custom-card {
     padding: 1.25rem 2rem !important;
+  }
+
+  .row.m-0.mt-4 {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .row.m-0.mt-4 > div {
+    width: calc(50% - 25px);
+    flex: 0 0 calc(50% - 25px);
+    max-width: calc(50% - 25px);
+  }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .row.m-0.mt-4 {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .row.m-0.mt-4 > div {
+    width: calc(50% - 25px);
+    flex: 0 0 calc(50% - 25px);
+    max-width: calc(50% - 25px);
   }
 }
 </style>

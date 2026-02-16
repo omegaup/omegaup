@@ -1,9 +1,14 @@
 <template>
-  <div class="card">
+  <div v-if="isDisabled" class="system-in-maintainance m-5 text-center">
+    <omegaup-markdown
+      :markdown="T.problemSolutionSystemInMaintainance"
+    ></omegaup-markdown>
+    <font-awesome-icon :icon="['fas', 'cogs']" />
+  </div>
+  <div v-else class="card">
     <div class="row p-3">
       <div class="col-12 text-right">
-        <a
-          href="https://blog.omegaup.com/features/soluciones-de-problemas-en-omegaup/"
+        <a :href="SolutionViewFeatureGuideURL"
           ><font-awesome-icon :icon="['fas', 'question-circle']" />
           {{ T.officialSolutionsInfo }}</a
         >
@@ -27,7 +32,6 @@
           }),
         "
       ></omegaup-markdown>
-
       <div class="text-center mt-5">
         <button
           v-if="status === 'unlocked'"
@@ -68,28 +72,34 @@ import {
   faLock,
   faUnlock,
   faQuestionCircle,
+  faCogs,
 } from '@fortawesome/free-solid-svg-icons';
-
+import { getBlogUrl } from '../../urlHelper';
 library.add(faLock);
 library.add(faUnlock);
 library.add(faQuestionCircle);
+library.add(faCogs);
 
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     FontAwesomeIcon,
   },
 })
-export default class ProblemSolution extends Vue {
+class ProblemSolution extends Vue {
   @Prop() status!: string;
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() allowedSolutionsToSee!: number;
+  @Prop({ default: true }) isDisabled!: boolean;
 
   T = T;
   ui = ui;
 
+  get SolutionViewFeatureGuideURL(): string {
+    return getBlogUrl('SolutionViewFeatureGuideURL');
+  }
   get showSolution(): boolean {
     return this.status === 'unlocked' && this.solution !== null;
   }
@@ -114,14 +124,21 @@ export default class ProblemSolution extends Vue {
     );
   }
 }
+
+export default ProblemSolution;
 </script>
 
-<style>
+<style scoped lang="scss">
 .interstitial {
   padding: 2em;
 }
 
 .solution {
   padding: 2em 7em;
+}
+
+.system-in-maintainance {
+  font-size: 160%;
+  color: var(--general-in-maintainance-color);
 }
 </style>

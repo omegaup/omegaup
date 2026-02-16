@@ -120,6 +120,8 @@
 </template>
 
 <script lang="ts">
+import * as monaco from 'monaco-editor';
+(window as any).monaco = monaco;
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
@@ -262,7 +264,7 @@ export default class Ephemeral extends Vue {
   initProblem() {
     // use commits for synchronous behavior
     // or else bugs occur where layout toggles cases column
-    // when it shouldnt
+    // when it shouldn't
     store.commit('updatingSettings', true);
     store
       .dispatch('initProblem', {
@@ -548,7 +550,7 @@ export default class Ephemeral extends Vue {
     reader.addEventListener('loadend', async (e) => {
       if (e.target?.readyState != FileReader.DONE) return;
       // due to the way files are strcutured
-      // to work as intended i use async awaits instead of promisses
+      // to work as intended i use async awaits instead of promises
 
       JSZip.loadAsync(reader.result as ArrayBuffer).then(async (zip) => {
         await store.dispatch('reset');
@@ -603,7 +605,7 @@ export default class Ephemeral extends Vue {
               ?.async('string')
               .then((value) => {
                 // the validator need to be set first
-                // before updaing language and source
+                // before updating language and source
                 store.dispatch('Validator', 'custom').then(() => {
                   store.dispatch(
                     'request.input.validator.custom_validator.language',
@@ -772,6 +774,12 @@ div {
     background: var(--vs-dark-background-color);
     color: var(--vs-dark-font-color);
     border-bottom: 1px solid var(--vs-dark-background-color);
+
+    /* Target the language selector */
+    .form-control.form-control-sm[data-language-select] {
+      background-color: var(--vs-dark-background-color);
+      color: var(--vs-dark-font-color);
+    }
   }
   &.vs {
     background: var(--vs-background-color);

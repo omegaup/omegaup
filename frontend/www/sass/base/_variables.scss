@@ -1,6 +1,6 @@
 // Variables are one of the more straightforward features of Sass but are still on occasion
 // used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
-// Without one, they become harder to understand and re-use.
+// Without one, they become harder to understand and reuse.
 
 :root {
   // STATUS
@@ -35,6 +35,19 @@
   --btn-intro-js-background-color: #f4f4f4;
   --btn-intro-js-font-color: #212529;
   --btn-intro-js-border-color: #bdbdbd;
+  --btn-github-background-color: #ffffff;
+  --btn-github-background-color--hover: #f9fafb;
+  --btn-github-border-color: #d1d5db;
+  --btn-github-border-color--hover: #9ca3af;
+  --btn-github-font-color: #000000;
+
+  // PASSWORD TOGGLE
+  --password-toggle-btn-color: #6c757d;
+  --password-toggle-btn-color--hover: #495057;
+
+  // REQUIRED FIELD INDICATORS
+  --field-required-incomplete-color: #dc3545; // Red - needs attention
+  --field-required-complete-color: #000000; // Black - completed
 
   // MARKDOWN
   --markdown-pre-background-color: #eee;
@@ -49,6 +62,7 @@
   --markdown-libinteractive-download-font-color: #ccc;
   --markdown-libinteractive-download-border-color: #ccc;
   --wmd-button-bar-background-color: #fff;
+  --markdown-preview-border-color: #ddd;
   --markdown-button-clipboard-border-color: #dae0e5;
 
   // OVERLAY POPUP
@@ -151,6 +165,29 @@
   --arena-reset-border-color: #ced4da;
   --arena-reset-text-color: #6c757d;
 
+  // USER HEATMAP
+  --user-heatmap-empty-cell-color: #dddddd;
+  --user-heatmap-low-activity-color: #739de3;
+  --user-heatmap-medium-activity-color: #5588dd;
+  --user-heatmap-high-activity-color: #4670b5;
+  --user-heatmap-background-color: transparent;
+  --user-heatmap-wrapper-background-color: #ffffff;
+  --user-chart-section-background-color: #ffffff;
+  --user-chart-section-heatmap-background-color: #ffffff;
+  --user-chart-title-color: #333333;
+
+  // PROBLEM SOLVING PROGRESS
+  --problem-progress-background-color: #ffffff;
+  --problem-progress-text-primary-color: #333333;
+  --problem-progress-text-secondary-color: #666666;
+  --problem-progress-text-muted-color: #999999;
+  --problem-progress-bg-light-color: #f7f7f7;
+  --problem-progress-border-light-color: #e8e8e8;
+  --problem-progress-easy-color: #00b8a3;
+  --problem-progress-medium-color: #ffc01e;
+  --problem-progress-hard-color: #ef4743;
+  --problem-progress-unlabelled-color: #999999;
+
   // FINDER WIZARD
   --finder-wizard-modal-mask-background-color: #000;
   --finder-wizard-modal-container-background-color: #eee;
@@ -199,6 +236,8 @@
   --coder-of-the-month-card-header-font-color: #fff;
   --coder-of-the-month-card-header-background-color: #58d;
   --coder-of-the-month-card-header-female-background-color: #85d;
+  --coder-of-the-month-card-header-female-hover-background-color: #ff66add1;
+  --coder-of-the-month-card-header-hover-background-color: #66ffb5d1;
 
   // BADGES
   --badges-link-font-color: #337ab7;
@@ -236,6 +275,13 @@
   --user-basic-info-form-group-border-color: #e9e9e9;
   --user-basic-info-field-data-font-color: #808080;
 
+  // USER COMPARE
+  --user-compare-stat-item-background-color: #f8f9fa;
+  --user-compare-stat-label-font-color: #6c757d;
+  --user-compare-winner-border-color: #28a745;
+  --user-compare-loser-border-color: #6c757d;
+  --user-compare-tie-border-color: #ffc107;
+
   // HOMEPAGE
   --homepage-carousel-font-color: #fff;
   --homepage-carousel-background-color: #466aaf;
@@ -250,7 +296,18 @@
   --vs-font-color: #333;
   --vs-dark-background-color: #222;
   --vs-dark-font-color: #d4d4d4;
-
+  --vs-dark-border-color-medium: #555;
+  --vs-dark-border-color-strong: #666;
+  --vs-dark-list-group-item-disabled-background-color: #333;
+  --vs-dark-list-group-item-disabled-color: #888;
+  --vs-dark-list-group-item-action-background-color--hover: #3a3a3a;
+  --vs-dark-list-group-item-action-background-color--active: #484848;
+  --vs-dark-list-group-item-secondary-background-color: #2d2d2d;
+  --vs-dark-close-color: #aaa;
+  --vs-dark-close-color--hover: #fff;
+  --vs-dark-btn-secondary-background-color: #444;
+  --vs-dark-btn-secondary-background-color--hover: #555;
+  --vs-dark-selected-form-border-color: #007bff;
   // GRADER ZIP BUTTONS
   --zip-button-color--hover: #fff;
 
@@ -263,6 +320,7 @@
   // FORM INPUT
   --form-input-error-color: #dc3545;
   --form-input-box-shadow-error-color: rgba(220, 53, 69, 0.25);
+  --form-character-counter-color: #6c757d;
 
   // PAGINATOR
   --table-paginator-background-color: #fff;
@@ -284,10 +342,23 @@
   // GENERAL
   --general-in-maintainance-color: #4b4b4b;
 
-  //MONCAO EDITOR
-  --moncao-editor-toolbar-background-color: #f4f4f4;
-  --moncao-editor-toolbar-label-background-color: #e1e1e1;
-  --moncao-editor-toolbar-label-color: #777777;
-  --moncao-editor-toolbar-label-border-color: #cccccc;
-  --moncao-editor-toolbar-border-bottom-color: #ccc;
+  //MONACO EDITOR
+  --monaco-editor-toolbar-background-color: #f4f4f4;
+  --monaco-editor-toolbar-label-background-color: #e1e1e1;
+  --monaco-editor-toolbar-label-color: #777777;
+  --monaco-editor-toolbar-label-border-color: #cccccc;
+  --monaco-editor-toolbar-border-bottom-color: #ccc;
+
+  // CONTEST CARD
+  --contest-card-border-color: rgba(0, 0, 0, 0.125);
+  --contest-card-hover-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  // SIGNIN
+  --signin-nav-tabs-border-color: #dee2e6;
+  --signin-nav-link-color: #6c757d;
+  --signin-nav-link-background-color: #e9ecef;
+  --signin-nav-link-hover-background-color: #d6d9dc;
+  --signin-nav-link-hover-color: #495057;
+  --signin-nav-link-active-color: #212529;
+  --signin-nav-link-active-background-color: #fff;
 }

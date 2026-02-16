@@ -8,11 +8,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
 import * as ui from '../ui';
-import { types } from '../api_types';
-
 import T from '../lang';
 
 declare global {
@@ -36,128 +34,71 @@ declare global {
 export default class Markdown extends Vue {
   @Prop() markdown!: string;
   @Ref() root!: HTMLElement;
-  @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
-  @Prop({ default: null }) sourceMapping!: markdown.SourceMapping | null;
-  @Prop({ default: null })
-  problemSettings!: types.ProblemSettingsDistrib | null;
-  @Prop({ default: false }) preview!: boolean;
   @Prop({ default: false }) fullWidth!: boolean;
 
-  markdownConverter = new markdown.Converter({ preview: this.preview });
+  markdownConverter = new markdown.Converter();
 
   get html(): string {
-    if (this.problemSettings || this.imageMapping) {
-      return this.markdownConverter.makeHtmlWithImages(
-        this.markdown,
-        this.imageMapping || {},
-        this.sourceMapping || {},
-        this.problemSettings || undefined,
-      );
-    }
     return this.markdownConverter.makeHtml(this.markdown);
   }
 
   mounted(): void {
-    this.renderMathJax();
+    this.root.innerHTML = this.html;
+    this.injectCopyButtons();
   }
 
   @Watch('markdown')
-  onMarkdownChanged() {
-    this.renderMathJax();
+  onMarkdownChanged(): void {
+    this.root.innerHTML = this.html;
+    this.injectCopyButtons();
   }
 
-  @Emit('rendered')
-  private renderMathJax(): void {
-    this.root.innerHTML = this.html;
-    this.root
-      .querySelectorAll(
-        '[data-markdown-statement] > pre, .sample_io > tbody > tr > td:first-of-type > pre',
-      )
-      .forEach((preElement) => {
-        if (!preElement.firstChild) {
-          return;
-        }
-        const inputValue = (preElement as HTMLElement).innerText;
-
-        const clipboardButton = document.createElement('button');
-        clipboardButton.appendChild(document.createTextNode('📋'));
-        clipboardButton.title = T.wordsCopyToClipboard;
-        clipboardButton.className = 'clipboard btn btn-light';
-
-        clipboardButton.addEventListener('click', (event: Event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          ui.copyToClipboard(inputValue);
-        });
-
-        (preElement.parentElement as HTMLElement).insertBefore(
-          clipboardButton,
-          preElement,
-        );
-      });
-    if (!window.MathJax?.startup) {
-      window.MathJax = {
-        tex: {
-          inlineMath: [
-            ['$', '$'],
-            ['\\(', '\\)'],
-          ],
-          processEscapes: true,
-          autoload: { color: [], colorV2: ['color'] },
-          packages: { '[+]': ['noerrors'] },
-        },
-        startup: {
-          typeset: true,
-          elements: [],
-          ready: () => {
-            if (!window.MathJax?.startup) {
-              return;
-            }
-            if (window.MathJax.startup.defaultReady) {
-              window.MathJax.startup.defaultReady();
-            }
-            if (
-              window.MathJax.startup.elements &&
-              window.MathJax.startup.elements.length > 0 &&
-              window.MathJax.typeset
-            ) {
-              window.MathJax.typeset(window.MathJax.startup.elements.splice(0));
-            }
-          },
-        },
-        options: {
-          ignoreHtmlClass: 'tex2jax_ignore',
-          processHtmlClass: 'tex2jax_process',
-        },
-        loader: { load: ['[tex]/noerrors'] },
-      };
-      // Now that the global MathJax config is set, we can lazily load the
-      // library. The element to be rendered will be queued up in
-      // MathJax.startup.elements.
-      let scriptElement = document.getElementById(
-        'MathJax-script',
-      ) as HTMLScriptElement | null;
-      if (!scriptElement) {
-        scriptElement = document.createElement('script');
-        scriptElement.src = '/third_party/js/mathjax/es5/tex-svg.js';
-        scriptElement.id = 'MathJax-script';
-        document.head.appendChild(scriptElement);
-      }
-    }
-
-    if (!window.MathJax.typeset) {
-      // In case the library hasn't quite finished loading completely, add the
-      // current element to the queue of elements that need to be rendered.
-      if (!window.MathJax.startup.elements) {
-        window.MathJax.startup.elements = [];
-      }
-      if (window.MathJax.startup.elements.indexOf(this.root) === -1) {
-        window.MathJax.startup.elements.push(this.root);
-      }
+  private injectCopyButtons(): void {
+    if (!this.root) {
       return;
     }
 
-    window.MathJax.typeset([this.root]);
+    const codeElements = this.root.querySelectorAll('span > code');
+    if (!codeElements.length) {
+      return;
+    }
+
+    codeElements.forEach((element) => {
+      const codeElement = element as HTMLElement;
+      const parentSpan = codeElement.parentElement;
+      if (!parentSpan) {
+        return;
+      }
+
+      if (parentSpan.querySelector('.copy-btn')) {
+        return;
+      }
+
+      const copyButton = document.createElement('button');
+      copyButton.type = 'button';
+      copyButton.className = 'btn btn-link btn-sm ml-2 copy-btn';
+      copyButton.textContent = T.wordsCopyToClipboard;
+
+      const copyHint = document.createElement('span');
+      copyHint.className = 'copy-hint';
+      copyHint.textContent = T.wordsCopiedToClipboard;
+
+      copyButton.addEventListener('click', () => {
+        const codeText = (codeElement.textContent || '').trim();
+        ui.copyToClipboard(codeText);
+
+        copyHint.classList.remove('fade-out');
+        copyHint.classList.add('fade-in');
+
+        window.setTimeout(() => {
+          copyHint.classList.remove('fade-in');
+          copyHint.classList.add('fade-out');
+        }, 1500);
+      });
+
+      parentSpan.appendChild(copyButton);
+      parentSpan.appendChild(copyHint);
+    });
   }
 }
 </script>
@@ -352,6 +293,32 @@ export default class Markdown extends Vue {
   img {
     max-width: 100%;
     page-break-inside: avoid;
+  }
+
+  span > code {
+    padding: 0.2em 0.4em;
+    margin: 0 0.25em 0 0;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .copy-hint {
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .copy-hint.fade-in {
+    opacity: 1;
+  }
+
+  .copy-hint.fade-out {
+    opacity: 0;
   }
 }
 </style>

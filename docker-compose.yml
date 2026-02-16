@@ -11,7 +11,11 @@ services:
       - type: bind
         source: .
         target: /opt/omegaup
-      - 'omegaupdata:/var/lib/omegaup'
+      - type: volume
+        source: omegaupdata
+        target: /var/lib/omegaup
+        volume:
+          nocopy: true
     depends_on:
       - mysql
       - gitserver
@@ -24,6 +28,10 @@ services:
     environment:
       CI: "${CI:-false}"
       MYSQL_TCP_PORT: 13306
+      OPENAI_API_KEY: ""
+      DEEPSEEK_API_KEY: ""
+      AI_WORKER_ENABLED: "true"
+      REDIS_PASSWORD: "redis"
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
@@ -37,7 +45,11 @@ services:
         source: ./stuff/docker/etc/omegaup/gitserver
         target: /etc/omegaup/gitserver
         read_only: true
-      - 'omegaupdata:/var/lib/omegaup'
+      - type: volume
+        source: omegaupdata
+        target: /var/lib/omegaup
+        volume:
+          nocopy: true
     expose:
       - '33861'
       - '33862'
@@ -72,12 +84,17 @@ services:
     restart: always
     depends_on:
       - mysql
+      - gitserver
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/grader
         target: /etc/omegaup/grader
         read_only: true
-      - 'omegaupdata:/var/lib/omegaup'
+      - type: volume
+        source: omegaupdata
+        target: /var/lib/omegaup
+        volume:
+          nocopy: true
     expose:
       - '6060'
       - '21680'
@@ -103,7 +120,8 @@ services:
       - '6060'
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.34
+    platform: linux/amd64
     restart: always
     environment:
       MYSQL_DATABASE: 'omegaup'

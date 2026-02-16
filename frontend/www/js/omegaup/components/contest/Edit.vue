@@ -154,6 +154,9 @@
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
           :problems="problems"
+          :can-set-recommended="details.canSetRecommended"
+          :initial-recommended="details.recommended"
+          :invalid-parameter-name="invalidParameterName"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
@@ -320,7 +323,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
-import contest_NewForm from './NewForm.vue';
+import contest_NewForm from './Form.vue';
 import common_Publish from '../common/Publish.vue';
 import contest_Certificates from './Certificates.vue';
 
@@ -357,6 +360,7 @@ export default class Edit extends Vue {
   @Prop() searchResultGroups!: types.ListItem[];
   @Prop({ default: null }) originalContestAdmissionMode!: null | string;
   @Prop() certificatesDetails!: types.ContestCertificatesAdminDetails;
+  @Prop({ default: null }) invalidParameterName!: null | string;
 
   T = T;
   ui = ui;

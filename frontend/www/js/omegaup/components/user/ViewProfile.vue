@@ -113,6 +113,13 @@
                   :title="T.profileCreatedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="bookmarkedProblems"
+                  :items-per-page="30"
+                  :title="T.profileBookmarkedProblems"
+                  class="mb-3"
+                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="currentSelectedTab == ViewProfileTabs.Contests"
@@ -196,11 +203,39 @@
                 role="tab"
                 aria-labelledby="nav-charts-tab"
               >
-                <omegaup-user-charts
-                  v-if="charts"
-                  :data="charts"
-                  :username="profile.username"
-                ></omegaup-user-charts>
+                <div
+                  v-if="profileStatistics"
+                  class="row mb-4 statistics-boxes-row"
+                >
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-problem-solving-progress
+                      :difficulty="profileStatistics.difficulty"
+                      :attempting="profileStatistics.attempting"
+                    ></omegaup-problem-solving-progress>
+                  </div>
+                  <div class="col-lg-6 mb-3">
+                    <omegaup-tags-solved-chart
+                      :tags="profileStatistics.tags"
+                    ></omegaup-tags-solved-chart>
+                  </div>
+                </div>
+                <div class="chart-section">
+                  <omegaup-user-charts
+                    v-if="charts"
+                    :data="charts"
+                    :username="profile.username"
+                  ></omegaup-user-charts>
+                </div>
+                <div class="chart-section-heatmap">
+                  <omegaup-user-heatmap
+                    :username="profile.username"
+                    :available-years="availableYears"
+                    :data="charts"
+                    @year-changed="
+                      (year) => $emit('heatmap-year-changed', year)
+                    "
+                  ></omegaup-user-heatmap>
+                </div>
               </div>
             </div>
           </div>
@@ -211,25 +246,28 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import * as Highcharts from 'highcharts/highstock';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import T from '../../lang';
-import country_Flag from '../CountryFlag.vue';
-import user_BasicInfo from './BasicInfov2.vue';
-import user_Username from './Username.vue';
-import user_Charts from './Chartsv2.vue';
-import user_MainInfo from './MainInfo.vue';
+import {
+  Contest,
+  ContestResult,
+  Course,
+  Problem,
+} from '../../linkable_resource';
+import * as ui from '../../ui';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
-import { types } from '../../api_types';
-import * as Highcharts from 'highcharts/highstock';
-import * as ui from '../../ui';
-import {
-  Problem,
-  ContestResult,
-  Contest,
-  Course,
-} from '../../linkable_resource';
+import country_Flag from '../CountryFlag.vue';
+import user_BasicInfo from './BasicInfov2.vue';
+import user_Charts from './Chartsv2.vue';
+import user_MainInfo from './MainInfo.vue';
+import problem_SolvingProgress from './ProblemSolvingProgress.vue';
+import tags_SolvedChart from './TagsSolvedChart.vue';
+import user_Heatmap from './UserHeatmap.vue';
+import user_Username from './Username.vue';
 
 export enum ViewProfileTabs {
   Badges = 'badges',
@@ -255,7 +293,10 @@ function getInitialSelectedTab(
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
+    'omegaup-user-heatmap': user_Heatmap,
     'omegaup-user-maininfo': user_MainInfo,
+    'omegaup-problem-solving-progress': problem_SolvingProgress,
+    'omegaup-tags-solved-chart': tags_SolvedChart,
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-table-paginator': common_TablePaginator,
@@ -268,6 +309,18 @@ export default class ViewProfile extends Vue {
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   @Prop({ default: null }) selectedTab!: string | null;
+  @Prop({ default: () => [] }) availableYears!: number[];
+  @Prop({ default: null }) profileStatistics!: {
+    solved: number;
+    attempting: number;
+    difficulty: {
+      easy: number;
+      medium: number;
+      hard: number;
+      unlabelled: number;
+    };
+    tags: Array<{ name: string; count: number }>;
+  } | null;
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -325,6 +378,12 @@ export default class ViewProfile extends Vue {
     if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
+  get bookmarkedProblems(): Problem[] {
+    if (!this.data?.bookmarkedProblems) return [];
+    return this.data.bookmarkedProblems.map(
+      (problem: types.BookmarkProblem) => new Problem(problem as types.Problem),
+    );
+  }
   get rank(): string {
     switch (this.profile.classname) {
       case 'user-rank-beginner':
@@ -352,5 +411,32 @@ export default class ViewProfile extends Vue {
 <style lang="scss">
 a:hover {
   cursor: pointer;
+}
+
+.chart-section {
+  background-color: var(--user-chart-section-background-color);
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.chart-section-heatmap {
+  background-color: var(--user-chart-section-heatmap-background-color);
+  border-radius: 4px;
+  padding: 0px;
+  margin-top: 15px;
+}
+
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--user-chart-title-color);
+}
+
+.statistics-boxes-row {
+  margin-top: 16px;
+}
+
+.statistics-boxes-row > [class*='col-'] {
+  display: flex;
 }
 </style>

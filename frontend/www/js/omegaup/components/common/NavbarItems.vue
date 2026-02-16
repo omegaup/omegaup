@@ -118,36 +118,37 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
-            <form
-              v-if="isLoggedIn && isMainUserIdentity && !isUnder13User"
-              class="collapse-submenu"
-            >
-              <div class="btn-group d-flex">
-                <span class="dropdown-item">
-                  {{ T.myproblemsListCreateProblem }}
-                </span>
+            <template v-if="!isLoggedIn">
+              <a class="dropdown-item" href="/problem/creator/">{{
+                T.createZipFileForProblem
+              }}</a>
+            </template>
+            <template v-else>
+              <form class="collapse-submenu">
                 <button
                   type="button"
-                  class="btn dropdown-item dropdown-toggle dropdown-toggle-split text-right"
+                  class="dropdown-item dropdown-toggle"
                   data-toggle="collapse"
                   data-target=".collapse-links"
                   data-nav-problems-create-options
                   aria-expanded="false"
                   aria-controls="collapse-links"
-                ></button>
-              </div>
-              <div class="collapse collapse-links pl-3">
-                <a class="dropdown-item" href="/problem/creator/">{{
-                  T.myproblemsListCreateZipFileProblem
-                }}</a>
-                <a
-                  class="dropdown-item"
-                  href="/problem/new/"
-                  data-nav-problems-create
-                  >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                 >
-              </div>
-            </form>
+                  {{ T.myproblemsListCreateProblem }}
+                </button>
+                <div class="collapse collapse-links pl-3">
+                  <a class="dropdown-item" href="/problem/creator/">{{
+                    T.myproblemsListCreateZipFileProblem
+                  }}</a>
+                  <a
+                    class="dropdown-item"
+                    href="/problem/new/"
+                    data-nav-problems-create
+                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                  >
+                </div>
+              </form>
+            </template>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
             }}</a>
@@ -170,6 +171,9 @@
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg">
           <a class="dropdown-item" href="/rank/">{{ T.navUserRanking }}</a>
+          <a class="dropdown-item" href="/rank/compare/">{{
+            T.navCompareUsers
+          }}</a>
           <a class="dropdown-item" href="/rank/authors/">{{
             T.navAuthorRanking
           }}</a>
@@ -198,7 +202,7 @@
         >
           {{ T.navHelp }}
         </a>
-        <div class="dropdown-menu fullwidth-mobile-fit-lg">
+        <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
             href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
@@ -223,6 +227,14 @@
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
+          <a
+            class="dropdown-item text-wrap"
+            href="https://hdl.handle.net/11059/16567"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ T.navCompetitiveProgrammingDataStructuresBook }}
+          </a>
         </div>
       </li>
     </ul>
@@ -248,3 +260,26 @@ export default class NavbarItems extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@media only screen and (max-width: 992px) {
+  .help-dropdown {
+    min-width: auto !important;
+    width: auto !important;
+    max-width: 85vw !important;
+    left: auto !important;
+    right: 0 !important;
+
+    .dropdown-item {
+      white-space: normal !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      line-height: 1.4 !important;
+      padding: 0.5rem 1rem !important;
+      max-width: 100% !important;
+      display: block !important;
+    }
+  }
+}
+</style>

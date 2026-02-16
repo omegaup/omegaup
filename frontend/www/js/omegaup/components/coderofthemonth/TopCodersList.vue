@@ -1,6 +1,8 @@
 <template>
   <div v-if="isDisabled" class="system-in-maintainance m-5 text-center">
-    <omegaup-markdown :markdown="T.systemInMaintainance"></omegaup-markdown>
+    <omegaup-markdown
+      :markdown="T.coderOfTheMonthSystemInMaintainance"
+    ></omegaup-markdown>
     <font-awesome-icon :icon="['fas', 'cogs']" />
   </div>
   <table v-else class="table table-striped table-hover table-responsive-sm">
@@ -18,7 +20,7 @@
     <tbody>
       <tr v-for="(coder, index) in coders" :key="index">
         <td class="text-center">
-          <img :src="coder.gravatar_32" />
+          <img :src="coder.gravatar_32" :alt="coder.username" />
         </td>
         <td class="text-center align-middle">
           <omegaup-user-username

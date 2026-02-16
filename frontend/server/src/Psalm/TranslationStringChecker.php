@@ -17,6 +17,7 @@ class TranslationStringChecker implements
         'errorWhileSendingMail',
         'generalError',
         'loginRequired',
+        'methodNotAllowed',
         'problemDeployerFailed',
         'resourceNotFound',
         'serviceUnavailableError',

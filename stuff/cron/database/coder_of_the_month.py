@@ -211,8 +211,7 @@ def get_cotm_eligible_users(
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
-        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
-            last_12_coders_str)
+        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
@@ -262,6 +261,14 @@ def get_cotm_eligible_users(
                 s.verdict = 'AC' AND s.type= 'normal' AND s.time >= %s AND
                 s.time <= %s AND p.visibility >= 1 AND p.quality_seal = 1 AND
                 i.user_id IS NOT NULL
+                -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
+                -- role_id = 1 is ADMIN_ROLE)
+                -- TODO: Replace magic numbers with constants
+                AND i.user_id NOT IN (
+                    SELECT ur.user_id
+                    FROM User_Roles ur
+                    WHERE ur.acl_id = 1 AND ur.role_id = 1
+                )
                 {last_12_coders_clause}
                 {gender_clause}
             GROUP BY
