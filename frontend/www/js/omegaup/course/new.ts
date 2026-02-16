@@ -82,7 +82,7 @@ OmegaUp.on('ready', () => {
                   });
               })
               .catch((error) => {
-                ui.apiError(error);
+                ui.error(error.message);
               });
           },
           cancel: () => {
