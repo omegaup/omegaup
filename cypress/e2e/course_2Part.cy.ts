@@ -310,7 +310,7 @@ const testCases: LinkTestCase[] = [
   {
     url: '/',
     links: [
-      'https://blog.omegaup.com',
+      'https://blog.omegaup.com/',
       'https://blog.omegaup.com/policies/codigo-de-conducta-en-omegaup/',
       'https://blog.omegaup.com/policies/privacy-policy/',
     ],
