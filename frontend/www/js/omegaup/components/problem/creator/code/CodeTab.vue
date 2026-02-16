@@ -1,17 +1,20 @@
 <template>
   <div class="card code-edit">
     <div class="card-body">
-      <div class="row">
-        <label class="col-sm-2 col-form-label">
+      <div class="form-group row align-items-center">
+        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
           {{ T.wordsLanguage }}
         </label>
-        <div class="col-sm-4">
+        <div class="col-12 col-sm-auto pl-sm-0">
           <select
             v-model="selectedLanguage"
             data-problem-creator-code-language
             class="form-control"
             name="language"
           >
+            <option value="" disabled>
+              {{ T.problemCreatorSelectLanguage }}
+            </option>
             <option
               v-for="(language, key) in allowedLanguages"
               :key="key"
@@ -37,13 +40,15 @@
         </div>
       </div>
       <div class="form-group row mt-3 align-items-center">
-        <label class="col-sm-3 col-form-label">
+        <label class="col-12 col-sm-auto col-form-label mb-2 mb-sm-0 pr-sm-2">
           {{ T.problemCreatorCodeUpload }}
         </label>
-        <div class="col-sm-7">
+        <div
+          class="col-12 col-sm-auto pl-sm-0 d-flex align-items-center overflow-hidden"
+        >
           <input
             data-problem-creator-code-input
-            class="w-100"
+            class="text-truncate mw-100"
             type="file"
             name="file"
             @change="handleInputFile"
@@ -52,7 +57,12 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <button class="btn btn-primary" type="submit" @click="updateCode">
+          <button
+            data-problem-creator-code-save-btn
+            class="btn btn-primary .intro-js-code"
+            type="submit"
+            @click="updateCode"
+          >
             {{ T.problemCreatorCodeSave }}
           </button>
         </div>
@@ -67,7 +77,13 @@ import { omegaup } from '../../../../omegaup';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
 import creator_CodeView from '../../../arena/CodeView.vue';
-import { LanguageInfo, supportedLanguages } from '../../../../graderv2/util';
+import { LanguageInfo, supportedLanguages } from '../../../../grader/util';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
+import VueCookies from 'vue-cookies';
+import { TabIndex } from '../Tabs.vue';
+
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -77,12 +93,13 @@ import { LanguageInfo, supportedLanguages } from '../../../../graderv2/util';
 export default class CodeTab extends Vue {
   @Prop({ default: T.problemCreatorEmpty }) codeProp!: string;
   @Prop({ default: T.problemCreatorEmpty }) extensionProp!: string;
+  @Prop() activeTabIndex!: TabIndex;
 
   inputLimit = 512 * 1024; // Hardcoded as 512kiB _must_ be enough for anybody.
   T = T;
   ui = ui;
   omegaup = omegaup;
-  selectedLanguage = T.problemCreatorEmpty;
+  selectedLanguage = '';
   codeInternal = T.problemCreatorEmpty;
   extensionInternal = T.problemCreatorEmpty;
 
@@ -117,6 +134,13 @@ export default class CodeTab extends Vue {
       if (languageInfo) {
         this.selectedLanguage = languageInfo.language;
       }
+    }
+  }
+
+  @Watch('activeTabIndex')
+  onActiveTabIndexChanged(newIndex: TabIndex) {
+    if (newIndex === TabIndex.Code) {
+      this.startIntroGuide();
     }
   }
 
@@ -190,6 +214,50 @@ export default class CodeTab extends Vue {
     this.$store.commit('updateCodeContent', this.code);
     this.$store.commit('updateCodeExtension', this.extension);
     this.$emit('show-update-success-message');
+  }
+
+  startIntroGuide() {
+    if (!this.$cookies.get('has-visited-code-tab')) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title: T.problemCreatorCodeTabIntroSelectLanguageTitle,
+              intro: T.problemCreatorCodeTabIntroSelectLanguageIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-language]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroWriteCodeTitle,
+              intro: T.problemCreatorCodeTabIntroWriteCodeIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-editor]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroUploadFileTitle,
+              intro: T.problemCreatorCodeTabIntroUploadFileIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-input]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorCodeTabIntroSaveCodeTitle,
+              intro: T.problemCreatorCodeTabIntroSaveCodeIntro,
+              element: document.querySelector(
+                '[data-problem-creator-code-save-btn]',
+              ) as Element,
+            },
+          ],
+        })
+        .start();
+
+      this.$cookies.set('has-visited-code-tab', true, -1);
+    }
   }
 }
 </script>

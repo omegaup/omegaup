@@ -5,7 +5,6 @@ import { problemPage } from './problemPage';
 
 import {
   ContestOptions,
-  GroupOptions,
   LoginOptions,
   ProblemOptions,
   RunOptions,
@@ -81,12 +80,16 @@ export class ContestPage {
     const encodedContestAlias = encodeURIComponent(contestAlias);
     const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedContestAlias}/token/secret`;
 
-    cy.request(scoreboardRefreshUrl).then((resp) => {
+    cy.request({ method: 'POST', url: scoreboardRefreshUrl }).then((resp) => {
       expect(resp.status).to.eq(200);
     });
   }
 
-  createContest(contestOptions: ContestOptions, users: Array<string>, shouldShowIntro: boolean = true): void {
+  createContest(
+    contestOptions: ContestOptions,
+    users: Array<string>,
+    shouldShowIntro: boolean = true,
+  ): void {
     cy.createContest(contestOptions, shouldShowIntro);
     cy.location('href').should('include', contestOptions.contestAlias);
     cy.get('a[data-contest-new-form]').trigger('click');
@@ -129,7 +132,7 @@ export class ContestPage {
     const contestProblems: ProblemOptions[] = [];
     const contestRuns: RunOptions[] = [];
 
-    problems.forEach( (problem: ProblemOptions) => {
+    problems.forEach((problem: ProblemOptions) => {
       problem.firstTimeVisited = firstTimeVisited;
 
       cy.login(loginOption);

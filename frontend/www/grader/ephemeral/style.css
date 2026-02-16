@@ -1,9 +1,0 @@
-button.ephemeral-button:disabled img, button.ephemeral-button span {
-	display: inline;
-}
-button.ephemeral-button img, button.ephemeral-button:disabled span {
-	display: none;
-}
-input[type="file"] {
-	display: none;
-}

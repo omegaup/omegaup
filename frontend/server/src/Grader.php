@@ -82,7 +82,7 @@ class Grader {
                     $runs
                 ),
                 'rejudge' => true,
-                'debug' => false, // TODO(lhchavez): Reenable with ACLs.
+                'debug' => false, // TODO(lhchavez): Re-enable with ACLs.
             ]
         );
     }
@@ -223,13 +223,83 @@ class Grader {
      *
      * @param string $url        The URL to request
      * @param int    $mode       How to return the result.
-     * @param mixed  $postData   Optional POST data. Will convert key-value
+     * @param string|array<string, mixed>|null $postData Optional POST data. Will convert key-value
      *                           pair dictionaries into JSON.
      * @param bool   $missingOk  Return null if the resource is not found.
      *
-     * @return mixed The result of the request.
+     * @return array{status: string}|null|string|bool The result of the request.
      */
     private function curlRequest(
+        string $url,
+        int $mode,
+        $postData = null,
+        bool $missingOk = false
+    ) {
+        $maxRetries = 3;
+        $retryCount = 0;
+
+        while ($retryCount < $maxRetries) {
+            try {
+                return $this->curlRequestSingle(
+                    $url,
+                    $mode,
+                    $postData,
+                    $missingOk
+                );
+            } catch (\RuntimeException $e) {
+                $retryCount++;
+
+                // Check if this is a retryable error
+                $errorMessage = $e->getMessage();
+                $isRetryable = $this->isRetryableError($errorMessage);
+
+                if (!$isRetryable || $retryCount >= $maxRetries) {
+                    throw $e;
+                }
+
+                // Wait before retry (exponential backoff)
+                $waitTime = max(1, intval(min(pow(2, $retryCount - 1), 5))); // Ensure positive int
+                sleep($waitTime);
+
+                self::$log->warning(
+                    "Retrying grader request ($retryCount/$maxRetries) after error: {$errorMessage}"
+                );
+            }
+        }
+
+        throw new \RuntimeException('Maximum retry attempts exceeded');
+    }
+
+    /**
+     * Check if a cURL error is retryable
+     */
+    private function isRetryableError(string $errorMessage): bool {
+        $retryableErrors = [
+            'SSL connection timeout',
+            'HTTP/2 stream',
+            'SSL routines::unexpected eof',
+            'INTERNAL_ERROR',
+            'Connection timed out',
+            'Operation timed out',
+        ];
+
+        foreach ($retryableErrors as $retryableError) {
+            if (strpos($errorMessage, $retryableError) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Single cURL request without retry logic
+     *
+     * @param string|array<string, mixed>|null $postData Optional POST data.
+     * Will convert key-value pair dictionaries into JSON.
+     * @return array{status: string}|null|string|bool
+     */
+    private function curlRequestSingle(
         string $url,
         int $mode,
         $postData = null,
@@ -255,8 +325,15 @@ class Grader {
                     CURLOPT_SSLKEY => '/etc/omegaup/frontend/key.pem',
                     CURLOPT_SSLCERT => '/etc/omegaup/frontend/certificate.pem',
                     CURLOPT_CAINFO => '/etc/omegaup/frontend/certificate.pem',
-                    CURLOPT_CONNECTTIMEOUT => 2,
-                    CURLOPT_TIMEOUT => 10,
+                    CURLOPT_CONNECTTIMEOUT => 5,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                    CURLOPT_TCP_KEEPALIVE => 1,
+                    CURLOPT_TCP_KEEPIDLE => 30,
+                    CURLOPT_TCP_KEEPINTVL => 15,
                 ]
             );
             if (!is_null($postData)) {
@@ -321,4 +398,9 @@ class Grader {
             }
         }
     }
+
+    /** @var \Monolog\Logger */
+    public static $log;
 }
+
+Grader::$log = \Monolog\Registry::omegaup()->withName('grader');

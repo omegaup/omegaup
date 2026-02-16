@@ -31,11 +31,41 @@ import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
+import { enforceSingleTab } from './singleTabEnforcer';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+
+  // Enforce single tab for virtual contests
+  let isBlocked = false;
+  let blockedMessage: string | null = null;
+  const TAB_ENFORCER_TIMEOUT_MS = 1000;
+
+  await new Promise<void>((resolve) => {
+    let settled = false;
+
+    const timeoutId = window.setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve();
+    }, TAB_ENFORCER_TIMEOUT_MS);
+
+    enforceSingleTab(payload.contest.alias, (message: string) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      isBlocked = true;
+      blockedMessage = message;
+      window.clearTimeout(timeoutId);
+      resolve();
+    });
+  });
+
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
@@ -134,6 +164,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (problemDetails?.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      problemDetails?.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
@@ -148,7 +185,10 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
       runDetailsData: runDetails,
+      isBlocked,
+      blockedMessage,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -174,7 +214,10 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
           runDetailsData: this.runDetailsData,
+          isBlocked: this.isBlocked,
+          blockedMessage: this.blockedMessage,
         },
         on: {
           'navigate-to-problem': ({
@@ -206,6 +249,19 @@ OmegaUp.on('ready', async () => {
                   run,
                 });
               });
+          },
+          'execute-run': ({
+            target,
+          }: {
+            target: Vue & { currentNextExecutionTimestamp: Date };
+          }) => {
+            api.Run.execute()
+              .then(time.remoteTimeAdapter)
+              .then((response) => {
+                target.currentNextExecutionTimestamp =
+                  response.nextExecutionTimestamp;
+              })
+              .catch(ui.apiError);
           },
           'submit-run': ({
             problem,

@@ -8,6 +8,11 @@ import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CoderOfTheMonthPayload();
+  const locationHash = window.location.hash.substring(1).split('/')[0];
+  const selectedTab = getSelectedValidTab(locationHash);
+  if (selectedTab !== locationHash) {
+    window.location.hash = selectedTab;
+  }
   const coderOfTheMonthList = new Vue({
     el: '#main-container',
     components: {
@@ -24,6 +29,7 @@ OmegaUp.on('ready', () => {
           codersOfPreviousMonth: payload.codersOfPreviousMonth,
           candidatesToCoderOfTheMonth: payload.candidatesToCoderOfTheMonth,
           isMentor: payload.isMentor,
+          selectedTab,
           canChooseCoder: payload.isMentor && payload.options?.canChooseCoder,
           coderIsSelected: this.coderIsSelected,
           category: payload.category,
@@ -48,4 +54,15 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function getSelectedValidTab(tab: string): string {
+    const validTabs = [
+      'codersOfTheMonth',
+      'codersOfPreviousMonth',
+      'candidatesToCoderOfTheMonth',
+    ];
+    const defaultTab = 'codersOfTheMonth';
+    const isValidTab = validTabs.includes(tab);
+    return isValidTab ? tab : defaultTab;
+  }
 });

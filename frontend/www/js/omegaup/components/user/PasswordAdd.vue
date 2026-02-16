@@ -15,27 +15,25 @@
     <div class="form-group">
       <label>{{ T.userEditChangePasswordNewPassword }}</label>
       <div>
-        <input
+        <omegaup-password-input
           v-model="newPassword"
           data-new-password
-          type="password"
-          size="30"
-          required
-          class="form-control"
+          :size="30"
+          :required="true"
+          autocomplete="new-password"
         />
       </div>
     </div>
     <div class="form-group">
       <label>{{ T.userEditChangePasswordRepeatNewPassword }}</label>
       <div>
-        <input
+        <omegaup-password-input
           v-model="newPassword2"
           data-new-password2
-          type="password"
-          size="30"
-          required
-          class="form-control"
-          :class="invalidPasswordClass"
+          :size="30"
+          :required="true"
+          :input-class="invalidPasswordClass"
+          autocomplete="new-password"
         />
         <div v-if="passwordMismatch" class="invalid-message">
           {{ T.passwordMismatch }}
@@ -58,8 +56,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-password-input': omegaup_PasswordInput,
+  },
+})
 export default class UserPasswordAdd extends Vue {
   @Prop() username!: string;
 

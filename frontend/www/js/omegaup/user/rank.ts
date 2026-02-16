@@ -7,7 +7,17 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload();
-
+  const commonPayload = types.payloadParsers.CommonPayload();
+  let availableFilters: {
+    country?: string;
+    school?: string;
+    state?: string;
+  } = {};
+  let filter: null | string = null;
+  if (payload.isLogged) {
+    availableFilters = payload.availableFilters;
+    filter = payload.filter;
+  }
   const ranking = payload.ranking.rank.map((user) => ({
     rank: user.ranking,
     country: user.country_id,
@@ -30,15 +40,15 @@ OmegaUp.on('ready', () => {
         props: {
           page: payload.page,
           length: payload.length,
-          isIndex: payload.isIndex,
           isLogged: payload.isLogged,
-          availableFilters: payload.availableFilters,
-          filter: payload.filter,
+          availableFilters,
+          filter,
           ranking,
           resultTotal: payload.ranking.total,
           pagerItems: payload.pagerItems,
           searchResultUsers: this.searchResultUsers,
           lastUpdated: payload.lastUpdated,
+          currentUsername: commonPayload.currentUsername,
         },
         on: {
           'update-search-result-users': (query: string) => {

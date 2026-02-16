@@ -128,6 +128,36 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     }
 
     /**
+     * Returns the quality nomination ID and contents for a problem and reviewer.
+     *
+     * @return array{contents: string, qualitynomination_id: int}|null
+     */
+    public static function getQualityNominationContentsForProblemAndReviewer(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem
+    ) {
+        $sql = "
+            SELECT
+                qualitynomination_id,
+                contents
+            FROM
+                QualityNominations qn
+            INNER JOIN
+                Identities i ON i.user_id = qn.user_id
+            WHERE
+                nomination = 'quality_tag' AND
+                i.identity_id = ? AND
+                qn.problem_id = ?
+            LIMIT 1";
+
+        /** @var array{contents: string, qualitynomination_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id, $problem->problem_id]
+        );
+    }
+
+    /**
      * Returns the votes from all the assigned reviewers for a particular
      * nomination.
      *
@@ -531,6 +561,42 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $nominations[] = new \OmegaUp\DAO\VO\QualityNominations($row);
         }
         return $nominations;
+    }
+
+    /**
+     * Gets all rationales for a problem's active demotion nominations.
+     * Only considers nominations of type 'demotion' with status 'warning' or 'banned'.
+     *
+     * @return list<string> List of unique rationale strings
+     */
+    public static function getDemotionRationales(int $problemId): array {
+        $sql = '
+            SELECT
+                contents
+            FROM
+                QualityNominations
+            WHERE
+                problem_id = ? AND
+                nomination = "demotion" AND
+                status IN ("warning", "banned");
+        ';
+
+        /** @var list<array{contents: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemId]
+        );
+
+        $rationales = [];
+        foreach ($rs as $row) {
+            /** @var array{rationale?: string} */
+            $contents = json_decode($row['contents'], associative: true);
+            if (!empty($contents['rationale'])) {
+                $rationales[] = $contents['rationale'];
+            }
+        }
+
+        return array_values(array_unique($rationales));
     }
     /**
      * This function gets contents of QualityNomination table

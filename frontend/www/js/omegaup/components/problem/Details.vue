@@ -37,6 +37,12 @@
           :problem="problem"
           :show-visibility-indicators="showVisibilityIndicators"
           :show-edit-link="user.admin"
+          :user-logged-in="user.loggedIn"
+          :is-bookmarked="bookmarkedStatus"
+          :in-contest-or-course="inContestOrCourse"
+          @toggle-bookmark="
+            (problemAlias) => $emit('toggle-bookmark', problemAlias)
+          "
         ></omegaup-problem-settings-summary>
 
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
@@ -185,6 +191,10 @@
               :can-submit="user.loggedIn && !inContestOrCourse"
               :accepted-languages="filteredLanguages"
               :preferred-language="preferredLanguage"
+              :last-run="lastRun"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
+              :next-execution-timestamp="nextExecutionTimestamp || new Date()"
+              @execute-run="() => $emit('execute-run')"
             ></omegaup-arena-ephemeral-grader>
           </div>
           <div class="bg-white text-center p-4 d-sm-none border">
@@ -209,8 +219,12 @@
             "
             @new-submission="onNewSubmission"
           >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
+            <template #title>
+              <div></div>
+            </template>
+            <template #runs>
+              <div></div>
+            </template>
           </omegaup-arena-runs>
           <omegaup-arena-runs-for-courses
             v-else
@@ -219,6 +233,8 @@
             :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
+            :created-guid="createdGuid"
+            :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
             :request-feedback="requestFeedback"
             :is-contest-finished="isContestFinished"
             @request-feedback="(guid) => $emit('request-feedback', guid)"
@@ -231,8 +247,12 @@
             "
             @new-submission="onNewSubmission"
           >
-            <template #title><div></div></template>
-            <template #runs><div></div></template>
+            <template #title>
+              <div></div>
+            </template>
+            <template #runs>
+              <div></div>
+            </template>
           </omegaup-arena-runs-for-courses>
         </template>
         <omegaup-problem-feedback
@@ -280,8 +300,12 @@
             (request) => $emit('update-search-result-users', request)
           "
         >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
+          <template #title>
+            <div></div>
+          </template>
+          <template #runs>
+            <div></div>
+          </template>
         </omegaup-arena-runs>
         <omegaup-arena-runs-for-courses
           v-else
@@ -312,8 +336,12 @@
             (request) => $emit('update-search-result-users', request)
           "
         >
-          <template #title><div></div></template>
-          <template #runs><div></div></template>
+          <template #title>
+            <div></div>
+          </template>
+          <template #runs>
+            <div></div>
+          </template>
         </omegaup-arena-runs-for-courses>
         <omegaup-overlay
           v-if="user.loggedIn"
@@ -339,7 +367,9 @@
           :is-admin="true"
           @clarification-response="onClarificationResponse"
         >
-          <template #new-clarification><div></div></template>
+          <template #new-clarification>
+            <div></div>
+          </template>
         </omegaup-arena-clarification-list>
       </div>
       <div
@@ -379,7 +409,7 @@ import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
-import omegaup_Markdown from '../Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_soltion from './Solution.vue';
 
@@ -427,7 +457,7 @@ export enum PopupDisplayed {
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-solvers': arena_Solvers,
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': omegaup_problemMarkdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
@@ -466,10 +496,12 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) inContestOrCourse!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) createdGuid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
+  @Prop() nextExecutionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
@@ -483,8 +515,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: () => new Map<number, ArenaCourseFeedback>() })
   feedbackThreadMap!: Map<number, ArenaCourseFeedback>;
   @Prop({ default: true }) useNewVerdictTable!: boolean;
+  @Prop({ default: false }) bookmarkedStatus!: boolean;
 
-  @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
+  @Ref('statement-markdown')
+  readonly statementMarkdown!: omegaup_problemMarkdown;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -523,16 +557,23 @@ export default class ProblemDetails extends Vue {
     return tabs.filter((tab) => tab.visible);
   }
 
-  get preferredLanguage(): null | string {
-    if (!(this.runs?.length > 0)) {
-      return this.problem.preferred_language ?? null;
+  get lastRun(): types.Run | null {
+    const runs = this.runsByProblem;
+    if (!runs?.length) {
+      return null;
     }
-    const mostRecentRun = this.runs.reduce(function (prev, current) {
+    return runs.reduce(function (prev, current) {
       return prev && prev.time.getTime() > current.time.getTime()
         ? prev
         : current;
     });
-    return mostRecentRun.language;
+  }
+
+  get preferredLanguage(): null | string {
+    if (!this.lastRun) {
+      return this.problem.preferred_language ?? null;
+    }
+    return this.lastRun.language;
   }
 
   get clarificationsCount(): string {

@@ -34,7 +34,7 @@
           <textarea
             v-model="participants"
             data-course-multiple-students-add
-            class="form-control pariticipants"
+            class="form-control participants"
             rows="4"
           ></textarea>
         </div>
@@ -81,7 +81,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="float-right">
+      <div v-if="students.length > 0" class="float-right">
         <a class="btn btn-primary" :href="studentsProgressUrl()">
           {{ T.courseStudentsProgress }}
         </a>

@@ -2,16 +2,21 @@
   <div class="card">
     <div class="card-body">
       <div class="row">
-        <div class="col-md-6">
-          <div ref="markdownButtonBar" class="wmd-button-bar"></div>
+        <div class="col-md-6 d-flex flex-column">
+          <div
+            ref="markdownButtonBar"
+            class="wmd-button-bar"
+            data-solution-markdown-toolbar
+          ></div>
           <textarea
             ref="markdownInput"
             v-model="currentSolutionMarkdown"
             data-problem-creator-solution-editor-markdown
             class="wmd-input"
+            @change="currentSolutionMarkdown = $event.target.value"
           ></textarea>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex flex-column">
           <omegaup-markdown
             data-problem-creator-solution-previewer-markdown
             :markdown="
@@ -44,8 +49,12 @@ import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import * as ui from '../../../../ui';
 import T from '../../../../lang';
-
-import omegaup_Markdown from '../../../Markdown.vue';
+import { TabIndex } from '../Tabs.vue';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
+import VueCookies from 'vue-cookies';
+import ProblemMarkdown from '../../ProblemMarkdown.vue';
+Vue.use(VueCookies, { expire: -1 });
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -53,7 +62,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class SolutionTab extends Vue {
@@ -62,6 +71,7 @@ export default class SolutionTab extends Vue {
 
   @Prop({ default: T.problemCreatorEmpty })
   currentSolutionMarkdownProp!: string;
+  @Prop() activeTabIndex!: TabIndex;
 
   T = T;
   ui = ui;
@@ -81,6 +91,15 @@ export default class SolutionTab extends Vue {
     this.currentSolutionMarkdown = this.currentSolutionMarkdownProp;
   }
 
+  @Watch('activeTabIndex')
+  onActiveTabIndexChanged(newIndex: TabIndex) {
+    if (newIndex === TabIndex.Solution) {
+      this.$nextTick(() => {
+        this.startIntroGuide();
+      });
+    }
+  }
+
   mounted(): void {
     this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
       panels: {
@@ -96,6 +115,49 @@ export default class SolutionTab extends Vue {
     this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
     this.$emit('show-update-success-message');
   }
+
+  startIntroGuide() {
+    if (!this.$cookies.get('has-visited-solution-tab')) {
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps: [
+            {
+              title: T.problemCreatorSolutionTabIntroToolbarTitle,
+              intro: T.problemCreatorSolutionTabIntroToolbarIntro,
+              element: document.querySelector(
+                '[data-solution-markdown-toolbar]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroEditorTitle,
+              intro: T.problemCreatorSolutionTabIntroEditorIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-editor-markdown]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroPreviewTitle,
+              intro: T.problemCreatorSolutionTabIntroPreviewIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-previewer-markdown]',
+              ) as Element,
+            },
+            {
+              title: T.problemCreatorSolutionTabIntroSaveTitle,
+              intro: T.problemCreatorSolutionTabIntroSaveIntro,
+              element: document.querySelector(
+                '[data-problem-creator-solution-save-markdown]',
+              ) as Element,
+            },
+          ],
+        })
+        .start();
+      this.$cookies.set('has-visited-solution-tab', true, -1);
+    }
+  }
 }
 </script>
 
@@ -106,5 +168,29 @@ export default class SolutionTab extends Vue {
 .wmd-preview,
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
+}
+
+.row {
+  .wmd-button-bar {
+    flex-shrink: 0;
+  }
+
+  .wmd-input {
+    flex: 1;
+    min-height: 400px;
+    height: auto !important;
+    resize: vertical;
+  }
+
+  [data-problem-creator-solution-previewer-markdown] {
+    flex: 1;
+    min-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--markdown-preview-border-color);
+    padding: 10px;
+    width: 100%;
+    margin-top: 35px;
+    overflow-wrap: anywhere;
+  }
 }
 </style>

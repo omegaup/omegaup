@@ -58,7 +58,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
+                'userNotAllowedToAddPrivateProblem'
             );
         }
     }
@@ -72,10 +72,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         float $points,
         int $order_in_contest = 1,
         ?\OmegaUp\DAO\VO\ProblemsetProblems $oldproblemsetProblem = null,
-        bool $validateVisibility = true,
+        bool $shouldValidateVisibility = true,
         bool $isExtraProblem = false
     ): void {
-        if ($validateVisibility) {
+        if ($shouldValidateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
                 $identity,

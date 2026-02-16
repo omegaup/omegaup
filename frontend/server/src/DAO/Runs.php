@@ -1200,7 +1200,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the time of the next submission to the current problem
+     * Returns the time of the next submission to the current problem.
+     * The calculation logic for the next submission time is delegated to
+     * `getTimeGap`.
      */
     final public static function nextSubmissionTimestamp(
         ?\OmegaUp\DAO\VO\Contests $contest = null,
@@ -1214,14 +1216,36 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 intval($contest->submissions_gap)
             );
         }
+        return self::getTimeGap($submissionGap, $lastSubmissionTime);
+    }
 
-        if (is_null($lastSubmissionTime)) {
+    /**
+     * Returns the time of the next execution to the current problem.
+     * The calculation logic for the next execution time is delegated to
+     * `getTimeGap`.
+     */
+    final public static function nextExecutionTimestamp(
+        ?\OmegaUp\Timestamp $lastExecutionTime = null
+    ): \OmegaUp\Timestamp {
+        return self::getTimeGap(
+            \OmegaUp\Controllers\Run::$defaultExecutionGap,
+            $lastExecutionTime
+        );
+    }
+
+    /**
+     * Calculates the timestamp for the next activity based on a specified
+     * time gap.
+     */
+    public static function getTimeGap(
+        int $initialGap,
+        ?\OmegaUp\Timestamp $lastActivityTime = null
+    ): \OmegaUp\Timestamp {
+        if (is_null($lastActivityTime)) {
             return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
-        return new \OmegaUp\Timestamp(
-            $lastSubmissionTime->time + $submissionGap
-        );
+        return new \OmegaUp\Timestamp($lastActivityTime->time + $initialGap);
     }
 
     /**

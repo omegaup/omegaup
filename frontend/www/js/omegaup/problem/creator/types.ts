@@ -123,10 +123,11 @@ export interface CaseLineInfo extends Omit<CaseLine, 'lineID' | 'caseID'> {
  * @typedef {object}
  * @property {CaseID} caseID UUID of the case
  * @property {GroupID} groupID UUID referencing to the parent group
- * @property {stirng} name Name of the case
+ * @property {string} name Name of the case
  * @property {number | null} points Points of the case
  * @property {Array<CaseLine>} lines Lines containing .IN information of the cases
  * @property {string} output output of the case
+ * @property {boolean} autoPoints Whether the points are gonna be calculated automatically
  */
 export interface Case {
   caseID: string;
@@ -134,7 +135,8 @@ export interface Case {
   name: string;
   lines: CaseLine[];
   output: string;
-  points: number | null;
+  points: number;
+  autoPoints: boolean;
 }
 
 /**
@@ -152,7 +154,7 @@ export interface Case {
 export interface Group {
   groupID: GroupID;
   name: string;
-  points: number | null;
+  points: number;
   autoPoints: boolean;
   ungroupedCase: boolean;
   cases: Case[];
@@ -208,7 +210,7 @@ export interface CaseRequest {
   caseID: CaseID;
   name: string;
   autoPoints: boolean;
-  points: number | null;
+  points: number;
   lines?: CaseLine[];
 }
 

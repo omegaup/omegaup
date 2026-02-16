@@ -44,6 +44,15 @@ class ProblemParams extends BaseParams {
     const SHOW_DIFFS_EXAMPLES = 'examples';
     const SHOW_DIFFS_ALL = 'all';
 
+    // Group score policy
+    const GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO = 'sum-if-not-zero';
+    const GROUP_SCORE_POLICY_MIN = 'min';
+
+    const VALID_GROUP_SCORE_POLICY_VALUES = [
+        self::GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO,
+        self::GROUP_SCORE_POLICY_MIN,
+    ];
+
     /**
      * @readonly
      * @var string
@@ -205,7 +214,7 @@ class ProblemParams extends BaseParams {
             \OmegaUp\Validators::validateInEnum(
                 $params['group_score_policy'],
                 'group_score_policy',
-                ['sum-if-not-zero', 'min']
+                self::VALID_GROUP_SCORE_POLICY_VALUES
             );
         }
         if (isset($params['validator'])) {
@@ -295,7 +304,7 @@ class ProblemParams extends BaseParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->order = $params['order'] ?? 'normal';
         $this->showDiff = $params['show_diff'] ?? 'none';
-        $this->groupScorePolicy = $params['group_score_policy'] ?? null;
+        $this->groupScorePolicy = $params['group_score_policy'] ?? self::GROUP_SCORE_POLICY_SUM_IF_NOT_ZERO;
     }
 
     /**

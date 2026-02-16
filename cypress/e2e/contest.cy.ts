@@ -1,5 +1,10 @@
 import { v4 as uuid } from 'uuid';
-import { ContestOptions, GroupOptions, LoginOptions, TeamGroupOptions } from '../support/types';
+import {
+  ContestOptions,
+  GroupOptions,
+  LoginOptions,
+  TeamGroupOptions,
+} from '../support/types';
 import { contestPage } from '../support/pageObjects/contestPage';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { getISODateTime, addSubtractDateTime } from '../support/commands';
@@ -298,7 +303,9 @@ describe('Contest Test', () => {
     // Update start time to 5 minutes ago and end time to 1 minute ago
     cy.get(`a[href="/contest/${contestOptions.contestAlias}/edit/"]`).click();
     cy.waitUntil(() =>
-      cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
+      cy
+        .url()
+        .should('include', `/contest/${contestOptions.contestAlias}/edit/`),
     );
     const startDate = addSubtractDateTime(now, { minutes: -5 });
     const endDate = addSubtractDateTime(now, { minutes: -1 });
@@ -316,6 +323,10 @@ describe('Contest Test', () => {
       .then(() => {
         const newContestAlias = contestOptions.contestAlias + '/practice';
         contestOptions.contestAlias = newContestAlias;
+        // Wait for the practice mode page to fully load before creating runs
+        cy.waitUntil(() => cy.url().should('include', newContestAlias));
+        // Add additional wait for the page to be fully interactive
+        cy.wait(1000);
         cy.createRunsInsideContest(contestOptions);
       });
     cy.get('a[href="#ranking"]').click();
@@ -467,7 +478,6 @@ describe('Contest Test', () => {
     contestPage.createContest(contestOptions, users);
     cy.logout();
 
-
     cy.login(contestant1);
     cy.enterContest(contestOptions);
     cy.createRunsInsideContest(contestOptions);
@@ -536,6 +546,7 @@ describe('Contest Test', () => {
     cy.logout();
 
     cy.login(userLoginOptions[1]);
+
     cy.visit(`arena/${contestOptions.contestAlias}`);
     cy.get('a.nav-link[href="#runs"]').click();
     cy.get('a[problem-navigation-button]').click();
@@ -563,7 +574,7 @@ describe('Contest Test', () => {
       groupDescription: 'group description',
       noOfContestants: '2',
     };
-    
+
     cy.login(userLoginOptions[0]);
     groupPage.createTeamGroup(teamGroupOptions);
     cy.visit('/');
@@ -571,7 +582,9 @@ describe('Contest Test', () => {
 
     // Update contest title and description
     cy.waitUntil(() =>
-      cy.url().should('include', `/contest/${contestOptions.contestAlias}/edit/`),
+      cy
+        .url()
+        .should('include', `/contest/${contestOptions.contestAlias}/edit/`),
     );
     const newContestTitle = 'New Contest Title';
     const newContestDescription = 'New Contest Description';

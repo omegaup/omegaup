@@ -38,7 +38,7 @@ export function submitRun({
 }: RunSubmit): void {
   ui.reportEvent('submission', 'submit');
   const run: types.Run = {
-    guid: guid,
+    guid,
     submit_delay: submitDelay,
     username,
     classname,

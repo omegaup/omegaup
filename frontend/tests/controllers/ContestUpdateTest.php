@@ -356,6 +356,66 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('31', $e->getErrorMessage());
+        }
+    }
+
+    /**
+     * Sys-admin contest admins can extend contests up to 60 days
+     */
+    public function testUpdateContestLengthAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $admin);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $startTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $contest->start_time
+        )->time;
+        $newFinishTime = $startTime + (60 * 60 * 24 * 60);
+
+        $login = self::login($admin);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'finish_time' => $newFinishTime,
+            ])
+        );
+        $this->assertSame('ok', $response['status']);
+    }
+
+    /**
+     * Sys-admin contest admins cannot exceed 60 days
+     */
+    public function testUpdateContestTooLongAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        \OmegaUp\Test\Factories\Contest::addAdminUser($contestData, $admin);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $startTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $contest->start_time
+        )->time;
+        $newFinishTime = $startTime + (60 * 60 * 24 * 61);
+
+        $login = self::login($admin);
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'finish_time' => $newFinishTime,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('60', $e->getErrorMessage());
         }
     }
 
@@ -1927,5 +1987,82 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedPenalty = $runs[0]['runtime'];
         }
         $this->assertSame($runs[0]['penalty'], $expectedPenalty);
+    }
+
+    /**
+     * A PHPUnit data provider for testing contest recommended flag permissions.
+     *
+     * @return list<array{0: string, 1: bool}>
+     */
+    public function contestRecommendedPermissionsProvider(): array {
+        return [
+            [\OmegaUp\Authorization::SUPPORT_GROUP_ALIAS, true],
+            [\OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::COURSE_CURATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::MENTOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::IDENTITY_CREATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::CERTIFICATE_GENERATOR_GROUP_ALIAS, false],
+            [\OmegaUp\Authorization::TEACHING_ASSISTANT_GROUP_ALIAS, false],
+        ];
+    }
+
+    /**
+     * Test setting recommended flag with different user roles
+     *
+     * @dataProvider contestRecommendedPermissionsProvider
+     */
+    public function testSetRecommendedFlagPermissions(
+        string $groupAlias,
+        bool $shouldHaveAccess
+    ) {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Create user and add to corresponding group
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to the group
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
+        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
+            'group_id' => $group?->group_id,
+            'identity_id' => $identity->identity_id,
+        ]));
+
+        // Login with the user
+        $login = self::login($identity);
+
+        try {
+            $r = new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'value' => true,
+            ]);
+
+            // Call API
+            \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+
+            if (!$shouldHaveAccess) {
+                $this->fail(
+                    'User should not have access to set recommended flag'
+                );
+            }
+
+            // Verify setting was applied
+            $contestData['request']['recommended'] = $r['value'];
+            $this->assertContest($contestData['request']);
+
+            // Try turning it off
+            $r['value'] = false;
+            \OmegaUp\Controllers\Contest::apiSetRecommended($r);
+
+            // Verify setting was applied
+            $contestData['request']['recommended'] = $r['value'];
+            $this->assertContest($contestData['request']);
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            if ($shouldHaveAccess) {
+                $this->fail('User should have access to set recommended flag');
+            }
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
     }
 }

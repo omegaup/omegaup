@@ -1,7 +1,11 @@
 import { getISODate } from '../support/commands';
 import { loginPage } from '../support/pageObjects/loginPage';
 import { profilePage } from '../support/pageObjects/profilePage';
-import { SchoolDetails, UserInformation, UserPreferences } from '../support/types';
+import {
+  SchoolDetails,
+  UserInformation,
+  UserPreferences,
+} from '../support/types';
 
 describe('Navigation Test', () => {
   beforeEach(() => {
@@ -61,11 +65,43 @@ describe('Navigation Test', () => {
       name: 'MIT',
       grade: 'bachelors',
       enrolledStatus: true,
-    }
+    };
 
     cy.login(loginOptions[0]);
     profilePage.updateSchoolDetails(schoolDetails);
     profilePage.verifySchoolDetails(schoolDetails);
     cy.logout();
+  });
+
+  it('Should navigate to enrolled contests and verify filter', () => {
+    const userLoginOptions = loginPage.registerMultipleUsers(1);
+    cy.login(userLoginOptions[0]);
+
+    cy.get('[data-nav-user]').should('be.visible');
+    cy.get('[data-nav-user]').click();
+    cy.get('[data-nav-user-contests-enrolled]').should('be.visible');
+
+    cy.get('[data-nav-user-contests-enrolled]').click();
+
+    cy.waitUntil(() =>
+      cy
+        .url()
+        .should(
+          'include',
+          '/arena/?page=1&tab_name=current&sort_order=none&filter=signedup',
+        ),
+    );
+
+    cy.get('[data-dropdown-filter]>button').click();
+
+    cy.get('.dropdown-menu.show').should('be.visible');
+
+    cy.get('[data-filter-by-signed-up].dropdown-item')
+      .should('exist')
+      .and('be.visible');
+
+    cy.get('[data-filter-by-signed-up].dropdown-item svg.fa-check').should(
+      'exist',
+    );
   });
 });

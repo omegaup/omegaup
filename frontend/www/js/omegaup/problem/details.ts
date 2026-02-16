@@ -60,6 +60,13 @@ OmegaUp.on('ready', async () => {
     );
   }
 
+  let nextExecutionTimestamp: null | Date = null;
+  if (payload.problem.nextExecutionTimestamp != null) {
+    nextExecutionTimestamp = time.remoteTime(
+      payload.problem.nextExecutionTimestamp.getTime(),
+    );
+  }
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -79,8 +86,12 @@ OmegaUp.on('ready', async () => {
           !payload.nominationStatus?.solved),
       guid,
       nextSubmissionTimestamp,
+      nextExecutionTimestamp,
+      createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
+      isBookmarked: payload.isBookmarked,
+      isLoadingBookmark: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -110,11 +121,14 @@ OmegaUp.on('ready', async () => {
           isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          nextExecutionTimestamp: this.nextExecutionTimestamp,
+          createdGuid: this.createdGuid,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
+          bookmarkedStatus: this.isBookmarked,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -175,6 +189,7 @@ OmegaUp.on('ready', async () => {
               .then((response) => {
                 problemDetailsView.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
+                problemDetailsView.createdGuid = response.guid;
 
                 submitRun({
                   guid: response.guid,
@@ -424,6 +439,27 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
+          'toggle-bookmark': (problemAlias: string) => {
+            if (this.isLoadingBookmark) {
+              return;
+            }
+            this.isLoadingBookmark = true;
+            api.ProblemBookmark.toggle({ problem_alias: problemAlias })
+              .then((response) => {
+                this.isBookmarked = response.bookmarked;
+                ui.success(
+                  response.bookmarked
+                    ? T.problemBookmarkAdded
+                    : T.problemBookmarkRemoved,
+                );
+              })
+              .catch((error) => {
+                ui.apiError(error);
+              })
+              .finally(() => {
+                this.isLoadingBookmark = false;
+              });
+          },
         },
       });
     },
@@ -440,6 +476,7 @@ OmegaUp.on('ready', async () => {
             .then((response) => {
               problemDetailsView.nextSubmissionTimestamp =
                 response.nextSubmissionTimestamp;
+              problemDetailsView.createdGuid = response.guid;
               submitRun({
                 guid: response.guid,
                 submitDelay: response.submit_delay,
@@ -448,6 +485,21 @@ OmegaUp.on('ready', async () => {
                 classname: commonPayload.userClassname,
                 problemAlias: payload.problem.alias,
               });
+            })
+            .catch((run) => {
+              submitRunFailed({
+                error: run.error,
+                errorname: run.errorname,
+                run,
+              });
+            });
+          break;
+        case 'executeRun':
+          api.Run.execute()
+            .then(time.remoteTimeAdapter)
+            .then((response) => {
+              problemDetailsView.nextExecutionTimestamp =
+                response.nextExecutionTimestamp;
             })
             .catch((run) => {
               submitRunFailed({

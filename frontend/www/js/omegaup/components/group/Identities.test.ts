@@ -62,6 +62,6 @@ describe('Identities.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('engineering@omegaup.com ');
+    expect(wrapper.text()).toContain('soporte@omegaup.com ');
   });
 });

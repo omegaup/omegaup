@@ -140,11 +140,11 @@ export default class AddPanel extends Vue {
       const caseName = this.caseInputRef.caseName;
       const caseGroup = this.caseInputRef.caseGroup;
       const casePoints = this.caseInputRef.casePoints;
-      const caseAutoPoints = casePoints === null;
+      const caseAutoPoints = this.caseInputRef.caseAutoPoints;
 
       // Check if there is a group/case with the same name already
       if (caseGroup === NIL) {
-        // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a coressponding group is created too
+        // In this case we just need to check if there is a group with the same name. Since every time a new ungrouped case is created, a corresponding group is created too
         const nameAlreadyExists = this.groups.find((g) => g.name === caseName);
         if (nameAlreadyExists) {
           this.invalidCaseName = true;
@@ -170,7 +170,7 @@ export default class AddPanel extends Vue {
     } else if (this.tab === 'group') {
       const groupName = this.groupInputRef.groupName;
       const groupPoints = this.groupInputRef.groupPoints;
-      const groupAutoPoints = groupPoints === null;
+      const groupAutoPoints = this.groupInputRef.groupAutoPoints;
 
       // Check if there is a group with the same name already
       const nameAlreadyExists = this.groups.find((g) => g.name === groupName);
@@ -208,7 +208,7 @@ export default class AddPanel extends Vue {
       };
 
       if (multipleCasesGroup === NIL) {
-        // In this case we just need to check if there is a group with the same name. Since everytime a new ungrouped case is created, a corresponding group is created too
+        // In this case we just need to check if there is a group with the same name. Since every time a new ungrouped case is created, a corresponding group is created too
         const nameAlreadyExists = this.groups.find((g) =>
           multipleCaseNameArray.includes(g.name),
         );

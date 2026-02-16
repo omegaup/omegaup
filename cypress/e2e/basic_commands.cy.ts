@@ -78,7 +78,17 @@ describe('Basic Commands Test', () => {
     const problemOptions = problemPage.generateProblemOptions(1);
     cy.login(loginOptions[0]);
     cy.createProblem(problemOptions[0]);
-    coursePage.verifyProblem(problemOptions[0]);
+    problemPage.verifyProblem(problemOptions[0]);
+    cy.logout();
+  });
+
+  it.only('Should download a recently created problem', () => {
+    const loginOptions = loginPage.registerMultipleUsers(1);
+    const problemOptions = problemPage.generateProblemOptions(1);
+    cy.login(loginOptions[0]);
+    cy.createProblem(problemOptions[0]);
+    problemPage.verifyProblem(problemOptions[0]);
+    problemPage.downloadProblem(problemOptions[0].problemAlias);
     cy.logout();
   });
 
@@ -96,7 +106,7 @@ describe('Basic Commands Test', () => {
     cy.login({ username: 'user', password: 'user' });
     cy.createProblem(problemOptions);
     cy.createRun(runOptions);
-    coursePage.verifyProblemRun('AC');
+    problemPage.verifyProblemRun('AC');
     cy.logout();
   });
 
@@ -134,7 +144,10 @@ describe('Basic Commands Test', () => {
   it('Should create two contests and merge their scoreboard', () => {
     const loginOptions = loginPage.registerMultipleUsers(4);
     const contestOptions1 = contestPage.generateContestOptions(loginOptions[1]);
-    const contestOptions2 = contestPage.generateContestOptions(loginOptions[2], false);
+    const contestOptions2 = contestPage.generateContestOptions(
+      loginOptions[2],
+      false,
+    );
     const users1 = [loginOptions[0].username, loginOptions[3].username];
     const users2 = [loginOptions[3].username];
 

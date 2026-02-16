@@ -228,21 +228,44 @@
                 <button
                   v-else-if="useNewSubmissionButton"
                   class="w-100"
-                  @click="$emit('new-submission')"
+                  :disabled="!canSubmit"
+                  :class="{ disabled: !canSubmit }"
+                  @click="onSubmit"
                 >
-                  {{ newSubmissionDescription }}
+                  <omegaup-countdown
+                    v-if="!canSubmit"
+                    :target-time="nextSubmissionTimestamp"
+                    :countdown-format="
+                      omegaup.CountdownFormat.WaitBetweenUploadsSeconds
+                    "
+                    @finish="now = Date.now()"
+                  ></omegaup-countdown>
+                  <span v-else>{{ newSubmissionDescription }}</span>
                 </button>
                 <a
-                  v-else
+                  v-else-if="canSubmit"
                   :href="newSubmissionUrl"
-                  @click="$emit('new-submission')"
+                  @click="onSubmit"
                   >{{ newSubmissionDescription }}</a
                 >
+                <div v-else>
+                  <omegaup-countdown
+                    :target-time="nextSubmissionTimestamp"
+                    :countdown-format="
+                      omegaup.CountdownFormat.WaitBetweenUploadsSeconds
+                    "
+                    @finish="now = Date.now()"
+                  ></omegaup-countdown>
+                </div>
               </td>
             </tr>
           </tfoot>
           <tbody>
-            <tr v-for="run in paginatedRuns" :key="run.guid">
+            <tr
+              v-for="run in paginatedRuns"
+              :key="run.guid"
+              :class="{ selected: createdGuid === run.guid }"
+            >
               <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
               <td v-show="showGUID">
                 <acronym :title="run.guid" data-run-guid>
@@ -489,6 +512,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import * as ui from '../../ui';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -496,6 +521,7 @@ import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import { DisqualificationType } from './Runs.vue';
+import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
 import { PaginationPlugin } from 'bootstrap-vue';
@@ -582,6 +608,7 @@ export enum PopupDisplayed {
     FontAwesomeIcon,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-overlay': omegaup_Overlay,
+    'omegaup-countdown': omegaup_Countdown,
     'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
   },
@@ -614,12 +641,15 @@ export default class RunsForCourses extends Vue {
   @Prop() requestFeedback!: boolean;
   @Prop({ default: 10 }) itemsPerPage!: number;
   @Prop({ default: false }) showGUID!: boolean;
+  @Prop({ default: null }) createdGuid!: null | string;
+  @Prop({ default: null }) nextSubmissionTimestamp!: null | Date;
 
   NumericOutputStatus = NumericOutputStatus;
   PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
   DisqualificationType = DisqualificationType;
+  omegaup = omegaup;
 
   filterLanguage: string = '';
   filterOffset: number = 0;
@@ -634,6 +664,7 @@ export default class RunsForCourses extends Vue {
   currentPage: number = 1;
   currentDataPage: number = 1;
   newFieldsLaunchDate: Date = new Date('2023-10-22');
+  now: number = Date.now();
 
   get totalRows(): number {
     if (this.totalRuns === undefined) {
@@ -647,6 +678,13 @@ export default class RunsForCourses extends Vue {
       return Math.ceil(this.totalRows / this.itemsPerPage);
     }
     return 1;
+  }
+
+  get canSubmit(): boolean {
+    if (!this.nextSubmissionTimestamp) {
+      return true;
+    }
+    return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
 
   onPageClick(bvEvent: any, page: number): void {
@@ -1045,6 +1083,41 @@ export default class RunsForCourses extends Vue {
     }
   }
 
+  @Watch('createdGuid')
+  onCreatedGuidChanged(newValue: null | string) {
+    if (!newValue) {
+      return;
+    }
+
+    const singleProblemRuns = document.getElementsByClassName(
+      'single-problem-runs',
+    );
+    if (singleProblemRuns.length === 0) {
+      return;
+    }
+    singleProblemRuns[0].scrollIntoView({ behavior: 'smooth' });
+    const selectedElements = document.getElementsByClassName('selected');
+    setTimeout(() => {
+      Array.from(selectedElements).forEach((element) => {
+        element.classList.remove('selected');
+      });
+    }, 10000);
+  }
+
+  onSubmit(): void {
+    if (!this.canSubmit && this.nextSubmissionTimestamp) {
+      alert(
+        ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+          submissionGap: Math.ceil(
+            (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
+          ),
+        }),
+      );
+      return;
+    }
+    this.$emit('new-submission');
+  }
+
   onRemoveFilter(filter: string): void {
     this.currentPage = 1;
     this.currentDataPage = 1;
@@ -1097,6 +1170,13 @@ export default class RunsForCourses extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
+.selected {
+  background-color: var(--arena-runs-table-row-selected-background-color);
+  border: 2px solid var(--arena-runs-table-row-selected-border-color);
+  border-radius: 8px;
+  transition: background-color 10s ease, border-color 10s ease;
+}
 
 .text-break-all {
   word-break: break-all;
@@ -1170,5 +1250,25 @@ export default class RunsForCourses extends Vue {
 .status-ce {
   background: var(--arena-runs-table-status-ce-background-color);
   color: var(--arena-runs-table-status-ce-font-color);
+}
+
+.status-pa {
+  background: var(--arena-runs-table-status-pa-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-ole {
+  background: var(--arena-runs-table-status-ole-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-rte {
+  background: var(--arena-runs-table-status-rte-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+
+.status-rfe {
+  background: var(--arena-runs-table-status-rfe-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
 }
 </style>

@@ -10,6 +10,7 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SupportDetailsPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const adminSupport = new Vue({
     el: '#main-container',
@@ -25,6 +26,10 @@ OmegaUp.on('ready', () => {
         birthDate: null as null | Date,
         roles: [] as Array<string>,
         email: null as null | string,
+        contestAlias: null as null | string,
+        contestTitle: null as null | string,
+        contestFound: false,
+        isContestRecommended: false,
       };
     },
     render: function (createElement) {
@@ -38,6 +43,18 @@ OmegaUp.on('ready', () => {
           roleNamesWithDescription: payload.roleNamesWithDescription,
           roles: this.roles,
           email: this.email,
+          contestAlias: this.contestAlias,
+          contestTitle: this.contestTitle,
+          contestFound: this.contestFound,
+          isContestRecommended: this.isContestRecommended,
+          maintenanceEnabled: payload.maintenanceMode.enabled,
+          maintenanceMessageEs: payload.maintenanceMode.message_es || '',
+          maintenanceMessageEn: payload.maintenanceMode.message_en || '',
+          maintenanceMessagePt: payload.maintenanceMode.message_pt || '',
+          maintenanceType: payload.maintenanceMode.type || 'info',
+          preferredLanguage: commonPayload.preferredLanguage,
+          maintenancePredefinedTemplates:
+            payload.maintenancePredefinedTemplates,
         },
         on: {
           'search-username-or-email': (usernameOrEmail: string): void => {
@@ -117,6 +134,75 @@ OmegaUp.on('ready', () => {
                 })
                 .catch(ui.apiError);
             }
+          },
+          'search-contest': (contestAlias: string): void => {
+            adminSupport.contestFound = false;
+            adminSupport.contestTitle = null;
+            adminSupport.isContestRecommended = false;
+
+            api.Contest.details({ contest_alias: contestAlias })
+              .then((data) => {
+                adminSupport.contestAlias = contestAlias;
+                adminSupport.contestTitle = data.title;
+                adminSupport.contestFound = true;
+                adminSupport.isContestRecommended = data.recommended;
+              })
+              .catch(ui.apiError);
+          },
+          'toggle-recommended': (isNowRecommended: boolean): void => {
+            api.Contest.setRecommended({
+              contest_alias: adminSupport.contestAlias,
+              value: isNowRecommended,
+            })
+              .then(() => {
+                ui.success(
+                  isNowRecommended
+                    ? T.supportContestSetAsRecommended
+                    : T.supportContestRemovedFromRecommended,
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'reset-contest': () => {
+            adminSupport.contestAlias = null;
+            adminSupport.contestTitle = null;
+            adminSupport.contestFound = false;
+            adminSupport.isContestRecommended = false;
+          },
+          'toggle-maintenance': (enabled: boolean): void => {
+            if (!enabled) {
+              // If disabling, save immediately
+              api.Admin.setMaintenanceMode({
+                enabled: false,
+                message_es: '',
+                message_en: '',
+                message_pt: '',
+                type: 'info',
+              })
+                .then(() => {
+                  ui.success(T.maintenanceModeInactive);
+                })
+                .catch(ui.apiError);
+            }
+          },
+          'save-maintenance': (data: {
+            enabled: boolean;
+            message_es: string;
+            message_en: string;
+            message_pt: string;
+            type: string;
+          }): void => {
+            api.Admin.setMaintenanceMode({
+              enabled: data.enabled,
+              message_es: data.message_es,
+              message_en: data.message_en,
+              message_pt: data.message_pt,
+              type: data.type,
+            })
+              .then(() => {
+                ui.success(T.maintenanceModeActive);
+              })
+              .catch(ui.apiError);
           },
         },
       });

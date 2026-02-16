@@ -16,6 +16,30 @@ CREATE TABLE `ACLs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `AI_Editorial_Jobs` (
+  `job_id` varchar(36) NOT NULL COMMENT 'UUID identificador único del trabajo',
+  `problem_id` int NOT NULL COMMENT 'Identificador del problema',
+  `user_id` int NOT NULL COMMENT 'Usuario que solicitó la generación',
+  `status` enum('queued','processing','completed','failed','approved','rejected') NOT NULL DEFAULT 'queued' COMMENT 'Estado actual del trabajo',
+  `error_message` text COMMENT 'Mensaje de error en caso de fallo',
+  `is_retriable` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Indica si el error permite reintentos (1 = sí, 0 = no)',
+  `attempts` int NOT NULL DEFAULT '0' COMMENT 'Número de intentos realizados',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora de creación del trabajo',
+  `md_en` mediumtext COMMENT 'Editorial generado en inglés',
+  `md_es` mediumtext COMMENT 'Editorial generado en español',
+  `md_pt` mediumtext COMMENT 'Editorial generado en portugués',
+  `validation_verdict` varchar(10) DEFAULT NULL COMMENT 'Veredicto de validación del código generado',
+  PRIMARY KEY (`job_id`),
+  KEY `idx_problem_id` (`problem_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `fk_aej_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
+  CONSTRAINT `fk_aej_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Trabajos de generación de editoriales con IA';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `API_Tokens` (
   `apitoken_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
@@ -63,6 +87,8 @@ CREATE TABLE `Assignments` (
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
   KEY `fk_ap_problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_finish_time` (`finish_time`),
+  KEY `idx_assignment_type` (`assignment_type`),
   CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
   CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
@@ -83,6 +109,25 @@ CREATE TABLE `Auth_Tokens` (
   CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens de autorización para los logins.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Carousel_Items` (
+  `carousel_item_id` int NOT NULL AUTO_INCREMENT,
+  `title` json NOT NULL,
+  `excerpt` json NOT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
+  `button_title` json DEFAULT NULL,
+  `expiration_date` datetime DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `user_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`carousel_item_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `Carousel_Items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar noticias en la plataforma';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -217,6 +262,8 @@ CREATE TABLE `Contests` (
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
   KEY `fk_cc_rerun_id` (`rerun_id`),
+  KEY `idx_contests_title_archived` (`title`,`archived`),
+  KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -308,11 +355,13 @@ CREATE TABLE `Courses` (
   `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `recommended` tinyint NOT NULL DEFAULT '0' COMMENT 'Mostrar el curso en la lista de cursos públicos, los cursos que no tengan la bandera encendida pueden ser cursos públicos pero no se mostrarán en la lista.',
+  `teaching_assistant_enabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el Asistente de enseñanza de IA está habilitado para este curso',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
   KEY `fk_cg_student_group_id` (`group_id`),
   KEY `school_id` (`school_id`),
+  KEY `idx_admission_mode_recommended_archived` (`archived`,`admission_mode`,`recommended`),
   CONSTRAINT `fk_ca_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cg_student_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`),
   CONSTRAINT `fk_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
@@ -341,6 +390,55 @@ CREATE TABLE `Favorites` (
   CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas favoritos de los usuarios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Edition` (
+  `edition_id` int NOT NULL AUTO_INCREMENT,
+  `year` int NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `application_deadline` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`edition_id`),
+  UNIQUE KEY `unique_year` (`year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ediciones de Google Summer of Code';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Idea` (
+  `idea_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `brief_description` text,
+  `expected_results` text,
+  `preferred_skills` text,
+  `possible_mentors` text,
+  `estimated_hours` int DEFAULT NULL,
+  `skill_level` enum('Low','Medium','Advanced') DEFAULT NULL,
+  `blog_link` varchar(500) DEFAULT NULL,
+  `contributor_username` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idea_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ideas de proyectos de Google Summer of Code (independientes de edición)';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Idea_Edition` (
+  `idea_edition_id` int NOT NULL AUTO_INCREMENT,
+  `idea_id` int NOT NULL,
+  `edition_id` int NOT NULL,
+  `status` enum('Proposed','Accepted','Archived','Completed') DEFAULT 'Proposed',
+  `decision_notes` text COMMENT 'Notas explicando la decisión tomada para este proyecto en esta edición',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idea_edition_id`),
+  UNIQUE KEY `unique_idea_edition` (`idea_id`,`edition_id`),
+  KEY `idea_id` (`idea_id`),
+  KEY `edition_id` (`edition_id`),
+  CONSTRAINT `gsoc_idea_edition_edition` FOREIGN KEY (`edition_id`) REFERENCES `GSoC_Edition` (`edition_id`) ON DELETE CASCADE,
+  CONSTRAINT `gsoc_idea_edition_idea` FOREIGN KEY (`idea_id`) REFERENCES `GSoC_Idea` (`idea_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Vincula ideas de GSoC a ediciones con estado por edición';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -471,6 +569,7 @@ CREATE TABLE `Identity_Login_Log` (
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `identity_id` (`identity_id`),
+  KEY `idx_loginlog_time_identity` (`time`,`identity_id`),
   CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -586,6 +685,18 @@ CREATE TABLE `PrivacyStatements` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Problem_Bookmarks` (
+  `identity_id` int NOT NULL,
+  `problem_id` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`identity_id`,`problem_id`),
+  KEY `problem_id` (`problem_id`),
+  CONSTRAINT `fk_pb_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pb_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas que las identidades marcaron como bookmark';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problem_Of_The_Week` (
   `problem_of_the_week_id` int NOT NULL AUTO_INCREMENT,
   `problem_id` int NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
@@ -594,6 +705,7 @@ CREATE TABLE `Problem_Of_The_Week` (
   PRIMARY KEY (`problem_of_the_week_id`),
   UNIQUE KEY `idx_time_difficulty` (`time`,`difficulty`),
   KEY `problem_id` (`problem_id`),
+  KEY `idx_pow_difficulty` (`difficulty`),
   CONSTRAINT `fk_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de problemas de la semana.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -642,6 +754,8 @@ CREATE TABLE `Problems` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
   KEY `idx_quality_seal` (`quality_seal`),
+  KEY `idx_problems_title` (`title`),
+  KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
@@ -973,6 +1087,8 @@ CREATE TABLE `Schools` (
   UNIQUE KEY `name_country_id_state_id` (`name`,`country_id`,`state_id`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`country_id`,`state_id`),
+  KEY `idx_schools_name` (`name`),
+  KEY `idx_schools_score` (`score`),
   CONSTRAINT `fk_scc_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ss_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
@@ -1075,12 +1191,29 @@ CREATE TABLE `Submissions` (
   KEY `school_id` (`school_id`),
   KEY `school_id_problem_id` (`school_id`,`problem_id`),
   KEY `verdict_type_time` (`verdict`,`type`,`time`),
+  KEY `idx_time_status` (`time`,`status`),
+  KEY `idx_submissions_identity_verdict_type_problem` (`identity_id`,`verdict`,`type`,`problem_id`),
+  KEY `idx_submissions_identity_problem_time` (`identity_id`,`problem_id`,`time` DESC),
+  KEY `idx_submissions_identity_problem_problemset_time` (`identity_id`,`problem_id`,`problemset_id`,`time` DESC),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_s_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`),
   CONSTRAINT `fk_ss_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Envíos';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `System_Settings` (
+  `setting_id` int NOT NULL AUTO_INCREMENT,
+  `setting_key` varchar(255) NOT NULL,
+  `setting_value` text,
+  `setting_description` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`setting_id`),
+  UNIQUE KEY `unique_setting_key` (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Sistema de configuración global del sitio';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1105,6 +1238,9 @@ CREATE TABLE `Team_Groups` (
   PRIMARY KEY (`team_group_id`),
   UNIQUE KEY `team_group_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_create_time` (`create_time`),
+  KEY `idx_team_groups_name` (`name`),
+  KEY `idx_team_groups_alias_name` (`alias`,`name`),
   CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1170,6 +1306,9 @@ CREATE TABLE `User_Rank` (
   KEY `rank` (`ranking`),
   KEY `fk_ur_state_id` (`country_id`,`state_id`),
   KEY `fk_ur_school_id` (`school_id`),
+  KEY `idx_user_rank_score_userid` (`score`,`user_id`),
+  KEY `idx_user_rank_author_score_ranking` (`author_score`,`author_ranking`),
+  KEY `idx_user_rank_order` (`author_ranking`,`user_id`),
   CONSTRAINT `fk_ur_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_ur_school_id` FOREIGN KEY (`school_id`) REFERENCES `Schools` (`school_id`),
   CONSTRAINT `fk_ur_state_id` FOREIGN KEY (`country_id`, `state_id`) REFERENCES `States` (`country_id`, `state_id`)
@@ -1182,6 +1321,34 @@ CREATE TABLE `User_Rank_Cutoffs` (
   `percentile` double NOT NULL,
   `classname` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los valores del ranking para los cuales hay un cambio de color.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Readme_Report_Log` (
+  `readme_id` int NOT NULL COMMENT 'README reportado',
+  `reporter_user_id` int NOT NULL COMMENT 'Usuario que hizo el reporte',
+  `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del reporte',
+  PRIMARY KEY (`readme_id`,`reporter_user_id`),
+  KEY `readme_id` (`readme_id`),
+  KEY `reporter_user_id` (`reporter_user_id`),
+  CONSTRAINT `fk_urel_readme_id` FOREIGN KEY (`readme_id`) REFERENCES `User_Readmes` (`readme_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_urel_reporter_user_id` FOREIGN KEY (`reporter_user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de reportes de READMEs de usuarios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Readmes` (
+  `readme_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador único del README',
+  `user_id` int NOT NULL COMMENT 'Usuario dueño del README',
+  `content` text NOT NULL COMMENT 'Contenido del README en Markdown',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Indica si el README es visible (1 = sí, 0 = no)',
+  `last_edit_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Última vez que se editó el README',
+  `report_count` int NOT NULL DEFAULT '0' COMMENT 'Número de reportes recibidos',
+  `is_disabled` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el README está deshabilitado por exceso de reportes (1 = sí, 0 = no)',
+  PRIMARY KEY (`readme_id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_ure_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='READMEs de perfil de usuarios';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1227,11 +1394,17 @@ CREATE TABLE `Users` (
   `parent_email_verification_initial` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora en que se envió el correo electrónico de verificación',
   `parent_email_verification_deadline` timestamp NULL DEFAULT NULL COMMENT 'Almacena la hora y fecha límite que tienen los padres para verificar la cuenta de su hijo menor a 13 años',
   `parent_email_id` int DEFAULT NULL,
+  `x_url` varchar(255) DEFAULT NULL COMMENT 'URL del perfil en X (antes Twitter)',
+  `linkedin_url` varchar(255) DEFAULT NULL COMMENT 'URL de perfil en LinkedIn',
+  `github_url` varchar(255) DEFAULT NULL COMMENT 'URL de perfil en GitHub',
   PRIMARY KEY (`user_id`),
   KEY `fk_main_email_id` (`main_email_id`),
   KEY `fk_main_identity_id` (`main_identity_id`),
   KEY `fk_parent_email_id` (`parent_email_id`),
   KEY `verification_id` (`verification_id`),
+  KEY `idx_is_private` (`is_private`),
+  KEY `idx_users_parental_verification` (`parental_verification_token`),
+  KEY `idx_users_verified_mailing_list` (`verified`,`in_mailing_list`),
   CONSTRAINT `fk_main_email_id` FOREIGN KEY (`main_email_id`) REFERENCES `Emails` (`email_id`),
   CONSTRAINT `fk_main_identity_id` FOREIGN KEY (`main_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_parent_email_id` FOREIGN KEY (`parent_email_id`) REFERENCES `Emails` (`email_id`)

@@ -21,102 +21,77 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/carousel_slide_1.svg',
+    image: '/media/homepage/ofmi.png',
     title: {
-      en: 'Improve your programming skills',
-      es: 'Mejora tus habilidades de programación',
-      pt: 'Melhore suas habilidades de programação',
+      en: 'Registration is now open!',
+      es: '¡Ya está abierta la convocatoria!',
+      pt: 'Inscrições abertas!',
     },
     description: {
       en:
-        'omegaUp is a free educational platform that helps you improve your programming skills, used by thousands of students and teachers in Latin America. Is this the first time you use omegaUp?',
+        'Discover, learn, and participate in the community that drives female talent in programming. 5th Mexican Female Informatics Olympiad (OFMI).',
       es:
-        'omegaUp es una plataforma educativa gratuita que te ayuda a mejorar tus habilidades de programación, usada por decenas de miles de estudiantes y docentes en Latinoamérica. ¿Es la primera vez que usas omegaUp?',
+        'Descubre, aprende y participa en la comunidad que impulsa el talento femenino en la programación. 5ª Olimpiada Femenil Mexicana de Informática (OFMI).',
       pt:
-        'omegaUp é uma plataforma educacional gratuita que ajuda você a melhorar suas habilidades de programação, usada por milhares de estudantes e professores na América Latina. É a primeira vez que você usa o omegaUp?',
+        'Descubra, aprenda e participe da comunidade que impulsiona o talento feminino na programação. 5ª Olimpíada Feminina Mexicana de Informática (OFMI).',
     },
     button: {
       text: {
-        en: 'See the tutorial',
-        es: 'Ve el tutorial',
-        pt: 'Veja o tutorial',
+        en: 'View call',
+        es: 'Ver convocatoria',
+        pt: 'Ver convocatória',
       },
-      href: 'https://blog.omegaup.com/introduccion-a-omegaup-parte-0/',
+      href: 'https://ofmi.omegaup.com/convocatoria',
       target: '_blank',
-    },
-  },
-  {
-    image: '/media/homepage/carousel_slide_2.svg',
-    title: {
-      en: 'Would you like to learn to program?',
-      es: '¿Te gustaría aprender a programar?',
-      pt: 'Deseja aprender a programar?',
-    },
-    description: {
-      en:
-        'Join the free Introduction to C++ course on omegaUp. It consists of lessons, examples and problems spread over 7 modules',
-      es:
-        'Apúntate al curso gratuito de Introducción a C++ en omegaUp. Consta de lecciones, ejemplos y problemas repartidos en 7 módulos.',
-      pt:
-        'Participe do curso gratuito de Introdução ao C ++ no omegaUp. Consiste em lições, exemplos e problemas espalhados por 7 módulos',
-    },
-    button: {
-      text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
-      },
-      href: '/course/introduccion_a_cpp/',
-      target: '_self',
     },
   },
   {
     image: '/media/homepage/carousel_slide_4.svg',
     title: {
-      en: 'Solve a new problem every week',
-      es: 'Resuelve un problema nuevo cada semana',
-      pt: 'Resolva um novo problema a cada semana',
+      en: 'Start preparing with Intro OFMI',
+      es: 'Empieza a prepararte con Intro OFMI',
+      pt: 'Comece a se preparar com o Intro OFMI',
     },
     description: {
       en:
-        'Enroll in the "Solving problems in omegaUp 2022" course, learn tips about programming contests and earn prizes.',
+        'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
       es:
-        'Únete al curso "Resolviendo problemas en omegaUp 2022", aprende tips sobre concursos de programación y gana premios.',
+        '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
       pt:
-        'Inscreva-se no curso "Resolvendo problemas no omegaUp 2022", aprenda dicas sobre concursos de programação e ganhe prêmios.',
+        'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
     },
     button: {
       text: {
-        en: 'Enter here',
-        es: 'Ingresa aquí',
-        pt: 'Entre aqui',
+        en: 'Start course',
+        es: 'Comenzar curso',
+        pt: 'Começar curso',
       },
-      href: 'https://omegaup.com/course/ResolviendoProblemas2022/',
-      target: '_self',
+      href: 'https://omegaup.com/course/Intro-OFMI/',
+      target: '_blank',
     },
   },
   {
-    image: '/media/homepage/discord_logo.svg',
+    image: '/media/homepage/Instagram.png',
     title: {
-      en: 'Join our coders community',
-      es: 'Únete a nuestra comunidad de coders',
-      pt: 'Junte-se à nossa comunidade de coders',
+      en: 'Do you already follow us on Instagram?',
+      es: '¿Ya nos sigues en Instagram?',
+      pt: 'Você já nos segue no Instagram?',
     },
     description: {
       en:
-        'Join omegaUp´s Discord server and hang out with your community, get help and learn about new projects.',
+        'Stay up to date with news, events, and much more. Follow us and be part of the community!',
       es:
-        'Únete al servidor de Discord de omegaUp y convive con la comunidad, obtén ayuda y entérate de los nuevos proyectos.',
+        'Entérate de noticias, eventos y mucho más. ¡Síguenos y sé parte de la comunidad!',
       pt:
-        'Junte-se ao servidor do Discord do omegaUp e convive com a comunidade, obtenha ajuda e aprenda sobre novos projetos.',
+        'Fique por dentro das novidades, eventos e muito mais. Siga-nos e faça parte da comunidade!',
     },
     button: {
       text: {
-        en: 'Join here',
-        es: 'Únete aquí',
-        pt: 'Junte-se aqui',
+        en: 'Follow us',
+        es: 'Síguenos',
+        pt: 'Siga-nos',
       },
-      href: 'https://discord.com/invite/K3JFd9d3wk',
+      href: 'https://www.instagram.com/omegaup_org/',
       target: '_blank',
     },
   },

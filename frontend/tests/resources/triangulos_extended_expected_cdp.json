@@ -1,0 +1,270 @@
+{
+    "problemName": "triangulos_extended",
+    "problemMarkdown": "# Descripción\n\nEl perímetro de un triángulo con aristas de largo $a, b, c$ es $a+b+c$.\n\nTienes varias palos de diferentes longitudes. Regresa el máximo perímetro posible de un triángulo que puede ser construido con los palos que tienes a tus disposición. Cada lado del triángulo debe ser construido usando un sólo palo. Tampoco puedes romper los palos existentes. Regresa $-1$ si el triángulo no puede ser construido.\n\n# Nota\nPuedes construir un triángulo con aristas de largo $ x \\leq y \\leq y$ si y sólo si $x + y \\gt z$\n\n# Entrada\nLa primer línea de entrada contendrá el número $3 \\leq N \\leq 50$ de elementos. La segunda línea contendrá los $1 \\leq N_i \\leq 1000$ elementos separados por un espacio.\n\n||input\n6\n2 3 2 3 2 4\n||output\n10\n||end",
+    "problemCodeContent": "",
+    "problemCodeExtension": "",
+    "problemSolutionMarkdown": "# Solución\nEste es el ejemplo de una solución.\nAquí se describirá la manera en que un problema puede ser resuelto, permitiendo que los usuarios aprendan estrategias nuevas y mejoren sus habilidades.\n\n# Nota\nCuando la solución de un problema es mostrada a pedido de un usuario, este problema no contará para calcular la puntuación del mismo en el ranking de omegaUp.\n",
+    "casesStore": {
+        "groups": [
+            {
+                "groupID": "37800a11-73a1-4ea3-8dfd-00c7d46b33c5",
+                "name": "1",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "9e2f85c7-4675-45e1-9c6e-151052ad1fb9",
+                        "groupID": "37800a11-73a1-4ea3-8dfd-00c7d46b33c5",
+                        "lines": [
+                            {
+                                "lineID": "58685e9a-7fa4-4950-8e9c-b99c84d357a6",
+                                "caseID": "9e2f85c7-4675-45e1-9c6e-151052ad1fb9",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "3\n1 2 3"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "-1\n",
+                        "name": "1"
+                    }
+                ]
+            },
+            {
+                "groupID": "79bf85a6-7c25-4aec-bc96-02c8748fa029",
+                "name": "2",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "e2514c76-2e48-4f13-9489-6a1b6db54e42",
+                        "groupID": "79bf85a6-7c25-4aec-bc96-02c8748fa029",
+                        "lines": [
+                            {
+                                "lineID": "f7bd8867-1254-4b66-8b93-b22850faec00",
+                                "caseID": "e2514c76-2e48-4f13-9489-6a1b6db54e42",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "3\n1000 1000 1000\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "3000\n",
+                        "name": "2"
+                    }
+                ]
+            },
+            {
+                "groupID": "0e083685-436b-4f47-b6b5-ba8933ac0f9b",
+                "name": "3",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "08b25246-a162-4534-85e6-a17a1228b347",
+                        "groupID": "0e083685-436b-4f47-b6b5-ba8933ac0f9b",
+                        "lines": [
+                            {
+                                "lineID": "f42aff0c-3279-463c-84bf-3247a897e238",
+                                "caseID": "08b25246-a162-4534-85e6-a17a1228b347",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "9\n215 968 124 73 839 485 315 911 272\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "2718\n",
+                        "name": "3"
+                    }
+                ]
+            },
+            {
+                "groupID": "ecafa255-b549-43a3-81dd-c6bb3111f117",
+                "name": "4",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": true,
+                "cases": [
+                    {
+                        "caseID": "c160d53d-e15a-4044-85cc-28ec9713bc52",
+                        "groupID": "ecafa255-b549-43a3-81dd-c6bb3111f117",
+                        "lines": [
+                            {
+                                "lineID": "0cd9e7ed-487e-42f2-a7f8-52ab4ca86ac3",
+                                "caseID": "c160d53d-e15a-4044-85cc-28ec9713bc52",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "42\n878 101 332 288 321 157 469 821 114 703 747 970 819 87 947 8 759 185 727 330 258 396 85 552 620 694 352 590 84 788 181 492 945 876 260 458 564 881 998 975 409 314\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "2943\n",
+                        "name": "4"
+                    }
+                ]
+            },
+            {
+                "groupID": "a7bf4bf4-2bf1-4b79-b330-b2e6bbb38a52",
+                "name": "easy",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": false,
+                "cases": [
+                    {
+                        "caseID": "468bd482-7c12-49cc-b11d-52b5cb438c2d",
+                        "groupID": "a7bf4bf4-2bf1-4b79-b330-b2e6bbb38a52",
+                        "lines": [
+                            {
+                                "lineID": "5db6595b-0a7d-4bc4-8664-f412609ab7d6",
+                                "caseID": "468bd482-7c12-49cc-b11d-52b5cb438c2d",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "3\n3 4 5\n"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "12\n",
+                        "name": "00"
+                    },
+                    {
+                        "caseID": "58a89c92-c167-465b-b6b7-8812c295d140",
+                        "groupID": "a7bf4bf4-2bf1-4b79-b330-b2e6bbb38a52",
+                        "lines": [
+                            {
+                                "lineID": "e613c5f8-f319-442a-bf60-523530cf237a",
+                                "caseID": "58a89c92-c167-465b-b6b7-8812c295d140",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "4\n10 2 50 20"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "-1\n",
+                        "name": "01"
+                    }
+                ]
+            },
+            {
+                "groupID": "3a5e6471-a8c9-467b-bb68-27217bcf3bc3",
+                "name": "hard",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": false,
+                "cases": [
+                    {
+                        "caseID": "f710544a-f718-4a4c-98f7-b13be3130a0b",
+                        "groupID": "3a5e6471-a8c9-467b-bb68-27217bcf3bc3",
+                        "lines": [
+                            {
+                                "lineID": "56913eb5-54a5-46ea-af0b-8000475e16b5",
+                                "caseID": "f710544a-f718-4a4c-98f7-b13be3130a0b",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "50\r\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "147",
+                        "name": "00"
+                    },
+                    {
+                        "caseID": "31b95212-e234-4ede-85bb-2806f3fd1fee",
+                        "groupID": "3a5e6471-a8c9-467b-bb68-27217bcf3bc3",
+                        "lines": [
+                            {
+                                "lineID": "6526e72a-1e30-47a8-95fb-535ef4ccc264",
+                                "caseID": "31b95212-e234-4ede-85bb-2806f3fd1fee",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "50\r\n990 990 990 990 990 950 950 950 950 950 800 800 800 800 800 750 750 750 750 750 600 600 600 600 600 550 550 550 550 550 400 400 400 400 400 350 350 350 350 350 200 200 200 200 200 1000 1000 1000 50 50"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "3000",
+                        "name": "01"
+                    }
+                ]
+            },
+            {
+                "groupID": "3ae1ee71-a6fe-4097-a591-5b409fe4d701",
+                "name": "medium",
+                "points": 100,
+                "autoPoints": true,
+                "ungroupedCase": false,
+                "cases": [
+                    {
+                        "caseID": "1ca8c154-698a-4942-b4ba-a11071ad7d20",
+                        "groupID": "3ae1ee71-a6fe-4097-a591-5b409fe4d701",
+                        "lines": [
+                            {
+                                "lineID": "d3785972-c5d1-46fc-b1b9-ac1b6d738c19",
+                                "caseID": "1ca8c154-698a-4942-b4ba-a11071ad7d20",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "25\n1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 100 200 250"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "550",
+                        "name": "00"
+                    },
+                    {
+                        "caseID": "8af0c352-2bbf-41b1-9dfc-f28741281cd8",
+                        "groupID": "3ae1ee71-a6fe-4097-a591-5b409fe4d701",
+                        "lines": [
+                            {
+                                "lineID": "4f2076a7-559b-4f7b-8af4-e92791d96207",
+                                "caseID": "8af0c352-2bbf-41b1-9dfc-f28741281cd8",
+                                "label": "",
+                                "data": {
+                                    "kind": "multiline",
+                                    "value": "24\n1000 400 300 5 2 7 1 8 1 9 1 5 2 3 4 1 1 1 5 6 7 2 1 150"
+                                }
+                            }
+                        ],
+                        "points": 100,
+                        "autoPoints": true,
+                        "output": "850",
+                        "name": "01"
+                    }
+                ]
+            }
+        ],
+        "selected": {
+            "groupID": "00000000-0000-0000-0000-000000000000",
+            "caseID": "00000000-0000-0000-0000-000000000000"
+        },
+        "layouts": [],
+        "hide": false
+    }
+}

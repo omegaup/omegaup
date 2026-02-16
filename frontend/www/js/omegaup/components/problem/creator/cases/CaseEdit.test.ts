@@ -706,13 +706,18 @@ describe('CaseEdit.vue', () => {
     expect(wrapper.vm.getLinesFromSelectedCase.length).toBe(2);
 
     const dropdownsMultiline = wrapper.findAll(
-      `a[data-array-modal-dropdown="multiline"]`,
+      `a[data-array-modal-dropdown-kind]`,
     );
 
     // There are two dropdown items for multiline, one for each line.
-    expect(dropdownsMultiline.length).toBe(2);
+    const fragment = 'multiline';
+    const filteredDropdowns = dropdownsMultiline.filter((node) => {
+      const nodeAttribute = node.attributes('data-array-modal-dropdown-kind');
+      return nodeAttribute?.includes(fragment);
+    });
+    expect(filteredDropdowns.length).toBe(2);
 
-    await dropdownsMultiline.at(1).trigger('click');
+    await filteredDropdowns.at(1).trigger('click');
 
     const formInputs = wrapper.findAll('input');
     const formTextArea = wrapper.find('textarea');

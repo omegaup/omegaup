@@ -2,13 +2,13 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 import { types } from './api_types';
+import notificationsStore, {
+  MessageType,
+  NotificationPosition,
+} from './notificationsStore';
 
-export enum MessageType {
-  Danger = 'alert-danger',
-  Info = 'alert-info',
-  Success = 'alert-success',
-  Warning = 'alert-warning',
-}
+// Re-export MessageType and NotificationPosition for backward compatibility and convenience
+export { MessageType, NotificationPosition };
 
 export function navigateTo(href: string): void {
   const [pathname, hash] = href.split('#');
@@ -92,62 +92,36 @@ export function displayStatus({
   message,
   type,
   autoHide,
+  position,
 }: {
   message: string;
   type: MessageType;
   autoHide?: boolean;
+  position?: NotificationPosition;
 }): void {
-  if ($('#status .message').length == 0) {
-    console.error('Showing warning but there is no status div');
-  }
-
-  // Just in case this needs to be displayed but the UI wasn't set up yet.
-  $('#loading').hide();
-  $('#root').show();
-
-  $('#status .message').html(message);
-  const statusElement = $('#status');
-  let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
-  if (statusCounter % 2 == 1) {
-    statusCounter++;
-  }
-  statusElement
-    .removeClass('alert-success alert-info alert-warning alert-danger')
-    .addClass(type)
-    .addClass('animating')
-    .attr('data-counter', statusCounter + 1)
-    .slideDown({
-      complete: () => {
-        statusElement
-          .removeClass('animating')
-          .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success' && autoHide) {
-          setTimeout(() => {
-            dismissNotifications(statusCounter + 2);
-          }, 5000);
-        }
-      },
-    });
-}
-
-export function error(message: string): void {
-  displayStatus({ message: message, type: MessageType.Danger });
-}
-
-export function info(message: string): void {
-  displayStatus({ message: message, type: MessageType.Info });
-}
-
-export function success(message: string, autoHide: boolean = true): void {
-  displayStatus({
-    message: message,
-    type: MessageType.Success,
-    autoHide: autoHide,
+  // Dispatch to Vuex store - the store action handles all visibility logic
+  notificationsStore.dispatch('displayStatus', {
+    message,
+    type,
+    autoHide,
+    position,
   });
 }
 
+export function error(message: string): void {
+  displayStatus({ message, type: MessageType.Danger });
+}
+
+export function info(message: string): void {
+  displayStatus({ message, type: MessageType.Info });
+}
+
+export function success(message: string, autoHide: boolean = true): void {
+  displayStatus({ message, type: MessageType.Success, autoHide });
+}
+
 export function warning(message: string): void {
-  displayStatus({ message: message, type: MessageType.Warning });
+  displayStatus({ message, type: MessageType.Warning });
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
@@ -164,29 +138,9 @@ export function ignoreError(response: { error?: string; payload?: any }): void {
   return;
 }
 
-export function dismissNotifications(originalStatusCounter?: number): void {
-  const statusElement = $('#status');
-  let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
-  if (
-    typeof originalStatusCounter == 'number' &&
-    statusCounter > originalStatusCounter
-  ) {
-    // This status has already been dismissed.
-    return;
-  }
-  if (statusCounter % 2 == 1) {
-    statusCounter++;
-  }
-  statusElement
-    .addClass('animating')
-    .attr('data-counter', statusCounter + 1)
-    .slideUp({
-      complete: () => {
-        statusElement
-          .removeClass('animating')
-          .attr('data-counter', statusCounter + 2);
-      },
-    });
+export function dismissNotifications(): void {
+  // Dispatch to Vuex store to hide notification
+  notificationsStore.dispatch('dismissNotifications');
 }
 
 type JSONType = any;
@@ -240,6 +194,20 @@ export function getFlag(country: string): string {
 }
 
 export function copyToClipboard(value: string): void {
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use the Clipboard API if available and in a secure context
+    navigator.clipboard.writeText(value).catch((err) => {
+      console.error('Failed to copy text in a secure context: ', err);
+      fallbackCopyToclipboard(value);
+    });
+    return;
+  }
+
+  fallbackCopyToclipboard(value);
+}
+
+function fallbackCopyToclipboard(value: string): void {
+  // Fallback to the deprecated method for older browsers
   const tempInput = document.createElement('textarea');
 
   tempInput.style.position = 'absolute';

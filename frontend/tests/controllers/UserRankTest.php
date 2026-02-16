@@ -5,7 +5,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      * Tests getRankByProblemsSolved
      */
     public function testFullRankByProblemSolved() {
-        // Create a user and sumbit a run with him
+        // Create a user and submit a run with him
         ['identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -84,7 +84,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      * Tests getRankByProblemsSolved
      */
     public function testFullRankByProblemSolvedNoPrivateProblems() {
-        // Create a user and sumbit a run with him
+        // Create a user and submit a run with him
         ['identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -93,7 +93,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        // Create a user and sumbit a run with him
+        // Create a user and submit a run with him
         ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'private',
@@ -141,7 +141,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      * Tests getUserRankInfo
      */
     public function testGetUserRankInfo() {
-        // Create a user and sumbit a run with him/her
+        // Create a user and submit a run with him/her
         ['identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -261,7 +261,6 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'identity' => $identityWithNoCountry,
         ] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identityWithNoCountry);
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -273,6 +272,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // User should not have filters
+        $login = self::login($identityWithNoCountry);
         $availableFilters = \OmegaUp\Controllers\User::getRankForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
@@ -468,7 +468,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUserRankingClassName() {
-        // Create a user and sumbit a run with them
+        // Create a user and submit a run with them
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -731,7 +731,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // User sumbits a run for a problem 0
+        // User submits a run for a problem 0
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemsData[0],
             $contestant
@@ -770,7 +770,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($user);
 
-        // User sumbits a run for a problem 0
+        // User submits a run for a problem 0
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemsData[0],
             $user
@@ -805,5 +805,151 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertSame($entry['ranking'], $i + 1);
         }
+    }
+
+    /**
+     * Test that site-admins are excluded from user rankings
+     * even if they solve more problems than regular users.
+     */
+    public function testSiteAdminExcludedFromUserRanking() {
+        // Create a regular user who solves few problems
+        ['identity' => $regularIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a site-admin user who solves many problems
+        ['identity' => $adminIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // Admin solves 10 problems
+        for ($i = 0; $i < 10; $i++) {
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $adminIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        // Regular user solves only 2 problems
+        for ($i = 0; $i < 2; $i++) {
+            $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problem,
+                $regularIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        // Update ranks
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Get user rankings
+        $response = \OmegaUp\Controllers\User::getRankByProblemsSolved(
+            null,
+            '',
+            1,
+            100
+        );
+
+        // Verify regular user appears in ranking but admin doesn't
+        $rankedUsers = array_column($response['rank'], 'username');
+        $this->assertContains(
+            $regularIdentity->username,
+            $rankedUsers,
+            'Regular user should appear in user ranking'
+        );
+        $this->assertNotContains(
+            $adminIdentity->username,
+            $rankedUsers,
+            'Site-admin should not appear in user ranking'
+        );
+    }
+
+    /**
+     * Test that site-admins are excluded from author rankings
+     * even if they have more quality problems than regular authors.
+     */
+    public function testSiteAdminExcludedFromAuthorRanking() {
+        // Create a regular author who creates few quality problems
+        ['identity' => $regularAuthor] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a site-admin author who creates many quality problems
+        ['identity' => $adminAuthor] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // Admin creates 5 quality problems
+        $adminProblems = [];
+        for ($i = 0; $i < 5; $i++) {
+            $adminProblems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $adminAuthor
+            );
+        }
+
+        // Regular author creates 2 quality problems
+        $regularProblems = [];
+        for ($i = 0; $i < 2; $i++) {
+            $regularProblems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $regularAuthor
+            );
+        }
+
+        // Get some users to solve and rate these problems
+        for ($i = 0; $i < 5; $i++) {
+            ['identity' => $solver] = \OmegaUp\Test\Factories\User::createUser();
+
+            // Solve and rate admin's problems
+            foreach ($adminProblems as $problemData) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problemData,
+                    $solver
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $solver,
+                    $problemData['request']['problem_alias'],
+                    1, /* difficulty */
+                    4, /* quality */
+                    [],
+                    false
+                );
+            }
+
+            // Solve and rate regular author's problems
+            foreach ($regularProblems as $problemData) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problemData,
+                    $solver
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $solver,
+                    $problemData['request']['problem_alias'],
+                    1, /* difficulty */
+                    4, /* quality */
+                    [],
+                    false
+                );
+            }
+        }
+
+        // Aggregate feedback and update ranks
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Get author rankings
+        $authorsRank = \OmegaUp\Controllers\User::getAuthorsRank(
+            1,
+            100
+        )['ranking'];
+
+        // Verify regular author appears in ranking but admin doesn't
+        $rankedAuthors = array_column($authorsRank, 'username');
+        $this->assertContains(
+            $regularAuthor->username,
+            $rankedAuthors,
+            'Regular author should appear in author ranking'
+        );
+        $this->assertNotContains(
+            $adminAuthor->username,
+            $rankedAuthors,
+            'Site-admin should not appear in author ranking'
+        );
     }
 }

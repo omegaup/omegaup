@@ -1,7 +1,6 @@
 // https://on.cypress.io/custom-commands
 import 'cypress-wait-until';
 import 'cypress-file-upload';
-import { buildURLQuery } from '@/js/omegaup/ui';
 import {
   CourseOptions,
   LoginOptions,
@@ -12,9 +11,12 @@ import {
 
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }: LoginOptions) => {
-  const URL =
-    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
-  cy.request(URL).then((response) => {
+  cy.request({
+    method: 'POST',
+    url: '/api/user/login/',
+    form: true,
+    body: { usernameOrEmail: username, password },
+  }).then((response) => {
     expect(response.status).to.equal(200);
     cy.reload();
   });
@@ -25,9 +27,12 @@ Cypress.Commands.add('loginAdmin', () => {
   const username = 'omegaup';
   const password = 'omegaup';
 
-  const URL =
-    '/api/user/login?' + buildURLQuery({ usernameOrEmail: username, password });
-  cy.request(URL).then((response) => {
+  cy.request({
+    method: 'POST',
+    url: '/api/user/login/',
+    form: true,
+    body: { usernameOrEmail: username, password },
+  }).then((response) => {
     expect(response.status).to.equal(200);
     cy.reload();
   });
@@ -36,7 +41,8 @@ Cypress.Commands.add('loginAdmin', () => {
 // Logouts the user
 Cypress.Commands.add('logout', () => {
   cy.get('a[data-nav-user]').click();
-  cy.get('a[data-logout-button]').click();
+  cy.get('a[data-logout-button]').click({ force: true });
+  cy.get('footer.logout-confirmation-modal>button.btn-primary').click();
   cy.waitUntil(() => cy.url().should('eq', 'http://127.0.0.1:8001/'));
 });
 
@@ -51,10 +57,12 @@ Cypress.Commands.add('logoutUsingApi', () => {
 
 // Registers and logs in a new user given a username and password.
 Cypress.Commands.add('register', ({ username, password }: LoginOptions) => {
-  const URL =
-    '/api/user/create?' +
-    buildURLQuery({ username, password, email: username + '@omegaup.com' });
-  cy.request(URL).then((response) => {
+  cy.request({
+    method: 'POST',
+    url: '/api/user/create/',
+    form: true,
+    body: { username, password, email: username + '@omegaup.com' },
+  }).then((response) => {
     expect(response.status).to.equal(200);
     cy.login({ username, password });
   });
@@ -75,6 +83,8 @@ Cypress.Commands.add(
     cy.visit('/');
     // Select problem nav
     cy.get('[data-nav-problems]').click();
+    // Click the dropdown toggle to show options
+    cy.get('[data-nav-problems-create-options]').click();
     cy.get('[data-nav-problems-create]').click();
     if (firstTimeVisited) {
       cy.get('.introjs-skipbutton').click();
@@ -108,6 +118,7 @@ Cypress.Commands.add(
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
     cy.get('button[type="submit"]').click(); // Submit
+    cy.url().should('include', problemAlias);
   },
 );
 
@@ -208,6 +219,7 @@ Cypress.Commands.add(
     cy.get('[name="description"]').type(description);
     cy.get('[data-start-date]').type(getISODateTime(startDate));
     cy.get('[data-end-date]').type(getISODateTime(endDate));
+    cy.get('[data-target=".logistics"]').click();
     cy.get('[data-score-board-visible-time]')
       .clear()
       .type(scoreBoardVisibleTime);
@@ -216,7 +228,9 @@ Cypress.Commands.add(
       cy.get('[data-different-start-time-input]').type(differentStartTime);
     }
     cy.get('[data-show-scoreboard-at-end]').select(`${showScoreboard}`); // "true" | "false"
+    cy.get('[data-target=".scoring-rules"]').click();
     cy.get('[data-score-mode]').select(`${scoreMode}`);
+    cy.get('[data-target=".privacy"]').click();
     if (basicInformation) {
       cy.get('[data-basic-information-required]').click();
     }
@@ -272,7 +286,11 @@ Cypress.Commands.add(
       // Mocking date just a few seconds after to allow create new run
       cy.clock(new Date(), ['Date']).then((clock) => clock.tick(9000));
       cy.get('[data-new-run]').click();
-      cy.get('[name="language"]').select(runs[idx].language);
+
+      // Wait for the language selector to be visible before trying to interact with it
+      cy.get('[name="language"]', { timeout: 10000 })
+        .should('be.visible')
+        .select(runs[idx].language);
 
       // Only the first submission is created because of server validations
       if (!runs[idx].valid) {

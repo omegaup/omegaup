@@ -55,6 +55,11 @@ export const casesStore: Module<CasesState, RootState> = {
       state.layouts = uploadedState.layouts;
       state.hide = uploadedState.hide;
     },
+    validateAndFixPoints(state) {
+      // As we are doing nothing with the state directly, es-lint complains, but this is crucial to fix the points distribution.
+      // eslint-disable-next-line
+      state = assignMissingPoints(state, true);
+    },
     addGroup(state, newGroup: Group) {
       state.groups.push(newGroup);
       state = assignMissingPoints(state);
@@ -72,7 +77,7 @@ export const casesStore: Module<CasesState, RootState> = {
     },
     updateGroup(
       state,
-      [groupID, newName, newPoints]: [GroupID, string, number | null],
+      [groupID, newName, newPoints]: [GroupID, string, number],
     ) {
       const targetGroup = state.groups.find(
         (_group) => _group.groupID === groupID,
@@ -84,14 +89,19 @@ export const casesStore: Module<CasesState, RootState> = {
     addCase(state, caseRequest: CaseRequest) {
       if (caseRequest.groupID === UUID_NIL) {
         // Should create a new group with the same name
+        if (caseRequest.autoPoints) {
+          caseRequest.points = 100;
+        }
         const newCase = generateCase({
           name: caseRequest.name,
           caseID: caseRequest.caseID,
+          autoPoints: caseRequest.autoPoints,
+          points: caseRequest.points,
         });
         const groupID = uuid();
         const newGroup = generateGroup({
           name: caseRequest.name,
-          groupID,
+          groupID: groupID,
           points: caseRequest.points,
           autoPoints: caseRequest.autoPoints,
           ungroupedCase: true,
@@ -105,13 +115,13 @@ export const casesStore: Module<CasesState, RootState> = {
         if (!group) {
           return;
         }
-
         group.cases.push(
           generateCase({
             name: caseRequest.name,
             groupID: caseRequest.groupID,
             caseID: caseRequest.caseID,
             points: caseRequest.points,
+            autoPoints: caseRequest.autoPoints,
           }),
         );
       }
@@ -185,6 +195,12 @@ export const casesStore: Module<CasesState, RootState> = {
       state = assignMissingPoints(state);
     },
     updateCase(state, [oldGroupID, updateCaseRequest]: [GroupID, CaseRequest]) {
+      if (
+        updateCaseRequest.groupID === UUID_NIL &&
+        updateCaseRequest.autoPoints
+      ) {
+        updateCaseRequest.points = 100;
+      }
       const oldGroup = state.groups.find(
         (_group) => _group.groupID === oldGroupID,
       );
@@ -193,15 +209,15 @@ export const casesStore: Module<CasesState, RootState> = {
         (_case) => _case.caseID === updateCaseRequest.caseID,
       );
       if (!caseToEdit) return;
-      if (
-        updateCaseRequest.groupID === UUID_NIL &&
-        oldGroup.ungroupedCase === true
-      ) {
+      if (updateCaseRequest.groupID === UUID_NIL && oldGroup.ungroupedCase) {
         if (caseToEdit.name !== updateCaseRequest.name) {
           caseToEdit.name = updateCaseRequest.name;
           oldGroup.name = updateCaseRequest.name;
         }
         caseToEdit.points = updateCaseRequest.points;
+        oldGroup.points = updateCaseRequest.points;
+        caseToEdit.autoPoints = updateCaseRequest.autoPoints;
+        oldGroup.autoPoints = updateCaseRequest.autoPoints;
         state = assignMissingPoints(state);
         return;
       }
@@ -217,7 +233,7 @@ export const casesStore: Module<CasesState, RootState> = {
           name: updateCaseRequest.name,
           groupID: groupID,
           points: updateCaseRequest.points,
-          autoPoints: updateCaseRequest.points === null,
+          autoPoints: updateCaseRequest.autoPoints,
           ungroupedCase: true,
           cases: [caseToEdit],
         });
@@ -240,7 +256,7 @@ export const casesStore: Module<CasesState, RootState> = {
         (_case) => _case.caseID !== updateCaseRequest.caseID,
       );
 
-      if (oldGroup.ungroupedCase === true && oldGroup.cases.length === 0) {
+      if (oldGroup.ungroupedCase && oldGroup.cases.length === 0) {
         state.groups = state.groups.filter(
           (_group) => _group.groupID !== oldGroup.groupID,
         );
@@ -319,6 +335,15 @@ export const casesStore: Module<CasesState, RootState> = {
         caseLineInfos: caseLineInfos,
       };
       state.layouts.push(layoutFromSelectedCase);
+    },
+    editLayoutName(state, [layoutID, newValue]: [LayoutID, string]) {
+      const targetLayout = state.layouts.find(
+        (layout) => layout.layoutID === layoutID,
+      );
+      if (!targetLayout) {
+        return;
+      }
+      targetLayout.name = newValue;
     },
     removeLayout(state, layoutIDToBeDeleted: LineID) {
       state.layouts = state.layouts.filter(
@@ -734,28 +759,95 @@ export const casesStore: Module<CasesState, RootState> = {
   },
 };
 
-export function assignMissingPoints(state: CasesState): CasesState {
-  let maxPoints = 100;
-  let notDefinedCount = 0;
+export function assignMissingPoints(
+  state: CasesState,
+  fixPoints = false,
+): CasesState {
+  // The updated points distribution will have the following structure:
+  // Each ungrouped case will have by default 100 points (if autoPoints is true).
+  // Each group will have by default 100 points (if autopoints is true).
+  // Lets say, we have n cases in the group.
+  // a among them have points set by the user.
+  // remaining b are having autoPoints as true.
+  // So a + b = n.
+  // if autopoints of the group is true, it has 100 points.
+  // So, each notDefined points will have score (1/b)*(100 - Σp(a)).
+  // Now, if the Σp(a) exceeds 100, group point will be set to Σp(a).
+  // Note that, in this case, all the notDefined cases will get 0 points.
+  // If the autopoint is not true, then the point in the group should have higher preference.
+  // In that case:
+  // 1. Users need to use all the points in the group.
+  // 2. Σp(a) should not exceed the total points of the group.
+  // This needs a validator that will let users know if the point distribution is correct.
+  // And there will be an option to automatically fix the points.
+  // If users fail to satisfy that, validator will keep the casepoints ratio intact but scale them to satisfy the group's total points.
 
-  for (const group of state.groups) {
-    if (!group.autoPoints) {
-      maxPoints -= group?.points ?? 0;
-    } else {
-      notDefinedCount++;
+  state.groups = state.groups.map((_group) => {
+    const groupAutoPoints = _group.autoPoints;
+
+    let casesPoints = 0;
+    let notDefinedCount = 0;
+
+    _group.cases.forEach((_case) => {
+      if (_case.autoPoints) {
+        notDefinedCount += 1;
+      } else {
+        casesPoints += _case.points;
+      }
+    });
+
+    if (groupAutoPoints) {
+      if (casesPoints >= _group.points) {
+        _group.points = casesPoints;
+      } else if (casesPoints < _group.points && notDefinedCount === 0) {
+        _group.points = casesPoints;
+      } else {
+        _group.points = 100;
+      }
+      if (_group.points === 0 && notDefinedCount != 0) {
+        _group.points = 100;
+      }
+      const remainingAssignablePoints = _group.points - casesPoints;
+      _group.cases.forEach((_case) => {
+        if (_case.autoPoints) {
+          _case.points = remainingAssignablePoints / notDefinedCount;
+        }
+      });
     }
-  }
-
-  const individualPoints =
-    notDefinedCount && Math.max(maxPoints, 0) / notDefinedCount;
-
-  state.groups = state.groups.map((element) => {
-    if (element.autoPoints) {
-      element.points = individualPoints;
+    if (!groupAutoPoints && !fixPoints) {
+      if (notDefinedCount > 0) {
+        const remainingAssignablePoints = _group.points - casesPoints;
+        _group.cases.forEach((_case) => {
+          if (_case.autoPoints) {
+            _case.points = remainingAssignablePoints / notDefinedCount;
+          }
+        });
+      }
     }
-    return element;
+    if (!groupAutoPoints && fixPoints) {
+      if (casesPoints > _group.points) {
+        const distributionRatio = _group.points / casesPoints;
+        _group.cases.forEach((_case) => {
+          _case.points = _case.points * distributionRatio;
+        });
+      } else {
+        if (notDefinedCount !== 0) {
+          const remainingAssignablePoints = _group.points - casesPoints;
+          _group.cases.forEach((_case) => {
+            if (_case.autoPoints) {
+              _case.points = remainingAssignablePoints / notDefinedCount;
+            }
+          });
+        } else {
+          const distributionRatio = _group.points / casesPoints;
+          _group.cases.forEach((_case) => {
+            _case.points = _case.points * distributionRatio;
+          });
+        }
+      }
+    }
+    return _group;
   });
-
   return state;
 }
 
@@ -766,7 +858,8 @@ export function generateCase(
     caseID: uuid(),
     groupID: UUID_NIL,
     lines: [],
-    points: null,
+    points: 0,
+    autoPoints: true,
     output: '',
     ...caseParams,
   };

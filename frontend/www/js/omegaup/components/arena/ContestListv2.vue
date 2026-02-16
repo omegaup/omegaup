@@ -15,7 +15,7 @@
           <b-container>
             <b-row class="justify-content-between" align-v="center">
               <b-col class="col-12 col-md-5 mb-2 mb-md-0 p-0">
-                <form :action="queryURL" method="GET">
+                <form @submit.prevent="onSearchQuery">
                   <div class="input-group">
                     <input
                       v-model.lazy="currentQuery"
@@ -27,8 +27,13 @@
                       autocapitalize="off"
                       spellcheck="false"
                       :placeholder="T.wordsKeyword"
+                      @keyup.enter="onSearchQuery"
                     />
-                    <button class="btn reset-btn nav-link" type="reset">
+                    <button
+                      class="btn reset-btn nav-link"
+                      type="reset"
+                      @click="onReset"
+                    >
                       &times;
                     </button>
                     <div class="input-group-append">
@@ -42,7 +47,7 @@
                 </form>
               </b-col>
               <b-col sm="12" class="d-flex col-md-6 btns-group p-0">
-                <b-dropdown ref="dropdownOrderBy" no-caret>
+                <b-dropdown ref="dropdownOrderBy" no-caret data-dropdown-order>
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />
@@ -116,7 +121,12 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
-                <b-dropdown ref="dropdownFilterBy" class="mr-0" no-caret>
+                <b-dropdown
+                  ref="dropdownFilterBy"
+                  class="mr-0"
+                  no-caret
+                  data-dropdown-filter
+                >
                   <template #button-content>
                     <font-awesome-icon icon="filter" />
                     {{ T.contestFilterBy }}
@@ -167,39 +177,71 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <div v-if="filteredContestList.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`current-${index}`"
+              class="card contest-card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.finish_time)">
+                    {{
+                      ui.formatString(T.contestEndTime, {
+                        endDate: finishContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Current">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-current-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Current
+            "
+            class="text-center mb-2"
           >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.finish_time)">
-                  {{
-                    ui.formatString(T.contestEndTime, {
-                      endDate: finishContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -209,42 +251,74 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <div v-if="filteredContestList.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`future-${index}`"
+              class="card contest-card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-button-scoreboard>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartTime, {
+                        startDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-dropdown>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Future">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-future-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Future
+            "
+            class="text-center mb-2"
           >
-            <template #contest-button-scoreboard>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartTime, {
-                      startDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-dropdown>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
-          <b-spinner
-            v-if="refreshing"
-            class="spinner mt-4"
-            variant="primary"
-          ></b-spinner>
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -254,81 +328,107 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <div v-if="filteredContestList.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          <template v-if="loading || refreshing">
+            <div
+              v-for="index in 3"
+              :key="`past-${index}`"
+              class="card contest-card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+          <div v-else-if="contestListEmpty" class="empty-category">
+            {{ T.contestListEmpty }}
           </div>
-          <omegaup-contest-card
-            v-for="contestItem in filteredContestList"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
+          <template v-else>
+            <omegaup-contest-card
+              v-for="contestItem in contestList"
+              :key="contestItem.contest_id"
+              :contest="contestItem"
+            >
+              <template #contest-enroll-status>
+                <div></div>
+              </template>
+              <template #text-contest-date>
+                <b-card-text>
+                  <font-awesome-icon icon="calendar-alt" />
+                  <a :href="getTimeLink(contestItem.start_time)">
+                    {{
+                      ui.formatString(T.contestStartedTime, {
+                        startedDate: startContestDate(contestItem),
+                      })
+                    }}
+                  </a>
+                </b-card-text>
+              </template>
+              <template #contest-button-enter>
+                <div></div>
+              </template>
+              <template #contest-button-see-details>
+                <div></div>
+              </template>
+            </omegaup-contest-card>
+          </template>
+          <template v-if="isScrollLoading && currentTab === ContestTab.Past">
+            <div
+              v-for="index in 3"
+              :key="`loading-more-past-${index}`"
+              class="card mb-2"
+            >
+              <omegaup-contest-skeleton></omegaup-contest-skeleton>
+            </div>
+          </template>
+
+          <div
+            v-if="
+              !loading &&
+              !contestListEmpty &&
+              hasMore &&
+              currentTab === ContestTab.Past
+            "
+            class="text-center mb-2"
           >
-            <template #contest-enroll-status>
-              <div></div>
-            </template>
-            <template #text-contest-date>
-              <b-card-text>
-                <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time)">
-                  {{
-                    ui.formatString(T.contestStartedTime, {
-                      startedDate: startContestDate(contestItem),
-                    })
-                  }}
-                </a>
-              </b-card-text>
-            </template>
-            <template #contest-button-enter>
-              <div></div>
-            </template>
-            <template #contest-button-see-details>
-              <div></div>
-            </template>
-          </omegaup-contest-card>
+            <button
+              class="btn btn-outline-primary w-100"
+              :disabled="isScrollLoading"
+              @click="loadMoreContests"
+            >
+              {{ showMoreContestButtonText }}
+            </button>
+          </div>
         </b-tab>
       </b-tabs>
-      <b-pagination-nav
-        ref="paginator"
-        v-model="currentPage"
-        base-url="#"
-        first-number
-        last-number
-        size="lg"
-        align="center"
-        :link-gen="linkGen"
-        :number-of-pages="numberOfPages(currentTab)"
-      ></b-pagination-nav>
     </b-card>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
-import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // Import Only Required Plugins
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  TabsPlugin,
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
-  PaginationNavPlugin,
+  TabsPlugin,
 } from 'bootstrap-vue';
+import infiniteScroll from 'vue-infinite-scroll';
 import ContestCard from './ContestCard.vue';
+import ContestSkeleton from './ContestSkeleton.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
-Vue.use(PaginationNavPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -353,20 +453,36 @@ export enum ContestFilter {
   All = 'all',
 }
 
+export interface UrlParams {
+  page: number;
+  tab_name: ContestTab;
+  query: string;
+  sort_order: ContestOrder;
+  filter: ContestFilter;
+  replaceState?: boolean; // When true, use replaceState instead of pushState (for browser navigation)
+}
+
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
+    'omegaup-contest-skeleton': ContestSkeleton,
     FontAwesomeIcon,
   },
+  directives: {
+    infiniteScroll,
+  },
 })
-export default class ArenaContestList extends Vue {
+class ArenaContestList extends Vue {
   @Prop({ default: null }) countContests!: { [key: string]: number } | null;
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
   @Prop() tab!: ContestTab;
-  @Prop() sortOrder!: ContestOrder;
+  @Prop({ default: ContestOrder.None }) sortOrder!: ContestOrder;
   @Prop({ default: ContestFilter.All }) filter!: ContestFilter;
   @Prop() page!: number;
+  @Prop({ default: 10 }) pageSize!: number;
+  @Prop({ default: false }) loading!: boolean;
+
   T = T;
   ui = ui;
   ContestTab = ContestTab;
@@ -378,6 +494,11 @@ export default class ArenaContestList extends Vue {
   currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
   refreshing: boolean = false;
+  isScrollLoading: boolean = false;
+  hasMore: boolean = true;
+  // Flag to track if state change came from browser navigation (back/forward button)
+  // When true, we should use replaceState instead of pushState to avoid corrupting history
+  isFromBrowserNavigation: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -387,30 +508,88 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  numberOfPages(tab: ContestTab): number {
-    if (!this.countContests || !this.countContests[tab]) {
-      // Default value when there are no contests in the list
-      return 1;
-    }
-    const numberOfPages = Math.ceil(this.countContests[tab] / 10);
-    return numberOfPages;
-  }
-
-  get queryURL(): string {
-    return `/arena/#${this.currentTab}`;
-  }
-
-  linkGen(pageNum: number) {
-    return {
-      path: `/arena/`,
-      query: {
-        page: pageNum,
-        tab_name: this.currentTab,
-        query: this.query,
-        sort_order: this.currentOrder,
-        filter: this.filter,
-      },
+  onSearchQuery() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
     };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
+    this.currentPage = 1;
+    this.hasMore = true;
+    this.fetchPage(params, urlObj);
+  }
+  onReset() {
+    this.currentQuery = '';
+    this.onSearchQuery();
+  }
+  fetchInitialContests() {
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: 1,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
+      replaceState: this.isFromBrowserNavigation,
+    };
+    // Reset the contest list for this tab to avoid stale data
+    Vue.set(this.contests, this.currentTab, []);
+    this.currentPage = 1;
+    this.hasMore = true;
+    // Reset the navigation flag after using it
+    this.isFromBrowserNavigation = false;
+    this.fetchPage(params, urlObj);
+  }
+  mounted() {
+    this.fetchInitialContests();
+  }
+
+  beforeDestroy() {
+    // Placeholder for cleanup when infinite scroll is re-implemented
+  }
+  async loadMoreContests() {
+    if (this.isScrollLoading || !this.hasMore || this.loading) return;
+
+    this.isScrollLoading = true;
+    const nextPage = this.currentPage + 1;
+    const urlObj = new URL(window.location.href);
+    const params: UrlParams = {
+      page: nextPage,
+      tab_name: this.currentTab,
+      query: this.currentQuery,
+      sort_order: this.currentOrder,
+      filter: this.currentFilter,
+    };
+
+    try {
+      await this.fetchPage(params, urlObj);
+      this.currentPage = nextPage;
+
+      // Check if there are more contests to load (based on pageSize)
+      this.hasMore = this.contestList.length % this.pageSize === 0;
+    } catch (error) {
+      console.error('Error loading more contests:', error);
+      // On error, re-enable the button after a delay to prevent spam
+      setTimeout(() => {
+        this.isScrollLoading = false;
+      }, 2000);
+      return;
+    } finally {
+      this.isScrollLoading = false;
+    }
+  }
+
+  fetchPage(params: UrlParams, urlObj: URL) {
+    this.$emit('fetch-page', { params, urlObj });
+    // Turn off refreshing after a short delay to allow parent component to respond
+    setTimeout(() => {
+      this.refreshing = false;
+    }, 1000);
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -452,70 +631,20 @@ export default class ArenaContestList extends Vue {
   filterBySignedUp() {
     this.currentFilter = ContestFilter.SignedUp;
   }
+
   filterByRecommended() {
     this.currentFilter = ContestFilter.OnlyRecommended;
   }
+
   filterByAll() {
     this.currentFilter = ContestFilter.All;
   }
 
-  get filteredContestList(): types.ContestListItem[] {
-    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
-    if (this.currentFilter === ContestFilter.SignedUp) {
-      filters.push((item) => item.participating);
+  get showMoreContestButtonText(): string {
+    if (this.isScrollLoading) {
+      return T.contestsListLoading;
     }
-    if (this.currentFilter === ContestFilter.OnlyRecommended) {
-      filters.push((item) => item.recommended);
-    }
-    return this.sortedContestList.slice().filter((contestItem) => {
-      for (const filter of filters) {
-        if (!filter(contestItem)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-
-  get sortedContestList(): types.ContestListItem[] {
-    function compareNumber(a: number, b: number): number {
-      if (a < b) {
-        return 1;
-      } else if (a > b) {
-        return -1;
-      }
-      return 0;
-    }
-    let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
-    switch (this.currentOrder) {
-      case ContestOrder.None:
-        return this.contestList.slice();
-      case ContestOrder.Title:
-        sortBy = (a, b) => a.title.localeCompare(b.title);
-        break;
-      case ContestOrder.Ends:
-        sortBy = (a, b) =>
-          compareNumber(a.finish_time.getTime(), b.finish_time.getTime());
-        break;
-      case ContestOrder.Duration:
-        sortBy = (a, b) =>
-          compareNumber(
-            a.finish_time.getTime() - a.start_time.getTime(),
-            b.finish_time.getTime() - b.start_time.getTime(),
-          );
-        break;
-      case ContestOrder.Organizer:
-        sortBy = (a, b) => a.organizer.localeCompare(b.organizer);
-        break;
-      case ContestOrder.Contestants:
-        sortBy = (a, b) => compareNumber(a.contestants, b.contestants);
-        break;
-      case ContestOrder.SignedUp:
-        sortBy = (a, b) =>
-          compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
-        break;
-    }
-    return this.contestList.slice().sort(sortBy);
+    return T.contestsListShowMore;
   }
 
   get contestList(): types.ContestListItem[] {
@@ -530,7 +659,65 @@ export default class ArenaContestList extends Vue {
         return this.contests.current;
     }
   }
+
+  get contestListEmpty(): boolean {
+    if (!this.contestList) return true;
+    return this.contestList.length === 0;
+  }
+
+  // Watchers for props - sync internal state when parent updates props (e.g., via popstate)
+  // Set isFromBrowserNavigation flag to prevent pushState from corrupting history
+  @Watch('tab')
+  onTabPropChanged(newValue: ContestTab) {
+    this.isFromBrowserNavigation = true;
+    this.currentTab = newValue;
+  }
+
+  @Watch('sortOrder')
+  onSortOrderPropChanged(newValue: ContestOrder) {
+    this.isFromBrowserNavigation = true;
+    this.currentOrder = newValue;
+  }
+
+  @Watch('filter')
+  onFilterPropChanged(newValue: ContestFilter) {
+    this.isFromBrowserNavigation = true;
+    this.currentFilter = newValue;
+  }
+
+  @Watch('page')
+  onPagePropChanged(newValue: number) {
+    this.isFromBrowserNavigation = true;
+    this.currentPage = newValue;
+  }
+
+  // Watchers for internal state - fetch data when user interacts with UI
+  @Watch('currentTab', { immediate: true, deep: true })
+  onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
+    if (typeof oldValue === 'undefined') return;
+    this.fetchInitialContests();
+  }
+
+  @Watch('currentOrder', { immediate: true, deep: true })
+  onCurrentOrderChanged(
+    newValue: ContestOrder,
+    oldValue: undefined | ContestOrder,
+  ) {
+    if (typeof oldValue === 'undefined') return;
+    this.fetchInitialContests();
+  }
+
+  @Watch('currentFilter', { immediate: true, deep: true })
+  onCurrentFilterChanged(
+    newValue: ContestFilter,
+    oldValue: undefined | ContestFilter,
+  ) {
+    if (typeof oldValue === 'undefined') return;
+    this.fetchInitialContests();
+  }
 }
+
+export default ArenaContestList;
 </script>
 
 <style lang="scss" scoped>
@@ -581,6 +768,20 @@ export default class ArenaContestList extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.contest-card {
+  height: 150px;
+  padding: 1rem;
+}
+
+.line {
+  height: 100%;
+  background: var(
+    --arena-submissions-list-skeletonloader-final-background-color
+  );
+  border-radius: 8px;
+  animation: loading 1.5s infinite;
 }
 
 .sidebar {
