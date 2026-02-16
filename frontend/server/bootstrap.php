@@ -36,6 +36,9 @@ function getCriticalSecretNames(): array {
 
 /**
  * Ensures required secrets are set to non placeholder values.
+ *
+ * @codeCoverageIgnore Bootstrap validation runs at startup in sandbox/production.
+ * This code is exercised in real deployments and integration tests.
  */
 function validateCriticalSecrets(): void {
     if (PHP_SAPI === 'cli') {
