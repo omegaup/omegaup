@@ -35,6 +35,13 @@ fi
 
 "${OMEGAUP_ROOT}/vendor/bin/psalm" --show-info=false
 
+# Verify GitHub Action hashes are consistent
+if command -v yq >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+	"${OMEGAUP_ROOT}/hack/gha-reversemap.sh" verify-mapusage
+else
+	echo "Skipping GitHub Action hash verification: yq and/or jq not available"
+fi
+
 if [[ "${IN_DOCKER}" == 1 ]]; then
 	echo "Please run \`./stuff/lint.sh ${REF}\` outside the container after this."
 	echo "Please run \`python3 -m pytest ./frontend/tests/ui/ -s\` outside the container after this."
