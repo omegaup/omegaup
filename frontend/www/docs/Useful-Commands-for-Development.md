@@ -123,3 +123,35 @@ systemctl restart docker.service
 OCI runtime exec failed: exec failed: unable to start container process: open /dev/pts/0: operation not permitted: unknown
 ```
 **Execution Location:** Outside the docker container
+
+### Verify GitHub Actions workflow references
+```bash
+./hack/gha-reversemap.sh verify-mapusage
+```
+**Description:** Checks that all workflow files in `.github/workflows` reference GitHub Actions by commit hash and that each hash matches the one in `.gha-reversemap.yml`. This ensures GitHub Actions are referenced by immutable commit hashes rather than mutable tags. You can optionally specify specific workflow files as arguments.  
+**Prerequisites:** Requires `yq` (version v4.45 or higher) to be installed.  
+**Execution Location:** Outside the Docker container, in the project's root directory. e.g. `ubuntu@pc:~/dev/omegaup$`
+
+### Apply reversemap to GitHub Actions workflows
+```bash
+./hack/gha-reversemap.sh apply-reversemap
+```
+**Description:** Updates workflow files in `.github/workflows` with commit hashes from `.gha-reversemap.yml`, replacing any tag references with the corresponding commit hashes. You can optionally specify specific workflow files as arguments.  
+**Prerequisites:** Requires `yq` (version v4.45 or higher) to be installed.  
+**Execution Location:** Outside the Docker container, in the project's root directory. e.g. `ubuntu@pc:~/dev/omegaup$`
+
+### Update GitHub Action version in reversemap
+```bash
+./hack/gha-reversemap.sh update-action-version actions/checkout
+```
+**Description:** Updates the version of a GitHub Action in `.gha-reversemap.yml` (sha, tag, urls) to its latest regular release tag. Replace `actions/checkout` with the action reference you want to update (format: `{gh_owner}/{gh_repo}`). You can update multiple actions by providing multiple arguments.  
+**Prerequisites:** Requires `yq` (version v4.45 or higher) to be installed. Optionally set `GITHUB_TOKEN` environment variable to avoid rate limiting.  
+**Execution Location:** Outside the Docker container, in the project's root directory. e.g. `ubuntu@pc:~/dev/omegaup$`
+
+### Update reversemap from GitHub Actions workflows
+```bash
+./hack/gha-reversemap.sh update-reversemap
+```
+**Description:** Updates `.gha-reversemap.yml` with information (sha, tag, urls) from the GitHub Actions used in workflow files. If workflow files reference actions by tags, it fetches the corresponding commit hashes and updates the reversemap. You can optionally specify specific workflow files as arguments.  
+**Prerequisites:** Requires `yq` (version v4.45 or higher) to be installed. Optionally set `GITHUB_TOKEN` environment variable to avoid rate limiting.  
+**Execution Location:** Outside the Docker container, in the project's root directory. e.g. `ubuntu@pc:~/dev/omegaup$`

@@ -150,7 +150,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify data in DB
         $problems = \OmegaUp\DAO\Problems::getByTitle($newTitle);
 
-        // Check that we only retreived 1 element
+        // Check that we only retrieved 1 element
         $this->assertSame(1, count($problems));
 
         {
@@ -420,7 +420,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -488,7 +488,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertSame('ok', $response['status']);
 
-        // Check statment contents
+        // Check statement contents
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemData['request']['problem_alias']
         );
@@ -2269,7 +2269,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertSame(0, $response['visibility']);
 
-        // Updated problem setttings and visibility
+        // Updated problem settings and visibility
         $newTimeLimit = 3000.0;
         $newExtraWallTime = 200.0;
         $newMemoryLimit = 8000;
@@ -2666,5 +2666,408 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
         return $data;
+    }
+
+    /**
+     * @dataProvider shouldOverrideMarkdownProvider
+     * @param null|string $current
+     * @param string $candidate
+     * @param string $preference
+     * @param bool $expected
+     */
+    public function testShouldOverrideMarkdown(
+        null|string $current,
+        string $candidate,
+        string $preference,
+        bool $expected
+    ): void {
+        $result = \OmegaUp\CdpBuilder::shouldOverrideMarkdown(
+            $current,
+            $candidate,
+            $preference
+        );
+
+        $this->assertSame(
+            $expected,
+            $result
+        );
+    }
+
+    /**
+     * Data provider for shouldOverrideMarkdown with 5 main flow cases.
+     * Format: [currentLanguage, candidateLanguage, languagePreference, expectedResult]
+     *
+     * @return array<string, array{0: null|string, 1: string, 2: string, 3: bool}>
+     */
+    public function shouldOverrideMarkdownProvider(): array {
+        return [
+            'null_current_overrides' => [
+                null, 'en', 'es', true
+            ],
+            'current_equals_preference' => [
+                'es', 'es', 'es', false
+            ],
+            'candidate_equals_preference' => [
+                'en', 'es', 'es', true
+            ],
+            'candidate_is_default' => [
+                'en', 'es', 'pt', true
+            ],
+            'no_rule_matches' => [
+                'en', 'pt', 'es', false
+            ],
+        ];
+    }
+
+    /**
+     * Test for updating an existing case in a problem
+     * This test validates the 'cases' request type
+     */
+    public function testUpdateCasesViaProblemEditDetailsForTypeScript() {
+        // Create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        // Login as problem author
+        $login = self::login($problemData['author']);
+
+        // Get the problem edit details to extract the current CDP
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('cdp', $response['payload']);
+        $initialCdp = $response['payload']['cdp'];
+        $this->assertArrayHasKey('casesStore', $initialCdp);
+        $this->assertArrayHasKey('groups', $initialCdp['casesStore']);
+
+        // Get the initial group
+        $initialGroup = $initialCdp['casesStore']['groups'][0];
+        $this->assertArrayHasKey('groupID', $initialGroup);
+        $this->assertArrayHasKey('cases', $initialGroup);
+        $this->assertGreaterThan(0, count($initialGroup['cases']));
+
+        $initialCase = $initialGroup['cases'][0];
+        $initialCaseId = $initialCase['caseID'];
+
+        // Prepare the updated case data
+        $updatedCaseName = 'updated_case_name';
+        $newInput = "10 20\n";
+        $newOutput = "30\n";
+
+        $updatedCaseData = [
+            'case' => [
+                'caseID' => $initialCaseId,
+                'groupID' => $initialGroup['groupID'],
+                'name' => $updatedCaseName,
+                'points' => $initialCase['points'],
+                'autoPoints' => $initialCase['autoPoints'],
+                'lines' => [
+                    [
+                        'lineID' => $initialCase['lines'][0]['lineID'],
+                        'caseID' => $initialCaseId,
+                        'label' => 'input',
+                        'data' => [
+                            'kind' => 'multiline',
+                            'value' => $newInput,
+                        ],
+                    ],
+                ],
+                'output' => $newOutput,
+            ],
+            'group' => [
+                'groupID' => $initialGroup['groupID'],
+                'name' => $initialGroup['name'],
+                'points' => $initialGroup['points'],
+                'autoPoints' => $initialGroup['autoPoints'],
+                'ungroupedCase' => $initialGroup['ungroupedCase'],
+                'cases' => $initialGroup['cases'],
+            ],
+        ];
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'cases',
+                'message' => 'Updated case input and output',
+                'contents' => json_encode($updatedCaseData),
+            ])
+        )['templateProperties'];
+
+        $this->assertTrue($response['payload']['statusSuccess']);
+        $this->assertArrayHasKey('cdp', $response['payload']);
+        $updatedCdp = $response['payload']['cdp'];
+
+        // Verify the case was updated in the CDP
+        $updatedGroup = $updatedCdp['casesStore']['groups'][0];
+        $updatedCase = null;
+        foreach ($updatedGroup['cases'] as $case) {
+            if ($case['caseID'] === $initialCaseId) {
+                $updatedCase = $case;
+                break;
+            }
+        }
+
+        $this->assertNotNull($updatedCase, 'Case should exist in updated CDP');
+        $this->assertSame($updatedCaseName, $updatedCase['name']);
+        $this->assertSame($newInput, $updatedCase['lines'][0]['data']['value']);
+        $this->assertSame($newOutput, $updatedCase['output']);
+    }
+
+    /**
+     * Test for adding a new case to an existing group
+     */
+    public function testAddNewCaseViaProblemEditDetailsForTypeScript() {
+        // Create a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        // Login as problem author
+        $login = self::login($problemData['author']);
+
+        // Get the problem edit details to extract the current CDP
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('cdp', $response['payload']);
+        $initialCdp = $response['payload']['cdp'];
+        $this->assertArrayHasKey('casesStore', $initialCdp);
+        $this->assertArrayHasKey('groups', $initialCdp['casesStore']);
+
+        // Get the initial group
+        $initialGroup = $initialCdp['casesStore']['groups'][0];
+        $this->assertArrayHasKey('groupID', $initialGroup);
+        $this->assertArrayHasKey('cases', $initialGroup);
+
+        // Prepare new case data
+        $newCaseId = '00000000-0000-0000-0000-000000000001';
+        $newCaseName = 'new_test_case';
+
+        $newCaseData = [
+            'case' => [
+                'caseID' => $newCaseId,
+                'groupID' => $initialGroup['groupID'],
+                'name' => $newCaseName,
+                'points' => 50,
+                'autoPoints' => false,
+                'lines' => [
+                    [
+                        'lineID' => '00000000-0000-0000-0000-000000000002',
+                        'caseID' => $newCaseId,
+                        'label' => 'input',
+                        'data' => [
+                            'kind' => 'multiline',
+                            'value' => "5 10\n",
+                        ],
+                    ],
+                ],
+                'output' => "15\n",
+            ],
+            'group' => [
+                'groupID' => $initialGroup['groupID'],
+                'name' => $initialGroup['name'],
+                'points' => $initialGroup['points'],
+                'autoPoints' => $initialGroup['autoPoints'],
+                'ungroupedCase' => $initialGroup['ungroupedCase'],
+                'cases' => array_merge($initialGroup['cases'], [
+                    [
+                        'caseID' => $newCaseId,
+                        'groupID' => $initialGroup['groupID'],
+                        'name' => $newCaseName,
+                        'points' => 50,
+                        'autoPoints' => false,
+                        'lines' => [],
+                        'output' => "15\n",
+                    ],
+                ]),
+            ],
+        ];
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'cases',
+                'message' => 'Added new case',
+                'contents' => json_encode($newCaseData),
+            ])
+        )['templateProperties'];
+
+        $this->assertTrue($response['payload']['statusSuccess']);
+        $finalCdp = $response['payload']['cdp'];
+
+        // Verify the new case was added
+        $finalGroup = $finalCdp['casesStore']['groups'][0];
+        $newCaseFound = false;
+        foreach ($finalGroup['cases'] as $case) {
+            if ($case['caseID'] === $newCaseId && $case['name'] === $newCaseName) {
+                $newCaseFound = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($newCaseFound, 'New case should exist in final CDP');
+
+        // Verify that the group has more cases than initially
+        $this->assertGreaterThan(
+            count($initialGroup['cases']),
+            count($finalGroup['cases']),
+            'Group should have more cases after adding a new one'
+        );
+    }
+
+    /**
+     * Test for deleting a single case in a problem
+     * Uses triangulos.zip which has ungrouped cases (each case creates its own group)
+     */
+    public function testDeleteCaseViaProblemEditDetailsForTypeScript() {
+        // Create a problem with ungrouped cases
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip'
+            ])
+        );
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        // Login as problem author
+        $login = self::login($problemData['author']);
+
+        // Get the current CDP structure
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('cdp', $response['payload']);
+        $initialCdp = $response['payload']['cdp'];
+        $initialGroups = $initialCdp['casesStore']['groups'];
+
+        // Get the first case to delete (should be an ungrouped case)
+        $firstGroup = $initialGroups[0];
+        $firstCase = $firstGroup['cases'][0];
+        $firstCaseId = $firstCase['caseID'];
+        $firstGroupId = $firstGroup['groupID'];
+
+        // Delete the case
+        $deleteRequest = [
+            'id' => $firstCaseId,
+        ];
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'deleteGroupCase',
+                'message' => 'Deleted test case',
+                'contents' => json_encode($deleteRequest),
+            ])
+        )['templateProperties'];
+
+        $this->assertTrue($response['payload']['statusSuccess']);
+        $this->assertArrayHasKey('cdp', $response['payload']);
+        $afterDeleteCaseCdp = $response['payload']['cdp'];
+
+        // Verify the case was deleted from the CDP
+        // Since it's an ungrouped case, the group should also be deleted
+        $groupStillExists = false;
+        foreach ($afterDeleteCaseCdp['casesStore']['groups'] as $group) {
+            if ($group['groupID'] === $firstGroupId) {
+                $groupStillExists = true;
+                break;
+            }
+        }
+
+        $this->assertFalse(
+            $groupStillExists,
+            'When deleting an ungrouped case, its group should also be deleted'
+        );
+
+        $this->assertLessThan(
+            count($initialGroups),
+            count($afterDeleteCaseCdp['casesStore']['groups']),
+            'Should have fewer groups after deleting ungrouped case'
+        );
+    }
+    /**
+     * Test for deleting an entire group in a problem
+     * Uses a basic problem without ungrouped cases
+     */
+    public function testDeleteGroupViaProblemEditDetailsForTypeScript() {
+        // Create a basic problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAlias = $problemData['request']['problem_alias'];
+
+         // Login as problem author
+        $login = self::login($problemData['author']);
+
+        // Get the current CDP structure
+        $initialResponse = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+            ])
+        )['templateProperties'];
+
+        $this->assertArrayHasKey('cdp', $initialResponse['payload']);
+        $initialCdp = $initialResponse['payload']['cdp'];
+        $initialGroups = $initialCdp['casesStore']['groups'];
+
+        $this->assertGreaterThan(
+            1,
+            count($initialGroups),
+            'Test requires at least 2 groups'
+        );
+
+        // Get the second group to delete
+        $secondGroup = $initialGroups[1];
+        $secondGroupId = $secondGroup['groupID'];
+
+        $deleteGroupRequest = [
+            'id' => $secondGroupId,
+        ];
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemAlias,
+                'request' => 'deleteGroupCase',
+                'message' => 'Deleted entire group',
+                'contents' => json_encode($deleteGroupRequest),
+            ])
+        )['templateProperties'];
+
+        $this->assertTrue($response['payload']['statusSuccess']);
+        $afterDeleteGroupCdp = $response['payload']['cdp'];
+
+        // Verify the group was deleted
+        $groupExists = false;
+        foreach ($afterDeleteGroupCdp['casesStore']['groups'] as $group) {
+            if ($group['groupID'] === $secondGroupId) {
+                $groupExists = true;
+                break;
+            }
+        }
+
+        $this->assertFalse(
+            $groupExists,
+            'Deleted group should not exist in CDP'
+        );
+
+        // Verify that we have one less group
+        $this->assertLessThan(
+            count($initialGroups),
+            count($afterDeleteGroupCdp['casesStore']['groups']),
+            'Should have fewer groups after deletion'
+        );
     }
 }

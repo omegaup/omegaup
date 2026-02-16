@@ -138,7 +138,10 @@
                   >
                   <div v-show="showFeedbackForm" class="form-group">
                     <p>{{ T.submissionFeedbackAnimationButton }}</p>
-                    <img src="/media/submission_feedback_demo.gif" />
+                    <img
+                      src="/media/submission_feedback_demo.gif"
+                      :alt="T.submissionFeedbackDemoAlt"
+                    />
                   </div>
                 </div>
               </template>
@@ -185,7 +188,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
-import omegaup_problemMarkdown from '../problem//Markdown.vue';
+import omegaup_problemMarkdown from '../problem/ProblemMarkdown.vue';
 import user_Username from '../user/Username.vue';
 
 import T from '../../lang';

@@ -796,7 +796,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         problemAlias: $problem['problem_alias'],
                         problemsetId: $problemset->problemset_id,
                         identity: $r->identity,
-                        shouldValidateVisibility: false, // visbility mode validation no needed when it is a clone
+                        shouldValidateVisibility: false, // visibility mode validation no needed when it is a clone
                         isExtraProblem: $problem['is_extra_problem'],
                         points: 100,
                         commit: null,
@@ -1246,6 +1246,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Notifications::COURSE_ASSIGNMENT_ADDED
         );
 
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
+
         return [
             'status' => 'ok',
         ];
@@ -1402,6 +1406,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         return [
             'status' => 'ok',
@@ -1953,6 +1961,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
+
         return [
             'status' => 'ok',
         ];
@@ -2150,60 +2162,67 @@ class Course extends \OmegaUp\Controllers\Controller {
         $request->accepted = $r->ensureBool('resolution');
         $request->last_update = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
-        \OmegaUp\DAO\CourseIdentityRequest::update($request);
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        // Save this action in the history
-        \OmegaUp\DAO\CourseIdentityRequestHistory::create(
-            new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
-                'identity_id' => $request->identity_id,
-                'course_id' => $course->course_id,
-                'time' => $request->last_update,
-                'admin_id' => intval($r->user->user_id),
-                'accepted' => $request->accepted,
-            ])
-        );
+            \OmegaUp\DAO\CourseIdentityRequest::update($request);
 
-        if (!is_null($targetIdentity->user_id)) {
-            if ($request->accepted) {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationAccepted'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
-            } else {
-                $localizationString = new \OmegaUp\TranslationString(
-                    'notificationCourseRegistrationRejected'
-                );
-                $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
-            }
-            \OmegaUp\Controllers\Notification::setCommonNotification(
-                [$targetIdentity->user_id],
-                $localizationString,
-                $notificationType,
-                "/course/{$course->alias}/",
-                [
-                    'courseName' => $course->name,
-                ]
+            // Save this action in the history
+            \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+                new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                    'identity_id' => $request->identity_id,
+                    'course_id' => $course->course_id,
+                    'time' => $request->last_update,
+                    'admin_id' => intval($r->user->user_id),
+                    'accepted' => $request->accepted,
+                ])
             );
-        }
 
-        self::$log->info(
-            "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
-        );
+            if (!is_null($targetIdentity->user_id)) {
+                if ($request->accepted) {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationAccepted'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED;
+                } else {
+                    $localizationString = new \OmegaUp\TranslationString(
+                        'notificationCourseRegistrationRejected'
+                    );
+                    $notificationType = \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED;
+                }
+                \OmegaUp\Controllers\Notification::setCommonNotification(
+                    [$targetIdentity->user_id],
+                    $localizationString,
+                    $notificationType,
+                    "/course/{$course->alias}/",
+                    [
+                        'courseName' => $course->name,
+                    ]
+                );
+            }
 
-        // If the request was accepted, we need to automatically add the student to the course
-        if (!$request->accepted) {
-            return ['status' => 'ok'];
-        }
+            self::$log->info(
+                "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
+            );
 
-        $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
-            'group_id' => $course->group_id,
-            'identity_id' => $targetIdentity->identity_id,
-            'share_user_information' => $request->share_user_information,
-        ]);
-        if (!is_null($request->accept_teacher)) {
-            $groupIdentity->accept_teacher = $request->accept_teacher;
+            // If the request was accepted, we need to automatically add the student to the course
+            if ($request->accepted) {
+                $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => $course->group_id,
+                    'identity_id' => $targetIdentity->identity_id,
+                    'share_user_information' => $request->share_user_information,
+                ]);
+                if (!is_null($request->accept_teacher)) {
+                    $groupIdentity->accept_teacher = $request->accept_teacher;
+                }
+                \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
-        \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
 
         return ['status' => 'ok'];
     }
@@ -2599,6 +2618,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
+
         return [
             'status' => 'ok',
         ];
@@ -2693,6 +2716,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
         ]));
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         return [
             'status' => 'ok',
@@ -2902,7 +2929,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
 
-        // Only admin is alowed to make modifications
+        // Only admin is allowed to make modifications
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -4059,7 +4086,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['student'], 'student');
+        $student = $r->ensureString('student');
 
         $course = self::validateCourseExists($courseAlias);
 
@@ -4071,13 +4098,35 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $student
+        );
+
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
+        if (
+            !\OmegaUp\DAO\GroupsIdentities::existsByPK(
+                $course->group_id,
+                $resolvedIdentity->identity_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4089,9 +4138,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
-                    'student' => $r['student']
+                    'student' => $student
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleStudentsProgress'
@@ -4132,6 +4180,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $student
         );
 
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
         if (
             !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                 $course->group_id,
@@ -4164,11 +4218,12 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            "{$courseAlias}-{$student}",
+            function () use ($course, $resolvedIdentity) {
+                return \OmegaUp\DAO\Courses::getSingleStudentProgressPerAssignment(
                     $course->course_id,
-                    $course->group_id
+                    $course->group_id,
+                    $resolvedIdentity->identity_id
                 );
             },
             60 * 60 * 12 // 12 hours
@@ -4180,7 +4235,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
-                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => $studentsProgress,
                     'student' => $student,
                     'problems' => $problems,
@@ -5531,7 +5585,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates and authenticate token for operations when user can be logged
      * in or not. This is the only private function that receives Request as a
-     * parameter because it needs authenticate it wheter there is no token.
+     * parameter because it needs authenticate it whether there is no token.
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
@@ -5597,7 +5651,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // hasToken is true, it means we do not autenticate request user
+        // hasToken is true, it means we do not authenticate request user
         return [
             'courseAdmin' => $courseAdmin,
             'hasToken' => true,
@@ -6131,7 +6185,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
-        // TODO: Expire cache
+
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+        );
 
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
