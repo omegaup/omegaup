@@ -80,7 +80,7 @@ function validateCriticalSecrets(): void {
     }
 
     $message = sprintf(
-        '[config] Startup aborted for environment "%s": invalid secrets detected:%s%s',
+        '[config] Invalid secrets detected for environment "%s":%s%s',
         $environment,
         PHP_EOL,
         implode(PHP_EOL, array_map(
@@ -94,13 +94,13 @@ function validateCriticalSecrets(): void {
 
     error_log($message);
 
-    if (PHP_SAPI !== 'cli') {
-        http_response_code(500);
-        echo 'Configuration error: one or more required secrets are missing or invalid. '
-            . 'Please check the server logs for details.';
+    if (class_exists(\OmegaUp\NewRelicHelper::class)) {
+        \OmegaUp\NewRelicHelper::noticeError($message);
+        \OmegaUp\NewRelicHelper::addCustomAttribute(
+            'invalid_secrets',
+            implode('; ', $failures)
+        );
     }
-
-    exit(1);
 }
 
 // Set paths
