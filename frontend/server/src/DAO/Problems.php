@@ -1708,56 +1708,41 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     WHERE
                         p.{$searchType} = ?";
         } else {
-            $args = array_fill(0, 5, $query);
             $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
-            $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
+            $args = array_merge(
+                array_fill(0, 5, $query),
+                array_fill(0, 2, $curatedQuery),
+                array_fill(0, 5, $query),
+                [$curatedQuery]
+            );
+            $select .= ' (
+                (CASE WHEN p.alias = ? THEN 2.0 ELSE 0 END) +
+                (CASE WHEN p.title = ? THEN 1.0 ELSE 0 END) +
+                (CASE WHEN (
+                    p.title LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.alias LIKE CONCAT(\'%\', ?, \'%\') OR
+                    p.problem_id = ?
+                ) THEN 0.1 ELSE 0 END) +
+                COALESCE(
+                    (CASE WHEN MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)
+                        THEN MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)
+                        ELSE NULL END),
+                    0.0
+                )
+            ) AS relevance
             ';
             $sql = "FROM
-                    (
-                        SELECT
-                            {$fields},
-                            2.0 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            alias = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            1.0 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            title = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            0.1 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
-                                problem_id = ?
-                            )
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            IFNULL(
-                                MATCH(alias, title)
-                                AGAINST (? IN BOOLEAN MODE), 0.0
-                            ) AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            MATCH(alias, title)
-                            AGAINST (? IN BOOLEAN MODE)
-                    ) AS p";
-            $groupByClause = "
-                        GROUP BY {$fields}
-            ";
+                    Problems p
+                WHERE
+                    p.alias = ?
+                    OR p.title = ?
+                    OR (
+                        p.title LIKE CONCAT('%', ?, '%') OR
+                        p.alias LIKE CONCAT('%', ?, '%') OR
+                        p.problem_id = ?
+                    )
+                    OR MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)";
+            $groupByClause = '';
             $orderByClause = '
                         ORDER BY relevance DESC
             ';
