@@ -20,7 +20,7 @@
         v-if="!coderOfTheMonth.is_private"
         :href="`/profile/${coderOfTheMonth.username}/`"
       >
-        <img :src="coderOfTheMonth.gravatar_92" height="80" />
+        <img :src="coderOfTheMonth.gravatar_92" height="80" draggable="false" />
       </a>
       <h5 class="card-title">
         <omegaup-user-username

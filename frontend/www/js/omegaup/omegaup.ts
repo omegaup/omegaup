@@ -532,3 +532,9 @@ export namespace omegaup {
 }
 
 export const OmegaUp = new omegaup.OmegaUp();
+// Prevent image dragging for better UX
+document.addEventListener('dragstart', (event) => {
+  if (event.target instanceof HTMLImageElement) {
+    event.preventDefault();
+  }
+});

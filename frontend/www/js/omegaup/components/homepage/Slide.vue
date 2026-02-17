@@ -17,7 +17,12 @@
         </a>
       </div>
       <div>
-        <img class="d-block image-width" height="320" :src="imageSrc" />
+        <img
+          class="d-block image-width"
+          height="320"
+          :src="imageSrc"
+          draggable="false"
+        />
       </div>
     </div>
   </div>

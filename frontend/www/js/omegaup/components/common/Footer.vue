@@ -7,6 +7,7 @@
             class="footer-logo d-block mx-auto mb-1 mt-n6"
             width="120"
             src="/media/logo-main-white.svg"
+            draggable="false"
           />
           <div class="slogan mx-auto">
             {{ T.frontPageFooter }}
@@ -77,6 +78,7 @@
                   src="/media/homepage/airbnb_logo.svg"
                   alt="AirbnbLogo"
                   width="100"
+                  draggable="false"
                 />
               </a>
             </li>
