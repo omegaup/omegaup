@@ -88,6 +88,29 @@ export function asyncError(err: Error) {
   console.error('Async error', err);
 }
 
+/**
+ * Announce message to screen readers using a live region element.
+ */
+export function announceToScreenReader(
+  message: string,
+  politeness: 'polite' | 'assertive' = 'polite',
+): void {
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', politeness);
+  announcement.className = 'sr-only';
+  announcement.textContent = message;
+
+  document.body.appendChild(announcement);
+  setTimeout(() => {
+    try {
+      document.body.removeChild(announcement);
+    } catch {
+      // Ignored: announcement may already be removed
+    }
+  }, 1000);
+}
+
 // Wraps a function `f(...args)` into `f(key)(...args)` that is called at most
 // once every `delay` milliseconds. `f(key).flush()` will cause the function to
 // be called immediately.

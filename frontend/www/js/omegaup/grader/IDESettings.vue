@@ -1,124 +1,145 @@
 <template>
-  <form class="h-100" :class="theme">
-    <div class="form-row">
-      <div class="form-group col-md-4">
-        <label for="inputTimeLimit">{{ T.settingsTimeLimit }}</label>
-        <input
-          v-model.number="timeLimit"
-          class="form-control"
-          max="5.0"
-          min="0.1"
-          step="0.1"
-          type="number"
-        />
+  <div class="settings-panel" :class="theme">
+    <div class="settings-content">
+      <!-- Time Limits -->
+      <div class="settings-section">
+        <h3 class="section-title">Time Limits</h3>
+        <div class="settings-grid">
+          <div class="form-field">
+            <label>Time Limit (seconds)</label>
+            <input
+              v-model.number="timeLimit"
+              class="form-input"
+              type="number"
+              min="0.1"
+              max="5.0"
+              step="0.1"
+            />
+          </div>
+          <div class="form-field">
+            <label>Overall Wall Time (seconds)</label>
+            <input
+              v-model.number="overallWallTimeLimit"
+              class="form-input"
+              type="number"
+              min="0.1"
+              max="5.0"
+              step="0.1"
+            />
+          </div>
+          <div class="form-field">
+            <label>Extra Wall Time (seconds)</label>
+            <input
+              v-model.number="extraWallTime"
+              class="form-input"
+              type="number"
+              min="0.0"
+              max="5.0"
+              step="0.1"
+            />
+          </div>
+        </div>
       </div>
-      <div class="form-group col-md-4">
-        <label for="inputOverallWallTimeLimit">{{
-          T.settingsOverallWallTimeLimit
-        }}</label>
-        <input
-          v-model.number="overallWallTimeLimit"
-          class="form-control"
-          max="5.0"
-          min="0.1"
-          step="0.1"
-          type="number"
-        />
+
+      <!-- Resource Limits -->
+      <div class="settings-section">
+        <h3 class="section-title">Resource Limits</h3>
+        <div class="settings-grid">
+          <div class="form-field">
+            <label>Memory Limit (bytes)</label>
+            <input
+              v-model.number="memoryLimit"
+              class="form-input"
+              type="number"
+              min="33554432"
+              max="1073741824"
+              step="1048576"
+            />
+          </div>
+          <div class="form-field">
+            <label>Output Limit (bytes)</label>
+            <input
+              v-model.number="outputLimit"
+              class="form-input"
+              type="number"
+              min="0"
+              max="104857600"
+              step="1024"
+            />
+          </div>
+        </div>
       </div>
-      <div class="form-group col-md-4">
-        <label for="inputExtraWallTime">{{ T.settingsExtraWallTime }}</label>
-        <input
-          v-model.number="extraWallTime"
-          class="form-control"
-          max="5.0"
-          min="0.0"
-          step="0.1"
-          type="number"
-        />
+
+      <!-- Validator -->
+      <div class="settings-section">
+        <h3 class="section-title">Validator</h3>
+        <div class="settings-grid">
+          <div class="form-field">
+            <label>Validator Type</label>
+            <select v-model="validator" class="form-select">
+              <option value="custom">Custom</option>
+              <option value="literal">Literal</option>
+              <option value="token">Token</option>
+              <option value="token-caseless">Token (Caseless)</option>
+              <option value="token-numeric">Token (Numeric)</option>
+            </select>
+          </div>
+          <div v-if="validator === 'token-numeric'" class="form-field">
+            <label>Tolerance</label>
+            <input
+              v-model.number="tolerance"
+              class="form-input"
+              type="number"
+              min="0"
+              max="1"
+              step="0.000001"
+            />
+          </div>
+          <div v-if="validator === 'custom'" class="form-field">
+            <label>Language</label>
+            <select v-model="validatorLanguage" class="form-select">
+              <option value="cpp17-gcc">C++17 (GCC)</option>
+              <option value="py3">Python 3.6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive -->
+      <div class="settings-section">
+        <h3 class="section-title">Interactive Mode</h3>
+        <div class="settings-grid">
+          <div class="form-field">
+            <label>Enable Interactive</label>
+            <omegaup-radio-switch
+              :value.sync="interactive"
+              :selected-value="interactive"
+              name="interactive"
+            />
+          </div>
+          <div v-if="interactive" class="form-field">
+            <label>Module Name</label>
+            <input
+              v-model="interactiveModuleName"
+              class="form-input"
+              type="text"
+              placeholder="Enter module name"
+            />
+          </div>
+          <div v-if="interactive" class="form-field">
+            <label>Language</label>
+            <select v-model="interactiveLanguage" class="form-select">
+              <option value="cpp17-gcc">C++17 (GCC)</option>
+              <option value="py3">Python</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="inputMemoryLimit">{{ T.settingsMemoryLimit }}</label>
-        <input
-          v-model.number="memoryLimit"
-          class="form-control"
-          max="1073741824"
-          min="33554432"
-          step="1048576"
-          type="number"
-        />
-      </div>
-      <div class="form-group col-md-6">
-        <label for="inputOutputLimit">{{ T.settingsOutputLimit }}</label>
-        <input
-          v-model.number="outputLimit"
-          class="form-control"
-          max="104857600"
-          min="0"
-          step="1024"
-          type="number"
-        />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="inputValidator">{{ T.settingsValidator }}</label>
-        <select v-model="validator" class="form-control">
-          <option value="custom">Custom</option>
-          <option value="literal">Literal</option>
-          <option value="token">Token</option>
-          <option value="token-caseless">Token (Caseless)</option>
-          <option value="token-numeric">Token (Numeric)</option>
-        </select>
-      </div>
-      <div v-if="validator == 'token-numeric'" class="form-group col-md-6">
-        <label for="inputTolerance">{{ T.settingsTolerance }}</label>
-        <input
-          v-model.number="tolerance"
-          class="form-control"
-          max="1"
-          min="0"
-          type="number"
-        />
-      </div>
-      <div v-if="validator == 'custom'" class="form-group col-md-6">
-        <label for="inputValidatorLanguage">{{ T.settingsLanguage }}</label>
-        <select v-model="validatorLanguage" class="form-control">
-          <option value="cpp17-gcc">C++17</option>
-          <option value="py3">Python 3.6</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-4">
-        <label for="inputInteractive">{{ T.settingsInteractive }}</label>
-        <omegaup-radio-switch
-          :value.sync="interactive"
-          :selected-value="interactive"
-          name="interactive"
-        >
-        </omegaup-radio-switch>
-      </div>
-      <div v-if="interactive" class="form-group col-md-4">
-        <label for="inputInteractiveModuleName">{{
-          T.settingsModuleName
-        }}</label>
-        <input v-model="interactiveModuleName" class="form-control" />
-      </div>
-      <div v-if="interactive" class="form-group col-md-4">
-        <label for="inputInteractiveLanguage">{{ T.settingsLanguage }}</label>
-        <select v-model="interactiveLanguage" class="form-control">
-          <option value="cpp17-gcc">C++17</option>
-          <option value="py3">Python</option>
-        </select>
-      </div>
-    </div>
-  </form>
+  </div>
 </template>
 
 <script lang="ts">
-// TODO: use mapGetters, mapMutations and mapActions to get auto complete
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import RadioSwitch from '../components/RadioSwitch.vue';
 import store from './GraderStore';
@@ -144,7 +165,6 @@ export default class IDESettings extends Vue {
   }
 
   set timeLimit(value: number) {
-    // convert back the time in seconds
     store.dispatch('limits', {
       ...store.state.request.input.limits,
       TimeLimit: `${value}s`,
@@ -226,7 +246,6 @@ export default class IDESettings extends Vue {
   }
 
   set interactive(value: boolean) {
-    // radio switch triggers an event value, make sure that value is a boolean
     if (typeof value !== 'boolean') return;
     if (value) store.dispatch('Interactive', {});
     else store.dispatch('Interactive', undefined);
@@ -250,28 +269,148 @@ export default class IDESettings extends Vue {
 }
 </script>
 
-<style lang="scss">
-@import '../../../sass/main.scss';
-form {
+<style lang="scss" scoped>
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #fff;
+  color: #1a1a1a;
+
   &.vs-dark {
-    background: var(--vs-dark-background-color);
-    color: var(--vs-dark-font-color);
+    background: #1e1e1e;
+    color: #d4d4d4;
+  }
+}
 
-    .form-control {
-      background-color: var(--vs-dark-background-color);
-      color: var(--vs-dark-font-color);
-    }
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
 
-    .form-control:focus {
-      border-color: var(--vs-dark-selected-form-border-color);
-      box-shadow: 0 0 0 3px rgba($omegaup-blue, 0.4);
-      background-color: var(--vs-dark-background-color);
-      color: var(--vs-dark-font-color);
+.settings-section {
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+
+  .vs-dark & {
+    color: #e5e5e5;
+    border-bottom-color: #333;
+  }
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #4b5563;
+    margin: 0;
+
+    .vs-dark & {
+      color: #9ca3af;
     }
   }
-  &.vs {
-    background: var(--vs-background-color);
-    color: var(--vs-font-color);
+}
+
+.form-input,
+.form-select {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s;
+  background: #fff;
+  color: #1a1a1a;
+  width: 100%;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .vs-dark & {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #d4d4d4;
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  }
+}
+
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234b5563' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+
+  .vs-dark & {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239ca3af' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  }
+}
+
+/* Number input styling */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Scrollbar styling */
+.settings-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+
+  &:hover {
+    background: #9ca3af;
+  }
+
+  .vs-dark & {
+    background: #404040;
+
+    &:hover {
+      background: #525252;
+    }
   }
 }
 </style>
