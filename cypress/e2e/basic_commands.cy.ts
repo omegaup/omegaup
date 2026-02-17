@@ -82,7 +82,7 @@ describe('Basic Commands Test', () => {
     cy.logout();
   });
 
-  it.only('Should download a recently created problem', () => {
+  it('Should download a recently created problem', () => {
     const loginOptions = loginPage.registerMultipleUsers(1);
     const problemOptions = problemPage.generateProblemOptions(1);
     cy.login(loginOptions[0]);
