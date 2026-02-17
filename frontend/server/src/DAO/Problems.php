@@ -1745,7 +1745,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         FROM Problems p
                         WHERE MATCH(alias, title) AGAINST (? IN BOOLEAN MODE)
                         AND p.visibility >= ?";
-                $argsForBranches[] = [$curatedQuery, $curatedQuery, $visibilityArg];
             }
 
             $args = array_merge(
@@ -1754,7 +1753,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $argsForBranches[2]
             );
             if ($hasFulltextQuery) {
-                $args = array_merge($args, $argsForBranches[3]);
+                $args = array_merge($args, [$curatedQuery, $curatedQuery, $visibilityArg]);
             }
 
             $sql = 'FROM (' . implode(' UNION ALL ', $branches) . ') AS p';
