@@ -468,7 +468,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         );
     }
 
-
     /**
      * Returns a single student's score and progress by problem.
      * Filters by identity_id to avoid fetching all students' data.
