@@ -172,7 +172,6 @@ CREATE TABLE `Clarifications` (
   KEY `author_id` (`author_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `receiver_id` (`receiver_id`),
-  KEY `idx_clarifications_problemset_clarification` (`problemset_id`,`clarification_id` DESC),
   CONSTRAINT `fk_ci_author_id` FOREIGN KEY (`author_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ci_receiver_id` FOREIGN KEY (`receiver_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_cp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
