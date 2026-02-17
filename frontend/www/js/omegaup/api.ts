@@ -358,6 +358,38 @@ export const Clarification = {
   >('/api/clarification/update/'),
 };
 
+export const CodeTemplate = {
+  create: apiCall<
+    messages.CodeTemplateCreateRequest,
+    messages.CodeTemplateCreateResponse
+  >('/api/codeTemplate/create/'),
+  delete: apiCall<
+    messages.CodeTemplateDeleteRequest,
+    messages.CodeTemplateDeleteResponse
+  >('/api/codeTemplate/delete/'),
+  list: apiCall<
+    messages.CodeTemplateListRequest,
+    messages._CodeTemplateListServerResponse,
+    messages.CodeTemplateListResponse
+  >('/api/codeTemplate/list/', (x) => {
+    x.templates = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
+        x.updated_at = ((x: number) => new Date(x * 1000))(x.updated_at);
+        return x;
+      });
+    })(x.templates);
+    return x;
+  }),
+  update: apiCall<
+    messages.CodeTemplateUpdateRequest,
+    messages.CodeTemplateUpdateResponse
+  >('/api/codeTemplate/update/'),
+};
+
 export const Contest = {
   activityReport: apiCall<
     messages.ContestActivityReportRequest,

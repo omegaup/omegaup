@@ -3017,6 +3017,15 @@ export namespace types {
     time: Date;
   }
 
+  export interface CodeTemplate {
+    code: string;
+    created_at: Date;
+    language: string;
+    template_id: number;
+    template_name: string;
+    updated_at: Date;
+  }
+
   export interface CoderOfTheMonth {
     category: string;
     classname: string;
@@ -5377,6 +5386,17 @@ export namespace messages {
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};
 
+  // CodeTemplate
+  export type CodeTemplateCreateRequest = { [key: string]: any };
+  export type CodeTemplateCreateResponse = {};
+  export type CodeTemplateDeleteRequest = { [key: string]: any };
+  export type CodeTemplateDeleteResponse = {};
+  export type CodeTemplateListRequest = { [key: string]: any };
+  export type _CodeTemplateListServerResponse = any;
+  export type CodeTemplateListResponse = { templates: types.CodeTemplate[] };
+  export type CodeTemplateUpdateRequest = { [key: string]: any };
+  export type CodeTemplateUpdateResponse = {};
+
   // Contest
   export type ContestActivityReportRequest = { [key: string]: any };
   export type _ContestActivityReportServerResponse = any;
@@ -6378,6 +6398,21 @@ export namespace controllers {
     update: (
       params?: messages.ClarificationUpdateRequest,
     ) => Promise<messages.ClarificationUpdateResponse>;
+  }
+
+  export interface CodeTemplate {
+    create: (
+      params?: messages.CodeTemplateCreateRequest,
+    ) => Promise<messages.CodeTemplateCreateResponse>;
+    delete: (
+      params?: messages.CodeTemplateDeleteRequest,
+    ) => Promise<messages.CodeTemplateDeleteResponse>;
+    list: (
+      params?: messages.CodeTemplateListRequest,
+    ) => Promise<messages.CodeTemplateListResponse>;
+    update: (
+      params?: messages.CodeTemplateUpdateRequest,
+    ) => Promise<messages.CodeTemplateUpdateResponse>;
   }
 
   export interface Contest {
