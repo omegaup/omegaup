@@ -36,7 +36,7 @@
               >
                 <img
                   src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                  alt="GitHub"
+                  :alt="T.loginGitHubButtonAlt"
                   class="github-icon"
                   height="20"
                   width="20"

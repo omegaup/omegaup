@@ -76,7 +76,7 @@
                 <img
                   class="sponsor-logo"
                   src="/media/homepage/airbnb_logo.svg"
-                  alt="AirbnbLogo"
+                  :alt="T.homepageSponsorAirbnbAlt"
                   width="100"
                 />
               </a>

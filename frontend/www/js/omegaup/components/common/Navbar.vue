@@ -7,14 +7,14 @@
       <div class="container-xl pl-0 pl-xl-3">
         <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
           <img
-            alt="omegaUp"
+            :alt="T.navLogoAlt"
             src="/media/omegaup_curves.png"
             height="20"
             class="d-inline-block"
           />
           <img
             v-show="omegaUpLockDown"
-            alt="lockdown"
+            :alt="T.navLockdownIconAlt"
             title="lockdown"
             :src="lockDownImage"
             :class="{ 'd-inline-block': omegaUpLockDown }"

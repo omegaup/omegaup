@@ -130,7 +130,7 @@
           {
             class: 'img-fluid mx-auto d-block my-4',
             src: '/media/homepage/airbnb_logo.svg',
-            alt: 'airbnbLogo',
+            alt: T.homepageSponsorAirbnbAlt,
             href: 'https://news.airbnb.com/2025-community-fund/',
           },
         ]"
