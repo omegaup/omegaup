@@ -1170,6 +1170,37 @@ export const Course = {
   >('/api/course/updateProblemsOrder/'),
 };
 
+export const GSoC = {
+  createEdition: apiCall<
+    messages.GSoCCreateEditionRequest,
+    messages.GSoCCreateEditionResponse
+  >('/api/gSoC/createEdition/'),
+  createIdea: apiCall<
+    messages.GSoCCreateIdeaRequest,
+    messages.GSoCCreateIdeaResponse
+  >('/api/gSoC/createIdea/'),
+  deleteIdea: apiCall<
+    messages.GSoCDeleteIdeaRequest,
+    messages.GSoCDeleteIdeaResponse
+  >('/api/gSoC/deleteIdea/'),
+  listEditions: apiCall<
+    messages.GSoCListEditionsRequest,
+    messages.GSoCListEditionsResponse
+  >('/api/gSoC/listEditions/'),
+  listIdeas: apiCall<
+    messages.GSoCListIdeasRequest,
+    messages.GSoCListIdeasResponse
+  >('/api/gSoC/listIdeas/'),
+  updateEdition: apiCall<
+    messages.GSoCUpdateEditionRequest,
+    messages.GSoCUpdateEditionResponse
+  >('/api/gSoC/updateEdition/'),
+  updateIdea: apiCall<
+    messages.GSoCUpdateIdeaRequest,
+    messages.GSoCUpdateIdeaResponse
+  >('/api/gSoC/updateIdea/'),
+};
+
 export const Grader = {
   status: apiCall<messages.GraderStatusRequest, messages.GraderStatusResponse>(
     '/api/grader/status/',
