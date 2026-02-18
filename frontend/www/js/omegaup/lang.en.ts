@@ -842,6 +842,8 @@ const translations: { [key: string]: string; } = {
   homepageCompeteSectionTitle: "Compete",
   homepageCreateSectionDescription: "Organize your contest with problems that are available on the platform or create your own problems",
   homepageCreateSectionTitle: "Create",
+  homepageGetStartedTitle: "Getting started with omegaUp",
+  homepageHowItWorks: "HOW IT WORKS",
   homepageSponsorsSectionTitle: "Thanks to our Sponsor",
   homepageTeachSectionDescription: "Track your student's progress through assignments and tests that are automatically assessed",
   homepageTeachSectionTitle: "Teach",
@@ -2294,4 +2296,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };
