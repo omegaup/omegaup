@@ -2,7 +2,8 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "Coder under 13 years can not perform this action.",
   aboutToStart: "You are about to start the contest. Once you click Start Contest your time will begin.",
-  acceptPrivacyPolicy: "I have read and accept the site's [Use and Privacy Policy](%(PrivacyPolicyURL)), as well as the [Code of Conduct](%(CodeofConductPolicyURL)).",
+  acceptCodeOfConduct: "I have read and accept the [Code of Conduct](%(CodeofConductPolicyURL)).",
+  acceptPrivacyPolicy: "I have read and accept the site's [Use and Privacy Policy](%(PrivacyPolicyURL)).",
   accountDeleteCancel: "Cancel",
   accountDeleteConfirmationMessage: "Are you sure you want to delete your account?",
   accountDeleteMessage: "Click the following button if you wish to delete your account and all your personal information from omegaUp. This operation will take place immediately after you confirm that you want to do it and it is not reversible.",
@@ -2294,4 +2295,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };
