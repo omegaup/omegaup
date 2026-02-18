@@ -1,42 +1,56 @@
 <template>
   <div data-arena-wrapper :class="backgroundClass">
     <div class="text-center mt-4 pt-2">
-      <h2 v-if="title !== null" class="mb-4">
+      <h2 v-if="title !== null && !isScrolled" class="mb-4">
         <span>{{ title }}</span>
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
         </slot>
         <slot name="edit-button"></slot>
       </h2>
-      <slot name="clock"><div class="clock">∞</div></slot>
+      <slot v-if="!isScrolled" name="clock"><div class="clock">∞</div></slot>
     </div>
-    <ul class="nav justify-content-center nav-tabs mt-4">
-      <li
-        v-for="tab in availableTabs"
-        :key="tab.name"
-        class="nav-item"
-        role="tablist"
-      >
-        <a
-          :href="`#${tab.name}`"
-          class="nav-link"
-          data-toggle="tab"
-          role="tab"
-          :aria-controls="tab.name"
-          :class="{ active: selectedTab === tab.name }"
-          :aria-selected="selectedTab === tab.name"
-          @click="onTabSelected(tab.name)"
+    <div class="nav-tabs-wrapper">
+      <div v-if="isScrolled && title !== null" class="compact-header">
+        <h2 class="compact-title">
+          <span>{{ title }}</span>
+          <slot name="socket-status">
+            <sup class="socket-status-error" title="WebSocket">✗</sup>
+          </slot>
+          <slot name="edit-button"></slot>
+        </h2>
+        <div class="compact-clock">
+          <slot name="clock"><div class="clock">∞</div></slot>
+        </div>
+      </div>
+      <ul class="nav justify-content-center nav-tabs mt-4">
+        <li
+          v-for="tab in availableTabs"
+          :key="tab.name"
+          class="nav-item"
+          role="tablist"
         >
-          {{ tab.text }}
-          <span
-            v-if="tab.name === 'clarifications' && clarifications.length"
-            :class="{ unread: unreadClarifications }"
-            >({{ clarifications.length }})</span
+          <a
+            :href="`#${tab.name}`"
+            class="nav-link"
+            data-toggle="tab"
+            role="tab"
+            :aria-controls="tab.name"
+            :class="{ active: selectedTab === tab.name }"
+            :aria-selected="selectedTab === tab.name"
+            @click="onTabSelected(tab.name)"
           >
-        </a>
-      </li>
-    </ul>
-    <div class="tab-content">
+            {{ tab.text }}
+            <span
+              v-if="tab.name === 'clarifications' && clarifications.length"
+              :class="{ unread: unreadClarifications }"
+              >({{ clarifications.length }})</span
+            >
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="tab-content" @scroll="onScroll">
       <div
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'problems' }"
@@ -83,6 +97,8 @@ export default class Arena extends Vue {
   T = T;
   selectedTab = this.activeTab;
   clarificationsHaveBeenRead = false;
+  isScrolled = false;
+  scrollThreshold = 50;
 
   get unreadClarifications() {
     return (
@@ -116,6 +132,11 @@ export default class Arena extends Vue {
     return tabs.filter((tab) => tab.visible);
   }
 
+  onScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    this.isScrolled = target.scrollTop > this.scrollThreshold;
+  }
+
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (tabName === 'clarifications') {
@@ -142,7 +163,61 @@ export default class Arena extends Vue {
 [data-arena-wrapper] {
   background: var(--arena-background-color);
   font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+[data-arena-wrapper] > .nav-tabs-wrapper {
+  flex-shrink: 0;
+  position: relative;
+}
+
+[data-arena-wrapper] > .nav-tabs-wrapper > .compact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 1rem;
+  margin-bottom: 0.5rem;
+  transition: opacity 0.2s ease;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+[data-arena-wrapper] > .nav-tabs-wrapper > .compact-header > .compact-title {
+  margin: 0;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+[data-arena-wrapper] > .nav-tabs-wrapper > .compact-header > .compact-clock {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+[data-arena-wrapper]
+  > .nav-tabs-wrapper
+  > .compact-header
+  > .compact-clock
+  .clock {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+[data-arena-wrapper] > .tab-content {
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  position: relative;
+  scrollbar-width: none;
 }
 
 .socket-status-error {
