@@ -204,17 +204,22 @@ export default class GettingStarted extends Vue {
 
   .card-links {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
     margin-top: auto;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.75rem;
+    padding: 0;
+    gap: 0.5rem;
 
     .card-link {
+      margin: 0;
+      padding: 0;
       font-size: 0.85rem;
       color: $omegaup-primary--accent;
       text-decoration: underline;
       font-weight: 500;
+      text-align: left;
+      line-height: 1.2;
       white-space: nowrap;
 
       &:hover {
