@@ -2295,4 +2295,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export { translations as default };
+export {translations as default};
