@@ -63,13 +63,13 @@ export default class ProblemMarkdown extends Vue {
   mounted(): void {
     this.renderMathJax();
     this.injectTemplates();
-    // NOTE: When binding markdown input via <textarea>, use v-model.lazy to ensure
-    // changes from pagedown controls are reflected correctly
+    this.renderMermaid();
   }
 
   @Watch('markdown')
   onMarkdownChanged() {
     this.renderMathJax();
+    this.renderMermaid();
   }
 
   @Emit('rendered')
@@ -164,6 +164,14 @@ export default class ProblemMarkdown extends Vue {
     }
 
     window.MathJax.typeset([this.root]);
+  }
+
+  private async renderMermaid(): Promise<void> {
+    try {
+      await this.markdownConverter.renderMermaidDiagrams(this.root);
+    } catch (error) {
+      console.error('Error rendering Mermaid diagrams:', error);
+    }
   }
 
   private injectTemplates(): void {
@@ -393,6 +401,62 @@ export default class ProblemMarkdown extends Vue {
   img {
     max-width: 100%;
     page-break-inside: avoid;
+  }
+
+  // Styles for Mermaid diagrams
+  .mermaid-diagram {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: var(--markdown-mermaid-background-color);
+    border: 1px solid var(--markdown-mermaid-border-color);
+    border-radius: 4px;
+
+    svg {
+      max-width: 100%;
+      height: auto;
+      display: inline-block;
+      font-family: 'trebuchet ms', verdana, arial, sans-serif;
+      font-size: inherit;
+    }
+
+    // Ensure text elements are visible
+    text {
+      fill: currentColor;
+      font-family: 'trebuchet ms', verdana, arial, sans-serif;
+    }
+
+    .nodeLabel,
+    .edgeLabel {
+      color: var(--markdown-mermaid-text-color);
+      fill: var(--markdown-mermaid-text-color);
+    }
+
+    // Label backgrounds
+    .label {
+      color: var(--markdown-mermaid-text-color);
+      fill: var(--markdown-mermaid-text-color);
+    }
+
+    .labelText {
+      fill: var(--markdown-mermaid-text-color);
+    }
+  }
+
+  .mermaid-error {
+    border: 2px solid var(--markdown-mermaid-error-border-color);
+    background-color: var(--markdown-mermaid-error-background-color);
+  }
+
+  .mermaid-error-message {
+    color: var(--markdown-mermaid-error-text-color);
+    background-color: var(--markdown-mermaid-error-background-color);
+    border: 1px solid var(--markdown-mermaid-error-message-border-color);
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.9rem;
   }
 }
 </style>
