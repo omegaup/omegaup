@@ -126,7 +126,7 @@ export default class GettingStarted extends Vue {
   .section-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--homepage-getting-started-title-color);
     margin: 0;
   }
 }
@@ -146,7 +146,7 @@ export default class GettingStarted extends Vue {
 }
 
 .getting-started-card {
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--homepage-getting-started-card-border-color);
   border-radius: 12px;
   overflow: hidden;
   background-color: $omegaup-white;
@@ -190,13 +190,13 @@ export default class GettingStarted extends Vue {
   .card-title {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--homepage-getting-started-title-color);
     margin-bottom: 0.5rem;
   }
 
   .card-description {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--homepage-getting-started-description-color);
     line-height: 1.5;
     flex-grow: 1;
     margin-bottom: 0.75rem;
@@ -206,6 +206,7 @@ export default class GettingStarted extends Vue {
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-top: auto;
     flex-wrap: wrap;
     gap: 0.25rem 0.75rem;
 
