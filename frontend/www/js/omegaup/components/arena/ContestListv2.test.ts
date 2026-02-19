@@ -359,4 +359,47 @@ describe('ContestListv2.vue', () => {
       });
     },
   );
+
+  it('Should use replaceState on initial mount to avoid extra history entry', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const emittedEvents = wrapper.emitted('fetch-page');
+    expect(emittedEvents).toBeDefined();
+    expect(emittedEvents!.length).toBeGreaterThanOrEqual(1);
+
+    // The first fetch-page event (from mounted → fetchInitialContests) should
+    // have replaceState: true so we don't create an extra history entry
+    const initialFetchParams = emittedEvents![0][0].params;
+    expect(initialFetchParams.replaceState).toBe(true);
+  });
+
+  it('Should use pushState (replaceState: false) for subsequent user interactions', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    // Clear emitted events from initial mount
+    const initialEvents = wrapper.emitted('fetch-page');
+    expect(initialEvents).toBeDefined();
+    const initialCount = initialEvents!.length;
+
+    // Simulate a user clicking a different tab
+    wrapper.vm.currentTab = ContestTab.Future;
+    await wrapper.vm.$nextTick();
+
+    const allEvents = wrapper.emitted('fetch-page');
+    expect(allEvents!.length).toBeGreaterThan(initialCount);
+
+    // The fetch-page event from the tab change should NOT use replaceState
+    const tabChangeParams = allEvents![allEvents!.length - 1][0].params;
+    expect(tabChangeParams.replaceState).toBe(false);
+  });
 });
