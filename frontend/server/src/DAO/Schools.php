@@ -216,7 +216,7 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
                     u.main_identity_id
             ) AS oc ON oc.identity_id = members.identity_id
         ORDER BY
-            members.username;';
+            members.identity_id;';
 
         /** @var list<array{classname: string, created_problems: int, organized_contests: int, solved_problems: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
