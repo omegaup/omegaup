@@ -4,11 +4,16 @@
       <h3 class="card-title mb-0">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body px-2 px-sm-4">
+      <div class="required-fields-legend">{{ T.wordsRequiredField }}</div>
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-course-name"
-              >{{ T.wordsName }}
+            <label class="font-weight-bold w-100 introjs-course-name">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isNameComplete }"
+                >{{ T.wordsName }}</span
+              >
               <input
                 v-model="name"
                 :disabled="readOnly"
@@ -17,11 +22,21 @@
                 data-course-new-name
                 type="text"
                 required="required"
+                :maxlength="MAX_LENGTH.name"
             /></label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': isExceedingName }"
+              >{{ name.length }}/{{ MAX_LENGTH.name }}</small
+            >
           </div>
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-short-title"
-              >{{ T.courseNewFormShortTitleAlias }}
+            <label class="font-weight-bold w-100 introjs-short-title">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isAliasComplete }"
+                >{{ T.courseNewFormShortTitleAlias }}</span
+              >
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
                 icon="info-circle" />
@@ -35,7 +50,13 @@
                 data-course-new-alias
                 :disabled="update || readOnly"
                 required="required"
+                :maxlength="MAX_LENGTH.alias"
             /></label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': isExceedingAlias }"
+              >{{ alias.length }}/{{ MAX_LENGTH.alias }}</small
+            >
           </div>
           <div class="form-group col-md-4 introjs-scoreboard">
             <span class="font-weight-bold"
@@ -101,8 +122,12 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="font-weight-bold w-100 introjs-school"
-              >{{ T.profileSchool }}
+            <label class="font-weight-bold w-100 introjs-school">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isSchoolComplete }"
+                >{{ T.profileSchool }}</span
+              >
               <omegaup-common-typeahead
                 :existing-options="searchResultSchools"
                 :options="searchResultSchools"
@@ -183,7 +208,13 @@
             </select>
           </div>
           <div class="form-group col-md-6 introjs-language">
-            <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
+            <label class="font-weight-bold w-100">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isLanguagesComplete }"
+                >{{ T.wordsLanguages }}</span
+              >
+            </label>
             <div
               :class="{
                 'is-invalid-wrapper': invalidParameterName === 'languages',
@@ -196,7 +227,7 @@
                 :multiple="true"
                 :placeholder="T.courseNewFormLanguages"
                 :close-on-select="false"
-                :allow-empty="true"
+                @select="onSelect"
               >
               </vue-multiselect>
             </div>
@@ -220,12 +251,22 @@
                 }"
                 cols="30"
                 rows="5"
+                :maxlength="MAX_LENGTH.objective"
               ></textarea>
             </label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': isExceedingObjective }"
+              >{{ (objective || '').length }}/{{ MAX_LENGTH.objective }}</small
+            >
           </div>
           <div class="form-group container-fluid col-md-6">
-            <label class="font-weight-bold w-100 introjs-description"
-              >{{ T.courseNewFormDescription }}
+            <label class="font-weight-bold w-100 introjs-description">
+              <span
+                class="field-required"
+                :class="{ 'is-complete': isDescriptionComplete }"
+                >{{ T.courseNewFormDescription }}</span
+              >
               <textarea
                 v-model="description"
                 :disabled="readOnly"
@@ -237,8 +278,14 @@
                 cols="30"
                 rows="5"
                 required="required"
+                :maxlength="MAX_LENGTH.description"
               ></textarea>
             </label>
+            <small
+              class="character-counter"
+              :class="{ 'text-danger': isExceedingDescription }"
+              >{{ description.length }}/{{ MAX_LENGTH.description }}</small
+            >
           </div>
         </div>
         <div v-if="!readOnly" class="row">
@@ -299,6 +346,15 @@ const levelOptions = [
   },
 ];
 
+const MAX_LENGTH = {
+  name: 100,
+  alias: 32,
+  description: 255,
+  objective: 500,
+};
+
+const DANGER_THRESHOLD_PERCENTAGE = 0.9;
+
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
@@ -334,6 +390,51 @@ export default class CourseDetails extends Vue {
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
   levelOptions = levelOptions;
+  MAX_LENGTH = MAX_LENGTH;
+
+  // Computed properties to track if required fields are complete
+  get isNameComplete(): boolean {
+    return this.name !== null && this.name.trim().length > 0;
+  }
+
+  get isAliasComplete(): boolean {
+    return this.alias !== null && this.alias.trim().length > 0;
+  }
+
+  get isSchoolComplete(): boolean {
+    return this.school !== null && this.school.key !== undefined;
+  }
+
+  get isLanguagesComplete(): boolean {
+    return (this.selectedLanguages?.length ?? 0) > 0;
+  }
+
+  get isDescriptionComplete(): boolean {
+    return this.description !== null && this.description.trim().length > 0;
+  }
+
+  // Computed properties for character limit danger thresholds
+  get isExceedingName(): boolean {
+    return this.name.length > MAX_LENGTH.name * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingAlias(): boolean {
+    return this.alias.length > MAX_LENGTH.alias * DANGER_THRESHOLD_PERCENTAGE;
+  }
+
+  get isExceedingDescription(): boolean {
+    return (
+      this.description.length >
+      MAX_LENGTH.description * DANGER_THRESHOLD_PERCENTAGE
+    );
+  }
+
+  get isExceedingObjective(): boolean {
+    return (
+      (this.objective || '').length >
+      MAX_LENGTH.objective * DANGER_THRESHOLD_PERCENTAGE
+    );
+  }
 
   mounted() {
     const title = T.createCourseInteractiveGuideTitle;
@@ -476,6 +577,11 @@ export default class CourseDetails extends Vue {
     this.$emit('submit', request);
   }
 
+  onSelect(): void {
+    // Clear the languages validation error when a language is selected
+    this.$emit('clear-language-error');
+  }
+
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
@@ -494,5 +600,13 @@ export default class CourseDetails extends Vue {
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
   border-color: var(--form-input-error-color);
+}
+
+.character-counter {
+  display: block;
+  text-align: right;
+  color: var(--form-character-counter-color, #6c757d);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 </style>

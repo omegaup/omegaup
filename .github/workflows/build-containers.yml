@@ -6,12 +6,18 @@ on:
       - main
       - release
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Extract branch name
         shell: bash

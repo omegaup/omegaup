@@ -120,7 +120,8 @@ services:
       - '6060'
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.34
+    platform: linux/amd64
     restart: always
     environment:
       MYSQL_DATABASE: 'omegaup'
