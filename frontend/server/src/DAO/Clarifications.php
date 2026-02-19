@@ -24,38 +24,9 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         int $rowcount
     ): array {
         if (!is_null($contest)) {
-            $sqlProblemsets = '
-            SELECT
-                problemset_id,
-                "" AS assignment_alias
+            $sqlFrom = '
             FROM
-                Problemsets
-            WHERE
-                contest_id = ?
-            ';
-            $params = [$contest->contest_id];
-        } elseif (!is_null($course)) {
-            $sqlProblemsets = '
-            SELECT
-                problemset_id,
-                alias AS assignment_alias
-            FROM
-                Assignments
-            WHERE
-                course_id = ?
-            ';
-            $params = [$course->course_id];
-        } else {
-            // This shouldn't happen!
-            return [
-                'totalRows' => 0,
-                'clarifications' => [],
-            ];
-        }
-
-        $sqlFrom = "
-            FROM
-                ($sqlProblemsets) ps
+                Problemsets ps
             INNER JOIN
                 Clarifications cl ON cl.problemset_id = ps.problemset_id
             INNER JOIN
@@ -64,7 +35,35 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 Identities r ON r.identity_id = cl.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = cl.problem_id
-            ";
+            WHERE
+                ps.contest_id = ?
+            ';
+            $assignmentAlias = '"" AS assignment_alias';
+            $params = [$contest->contest_id];
+        } elseif (!is_null($course)) {
+            $sqlFrom = '
+            FROM
+                Assignments a
+            INNER JOIN
+                Clarifications cl ON cl.problemset_id = a.problemset_id
+            INNER JOIN
+                Identities i ON i.identity_id = cl.author_id
+            LEFT JOIN
+                Identities r ON r.identity_id = cl.receiver_id
+            INNER JOIN
+                Problems p ON p.problem_id = cl.problem_id
+            WHERE
+                a.course_id = ?
+            ';
+            $assignmentAlias = 'a.alias AS assignment_alias';
+            $params = [$course->course_id];
+        } else {
+            // This shouldn't happen!
+            return [
+                'totalRows' => 0,
+                'clarifications' => [],
+            ];
+        }
 
         if (!$isAdmin) {
             $sqlFrom .= '
@@ -88,10 +87,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 COUNT(*)
         ';
 
-        $sql = '
+        $sql = "
             SELECT
                 cl.clarification_id,
-                ps.assignment_alias AS assignment_alias,
+                {$assignmentAlias},
                 p.alias AS problem_alias,
                 i.username AS author,
                 r.username AS receiver,
@@ -99,7 +98,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 cl.answer,
                 cl.`time`,
                 cl.public
-        ';
+        ";
 
         $query = $sql . $sqlFrom;
         $countQuery = $sqlCount . $sqlFrom;
