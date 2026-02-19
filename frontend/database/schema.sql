@@ -704,6 +704,7 @@ CREATE TABLE `Problems` (
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
+  KEY `idx_problems_visibility_difficulty` (`visibility`,`difficulty`),
   KEY `idx_quality_seal` (`quality_seal`),
   KEY `idx_problems_title` (`title`),
   KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
