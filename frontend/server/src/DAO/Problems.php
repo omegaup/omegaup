@@ -1699,62 +1699,64 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $groupByClause = '';
         $orderByClause = '';
 
+        $visibilityArg = max(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            $minVisibility
+        );
+
         if (in_array($searchType, ['alias', 'title', 'problem_id'])) {
-            $args[] = $query;
+            $args = [$query, $visibilityArg];
             $select .= ' 1.0 AS relevance
             ';
             $sql = "FROM
                         Problems p
                     WHERE
-                        p.{$searchType} = ?";
+                        p.{$searchType} = ?
+                        AND p.visibility >= ?";
         } else {
-            $args = array_fill(0, 5, $query);
             $curatedQuery = preg_replace('/\W+/', ' ', $query);
-            $args = array_merge($args, array_fill(0, 2, $curatedQuery));
+            $hasFulltextQuery = strlen(trim($curatedQuery)) >= 3;
+
             $select .= ' IFNULL(SUM(relevance), 0.0) AS relevance
             ';
-            $sql = "FROM
-                    (
-                        SELECT
-                            {$fields},
-                            2.0 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            alias = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            1.0 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            title = ?
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            0.1 AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            (
-                                title LIKE CONCAT('%', ?, '%') OR
-                                alias LIKE CONCAT('%', ?, '%') OR
-                                problem_id = ?
-                            )
-                        UNION ALL
-                        SELECT
-                            {$fields},
-                            IFNULL(
-                                MATCH(alias, title)
-                                AGAINST (? IN BOOLEAN MODE), 0.0
-                            ) AS relevance
-                        FROM
-                            Problems p
-                        WHERE
-                            MATCH(alias, title)
-                            AGAINST (? IN BOOLEAN MODE)
-                    ) AS p";
+            $aliasBranch = "SELECT {$fields}, 2.0 AS relevance
+                        FROM Problems p
+                        WHERE alias = ? AND p.visibility >= ?";
+            $titleBranch = "SELECT {$fields}, 1.0 AS relevance
+                        FROM Problems p
+                        WHERE title = ? AND p.visibility >= ?";
+            $likeBranch = "SELECT {$fields}, 0.1 AS relevance
+                        FROM Problems p
+                        WHERE (title LIKE CONCAT('%', ?, '%') OR
+                               alias LIKE CONCAT('%', ?, '%') OR
+                               problem_id = ?)
+                        AND p.visibility >= ?";
+
+            $branches = [$aliasBranch, $titleBranch, $likeBranch];
+            $argsForBranches = [
+                [$query, $visibilityArg],
+                [$query, $visibilityArg],
+                [$query, $query, $query, $visibilityArg],
+            ];
+
+            if ($hasFulltextQuery) {
+                $branches[] = "SELECT {$fields},
+                            IFNULL(MATCH(alias, title) AGAINST (? IN BOOLEAN MODE), 0.0) AS relevance
+                        FROM Problems p
+                        WHERE MATCH(alias, title) AGAINST (? IN BOOLEAN MODE)
+                        AND p.visibility >= ?";
+            }
+
+            $args = array_merge(
+                $argsForBranches[0],
+                $argsForBranches[1],
+                $argsForBranches[2]
+            );
+            if ($hasFulltextQuery) {
+                $args = array_merge($args, [$curatedQuery, $curatedQuery, $visibilityArg]);
+            }
+
+            $sql = 'FROM (' . implode(' UNION ALL ', $branches) . ') AS p';
             $groupByClause = "
                         GROUP BY {$fields}
             ";
