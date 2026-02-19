@@ -3110,10 +3110,12 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    maintenanceMessage?: types.MaintenanceMessage;
     mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
+    preferredLanguage: string;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -4007,10 +4009,25 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    githubClientId?: string;
+    githubState?: string;
     hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
+  }
+
+  export interface MaintenanceMessage {
+    message: string;
+    type: string;
+  }
+
+  export interface MaintenanceModeStatus {
+    enabled: boolean;
+    message_en?: string;
+    message_es?: string;
+    message_pt?: string;
+    type: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -4019,6 +4036,12 @@ export namespace types {
     place?: number;
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface MessageLanguages {
+    en: string;
+    es: string;
+    pt: string;
   }
 
   export interface NavbarProblemsetProblem {
@@ -4105,6 +4128,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PredefinedTemplate {
+    id: string;
+    message: types.MessageLanguages;
+    title: types.MessageLanguages;
+    type: string;
   }
 
   export interface PrivacyPolicyDetailsPayload {
@@ -4973,6 +5003,8 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -5245,6 +5277,8 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5259,6 +5293,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6249,9 +6285,15 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
   }
 
   export interface AiEditorial {

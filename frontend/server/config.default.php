@@ -115,6 +115,15 @@ try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
 try_define('OMEGAUP_GOOGLE_CLIENTID', 'xxxxx');
 
 # ####################################
+# GITHUB LOGIN CONFIG
+# ####################################
+try_define('OMEGAUP_GITHUB_CLIENT_ID', 'xxxxx');
+try_define(
+    'OMEGAUP_GITHUB_CLIENT_SECRET',
+    'xxxxx'
+);
+
+# ####################################
 # GOOGLE ANALYTICS
 # ####################################
 try_define('OMEGAUP_GA_TRACK', false);

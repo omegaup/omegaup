@@ -6,9 +6,10 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentMarkdown"
+            v-model="currentMarkdown"
             data-problem-creator-editor-markdown
             class="wmd-input"
+            @change="currentMarkdown = $event.target.value"
             @paste="handlePaste"
             @drop="handleDrop"
           ></textarea>
@@ -45,8 +46,7 @@ import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../../../markdown';
 import T from '../../../../lang';
 import * as ui from '../../../../ui';
-
-import omegaup_problemMarkdown from '../../ProblemMarkdown.vue';
+import ProblemMarkdown from '../../ProblemMarkdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -54,7 +54,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_problemMarkdown,
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class StatementTab extends Vue {

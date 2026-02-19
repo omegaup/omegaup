@@ -105,7 +105,7 @@
                   rel="tooltip"
                   :title="T.wordsPointsForRank"
                   :data-original-title="T.wordsPointsForRankTooltip"
-                  ><img src="/media/question.png"
+                  ><img src="/media/question.png" :alt="T.wordsPointsForRank"
                 /></a>
                 <omegaup-common-sort-controls
                   column="points"
