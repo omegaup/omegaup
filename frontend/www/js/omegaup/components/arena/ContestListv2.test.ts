@@ -368,13 +368,15 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const emittedEvents = wrapper.emitted('fetch-page');
+    const emittedEvents = wrapper.emitted('fetch-page') as Array<
+      Array<{ params: { replaceState: boolean } }>
+    >;
     expect(emittedEvents).toBeDefined();
-    expect(emittedEvents!.length).toBeGreaterThanOrEqual(1);
+    expect(emittedEvents.length).toBeGreaterThanOrEqual(1);
 
     // The first fetch-page event (from mounted → fetchInitialContests) should
     // have replaceState: true so we don't create an extra history entry
-    const initialFetchParams = emittedEvents![0][0].params;
+    const initialFetchParams = emittedEvents[0][0].params;
     expect(initialFetchParams.replaceState).toBe(true);
   });
 
@@ -386,20 +388,24 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    // Clear emitted events from initial mount
-    const initialEvents = wrapper.emitted('fetch-page');
+    // Get emitted events from initial mount
+    const initialEvents = wrapper.emitted('fetch-page') as Array<
+      Array<{ params: { replaceState: boolean } }>
+    >;
     expect(initialEvents).toBeDefined();
-    const initialCount = initialEvents!.length;
+    const initialCount = initialEvents.length;
 
     // Simulate a user clicking a different tab
-    wrapper.vm.currentTab = ContestTab.Future;
+    (wrapper.vm as unknown as { currentTab: ContestTab }).currentTab = ContestTab.Future;
     await wrapper.vm.$nextTick();
 
-    const allEvents = wrapper.emitted('fetch-page');
-    expect(allEvents!.length).toBeGreaterThan(initialCount);
+    const allEvents = wrapper.emitted('fetch-page') as Array<
+      Array<{ params: { replaceState: boolean } }>
+    >;
+    expect(allEvents.length).toBeGreaterThan(initialCount);
 
     // The fetch-page event from the tab change should NOT use replaceState
-    const tabChangeParams = allEvents![allEvents!.length - 1][0].params;
+    const tabChangeParams = allEvents[allEvents.length - 1][0].params;
     expect(tabChangeParams.replaceState).toBe(false);
   });
 });
