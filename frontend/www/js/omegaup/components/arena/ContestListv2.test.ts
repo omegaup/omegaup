@@ -396,7 +396,8 @@ describe('ContestListv2.vue', () => {
     const initialCount = initialEvents.length;
 
     // Simulate a user clicking a different tab
-    (wrapper.vm as unknown as { currentTab: ContestTab }).currentTab = ContestTab.Future;
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Future;
     await wrapper.vm.$nextTick();
 
     const allEvents = wrapper.emitted('fetch-page') as Array<
