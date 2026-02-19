@@ -128,7 +128,11 @@
                 :class="{ 'is-complete': isSchoolComplete }"
                 >{{ T.profileSchool }}</span
               >
-              <div :class="{ 'is-invalid-school': invalidParameterName === 'school' }">
+              <div
+                :class="{
+                  'is-invalid-school': invalidParameterName === 'school',
+                }"
+              >
                 <omegaup-common-typeahead
                   :existing-options="searchResultSchools"
                   :options="searchResultSchools"
