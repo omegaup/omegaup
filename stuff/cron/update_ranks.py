@@ -626,14 +626,10 @@ def update_users_stats(
         except:  # noqa: bare-except
             logging.exception('Failed to update authors ranking')
             raise
-        # We update both the general rank and the author's rank in the same
-        # transaction since both are stored in the same DB table.
-        dbconn.commit()
 
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, 'all',
                                                  args)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to update candidates to coder of the month')
@@ -642,15 +638,18 @@ def update_users_stats(
         try:
             update_coder_of_the_month_candidates(cur, cur_readonly, 'female',
                                                  args)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception(
                 'Failed to update candidates to coder of the month female')
             raise
 
+        # Commit all user stats and coder of the month updates atomically.
+        dbconn.commit()
         logging.info('Users stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all users stats')
+        dbconn.rollback()
+        raise
 
 
 def update_schools_stats(
