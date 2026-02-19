@@ -95,7 +95,11 @@ function validateCriticalSecrets(): void {
         ))
     );
 
-    error_log($message);
+    if (\Monolog\Registry::hasLogger('omegaup')) {
+        \Monolog\Registry::getLogger('omegaup')->error($message);
+    } else {
+        error_log($message);
+    }
 
     if (class_exists(\OmegaUp\NewRelicHelper::class)) {
         \OmegaUp\NewRelicHelper::noticeError($message);
@@ -142,8 +146,6 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     }
     require_once(__DIR__ . '/config.php');
     require_once(__DIR__ . '/config.default.php');
-
-    validateCriticalSecrets();
 }
 
 if (!defined('OMEGAUP_LOCKDOWN')) {
@@ -243,3 +245,8 @@ if (class_exists('\NewRelic\Monolog\Enricher\Processor')) {
 $rootLogger->pushHandler($logHandler);
 \Monolog\Registry::addLogger($rootLogger);
 \Monolog\ErrorHandler::register($rootLogger);
+
+/** @psalm-suppress RedundantCondition IS_TEST may be defined as true in tests. */
+if (!defined('IS_TEST') || IS_TEST !== true) {
+    validateCriticalSecrets();
+}
