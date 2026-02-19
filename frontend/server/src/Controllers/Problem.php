@@ -456,6 +456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentityIsOver13();
 
         // Rate limit: 20 problem creations per hour per user.
