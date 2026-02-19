@@ -139,7 +139,9 @@ export default class UserNextRegisteredContest extends Vue {
   }
 
   get startTimeLink(): string {
-    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
+    return `${getExternalUrl(
+      'TimeAndDateBaseURL',
+    )}?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
   }
 
   get isContestStarted(): boolean {

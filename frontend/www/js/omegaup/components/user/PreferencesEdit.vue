@@ -2,12 +2,7 @@
   <form role="form" class="card-body" @submit.prevent="onUpdateUserPreferences">
     <div class="form-group">
       <label>{{ T.userEditProfileImage }}</label>
-      <a
-        :href="GravatarURL"
-        target="_blank"
-        data-email
-        class="btn btn-link"
-      >
+      <a :href="GravatarURL" target="_blank" data-email class="btn btn-link">
         {{ T.userEditGravatar }} {{ email }}
       </a>
     </div>
