@@ -144,73 +144,84 @@ class Schools extends \OmegaUp\DAO\Base\Schools {
     ): array {
         $sql = '
         SELECT
-            IFNULL(i.username, "") AS `username`,
+            IFNULL(members.username, "") AS `username`,
             IFNULL(ur.classname, "user-rank-unranked") AS classname,
-            IFNULL(
-                (
-                    SELECT
-                        COUNT(DISTINCT Problems.problem_id)
-                    FROM
-                        Users
-                    INNER JOIN
-                        ACLs ON ACLs.owner_id = Users.user_id
-                    INNER JOIN
-                        Problems ON Problems.acl_id = ACLs.acl_id
-                    WHERE
-                        Problems.visibility = ? AND
-                        Users.main_identity_id = i.identity_id
-                ),
-                0
-            ) AS created_problems,
-            IFNULL(
-                (
-                    SELECT
-                        COUNT(DISTINCT Problems.problem_id)
-                    FROM
-                        Problems
-                    INNER JOIN
-                        Submissions ON Submissions.problem_id = Problems.problem_id
-                    INNER JOIN
-                        Runs ON Runs.run_id = Submissions.current_run_id
-                    WHERE
-                        Runs.verdict = "AC"
-                        AND Submissions.identity_id = i.identity_id
-                        AND Submissions.type = "normal"
-                ),
-                0
-            ) AS solved_problems,
-            IFNULL(
-                (
-                    SELECT
-                        COUNT(DISTINCT Contests.contest_id)
-                    FROM
-                        Contests
-                    INNER JOIN
-                        ACLs ON ACLs.acl_id = Contests.acl_id
-                    INNER JOIN
-                        Users ON Users.user_id = ACLs.owner_id
-                    INNER JOIN
-                        Problemsets ON Problemsets.problemset_id = Contests.problemset_id
-                    WHERE
-                        Users.main_identity_id = i.identity_id
-                ),
-                0
-            ) AS organized_contests
+            IFNULL(cp.created_count, 0) AS created_problems,
+            IFNULL(sp.solved_count, 0) AS solved_problems,
+            IFNULL(oc.organized_count, 0) AS organized_contests
         FROM
-            Schools sc
-        INNER JOIN
-            Identities_Schools isc ON isc.school_id = sc.school_id
-        INNER JOIN
-            Identities i ON i.current_identity_school_id = isc.identity_school_id
+            (
+                SELECT
+                    i.identity_id,
+                    i.username,
+                    i.user_id
+                FROM
+                    Schools sc
+                INNER JOIN
+                    Identities_Schools isc ON isc.school_id = sc.school_id
+                INNER JOIN
+                    Identities i ON i.current_identity_school_id = isc.identity_school_id
+                WHERE
+                    sc.school_id = ?
+            ) AS members
         LEFT JOIN
-            User_Rank ur ON ur.user_id = i.user_id
-        WHERE
-            sc.school_id = ?;';
+            User_Rank ur ON ur.user_id = members.user_id
+        LEFT JOIN
+            (
+                SELECT
+                    u.main_identity_id AS identity_id,
+                    COUNT(DISTINCT p.problem_id) AS created_count
+                FROM
+                    Users u
+                INNER JOIN
+                    ACLs a ON a.owner_id = u.user_id
+                INNER JOIN
+                    Problems p ON p.acl_id = a.acl_id
+                WHERE
+                    p.visibility = ?
+                GROUP BY
+                    u.main_identity_id
+            ) AS cp ON cp.identity_id = members.identity_id
+        LEFT JOIN
+            (
+                SELECT
+                    s.identity_id,
+                    COUNT(DISTINCT p.problem_id) AS solved_count
+                FROM
+                    Problems p
+                INNER JOIN
+                    Submissions s ON s.problem_id = p.problem_id
+                INNER JOIN
+                    Runs r ON r.run_id = s.current_run_id
+                WHERE
+                    r.verdict = "AC"
+                    AND s.type = "normal"
+                GROUP BY
+                    s.identity_id
+            ) AS sp ON sp.identity_id = members.identity_id
+        LEFT JOIN
+            (
+                SELECT
+                    u.main_identity_id AS identity_id,
+                    COUNT(DISTINCT c.contest_id) AS organized_count
+                FROM
+                    Contests c
+                INNER JOIN
+                    ACLs a ON a.acl_id = c.acl_id
+                INNER JOIN
+                    Users u ON u.user_id = a.owner_id
+                INNER JOIN
+                    Problemsets ps ON ps.problemset_id = c.problemset_id
+                GROUP BY
+                    u.main_identity_id
+            ) AS oc ON oc.identity_id = members.identity_id
+        ORDER BY
+            members.username;';
 
         /** @var list<array{classname: string, created_problems: int, organized_contests: int, solved_problems: int, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $schoolId]
+            [$schoolId, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC]
         );
     }
 
