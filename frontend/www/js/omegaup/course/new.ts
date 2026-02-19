@@ -91,6 +91,9 @@ OmegaUp.on('ready', () => {
             window.location.href = '/course/';
           },
           'update-search-result-schools': (query: string) => {
+            if (this.invalidParameterName === 'school') {
+              this.invalidParameterName = '';
+            }
             api.School.list({ query })
               .then(({ results }) => {
                 if (!results.length) {
