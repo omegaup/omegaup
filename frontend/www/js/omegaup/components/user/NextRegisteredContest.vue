@@ -99,6 +99,7 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import omegaup_Countdown from '../Countdown.vue';
 import { omegaup } from '../../omegaup';
+import { getExternalUrl } from '../../urlHelper';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -138,7 +139,7 @@ export default class UserNextRegisteredContest extends Vue {
   }
 
   get startTimeLink(): string {
-    return `https://timeanddate.com/worldclock/fixedtime.html?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
+    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${this.nextRegisteredContest.start_time.toISOString()}`;
   }
 
   get isContestStarted(): boolean {

@@ -3,7 +3,7 @@
     <div class="form-group">
       <label>{{ T.userEditProfileImage }}</label>
       <a
-        href="https://www.gravatar.com"
+        :href="GravatarURL"
         target="_blank"
         data-email
         class="btn btn-link"
@@ -146,6 +146,7 @@ import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { getExternalUrl } from '../../urlHelper';
 
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -189,6 +190,10 @@ export default class UserPreferencesEdit extends Vue {
       return this.T.userObjectivesModalDescriptionTeaching;
     }
     return T.userObjectivesModalDescriptionUsage;
+  }
+
+  get GravatarURL(): string {
+    return getExternalUrl('GravatarURL');
   }
 
   get learningTeachingObjective(): string {

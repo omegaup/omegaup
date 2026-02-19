@@ -95,6 +95,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
+import { getExternalUrl } from '../../urlHelper';
 
 @Component
 export default class FilteredList extends Vue {
@@ -156,7 +157,7 @@ export default class FilteredList extends Vue {
   }
 
   getTimeLink(time: string): string {
-    return `https://timeanddate.com/worldclock/fixedtime.html?iso=${time}`;
+    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time}`;
   }
 }
 </script>
