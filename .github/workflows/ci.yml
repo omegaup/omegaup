@@ -175,12 +175,15 @@ jobs:
             --long-progress \
             --show-info=false
 
+      # continue-on-error: CI passes when CODECOV_TOKEN is missing or upload fails; remove once secret is added and stable
       - name: Upload code coverage
-        run: |
-          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
-          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
-          chmod +x codecov
-          ./codecov
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
+        continue-on-error: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: php
+          fail_ci_if_error: false
+          handle_no_reports_found: true
 
       - name: Upload artifacts
         if: ${{ always() }}
@@ -212,12 +215,15 @@ jobs:
       - name: Run JavaScript tests
         run: yarn test:coverage
 
+      # continue-on-error: CI passes when CODECOV_TOKEN is missing or upload fails; remove once secret is added and stable
       - name: Upload code coverage
-        run: |
-          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
-          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
-          chmod +x codecov
-          ./codecov
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
+        continue-on-error: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: javascript
+          fail_ci_if_error: false
+          handle_no_reports_found: true
 
   lint:
     runs-on: ubuntu-22.04
