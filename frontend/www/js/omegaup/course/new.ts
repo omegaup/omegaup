@@ -60,6 +60,7 @@ OmegaUp.on('ready', () => {
                   })
                   .catch((error) => {
                     ui.apiError(error);
+                    this.invalidParameterName = 'school';
                   });
               } else {
                 reject(new Error(T.schoolNotSelected));
@@ -83,6 +84,7 @@ OmegaUp.on('ready', () => {
               })
               .catch((error) => {
                 ui.error(error.message);
+                this.invalidParameterName = 'school';
               });
           },
           cancel: () => {

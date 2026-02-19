@@ -128,15 +128,17 @@
                 :class="{ 'is-complete': isSchoolComplete }"
                 >{{ T.profileSchool }}</span
               >
-              <omegaup-common-typeahead
-                :existing-options="searchResultSchools"
-                :options="searchResultSchools"
-                :readonly="readOnly"
-                :value.sync="school"
-                @update-existing-options="
-                  (query) => $emit('update-search-result-schools', query)
-                "
-              ></omegaup-common-typeahead>
+              <div :class="{ 'is-invalid-school': invalidParameterName === 'school' }">
+                <omegaup-common-typeahead
+                  :existing-options="searchResultSchools"
+                  :options="searchResultSchools"
+                  :readonly="readOnly"
+                  :value.sync="school"
+                  @update-existing-options="
+                    (query) => $emit('update-search-result-schools', query)
+                  "
+                ></omegaup-common-typeahead>
+              </div>
             </label>
           </div>
           <div class="form-group col-md-4 introjs-basic-information">
@@ -599,6 +601,11 @@ export default class CourseDetails extends Vue {
 
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .is-invalid-wrapper ::v-deep .multiselect__tags {
+  border-color: var(--form-input-error-color);
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.is-invalid-school ::v-deep .tags-input-wrapper-default {
   border-color: var(--form-input-error-color);
 }
 
