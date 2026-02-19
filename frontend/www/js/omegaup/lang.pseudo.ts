@@ -170,6 +170,7 @@ const translations: { [key: string]: string; } = {
   banningDeclinedByReviewer: "(Banning d3c1in3d by r3vi3w3r.)",
   banningProblemDueToReport: "(Banning pr0b13m du3 70 acc0un7 r3p0r7.)",
   birthdayInTheFuture: "(Y0u ar3 n07 01d 3n0ugh 70 u53 0m3gaUp)",
+  bookmarkedProblems: "(B00kmark3d Pr0b13m5)",
   bulkOperationError: "(Th3r3 wa5 an 3rr0r 3x3cu7ing 7h3 0p3ra7i0n)",
   bulkUserAddError: "(Th3r3 wa5 an 3rr0r adding acc0un75. Th3 f0110wing 3mai1 addr35535 w3r3 n07 f0und in 0m3gaUp:<br><br><b>%(userEmail)</b>.<br><br>H0w3v3r, 7h3 r357 0f acc0un75 hav3 b33n add3d 5ucc355fu11y.)",
   bulkUserAddSuccess: "(Acc0un75 5ucc355fu11y add3d!)",
