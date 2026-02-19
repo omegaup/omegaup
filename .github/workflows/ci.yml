@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -39,7 +42,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0.23
+        image: mysql:8.0.34
         ports:
           - 13306:13306
         env:
@@ -205,6 +208,12 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Install yarn dependencies
         run: yarn install

@@ -6,6 +6,7 @@
     <div class="card-body">
       <div class="row justify-content-md-center">
         <div class="col-md-5 mx-2 login-section">
+        <div class="col-md-4 col-md-offset-2 introjs-federated">
           <h4>{{ T.loginFederated }}</h4>
           <div class="row">
             <div class="col-xs-12 text-left py-2 pl-3">
@@ -17,7 +18,7 @@
                 data-auto_prompt="false"
               ></div>
               <div
-                class="g_id_signin"
+                class="g_id_signin introjs-google"
                 data-type="standard"
                 data-size="large"
                 data-theme="outline"
@@ -28,7 +29,7 @@
               <!-- id-lint on -->
               <button
                 data-login-github
-                class="btn btn-block btn-outline-secondary mt-3 github-login-btn"
+                class="btn btn-block btn-outline-secondary mt-3 github-login-btn introjs-github"
                 type="button"
                 :disabled="!githubClientId"
                 :aria-label="T.loginGithub"
@@ -48,6 +49,7 @@
         </div>
 
         <div class="col-md-5 mx-2 login-section">
+        <div class="col-md-4 col-md-offset-2 introjs-native">
           <h4>{{ T.loginNative }}</h4>
           <form class="form-horizontal">
             <div class="form-group">
@@ -65,9 +67,10 @@
 
             <div class="form-group">
               <label for="pass"
-                >{{ T.loginPassword }} (<a href="/login/password/recover/">{{
-                  T.loginRecover
-                }}</a
+                >{{ T.loginPassword }} (<a
+                  href="/login/password/recover/"
+                  data-login-recover
+                  >{{ T.loginRecover }}</a
                 >)</label
               >
               <omegaup-password-input
@@ -97,9 +100,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import omegaup_PasswordInput from '../common/PasswordInput.vue';
+import 'intro.js/introjs.css';
+import introJs from 'intro.js';
+import VueCookies from 'vue-cookies';
+
+Vue.use(VueCookies, { expire: -1 });
 
 @Component({
   components: {
@@ -111,11 +119,13 @@ export default class Login extends Vue {
   @Prop({ default: '' }) githubClientId!: string;
   @Prop({ default: null }) githubState!: string | null;
   @Prop() googleClientId!: string;
+  @Prop({ default: 'login' }) activeTab!: string;
 
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
   githubCsrfState: string | null = null;
+  introStarted: boolean = false;
 
   mounted() {
     // The reason for loading the script here instead of the `template.tpl` file
@@ -126,6 +136,74 @@ export default class Login extends Vue {
     document.body.appendChild(script);
 
     this.initializeGithubCsrfToken();
+    this.maybeStartIntro();
+  }
+
+  @Watch('activeTab')
+  onActiveTabChanged(newValue: string): void {
+    if (newValue === 'login') {
+      this.maybeStartIntro();
+    }
+  }
+
+  maybeStartIntro(): void {
+    if (this.introStarted || this.$cookies.get('has-visited-login')) {
+      return;
+    }
+    if (this.activeTab !== 'login') {
+      return;
+    }
+
+    this.$nextTick(() => {
+      if (this.introStarted || this.$cookies.get('has-visited-login')) {
+        return;
+      }
+      const title = T.loginFormInteractiveGuideTitle;
+      const steps: Array<{
+        title: string;
+        intro: string;
+        element?: Element;
+      }> = [
+        {
+          title,
+          intro: T.loginFormInteractiveGuideWelcome,
+        },
+      ];
+      const addStep = (selector: string, intro: string): void => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return;
+        }
+        steps.push({
+          element,
+          title,
+          intro,
+        });
+      };
+
+      addStep('.introjs-federated', T.loginFormInteractiveGuideFederated);
+      addStep('.introjs-google', T.loginFormInteractiveGuideGoogle);
+      addStep('.introjs-github', T.loginFormInteractiveGuideGithub);
+      addStep('.introjs-native', T.loginFormInteractiveGuideNative);
+      addStep('[data-login-username]', T.loginFormInteractiveGuideUsername);
+      addStep('[data-login-password]', T.loginFormInteractiveGuidePassword);
+      addStep('[data-login-recover]', T.loginFormInteractiveGuideRecover);
+      addStep('[data-login-submit]', T.loginFormInteractiveGuideSubmit);
+
+      if (steps.length <= 1) {
+        return;
+      }
+      this.introStarted = true;
+      introJs()
+        .setOptions({
+          nextLabel: T.interactiveGuideNextButton,
+          prevLabel: T.interactiveGuidePreviousButton,
+          doneLabel: T.interactiveGuideDoneButton,
+          steps,
+        })
+        .start();
+      this.$cookies.set('has-visited-login', true, -1);
+    });
   }
 
   get loginUri(): string {
