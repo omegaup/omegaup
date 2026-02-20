@@ -130,11 +130,17 @@ import {
   BIconChevronLeft,
   BIconArrowLeftCircleFill,
   BIconArrowRightCircleFill,
-  BootstrapVue,
+  LayoutPlugin,
+  CardPlugin,
+  NavPlugin,
+  ButtonPlugin,
 } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+Vue.use(LayoutPlugin);
+Vue.use(CardPlugin);
+Vue.use(NavPlugin);
+Vue.use(ButtonPlugin);
 
 export enum Tabs {
   Summary = 'summary',
