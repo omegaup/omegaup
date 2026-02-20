@@ -6,7 +6,7 @@ services:
       context: ./stuff/docker/
     image: omegaup/dev-php:20231008
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     volumes:
       - type: bind
         source: .
@@ -37,7 +37,7 @@ services:
     image: omegaup/gitserver:v1.9.13
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
       - mysql
     volumes:
@@ -64,7 +64,7 @@ services:
     image: omegaup/backend:v1.9.35
     entrypoint: ["/usr/bin/omegaup-broadcaster"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
       - mysql
     volumes:
@@ -81,7 +81,7 @@ services:
     image: omegaup/backend:v1.9.35
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
       - mysql
       - gitserver
@@ -108,7 +108,7 @@ services:
     image: omegaup/runner:v1.9.35
     entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
       - grader
     volumes:
@@ -122,7 +122,7 @@ services:
   mysql:
     image: mysql:8.0.34
     platform: linux/amd64
-    restart: always
+    restart: on-failure
     environment:
       MYSQL_DATABASE: 'omegaup'
       MYSQL_USER: 'omegaup'
@@ -147,7 +147,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    restart: always
+    restart: on-failure
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
       RABBITMQ_DEFAULT_PASS: 'omegaup'
@@ -168,7 +168,7 @@ services:
 
   redis:
     image: redis
-    restart: always
+    restart: on-failure
     command: ['redis-server', '/etc/redis/redis.conf']
     expose:
       - '6379'
