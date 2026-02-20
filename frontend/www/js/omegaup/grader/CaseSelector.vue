@@ -1,101 +1,43 @@
 <template>
-  <div class="root d-flex flex-column h-100" :class="theme">
-    <div class="case-header">
-      <h6 class="case-title mb-0">{{ T.wordsCases }}</h6>
-    </div>
-    <div class="summary">
-      {{ summary }}
-    </div>
-    <form class="case-form" @submit.prevent="createCase()">
-      <div class="input-group">
-        <input
-          v-model="newCaseWeight"
-          class="form-control case-weight"
-          type="number"
-          :placeholder="T.caseSelectorCaseWeight"
-        />
-        <input
-          v-model="newCaseName"
-          class="form-control"
-          type="text"
-          data-case-name
-          :placeholder="T.caseSelectorCaseName"
-        />
-      </div>
-      <button
-        class="btn btn-sm text-nowrap w-100 mt-2"
-        :class="{
-          'btn-primary': theme == 'vs',
-          'btn-secondary': theme == 'vs-dark',
-        }"
-        type="submit"
-        :disabled="!newCaseName.length"
-        data-add-button
-      >
-        {{ T.caseSelectorAddCase }}
+  <div class="case-selector" :class="theme">
+    <div class="selector-header">
+      <span class="header-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i> Test Cases
+      </span>
+      <button class="icon-btn add-btn" title="Add new case" @click="addCase">
+        <i class="fas fa-plus" aria-hidden="true"></i>
       </button>
-    </form>
-    <div class="filenames">
-      <div class="list-group">
+    </div>
+
+    <div class="case-list">
+      <div v-if="Object.keys(cases).length === 0" class="empty-state">
+        <p>No test cases available.</p>
+      </div>
+      <div
+        v-for="(_, caseName) in cases"
+        :key="caseName"
+        class="case-item"
+        :class="{ 'case-item--active': currentCase === caseName }"
+        role="button"
+        :tabindex="0"
+        @click="selectCase(caseName)"
+        @keydown.enter="selectCase(caseName)"
+        @keydown.space.prevent="selectCase(caseName)"
+      >
+        <div class="case-info">
+          <i class="fas fa-vial case-icon" aria-hidden="true"></i>
+          <span class="case-name" :title="caseName">{{ caseName }}</span>
+        </div>
+
         <button
-          v-if="!groups"
-          class="list-group-item list-group-item-action disabled"
-          type="button"
+          v-if="caseName !== 'sample'"
+          class="icon-btn delete-btn"
+          title="Delete case"
+          aria-label="Delete case"
+          @click.stop="deleteCase(caseName)"
         >
-          <em>{{ T.wordsEmpty }}</em>
+          <i class="fas fa-trash-alt" aria-hidden="true"></i>
         </button>
-        <template v-for="group in groups" v-else :title="name">
-          <div
-            v-if="group.explicit"
-            :key="group.name"
-            class="list-group-item list-group-item-secondary"
-          >
-            <div>
-              <span
-                class="verdict"
-                :class="verdictClass(groupResult(group.name))"
-                :title="verdictTooltip(groupResult(group.name))"
-                >{{ verdictLabel(groupResult(group.name))
-                }}<span class="score">{{
-                  score(groupResult(group.name))
-                }}</span></span
-              >
-              <span :title="group.name">{{ group.name }}</span>
-            </div>
-          </div>
-          <button
-            v-for="item in group.cases"
-            :key="item.name"
-            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-            type="button"
-            :class="{
-              'in-group': group.explicit,
-              active: currentCase == item.name,
-            }"
-            @click="selectCase(item.name)"
-          >
-            <div class="text-truncate">
-              <span
-                class="verdict"
-                :title="verdictTooltip(caseResult(item.name))"
-                >{{ verdictLabel(caseResult(item.name))
-                }}<span class="score">{{
-                  score(caseResult(item.name))
-                }}</span></span
-              >
-              <span :title="item.name">{{ item.name }}</span>
-            </div>
-            <button
-              v-if="groups.length > 1"
-              :aria-label="T.wordsClose"
-              class="close"
-              type="button"
-              @click.prevent.stop="removeCase(item.name)"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </button>
-        </template>
       </div>
     </div>
   </div>
@@ -104,274 +46,271 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import store from './GraderStore';
-import { types } from '../api_types';
-import { GraderResults, CaseSelectorGroup } from './GraderStore';
 import T from '../lang';
 
 @Component
 export default class CaseSelector extends Vue {
-  newCaseWeight: null | number = null;
-  newCaseName: string = '';
   T = T;
 
   get theme(): string {
     return store.getters['theme'];
   }
-  get summary(): string {
-    if (!store.state.results || !store.state.results.verdict) {
-      return '…';
-    }
-    return `${store.state.results.verdict} ${this.score(store.state.results)}`;
-  }
 
-  get groups(): CaseSelectorGroup[] {
-    return store.getters['caseSelectorGroups'];
+  get cases(): Record<string, unknown> {
+    return store.getters['inputCases'] || {};
   }
 
   get currentCase(): string {
     return store.getters['currentCase'];
   }
 
-  set currentCase(value: string) {
-    store.dispatch('currentCase', value);
-  }
-
-  caseResult(caseName: string): null | types.CaseResult {
-    const flatCaseResults = store.getters.flatCaseResults;
-    if (!flatCaseResults[caseName]) return null;
-    return flatCaseResults[caseName];
-  }
-
-  groupResult(groupName: string): null | types.RunDetailsGroup {
-    const results = store.state.results;
-    if (!results || !results.groups) return null;
-    for (const group of results.groups) {
-      if (group.group == groupName) return group;
+  selectCase(caseName: string): void {
+    if (this.currentCase !== caseName) {
+      store.dispatch('currentCase', caseName);
     }
-    return null;
   }
 
-  verdictLabel(
-    result: null | types.RunDetailsGroup | types.CaseResult,
-  ): string {
-    if (!result) return '…';
+  addCase(): void {
+    const name = prompt('Enter a name for the new test case:');
+    if (!name || name.trim() === '') return;
 
-    if (typeof result.verdict === 'undefined') {
-      if (result.contest_score == result.max_score) return '✓';
-      return '✗';
+    const cleanName = name.trim();
+    if (this.cases[cleanName]) {
+      alert('A test case with this name already exists!');
+      return;
     }
-    switch (result.verdict) {
-      case 'CE':
-        return '…';
-      case 'AC':
-        return '✓';
-      case 'PA':
-        return '½';
-      case 'WA':
-        return '✗';
-      case 'TLE':
-        return '⌚';
-    }
-    return ' ☹';
-  }
-
-  verdictClass(result: null | types.RunDetailsGroup): string {
-    if (!result) return '';
-    return result.verdict || '';
-  }
-
-  verdictTooltip(
-    result: null | types.RunDetailsGroup | types.CaseResult,
-  ): string {
-    if (!result) return '';
-    if (typeof result.verdict !== 'undefined') {
-      return `${result.verdict} ${this.score(result)}`;
-    }
-    return this.score(result);
-  }
-
-  score(
-    result: null | types.RunDetailsGroup | types.CaseResult | GraderResults,
-  ): string {
-    if (!result) return '…';
-    return `${this.formatNumber(result.contest_score)}/${this.formatNumber(
-      result.max_score || 0,
-    )}`;
-  }
-
-  formatNumber(value: number): string {
-    const str = value.toFixed(2);
-    if (str.endsWith('.00')) return str.substring(0, str.length - 3);
-    return str;
-  }
-
-  selectCase(name: string): void {
-    this.currentCase = name;
-  }
-
-  createCase(): void {
-    if (!this.newCaseName) return;
 
     store.dispatch('createCase', {
-      name: this.newCaseName,
-      weight: this.newCaseWeight ?? 1,
+      name: cleanName,
+      in: '',
+      out: '',
+      weight: 1,
     });
-
-    this.newCaseWeight = null;
-    this.newCaseName = '';
+    this.selectCase(cleanName);
   }
 
-  removeCase(name: string): void {
-    store.dispatch('removeCase', name);
+  deleteCase(caseName: string): void {
+    if (
+      confirm(`Are you sure you want to delete the test case '${caseName}'?`)
+    ) {
+      store.dispatch('removeCase', caseName);
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '../../../sass/main.scss';
-
-.case-header {
-  padding: 0.5em 0.75em 0;
-  border-bottom: 1px solid $omegaup-grey--lighter;
-}
-
-.case-title {
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.8em;
-  color: $omegaup-grey;
-}
-
-.case-form {
-  padding: 0.5em 0.75em 0.5em;
-  border-bottom: 1px solid $omegaup-grey--lighter;
-}
-
-button.in-group {
-  border-left-width: 6px;
-  padding-left: 15px;
-}
-
-div.summary {
-  text-align: center;
-  padding: 0.25em;
-}
-
-span.verdict {
-  display: inline-block;
-  float: left;
-  width: 2em;
-  text-align: center;
-  margin: -7px 5px -6px -10px;
-}
-
-span.verdict span.score {
-  font-size: xx-small;
-  display: block;
-}
-
-div.filenames {
-  overflow-y: auto;
-  flex: 1;
-}
-
-.case-weight {
-  flex: 1 1 auto;
-  font-weight: 600;
-  align-items: center;
+.case-selector {
   display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f9fafb;
+  border-left: 1px solid #e5e7eb;
+
+  .vs-dark & {
+    background: #252525;
+    border-left-color: #333;
+  }
 }
 
-.input-group [data-case-name] {
-  flex: 1 1 auto;
-  font-weight: 500;
+.selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 44px;
+
+  .vs-dark & {
+    background: #1e1e1e;
+    border-bottom-color: #333;
+  }
 }
 
-.case-form .btn {
+.header-title {
+  font-size: 13px;
   font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  i {
+    color: #9ca3af;
+  }
+
+  .vs-dark & {
+    color: #9ca3af;
+    i {
+      color: #6b7280;
+    }
+  }
 }
 
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
-  font-size: 10px;
-  margin-left: 2px;
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+  }
+
+  .vs-dark & {
+    color: #9ca3af;
+    &:hover {
+      background: #404040;
+      color: #f3f4f6;
+    }
+  }
 }
 
-.list-group-item-secondary {
-  font-weight: bold;
-  border-left-width: 6px;
-  padding-left: 15px;
+.add-btn {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #2563eb;
+  }
+
+  .vs-dark & {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+    &:hover {
+      background: rgba(96, 165, 250, 0.2);
+      color: #93c5fd;
+    }
+  }
 }
 
-/* Dark theme styles */
-.vs-dark .summary {
-  color: var(--vs-dark-font-color);
-  background-color: var(--vs-dark-background-color);
+.case-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
 }
 
-.vs-dark .list-group-item {
-  background-color: var(--vs-dark-background-color);
-  color: var(--vs-dark-font-color);
-  border-color: var(--vs-dark-border-color-medium);
+.empty-state {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+
+  .vs-dark & {
+    color: #6b7280;
+  }
 }
 
-.vs-dark .list-group-item-action {
-  background-color: var(--vs-dark-background-color);
-  color: var(--vs-dark-font-color);
+.case-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #e5e7eb;
+  }
+
+  &.case-item--active {
+    background: #eff6ff;
+    border-left-color: #3b82f6;
+
+    .case-name {
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    .case-icon {
+      color: #3b82f6;
+    }
+  }
+
+  .vs-dark & {
+    &:hover {
+      background: #333;
+    }
+
+    &.case-item--active {
+      background: rgba(59, 130, 246, 0.15);
+      border-left-color: #60a5fa;
+
+      .case-name {
+        color: #93c5fd;
+      }
+
+      .case-icon {
+        color: #60a5fa;
+      }
+    }
+  }
 }
 
-.vs-dark .list-group-item-action:hover,
-.vs-dark .list-group-item-action:focus {
-  background-color: var(
-    --vs-dark-list-group-item-action-background-color--hover
-  );
-  color: var(--vs-dark-font-color);
+.case-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
 }
 
-.vs-dark .list-group-item-action.active {
-  background-color: var(
-    --vs-dark-list-group-item-action-background-color--active
-  );
-  border-color: var(--vs-dark-border-color-strong);
+.case-icon {
+  font-size: 14px;
+  color: #9ca3af;
+
+  .vs-dark & {
+    color: #6b7280;
+  }
 }
 
-.vs-dark .list-group-item-secondary {
-  background-color: var(--vs-dark-list-group-item-secondary-background-color);
-  color: var(--vs-dark-font-color);
+.case-name {
+  font-size: 13px;
+  color: #4b5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .vs-dark & {
+    color: #d1d5db;
+  }
 }
 
-.vs-dark .close {
-  color: var(--vs-dark-close-color);
-}
+.delete-btn {
+  opacity: 0;
+  width: 24px;
+  height: 24px;
 
-.vs-dark .close:hover {
-  color: var(--vs-dark-close-color--hover);
-}
+  .case-item:hover & {
+    opacity: 1;
+  }
 
-.vs-dark .input-group input.form-control {
-  background-color: var(--vs-dark-background-color);
-  color: var(--vs-dark-font-color);
-  border-color: var(--vs-dark-border-color-medium);
-}
+  &:hover {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+  }
 
-.vs-dark input[type='number']::-webkit-inner-spin-button,
-.vs-dark input[type='number']::-webkit-outer-spin-button {
-  opacity: 0.6;
-  filter: invert(1);
-  font-size: 10px;
-  margin-left: 2px;
-}
-
-.vs-dark .btn-secondary {
-  background-color: var(--vs-dark-btn-secondary-background-color);
-  border-color: var(--vs-dark-border-color-strong);
-}
-
-.vs-dark .btn-secondary:hover {
-  background-color: var(--vs-dark-btn-secondary-background-color--hover);
-}
-
-.vs-dark .verdict {
-  color: var(--vs-dark-font-color);
+  .vs-dark &:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+  }
 }
 </style>
