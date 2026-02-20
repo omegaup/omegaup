@@ -27,10 +27,7 @@ import T from '../../lang';
 
 import omegaup_Markdown from '../Markdown.vue';
 
-import {
-  BIconCheckCircleFill,
-  BIconXCircleFill,
-} from 'bootstrap-vue';
+import { BIconCheckCircleFill, BIconXCircleFill } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
