@@ -1,6 +1,7 @@
 U13CannotPerform = "Coder menor de 13 anos não pode realizar esta ação."
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
-acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](%(PrivacyPolicyURL)) do site, bem como o [Código de Conduta](%(CodeofConductPolicyURL))."
+acceptCodeOfConduct = "Li e aceito o [Código de Conduta](%(CodeofConductPolicyURL))."
+acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](%(PrivacyPolicyURL)) do site."
 accountDeleteCancel = "Cancelar"
 accountDeleteConfirmationMessage = "Tem certeza de que deseja excluir sua conta?"
 accountDeleteMessage = "Clique no botão abaixo se desejar excluir sua conta e todas as suas informações pessoais do omegaUp. Esta operação será realizada imediatamente assim que você confirmar que deseja realizá-la e não é reversível."
