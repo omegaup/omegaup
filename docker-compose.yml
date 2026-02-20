@@ -17,9 +17,12 @@ services:
         volume:
           nocopy: true
     depends_on:
-      - mysql
-      - gitserver
-      - grader
+      mysql:
+        condition: service_healthy
+      gitserver:
+        condition: service_started
+      grader:
+        condition: service_started
     ports:
       - target: 8001
         published: 8001
@@ -39,7 +42,8 @@ services:
     user: "${UID_GID}"
     restart: on-failure
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/gitserver
@@ -66,7 +70,8 @@ services:
     user: "${UID_GID}"
     restart: on-failure
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/broadcaster
@@ -83,8 +88,10 @@ services:
     user: "${UID_GID}"
     restart: on-failure
     depends_on:
-      - mysql
-      - gitserver
+      mysql:
+        condition: service_healthy
+      gitserver:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/grader
@@ -110,7 +117,8 @@ services:
     user: "${UID_GID}"
     restart: on-failure
     depends_on:
-      - grader
+      grader:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/runner
@@ -144,10 +152,22 @@ services:
         mode: host
     cap_add:
       - SYS_NICE
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uomegaup", "-pomegaup"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
       RABBITMQ_DEFAULT_PASS: 'omegaup'
@@ -169,6 +189,11 @@ services:
   redis:
     image: redis
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     command: ['redis-server', '/etc/redis/redis.conf']
     expose:
       - '6379'
