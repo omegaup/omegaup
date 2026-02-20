@@ -207,17 +207,10 @@
           @emit-update-problem-level="
             (levelTag) => $emit('update-problem-level', levelTag)
           "
-          @emit-add-tag="
-            (alias, tagname, isPublic) =>
-              $emit('add-tag', alias, tagname, isPublic)
-          "
-          @emit-remove-tag="
-            (alias, tagname, isPublic) =>
-              $emit('remove-tag', alias, tagname, isPublic)
-          "
+          @emit-add-tag="(payload) => $emit('add-tag', payload)"
+          @emit-remove-tag="(payload) => $emit('remove-tag', payload)"
           @emit-change-allow-user-add-tag="
-            (alias, title, allowTags) =>
-              $emit('change-allow-user-add-tag', alias, title, allowTags)
+            (payload) => $emit('change-allow-user-add-tag', payload)
           "
         ></omegaup-problem-tags>
       </div>
