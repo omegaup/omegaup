@@ -59,6 +59,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserDocsPayload=array{docs: array<string, list<UserDocument>>}
  * @psalm-type UserCompareData=array{profile: UserProfileInfo, solvedProblemsCount: int|null, contestsCount: int|null}
  * @psalm-type UserComparePayload=array{user1: UserCompareData|null, user2: UserCompareData|null, username1: string|null, username2: string|null}
+ * @psalm-type HelpResource=array{name: string, url: string, external: bool}
+ * @psalm-type UserHelpPayload=array{helpResources: list<HelpResource>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -526,7 +528,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $old_password
      * @omegaup-request-param null|string $password
-     * @omegaup-request-param mixed $permission_key
+     * @omegaup-request-param string $permission_key
      * @omegaup-request-param string $username
      */
     public static function apiChangePassword(\OmegaUp\Request $r): array {
@@ -820,7 +822,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return bool
      *
      * @omegaup-request-param string $auth_token
-     * @omegaup-request-param mixed $change_password
+     * @omegaup-request-param null|string $change_password
      * @omegaup-request-param string $id
      * @omegaup-request-param string $old_password
      * @omegaup-request-param null|string $password
@@ -884,7 +886,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array<string, string>
      *
      * @omegaup-request-param string $auth_token
-     * @omegaup-request-param mixed $change_password
+     * @omegaup-request-param null|string $change_password
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param string $contest_type
      * @omegaup-request-param string $id
@@ -1553,7 +1555,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return UserProfileInfo
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param string $category
      * @omegaup-request-param bool|null $omit_rank
      * @omegaup-request-param null|string $username
      */
@@ -1772,7 +1774,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{coderinfo: UserProfile|null}
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param string $category
      * @omegaup-request-param null|string $date
      */
     public static function apiCoderOfTheMonth(\OmegaUp\Request $r) {
@@ -1853,7 +1855,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{coders: CoderOfTheMonthList}
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param string $category
      * @omegaup-request-param null|string $date
      */
     public static function apiCoderOfTheMonthList(\OmegaUp\Request $r): array {
@@ -1884,7 +1886,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: 'ok'}
      *
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param string $category
      * @omegaup-request-param string $username
      */
     public static function apiSelectCoderOfTheMonth(\OmegaUp\Request $r): array {
@@ -2484,7 +2486,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param string $auth_token
      * @omegaup-request-param string $birth_date
      * @omegaup-request-param string $country_id
      * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
@@ -3185,7 +3187,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $filter
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param null|string $token
-     * @omegaup-request-param mixed $tokens
+     * @omegaup-request-param string $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
         $filtersList = $r->ensureString('filter');
@@ -4280,7 +4282,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $category
+     * @omegaup-request-param string $category
      * @omegaup-request-param null|string $date
      *
      * @return array{entrypoint: string, templateProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
@@ -5161,6 +5163,54 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('omegaupTitleDocs'),
             ],
             'entrypoint' => 'common_docs',
+        ];
+    }
+
+    /**
+     * Returns help resources for the Help page.
+     *
+     * @return array{entrypoint: string, templateProperties: array{payload: UserHelpPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getHelpForTypeScript(\OmegaUp\Request $r): array {
+        $helpResources = [
+            [
+                'name' => 'tutorials',
+                'url' => 'https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4',
+                'external' => true,
+            ],
+            [
+                'name' => 'discord',
+                'url' => 'https://discord.com/invite/K3JFd9d3wk',
+                'external' => true,
+            ],
+            [
+                'name' => 'omegaUpBlog',
+                'url' => 'https://blog.omegaup.com/',
+                'external' => true,
+            ],
+            [
+                'name' => 'algorithmsBook',
+                'url' => 'https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view',
+                'external' => true,
+            ],
+            [
+                'name' => 'documentation',
+                'url' => '/docs/',
+                'external' => false,
+            ],
+            [
+                'name' => 'github',
+                'url' => 'https://github.com/omegaup/omegaup',
+                'external' => true,
+            ],
+        ];
+
+        return [
+            'templateProperties' => [
+                'payload' => ['helpResources' => $helpResources],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleHelp'),
+            ],
+            'entrypoint' => 'common_help',
         ];
     }
 

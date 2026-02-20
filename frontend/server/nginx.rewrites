@@ -107,6 +107,7 @@ rewrite ^/rank/authors/?$ /rank/authors.php last;
 rewrite ^/rank/schools/?$ /rank/schools.php last;
 rewrite ^/rank/compare/?$ /rank/compare.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
+rewrite ^/help/?$ /help.php last;
 rewrite ^/schoolofthemonth/?$ /schools/schoolofthemonth.php last;
 rewrite ^/schools/?$ /course/ permanent;
 rewrite ^/schoolsrank/?$ /rank/schools/ permanent;

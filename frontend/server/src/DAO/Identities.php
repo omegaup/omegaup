@@ -69,7 +69,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByUsernameOrName(
         string $usernameOrName,
         int $rowcount = 100
-    ) {
+    ): array {
         $sql = "SELECT
                     sq.name,
                     sq.username,
@@ -589,7 +589,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
      */
     public static function getTeamIdentity(
         \OmegaUp\DAO\VO\Identities $identity
-    ) {
+    ): ?array {
         $sql = 'SELECT
                     ' .  \OmegaUp\DAO\DAO::getFields(
             \OmegaUp\DAO\VO\Identities::FIELD_NAMES,

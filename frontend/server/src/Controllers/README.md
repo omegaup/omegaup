@@ -4991,9 +4991,9 @@ Changes the password of a user
 | Name             | Type           | Description | Required |
 | ---------------- | -------------- | ----------- | -------- |
 | `old_password`   | `string`       |             | ✓        |
+| `permission_key` | `string`       |             | ✓        |
 | `username`       | `string`       |             | ✓        |
 | `password`       | `null\|string` |             |          |
-| `permission_key` | `mixed`        |             |          |
 
 ### Returns
 
@@ -5011,7 +5011,7 @@ date, calculate it and save it.
 
 | Name       | Type           | Description | Required |
 | ---------- | -------------- | ----------- | -------- |
-| `category` | `mixed`        |             |          |
+| `category` | `string`       |             | ✓        |
 | `date`     | `null\|string` |             |          |
 
 ### Returns
@@ -5060,7 +5060,7 @@ Returns the list of coders of the month
 
 | Name       | Type           | Description | Required |
 | ---------- | -------------- | ----------- | -------- |
-| `category` | `mixed`        |             |          |
+| `category` | `string`       |             | ✓        |
 | `date`     | `null\|string` |             |          |
 
 ### Returns
@@ -5288,7 +5288,7 @@ against the gitserver.
 | `old_password`    | `string`       |             | ✓        |
 | `permission_key`  | `string`       |             | ✓        |
 | `username`        | `string`       |             | ✓        |
-| `change_password` | `mixed`        |             |          |
+| `change_password` | `null\|string` |             |          |
 | `password`        | `null\|string` |             |          |
 | `usernameOrEmail` | `null\|string` |             |          |
 
@@ -5458,7 +5458,7 @@ Get general user info
 
 | Name        | Type           | Description | Required |
 | ----------- | -------------- | ----------- | -------- |
-| `category`  | `mixed`        |             |          |
+| `category`  | `string`       |             | ✓        |
 | `omit_rank` | `bool\|null`   |             |          |
 | `username`  | `null\|string` |             |          |
 
@@ -5565,8 +5565,8 @@ Selects coder of the month for next month.
 
 | Name       | Type     | Description | Required |
 | ---------- | -------- | ----------- | -------- |
+| `category` | `string` |             | ✓        |
 | `username` | `string` |             | ✓        |
-| `category` | `mixed`  |             |          |
 
 ### Returns
 
@@ -5621,12 +5621,12 @@ Update user profile
 
 | Name                        | Type                                         | Description | Required |
 | --------------------------- | -------------------------------------------- | ----------- | -------- |
+| `auth_token`                | `string`                                     |             | ✓        |
 | `birth_date`                | `string`                                     |             | ✓        |
 | `country_id`                | `string`                                     |             | ✓        |
 | `graduation_date`           | `string`                                     |             | ✓        |
 | `locale`                    | `string`                                     |             | ✓        |
 | `state_id`                  | `string`                                     |             | ✓        |
-| `auth_token`                | `mixed`                                      |             |          |
 | `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |          |
 | `has_competitive_objective` | `bool\|null`                                 |             |          |
 | `has_learning_objective`    | `bool\|null`                                 |             |          |
@@ -5700,11 +5700,11 @@ contest updates with an access token.
 | --------------- | -------------- | ----------- | -------- |
 | `filter`        | `string`       |             | ✓        |
 | `problemset_id` | `int`          |             | ✓        |
+| `tokens`        | `string`       |             | ✓        |
 | `auth_token`    | `null\|string` |             |          |
 | `contest_admin` | `null\|string` |             |          |
 | `contest_alias` | `null\|string` |             |          |
 | `token`         | `null\|string` |             |          |
-| `tokens`        | `mixed`        |             |          |
 
 ### Returns
 
