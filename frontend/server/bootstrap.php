@@ -2,6 +2,114 @@
 
 namespace OmegaUp;
 
+/**
+ * @return list<string>
+ */
+function getCriticalSecretNames(): array {
+    return [
+        'OMEGAUP_DB_USER',
+        'OMEGAUP_DB_PASS',
+        'OMEGAUP_DB_HOST',
+        'OMEGAUP_DB_NAME',
+
+        'OMEGAUP_EXPERIMENT_SECRET',
+        'OMEGAUP_GITSERVER_SECRET_KEY',
+        'OMEGAUP_GITSERVER_PUBLIC_KEY',
+        'OMEGAUP_GITSERVER_SECRET_TOKEN',
+        'OMEGAUP_GRADER_SECRET',
+        'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+
+        'OMEGAUP_RABBITMQ_USERNAME',
+        'OMEGAUP_RABBITMQ_PASSWORD',
+
+        'OMEGAUP_FB_APPID',
+        'OMEGAUP_FB_SECRET',
+        'OMEGAUP_GOOGLE_SECRET',
+        'OMEGAUP_GOOGLE_CLIENTID',
+        'OMEGAUP_GITHUB_CLIENT_ID',
+        'OMEGAUP_GITHUB_CLIENT_SECRET',
+        'OMEGAUP_GA_ID',
+
+        'OMEGAUP_RECAPTCHA_SECRET',
+    ];
+}
+
+/**
+ * Ensures required secrets are set to non placeholder values.
+ *
+ * @codeCoverageIgnore Bootstrap validation runs at startup in sandbox/production.
+ * This code is exercised in real deployments and integration tests.
+ */
+function validateCriticalSecrets(): void {
+    if (PHP_SAPI === 'cli') {
+        return;
+    }
+
+    $environment = defined(
+        'OMEGAUP_ENVIRONMENT'
+    ) ? OMEGAUP_ENVIRONMENT : 'production';
+
+    $strictEnvironments = ['sandbox', 'production'];
+    /** @psalm-suppress TypeDoesNotContainType this can change depending on environment */
+    if (!in_array($environment, $strictEnvironments, true)) {
+        return;
+    }
+
+    $placeholderValues = ['CHANGE_ME', 'xxxxx', ''];
+
+    $failures = [];
+
+    foreach (getCriticalSecretNames() as $name) {
+        if (!defined($name)) {
+            $failures[] = "{$name}: missing from configuration";
+            continue;
+        }
+
+        /** @var mixed $value */
+        $value = constant($name);
+        if (!is_string($value)) {
+            $failures[] = "{$name}: expected string, got " . gettype($value);
+            continue;
+        }
+
+        if (in_array($value, $placeholderValues, true)) {
+            $reason = $value === '' ? 'empty' : "placeholder value '{$value}'";
+            $failures[] = "{$name}: {$reason}";
+        }
+    }
+
+    if (empty($failures)) {
+        return;
+    }
+
+    $message = sprintf(
+        '[config] Invalid secrets detected for environment "%s":%s%s',
+        $environment,
+        PHP_EOL,
+        implode(PHP_EOL, array_map(
+            /**
+             * @param string $failure
+             */
+            fn (string $failure): string => "  - {$failure}",
+            $failures
+        ))
+    );
+
+    if (\Monolog\Registry::hasLogger('omegaup')) {
+        \Monolog\Registry::getLogger('omegaup')->error($message);
+    } else {
+        error_log($message);
+    }
+
+    if (class_exists(\OmegaUp\NewRelicHelper::class)) {
+        \OmegaUp\NewRelicHelper::noticeError($message);
+        \OmegaUp\NewRelicHelper::addCustomAttribute(
+            'invalid_secrets',
+            implode('; ', $failures)
+        );
+    }
+}
+
 // Set paths
 if (!defined('OMEGAUP_ROOT')) {
     define('OMEGAUP_ROOT', dirname(__DIR__));
@@ -137,3 +245,8 @@ if (class_exists('\NewRelic\Monolog\Enricher\Processor')) {
 $rootLogger->pushHandler($logHandler);
 \Monolog\Registry::addLogger($rootLogger);
 \Monolog\ErrorHandler::register($rootLogger);
+
+/** @psalm-suppress RedundantCondition IS_TEST may be defined as true in tests. */
+if (!defined('IS_TEST') || IS_TEST !== true) {
+    validateCriticalSecrets();
+}
