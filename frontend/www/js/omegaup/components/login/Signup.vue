@@ -58,15 +58,17 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-8 introjs-terms-and-conditions">
             <div class="checkbox-wrapper">
               <input
+                id="accept-privacy-policy"
                 v-model="privacyPolicyAccepted"
                 data-signup-accept-policies
                 type="checkbox"
                 required
               />
-              <label for="checkbox" class="pl-1">
+              <label for="accept-privacy-policy" class="pl-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptPolicyMarkdown"
                 ></omegaup-markdown>
@@ -74,12 +76,13 @@
             </div>
             <div class="checkbox-wrapper">
               <input
+                id="accept-code-of-conduct"
                 v-model="codeOfConductAccepted"
                 data-signup-accept-conduct
                 type="checkbox"
                 required
               />
-              <label for="checkbox" class="pl-1">
+              <label for="accept-code-of-conduct" class="pl-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptConductMarkdown"
                 ></omegaup-markdown>
@@ -219,14 +222,16 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-10 introjs-terms-and-conditions">
             <div class="checkbox-wrapper">
               <input
+                id="accept-privacy-policy-birthdate"
                 v-model="privacyPolicyAccepted"
                 data-signup-accept-policies
                 type="checkbox"
               />
-              <label for="checkbox" class="pl-1">
+              <label for="accept-privacy-policy-birthdate" class="pl-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptPolicyMarkdown"
                 ></omegaup-markdown>
@@ -234,11 +239,12 @@
             </div>
             <div class="checkbox-wrapper">
               <input
+                id="accept-code-of-conduct-birthdate"
                 v-model="codeOfConductAccepted"
                 data-signup-accept-conduct
                 type="checkbox"
               />
-              <label for="checkbox" class="pl-1">
+              <label for="accept-code-of-conduct-birthdate" class="pl-1">
                 <omegaup-markdown
                   :markdown="formattedAcceptConductMarkdown"
                 ></omegaup-markdown>
