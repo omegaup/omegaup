@@ -1,16 +1,27 @@
 <template>
   <div :class="['h-100', 'd-flex', 'flex-column', theme]">
-    <div class="editor-toolbar d-flex align-items-center p-1 form-inline">
-      <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
-      <select
-        v-model="selectedFontSize"
-        class="custom-select-sm"
-        @change="onFontSizeChange"
+    <div
+      class="editor-toolbar d-flex align-items-center justify-content-between p-1 form-inline"
+    >
+      <div class="d-flex align-items-center">
+        <label class="mr-1 mb-0 p-1">{{ T.fontSize }}</label>
+        <select
+          v-model="selectedFontSize"
+          class="custom-select-sm"
+          @change="onFontSizeChange"
+        >
+          <option v-for="size in fontSizes" :key="size" :value="size">
+            {{ size }}px
+          </option>
+        </select>
+      </div>
+      <button
+        class="btn btn-sm btn-secondary"
+        :title="T.resetToDefault"
+        @click="onReset"
       >
-        <option v-for="size in fontSizes" :key="size" :value="size">
-          {{ size }}px
-        </option>
-      </select>
+        <font-awesome-icon :icon="['fas', 'undo']" aria-hidden="true" />
+      </button>
     </div>
     <div ref="editorContainer" class="editor flex-grow-1 w-100 h-100"></div>
   </div>
@@ -23,8 +34,18 @@ import store from './GraderStore';
 import * as Util from './util';
 import * as monaco from 'monaco-editor';
 import T from '../lang';
+import * as templates from './GraderTemplates';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faUndo } from '@fortawesome/free-solid-svg-icons';
+library.add(faUndo);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class MonacoEditor extends Vue {
   // TODO: place more restrictions on value of keys inside storeMapping
   @Prop({ required: true }) storeMapping!: {
@@ -148,6 +169,25 @@ export default class MonacoEditor extends Vue {
       this._editor.updateOptions({ fontSize: this.selectedFontSize });
     }
   }
+
+  get isInteractive(): boolean {
+    return store.getters['isInteractive'];
+  }
+
+  onReset(): void {
+    const extension = Util.supportedLanguages[this.language].extension;
+    let defaultTemplate = '';
+
+    if (this.isInteractive) {
+      // For interactive problems, use original interactive templates
+      defaultTemplate = templates.originalInteractiveTemplates[extension];
+    } else {
+      // For regular problems, use source templates
+      defaultTemplate = templates.sourceTemplates[extension];
+    }
+
+    this.contents = defaultTemplate;
+  }
 }
 </script>
 
@@ -170,6 +210,13 @@ export default class MonacoEditor extends Vue {
   font-size: 10px;
 }
 
+.editor-toolbar button {
+  font-size: 10px;
+  padding: 0.25rem 0.5rem;
+  background: var(--monaco-editor-toolbar-label-background-color);
+  color: var(--monaco-editor-toolbar-label-color);
+}
+
 .editor {
   border: 1px solid var(--monaco-editor-toolbar-label-border-color);
 }
@@ -185,6 +232,11 @@ export default class MonacoEditor extends Vue {
 }
 
 .vs-dark .editor-toolbar select {
+  background-color: var(--vs-dark-background-color);
+  color: var(--vs-dark-font-color);
+}
+
+.vs-dark .editor-toolbar button {
   background-color: var(--vs-dark-background-color);
   color: var(--vs-dark-font-color);
 }
