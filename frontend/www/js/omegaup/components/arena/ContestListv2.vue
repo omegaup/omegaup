@@ -696,13 +696,13 @@ class ArenaContestList extends Vue {
   }
 
   // Watchers for internal state - fetch data when user interacts with UI
-  @Watch('currentTab', { immediate: true, deep: true })
+  @Watch('currentTab', { immediate: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
   }
 
-  @Watch('currentOrder', { immediate: true, deep: true })
+  @Watch('currentOrder', { immediate: true })
   onCurrentOrderChanged(
     newValue: ContestOrder,
     oldValue: undefined | ContestOrder,
@@ -711,7 +711,7 @@ class ArenaContestList extends Vue {
     this.fetchInitialContests();
   }
 
-  @Watch('currentFilter', { immediate: true, deep: true })
+  @Watch('currentFilter', { immediate: true })
   onCurrentFilterChanged(
     newValue: ContestFilter,
     oldValue: undefined | ContestFilter,
