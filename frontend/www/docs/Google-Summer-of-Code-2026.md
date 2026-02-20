@@ -220,6 +220,41 @@ A seamless end-to-end user experience where authors can create or edit problems 
 
 High
 
+## 1v1 Competitive Platform
+
+**Brief Description**:
+
+Build a real-time 1v1 competitive platform where users compete head-to-head by solving problems. Each match consists of 3 randomly selected problems from a curated pool. The first competitor to solve all 3 problems wins the match. This feature will enhance user engagement and create a gamified competitive experience on omegaUp.
+
+**Expected results**:
+
+A fully functional 1v1 competitive platform with:
+* Real-time matchmaking system
+* Dynamic problem pool selection
+* Live competition interface with progress tracking
+* Match history and leaderboards
+* Notifications for match invitations and completion
+
+**Preferred skills**:
+
+* Vue.js
+* TypeScript
+* PHP
+* WebSocket/Real-time communication
+* SQL query optimization
+
+**Possible mentor**:
+
+[pabo99](https://github.com/pabo99), [heduenas](https://github.com/heduenas)
+
+**Estimated size of project:**
+
+350 hours
+
+**Skill level**:
+
+High
+
 # How to Ramp Up
 
 If you are interested spending this summer collaborating with us, first of all, we're honored that you are interested in our organization and we want to make the application process as smooth and enjoyable as possible for you. In order to familiarize yourself with [omegaUp.com](omegaup.com) and start collaborating with us please follow these steps:
