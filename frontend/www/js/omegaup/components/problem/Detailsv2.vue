@@ -146,10 +146,11 @@ import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import user_Username from '../user/Username.vue';
 
-import { BootstrapVue } from 'bootstrap-vue';
+import { LayoutPlugin, TabsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-Vue.use(BootstrapVue);
+Vue.use(LayoutPlugin);
+Vue.use(TabsPlugin);
 
 export interface Tab {
   name: string;
