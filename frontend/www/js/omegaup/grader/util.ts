@@ -18,10 +18,18 @@ export function vuexSet(store: any, name: string, value: unknown) {
   store.commit(name, value);
 }
 export const units: { [key: string]: number } = {
-  ns: 1e-9, us: 1e-6, µs: 1e-6, ms: 1e-3, s: 1, m: 60, '': 1,
+  ns: 1e-9,
+  us: 1e-6,
+  µs: 1e-6,
+  ms: 1e-3,
+  s: 1,
+  m: 60,
+  '': 1,
 };
 
-export const splitMeasurement = (measurement: string): { numericalValue: number; unit: string; } => {
+export const splitMeasurement = (
+  measurement: string,
+): { numericalValue: number; unit: string } => {
   for (const unit in units) {
     if (measurement.endsWith(unit)) {
       const numberPart = measurement.slice(0, -unit.length);
@@ -46,17 +54,27 @@ export function parseDuration(value: number | string) {
 }
 
 export interface LanguageInfo {
-  extension: string; name: string; modelMapping: string; language: string;
+  extension: string;
+  name: string;
+  modelMapping: string;
+  language: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const supportedLanguages: Record<string, LanguageInfo> = (languages as any);
+export const supportedLanguages: Record<
+  string,
+  LanguageInfo
+> = languages as any;
 
 export const supportedExtensions: string[] = [
-  ...new Set(Object.values(supportedLanguages).map((language) => language.extension)),
+  ...new Set(
+    Object.values(supportedLanguages).map((language) => language.extension),
+  ),
 ];
 
-export const extensionToLanguages: { [key: string]: string[]; } = Object.values(supportedLanguages).reduce<{ [key: string]: string[]; }>((acc, languageInfo) => {
+export const extensionToLanguages: { [key: string]: string[] } = Object.values(
+  supportedLanguages,
+).reduce<{ [key: string]: string[] }>((acc, languageInfo) => {
   const { extension, language } = languageInfo;
   if (!acc[extension]) acc[extension] = [];
   acc[extension].push(language);
@@ -67,7 +85,10 @@ export function asyncError(err: Error) {
   console.error('Async error', err);
 }
 
-export function announceToScreenReader(message: string, politeness: 'polite' | 'assertive' = 'polite'): void {
+export function announceToScreenReader(
+  message: string,
+  politeness: 'polite' | 'assertive' = 'polite',
+): void {
   const announcement = document.createElement('div');
   announcement.setAttribute('role', 'status');
   announcement.setAttribute('aria-live', politeness);
@@ -76,7 +97,11 @@ export function announceToScreenReader(message: string, politeness: 'polite' | '
 
   document.body.appendChild(announcement);
   setTimeout(() => {
-    try { document.body.removeChild(announcement); } catch { /* Ignored */ }
+    try {
+      document.body.removeChild(announcement);
+    } catch {
+      /* Ignored */
+    }
   }, 1000);
 }
 
@@ -85,14 +110,21 @@ type ThrottledFunction<T extends unknown[]> = {
   flush?: () => void;
 };
 
-export function throttle<T extends unknown[]>(f: (...args: T) => void, delay: number): (key: string) => ThrottledFunction<T> {
-  const timeouts: { [key: string]: { timeout: NodeJS.Timeout; args: T | null }; } = {};
+export function throttle<T extends unknown[]>(
+  f: (...args: T) => void,
+  delay: number,
+): (key: string) => ThrottledFunction<T> {
+  const timeouts: {
+    [key: string]: { timeout: NodeJS.Timeout; args: T | null };
+  } = {};
 
   const throttled = (key: string): ThrottledFunction<T> => {
     let wrapped: ThrottledFunction<T>;
 
     if (key in timeouts) {
-      wrapped = (...args: T) => { timeouts[key].args = args; };
+      wrapped = (...args: T) => {
+        timeouts[key].args = args;
+      };
     } else {
       wrapped = (...args: T) => {
         f(...args);
@@ -121,30 +153,56 @@ export function throttle<T extends unknown[]>(f: (...args: T) => void, delay: nu
 }
 
 export enum MonacoThemes {
-  VSLight = 'vs', VSDark = 'vs-dark',
+  VSLight = 'vs',
+  VSDark = 'vs-dark',
 }
 export const DUMMY_PROBLEM: types.ProblemInfo = {
   alias: 'dummy-problem',
   settings: {
     cases: {
       sample: { in: '1 2\n', out: '3\n', weight: 1 },
-      long: { in: '123456789012345678 123456789012345678\n', out: '246913578024691356\n', weight: 1 },
+      long: {
+        in: '123456789012345678 123456789012345678\n',
+        out: '246913578024691356\n',
+        weight: 1,
+      },
     },
-    limits: { ExtraWallTime: '5s', MemoryLimit: 33554432, OutputLimit: 10240, OverallWallTimeLimit: '3s', TimeLimit: '1s' },
+    limits: {
+      ExtraWallTime: '5s',
+      MemoryLimit: 33554432,
+      OutputLimit: 10240,
+      OverallWallTimeLimit: '3s',
+      TimeLimit: '1s',
+    },
     validator: { name: 'token-numeric', tolerance: 1e-9 },
   },
   accepts_submissions: false,
   karel_problem: false,
   commit: 'NA',
   languages: [],
-  limits: { input_limit: '10 KiB', memory_limit: '32 MiB', overall_wall_time_limit: '1s', time_limit: '1s' },
+  limits: {
+    input_limit: '10 KiB',
+    memory_limit: '32 MiB',
+    overall_wall_time_limit: '1s',
+    time_limit: '1s',
+  },
   points: 100,
   problem_id: 1,
-  problemsetter: { classname: 'user-rank-unranked', creation_date: new Date(), name: 'omegaUp admin', username: 'omegaup' },
+  problemsetter: {
+    classname: 'user-rank-unranked',
+    creation_date: new Date(),
+    name: 'omegaUp admin',
+    username: 'omegaup',
+  },
   quality_seal: false,
   sample_input: undefined,
   source: 'omegaUp classics',
-  statement: { images: {}, sources: {}, language: 'en', markdown: `# test\n{{sample.cpp}}` },
+  statement: {
+    images: {},
+    sources: {},
+    language: 'en',
+    markdown: `# test\n{{sample.cpp}}`,
+  },
   title: 'Dummy Problem',
   visibility: 2,
   input_limit: 1000,
