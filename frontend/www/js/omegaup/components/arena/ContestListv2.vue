@@ -499,6 +499,9 @@ class ArenaContestList extends Vue {
   // Flag to track if state change came from browser navigation (back/forward button)
   // When true, we should use replaceState instead of pushState to avoid corrupting history
   isFromBrowserNavigation: boolean = false;
+  // Flag to track the very first load — initial URL normalization should use
+  // replaceState to avoid creating an extra history entry (see issue #9161)
+  isInitialLoad: boolean = true;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -535,14 +538,15 @@ class ArenaContestList extends Vue {
       query: this.currentQuery,
       sort_order: this.currentOrder,
       filter: this.currentFilter,
-      replaceState: this.isFromBrowserNavigation,
+      replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
     };
     // Reset the contest list for this tab to avoid stale data
     Vue.set(this.contests, this.currentTab, []);
     this.currentPage = 1;
     this.hasMore = true;
-    // Reset the navigation flag after using it
+    // Reset the navigation and initial load flags after using them
     this.isFromBrowserNavigation = false;
+    this.isInitialLoad = false;
     this.fetchPage(params, urlObj);
   }
   mounted() {
