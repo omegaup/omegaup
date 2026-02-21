@@ -39,6 +39,7 @@ RUN curl -sL https://getcomposer.org/download/2.1.14/composer.phar -o /usr/bin/c
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
 RUN mkdir -p /opt/omegaup /var/lib/omegaup/templates && chown -R ubuntu /opt/omegaup /var/lib/omegaup
+RUN mkdir -p /opt/omegaup /var/lib/omegaup /var/log/omegaup && chown -R ubuntu /opt/omegaup /var/lib/omegaup /var/log/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 ARG BRANCH=release
