@@ -28,7 +28,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -97,7 +97,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -189,7 +189,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::CreateRandomString();
+        $password = \OmegaUp\Test\Utils::CreateRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -237,7 +237,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -256,7 +256,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identityLogin = self::login($identity);
 
         // Changing password
-        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
@@ -287,7 +287,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::CreateRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $originalPassword = \OmegaUp\Test\Utils::CreateRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::CreateRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -304,7 +304,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity($username);
         $identity->password = $originalPassword;
         $identityLogin = self::login($identity);
-        $newPassword = 'anypassword';
+        $newPassword = 'AnyP@ssw0rd!';
 
         try {
             \OmegaUp\Controllers\User::apiUpdateBasicInfo(new \OmegaUp\Request([
@@ -335,7 +335,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -354,7 +354,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identityLogin = self::login($identity);
 
         // Changing password
-        $newPassword = \OmegaUp\Test\Utils::createRandomString();
+        $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
@@ -393,7 +393,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -413,7 +413,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Trying to change the password, it must fail
-            $newPassword = \OmegaUp\Test\Utils::createRandomString();
+            $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
             \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
                 'auth_token' => $creatorLogin2->auth_token,
                 'username' => $username,
@@ -445,7 +445,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $originalPassword = \OmegaUp\Test\Utils::createRandomString();
+        $originalPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -469,7 +469,7 @@ class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Changing password
-            $newPassword = \OmegaUp\Test\Utils::createRandomString();
+            $newPassword = \OmegaUp\Test\Utils::createRandomPassword();
             \OmegaUp\Controllers\Identity::apiChangePassword(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'username' => $username,

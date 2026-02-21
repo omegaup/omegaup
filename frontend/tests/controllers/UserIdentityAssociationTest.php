@@ -32,7 +32,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -118,7 +118,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -171,7 +171,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
         $username = "{$group['group']->alias}:{$identityName}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
             'auth_token' => $creatorLogin->auth_token,
@@ -237,7 +237,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'username' => $username,
             'name' => $identityName,
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'country_id' => 'MX',
             'state_id' => 'QUE',
             'gender' => 'male',
@@ -253,7 +253,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\User::apiAssociateIdentity(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
-                'password' => \OmegaUp\Test\Utils::createRandomString(),
+                'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             ]));
             $this->fail('Identity should not be associated because identity ' .
                         'password does not match');
@@ -278,7 +278,7 @@ class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             $creatorLogin
         );
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([

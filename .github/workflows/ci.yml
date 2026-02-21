@@ -420,7 +420,7 @@ jobs:
       - name: Run the teaching assistant for course mode
         run: |
           cd stuff/teaching_assistant
-          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password 'Teacher_123!' --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
 
       - name: Run post check for course mode
         run: |
