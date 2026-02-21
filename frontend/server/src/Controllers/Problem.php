@@ -3654,9 +3654,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             intval($r->identity->identity_id)
         );
 
+        $verdict = $r->ensureOptionalString('verdict');
+        $status = $r->ensureOptionalString('status');
+        $language = $r->ensureOptionalString('language');
+
         // Add each filtered run to an array
         $result = [];
         foreach ($runsArray as $run) {
+            if (!is_null($verdict) && $run['verdict'] !== $verdict) {
+                continue;
+            }
+            if (!is_null($status) && $run['status'] !== $status) {
+                continue;
+            }
+            if (!is_null($language) && $run['language'] !== $language) {
+                continue;
+            }
             $run['alias'] = strval($problem->alias);
             $run['country'] = 'xx';
             $result[] = $run;
