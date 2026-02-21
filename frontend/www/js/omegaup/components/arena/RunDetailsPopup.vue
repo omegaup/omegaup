@@ -275,14 +275,14 @@ export default class ArenaRunDetailsPopup extends Vue {
     feedbackList: { lineNumber: number; feedback: string }[],
     guid: string,
   ) {
-    this.$parent.$parent.$parent.$parent.$emit('save-feedback-list', {
+    this.$parent?.$parent?.$parent?.$parent?.$emit('save-feedback-list', {
       feedbackList,
       guid,
     });
   }
 
   onSubmitFeedbackThread(feedback: ArenaCourseFeedback, guid: string) {
-    this.$parent.$parent.$parent.$parent.$emit('submit-feedback-thread', {
+    this.$parent?.$parent?.$parent?.$parent?.$emit('submit-feedback-thread', {
       feedback,
       guid,
     });
