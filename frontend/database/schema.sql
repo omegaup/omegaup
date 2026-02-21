@@ -89,6 +89,7 @@ CREATE TABLE `Assignments` (
   KEY `acl_id` (`acl_id`),
   KEY `idx_finish_time` (`finish_time`),
   KEY `idx_assignment_type` (`assignment_type`),
+  KEY `idx_assignments_problemset_assignment_course` (`problemset_id`,`assignment_id`,`course_id`),
   CONSTRAINT `fk_aa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_ac_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
   CONSTRAINT `fk_ap_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
@@ -1195,6 +1196,7 @@ CREATE TABLE `Submissions` (
   KEY `idx_submissions_identity_verdict_type_problem` (`identity_id`,`verdict`,`type`,`problem_id`),
   KEY `idx_submissions_identity_problem_time` (`identity_id`,`problem_id`,`time` DESC),
   KEY `idx_submissions_identity_problem_problemset_time` (`identity_id`,`problem_id`,`problemset_id`,`time` DESC),
+  KEY `idx_submissions_identity_problemset_problem` (`identity_id`,`problemset_id`,`problem_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1439,4 +1441,3 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
