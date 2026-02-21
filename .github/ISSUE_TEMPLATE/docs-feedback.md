@@ -1,5 +1,5 @@
 ---
-name: Documentation feedback
+name: Documentation feedback (English)
 about: Help us improve the platform by requesting changes, clarifications, or enhancements to the documentation using this format.
 title: "[DOCS] Brief description of the proposed improvement"
 labels: 'documentation'
