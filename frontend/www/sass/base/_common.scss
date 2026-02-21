@@ -161,3 +161,7 @@ pre > code {
   overflow-y: auto;
   overflow-x: hidden;
 }
+.navbar-collapse.show {
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+}
