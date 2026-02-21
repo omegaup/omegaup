@@ -85,7 +85,6 @@ CREATE TABLE `Assignments` (
   `order` int NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas/tareas',
   PRIMARY KEY (`assignment_id`),
   UNIQUE KEY `assignment_alias` (`course_id`,`alias`),
-  KEY `fk_ap_problemset_id` (`problemset_id`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_finish_time` (`finish_time`),
   KEY `idx_assignment_type` (`assignment_type`),
@@ -1441,3 +1440,4 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
