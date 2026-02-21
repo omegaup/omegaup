@@ -3,10 +3,15 @@ on:
   workflow_dispatch: # can be run manually
   issue_comment:
     types: [created]
+permissions:
+  contents: read
+
 jobs:
   rebase:
     name: Rebase
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     if: >-
       github.event.issue.pull_request != '' && 
       github.event.comment.author_association == 'MEMBER' && 
@@ -16,12 +21,12 @@ jobs:
       )
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
       - name: Automatic Rebase
-        uses: cirrus-actions/rebase@1.8
+        uses: cirrus-actions/rebase@b87d48154a87a85666003575337e27b8cd65f691
         with:
           autosquash: ${{ contains(github.event.comment.body, '/autosquash') || contains(github.event.comment.body, '/rebase-autosquash') }}
         env:

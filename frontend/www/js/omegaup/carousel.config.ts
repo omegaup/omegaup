@@ -21,52 +21,52 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/egoi25.png',
+    image: '/media/homepage/ofmi.png',
     title: {
-      en: 'Mexico present at EGOI 2025',
-      es: 'México presente en la EGOI 2025',
-      pt: 'México presente na EGOI 2025',
+      en: 'Registration is now open!',
+      es: '¡Ya está abierta la convocatoria!',
+      pt: 'Inscrições abertas!',
     },
     description: {
       en:
-        'We proudly celebrate our team’s participation at the European Girls’ Olympiad in Informatics (EGOI) 2025 in Bonn, Germany. 🎉🎉🎉 Thanks to our sponsors, donors, and volunteers for making this dream possible. 💙',
+        'Discover, learn, and participate in the community that drives female talent in programming. 5th Mexican Female Informatics Olympiad (OFMI).',
       es:
-        'Con orgullo celebramos la participación de nuestro equipo en la European Girls’ Olympiad in Informatics (EGOI) 2025 en Bonn, Alemania. 🎉🎉🎉 Gracias a patrocinadores, donantes y al voluntariado por hacer posible este sueño. 💙',
+        'Descubre, aprende y participa en la comunidad que impulsa el talento femenino en la programación. 5ª Olimpiada Femenil Mexicana de Informática (OFMI).',
       pt:
-        'Com orgulho, celebramos a participação de nossa equipe na European Girls’ Olympiad in Informatics (EGOI) 2025 em Bonn, Alemanha. 🎉🎉🎉 Obrigado aos patrocinadores, doadores e voluntários por tornar este sonho possível. 💙',
+        'Descubra, aprenda e participe da comunidade que impulsiona o talento feminino na programação. 5ª Olimpíada Feminina Mexicana de Informática (OFMI).',
     },
     button: {
       text: {
-        en: 'EGOI',
-        es: 'EGOI',
-        pt: 'EGOI',
+        en: 'View call',
+        es: 'Ver convocatoria',
+        pt: 'Ver convocatória',
       },
-      href: 'https://egoi.org/',
+      href: 'https://ofmi.omegaup.com/convocatoria',
       target: '_blank',
     },
   },
   {
-    image: '/media/homepage/copa.png',
+    image: '/media/homepage/carousel_slide_4.svg',
     title: {
-      en: 'Copa de Comunidades de Programación',
-      es: 'Copa de Comunidades de Programación',
-      pt: 'Copa de Comunidades de Programação',
+      en: 'Start preparing with Intro OFMI',
+      es: 'Empieza a prepararte con Intro OFMI',
+      pt: 'Comece a se preparar com o Intro OFMI',
     },
     description: {
       en:
-        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
+        'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
       es:
-        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
+        '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
       pt:
-        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
+        'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
     },
     button: {
       text: {
-        en: 'Final Ranklist',
-        es: 'Ranklist final',
-        pt: 'Ranklist final',
+        en: 'Start course',
+        es: 'Comenzar curso',
+        pt: 'Começar curso',
       },
-      href: 'https://omegaup.github.io/CCP/',
+      href: 'https://omegaup.com/course/Intro-OFMI/',
       target: '_blank',
     },
   },

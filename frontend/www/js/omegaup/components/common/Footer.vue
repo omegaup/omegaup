@@ -7,6 +7,7 @@
             class="footer-logo d-block mx-auto mb-1 mt-n6"
             width="120"
             src="/media/logo-main-white.svg"
+            :alt="T.frontPageFooterLogoAlt"
           />
           <div class="slogan mx-auto">
             {{ T.frontPageFooter }}
@@ -223,7 +224,6 @@ export default class Footer extends Vue {
 .common-footer {
   background-color: $omegaup-primary--darker;
   color: $omegaup-white;
-  flex-grow: 1;
 
   .footer-navigation {
     .footer-brand {
