@@ -103,7 +103,12 @@ class SessionManager {
         }
         /** @psalm-suppress MixedArgument If this is defined, it is a string */
         $authorization = strval($_SERVER['HTTP_AUTHORIZATION']);
-        if (!str_starts_with($authorization, self::TOKEN_AUTHORIZATION_PREFIX)) {
+        if (
+            !str_starts_with(
+                $authorization,
+                self::TOKEN_AUTHORIZATION_PREFIX
+            )
+        ) {
             return null;
         }
         return trim(
