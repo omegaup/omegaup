@@ -543,14 +543,22 @@ class Run extends \OmegaUp\Controllers\Controller {
             'verdict' => 'JE',
         ]);
 
-        // Use TransactionHelper to handle potential deadlocks in submission creation
-        \OmegaUp\TransactionHelper::executeWithRetry(function () use (
-            $submission,
-            $r,
-            $problem,
-            $contest,
-            $run
-        ) {
+        // Set READ COMMITTED isolation at the session level.
+        // This eliminates InnoDB gap locks that cause deadlocks when
+        // multiple users submit concurrently. The FOR UPDATE lock in
+        // isInsideSubmissionGap() will still acquire row-level locks
+        // to serialize same-user submissions, but without gap locks
+        // there is no cross-user deadlock risk.
+        // We use SESSION scope because autocommit is off, which means
+        // SET TRANSACTION (next-transaction scope) would fail with
+        // error 1568.
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED'
+        );
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
             // _Now_ that we are in a transaction, we can check whether the run
             // is within the submission gap.
             self::validateWithinSubmissionGap(
@@ -566,7 +574,18 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Runs::create($run);
             $submission->current_run_id = $run->run_id;
             \OmegaUp\DAO\Submissions::update($submission);
-        });
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        } finally {
+            // Restore the default isolation level to avoid leaking
+            // the session-level change to other code paths.
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ'
+            );
+        }
 
         // Call Grader
         try {
