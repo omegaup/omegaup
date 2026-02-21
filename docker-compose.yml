@@ -133,6 +133,9 @@ services:
       - --max_execution_time=30000
       - --lock_wait_timeout=10
       - --wait_timeout=20
+      - --slow_query_log=1
+      - --slow_query_log_file=/var/lib/mysql/slow.log
+      - --long_query_time=1
     expose:
       - '13306'
     volumes:
