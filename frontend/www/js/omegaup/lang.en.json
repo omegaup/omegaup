@@ -291,6 +291,7 @@
 	"compareUserNotFound": "User not found",
 	"compareUsersTitle": "Compare Users",
 	"compareVsMe": "Compare vs me",
+	"contentCreationRateLimitExceeded": "You have exceeded the maximum number of allowed creations per hour. Please try again later.",
 	"contentCreator": "Contributor",
 	"contentOrderUpdated": "Content's order has been updated",
 	"contestAddUserContestant": "Contestant",
