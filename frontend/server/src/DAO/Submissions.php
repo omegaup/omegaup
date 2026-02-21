@@ -159,64 +159,14 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     /**
      * Get whether the to-be-created submission is within the allowed
      * submission gap.
+     *
+     * This method uses `FOR UPDATE` to acquire row-level locks, preventing
+     * concurrent submissions from the same user from bypassing the gap check.
+     * The caller must set the transaction isolation level to READ COMMITTED
+     * before calling this method to avoid gap locks (which cause deadlocks
+     * under the default REPEATABLE READ isolation).
      */
     final public static function isInsideSubmissionGap(
-        \OmegaUp\DAO\VO\Submissions $submission,
-        int $problemId,
-        int $identityId,
-        ?\OmegaUp\DAO\VO\Contests $contest = null
-    ): bool {
-        $maxRetries = 3;
-        $retryCount = 0;
-
-        while ($retryCount < $maxRetries) {
-            try {
-                return self::isInsideSubmissionGapSingle(
-                    $submission,
-                    $problemId,
-                    $identityId,
-                    $contest
-                );
-            } catch (\mysqli_sql_exception $e) {
-                $retryCount++;
-
-                // Check if this is a deadlock or lock timeout error
-                $errorCode = $e->getCode();
-                $isDeadlock = in_array($errorCode, [1205, 1213]);
-
-                if (!$isDeadlock || $retryCount >= $maxRetries) {
-                    throw $e;
-                }
-
-                // Exponential backoff with jitter
-                $waitTime = max(
-                    value: 0,
-                    values: intval(
-                        value: min(pow(2, $retryCount - 1) * 100000, 1000000)
-                    )
-                );
-                $jitter = rand(0, 50000);
-                usleep($waitTime + $jitter);
-
-                // Log the retry attempt if NewRelic is available
-                if (extension_loaded('newrelic')) {
-                    \newrelic_notice_error(
-                        "Submission gap deadlock retry attempt {$retryCount}/{$maxRetries}: " . $e->getMessage(),
-                        $e
-                    );
-                }
-            }
-        }
-
-        throw new \RuntimeException(
-            'Maximum retry attempts exceeded for submission gap check'
-        );
-    }
-
-    /**
-     * Single attempt to check submission gap
-     */
-    private static function isInsideSubmissionGapSingle(
         \OmegaUp\DAO\VO\Submissions $submission,
         int $problemId,
         int $identityId,
