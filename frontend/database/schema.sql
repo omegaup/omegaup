@@ -800,6 +800,7 @@ CREATE TABLE `Problemset_Access_Log` (
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `problemset_id` (`problemset_id`),
   KEY `identity_id` (`identity_id`),
+  KEY `idx_problemset_access_log_covering` (`problemset_id`,`identity_id`,`ip`,`time`),
   CONSTRAINT `fk_palc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`),
   CONSTRAINT `fk_pali_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de acceso a listas de problemas';
