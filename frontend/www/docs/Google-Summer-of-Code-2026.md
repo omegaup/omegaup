@@ -237,6 +237,7 @@ If you are interested spending this summer collaborating with us, first of all, 
 
  - First, create an account at [omegaUp.com](https://omegaUp.com).
  - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/contest/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
+#### note: alternative url for the test: [omegaUp Test](https://omegaup.com/arena/gsoc2026)
 
 ### Phase Two: Familiarize yourself with our codebase
 
