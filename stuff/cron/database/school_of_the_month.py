@@ -301,3 +301,54 @@ def insert_school_of_the_month_candidates(
             );
             ''', (row.school_id, first_day_of_next_month,
                   index + 1, row.score))
+
+
+def get_last_12_schools_of_the_month(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date) -> List[School]:
+    '''Get last 12 school of the month winners'''
+    logging.info("Getting last 12 school of the month winners")
+    sql = '''
+        SELECT
+            `sotm`.`school_id`,
+            `sch`.`name`,
+            `sotm`.`score`
+        FROM
+            `School_Of_The_Month` AS `sotm`
+        INNER JOIN
+            `Schools` AS `sch` ON `sch`.`school_id` = `sotm`.`school_id`
+        WHERE
+            (
+                `sotm`.`selected_by` IS NOT NULL
+                OR (
+                    `sotm`.`ranking` = 1 AND
+                    NOT EXISTS (
+                        SELECT
+                            *
+                        FROM
+                            `School_Of_The_Month`
+                        WHERE
+                            `time` = `sotm`.`time` AND
+                            `selected_by` IS NOT NULL
+                    )
+                )
+            )
+            AND `sotm`.`time` <= %s
+            AND `sotm`.`time` > DATE_SUB(%s, INTERVAL 12 MONTH)
+        ORDER BY
+            `sotm`.`time` DESC
+        LIMIT
+            0, 12;
+    '''
+    cur_readonly.execute(sql, (first_day_of_current_month,
+                               first_day_of_current_month))
+    schools: List[School] = []
+    for row in cur_readonly.fetchall():
+        schools.append(
+            School(
+                school_id=row['school_id'],
+                name=row['name'],
+                score=row['score'],
+            )
+        )
+    return schools

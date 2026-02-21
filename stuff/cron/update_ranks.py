@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence
+from typing import List, NamedTuple, Sequence, Dict
 
 import mysql.connector
 import mysql.connector.cursor
@@ -17,10 +17,8 @@ from database.coder_of_the_month import get_cotm_eligible_users
 from database.coder_of_the_month import get_eligible_problems
 from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
-from database.coder_of_the_month import get_first_day_of_next_month
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
-from database.coder_of_the_month import UserRank
 from database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
@@ -30,6 +28,11 @@ from database.school_of_the_month import (
     delete_problems_solved_per_month,
     get_current_problems_solved_per_month,
     insert_updated_problems_solved_per_month,
+    get_last_12_schools_of_the_month,
+)
+from utils import (
+    UserRank,
+    get_first_day_of_next_month,
 )
 
 
@@ -39,6 +42,12 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+logging.basicConfig(
+    filename='update_ranks.log',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
 
 
 class Cutoff(NamedTuple):
@@ -423,10 +432,10 @@ def update_school_of_the_month_candidates(
         logging.info('Skipping because already exist selected schools.')
         return
     remove_school_of_the_month_candidates(cur, first_day_of_next_month)
-    schools = get_school_of_the_month_candidates(
+    schools = compute_points_for_school(
         cur_readonly,
-        first_day_of_next_month,
-        first_day_of_current_month
+        first_day_of_current_month,
+        first_day_of_next_month
     )
     if not schools:
         logging.info('No eligible schools found.')
@@ -458,6 +467,108 @@ def debug_school_of_the_month_candidates(
     log_message = json.dumps(log_entries, indent=4)
     logging.info('School of the month candidates:')
     logging.info(log_message)
+
+
+def compute_points_for_school(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date
+) -> List[School]:
+    '''Computes the points for each eligible school'''
+
+    # Get the last 12 schools of the month winners
+    last_12_schools = get_last_12_schools_of_the_month(
+        cur_readonly,
+        first_day_of_current_month
+    )
+
+    last_12_schools_ids = {school.school_id for school in last_12_schools}
+
+    eligible_schools = get_school_of_the_month_candidates(
+        cur_readonly,
+        first_day_of_next_month,
+        first_day_of_current_month
+    )
+    eligible_users = get_cotm_eligible_users(
+        cur_readonly,
+        first_day_of_current_month,
+        first_day_of_next_month,
+        'all',
+        []
+    )
+
+    if last_12_schools_ids:
+        eligible_schools = [
+            s for s in eligible_schools
+            if s.school_id not in last_12_schools_ids
+        ]
+        eligible_users = [
+            u for u in eligible_users
+            if u.school_id is None or u.school_id not in last_12_schools_ids
+        ]
+
+    # Debug
+    if not eligible_schools:
+        logging.info('No eligible schools founds.')
+        return []
+
+    eligible_problems = get_eligible_problems(cur_readonly)
+
+    # Get the list of identity IDs for eligible users
+    identity_ids = [user.identity_id for user in eligible_users]
+
+    # Get the list of problem IDs for eligible problems
+    problem_ids = list(eligible_problems.keys())
+
+    if not identity_ids:
+        logging.info('No eligible users founds.')
+        return []
+
+    if not problem_ids:
+        logging.info('No eligible problems found.')
+        return []
+
+    # Convert the list of identity IDs to a comma-separated string
+    identity_ids_str = ', '.join(map(str, identity_ids))
+
+    # Convert the list of problem IDs to a comma-separated string
+    problem_ids_str = ', '.join(map(str, problem_ids))
+
+    user_problems = get_user_problems(cur_readonly,
+                                      identity_ids_str,
+                                      problem_ids_str,
+                                      eligible_users,
+                                      first_day_of_current_month,
+                                      )
+    # Calculate the score for each school based on the problems solved by its
+    # users
+    for _, points in user_problems.items():
+        # Iterate over each problem solved by the user to get the score and add
+        # it to the total score
+        for problem_id in points['solved']:
+            points['score'] += eligible_problems[problem_id].score
+    # Create a mapping from school_id to School object
+    school_map: Dict[int, School] = {}
+    for school in eligible_schools:
+        school_map[school.school_id] = school
+    # Aggregate scores for each school
+    for user in eligible_users:
+        school_id = user.school_id
+        if school_id is not None and school_id in school_map:
+            school = school_map[school_id]
+            updated_school = school._replace(
+                score=school.score +
+                user_problems[user.identity_id]['score']
+            )
+            school_map[school_id] = updated_school
+    # Create a list of updated schools with their scores
+    eligible_schools = list(school_map.values())
+    # Sort the updated schools by score in descending order
+    eligible_schools_sorted = sorted(
+        eligible_schools, key=lambda school: school.score, reverse=True)
+    eligible_schools = eligible_schools_sorted
+
+    return eligible_schools
 
 
 def compute_points_for_user(
@@ -530,7 +641,7 @@ def compute_points_for_user(
         updated_users.append(updated_user)
     # Sort the updated users by score in descending order
     updated_users_sorted = sorted(
-        updated_users, key=lambda user: user.score, reverse=True)
+        updated_users, key=lambda user: float(user.score), reverse=True)
     return updated_users_sorted[:coder_list_count]
 
 
