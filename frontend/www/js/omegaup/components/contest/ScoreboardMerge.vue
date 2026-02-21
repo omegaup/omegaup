@@ -4,9 +4,8 @@
       <h3 class="card-title mb-0">{{ T.omegaupTitleScoreboardmerge }}</h3>
     </div>
     <div class="card-body">
-      <div class="row align-items-center">
-        <div class="form-group col-md-9" data-merge-contest-name>
-          <label>{{ T.wordsContest }}:</label>
+      <div class="row align-items-end">
+        <div class="form-group col-md-8" data-merge-contest-name>
           <multiselect
             :value="selectedContests"
             :options="contestAliases"
@@ -18,10 +17,10 @@
             @select="onSelect"
           ></multiselect>
         </div>
-        <div class="form-group col-md-3 text-right">
+        <div class="form-group col-md-4 text-right">
           <button
             data-merge-contest-button
-            class="btn btn-primary"
+            class="btn btn-primary w-100"
             type="button"
             :disabled="!selectedContests.length"
             @click.prevent="onDisplayTable"

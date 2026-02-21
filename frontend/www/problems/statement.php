@@ -1,6 +1,6 @@
 <?php
 namespace OmegaUp;
-require_once(dirname(__DIR__) . '/server/bootstrap.php');
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
     /** @return array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string} */

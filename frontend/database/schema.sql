@@ -104,7 +104,6 @@ CREATE TABLE `Auth_Tokens` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
   KEY `identity_id` (`identity_id`),
-  KEY `acting_identity_id` (`identity_id`),
   KEY `fk_ati_acting_identity_id` (`acting_identity_id`),
   CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
@@ -194,7 +193,6 @@ CREATE TABLE `Coder_Of_The_Month` (
   `problems_solved` int NOT NULL DEFAULT '0',
   `certificate_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   PRIMARY KEY (`coder_of_the_month_id`),
-  KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
@@ -385,11 +383,59 @@ CREATE TABLE `Favorites` (
   `user_id` int NOT NULL,
   `problem_id` int NOT NULL,
   PRIMARY KEY (`user_id`,`problem_id`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas favoritos de los usuarios';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Edition` (
+  `edition_id` int NOT NULL AUTO_INCREMENT,
+  `year` int NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `application_deadline` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`edition_id`),
+  UNIQUE KEY `unique_year` (`year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ediciones de Google Summer of Code';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Idea` (
+  `idea_id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `brief_description` text,
+  `expected_results` text,
+  `preferred_skills` text,
+  `possible_mentors` text,
+  `estimated_hours` int DEFAULT NULL,
+  `skill_level` enum('Low','Medium','Advanced') DEFAULT NULL,
+  `blog_link` varchar(500) DEFAULT NULL,
+  `contributor_username` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idea_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Ideas de proyectos de Google Summer of Code (independientes de edición)';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GSoC_Idea_Edition` (
+  `idea_edition_id` int NOT NULL AUTO_INCREMENT,
+  `idea_id` int NOT NULL,
+  `edition_id` int NOT NULL,
+  `status` enum('Proposed','Accepted','Archived','Completed') DEFAULT 'Proposed',
+  `decision_notes` text COMMENT 'Notas explicando la decisión tomada para este proyecto en esta edición',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idea_edition_id`),
+  UNIQUE KEY `unique_idea_edition` (`idea_id`,`edition_id`),
+  KEY `idea_id` (`idea_id`),
+  KEY `edition_id` (`edition_id`),
+  CONSTRAINT `gsoc_idea_edition_edition` FOREIGN KEY (`edition_id`) REFERENCES `GSoC_Edition` (`edition_id`) ON DELETE CASCADE,
+  CONSTRAINT `gsoc_idea_edition_idea` FOREIGN KEY (`idea_id`) REFERENCES `GSoC_Idea` (`idea_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Vincula ideas de GSoC a ediciones con estado por edición';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -667,7 +713,6 @@ CREATE TABLE `Problem_Viewed` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `view_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`problem_id`,`identity_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_pv_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_pvi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
@@ -718,7 +763,6 @@ CREATE TABLE `Problems_Forfeited` (
   `problem_id` int NOT NULL,
   `forfeited_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`problem_id`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_pfp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_pfu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
@@ -730,7 +774,6 @@ CREATE TABLE `Problems_Languages` (
   `problem_id` int NOT NULL,
   `language_id` int NOT NULL,
   PRIMARY KEY (`problem_id`,`language_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `language_id` (`language_id`),
   CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
   CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
@@ -743,7 +786,6 @@ CREATE TABLE `Problems_Tags` (
   `tag_id` int NOT NULL,
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `tag_id` (`tag_id`),
   CONSTRAINT `fk_ptp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_ptt_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`)
@@ -842,7 +884,6 @@ CREATE TABLE `Problemset_Problems` (
   `order` int NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
   `is_extra_problem` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problemset_id`,`problem_id`),
-  KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
   KEY `idx_problemset_problems_ids` (`problem_id`,`problemset_id`),
   CONSTRAINT `fk_ppp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1017,7 +1058,6 @@ CREATE TABLE `School_Of_The_Month` (
   `score` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_of_the_month_id`),
   UNIQUE KEY `rank_time` (`ranking`,`time`),
-  KEY `school_of_the_month_id` (`school_of_the_month_id`),
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
   KEY `idx_time` (`time`),
@@ -1270,7 +1310,8 @@ CREATE TABLE `User_Rank` (
 CREATE TABLE `User_Rank_Cutoffs` (
   `score` double NOT NULL,
   `percentile` double NOT NULL,
-  `classname` varchar(50) NOT NULL
+  `classname` varchar(50) NOT NULL,
+  PRIMARY KEY (`classname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los valores del ranking para los cuales hay un cambio de color.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
