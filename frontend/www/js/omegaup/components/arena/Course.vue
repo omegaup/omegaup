@@ -63,7 +63,7 @@
             :finish-time="currentAssignment.finish_time"
             :admin="currentAssignment.director"
           ></omegaup-arena-summary>
-          <div v-else class="problem main">
+          <div v-else ref="problemContent" class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
@@ -417,6 +417,27 @@ export default class ArenaCourse extends Vue {
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
     this.activeProblem = problem;
     this.$emit('navigate-to-problem', { problem });
+    // Scroll problem content to top when switching problems
+    this.$nextTick(() => {
+      const problemContent = this.$refs.problemContent as HTMLElement;
+      if (problemContent) {
+        // Find the scrollable tab-content container (the actual scrollable area)
+        const tabContent = problemContent.closest(
+          '.tab-content',
+        ) as HTMLElement;
+        if (tabContent) {
+          // Get the position of problem content relative to tab-content
+          const problemRect = problemContent.getBoundingClientRect();
+          const tabContentRect = tabContent.getBoundingClientRect();
+          // Calculate scroll position: current scroll + difference in positions
+          const scrollTop =
+            tabContent.scrollTop + (problemRect.top - tabContentRect.top);
+
+          // Scroll the tab-content container to show problem at the top
+          tabContent.scrollTop = scrollTop;
+        }
+      }
+    });
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
@@ -483,9 +504,15 @@ export default class ArenaCourse extends Vue {
   .navbar {
     width: 21em;
     float: left;
-    background: transparent;
+    position: sticky;
+    top: 0;
+    max-height: calc(100vh - 225px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 100;
+    scrollbar-width: none;
+    padding-top: 1.5rem;
   }
-
   .main {
     margin-left: 20em;
     border: 1px solid var(--arena-contest-navleft-main-border-color);
