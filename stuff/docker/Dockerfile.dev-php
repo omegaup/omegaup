@@ -55,7 +55,7 @@ RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27
 RUN useradd --create-home --shell=/bin/bash ubuntu
 
 RUN mkdir -p /etc/omegaup/frontend
-RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
+RUN mkdir -p /var/log/omegaup /var/lib/omegaup/templates && chown -R ubuntu /var/log/omegaup /var/lib/omegaup/templates
 RUN mkdir -p /var/log/supervisor && chown -R ubuntu /var/log/supervisor
 
 COPY ./etc/omegaup/frontend/* /etc/omegaup/frontend/
