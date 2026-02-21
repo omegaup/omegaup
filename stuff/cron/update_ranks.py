@@ -499,15 +499,9 @@ def compute_points_for_user(
         logging.info('No eligible problems found.')
         return []
 
-    # Convert the list of identity IDs to a comma-separated string
-    identity_ids_str = ', '.join(map(str, identity_ids))
-
-    # Convert the list of problem IDs to a comma-separated string
-    problem_ids_str = ', '.join(map(str, problem_ids))
-
     user_problems = get_user_problems(cur_readonly,
-                                      identity_ids_str,
-                                      problem_ids_str,
+                                      identity_ids,
+                                      problem_ids,
                                       eligible_users,
                                       first_day_of_current_month,
                                       )

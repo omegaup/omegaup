@@ -328,8 +328,8 @@ def get_eligible_problems(
 
 def get_user_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    identity_ids_str: str,
-    problem_ids_str: str,
+    identity_ids: List[int],
+    problem_ids: List[int],
     eligible_users: List[UserRank],
     first_day_of_current_month: datetime.date,
 ) -> Dict[int, UserProblems]:
@@ -344,8 +344,10 @@ def get_user_problems(
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
 
-    problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
+    problems_admins = get_problems_admins(cur_readonly, problem_ids)
 
+    identity_placeholders = ', '.join(['%s'] * len(identity_ids))
+    problem_placeholders = ', '.join(['%s'] * len(problem_ids))
     cur_readonly.execute(f'''
             WITH
                 ProblemsForfeitedByUser AS (
@@ -374,14 +376,14 @@ def get_user_problems(
                 pfbu.user_id = i.user_id
                 AND pfbu.problem_id = s.problem_id
             WHERE
-                s.identity_id IN ({identity_ids_str})
-                AND s.problem_id IN ({problem_ids_str})
+                s.identity_id IN ({identity_placeholders})
+                AND s.problem_id IN ({problem_placeholders})
                 AND s.verdict = 'AC'
                 AND s.type = 'normal'
                 AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
-    ''')
+    ''', tuple(identity_ids) + tuple(problem_ids))
 
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
@@ -401,10 +403,11 @@ def get_user_problems(
 
 def get_problems_admins(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    problem_ids_str: str,
+    problem_ids: List[int],
 ) -> Dict[int, List[int]]:
     '''Get the list of problems admins'''
 
+    placeholders = ', '.join(['%s'] * len(problem_ids))
     cur_readonly.execute(f'''
         SELECT
             p.problem_id,
@@ -416,7 +419,7 @@ def get_problems_admins(
         INNER JOIN
             Identities AS ai ON a.owner_id = ai.user_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         UNION DISTINCT
         SELECT
             p.problem_id,
@@ -429,7 +432,7 @@ def get_problems_admins(
         INNER JOIN
             Identities uri ON ur.user_id = uri.user_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         UNION DISTINCT
         SELECT
             p.problem_id,
@@ -442,10 +445,10 @@ def get_problems_admins(
         INNER JOIN
             Groups_Identities gi ON gi.group_id = gr.group_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         ORDER BY
             problem_id;
-    ''')
+    ''', tuple(problem_ids) * 3)
 
     problems_admins: Dict[int, List[int]] = {}
 
