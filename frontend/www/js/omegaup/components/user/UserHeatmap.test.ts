@@ -2,15 +2,18 @@ import { shallowMount } from '@vue/test-utils';
 import UserHeatmap from './UserHeatmap.vue';
 
 // Mock Highcharts to avoid actual chart rendering in tests
-const mockDestroy = jest.fn();
-const mockChart = { destroy: mockDestroy };
-const MockChart = jest.fn().mockImplementation(() => mockChart);
+// NOTE: jest.mock() is hoisted above all variable declarations by babel-jest,
+// so all mock setup must be self-contained inside the factory functions.
 
-jest.mock('highcharts/highstock', () => ({
-    __esModule: true,
-    default: { Chart: MockChart },
-    Chart: MockChart,
-}));
+jest.mock('highcharts/highstock', () => {
+    const chart = { destroy: jest.fn() };
+    const Chart = jest.fn().mockImplementation(() => chart);
+    return {
+        __esModule: true,
+        default: { Chart },
+        Chart,
+    };
+});
 
 jest.mock('highcharts/modules/heatmap', () => jest.fn());
 
