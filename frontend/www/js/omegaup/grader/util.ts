@@ -25,6 +25,184 @@ export const units: { [key: string]: number } = {
   '': 1,
 };
 
+export const LANGUAGE_FAMILIES: Record<string, string> = {
+  'cpp11-gcc': 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
+  'cpp20-gcc': 'cpp',
+  'cpp20-clang': 'cpp',
+  'c11-gcc': 'c',
+  'c11-clang': 'c',
+  py2: 'python',
+  py3: 'python',
+};
+
+interface LanguagePattern {
+  language: string;
+  displayName: string;
+  patterns: RegExp[];
+  priority: number;
+}
+
+const LANGUAGE_PATTERNS: LanguagePattern[] = [
+  {
+    language: 'cpp20-gcc',
+    displayName: 'C++20 (g++ 10.3)',
+    patterns: [
+      /#include\s*<(iostream|vector|algorithm|string|map|set|queue|stack|cmath|bits\/stdc\+\+\.h)>/,
+      /\b(std::cout|std::cin|std::endl|std::vector|std::string|namespace\s+std)\b/,
+      /using\s+namespace\s+std/,
+    ],
+    priority: 95,
+  },
+  {
+    language: 'c11-gcc',
+    displayName: 'C11 (gcc 10.3)',
+    patterns: [
+      /#include\s*<(stdio\.h|stdlib\.h|string\.h|math\.h|stdbool\.h)>/,
+      /\b(printf|scanf|malloc|free|sizeof)\s*\(/,
+    ],
+    priority: 90,
+  },
+  {
+    language: 'java',
+    displayName: 'Java (openjdk 16.0)',
+    patterns: [
+      /^\s*public\s+class\s+\w+/m,
+      /^\s*import\s+java\./m,
+      /public\s+static\s+void\s+main\s*\(/,
+    ],
+    priority: 88,
+  },
+  {
+    language: 'kt',
+    displayName: 'Kotlin (1.6.10)',
+    patterns: [/\bfun\s+main\s*\(/, /\b(val|var)\s+\w+\s*[:=]/, /println\s*\(/],
+    priority: 87,
+  },
+  {
+    language: 'cs',
+    displayName: 'C# (10, dotnet 6.0)',
+    patterns: [/^\s*using\s+System/m, /namespace\s+\w+/, /Console\.WriteLine/],
+    priority: 86,
+  },
+  {
+    language: 'py3',
+    displayName: 'Python (3.9)',
+    patterns: [
+      /^(?:import|from)\s+\w+/m,
+      /^def\s+\w+\s*\(/m,
+      /\bprint\s*\(/,
+      /if\s+__name__\s*==\s*['"]__main__['"]/,
+    ],
+    priority: 85,
+  },
+  {
+    language: 'go',
+    displayName: 'Go (1.18.beta2)',
+    patterns: [
+      /^\s*package\s+\w+/m,
+      /^\s*func\s+main\s*\(/m,
+      /fmt\.(Println|Printf)/,
+    ],
+    priority: 84,
+  },
+  {
+    language: 'rs',
+    displayName: 'Rust (1.56.1)',
+    patterns: [
+      /^\s*fn\s+main\s*\(/m,
+      /println!\s*\(/,
+      /\blet\b.*\bmut\b|use\s+std::/,
+    ],
+    priority: 83,
+  },
+  {
+    language: 'js',
+    displayName: 'JavaScript (Node.js 16)',
+    patterns: [
+      /\bconsole\.log\b|\bmodule\.exports\b|\brequire\s*\(/,
+      /=>\s*\{/,
+      /\b(const|let|var)\s+\w+\s*=\s*/,
+    ],
+    priority: 82,
+  },
+  {
+    language: 'hs',
+    displayName: 'Haskell (ghc 8.8)',
+    patterns: [/^\s*module\s+\w+\s+where/m, /::/, /\bwhere\b|\bdata\b/],
+    priority: 81,
+  },
+  {
+    language: 'rb',
+    displayName: 'Ruby (2.7)',
+    patterns: [
+      /^\s*(require|require_relative)\s+['"]/m,
+      /^\s*def\s+\w+/m,
+      /\b(puts|gets)\b/,
+    ],
+    priority: 78,
+  },
+  {
+    language: 'pas',
+    displayName: 'Pascal (fpc 3.0)',
+    patterns: [
+      /\b(program|unit)\s+\w+\s*;/i,
+      /\b(begin|end)\b/i,
+      /writeln\s*\(/i,
+    ],
+    priority: 77,
+  },
+  {
+    language: 'lua',
+    displayName: 'Lua (5.3)',
+    patterns: [
+      /\blocal\s+\w+/,
+      /\bfunction\s+\w+\s*\(/,
+      /\b(print|io\.write)\b/,
+    ],
+    priority: 76,
+  },
+];
+
+export function detectLanguageFromCode(
+  code: string,
+): { language: string; displayName: string } | null {
+  if (!code || code.trim().length < 10) return null;
+  const trimmed = code.trim();
+
+  let bestLanguage = '';
+  let bestDisplayName = '';
+  let bestScore = 0;
+  let bestPriority = 0;
+
+  for (const pat of LANGUAGE_PATTERNS) {
+    let matches = 0;
+    for (const r of pat.patterns) {
+      if (r.test(trimmed)) matches++;
+    }
+    if (matches > 0) {
+      const score = (matches / pat.patterns.length) * pat.priority;
+      if (score > bestScore) {
+        bestScore = score;
+        bestLanguage = pat.language;
+        bestDisplayName = pat.displayName;
+        bestPriority = pat.priority;
+      }
+    }
+  }
+
+  if (!bestLanguage) return null;
+  const confidence = Math.min(
+    100,
+    Math.round((bestScore / bestPriority) * 100),
+  );
+  if (confidence < 30) return null;
+  if (!supportedLanguages[bestLanguage]) return null;
+  return { language: bestLanguage, displayName: bestDisplayName };
+}
+
 export const splitMeasurement = (
   measurement: string,
 ): {
