@@ -1,4 +1,3 @@
-// TODO: add return types to each of the getters
 // TODO: move logic from components inside this store
 
 import Vuex, { Commit, StoreOptions } from 'vuex';
@@ -160,24 +159,24 @@ const storeOptions: StoreOptions<GraderStore> = {
     theme: Util.MonacoThemes.VSLight,
   },
   getters: {
-    alias(state: GraderStore) {
+    alias(state: GraderStore): string {
       return state.alias;
     },
-    showSubmitButton(state: GraderStore) {
+    showSubmitButton(state: GraderStore): boolean {
       return state.showSubmitButton;
     },
-    languages(state: GraderStore) {
+    languages(state: GraderStore): string[] {
       return state.languages;
     },
-    sessionStorageSources(state: GraderStore) {
+    sessionStorageSources(state: GraderStore): GraderSessionStorageSources | null {
       return state.sessionStorageSources;
     },
-    moduleName(state: GraderStore) {
+    moduleName(state: GraderStore): string {
       return (
         state.request.input.interactive?.module_name || state.alias || 'Main'
       );
     },
-    flatCaseResults(state: GraderStore) {
+    flatCaseResults(state: GraderStore): { [key: string]: types.CaseResult } {
       const result: { [key: string]: types.CaseResult } = {};
       if (!state.results || !state.results.groups) return result;
       for (const group of state.results.groups) {
@@ -187,24 +186,24 @@ const storeOptions: StoreOptions<GraderStore> = {
       }
       return result;
     },
-    currentCase(state: GraderStore) {
+    currentCase(state: GraderStore): string {
       return state.currentCase;
     },
-    inputIn(state: GraderStore) {
+    inputIn(state: GraderStore): string {
       return state.request.input.cases[state.currentCase]['in'];
     },
-    inputOut(state: GraderStore) {
+    inputOut(state: GraderStore): string {
       return state.request.input.cases[state.currentCase]['out'];
     },
-    outputStdout(state: GraderStore) {
+    outputStdout(state: GraderStore): string {
       const filename: CaseKey = `${state.currentCase}.out`;
       return state.outputs[filename] || '';
     },
-    outputStderr(state: GraderStore) {
+    outputStderr(state: GraderStore): string {
       const filename: CaseKey = `${state.currentCase}.err`;
       return state.outputs[filename] || '';
     },
-    settingsCases(state: GraderStore) {
+    settingsCases(state: GraderStore): SettingsCasesGroup[] {
       // resultMap type is not present in types
       const resultMap: {
         [key: string]: SettingsCasesGroup;
@@ -250,53 +249,53 @@ const storeOptions: StoreOptions<GraderStore> = {
       });
       return result;
     },
-    'request.source'(state: GraderStore) {
+    'request.source'(state: GraderStore): string {
       return state.request.source;
     },
-    'request.language'(state: GraderStore) {
+    'request.language'(state: GraderStore): string {
       return state.request.language;
     },
-    'request.input.validator.custom_validator.language'(state: GraderStore) {
+    'request.input.validator.custom_validator.language'(state: GraderStore): string {
       return state.request.input.validator.custom_validator?.language || '';
     },
-    'request.input.validator.custom_validator.source'(state: GraderStore) {
+    'request.input.validator.custom_validator.source'(state: GraderStore): string {
       return state.request.input.validator.custom_validator?.source || '';
     },
-    'request.input.interactive.idl'(state: GraderStore) {
+    'request.input.interactive.idl'(state: GraderStore): string {
       return state.request.input.interactive?.idl || '';
     },
-    'request.input.interactive.main_source'(state: GraderStore) {
+    'request.input.interactive.main_source'(state: GraderStore): string {
       return state.request.input.interactive?.main_source || '';
     },
-    'request.input.interactive.language'(state: GraderStore) {
+    'request.input.interactive.language'(state: GraderStore): string {
       return state.request.input.interactive?.language || '';
     },
-    Tolerance(state: GraderStore) {
+    Tolerance(state: GraderStore): number {
       return state.request.input.validator?.tolerance || 0;
     },
-    isCustomValidator(state: GraderStore) {
+    isCustomValidator(state: GraderStore): boolean {
       return !!state.request.input.validator.custom_validator;
     },
-    isInteractive(state: GraderStore) {
+    isInteractive(state: GraderStore): boolean {
       return !!state.request.input.interactive;
     },
-    isUpdatingSettings(state: GraderStore) {
+    isUpdatingSettings(state: GraderStore): boolean {
       return state.updatingSettings;
     },
-    isDirty(state: GraderStore) {
+    isDirty(state: GraderStore): boolean {
       return state.dirty;
     },
     // new getters separate from refactored code
-    zipContent(state: GraderStore) {
+    zipContent(state: GraderStore): string {
       return state.zipContent;
     },
-    compilerOutput(state: GraderStore) {
+    compilerOutput(state: GraderStore): string {
       return state.compilerOutput;
     },
-    logs(state: GraderStore) {
+    logs(state: GraderStore): string {
       return state.logs;
     },
-    Validator(state: GraderStore) {
+    Validator(state: GraderStore): string {
       return state.request.input.validator.name;
     },
     caseSelectorGroups(state: GraderStore): CaseSelectorGroup[] {
@@ -347,25 +346,25 @@ const storeOptions: StoreOptions<GraderStore> = {
       );
       return result;
     },
-    showRunButton(state: GraderStore) {
+    showRunButton(state: GraderStore): boolean {
       return state.showRunButton;
     },
-    request(state: GraderStore) {
+    request(state: GraderStore): GraderRequest {
       return state.request;
     },
-    customValidator(state: GraderStore) {
+    customValidator(state: GraderStore): { language: string; limits?: types.LimitsSettings; source: string; } | undefined {
       return state.request.input.validator.custom_validator;
     },
-    inputCases(state: GraderStore) {
+    inputCases(state: GraderStore): { [key: string]: { in: string; out: string; weight?: number; } } {
       return state.request.input.cases;
     },
-    Interactive(state: GraderStore) {
+    Interactive(state: GraderStore): types.InteractiveSettingsDistrib | undefined {
       return state.request.input.interactive;
     },
-    limits(state: GraderStore) {
+    limits(state: GraderStore): types.LimitsSettings {
       return state.request.input.limits;
     },
-    theme(state: GraderStore) {
+    theme(state: GraderStore): Util.MonacoThemes {
       return state.theme;
     },
   },
@@ -408,7 +407,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       state.request.source =
         initialSource ||
         state.sessionStorageSources.sources[
-          languageExtensionMapping[state.request.language]
+        languageExtensionMapping[state.request.language]
         ];
     },
     showSubmitButton(state: GraderStore, value: boolean) {
@@ -609,13 +608,13 @@ const storeOptions: StoreOptions<GraderStore> = {
       // update interactive problem data
       const {
         idl = state.request.input.interactive?.idl ||
-          defaultInteractiveIdlSource,
+        defaultInteractiveIdlSource,
         module_name = state.request.input.interactive?.module_name || 'sumas',
         language = state.request.input.interactive?.language || 'cpp17-gcc',
         main_source = state.request.input.interactive?.main_source ||
-          defaultInteractiveMainSource,
+        defaultInteractiveMainSource,
         templates = state.request.input.interactive?.templates ||
-          originalInteractiveTemplates,
+        originalInteractiveTemplates,
       } = value;
 
       store.commit('request.input.interactive.idl', idl);
