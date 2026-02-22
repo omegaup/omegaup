@@ -343,9 +343,9 @@ class ApiCaller {
      * terminates the request.
      *
      * @param \Exception $e the thrown exception.
-     * @return no-return
+     * @return never
      */
-    public static function handleException(\Exception $e): void {
+    public static function handleException(\Exception $e): never {
         $apiException = null;
         if ($e instanceof \OmegaUp\Exceptions\ApiException) {
             $apiException = $e;
