@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'score' => true,
         'percentile' => true,
         'classname' => true,

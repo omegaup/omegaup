@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class AIEditorialJobs extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'job_id' => true,
         'problem_id' => true,
         'user_id' => true,
