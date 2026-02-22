@@ -99,7 +99,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
         /** @var list<Notification> */
         $notifications = [];
         foreach (
-            is_null($r->user) ?
+            $r->user === null ?
             [] :
             \OmegaUp\DAO\Notifications::getUnreadNotifications($r->user) as $notification
         ) {
@@ -144,7 +144,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
         }
         foreach ($notifications as $id) {
             $notification = \OmegaUp\DAO\Notifications::getByPK($id);
-            if (is_null($notification)) {
+            if ($notification === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'notificationNotFound'
                 );

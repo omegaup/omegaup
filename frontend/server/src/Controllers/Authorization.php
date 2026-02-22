@@ -39,7 +39,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 

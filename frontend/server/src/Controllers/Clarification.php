@@ -15,7 +15,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * Creates an instance of Broadcaster if not already created
      */
     private static function getBroadcasterInstance(): \OmegaUp\Broadcaster {
-        if (is_null(self::$broadcaster)) {
+        if (self::$broadcaster === null) {
             // Create new grader
             self::$broadcaster = new \OmegaUp\Broadcaster();
         }
@@ -44,7 +44,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
 
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -68,7 +68,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $contest = null;
         $problemsetId = null;
         $admins = [];
-        if (is_null($contestAlias)) {
+        if ($contestAlias === null) {
             // Clarification for course assignment
             $courseAlias = $r->ensureString(
                 'course_alias',
@@ -82,7 +82,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
             $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
 
-            if (is_null($course)) {
+            if ($course === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseNotFound'
                 );
@@ -108,7 +108,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 $assignmentAlias
             );
 
-            if (is_null($problemset)) {
+            if ($problemset === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemsetNotFound'
                 );
@@ -130,7 +130,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         } else {
             // Clarification for contest
             $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-            if (is_null($contest)) {
+            if ($contest === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'contestNotFound'
                 );
@@ -153,19 +153,17 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         // Is the combination problemset_id and problem_id valid?
         if (
-            is_null(
-                \OmegaUp\DAO\ProblemsetProblems::getByPK(
+            \OmegaUp\DAO\ProblemsetProblems::getByPK(
                     $problemsetId,
                     $problem->problem_id
-                )
-            )
+                ) === null
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFoundInProblemset'
             );
         }
 
-        $receiver = !is_null($username) ?
+        $receiver = $username !== null ?
         \OmegaUp\DAO\Identities::findByUsername($username) : null;
         $receiverId = $receiver ? $receiver->identity_id : null;
 
@@ -181,7 +179,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Clarifications::create($clarification);
 
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             self::clarificationUpdated(
                 $r,
                 $clarification,
@@ -235,7 +233,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $clarification = \OmegaUp\DAO\Clarifications::getByPK(
             intval($r['clarification_id'])
         );
-        if (is_null($clarification)) {
+        if ($clarification === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'clarificationNotFound'
             );
@@ -293,7 +291,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
             $r->ensureInt('clarification_id')
         );
-        if (is_null($clarification)) {
+        if ($clarification === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'clarificationNotFound'
             );
@@ -309,15 +307,15 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         }
 
         // Update clarification
-        if (!is_null($public)) {
+        if ($public !== null) {
             $clarification->public = $public;
         }
 
-        if (!is_null($message)) {
+        if ($message !== null) {
             $clarification->message = $message;
         }
 
-        if (!is_null($answer)) {
+        if ($answer !== null) {
             $clarification->answer = $answer;
         }
 
@@ -326,7 +324,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 $clarification->author_id
             )
         );
-        if (is_null($author)) {
+        if ($author === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
             );
@@ -335,7 +333,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::GetByPK(
             intval($clarification->problem_id)
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -346,11 +344,11 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         );
         $assignment = null;
         $course = null;
-        if (is_null($contest)) {
+        if ($contest === null) {
             $assignment = \OmegaUp\DAO\Assignments::getByProblemset(
                 intval($clarification->problemset_id)
             );
-            if (is_null($assignment)) {
+            if ($assignment === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'assignmentNotFound'
                 );
@@ -358,7 +356,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             $course = \OmegaUp\DAO\Courses::getByPK(
                 intval($assignment->course_id)
             );
-            if (is_null($course)) {
+            if ($course === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseNotFound'
                 );
@@ -370,7 +368,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\Clarifications::update($clarification);
 
         // Send notification to author
-        if (!is_null($author->user_id) && !is_null($answer)) {
+        if ($author->user_id !== null && $answer !== null) {
             if ($contest) {
                 \OmegaUp\Controllers\Notification::setCommonNotification(
                     [$author->user_id],
@@ -422,29 +420,29 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Contests $contest
     ): void {
         try {
-            if (is_null($problem)) {
+            if ($problem === null) {
                 $problem = \OmegaUp\DAO\Problems::GetByPK(
                     intval($clarification->problem_id)
                 );
-                if (is_null($problem)) {
+                if ($problem === null) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemNotFound'
                     );
                 }
             }
             if (
-                is_null($contest) &&
-                !is_null($clarification->problemset_id)
+                $contest === null &&
+                $clarification->problemset_id !== null
             ) {
                 $contest = \OmegaUp\DAO\Contests::getByProblemset(
                     $clarification->problemset_id
                 );
             }
-            if (is_null($identity)) {
+            if ($identity === null) {
                 $identity = \OmegaUp\DAO\Identities::GetByPK(
                     intval($clarification->author_id)
                 );
-                if (is_null($identity)) {
+                if ($identity === null) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'userNotExist'
                     );

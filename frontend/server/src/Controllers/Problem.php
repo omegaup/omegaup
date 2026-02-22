@@ -160,81 +160,81 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             ),
         ];
-        if (!is_null($r['email_clarifications'])) {
+        if ($r['email_clarifications'] !== null) {
             $params['email_clarifications'] = $r->ensureOptionalBool(
                 'email_clarifications'
             ) ?? false;
         }
-        if (!is_null($r['extra_wall_time'])) {
+        if ($r['extra_wall_time'] !== null) {
             $params['extra_wall_time'] = $r->ensureOptionalInt(
                 'extra_wall_time'
             ) ?? 0;
         }
-        if (!is_null($r['input_limit'])) {
+        if ($r['input_limit'] !== null) {
             $params['input_limit'] = $r->ensureOptionalInt('input_limit') ?? 0;
         }
         $languages = $r->ensureOptionalString('languages');
-        if (!is_null($languages)) {
+        if ($languages !== null) {
             $params['languages'] = $languages;
         }
-        if (!is_null($r['memory_limit'])) {
+        if ($r['memory_limit'] !== null) {
             $params['memory_limit'] = $r->ensureOptionalInt('memory_limit');
         }
-        if (!is_null($r['output_limit'])) {
+        if ($r['output_limit'] !== null) {
             $params['output_limit'] = $r->ensureOptionalInt('output_limit');
         }
-        if (!is_null($r['overall_wall_time_limit'])) {
+        if ($r['overall_wall_time_limit'] !== null) {
             $params['overall_wall_time_limit'] = $r->ensureOptionalInt(
                 'overall_wall_time_limit'
             );
         }
         $problemLevel = $r->ensureOptionalString('problem_level');
-        if (!is_null($problemLevel)) {
+        if ($problemLevel !== null) {
             $params['problem_level'] = $problemLevel;
         }
         $selectedTags = $r->ensureOptionalString('selected_tags');
-        if (!is_null($selectedTags)) {
+        if ($selectedTags !== null) {
             $params['selected_tags'] = $selectedTags;
         }
         $source = $r->ensureOptionalString('source');
-        if (!is_null($source)) {
+        if ($source !== null) {
             $params['source'] = $source;
         }
-        if (!is_null($r['time_limit'])) {
+        if ($r['time_limit'] !== null) {
             $params['time_limit'] = $r->ensureOptionalInt('time_limit');
         }
         $title = $r->ensureOptionalString('title');
-        if (!is_null($title)) {
+        if ($title !== null) {
             $params['title'] = $title;
         }
         $updatePublished = $r->ensureOptionalString('update_published');
-        if (!is_null($updatePublished)) {
+        if ($updatePublished !== null) {
             $params['update_published'] = $updatePublished;
         }
         $validator = $r->ensureOptionalString('validator');
-        if (!is_null($validator)) {
+        if ($validator !== null) {
             $params['validator'] = $validator;
         }
-        if (!is_null($r['validator_time_limit'])) {
+        if ($r['validator_time_limit'] !== null) {
             $params['validator_time_limit'] = $r->ensureOptionalInt(
                 'validator_time_limit'
             );
         }
         $visibility = $r->ensureOptionalString('visibility');
-        if (!is_null($visibility)) {
+        if ($visibility !== null) {
             $params['visibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
                 $visibility
             );
         }
         $showDiff = $r->ensureOptionalString('show_diff');
-        if (!is_null($showDiff)) {
+        if ($showDiff !== null) {
             $params['show_diff'] = $showDiff;
         }
         $groupScorePolicy = $r->ensureOptionalString('group_score_policy');
-        if (!is_null($groupScorePolicy)) {
+        if ($groupScorePolicy !== null) {
             $params['group_score_policy'] = $groupScorePolicy;
         }
-        if (!is_null($r['allow_user_add_tags'])) {
+        if ($r['allow_user_add_tags'] !== null) {
             $params['allow_user_add_tags'] = $r->ensureOptionalBool(
                 'allow_user_add_tags'
             ) ?? false;
@@ -264,7 +264,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // In case of update, params are optional
         if (!$isRequired) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($params->problemAlias);
-            if (is_null($problem)) {
+            if ($problem === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
@@ -284,7 +284,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (
                 ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
                   $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED) &&
-                    !is_null($params->visibility) &&
+                    $params->visibility !== null &&
                     $problem->visibility !== $params->visibility &&
                     !\OmegaUp\Authorization::isQualityReviewer($identity)
             ) {
@@ -296,7 +296,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (
                 ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING ||
                   $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING) &&
-                    !is_null($params->visibility) &&
+                    $params->visibility !== null &&
                     $problem->visibility !== $params->visibility &&
                     !\OmegaUp\Authorization::isQualityReviewer($identity)
             ) {
@@ -322,7 +322,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             if (
-                !is_null($params->visibility)
+                $params->visibility !== null
                 && $problem->visibility !== $params->visibility
             ) {
                 if ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PROMOTED) {
@@ -355,7 +355,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             /** @var list<array{tagname: string, public: bool}>|null */
-            $selectedTags = !is_null($params->selectedTagsAsJSON) ? json_decode(
+            $selectedTags = $params->selectedTagsAsJSON !== null ? json_decode(
                 $params->selectedTagsAsJSON,
                 associative: true
             ) : null;
@@ -367,7 +367,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $hasPublicTags = false;
-            if (!is_null($selectedTags)) {
+            if ($selectedTags !== null) {
                 foreach ($selectedTags as $tag) {
                     if (!$hasPublicTags) {
                         $hasPublicTags = boolval($tag['public']);
@@ -407,7 +407,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             null,
             $isRequired
         );
-        if (!is_null($params->languages)) {
+        if ($params->languages !== null) {
             $languages = explode(',', $params->languages);
             \OmegaUp\Validators::validateValidSubset(
                 $languages,
@@ -544,7 +544,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Problems::create($problem);
 
             // Add tags
-            if (!is_null($selectedTags)) {
+            if ($selectedTags !== null) {
                 foreach ($selectedTags as $tag) {
                     $tagName = \OmegaUp\Controllers\Tag::normalize(
                         $tag['tagname']
@@ -560,7 +560,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
             if (
-                is_null($tag) ||
+                $tag === null ||
                 !in_array(
                     $tag->name,
                     \OmegaUp\Controllers\Tag::getLevelTags()
@@ -642,12 +642,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
-        if (is_null($user->user_id)) {
+        if ($user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->acl_id)) {
+        if ($problem === null || $problem->acl_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -688,7 +688,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->acl_id)) {
+        if ($problem === null || $problem->acl_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -697,7 +697,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
-        if (is_null($group) || is_null($group->group_id)) {
+        if ($group === null || $group->group_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
@@ -714,7 +714,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 $row['identity_id']
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 continue;
             }
             self::invalidateProblemsAclCacheForIdentity($identity);
@@ -744,7 +744,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -757,7 +757,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tag = \OmegaUp\DAO\Tags::getByName($r['level_tag']);
 
             if (
-                is_null($tag) ||
+                $tag === null ||
                 !in_array(
                     $tag->name,
                     \OmegaUp\Controllers\Tag::getLevelTags()
@@ -807,7 +807,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $isPublic = $r->ensureOptionalBool('public') ?? false;
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -844,7 +844,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $tag = \OmegaUp\DAO\Tags::getByName($tagName);
-        if (is_null($tag)) {
+        if ($tag === null) {
             if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
                 $tag = new \OmegaUp\DAO\VO\Tags([
                     'name' => $tagName,
@@ -908,12 +908,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
-        if (is_null($identity->user_id)) {
+        if ($identity->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->acl_id)) {
+        if ($problem === null || $problem->acl_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -960,7 +960,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->acl_id)) {
+        if ($problem === null || $problem->acl_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -969,7 +969,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $group) => \OmegaUp\Validators::alias($group)
         );
         $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
-        if (is_null($group) || is_null($group->group_id)) {
+        if ($group === null || $group->group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
             );
@@ -987,7 +987,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 $row['identity_id']
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 continue;
             }
             self::invalidateProblemsAclCacheForIdentity($identity);
@@ -1026,12 +1026,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $tag = \OmegaUp\DAO\Tags::getByName($tagName);
-        if (is_null($tag)) {
+        if ($tag === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('tagNotFound');
         }
 
@@ -1076,7 +1076,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->problem_id)) {
+        if ($problem === null || $problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -1114,7 +1114,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -1148,7 +1148,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $includeVoted = ($r['include_voted'] == 'true');
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -1178,7 +1178,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if ($problem->deprecated) {
@@ -1518,7 +1518,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params,
             isRequired: false
         );
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -1610,7 +1610,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
 
                 $needsUpdate = false;
-                if (!is_null($problemDeployer->publishedCommit)) {
+                if ($problemDeployer->publishedCommit !== null) {
                     $oldCommit = $problem->commit;
                     $oldVersion = $problem->current_version;
                     [
@@ -1700,7 +1700,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['problem'] = \OmegaUp\DAO\Problems::getByAlias(
             $params->problemAlias
         );
-        if (is_null($response['problem'])) {
+        if ($response['problem'] === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -1785,12 +1785,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'lang',
             \OmegaUp\Controllers\Problem::ISO639_1
         );
-        if (is_null($lang)) {
+        if ($lang === null) {
             $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
                 $identity
             );
         }
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -1874,7 +1874,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -1967,7 +1967,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemParams,
             isRequired: false
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -2078,7 +2078,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             return $response;
         }
 
@@ -2097,8 +2097,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $response['problem'] = $problem;
 
-        if (!is_null($problemset) && isset($problemset['problemset'])) {
-            if (is_null($identity)) {
+        if ($problemset !== null && isset($problemset['problemset'])) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             if (
@@ -2148,7 +2148,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
 
                     if (
-                        !is_null($assignment)
+                        $assignment !== null
                         && $assignment->start_time->time > \OmegaUp\Time::get()
                     ) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -2160,7 +2160,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['problemset'] = $problemset['problemset'];
         } else {
             if (
-                is_null($identity)
+                $identity === null
                 || !\OmegaUp\Authorization::canEditProblem(
                     $identity,
                     $problem
@@ -2169,7 +2169,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 // If the problem is requested outside a contest, we need to
                 // check that it is not private and the user is logged in
                 if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
-                    if (is_null($identity)) {
+                    if ($identity === null) {
                         throw new \OmegaUp\Exceptions\UnauthorizedException(
                             'userNotAllowed'
                         );
@@ -2194,7 +2194,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return ProblemStatement|null The contents of the resource, plus some metadata.
      */
     public static function getProblemResourceImpl(array $params): ?array {
-        if (is_null($params['alias'])) {
+        if ($params['alias'] === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
@@ -2510,7 +2510,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $problemAlias
     ): \OmegaUp\DAO\VO\Problems {
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -2539,7 +2539,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['contest'] = \OmegaUp\DAO\Contests::getByAlias(
                 $contestAlias
             );
-            if (is_null($response['contest'])) {
+            if ($response['contest'] === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'contestNotFound'
                 );
@@ -2549,7 +2549,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $response['contest']->problemset_id
                 )
             );
-            if (is_null($response['problemset'])) {
+            if ($response['problemset'] === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'contestNotFound'
                 );
@@ -2565,12 +2565,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'problemNotFoundInContest'
                 );
             }
-        } elseif (!is_null($problemsetId)) {
+        } elseif ($problemsetId !== null) {
             // Is it a valid problemset_id?
             $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK(
                 $problemsetId
             );
-            if (is_null($response['problemset'])) {
+            if ($response['problemset'] === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemsetNotFound'
                 );
@@ -2642,7 +2642,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->ensureOptionalString('statement_type') ?? '',
             $r->ensureOptionalInt('problemset_id')
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -2656,7 +2656,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $preventProblemsetOpen,
             $contestAlias
         );
-        if (is_null($details)) {
+        if ($details === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -2679,7 +2679,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $statementType,
         ?int $problemsetId
     ): array {
-        if (is_null($identity) && !is_null($contestAlias)) {
+        if ($identity === null && $contestAlias !== null) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -2709,7 +2709,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $preventProblemsetOpen,
         ?string $contestAlias = null
     ): ?array {
-        if (is_null($problem->problem_id)) {
+        if ($problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         // Get the expected commit version.
@@ -2720,7 +2720,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problemset->problemset_id,
                 $problem->problem_id
             );
-            if (is_null($problemsetProblem)) {
+            if ($problemsetProblem === null) {
                 return null;
             }
             $commit = $problemsetProblem->commit;
@@ -2733,7 +2733,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $commit,
             $statementLanguage
         );
-        if (is_null($response['statement'])) {
+        if ($response['statement'] === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'statementNotFound'
             );
@@ -2744,7 +2744,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         // Add preferred language of the user.
-        if (!is_null($loggedIdentity)) {
+        if ($loggedIdentity !== null) {
             $preferredLanguage = \OmegaUp\DAO\Users::getPreferredLanguage(
                 $loggedIdentity->user_id
             );
@@ -2793,26 +2793,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (
             \OmegaUp\DAO\Problems::isVisible($problem) ||
             (
-                !is_null($loggedIdentity) &&
+                $loggedIdentity !== null &&
                 \OmegaUp\Authorization::isProblemAdmin(
                     $loggedIdentity,
                     $problem
                 )
             )
         ) {
-            if (is_null($problem->acl_id)) {
+            if ($problem->acl_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
             }
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
-            if (is_null($acl) || is_null($acl->owner_id)) {
+            if ($acl === null || $acl->owner_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $problemsetter = \OmegaUp\DAO\Identities::findByUserId(
                 $acl->owner_id
             );
-            if (is_null($problemsetter) || is_null($problemsetter->username)) {
+            if ($problemsetter === null || $problemsetter->username === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $response['problemsetter'] = [
@@ -2839,8 +2839,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 strict: true
             );
             $isOwner = (
-                !is_null($loggedIdentity) &&
-                !is_null($loggedIdentity->user_id) &&
+                $loggedIdentity !== null &&
+                $loggedIdentity->user_id !== null &&
                 $loggedIdentity->user_id === $acl->owner_id
             );
             if ($isWarningOrBanned && $isOwner) {
@@ -2856,14 +2856,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $isPracticeMode = false;
         $container = null;
-        if (!is_null($problemset) && !is_null($loggedIdentity)) {
+        if ($problemset !== null && $loggedIdentity !== null) {
             $response['admin'] = \OmegaUp\Authorization::isAdmin(
                 $loggedIdentity,
                 $problemset
             );
 
             if (!$response['admin'] || $preventProblemsetOpen !== true) {
-                if (is_null($problemset->problemset_id)) {
+                if ($problemset->problemset_id === null) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemsetNotFound'
                     );
@@ -2872,7 +2872,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $container = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                     $problemset->problemset_id
                 );
-                if (is_null($container)) {
+                if ($container === null) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemsetNotFound'
                     );
@@ -2919,11 +2919,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            !is_null(
-                $loggedIdentity
-            ) && !is_null(
-                $loggedIdentity->identity_id
-            )
+            $loggedIdentity !== null && $loggedIdentity->identity_id !== null
         ) {
             // Get all the available runs done by the current_user
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
@@ -2981,7 +2977,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'nominated' => $nominationStatus['nominated'],
                 'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
                 'language' => $response['statement']['language'],
-                'canNominateProblem' => !is_null($loggedIdentity->user_id),
+                'canNominateProblem' => $loggedIdentity->user_id !== null,
                 'solved' => false,
                 'tried' => false,
             ];
@@ -3030,7 +3026,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             )),
             2
         );
-        if (is_null($loggedIdentity)) {
+        if ($loggedIdentity === null) {
             $response['score'] = 0.0;
         } else {
             $response['score'] = self::bestScore(
@@ -3075,9 +3071,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias,
             $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
-            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+            $r['problemset_id'] !== null ? intval($r['problemset_id']) : null
         );
-        if (is_null($response['problem'])) {
+        if ($response['problem'] === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemset = $response['problemset'];
@@ -3094,7 +3090,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problemset->problemset_id,
                 $problem->problem_id
             );
-            if (is_null($problemsetProblem)) {
+            if ($problemsetProblem === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
@@ -3134,7 +3130,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'allowedSolutionsLimitReached'
                 );
             }
-            if (!is_null($response['solution'])) {
+            if ($response['solution'] !== null) {
                 // We don't consume a token if there is no solution.
                 \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
                     'user_id' => $r->user->user_id,
@@ -3168,7 +3164,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemsetId = $r->ensureOptionalInt('problemset_id');
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -3185,13 +3181,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         ?int $problemsetId = null
     ) {
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (
             !\OmegaUp\Authorization::canEditProblem($identity, $problem) &&
             (
-                is_null($problemsetId) ||
+                $problemsetId === null ||
                 !\OmegaUp\Authorization::canEditProblemset(
                     $identity,
                     $problemsetId
@@ -3247,7 +3243,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             new \OmegaUp\ProblemArtifacts($problem->alias, 'published')
         )->commit();
 
-        if (is_null($commit)) {
+        if ($commit === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         return [
@@ -3299,12 +3295,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $updatePublished = \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
-        if (!is_null($r['update_published'])) {
+        if ($r['update_published'] !== null) {
             $updatePublished = $r['update_published'];
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
@@ -3338,7 +3334,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem->alias,
                 'published'
             ))->commit();
-            if (is_null($commit)) {
+            if ($commit === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemVersionNotFound'
                 );
@@ -3453,7 +3449,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
@@ -3489,7 +3485,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ): array {
         /** @var null|array{commit: string, tree: string, parents: string[], author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
         $masterCommit = null;
-        if (is_null($commit)) {
+        if ($commit === null) {
             $masterCommit = (new \OmegaUp\ProblemArtifacts(
                 strval($problem->alias),
                 'published'
@@ -3512,7 +3508,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
-        if (is_null($masterCommit)) {
+        if ($masterCommit === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemVersionNotFound'
             );
@@ -3527,7 +3523,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $privateCommitHash
         );
         $privateCommit = $problemArtifacts->commit();
-        if (is_null($privateCommit)) {
+        if ($privateCommit === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemVersionNotFound'
             );
@@ -3609,7 +3605,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->problem_id)) {
+        if ($problem === null || $problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -3624,7 +3620,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $identity = null;
             $username = $r->ensureOptionalString('username');
-            if (!is_null($username)) {
+            if ($username !== null) {
                 try {
                     $identity = \OmegaUp\DAO\Identities::findByUsername(
                         $username
@@ -3640,7 +3636,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r->ensureOptionalString('status'),
                 $r->ensureOptionalString('verdict'),
                 $r->ensureOptionalString('language'),
-                !is_null($identity) ? intval($identity->identity_id) : null,
+                $identity !== null ? intval($identity->identity_id) : null,
                 max($r->ensureOptionalInt('offset') ?? 0, 0),
                 $r->ensureOptionalInt('rowcount') ?? 100,
                 $r->ensureOptionalString('execution'),
@@ -3689,7 +3685,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $offset = $r->ensureOptionalInt('offset');
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 0;
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->problem_id)) {
+        if ($problem === null || $problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -3731,7 +3727,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         return self::getStats($problem, $r->identity);
@@ -3752,7 +3748,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         return [
@@ -3817,7 +3813,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         /** @var array{counts: array<string, int>, last_submission_id: int}|null */
         $casesStats = $problemStatsCache->get();
-        if (is_null($casesStats)) {
+        if ($casesStats === null) {
             // Initialize the array at counts = 0
             $casesStats = [
                 'counts' => [],
@@ -3844,7 +3840,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'details.json',
                 missingOk: true
             );
-            if (!is_null($detailsJson)) {
+            if ($detailsJson !== null) {
                 /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<CaseResult>}>} */
                 $details = json_decode($detailsJson, associative: true);
                 if (!is_array($details)) {
@@ -3989,11 +3985,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'language' => $language,
             'tags' => $tags,
             'keyword' => $keyword,
-            'requireAllTags' => is_null(
-                $requireAllTags
-            ) ? is_null(
-                $someTags
-            ) : $requireAllTags,
+            'requireAllTags' => $requireAllTags === null ? $someTags === null : $requireAllTags,
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
@@ -4079,7 +4071,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Defaults for offset and rowcount
         $page = $r->ensureOptionalInt('page');
         $offset = null;
-        if (is_null($page)) {
+        if ($page === null) {
             $offset = $r->ensureOptionalInt('offset') ?? 0;
         }
         $rowcount = $r->ensureOptionalInt(
@@ -4162,9 +4154,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // - Logged in users with normal permissions: Normal
         // - Logged in users with administrative rights: Admin
         $identityType = IDENTITY_ANONYMOUS;
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             $authorIdentityId = intval($identity->identity_id);
-            if (!is_null($user)) {
+            if ($user !== null) {
                 $authorUserId = intval($user->user_id);
             }
 
@@ -4182,7 +4174,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (is_null($offset)) {
+        if ($offset === null) {
             $offset = ($page - 1) * $rowcount;
         }
 
@@ -4421,23 +4413,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias,
             $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
-            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+            $r['problemset_id'] !== null ? intval($r['problemset_id']) : null
         );
 
         // If username is set in the request, we use that identity as target.
         // else, we query using current_user
         $identity = self::resolveTargetIdentity($r);
 
-        if (is_null($problem['problem'])) {
+        if ($problem['problem'] === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         return [
             'score' => self::bestScore(
                 $problem['problem'],
-                !is_null(
-                    $r['problemset_id']
-                ) ? intval(
+                $r['problemset_id'] !== null ? intval(
                     $r['problemset_id']
                 ) : $r['problemset_id'],
                 $contestAlias,
@@ -4462,9 +4452,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         int $currentLoggedIdentityId,
         ?\OmegaUp\DAO\VO\Identities $identity = null
     ): float {
-        $currentIdentityId = (is_null(
-            $identity
-        ) ? $currentLoggedIdentityId : $identity->identity_id);
+        $currentIdentityId = ($identity === null ? $currentLoggedIdentityId : $identity->identity_id);
 
         $score = 0.0;
         // Add best score info
@@ -4474,7 +4462,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias
         );
 
-        if (is_null($problemset)) {
+        if ($problemset === null) {
             $score = floatval(\OmegaUp\DAO\Runs::getBestProblemScore(
                 intval($problem->problem_id),
                 intval($currentIdentityId)
@@ -4495,7 +4483,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return void
      */
     private static function updateLanguages(\OmegaUp\DAO\VO\Problems $problem): void {
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -4573,25 +4561,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
         &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
-        if (!is_null($params->extraWallTime)) {
+        if ($params->extraWallTime !== null) {
             $problemSettings['Limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
         }
-        if (!is_null($params->memoryLimit)) {
+        if ($params->memoryLimit !== null) {
             $problemSettings['Limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
         }
-        if (!is_null($params->outputLimit)) {
+        if ($params->outputLimit !== null) {
             $problemSettings['Limits']['OutputLimit'] = "{$params->outputLimit}";
         }
-        if (!is_null($params->memoryLimit)) {
+        if ($params->memoryLimit !== null) {
             $problemSettings['Limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
         }
-        if (!is_null($params->timeLimit)) {
+        if ($params->timeLimit !== null) {
             $problemSettings['Limits']['TimeLimit'] = "{$params->timeLimit}ms";
         }
-        if (!is_null($params->validator)) {
+        if ($params->validator !== null) {
             $problemSettings['Validator']['Name'] = "{$params->validator}";
         }
-        if (!is_null($params->groupScorePolicy)) {
+        if ($params->groupScorePolicy !== null) {
             $problemSettings['Validator']['GroupScorePolicy'] = "{$params->groupScorePolicy}";
         }
         if ($problemSettings['Validator']['Name'] === 'custom') {
@@ -4608,7 +4596,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            if (!is_null($params->validatorTimeLimit)) {
+            if ($params->validatorTimeLimit !== null) {
                 $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
             }
         } else {
@@ -4706,7 +4694,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $basePayload = self::buildUnloggedPayload($problem, $details);
         $response['templateProperties']['payload'] = $basePayload;
 
-        if (is_null($r->identity)) {
+        if ($r->identity === null) {
             return $response;
         }
 
@@ -4829,7 +4817,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $requestData['problemsetId']
         );
 
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         // Get problem details from API
@@ -4843,7 +4831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             contestAlias: $requestData['contestAlias'],
         );
 
-        if (is_null($details)) {
+        if ($details === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -4945,7 +4933,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $contents = [];
-        if (!is_null($qualityNomination)) {
+        if ($qualityNomination !== null) {
             /**
              * @var array{tags?: list<string>, quality_seal?: bool, level?: string}|null $contents
              */
@@ -4953,7 +4941,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $qualityNomination['contents'],
                 associative: true
             );
-            if (is_null($contents)) {
+            if ($contents === null) {
                 $contents = [];
             }
         }
@@ -4983,7 +4971,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         $problem
     ): array {
-        if (is_null($problem->problem_id)) {
+        if ($problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -5062,7 +5050,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $isAdmin,
         bool $isQualityReviewer
     ): array {
-        if (is_null($problem->problem_id)) {
+        if ($problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -5081,7 +5069,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'nominated' => $nominationStatus['nominated'],
             'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
             'language' => $details['statement']['language'],
-            'canNominateProblem' => !is_null($identity->user_id),
+            'canNominateProblem' => $identity->user_id !== null,
             'solved' => false,
             'tried' => false,
         ];
@@ -5104,7 +5092,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $allowedSolutionsToSee = 0;
 
-        if (!is_null($user)) {
+        if ($user !== null) {
             // Get the count of problems forfeited by the user on the current day.
             $problemsForfeitedCount = \OmegaUp\DAO\ProblemsForfeited::getProblemsForfeitedCountInDay(
                 $user
@@ -5228,7 +5216,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'templateProperties' => [
                 'payload' => [
                     'problems' => $result['problems'],
-                    'loggedIn' => !is_null($r->identity),
+                    'loggedIn' => $r->identity !== null,
                     'selectedTags' => $result['selectedTags'],
                     'pagerItems' => $result['pagerItems'],
                     'keyword' => $result['keyword'],
@@ -5260,7 +5248,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
-            if (is_null($tag->name)) {
+            if ($tag->name === null) {
                 continue;
             }
             if (!$tag->public) {
@@ -5408,7 +5396,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemParams->problemAlias
         );
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -5562,7 +5550,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'invalidJson'
                 );
             }
-            if (is_null($cdp)) {
+            if ($cdp === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'cdpNotFound'
                 );
@@ -5610,7 +5598,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            if (is_null($cdp)) {
+            if ($cdp === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'cdpNotFound'
                 );
@@ -5652,7 +5640,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             showSolvers: false,
             preventProblemsetOpen: false,
         );
-        if (is_null($details)) {
+        if ($details === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -5757,7 +5745,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tags[] = ['name' => $tag->name];
         }
         $request = $r->ensureOptionalString('request');
-        if (!is_null($request) && $request === 'submit') {
+        if ($request !== null && $request === 'submit') {
             $problemParams = null;
             try {
                 $problemParams = self::convertRequestToProblemParams($r);
@@ -5779,8 +5767,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $statusError = $response['error'];
                 }
                 if (
-                    !is_null($problemParams)
-                    && !is_null($problemParams->selectedTagsAsJSON)
+                    $problemParams !== null
+                    && $problemParams->selectedTagsAsJSON !== null
                 ) {
                     /** @var list<array{tagname: string, public: bool}> */
                     $selectedTags = json_decode(
@@ -5990,8 +5978,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?int $maxDifficulty
     ) {
         if (
-            is_null($minDifficulty) ||
-            is_null($maxDifficulty) ||
+            $minDifficulty === null ||
+            $maxDifficulty === null ||
             $minDifficulty > $maxDifficulty ||
             $minDifficulty < 0 ||
             $minDifficulty > 4 ||
@@ -6063,7 +6051,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemAlias
         );
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -6090,7 +6078,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -6134,7 +6122,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!in_array('cat', explode(',', $problem->languages))) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -6237,7 +6225,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $problemAlias
         );
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -6550,7 +6538,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'frequentTags' => $frequentTags,
                     'level' => $collectionLevel,
                     'problems' => $result['problems'],
-                    'loggedIn' => !is_null($r->identity),
+                    'loggedIn' => $r->identity !== null,
                     'selectedTags' => $result['selectedTags'],
                     'pagerItems' => $result['pagerItems'],
                     'keyword' => $result['keyword'],
@@ -6664,7 +6652,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
-            if (is_null($tag->name)) {
+            if ($tag->name === null) {
                 continue;
             }
             if (!$tag->public) {
@@ -6785,7 +6773,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'authorsRanking' => $authorsRanking,
                     'problems' => $result['problems'],
-                    'loggedIn' => !is_null($r->identity),
+                    'loggedIn' => $r->identity !== null,
                     'selectedTags' => $result['selectedTags'],
                     'pagerItems' => $result['pagerItems'],
                     'keyword' => $result['keyword'],
@@ -6825,7 +6813,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -6843,7 +6831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             statementType: 'markdown',
             problemsetId: null
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -6857,7 +6845,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             preventProblemsetOpen: false,
         );
 
-        if (is_null($details)) {
+        if ($details === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -6929,7 +6917,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            if (!is_null($zipFilePath)) {
+            if ($zipFilePath !== null) {
                 $result = \OmegaUp\ZipToCdpConverter::convert(
                     $zipFilePath,
                     $params['alias']
@@ -6957,7 +6945,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'cdpNotFound'
             );
         } finally {
-            if (!is_null($zipFilePath) && file_exists($zipFilePath)) {
+            if ($zipFilePath !== null && file_exists($zipFilePath)) {
                 unlink($zipFilePath);
             }
         }
@@ -7036,7 +7024,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $message,
         string $updatePublished
     ) {
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -7044,7 +7032,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Search to see if the case exists in the CDP
         $caseInfo = self::findCaseInCDP($cdp, $newCaseData['caseID']);
 
-        $isEditOperation = !is_null($caseInfo);
+        $isEditOperation = $caseInfo !== null;
 
         $result = $isEditOperation
             ? self::handleEditCase(
@@ -7105,7 +7093,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $caseID = $newCaseData['caseID'];
         // Search for original case in CDP
         $caseInfo = self::findCaseInCDP($cdp, $caseID);
-        if (is_null($caseInfo)) {
+        if ($caseInfo === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('missingCase');
         }
 
@@ -7149,10 +7137,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Detect changes
         $nameChanged = ($newCaseName !== $oldCaseName);
         $groupChanged = ($newGroupID !== $oldGroupID);
-        $inputChanged = !is_null($uploadedInput) || ($newInput !== $oldInput);
-        $outputChanged = !is_null(
-            $uploadedOutput
-        ) || ($newOutput !== $oldOutput);
+        $inputChanged = $uploadedInput !== null || ($newInput !== $oldInput);
+        $outputChanged = $uploadedOutput !== null || ($newOutput !== $oldOutput);
         $pointsChanged = ($newPoints !== $oldPoints);
 
         if (!$nameChanged && !$groupChanged && !$inputChanged && !$outputChanged && !$pointsChanged) {
@@ -7210,20 +7196,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $pathsToExclude[] = $oldInputPath;
             $pathsToExclude[] = $oldOutputPath;
         } else {
-            if (!is_null($uploadedInput)) {
+            if ($uploadedInput !== null) {
                 $blobUpdate[$oldInputPath] = $uploadedInput['full'];
             } elseif ($inputChanged) {
                 $blobUpdate[$oldInputPath] = $newInput;
             }
 
-            if (!is_null($uploadedOutput)) {
+            if ($uploadedOutput !== null) {
                 $blobUpdate[$oldOutputPath] = $uploadedOutput['full'];
             } elseif ($outputChanged) {
                 $blobUpdate[$oldOutputPath] = $newOutput;
             }
         }
 
-        $newLine = is_null($uploadedInput)
+        $newLine = $uploadedInput === null
             ? $newCaseData['lines']
             : [[
                 'lineID' => $newCaseData['lines'][0]['lineID'],
@@ -7246,7 +7232,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     }
                 }
 
-                if (is_null($targetGroupIndex)) {
+                if ($targetGroupIndex === null) {
                     $cdp['casesStore']['groups'][] = [
                         'groupID' => $groupData['groupID'],
                         'name' => $groupData['name'],
@@ -7261,7 +7247,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 // Search for or create a normal group
                 $newGroupInfo = self::findGroupInCDP($cdp, $newGroupID);
 
-                if (is_null($newGroupInfo)) {
+                if ($newGroupInfo === null) {
                     // Create new group
                     $cdp['casesStore']['groups'][] = [
                         'groupID' => $groupData['groupID'],
@@ -7359,7 +7345,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            if (is_null($targetGroupIndex)) {
+            if ($targetGroupIndex === null) {
                 // Create ungrouped group with frontend data
                 $cdp['casesStore']['groups'][] = [
                     'groupID' => $groupData['groupID'],
@@ -7372,7 +7358,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $targetGroupIndex = count($cdp['casesStore']['groups']) - 1;
             }
         } else {
-            if (is_null($groupInfo)) {
+            if ($groupInfo === null) {
                 // The group does not exist; create it with the frontend data.
                 $cdp['casesStore']['groups'][] = [
                     'groupID' => $groupData['groupID'],
@@ -7462,7 +7448,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $message,
         string $updatePublished
     ) {
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -7470,7 +7456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Search to see if the group exists in the CDP
         $groupInfo = self::findGroupInCDP($cdp, $newGroupData['groupID']);
 
-        if (is_null($groupInfo)) {
+        if ($groupInfo === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
@@ -7581,7 +7567,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         string $message,
         string $updatePublished
     ) {
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
@@ -7589,12 +7575,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // First try searching as a case
         $caseInfo = self::findCaseInCDP($cdp, $id);
 
-        if (!is_null($caseInfo)) {
+        if ($caseInfo !== null) {
             $result = self::handleDeleteCase($caseInfo, $cdp);
         } else {
             $groupInfo = self::findGroupInCDP($cdp, $id);
 
-            if (is_null($groupInfo)) {
+            if ($groupInfo === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'elementNotFound'
                 );
@@ -7737,7 +7723,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'noChangesDetected'
             );
         }
-        if (is_null($problem->alias)) {
+        if ($problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);

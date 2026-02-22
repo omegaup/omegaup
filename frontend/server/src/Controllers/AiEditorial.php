@@ -45,7 +45,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -57,13 +57,13 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate required fields for job creation
-        if (is_null($problem->problem_id)) {
+        if ($problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
         }
 
-        if (is_null($r->identity->user_id)) {
+        if ($r->identity->user_id === null) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
@@ -88,7 +88,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 $problem->problem_id
             );
 
-            if (!is_null($lastJob)) {
+            if ($lastJob !== null) {
                 $cooldownEnd = $lastJob->created_at->time + (self::COOLDOWN_MINUTES * 60);
                 if (time() < $cooldownEnd) {
                     throw new \OmegaUp\Exceptions\RateLimitExceededException(
@@ -102,7 +102,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $sessionAuthToken = $currentSession['auth_token'];
 
-        if (is_null($sessionAuthToken)) {
+        if ($sessionAuthToken === null) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -228,16 +228,16 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         $jobId = $r->ensureString('job_id');
 
         $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
-        if (is_null($job)) {
+        if ($job === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         // Get problem to check permissions
-        if (is_null($job->problem_id)) {
+        if ($job->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -289,16 +289,16 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
-        if (is_null($job)) {
+        if ($job === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         // Get problem to check permissions
-        if (is_null($job->problem_id)) {
+        if ($job->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -325,18 +325,18 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             // Publish the editorial using existing Problem API
             $solutionMarkdown = null;
-            if ($language === 'en' && !is_null($job->md_en)) {
+            if ($language === 'en' && $job->md_en !== null) {
                 $solutionMarkdown = $job->md_en;
-            } elseif ($language === 'es' && !is_null($job->md_es)) {
+            } elseif ($language === 'es' && $job->md_es !== null) {
                 $solutionMarkdown = $job->md_es;
-            } elseif ($language === 'pt' && !is_null($job->md_pt)) {
+            } elseif ($language === 'pt' && $job->md_pt !== null) {
                 $solutionMarkdown = $job->md_pt;
             } else {
                 // Default to English if no language specified or content not found
                 $solutionMarkdown = $job->md_en ?? $job->md_es ?? $job->md_pt;
             }
 
-            if (!is_null($solutionMarkdown)) {
+            if ($solutionMarkdown !== null) {
                 // Skip publishing in test environment to avoid gitserver dependencies
                 // Check if we're in a test environment by looking for PHPUnit class
                 if (class_exists('\PHPUnit\Framework\TestCase', false)) {
@@ -434,16 +434,16 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
         }
 
         $job = \OmegaUp\DAO\AIEditorialJobs::getByPK($jobId);
-        if (is_null($job)) {
+        if ($job === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         // Get problem to check permissions
-        if (is_null($job->problem_id)) {
+        if ($job->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problem = \OmegaUp\DAO\Problems::getByPK($job->problem_id);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -465,15 +465,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
         // Update job content if provided
         if (
-            !is_null(
-                $mdEn
-            ) || !is_null(
-                $mdEs
-            ) || !is_null(
-                $mdPt
-            ) || !is_null(
-                $validationVerdict
-            )
+            $mdEn !== null || $mdEs !== null || $mdPt !== null || $validationVerdict !== null
         ) {
             \OmegaUp\DAO\AIEditorialJobs::updateJobContent(
                 $jobId,

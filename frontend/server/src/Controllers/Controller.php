@@ -26,7 +26,7 @@ class Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // allow unauthenticated only if it has $r["username"]
-            if (is_null($r['username'])) {
+            if ($r['username'] === null) {
                 throw $e;
             }
         }
@@ -49,13 +49,13 @@ class Controller {
         // By default use current user
         $user = $r->user;
 
-        if (!is_null($r['username'])) {
+        if ($r['username'] !== null) {
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['username'],
                 'username'
             );
             $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if (is_null($user)) {
+            if ($user === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
@@ -88,9 +88,9 @@ class Controller {
             )
         );
 
-        if (!is_null($username)) {
+        if ($username !== null) {
             $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
@@ -146,7 +146,7 @@ class Controller {
         foreach ($properties as $source => $info) {
             $propertyConfig = self::parsePropertyConfiguration($source, $info);
 
-            if (is_null($request[$propertyConfig['fieldName']])) {
+            if ($request[$propertyConfig['fieldName']] === null) {
                 continue;
             }
 
@@ -217,7 +217,7 @@ class Controller {
      * @return mixed
      */
     private static function getTransformedValue($value, ?callable $transform) {
-        if (is_null($transform)) {
+        if ($transform === null) {
             return $value;
         }
         return $transform($value);

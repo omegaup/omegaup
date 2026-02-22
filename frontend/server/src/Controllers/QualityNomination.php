@@ -430,11 +430,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $original = \OmegaUp\DAO\Problems::getByAlias(
                     $contents['original']
                 );
-                if (is_null($original)) {
+                if ($original === null) {
                     $contents['original'] = self::extractAliasFromArgument(
                         $contents['original']
                     );
-                    if (is_null($contents['original'])) {
+                    if ($contents['original'] === null) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
                         );
@@ -442,7 +442,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     $original = \OmegaUp\DAO\Problems::getByAlias(
                         $contents['original']
                     );
-                    if (is_null($original)) {
+                    if ($original === null) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
                         );
@@ -517,9 +517,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             if (
-                $nominationType === 'quality_tag' && !is_null(
-                    $qualityNomination
-                )
+                $nominationType === 'quality_tag' && $qualityNomination !== null
             ) {
                 $nomination->qualitynomination_id = $qualityNomination['qualitynomination_id'];
                 \OmegaUp\DAO\QualityNominations::update($nomination);
@@ -531,7 +529,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $qualityReviewerGroup = \OmegaUp\DAO\Groups::findByAlias(
                     \OmegaUp\Authorization::QUALITY_REVIEWER_GROUP_ALIAS
                 );
-                if (is_null($qualityReviewerGroup)) {
+                if ($qualityReviewerGroup === null) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'groupNotFound'
                     );
@@ -648,7 +646,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             );
         }
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -695,7 +693,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
             $qualityNominationId
         );
-        if (is_null($qualitynomination)) {
+        if ($qualitynomination === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'qualityNominationNotFound'
             );
@@ -713,7 +711,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        if (is_null($qualitynomination->problem_id)) {
+        if ($qualitynomination->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
@@ -721,7 +719,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByPK(
             $qualitynomination->problem_id
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -849,7 +847,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ): void {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
 
-        if (is_null($adminUser)) {
+        if ($adminUser === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         [
@@ -1151,7 +1149,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\DAO\QualityNominations::getById(
             $qualityNominationId
         );
-        if (is_null($response)) {
+        if ($response === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'qualityNominationNotFound'
             );
@@ -1173,7 +1171,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problem = \OmegaUp\DAO\Problems::getByAlias(
             $response['problem']['alias']
         );
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 

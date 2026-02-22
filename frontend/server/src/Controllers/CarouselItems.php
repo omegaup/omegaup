@@ -35,7 +35,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
             'image_url' => $r->ensureString('image_url'),
             'link' => $r->ensureString('link'),
             'button_title' => $r->ensureString('buttonTitle'),
-            'expiration_date' => is_null($expiration)
+            'expiration_date' => $expiration === null
                 ? null
                 : new \OmegaUp\Timestamp(strtotime($expiration)),
             'status' => $r->ensureBool('status') ? 'active' : 'inactive',
@@ -62,7 +62,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $carouselItemId
         );
-        if (is_null($carouselItem)) {
+        if ($carouselItem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'carouselItemNotFound'
             );
@@ -97,7 +97,7 @@ class CarouselItems extends \OmegaUp\Controllers\Controller {
         $carouselItem = \OmegaUp\DAO\Base\CarouselItems::getByPK(
             $r->ensureInt('carousel_item_id')
         );
-        if (is_null($carouselItem)) {
+        if ($carouselItem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'carouselItemNotFound'
             );

@@ -29,7 +29,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         $scoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias(
             $scoreboardAlias
         );
-        if (is_null($scoreboard)) {
+        if ($scoreboard === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'Scoreboard'
@@ -55,7 +55,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         );
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest)) {
+        if ($contest === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'Contest'
@@ -302,7 +302,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $groupAlias,
             $r->identity
         );
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'

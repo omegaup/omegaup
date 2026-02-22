@@ -26,7 +26,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $reset_digest = hash('sha1', $token);
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -90,7 +90,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         $lastRequest = \OmegaUp\DAO\Identities::getExtraInformation($email);
 
-        if (is_null($lastRequest)) {
+        if ($lastRequest === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -106,7 +106,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $reset_digest = hash('sha1', $token);
 
         $user = \OmegaUp\DAO\Users::findByEmail($email);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -148,7 +148,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             'email'
         );
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
             );
@@ -183,7 +183,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\SecurityTools::testStrongPassword($password);
 
-        if (is_null($user->reset_sent_at)) {
+        if ($user->reset_sent_at === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'passwordResetResetExpired'
             );
@@ -197,13 +197,13 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         $user->reset_digest = null;
         $user->reset_sent_at = null;
-        if (is_null($user->main_identity_id)) {
+        if ($user->main_identity_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -230,7 +230,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
     private static function validateCreateRequest(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -244,7 +244,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
 
         // Support doesn't need wait to reset passwords
         if (
-            !is_null($r->identity) &&
+            $r->identity !== null &&
             \OmegaUp\Authorization::isSupportTeamMember(
                 $r->identity
             )
@@ -252,7 +252,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             return;
         }
 
-        if (is_null($user->reset_sent_at)) {
+        if ($user->reset_sent_at === null) {
             return;
         }
         $seconds = \OmegaUp\Time::get() - $user->reset_sent_at->time;

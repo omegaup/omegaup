@@ -53,7 +53,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         return [
-            'badges' => is_null($r->user) ?
+            'badges' => $r->user === null ?
                 [] :
                 \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($r->user),
         ];
@@ -72,7 +72,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             'target_username'
         );
         $user = \OmegaUp\DAO\Users::FindByUsername($r['target_username']);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return [
@@ -99,7 +99,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             self::getAllBadges()
         );
         return [
-            'assignation_time' => is_null($r->user) ?
+            'assignation_time' => $r->user === null ?
                 null :
                 \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
                     $r->user,
@@ -187,7 +187,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
         );
 
         $details = self::getBadgeDetails($badgeAlias);
-        if (!is_null($r->user)) {
+        if ($r->user !== null) {
             $details['assignation_time'] = \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
                 $r->user,
                 $badgeAlias

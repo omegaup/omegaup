@@ -25,7 +25,7 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (!is_null($r['course_alias'])) {
+        if ($r['course_alias'] !== null) {
             $courseAlias = $r->ensureString(
                 'course_alias',
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -36,9 +36,9 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
             );
             $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
             if (
-                is_null($course) ||
-                is_null($course->group_id) ||
-                is_null($course->course_id)
+                $course === null ||
+                $course->group_id === null ||
+                $course->course_id === null
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseNotFound'
@@ -48,7 +48,7 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
                 $assignmentAlias,
                 intval($course->course_id)
             );
-            if (is_null($assignment)) {
+            if ($assignment === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'assignmentNotFound'
                 );
@@ -68,7 +68,7 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest)) {
+        if ($contest === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'contestNotFound'
             );

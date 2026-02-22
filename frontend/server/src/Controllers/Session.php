@@ -54,7 +54,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static $_setCookieOnRegisterSession = true;
 
     public static function getSessionManagerInstance(): \OmegaUp\SessionManager {
-        if (is_null(self::$_sessionManager)) {
+        if (self::$_sessionManager === null) {
             self::$_sessionManager = new \OmegaUp\SessionManager();
         }
         return self::$_sessionManager;
@@ -74,7 +74,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     public static function currentSessionAvailable(): bool {
         $session = self::getCurrentSession();
-        return !is_null($session['identity']);
+        return $session['identity'] !== null;
     }
 
     /**
@@ -99,7 +99,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      */
     private static function getAPIToken() {
         $token = self::getSessionManagerInstance()->getTokenAuthorization();
-        if (is_null($token)) {
+        if ($token === null) {
             return null;
         }
         if (strpos($token, ',') === false) {
@@ -138,12 +138,12 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
         $sessionManager = self::getSessionManagerInstance();
         $authToken = $r->ensureOptionalString('auth_token');
-        if (is_null($authToken)) {
+        if ($authToken === null) {
             $authToken = $sessionManager->getCookie(
                 OMEGAUP_AUTH_TOKEN_COOKIE_NAME
             );
         }
-        if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
+        if ($authToken !== null && self::isAuthTokenValid($authToken)) {
             return $authToken;
         }
 
@@ -165,15 +165,15 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (
             defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
             OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null(self::$_currentSession)
+            self::$_currentSession !== null
         ) {
             return self::$_currentSession;
         }
-        if (is_null($r)) {
+        if ($r === null) {
             $r = new \OmegaUp\Request();
         }
         $apiToken = self::getAPIToken();
-        if (!is_null($apiToken)) {
+        if ($apiToken !== null) {
             if (
                 defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
                 OMEGAUP_SESSION_CACHE_ENABLED === true
@@ -195,7 +195,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                     $apiToken['cacheKey'],
                 );
             }
-            if (is_null(self::$_currentSession['apiTokenId'])) {
+            if (self::$_currentSession['apiTokenId'] === null) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
             $now = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
@@ -203,7 +203,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 self::$_currentSession['apiTokenId'],
                 $now,
             );
-            if (is_null($usageData)) {
+            if ($usageData === null) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
             $sessionManagerInstance = self::getSessionManagerInstance();
@@ -225,7 +225,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             }
         } else {
             $authToken = $r->ensureOptionalString('auth_token');
-            if (is_null($authToken)) {
+            if ($authToken === null) {
                 $authToken = self::getAuthToken($r);
                 $r['auth_token'] = $authToken;
             }
@@ -246,7 +246,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $authToken
             );
         }
-        if (is_null($identityExt) || is_null($authToken)) {
+        if ($identityExt === null || $authToken === null) {
             // Means user has auth token, but does not exist in DB
             return [
                 'valid' => false,
@@ -286,7 +286,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             $apiToken,
             $username
         );
-        if (is_null($identityExt)) {
+        if ($identityExt === null) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $apiTokenId = $identityExt['apiTokenId'];
@@ -323,7 +323,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         $currentUser = null;
         $email = null;
         $apiTokens = [];
-        if (is_null($currentIdentity->user_id)) {
+        if ($currentIdentity->user_id === null) {
             if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
                 $associatedIdentities = [
                     [
@@ -346,10 +346,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
             );
-            if (is_null($currentUser)) {
+            if ($currentUser === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
-            $email = !is_null($currentUser->main_email_id) ?
+            $email = $currentUser->main_email_id !== null ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
             if ($currentUser->main_identity_id === $loginIdentity->identity_id) {
@@ -382,14 +382,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             ),
             'associated_identities' => $associatedIdentities,
             'api_tokens' => $apiTokens,
-            'is_under_13_user' => !is_null(
-                $currentUser
-            ) ? \OmegaUp\Authorization::isUnderThirteenUser(
+            'is_under_13_user' => $currentUser !== null ? \OmegaUp\Authorization::isUnderThirteenUser(
                 $currentUser
             ) : false,
-            'user_verification_deadline' => !is_null(
-                $currentUser
-            ) ? $currentUser->parent_email_verification_deadline
+            'user_verification_deadline' => $currentUser !== null ? $currentUser->parent_email_verification_deadline
              : null,
         ];
     }
@@ -400,7 +396,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function invalidateCache(): void {
         $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession['cacheKey'])
+            $currentSession['cacheKey'] === null
         ) {
             return;
         }
@@ -422,7 +418,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession['auth_token'])
+            $currentSession['auth_token'] === null
         ) {
             return;
         }
@@ -552,7 +548,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'g_csrf_token'
         );
 
-        if (is_null($csrfTokenCookie)) {
+        if ($csrfTokenCookie === null) {
             self::$log->error('Missing CSRF token cookie');
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'loginGoogleInvalidCSRFToken',
@@ -636,7 +632,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         self::$log->info('User is logged in via facebook !!');
-        if (is_null($fbUserProfile->getEmail())) {
+        if ($fbUserProfile->getEmail() === null) {
             self::$log->error('Facebook email empty');
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'loginFacebookEmptyEmailError',
@@ -666,7 +662,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     ): void {
         $sessionManager = self::getSessionManagerInstance();
         $storedState = $sessionManager->getCookie('github_oauth_state');
-        if (is_null($storedState) || $storedState !== $state) {
+        if ($storedState === null || $storedState !== $state) {
             self::$log->error('Invalid GitHub CSRF token');
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'loginGitHubInvalidCSRFToken',
@@ -811,7 +807,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     private static function getRedirectUrl(?string $url = null): string {
         $defaultRedirectUrl = '/?fromLogin';
-        if (is_null($url)) {
+        if ($url === null) {
             return $defaultRedirectUrl;
         }
         $redirectParsedUrl = parse_url($url);
@@ -879,7 +875,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
         if (
-            !is_null($identity->password)
+            $identity->password !== null
             && \OmegaUp\SecurityTools::isOldHash($identity->password)
         ) {
             // Update the password using the new Argon2i algorithm.
@@ -895,9 +891,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         );
 
         $user = null;
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-            if (is_null($user)) {
+            if ($user === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             \OmegaUp\Controllers\User::checkEmailVerification($user, $identity);
@@ -934,7 +930,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (
             !$r->isLoggedAsMainIdentity()
             && (
-                is_null($r->loginIdentity)
+                $r->loginIdentity === null
                 || $targetIdentity->identity_id !== $r->loginIdentity->identity_id
             )
         ) {
@@ -944,7 +940,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         $currentSession = self::getCurrentSession($r);
-        if (is_null($currentSession['auth_token'])) {
+        if ($currentSession['auth_token'] === null) {
             self::$log->warning('Auth token not found.');
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'loginRequired'
@@ -953,11 +949,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            currentIdentity: !is_null(
-                $loggedIdentity->user_id
-            ) ? $loggedIdentity : $targetIdentity
+            currentIdentity: $loggedIdentity->user_id !== null ? $loggedIdentity : $targetIdentity
         );
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             self::$log->warning("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -995,7 +989,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
         $isAccountCreation = true;
-        if (!is_null($results)) {
+        if ($results !== null) {
             self::$log->info("User has been here before with $provider");
             $identity = $results;
             $isAccountCreation = false;
@@ -1008,7 +1002,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             try {
                 \OmegaUp\Controllers\User::createUser(
                     new \OmegaUp\CreateUserParams([
-                        'name' => (!is_null($name) ? $name : $username),
+                        'name' => ($name !== null ? $name : $username),
                         'username' => $username,
                         'email' => $email,
                     ]),
@@ -1023,15 +1017,15 @@ class Session extends \OmegaUp\Controllers\Controller {
                 throw $e;
             }
             $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
-        if (is_null($identity->username) || is_null($identity->user_id)) {
+        if ($identity->username === null || $identity->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-        if (is_null($user)) {
+        if ($user === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 

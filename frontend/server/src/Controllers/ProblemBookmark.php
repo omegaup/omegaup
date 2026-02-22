@@ -23,7 +23,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
         );
 
         $targetProblem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($targetProblem) || is_null($targetProblem->problem_id)) {
+        if ($targetProblem === null || $targetProblem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -38,7 +38,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
                 $currentIdentityId,
                 $targetProblem->problem_id
             );
-            if (!is_null($existingBookmark)) {
+            if ($existingBookmark !== null) {
                 self::removeBookmark(
                     $existingBookmark,
                     $r->identity->username
@@ -79,7 +79,7 @@ class ProblemBookmark extends \OmegaUp\Controllers\Controller {
 
         // Validate that the problem exists
         $targetProblem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($targetProblem) || is_null($targetProblem->problem_id)) {
+        if ($targetProblem === null || $targetProblem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 

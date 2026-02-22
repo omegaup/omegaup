@@ -79,15 +79,13 @@ class Submission extends \OmegaUp\Controllers\Controller {
             self::MAX_SUBMISSION_LIST_PAGE_SIZE
         );
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
-            !is_null(
-                $user
-            ) &&
+            $user !== null &&
             ($user->main_identity_id == $identity->identity_id) &&
             $user->is_private
         ) {
@@ -139,7 +137,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             null,
             self::MAX_SUBMISSION_LIST_PAGE_SIZE
         );
-        if (is_null($username)) {
+        if ($username === null) {
             return [
                 'submissions' =>  \OmegaUp\DAO\Submissions::getLatestSubmissions(
                     page: $page,
@@ -148,14 +146,12 @@ class Submission extends \OmegaUp\Controllers\Controller {
             ];
         }
         $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
-            !is_null(
-                $user
-            ) &&
+            $user !== null &&
             ($user->main_identity_id == $identity->identity_id) &&
             $user->is_private
         ) {
@@ -219,7 +215,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         ?int $rangeBytesStart = null,
         ?int $rangeBytesEnd = null
     ): \OmegaUp\DAO\VO\SubmissionFeedback {
-        if (is_null($submission->guid)) {
+        if ($submission->guid === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
@@ -228,10 +224,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
             $submission->guid,
             $rangeBytesStart
         );
-        if (!is_null($submissionFeedback)) {
+        if ($submissionFeedback !== null) {
             // Edit the feedback for specific range bytes is not supported yet
             // so we just return the existing submission feedback
-            if (!is_null($rangeBytesStart)) {
+            if ($rangeBytesStart !== null) {
                 return $submissionFeedback;
             }
             return self::updateFeedback(
@@ -335,7 +331,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $guid = $r->ensureString('guid');
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
-        if (is_null($submission) || is_null($submission->guid)) {
+        if ($submission === null || $submission->guid === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
@@ -361,7 +357,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             )
         );
-        if (is_null($courseSubmissionInfo)) {
+        if ($courseSubmissionInfo === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseSubmissionNotFound'
             );
@@ -370,7 +366,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $course = \OmegaUp\DAO\Courses::getByPK(
             $courseSubmissionInfo['course_id']
         );
-        if (is_null($course)) {
+        if ($course === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
             );
@@ -378,7 +374,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
 
         $submissionFeedbackId = $r->ensureOptionalInt('submission_feedback_id');
         $submissionFeedback = null;
-        if (!is_null($submissionFeedbackId)) {
+        if ($submissionFeedbackId !== null) {
             $submissionFeedbackThread = self::createFeedbackThread(
                 $r->identity,
                 $submissionFeedbackId,
@@ -407,11 +403,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $rangeBytesEnd = $r->ensureOptionalInt('range_bytes_end');
 
         if (
-            !is_null(
-                $rangeBytesStart
-            ) && !is_null(
-                $rangeBytesEnd
-            ) && ($rangeBytesStart < 0
+            $rangeBytesStart !== null && $rangeBytesEnd !== null && ($rangeBytesStart < 0
             ||  $rangeBytesEnd < $rangeBytesStart)
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -439,7 +431,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             $rangeBytesEnd
         );
 
-        if (!is_null($courseSubmissionInfo['author_id'])) {
+        if ($courseSubmissionInfo['author_id'] !== null) {
             self::createNotificationForFeedback(
                 $courseSubmissionInfo['author_id'],
                 $courseSubmissionInfo['problem_alias'],
@@ -522,7 +514,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $guid = $r->ensureString('guid');
 
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
-        if (is_null($submission) || is_null($submission->guid)) {
+        if ($submission === null || $submission->guid === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
             );
@@ -539,7 +531,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             )
         );
-        if (is_null($courseSubmissionInfo)) {
+        if ($courseSubmissionInfo === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseSubmissionNotFound'
             );
@@ -548,7 +540,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $course = \OmegaUp\DAO\Courses::getByPK(
             $courseSubmissionInfo['course_id']
         );
-        if (is_null($course)) {
+        if ($course === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
             );
@@ -579,7 +571,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($courseSubmissionInfo['author_id'])) {
+        if ($courseSubmissionInfo['author_id'] !== null) {
             self::createNotificationForFeedback(
                 $courseSubmissionInfo['author_id'],
                 $courseSubmissionInfo['problem_alias'],

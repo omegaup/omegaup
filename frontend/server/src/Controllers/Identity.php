@@ -19,11 +19,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'usernameOrEmail'
         );
         $identity = \OmegaUp\DAO\Identities::findByUsername($userOrEmail);
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             return $identity;
         }
         $identity = \OmegaUp\DAO\Identities::findByEmail($userOrEmail);
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             return $identity;
         }
         $exception = new \OmegaUp\Exceptions\NotFoundException(
@@ -43,7 +43,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         string $password
     ): bool {
-        if (is_null($identity->password)) {
+        if ($identity->password === null) {
             // The user had logged in through a third-party account.
             throw new \OmegaUp\Exceptions\LoginDisabledException(
                 'loginThroughThirdParty'
@@ -81,7 +81,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $group = self::validateGroupOwnership($r);
-        if (is_null($group->alias)) {
+        if ($group->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'groupNotFound'
             );
@@ -125,7 +125,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
 
             $state = null;
-            if (!is_null($countryId) && !is_null($stateId)) {
+            if ($countryId !== null && $stateId !== null) {
                 $state = \OmegaUp\DAO\States::getByPK(
                     $countryId,
                     $stateId
@@ -180,7 +180,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      */
     public static function apiBulkCreate(\OmegaUp\Request $r): array {
         $group = self::validateGroupOwnership($r);
-        if (is_null($group->alias)) {
+        if ($group->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'groupNotFound'
             );
@@ -266,7 +266,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                         128
                     );
                     $state = null;
-                    if (!is_null($countryId) && !is_null($stateId)) {
+                    if ($countryId !== null && $stateId !== null) {
                         $state = \OmegaUp\DAO\States::getByPK(
                             $countryId,
                             $stateId
@@ -283,7 +283,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $group
                 );
 
-                if (!is_null($schoolId)) {
+                if ($schoolId !== null) {
                     // Create IdentitySchool
                     $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
                         'identity_id' => $newIdentity->identity_id,
@@ -333,13 +333,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup)) {
+        if ($teamGroup === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'groupNotFound'
             );
         }
 
-        if (is_null($teamGroup->alias)) {
+        if ($teamGroup->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'groupNotFound'
             );
@@ -434,7 +434,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
 
                 $state = null;
-                if (!is_null($countryId) && !is_null($stateId)) {
+                if ($countryId !== null && $stateId !== null) {
                     $state = \OmegaUp\DAO\States::getByPK(
                         $countryId,
                         $stateId
@@ -451,8 +451,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
 
                 if (
-                    !is_null($teamIdentity['identityUsernames'])
-                    && !is_null($team->team_id)
+                    $teamIdentity['identityUsernames'] !== null
+                    && $team->team_id !== null
                 ) {
                     /** @var list<array{password: string, username: string}> $selfGeneratedIdentities */
                     $selfGeneratedIdentities = array_filter(
@@ -476,7 +476,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
                             $selfGeneratedIdentity['username']
                         );
-                        if (is_null($preexistingIdentity)) {
+                        if ($preexistingIdentity === null) {
                             \OmegaUp\DAO\Identities::create($newIdentity);
                         } else {
                             $preexistingIdentity->password = $newIdentity->password;
@@ -505,7 +505,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $schoolId
                 );
 
-                if (is_null($preexistingIdentitySchool)) {
+                if ($preexistingIdentitySchool === null) {
                     // Create IdentitySchool
                     $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
                         'identity_id' => $newIdentity->identity_id,
@@ -537,7 +537,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?string &$name,
         ?string &$gender
     ): void {
-        if (!is_null($name)) {
+        if ($name !== null) {
             $name = trim($name);
             \OmegaUp\Validators::validateLengthInRange(
                 $name,
@@ -547,7 +547,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($gender)) {
+        if ($gender !== null) {
             $gender = trim($gender);
         }
         if (!empty($gender)) {
@@ -621,20 +621,18 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $originalIdentity = self::resolveIdentity($originalUsername);
 
         $originalSchoolId = null;
-        if (!is_null($originalIdentity->current_identity_school_id)) {
+        if ($originalIdentity->current_identity_school_id !== null) {
             $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $originalIdentity->current_identity_school_id
             );
-            $originalSchoolId = !is_null(
-                $originalIdentitySchool
-            ) ? $originalIdentitySchool->school_id : null;
+            $originalSchoolId = $originalIdentitySchool !== null ? $originalIdentitySchool->school_id : null;
         }
 
         // Prepare DAOs
         $state = null;
         $countryId = $r->ensureOptionalString('country_id');
         $stateId = $r->ensureOptionalString('state_id');
-        if (!is_null($countryId) && !is_null($stateId)) {
+        if ($countryId !== null && $stateId !== null) {
             $state = \OmegaUp\DAO\States::getByPK($countryId, $stateId);
         }
         self::validateIdentityTeam($username, $name, $gender, $groupAlias);
@@ -722,7 +720,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $groupAlias,
             $r->identity
         );
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'groupNotFound'
             );
@@ -752,12 +750,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return new \OmegaUp\DAO\VO\Identities([
             'username' => $username,
             'name' => $name ?? $originalIdentity->name,
-            'country_id' => !is_null(
-                $state
-            ) ? $state->country_id : $originalIdentity->country_id,
-            'state_id' => !is_null(
-                $state
-            ) ? $state->state_id : $originalIdentity->state_id,
+            'country_id' => $state !== null ? $state->country_id : $originalIdentity->country_id,
+            'state_id' => $state !== null ? $state->state_id : $originalIdentity->state_id,
             'gender' => $gender ?? $originalIdentity->gender,
             'current_identity_school_id' => $originalIdentity->current_identity_school_id,
             'password' => $originalIdentity->password,
@@ -773,19 +767,19 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Groups $group
     ): void {
-        if (is_null($identity->username)) {
+        if ($identity->username === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
             );
         }
-        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+        if ($identity->country_id === null && $identity->state_id !== null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidStateNeedsToBelongToCountry',
                 $identity->username
             );
         } elseif (
-            !is_null($identity->country_id)
-            && !is_null($identity->state_id)
+            $identity->country_id !== null
+            && $identity->state_id !== null
         ) {
             $countryStates = \OmegaUp\DAO\States::getByCountry(
                 $identity->country_id
@@ -807,7 +801,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
-        if (is_null($preexistingIdentity)) {
+        if ($preexistingIdentity === null) {
             \OmegaUp\DAO\Identities::create($identity);
         } else {
             $identity->identity_id = $preexistingIdentity->identity_id;
@@ -829,20 +823,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\TeamGroups $teamGroup
     ): \OmegaUp\DAO\VO\Teams {
-        if (is_null($identity->username)) {
+        if ($identity->username === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
             );
         }
-        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+        if ($identity->country_id === null && $identity->state_id !== null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidStateNeedsToBelongToCountry',
                 $identity->username
             );
         }
         if (
-            !is_null($identity->country_id)
-            && !is_null($identity->state_id)
+            $identity->country_id !== null
+            && $identity->state_id !== null
         ) {
             $countryStates = \OmegaUp\DAO\States::getByCountry(
                 $identity->country_id
@@ -864,7 +858,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
-        if (is_null($preexistingIdentity)) {
+        if ($preexistingIdentity === null) {
             \OmegaUp\DAO\Identities::create($identity);
         } else {
             $identity->identity_id = $preexistingIdentity->identity_id;
@@ -877,7 +871,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'team_group_id' => $teamGroup->team_group_id,
             'identity_id' => $identity->identity_id,
         ]);
-        if (is_null($preexistingTeam)) {
+        if ($preexistingTeam === null) {
             \OmegaUp\DAO\Teams::create($team);
             return $team;
         }
@@ -920,20 +914,18 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $originalIdentity = self::resolveIdentity($originalUsername);
 
         $originalSchoolId = null;
-        if (!is_null($originalIdentity->current_identity_school_id)) {
+        if ($originalIdentity->current_identity_school_id !== null) {
             $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $originalIdentity->current_identity_school_id
             );
-            $originalSchoolId = !is_null(
-                $originalIdentitySchool
-            ) ? $originalIdentitySchool->school_id : null;
+            $originalSchoolId = $originalIdentitySchool !== null ? $originalIdentitySchool->school_id : null;
         }
 
         // Prepare DAOs
         $state = null;
         $countryId = $r->ensureOptionalString('country_id');
         $stateId = $r->ensureOptionalString('state_id');
-        if (!is_null($countryId) && !is_null($stateId)) {
+        if ($countryId !== null && $stateId !== null) {
             $state = \OmegaUp\DAO\States::getByPK($countryId, $stateId);
         }
         self::validateIdentity($username, $name, $gender, $groupAlias);
@@ -1157,7 +1149,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         bool $omitRank,
         string $category = 'all'
     ): array {
-        if (is_null($identity->username)) {
+        if ($identity->username === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'username'
@@ -1168,7 +1160,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $identity->username,
             /** @return array{birth_date?: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
             function () use ($identity, $user) {
-                if (!is_null($user)) {
+                if ($user !== null) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
                         $user,
                         $identity
@@ -1195,7 +1187,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         // Do not leak plain emails, birth dates, genders and user's objectives in case the request is for a profile other than
         // the logged identity's one. Admins can see emails, birth dates, genders and user's objectives
         if (
-            !is_null($loggedIdentity)
+            $loggedIdentity !== null
             && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
                 || $identity->identity_id === $loggedIdentity->identity_id)
         ) {
@@ -1211,7 +1203,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         // Mentors can see current coder of the month email.
         if (
-            !is_null($loggedIdentity)
+            $loggedIdentity !== null
             && \OmegaUp\Authorization::canViewEmail($loggedIdentity)
             && \OmegaUp\DAO\CoderOfTheMonth::isLastCoderOfTheMonth(
                 $identity->username,
@@ -1233,15 +1225,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
             $identity->identity_id
         );
-        if (is_null($extendedProfile)) {
+        if ($extendedProfile === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $schoolId = null;
-        if (!is_null($identity->current_identity_school_id)) {
+        if ($identity->current_identity_school_id !== null) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $identity->current_identity_school_id
             );
-            if (!is_null($identitySchool)) {
+            if ($identitySchool !== null) {
                 $schoolId = $identitySchool->school_id;
             }
         }
@@ -1288,7 +1280,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     ): string {
         // for quick debugging
         $requestLanguage = (
-            !is_null($request) ?
+            $request !== null ?
             $request->ensureOptionalString('lang') :
             null
         );
@@ -1301,11 +1293,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            if (!is_null($identity) && !is_null($identity->language_id)) {
+            if ($identity !== null && $identity->language_id !== null) {
                 $result = \OmegaUp\DAO\Languages::getByPK(
                     $identity->language_id
                 );
-                if (is_null($result) || is_null($result->name)) {
+                if ($result === null || $result->name === null) {
                     self::$log->warning('Invalid language id for identity');
                 } else {
                     return \OmegaUp\Controllers\Identity::convertToSupportedLanguage(

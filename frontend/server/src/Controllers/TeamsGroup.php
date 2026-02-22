@@ -30,7 +30,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ): ?\OmegaUp\DAO\VO\TeamGroups {
         $teamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($teamGroupAlias);
-        if (is_null($teamGroup)) {
+        if ($teamGroup === null) {
             return null;
         }
 
@@ -59,7 +59,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup)) {
+        if ($teamGroup === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
@@ -139,7 +139,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup) || is_null($teamGroup->team_group_id)) {
+        if ($teamGroup === null || $teamGroup->team_group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'team_group_alias'
@@ -278,7 +278,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamsGroupAlias,
             $r->identity
         );
-        if (is_null($teamsGroup)) {
+        if ($teamsGroup === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'teams_group_alias'
@@ -317,7 +317,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup)) {
+        if ($teamGroup === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'team_group_alias'
@@ -351,7 +351,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup)) {
+        if ($teamGroup === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'team_group_alias'
@@ -367,7 +367,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             intval($teamGroup->team_group_id),
             intval($resolvedIdentity->identity_id)
         );
-        if (is_null($teams)) {
+        if ($teams === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'User'
@@ -398,7 +398,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             )
         );
         $team = \OmegaUp\DAO\TeamGroups::getByTeamUsername($teamUsername);
-        if (is_null($team)) {
+        if ($team === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'teams_group_alias'
@@ -409,7 +409,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $team['alias'],
             $r->identity
         );
-        if (is_null($teamsGroup) || is_null($teamsGroup->team_group_id)) {
+        if ($teamsGroup === null || $teamsGroup->team_group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'teams_group_alias'
@@ -478,7 +478,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             )
         );
         $team = \OmegaUp\DAO\TeamGroups::getByTeamUsername($teamUsername);
-        if (is_null($team)) {
+        if ($team === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'teams_group_alias'
@@ -489,7 +489,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $team['alias'],
             $r->identity
         );
-        if (is_null($teamsGroup) || is_null($teamsGroup->team_group_id)) {
+        if ($teamsGroup === null || $teamsGroup->team_group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'teams_group_alias'
@@ -499,7 +499,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUsername(
             $r->ensureString('username')
         );
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'identity_id'
@@ -538,7 +538,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             $teamGroupAlias,
             $r->identity
         );
-        if (is_null($teamGroup) || is_null($teamGroup->team_group_id)) {
+        if ($teamGroup === null || $teamGroup->team_group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'team_group_alias'

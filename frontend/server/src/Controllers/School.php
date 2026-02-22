@@ -28,10 +28,10 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $param = $r->ensureOptionalString('query');
-        if (is_null($param)) {
+        if ($param === null) {
             $param = $r->ensureOptionalString('term');
         }
-        if (is_null($param)) {
+        if ($param === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -64,7 +64,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
-        if (is_null($school)) {
+        if ($school === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
@@ -85,25 +85,25 @@ class School extends \OmegaUp\Controllers\Controller {
             ),
         ];
 
-        if (!is_null($school->country_id)) {
+        if ($school->country_id !== null) {
             $country = \OmegaUp\DAO\Countries::getByPK(
                 strval(
                     $school->country_id
                 )
             );
-            if (!is_null($country)) {
+            if ($country !== null) {
                 $payload['country'] = [
                     'id' => strval($country->country_id),
                     'name' => strval($country->name),
                 ];
             }
 
-            if (!is_null($school->state_id)) {
+            if ($school->state_id !== null) {
                 $state = \OmegaUp\DAO\States::getByPK(
                     strval($school->country_id),
                     strval($school->state_id)
                 );
-                if (!is_null($state)) {
+                if ($state !== null) {
                     $payload['state_name'] = $state->name;
                 }
             }
@@ -145,7 +145,7 @@ class School extends \OmegaUp\Controllers\Controller {
         );
 
         $state = null;
-        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
+        if ($r['country_id'] !== null && $r['state_id'] !== null) {
             $state = \OmegaUp\DAO\States::getByPK(
                 $r['country_id'],
                 $r['state_id']
@@ -171,8 +171,8 @@ class School extends \OmegaUp\Controllers\Controller {
         // Create school object
         $school = new \OmegaUp\DAO\VO\Schools([
             'name' => $name,
-            'country_id' => !is_null($state) ? $state->country_id : null,
-            'state_id' => !is_null($state) ? $state->state_id : null,
+            'country_id' => $state !== null ? $state->country_id : null,
+            'state_id' => $state !== null ? $state->state_id : null,
         ]);
 
         $existing = \OmegaUp\DAO\Schools::findByName($name);
@@ -194,7 +194,7 @@ class School extends \OmegaUp\Controllers\Controller {
         int $schoolId
     ): array {
         $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
-        if (is_null($school)) {
+        if ($school === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
@@ -214,7 +214,7 @@ class School extends \OmegaUp\Controllers\Controller {
     ): array {
         $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
 
-        if (is_null($school)) {
+        if ($school === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
@@ -234,7 +234,7 @@ class School extends \OmegaUp\Controllers\Controller {
     ): array {
         $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
 
-        if (is_null($school)) {
+        if ($school === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
@@ -275,8 +275,8 @@ class School extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
-        $page = is_null($r['page']) ? 1 : intval($r['page']);
-        $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $page = $r['page'] === null ? 1 : intval($r['page']);
+        $length = $r['length'] === null ? 100 : intval($r['length']);
 
         $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
@@ -323,9 +323,7 @@ class School extends \OmegaUp\Controllers\Controller {
             $identity = null;
         }
 
-        $isMentor = !is_null(
-            $identity
-        ) && \OmegaUp\Authorization::isMentor(
+        $isMentor = $identity !== null && \OmegaUp\Authorization::isMentor(
             $identity
         );
 
@@ -396,7 +394,7 @@ class School extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (is_null($schoolOfTheMonthId)) {
+        if ($schoolOfTheMonthId === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'schoolOfTheMonthNotFound'
             );
@@ -405,7 +403,7 @@ class School extends \OmegaUp\Controllers\Controller {
         // Now get the school data
         $school = \OmegaUp\DAO\Schools::getByPK($schoolOfTheMonthId);
 
-        if (is_null($school)) {
+        if ($school === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'schoolOfTheMonthNotFound'
             );
@@ -415,14 +413,14 @@ class School extends \OmegaUp\Controllers\Controller {
         $stateName = null;
         $country = \OmegaUp\DAO\Countries::getByPK($school->country_id);
 
-        if (!is_null($country)) {
+        if ($country !== null) {
             $countryName = $country->name;
 
             $state = \OmegaUp\DAO\States::getByPK(
                 $country->country_id,
                 $school->state_id
             );
-            if (!is_null($state)) {
+            if ($state !== null) {
                 $stateName = $state->name;
             }
         }
@@ -472,7 +470,7 @@ class School extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        if (is_null($selectedSchool)) {
+        if ($selectedSchool === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
@@ -506,7 +504,7 @@ class School extends \OmegaUp\Controllers\Controller {
                     $selectedSchoolOfTheMonth = \OmegaUp\DAO\SchoolOfTheMonth::getByPK(
                         $school['school_of_the_month_id']
                     );
-                    if (is_null($selectedSchoolOfTheMonth)) {
+                    if ($selectedSchoolOfTheMonth === null) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'schoolNotFound'
                         );

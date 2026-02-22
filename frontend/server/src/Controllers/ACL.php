@@ -91,13 +91,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
         $roleMap = [];
         foreach (\OmegaUp\DAO\Roles::getAll() as $role) {
             if (
-                is_null(
-                    $role->role_id
-                ) || is_null(
-                    $role->name
-                ) || is_null(
-                    $role->description
-                )
+                $role->role_id === null || $role->name === null || $role->description === null
             ) {
                 continue;
             }
@@ -114,7 +108,7 @@ class ACL extends \OmegaUp\Controllers\Controller {
                 $userRoles,
                 'user_id'
             ),
-            fn($id) => !is_null($id)
+            fn($id) => $id !== null
         );
         /** @var list<int> $userIds */
         $userIds = array_values(array_unique($userIds));

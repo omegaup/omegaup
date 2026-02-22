@@ -62,7 +62,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
     public static function getCertificateListMineForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $certificates = [];
-        if (!is_null($r->identity->user_id)) {
+        if ($r->identity->user_id !== null) {
             $certificates = \OmegaUp\DAO\Certificates::getUserCertificates(
                 $r->identity->user_id
             );
@@ -398,12 +398,12 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $verificationCode
         );
 
-        if (is_null($certificateData)) {
+        if ($certificateData === null) {
             return null;
         }
 
         $translator = \OmegaUp\Translations::getInstance();
-        if (!is_null($certificateData['contest_place'])) {
+        if ($certificateData['contest_place'] !== null) {
             $placeNumber = intval($certificateData['contest_place']);
             $title = \OmegaUp\ApiUtils::convertUTFToISO(
                 $placeNumber
@@ -440,7 +440,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $verificationCode
         );
 
-        if (is_null($certificateData)) {
+        if ($certificateData === null) {
             return null;
         }
 
@@ -477,7 +477,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $verificationCode
         );
 
-        if (is_null($certificateData)) {
+        if ($certificateData === null) {
             return null;
         }
 
@@ -575,9 +575,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
 
         if (
-            is_null($contest)
-            || is_null($contest->problemset_id)
-            || is_null($contest->alias)
+            $contest === null
+            || $contest->problemset_id === null
+            || $contest->alias === null
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -586,7 +586,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $contest->problemset_id
         );
 
-        if (is_null($problemset)) {
+        if ($problemset === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
@@ -620,7 +620,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         $certificateCutoff = $r->ensureOptionalInt('certificates_cutoff');
 
         // add certificates_cutoff value to the contest
-        if (!is_null($certificateCutoff)) {
+        if ($certificateCutoff !== null) {
             $contest->certificate_cutoff = $certificateCutoff;
 
             // update contest with the new value
@@ -632,7 +632,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
             $contest->alias
         );
 
-        if (is_null($contestExtraInformation)) {
+        if ($contestExtraInformation === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 

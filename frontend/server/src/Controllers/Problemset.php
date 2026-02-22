@@ -30,9 +30,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 'problemIsBanned'
             );
         }
-        $canEditProblemset = !is_null(
-            $problemsetId
-        ) && \OmegaUp\Authorization::canEditProblemset(
+        $canEditProblemset = $problemsetId !== null && \OmegaUp\Authorization::canEditProblemset(
             $identity,
             $problemsetId
         );
@@ -47,7 +45,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             $problemsetId,
             $problem->problem_id
         );
-        if (!is_null($problemsetProblem)) {
+        if ($problemsetProblem !== null) {
             // Invited admin should update a problem in problemset
             return;
         }
@@ -102,7 +100,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\ProblemsetProblems $updatedProblemsetProblem,
         ?\OmegaUp\DAO\VO\ProblemsetProblems $oldProblemsetProblem = null,
     ): void {
-        if (is_null($oldProblemsetProblem)) {
+        if ($oldProblemsetProblem === null) {
             \OmegaUp\DAO\Base\ProblemsetProblems::create(
                 $updatedProblemsetProblem
             );
@@ -273,13 +271,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         $problemsetId = $r->ensureInt('problemset_id');
 
         $problemset = \OmegaUp\DAO\Problemsets::getWithTypeByPK($problemsetId);
-        if (is_null($problemset)) {
+        if ($problemset === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
         if ($problemset['type'] == 'Contest') {
-            if (is_null($problemset['contest_alias'])) {
+            if ($problemset['contest_alias'] === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemsetNotFound'
                 );

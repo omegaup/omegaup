@@ -142,16 +142,16 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::findByUsername(
             $createUserParams->username
         );
-        if (!is_null($createUserParams->email)) {
+        if ($createUserParams->email !== null) {
             $identityByEmail = \OmegaUp\DAO\Identities::findByEmail(
                 $createUserParams->email
             );
 
-            if (!is_null($identityByEmail)) {
+            if ($identityByEmail !== null) {
                 // Check if the same user had already tried to create this account.
                 if (
-                    !is_null($identityByEmail->password) &&
-                    !is_null($identity) &&
+                    $identityByEmail->password !== null &&
+                    $identity !== null &&
                     $identity->user_id === $identityByEmail->user_id &&
                     \OmegaUp\SecurityTools::compareHashedStrings(
                         strval($createUserParams->password),
@@ -177,7 +177,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'usernameInUse'
             );
@@ -203,7 +203,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 '-13 year',
                 \OmegaUp\Time::get()
             )
-            && !is_null($createUserParams->parentEmail)
+            && $createUserParams->parentEmail !== null
         ) {
             // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
@@ -224,7 +224,7 @@ class User extends \OmegaUp\Controllers\Controller {
             // simply send an email to the parent with the verification token
             // and wait until the parent registers in omegaUp. Then, they can
             // verify the dependent account.
-            if (!is_null($parentEmail) && $parentEmail->email_id !== 0) {
+            if ($parentEmail !== null && $parentEmail->email_id !== 0) {
                 $userData['parent_email_id'] = $parentEmail->email_id;
             }
 
@@ -246,13 +246,13 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($createUserParams->name)) {
+        if ($createUserParams->name !== null) {
             $identityData['name'] = $createUserParams->name;
         }
-        if (!is_null($createUserParams->gender)) {
+        if ($createUserParams->gender !== null) {
             $identityData['gender'] = $createUserParams->gender;
         }
-        if (!is_null($createUserParams->facebookUserId)) {
+        if ($createUserParams->facebookUserId !== null) {
             $userData['facebook_user_id'] = $createUserParams->facebookUserId;
         }
         /** @psalm-suppress TypeDoesNotContainType OMEGAUP_VALIDATE_CAPTCHA may be defined as true in tests. */
@@ -294,7 +294,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             /** @var null|mixed */
             $resultAsJson = json_decode($result, associative: true);
-            if (is_null($resultAsJson)) {
+            if ($resultAsJson === null) {
                 self::$log->error('Captcha response was not a json');
                 self::$log->error("Here is the result: {$result}");
                 throw new \OmegaUp\Exceptions\CaptchaVerificationFailedException();
@@ -314,7 +314,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = new \OmegaUp\DAO\VO\Identities($identityData);
 
         $email = null;
-        if (!is_null($createUserParams->email)) {
+        if ($createUserParams->email !== null) {
             $email = new \OmegaUp\DAO\VO\Emails([
                 'email' => $createUserParams->email,
             ]);
@@ -326,7 +326,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\Users::create($user);
 
-            if (!is_null($email)) {
+            if ($email !== null) {
                 $email->user_id = $user->user_id;
                 \OmegaUp\DAO\Emails::create($email);
                 if (empty($email->email_id)) {
@@ -347,7 +347,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 self::$log->info(
                     "Identity {$identity->username} created, trusting e-mail"
                 );
-            } elseif (is_null($createUserParams->parentEmail)) {
+            } elseif ($createUserParams->parentEmail === null) {
                 self::$log->info(
                     "Identity {$identity->username} created, sending verification mail"
                 );
@@ -375,14 +375,14 @@ class User extends \OmegaUp\Controllers\Controller {
 
         self::$log->info('Adding user to Sendy.');
 
-        if (is_null($user->main_email_id)) {
+        if ($user->main_email_id === null) {
             return false;
         }
 
         // Get email
         try {
             $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-            if (is_null($email) || is_null($email->email)) {
+            if ($email === null || $email->email === null) {
                 return false;
             }
         } catch (\Exception $e) {
@@ -430,13 +430,13 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\EmailVerificationSendException
      */
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user): void {
-        if (is_null($user->main_email_id)) {
+        if ($user->main_email_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userOrMailNotFound'
             );
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-        if (is_null($email) || is_null($email->email)) {
+        if ($email === null || $email->email === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userOrMailNotFound'
             );
@@ -480,7 +480,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         self::$log->info("User {$identity->username} not verified.");
 
-        if (is_null($user->verification_id)) {
+        if ($user->verification_id === null) {
             self::$log->info('User does not have verification id. Generating.');
 
             try {
@@ -546,7 +546,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (isset($r['username']) && $r['username'] !== $identity->username) {
             // This is usable only in tests.
             if (
-                is_null(self::$permissionKey) ||
+                self::$permissionKey === null ||
                 self::$permissionKey != $r['permission_key']
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -557,34 +557,34 @@ class User extends \OmegaUp\Controllers\Controller {
             );
 
             $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
-            if (is_null($user) || is_null($user->main_identity_id)) {
+            if ($user === null || $user->main_identity_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 $user->main_identity_id
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
 
-            if (!is_null($password)) {
+            if ($password !== null) {
                 \OmegaUp\SecurityTools::testStrongPassword($password);
                 $hashedPassword = \OmegaUp\SecurityTools::hashString(
                     $password
                 );
             }
         } else {
-            if (is_null($user->main_identity_id)) {
+            if ($user->main_identity_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 $user->main_identity_id
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
 
-            if (!is_null($identity->password)) {
+            if ($identity->password !== null) {
                 // Check the old password
                 \OmegaUp\Validators::validateStringNonEmpty(
                     $r['old_password'],
@@ -604,7 +604,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            if (is_null($password)) {
+            if ($password === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterEmpty',
                     'password'
@@ -682,7 +682,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        if (!is_null($usernameOrEmail)) {
+        if ($usernameOrEmail !== null) {
             // Admin can override verification by sending username
             $r->ensureIdentity();
 
@@ -709,7 +709,7 @@ class User extends \OmegaUp\Controllers\Controller {
     private static function verifyEmail(
         ?\OmegaUp\DAO\VO\Users $user
     ): void {
-        if (is_null($user) || is_null($user->main_identity_id)) {
+        if ($user === null || $user->main_identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'verificationIdInvalid'
             );
@@ -717,7 +717,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::getByPK(
             $user->main_identity_id
         );
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -760,13 +760,13 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         foreach ($usersMissing as $user) {
-            if (is_null($user->main_identity_id)) {
+            if ($user->main_identity_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 $user->main_identity_id
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $registered = self::registerToSendy($user, $identity);
@@ -798,11 +798,11 @@ class User extends \OmegaUp\Controllers\Controller {
             'usernameOrEmail'
         );
         $user = \OmegaUp\DAO\Users::FindByUsername($userOrEmail);
-        if (!is_null($user)) {
+        if ($user !== null) {
             return $user;
         }
         $user = \OmegaUp\DAO\Users::findByEmail($userOrEmail);
-        if (!is_null($user)) {
+        if ($user !== null) {
             return $user;
         }
         throw new \OmegaUp\Exceptions\NotFoundException('userOrMailNotFound');
@@ -834,7 +834,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $password
     ): bool {
         $user = \OmegaUp\DAO\Users::FindByUsername($username);
-        if (is_null($user)) {
+        if ($user === null) {
             self::$log->info('Creating user: ' . $username);
             $createRequest = new \OmegaUp\Request([
                 'username' => $username,
@@ -847,7 +847,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::apiCreate($createRequest);
             return true;
         } elseif (
-            is_null($r['change_password']) ||
+            $r['change_password'] === null ||
             $r['change_password'] !== 'false'
         ) {
             if (!$user->verified) {
@@ -1437,7 +1437,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
 
                 // Add user to contest if needed
-                if (!is_null($contestAlias)) {
+                if ($contestAlias !== null) {
                     $addUserRequest = new \OmegaUp\Request();
                     $addUserRequest['auth_token'] = $r['auth_token'];
                     $addUserRequest['usernameOrEmail'] = $username;
@@ -1462,9 +1462,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'username' => $identity->username,
             'name' => $identity->name,
-            'birth_date' => is_null(
-                $user->birth_date
-            ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            'birth_date' => $user->birth_date === null ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                 $user->birth_date
             ),
             'gender' => $identity->gender,
@@ -1476,16 +1474,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'has_learning_objective' => $user->has_learning_objective,
             'has_scholar_objective' => $user->has_scholar_objective,
             'has_teaching_objective' => $user->has_teaching_objective,
-            'hide_problem_tags' => is_null(
-                $user->hide_problem_tags
-            ) ? false : $user->hide_problem_tags,
+            'hide_problem_tags' => $user->hide_problem_tags === null ? false : $user->hide_problem_tags,
             'is_own_profile' => false,
         ];
 
         $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
             intval($user->user_id)
         );
-        if (is_null($userDb)) {
+        if ($userDb === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -1514,9 +1510,9 @@ class User extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $user
     ): float {
         if (
-            is_null($user) ||
-            is_null($user->main_identity_id) ||
-            is_null($user->user_id)
+            $user === null ||
+            $user->main_identity_id === null ||
+            $user->user_id === null
         ) {
             return 0;
         }
@@ -1525,25 +1521,23 @@ class User extends \OmegaUp\Controllers\Controller {
         $profile = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
             $user->user_id
         );
-        if (is_null($identity) || is_null($profile)) {
+        if ($identity === null || $profile === null) {
             return 0;
         }
         $fields = [
-            'username' => !is_null($identity->username) ? 1 : 0,
-            'name' => !is_null($identity->name) ? 1 : 0,
-            'birth_date' => !is_null($user->birth_date) ? 1 : 0,
-            'gender' => !is_null($identity->gender) ? 1 : 0,
-            'scholar_degree' => !is_null($user->scholar_degree) ? 1 : 0,
-            'preferred_language' => !is_null($user->preferred_language) ? 1 : 0,
+            'username' => $identity->username !== null ? 1 : 0,
+            'name' => $identity->name !== null ? 1 : 0,
+            'birth_date' => $user->birth_date !== null ? 1 : 0,
+            'gender' => $identity->gender !== null ? 1 : 0,
+            'scholar_degree' => $user->scholar_degree !== null ? 1 : 0,
+            'preferred_language' => $user->preferred_language !== null ? 1 : 0,
             'verified' => $user->verified ? 1 : 0,
-            'graduation_date' => !is_null(
-                $profile['graduation_date']
-            ) ? 1 : 0,
-            'email' => !is_null($profile['email']) ? 1 : 0,
-            'country_id' => !is_null($profile['country_id']) ? 1 : 0,
-            'state_id' => !is_null($profile['state_id']) ? 1 : 0,
-            'school_id' => !is_null($profile['school_id']) ? 1 : 0,
-            'locale' => !is_null($profile['locale']) ? 1 : 0,
+            'graduation_date' => $profile['graduation_date'] !== null ? 1 : 0,
+            'email' => $profile['email'] !== null ? 1 : 0,
+            'country_id' => $profile['country_id'] !== null ? 1 : 0,
+            'state_id' => $profile['state_id'] !== null ? 1 : 0,
+            'school_id' => $profile['school_id'] !== null ? 1 : 0,
+            'locale' => $profile['locale'] !== null ? 1 : 0,
         ];
         return (array_sum($fields) / count($fields)) * 100;
     }
@@ -1568,7 +1562,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $category = $r['category'] ?? 'all';
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'Identity'
@@ -1644,7 +1638,7 @@ class User extends \OmegaUp\Controllers\Controller {
         string $category = 'all'
     ) {
         $user = null;
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 
@@ -1697,7 +1691,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $response = \OmegaUp\DAO\Users::getStatusVerified($email);
 
-        if (is_null($response)) {
+        if ($response === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -1740,14 +1734,14 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\DAO\Identities::getExtraInformation(
             $usernameOrEmail
         );
-        if (is_null($response)) {
+        if ($response === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
         }
 
         $user = self::resolveUser($usernameOrEmail);
-        if (is_null($user->user_id)) {
+        if ($user->user_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
             );
@@ -1816,7 +1810,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (is_null($coderOfTheMonthUserId)) {
+        if ($coderOfTheMonthUserId === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'coderOfTheMonthNotFound'
             );
@@ -1824,11 +1818,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Get the profile of the coder of the month
         $user = \OmegaUp\DAO\Users::getByPK($coderOfTheMonthUserId);
-        if (is_null($user) || is_null($user->main_identity_id)) {
+        if ($user === null || $user->main_identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
-        if (is_null($identity)) {
+        if ($identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $response = [
@@ -1864,7 +1858,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
         $category = $r['category'] ?? 'all';
-        if (!is_null($r['date'])) {
+        if ($r['date'] !== null) {
             $coders = \OmegaUp\DAO\CoderOfTheMonth::getMonthlyList(
                 $r['date'],
                 $category
@@ -1981,8 +1975,8 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         return (
-            !is_null($problemsetOpened) &&
-            !is_null($problemsetOpened->access_time)
+            $problemsetOpened !== null &&
+            $problemsetOpened->access_time !== null
         );
     }
 
@@ -1998,9 +1992,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $identity = self::resolveTargetIdentity($r);
         if (
-            is_null($identity) ||
-            is_null($identity->identity_id) ||
-            is_null($identity->username)
+            $identity === null ||
+            $identity->identity_id === null ||
+            $identity->username === null
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -2026,8 +2020,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
         foreach ($contestsParticipated as $contestProblemset) {
             if (
-                is_null($contestProblemset['contest']->alias)
-                || is_null($contestProblemset['contest']->title)
+                $contestProblemset['contest']->alias === null
+                || $contestProblemset['contest']->title === null
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'contestNotFound'
@@ -2039,7 +2033,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $contestProblemset['problemset'],
                 $identity
             );
-            if (is_null($scoreboardResponse)) {
+            if ($scoreboardResponse === null) {
                 continue;
             }
             $contest = [
@@ -2081,7 +2075,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -2120,7 +2114,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -2162,7 +2156,7 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -2219,7 +2213,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 100;
         $param = $term ?? $query;
-        if (is_null($param)) {
+        if ($param === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -2247,11 +2241,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $user = null;
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 
@@ -2294,7 +2288,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ?int $year
     ): array {
         // Set date range based on year parameter if provided
-        if (!is_null($year)) {
+        if ($year !== null) {
             $startDate = new \DateTime("{$year}-01-01");
             $endDate = new \DateTime("{$year}-12-31");
 
@@ -2319,7 +2313,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Fill in actual run counts for submissions
         foreach ($runs as $run) {
-            if (!is_null($run['date'])) {
+            if ($run['date'] !== null) {
                 $runDate = new \DateTime($run['date']);
                 if ($runDate >= $startDate && $runDate <= $endDate) {
                     $heatmapData[$run['date']] += $run['runs'];
@@ -2352,11 +2346,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiProfileStatistics(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $user = null;
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 
@@ -2406,13 +2400,13 @@ class User extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $user
     ): bool {
         return (
-            is_null($loggedIdentity)
+            $loggedIdentity === null
             || (
                 $loggedIdentity->username !== $identity->username
                 && !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
             )
         )
-        && !is_null($user)
+        && $user !== null
         && boolval($user->is_private);
     }
 
@@ -2447,7 +2441,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if ($r['username'] !== $r->identity->username) {
             $testu = \OmegaUp\DAO\Users::FindByUsername($r['username']);
 
-            if (!is_null($testu)) {
+            if ($testu !== null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterUsernameInUse',
                     'username'
@@ -2513,9 +2507,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 $username
             )
         );
-        if (!is_null($username)) {
+        if ($username !== null) {
             $user = \OmegaUp\DAO\Users::FindByUsername($username);
-            if ($username !== $r->identity->username && !is_null($user)) {
+            if ($username !== $r->identity->username && $user !== null) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'usernameInUse'
                 );
@@ -2528,7 +2522,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (!is_null($r['name'])) {
+        if ($r['name'] !== null) {
             \OmegaUp\Validators::validateStringOfLengthInRange(
                 $r['name'],
                 'name',
@@ -2539,7 +2533,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $state = null;
-        if (!is_null($r['country_id']) || !is_null($r['state_id'])) {
+        if ($r['country_id'] !== null || $r['state_id'] !== null) {
             // Both state and country must be specified together.
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['country_id'],
@@ -2554,7 +2548,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $r['country_id'],
                 $r['state_id']
             );
-            if (is_null($state)) {
+            if ($state === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'state_id'
@@ -2568,13 +2562,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $currentIdentitySchool = null;
         $currentGraduationDate = null;
         $currentSchoolId = null;
-        if (!is_null($r->identity->current_identity_school_id)) {
+        if ($r->identity->current_identity_school_id !== null) {
             $currentIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $r->identity->current_identity_school_id
             );
-            if (!is_null($currentIdentitySchool)) {
+            if ($currentIdentitySchool !== null) {
                 $currentSchoolId = $currentIdentitySchool->school_id;
-                if (!is_null($currentIdentitySchool->graduation_date)) {
+                if ($currentIdentitySchool->graduation_date !== null) {
                     $currentGraduationDate = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                         $currentIdentitySchool->graduation_date
                     );
@@ -2584,9 +2578,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $newSchoolId = $currentSchoolId;
 
         $schoolId = $r->ensureOptionalInt('school_id');
-        if (!is_null($schoolId) && $schoolId !== 0) {
+        if ($schoolId !== null && $schoolId !== 0) {
             $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
-            if (is_null($school)) {
+            if ($school === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'school'
@@ -2600,14 +2594,12 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $schoolName = $r->ensureOptionalString('school_name');
-        if (is_null($newSchoolId) && !is_null($schoolName)) {
+        if ($newSchoolId === null && $schoolName !== null) {
             $response = \OmegaUp\Controllers\School::apiCreate(
                 new \OmegaUp\Request([
                     'name' => $schoolName,
-                    'country_id' => !is_null(
-                        $state
-                    ) ? $state->country_id : null,
-                    'state_id' => !is_null($state) ? $state->state_id : null,
+                    'country_id' => $state !== null ? $state->country_id : null,
+                    'state_id' => $state !== null ? $state->state_id : null,
                     'auth_token' => $r['auth_token'],
                 ])
             );
@@ -2620,7 +2612,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $newGraduationDate = $currentGraduationDate;
-        if (!is_null($r['graduation_date'])) {
+        if ($r['graduation_date'] !== null) {
             if (is_numeric($r['graduation_date'])) {
                 $graduationDate = new \OmegaUp\Timestamp(
                     intval($r['graduation_date'])
@@ -2636,7 +2628,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             $newGraduationDate = $graduationDate;
         }
-        if (!is_null($r['birth_date'])) {
+        if ($r['birth_date'] !== null) {
             if (is_numeric($r['birth_date'])) {
                 $birthDate = intval($r['birth_date']);
             } else {
@@ -2655,14 +2647,14 @@ class User extends \OmegaUp\Controllers\Controller {
             }
             $r['birth_date'] = $birthDate;
         }
-        if (!is_null($r['locale'])) {
+        if ($r['locale'] !== null) {
             // find language in Language
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['locale'],
                 'locale'
             );
             $language = \OmegaUp\DAO\Languages::getByName($r['locale']);
-            if (is_null($language)) {
+            if ($language === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'invalidLanguage',
                     'locale'
@@ -2677,7 +2669,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalBool('has_scholar_objective');
         $r->ensureOptionalBool('has_teaching_objective');
         $r->ensureOptionalBool('hide_problem_tags');
-        if (!is_null($r['gender'])) {
+        if ($r['gender'] !== null) {
             $r->identity->gender = $r->ensureOptionalEnum(
                 'gender',
                 \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
@@ -2716,11 +2708,9 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update IdentitiesSchools
-            if ($newSchoolId !== $currentSchoolId && !is_null($newSchoolId)) {
+            if ($newSchoolId !== $currentSchoolId && $newSchoolId !== null) {
                 // Update end time for current record and create a new one
-                $graduationDate = !is_null(
-                    $newGraduationDate
-                ) ? gmdate(
+                $graduationDate = $newGraduationDate !== null ? gmdate(
                     'Y-m-d',
                     $newGraduationDate->time
                 ) : null;
@@ -2731,17 +2721,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
                 $r->identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
             } elseif (
-                (!is_null($newSchoolId)
-                || !is_null($currentSchoolId))
+                ($newSchoolId !== null
+                || $currentSchoolId !== null)
                 && ($currentGraduationDate !== $newGraduationDate)
             ) {
-                $graduationDate = !is_null(
-                    $newGraduationDate
-                ) ? gmdate(
+                $graduationDate = $newGraduationDate !== null ? gmdate(
                     'Y-m-d',
                     $newGraduationDate->time
                 ) : null;
-                if (!is_null($currentIdentitySchool)) {
+                if ($currentIdentitySchool !== null) {
                     // Only update the graduation date
                     $currentIdentitySchool->graduation_date = $graduationDate;
                     \OmegaUp\DAO\IdentitiesSchools::update(
@@ -2798,12 +2786,12 @@ class User extends \OmegaUp\Controllers\Controller {
             'author_ranking' => null,
         ];
 
-        if (is_null($identity->user_id)) {
+        if ($identity->user_id === null) {
             return $response;
         }
 
         $userRank = \OmegaUp\DAO\UserRank::getByPK($identity->user_id);
-        if (is_null($userRank)) {
+        if ($userRank === null) {
             return $response;
         }
 
@@ -3053,7 +3041,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        if (!is_null($originalEmail)) {
+        if ($originalEmail !== null) {
             // Only users with privileges of support team can update the email
             // on behalf to another user
             if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
@@ -3063,15 +3051,13 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             $user = \OmegaUp\DAO\Users::findByEmail($originalEmail);
-            if (is_null($user) || is_null($user->main_identity_id)) {
+            if ($user === null || $user->main_identity_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             if (
-                is_null(
-                    \OmegaUp\DAO\Identities::getByPK(
+                \OmegaUp\DAO\Identities::getByPK(
                         $user->main_identity_id
-                    )
-                )
+                    ) === null
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
@@ -3086,9 +3072,9 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
-            if (!is_null($user->main_email_id)) {
+            if ($user->main_email_id !== null) {
                 $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
-                if (!is_null($email)) {
+                if ($email !== null) {
                     $email->email = $emailParam;
                     \OmegaUp\DAO\Emails::update($email);
                 }
@@ -3106,7 +3092,7 @@ class User extends \OmegaUp\Controllers\Controller {
             if (!$user->verified) {
                 self::$log->info('User not verified.');
 
-                if (is_null($user->verification_id)) {
+                if ($user->verification_id === null) {
                     self::$log->info(
                         'User does not have verification id. Generating.'
                     );
@@ -3134,7 +3120,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
-        if (!is_null($originalEmail)) {
+        if ($originalEmail !== null) {
             // Delete profile cache, no needed for support team members
             \OmegaUp\Cache::deleteFromCache(
                 \OmegaUp\Cache::USER_PROFILE,
@@ -3201,7 +3187,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
         $identity = $session['identity'];
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             $response['user'] = $identity->username;
             $response['admin'] = $session['is_admin'];
         }
@@ -3236,7 +3222,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             'filter'
                         );
                     }
-                    if (is_null($identity)) {
+                    if ($identity === null) {
                         throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                             'userNotAllowed'
                         );
@@ -3259,7 +3245,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     $r2 = new \OmegaUp\Request([
                         'contest_alias' => $contestAlias,
                     ]);
-                    if (!is_null($authToken)) {
+                    if ($authToken !== null) {
                         $r2['auth_token'] = $authToken;
                     }
                     $token = null;
@@ -3318,13 +3304,13 @@ class User extends \OmegaUp\Controllers\Controller {
                     }
                     $problemAlias = $tokens[2];
                     $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-                    if (is_null($problem)) {
+                    if ($problem === null) {
                         throw new \OmegaUp\Exceptions\NotFoundException(
                             'problemNotFound'
                         );
                     }
                     if (
-                        !is_null($identity) &&
+                        $identity !== null &&
                         \OmegaUp\Authorization::isProblemAdmin(
                             $identity,
                             $problem
@@ -3433,7 +3419,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $group = \OmegaUp\DAO\Groups::getByName($groupName);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group'
@@ -3463,7 +3449,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($user->user_id)) {
+        if ($user === null || $user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -3509,7 +3495,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($user->user_id)) {
+        if ($user === null || $user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -3541,15 +3527,13 @@ class User extends \OmegaUp\Controllers\Controller {
         if (
             !\OmegaUp\Authorization::isSystemAdmin(
                 $r->identity
-            ) && !is_null(
-                $username
-            )
+            ) && $username !== null
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         $identity = self::resolveTargetIdentity($r);
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($identity)) {
+        if ($user === null || $identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $token = \OmegaUp\SecurityTools::randomString(50);
@@ -3557,14 +3541,14 @@ class User extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User {$identity->username} is requesting to delete their account."
         );
-        if (is_null($user->main_email_id)) {
+        if ($user->main_email_id === null) {
             return [
                 'token' => $token,
             ];
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
-        if (is_null($email) || is_null($email->email)) {
+        if ($email === null || $email->email === null) {
             return [
                 'token' => $token,
             ];
@@ -3606,15 +3590,13 @@ class User extends \OmegaUp\Controllers\Controller {
         if (
             !\OmegaUp\Authorization::isSystemAdmin(
                 $r->identity
-            ) && !is_null(
-                $username
-            )
+            ) && $username !== null
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         $user = self::resolveTargetUser($r);
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($user) || is_null($identity)) {
+        if ($user === null || $identity === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -3628,14 +3610,14 @@ class User extends \OmegaUp\Controllers\Controller {
         self::$log->info(
             "User {$identity->username} deleted their account successfully."
         );
-        if (is_null($user->main_email_id)) {
+        if ($user->main_email_id === null) {
             return [
                 'status' => 'ok',
             ];
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
 
-        if (is_null($email) || is_null($email->email)) {
+        if ($email === null || $email->email === null) {
             return [
                 'status' => 'ok',
             ];
@@ -3733,7 +3715,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($user->user_id)) {
+        if ($user === null || $user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -3770,7 +3752,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($user->user_id)) {
+        if ($user === null || $user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -3812,7 +3794,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         self::$log->error(print_r($lang, true));
         $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
-        if (is_null($latestStatement)) {
+        if ($latestStatement === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'privacyStatementNotFound'
             );
@@ -3850,7 +3832,7 @@ class User extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         string $filteredBy
     ): array {
-        if (is_null($identity)) {
+        if ($identity === null) {
             return ['filteredBy' => null, 'value' => null];
         }
         if ($filteredBy === 'country') {
@@ -3867,11 +3849,11 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         if ($filteredBy === 'school') {
             $schoolId = null;
-            if (!is_null($identity->current_identity_school_id)) {
+            if ($identity->current_identity_school_id !== null) {
                 $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                     $identity->current_identity_school_id
                 );
-                if (!is_null($identitySchool)) {
+                if ($identitySchool !== null) {
                     $schoolId = $identitySchool->school_id;
                 }
             }
@@ -3910,7 +3892,7 @@ class User extends \OmegaUp\Controllers\Controller {
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
         $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
-        if (is_null($latestStatement)) {
+        if ($latestStatement === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'privacyStatementNotFound'
             );
@@ -3950,7 +3932,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['privacy_git_object_id'],
             $r['statement_type']
         );
-        if (is_null($privacystatementId)) {
+        if ($privacystatementId === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'privacyStatementNotFound'
             );
@@ -3999,13 +3981,13 @@ class User extends \OmegaUp\Controllers\Controller {
         $identity = \OmegaUp\DAO\Identities::getUnassociatedIdentity(
             $r['username']
         );
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'username'
             );
         }
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'identityAlreadyInUse'
             );
@@ -4127,7 +4109,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        if (is_null($r->identity)) {
+        if ($r->identity === null) {
             return self::getRankToLoggedOutUser(
                 offset: $page,
                 rowCount: $length,
@@ -4196,29 +4178,29 @@ class User extends \OmegaUp\Controllers\Controller {
         array $params
     ) {
         $availableFilters = [];
-        if (!is_null($loggedIdentity->country_id)) {
+        if ($loggedIdentity->country_id !== null) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance($loggedIdentity)->get(
                     'wordsFilterByCountry'
                 );
         }
-        if (!is_null($loggedIdentity->state_id)) {
+        if ($loggedIdentity->state_id !== null) {
             $availableFilters['state'] =
                 \OmegaUp\Translations::getInstance($loggedIdentity)->get(
                     'wordsFilterByState'
                 );
         }
         $schoolId = null;
-        if (!is_null($loggedIdentity->current_identity_school_id)) {
+        if ($loggedIdentity->current_identity_school_id !== null) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $loggedIdentity->current_identity_school_id
             );
-            if (!is_null($identitySchool)) {
+            if ($identitySchool !== null) {
                 $schoolId = $identitySchool->school_id;
             }
         }
 
-        if (!is_null($schoolId)) {
+        if ($schoolId !== null) {
             $availableFilters['school'] =
                 \OmegaUp\Translations::getInstance($loggedIdentity)->get(
                     'wordsFilterBySchool'
@@ -4332,8 +4314,8 @@ class User extends \OmegaUp\Controllers\Controller {
                         $rowCount
                     ),
                     'currentUserInfo' => (
-                        !is_null($r->identity) &&
-                        !is_null($r->identity->username)
+                        $r->identity !== null &&
+                        $r->identity->username !== null
                     ) ? [
                         'username' => $r->identity->username,
                     ] : [],
@@ -4369,9 +4351,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $isMentor = !is_null(
-            $r->identity
-        ) && \OmegaUp\Authorization::isMentor(
+        $isMentor = $r->identity !== null && \OmegaUp\Authorization::isMentor(
             $r->identity
         );
 
@@ -4468,15 +4448,15 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         // When $username is not provided we need to validate that user is
         // logged in because we assume they want to see/edit their own profile
-        if (is_null($username)) {
+        if ($username === null) {
             $r->ensureIdentity();
         }
         $loggedIdentity = $r->identity;
         $targetIdentity = self::resolveTargetIdentity($r);
         if (
-            is_null($targetIdentity) ||
-            is_null($targetIdentity->identity_id) ||
-            is_null($targetIdentity->username)
+            $targetIdentity === null ||
+            $targetIdentity->identity_id === null ||
+            $targetIdentity->username === null
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -4484,7 +4464,7 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         $targetUser = null;
-        if (!is_null($targetIdentity->user_id)) {
+        if ($targetIdentity->user_id !== null) {
             $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
         }
         $response = [
@@ -4561,13 +4541,11 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $profile = self::getUserProfile($loggedIdentity, $targetIdentity);
-        $associatedIdentities = is_null(
-            $loggedIdentity
-        ) ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
+        $associatedIdentities = $loggedIdentity === null ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
             $loggedIdentity
         );
         $ownedBadges = [];
-        if (!is_null($targetUser)) {
+        if ($targetUser !== null) {
             $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
                 $targetUser
             );
@@ -4579,7 +4557,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'extraProfileDetails' => array_merge(
                     [
                     'ownedBadges' => $ownedBadges,
-                    'hasPassword' => !is_null($targetIdentity->password),
+                    'hasPassword' => $targetIdentity->password !== null,
                     ],
                     $cachedExtraProfileDetails
                 ),
@@ -4605,14 +4583,14 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $user = self::resolveTargetUser($r);
-        if (is_null($user) || is_null($user->user_id)) {
+        if ($user === null || $user->user_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $emails = \OmegaUp\DAO\Emails::getByUserId($user->user_id);
         $emailsList = [];
         foreach ($emails as $email) {
-            if (is_null($email->email)) {
+            if ($email->email === null) {
                 continue;
             }
             $emailsList[] = $email->email;
@@ -4623,7 +4601,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
         $userExperimentsList = [];
         foreach ($userExperiments as $userExperiment) {
-            if (is_null($userExperiment->experiment)) {
+            if ($userExperiment->experiment === null) {
                 continue;
             }
             $userExperimentsList[] = $userExperiment->experiment;
@@ -4635,7 +4613,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $roles = \OmegaUp\DAO\Roles::getAll();
         $rolesList = [];
         foreach ($roles as $role) {
-            if (is_null($role->name)) {
+            if ($role->name === null) {
                 continue;
             }
             $rolesList[] = [
@@ -4691,7 +4669,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $roles = \OmegaUp\DAO\Roles::getAll();
         $rolesList = [];
         foreach ($roles as $role) {
-            if (is_null($role->name) || $role->name == 'Admin') {
+            if ($role->name === null || $role->name == 'Admin') {
                 continue;
             }
             $rolesList[] = [
@@ -4727,7 +4705,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         // Only sysadmin can change email for another user
         if (
-            !is_null($targetIdentity)
+            $targetIdentity !== null
             && $targetIdentity->identity_id !== $r->identity->identity_id
             && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
         ) {
@@ -4737,13 +4715,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            is_null(
-                $targetIdentity
-            ) || is_null(
-                $targetIdentity->identity_id
-            ) || is_null(
-                $targetIdentity->user_id
-            )
+            $targetIdentity === null || $targetIdentity->identity_id === null || $targetIdentity->user_id === null
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -4784,17 +4756,17 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        if (is_null($user->main_identity_id)) {
+        if ($user->main_identity_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $userTypes = [];
 
         if (
-            is_null($user->has_competitive_objective)
-            || is_null($user->has_learning_objective)
-            || is_null($user->has_scholar_objective)
-            || is_null($user->has_teaching_objective)
+            $user->has_competitive_objective === null
+            || $user->has_learning_objective === null
+            || $user->has_scholar_objective === null
+            || $user->has_teaching_objective === null
         ) {
             return $userTypes;
         }
@@ -4852,7 +4824,7 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function isNonUserIdentity(
         \OmegaUp\DAO\VO\Identities $identity
     ): bool {
-        if (is_null($identity->username)) {
+        if ($identity->username === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return strpos($identity->username, ':') !== false;
@@ -4887,7 +4859,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $sessionManager = \OmegaUp\Controllers\Session::getSessionManagerInstance();
         $githubState = $sessionManager->getCookie('github_oauth_state');
-        if (is_null($githubState) && !$r->offsetExists('code')) {
+        if ($githubState === null && !$r->offsetExists('code')) {
             $githubState = \OmegaUp\SecurityTools::randomString(16);
             $sessionManager->setCookie(
                 'github_oauth_state',
@@ -4917,7 +4889,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
             } elseif ($thirdPartyLogin === 'github') {
                 \OmegaUp\Controllers\Session::loginViaGithubCallback($r);
-            } elseif (!is_null($gCsrfToken) && !is_null($idToken)) {
+            } elseif ($gCsrfToken !== null && $idToken !== null) {
                 \OmegaUp\Controllers\Session::loginViaGoogle(
                     $idToken,
                     $gCsrfToken,
@@ -5080,13 +5052,13 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             $user = \OmegaUp\DAO\Users::findByParentalToken($token);
 
-            if (is_null($user)) {
+            if ($user === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'parentalTokenNotFound'
                 );
             }
 
-            if (is_null($r->user) || is_null($r->user->main_email_id)) {
+            if ($r->user === null || $r->user->main_email_id === null) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
 
@@ -5178,12 +5150,12 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             return null;
         }
 
         $targetUser = null;
-        if (!is_null($identity->user_id)) {
+        if ($identity->user_id !== null) {
             $targetUser = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         }
 

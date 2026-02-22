@@ -209,23 +209,17 @@ class Admin extends \OmegaUp\Controllers\Controller {
         $enabled = boolval($cacheEnabled->get());
 
         $cacheMessageEs = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_ES_KEY);
-        $messageEs = is_null(
-            $cacheMessageEs->get()
-        ) ? null : strval(
+        $messageEs = $cacheMessageEs->get() === null ? null : strval(
             $cacheMessageEs->get()
         );
 
         $cacheMessageEn = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_EN_KEY);
-        $messageEn = is_null(
-            $cacheMessageEn->get()
-        ) ? null : strval(
+        $messageEn = $cacheMessageEn->get() === null ? null : strval(
             $cacheMessageEn->get()
         );
 
         $cacheMessagePt = new \OmegaUp\Cache(self::MAINTENANCE_MESSAGE_PT_KEY);
-        $messagePt = is_null(
-            $cacheMessagePt->get()
-        ) ? null : strval(
+        $messagePt = $cacheMessagePt->get() === null ? null : strval(
             $cacheMessagePt->get()
         );
 

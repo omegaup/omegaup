@@ -29,9 +29,9 @@ class Tag extends \OmegaUp\Controllers\Controller {
         $term = $r->ensureOptionalString('term');
         $query = $r->ensureOptionalString('query');
 
-        if (!is_null($term)) {
+        if ($term !== null) {
             $param = $term;
-        } elseif (!is_null($query)) {
+        } elseif ($query !== null) {
             $param = $query;
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(

@@ -125,7 +125,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             intval($identity->identity_id),
             $contest
         );
-        if (is_null($contest)) {
+        if ($contest === null) {
             $isAdmin = \OmegaUp\Authorization::isSystemAdmin($identity);
         } else {
             $isAdmin = \OmegaUp\Authorization::isAdmin($identity, $contest);
@@ -167,7 +167,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         // Check that problem exists
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem) || is_null($problem->problem_id)) {
+        if ($problem === null || $problem->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -204,7 +204,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
 
         // Can't set both problemset_id and contest_alias at the same time.
-        if (!is_null($problemsetId) && !is_null($contestAlias)) {
+        if ($problemsetId !== null && $contestAlias !== null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'incompatibleArgs',
                 'problemset_id and contest_alias'
@@ -215,15 +215,15 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problemsetContainer = null;
         /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = null;
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $problemsetContainer = \OmegaUp\DAO\Problemsets::getProblemsetContainer(
                 $problemsetId
             );
-        } elseif (!is_null($contestAlias)) {
+        } elseif ($contestAlias !== null) {
             // Got a contest alias, need to fetch the problemset id.
             // Validate contest
             $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-            if (is_null($contest)) {
+            if ($contest === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterNotFound',
                     'contest_alias'
@@ -234,7 +234,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $problemsetContainer = $contest;
 
             // Update list of valid languages.
-            if (!is_null($contest->languages)) {
+            if ($contest->languages !== null) {
                 /** @var list<string> $allowedLanguages */
                 $allowedLanguages = array_intersect(
                     $allowedLanguages,
@@ -254,7 +254,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                     $problem
                 ) &&
                 !(
-                    is_null($practiceDeadline) ||
+                    $practiceDeadline === null ||
                     \OmegaUp\Time::get() > $practiceDeadline->time
                 )
             ) {
@@ -271,14 +271,14 @@ class Run extends \OmegaUp\Controllers\Controller {
                 'problemset' => null,
             ];
         }
-        if (is_null($problemsetContainer)) {
+        if ($problemsetContainer === null) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
 
         $problemset = \OmegaUp\DAO\Problemsets::getByPK($problemsetId);
-        if (is_null($problemset)) {
+        if ($problemset === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'problemset_id'
@@ -286,7 +286,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Validate the language.
-        if (!is_null($problemset->languages)) {
+        if ($problemset->languages !== null) {
             /** @var list<string> $allowedLanguages */
             $allowedLanguages = array_intersect(
                 $allowedLanguages,
@@ -333,7 +333,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isAdmin($r->identity, $problemset)) {
             // Before submit something, user had to open the problem/problemset.
             if (
-                is_null($problemsetIdentity) &&
+                $problemsetIdentity === null &&
                 !\OmegaUp\Authorization::canSubmitToProblemset(
                     $r->identity,
                     $problemset
@@ -435,14 +435,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submitDelay = 0;
             $type = 'normal';
         } else {
-            $problemsetId = !is_null(
-                $problemset
-            ) ? intval(
+            $problemsetId = $problemset !== null ? intval(
                 $problemset->problemset_id
             ) : null;
             //check the kind of penalty_type for this contest
             $start = null;
-            if (!is_null($contest) && !is_null($problemsetId)) {
+            if ($contest !== null && $problemsetId !== null) {
                 switch ($contest->penalty_type) {
                     case 'contest_start':
                         // submit_delay is calculated from the start
@@ -459,7 +457,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                             $r->identity->identity_id
                         );
 
-                        if (is_null($opened)) {
+                        if ($opened === null) {
                             // welp, the user is submitting a run before even
                             // opening the problem!
                             throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
@@ -484,7 +482,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 }
             }
 
-            if (!is_null($start)) {
+            if ($start !== null) {
                 // assuming submit_delay is in minutes.
                 $submitDelay = intval(
                     (\OmegaUp\Time::get() - $start->time) / 60
@@ -495,8 +493,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             // If user is admin and is in virtual contest, then admin will be treated as contestant
             $type = (
-                !is_null($problemset) &&
-                !is_null($contest) &&
+                $problemset !== null &&
+                $contest !== null &&
                 \OmegaUp\Authorization::isAdmin(
                     $r->identity,
                     $problemset
@@ -521,11 +519,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             'type' => $type,
         ]);
 
-        if (!is_null($r->identity->current_identity_school_id)) {
+        if ($r->identity->current_identity_school_id !== null) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $r->identity->current_identity_school_id
             );
-            if (!is_null($identitySchool)) {
+            if ($identitySchool !== null) {
                 $submission->school_id = $identitySchool->school_id;
             }
         }
@@ -539,7 +537,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'time' => $submission->time,
             'memory' => 0,
             'score' => 0,
-            'contest_score' => !is_null($problemsetId) ? 0 : null,
+            'contest_score' => $problemsetId !== null ? 0 : null,
             'verdict' => 'JE',
         ]);
 
@@ -589,7 +587,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
         $userId = $r->identity->user_id;
-        if (is_null($userId) && !is_null($r->loginIdentity)) {
+        if ($userId === null && $r->loginIdentity !== null) {
             $userId = $r->loginIdentity->user_id;
         }
 
@@ -619,8 +617,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $problemsetId
             );
             if (
-                !is_null($problemsetIdentity) &&
-                !is_null($problemsetIdentity->end_time)
+                $problemsetIdentity !== null &&
+                $problemsetIdentity->end_time !== null
             ) {
                 $response['submission_deadline'] = $problemsetIdentity->end_time;
             } elseif (isset($problemsetContainer->finish_time)) {
@@ -639,18 +637,18 @@ class Run extends \OmegaUp\Controllers\Controller {
             lastSubmissionTime: $submission->time
         );
 
-        if (is_null($submission->guid)) {
+        if ($submission->guid === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         // Expire rank cache
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
                 $problemsetId
             );
-            if (!is_null($assignment) && !is_null($assignment->course_id)) {
+            if ($assignment !== null && $assignment->course_id !== null) {
                 \OmegaUp\Cache::invalidateAllKeys(
                     \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
                 );
@@ -671,14 +669,14 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function validateDetailsRequest(string $runAlias): array {
         // If user is not judge, must be the run's owner.
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
-        if (is_null($submission) || is_null($submission->current_run_id)) {
+        if ($submission === null || $submission->current_run_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $run = \OmegaUp\DAO\Runs::getByPK(
             $submission->current_run_id
         );
-        if (is_null($run)) {
+        if ($run === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
@@ -712,13 +710,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         $submission = \OmegaUp\DAO\Submissions::getByGuid($runAlias);
         if (
-            is_null(
-                $submission
-            ) || is_null(
-                $submission->current_run_id
-            ) || is_null(
-                $submission->guid
-            )
+            $submission === null || $submission->current_run_id === null || $submission->guid === null
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
@@ -726,23 +718,23 @@ class Run extends \OmegaUp\Controllers\Controller {
         $run = \OmegaUp\DAO\Runs::getByGUID(
             $submission->guid
         );
-        if (is_null($run)) {
+        if ($run === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
         $problem = \OmegaUp\DAO\Problems::getByPK(
             intval($submission->problem_id)
         );
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemset = null;
-        if (!is_null($submission->problemset_id)) {
+        if ($submission->problemset_id !== null) {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $submission->problemset_id
             );
         }
         $contest = null;
-        if (!is_null($problemset) && !is_null($problemset->contest_id)) {
+        if ($problemset !== null && $problemset->contest_id !== null) {
             $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
         }
 
@@ -792,9 +784,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             'status_memory' => strval($filtered['status_memory']),
             'status_runtime' => strval($filtered['status_runtime']),
         ];
-        if (!is_null($filtered['contest_score'])) {
+        if ($filtered['contest_score'] !== null) {
             if (
-                is_null($contest)
+                $contest === null
                 || $contest->score_mode == 'partial'
                 || $filtered['score'] == 1
             ) {
@@ -932,7 +924,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             )
         );
         $runs = [];
-        if (!is_null($runAlias)) {
+        if ($runAlias !== null) {
             [
                 'submission' => $submission,
             ] = self::validateDetailsRequest($runAlias);
@@ -955,8 +947,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\Submissions::disqualify($submission);
             $runs[] = ['guid' => $runAlias, 'username' => $username];
-        } elseif (!is_null($username)) {
-            if (is_null($contestAlias)) {
+        } elseif ($username !== null) {
+            if ($contestAlias === null) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterNotFound',
                     'contest_alias'
@@ -1052,14 +1044,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission = \OmegaUp\DAO\Submissions::getByPK(
                 intval($run->submission_id)
             );
-            if (is_null($submission) || is_null($submission->problem_id)) {
+            if ($submission === null || $submission->problem_id === null) {
                 return;
             }
 
             // Now we need to invalidate problem stats
             $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
 
-            if (!is_null($problem) && !is_null($problem->alias)) {
+            if ($problem !== null && $problem->alias !== null) {
                 // Invalidar cache stats
                 \OmegaUp\Cache::deleteFromCache(
                     \OmegaUp\Cache::PROBLEM_STATS,
@@ -1119,28 +1111,28 @@ class Run extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        if (is_null($submission->problem_id)) {
+        if ($submission->problem_id === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (is_null($run->commit) || is_null($run->version)) {
+        if ($run->commit === null || $run->version === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
-        if (is_null($problem) || is_null($problem->alias)) {
+        if ($problem === null || $problem->alias === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $problemset = null;
-        if (!is_null($submission->problemset_id)) {
+        if ($submission->problemset_id !== null) {
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 $submission->problemset_id
             );
         }
 
         $contest = null;
-        if (!is_null($problemset) && !is_null($problemset->contest_id)) {
+        if ($problemset !== null && $problemset->contest_id !== null) {
             $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
         }
 
@@ -1189,7 +1181,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         if (isset($details['details'])) {
             if (
-                !is_null($contest)
+                $contest !== null
                 && $contest->feedback === 'summary'
                 && isset($details['details']['groups'])
             ) {
@@ -1401,7 +1393,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $identityId
         );
         if (
-            !is_null($contest) &&
+            $contest !== null &&
             $contest->finish_time->time > \OmegaUp\Time::get()
         ) {
             return $contest->feedback;
@@ -1447,9 +1439,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['compile_error'] = $details['compile_error'];
         }
         if (
-            !is_null(
-                $contest
-            ) && $contest->score_mode == 'all_or_nothing' && $run->score < 1
+            $contest !== null && $contest->score_mode == 'all_or_nothing' && $run->score < 1
         ) {
             $details['contest_score'] = 0.0;
             $details['score'] = 0.0;
@@ -1508,20 +1498,20 @@ class Run extends \OmegaUp\Controllers\Controller {
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
-            is_null($submission) ||
-            is_null($submission->current_run_id) ||
-            is_null($submission->problem_id)
+            $submission === null ||
+            $submission->current_run_id === null ||
+            $submission->problem_id === null
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        if (is_null($run)) {
+        if ($run === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
-        if (is_null($problem)) {
+        if ($problem === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -1553,7 +1543,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $filename,
             missingOk: true
         );
-        if (is_null($result)) {
+        if ($result === null) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
                 passthru: false
@@ -1577,7 +1567,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             missingOk: true,
             fileHeaders: $headers,
         );
-        if (is_null($result)) {
+        if ($result === null) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
                 passthru: true,
@@ -1796,9 +1786,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             required: false,
             validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        if (!is_null($problemAlias)) {
+        if ($problemAlias !== null) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-            if (is_null($problem)) {
+            if ($problem === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
                 );
@@ -1815,7 +1805,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         /** @var null|\OmegaUp\DAO\VO\Identities */
         $identity = null;
-        if (!is_null($username)) {
+        if ($username !== null) {
             try {
                 $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
                     $username
@@ -1861,9 +1851,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             null,
             $r->ensureOptionalEnum('status', self::STATUS),
             $r->ensureOptionalEnum('verdict', self::VERDICTS),
-            !is_null($problem) ? $problem->problem_id : null,
+            $problem !== null ? $problem->problem_id : null,
             $r->ensureOptionalEnum('language', $languagesKeys),
-            !is_null($identity) ? $identity->identity_id : null,
+            $identity !== null ? $identity->identity_id : null,
             max($r->ensureOptionalInt('offset') ?? 0, 0),
             $r->ensureOptionalInt('rowcount') ?? 100
         );
@@ -1871,7 +1861,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = [];
         foreach ($runs as $run) {
             $run['score'] = round(floatval($run['score']), 4);
-            if (!is_null($run['contest_score'])) {
+            if ($run['contest_score'] !== null) {
                 $run['contest_score'] = round(
                     floatval(
                         $run['contest_score']

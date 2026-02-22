@@ -112,7 +112,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
@@ -138,7 +138,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ): ?\OmegaUp\DAO\VO\Groups {
         $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
-        if (is_null($group)) {
+        if ($group === null) {
             return null;
         }
 
@@ -165,7 +165,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
@@ -215,7 +215,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
@@ -234,7 +234,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             $group->group_id,
             $resolvedIdentity->identity_id
         );
-        if (is_null($groupIdentities)) {
+        if ($groupIdentities === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'User'
@@ -300,7 +300,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
@@ -347,7 +347,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
@@ -378,7 +378,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group)) {
+        if ($group === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
@@ -424,7 +424,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
-        if (is_null($group) || is_null($group->group_id)) {
+        if ($group === null || $group->group_id === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'group_alias'
