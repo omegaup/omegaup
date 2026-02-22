@@ -7,23 +7,13 @@ namespace OmegaUp;
  */
 class TranslationString implements \JsonSerializable {
     /**
-     * @var string
-     * @readonly
-     */
-    public $message;
-
-    /**
-     * @var array<string, mixed>
-     * @readonly
-     */
-    public $args;
-
-    /**
      * @param array<string, mixed> $args
      */
-    public function __construct(string $message, array $args = []) {
-        $this->message = $message;
-        $this->args = $args;
+    public function __construct(
+        public readonly string $message,
+        /** @var array<string, mixed> */
+        public readonly array $args = [],
+    ) {
     }
 
     public function __toString(): string {
