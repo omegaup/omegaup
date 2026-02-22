@@ -131,7 +131,7 @@ class CourseParams extends BaseParams {
      * @param array{name: string, description: string, objective: null|string, alias: string, level: null|\OmegaUp\CourseParams::COURSE_LEVEL_INTRODUCTORY|\OmegaUp\CourseParams::COURSE_LEVEL_INTERMEDIATE|\OmegaUp\CourseParams::COURSE_LEVEL_ADVANCED, start_time: int, finish_time: null|int, admission_mode: null|\OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PRIVATE|\OmegaUp\CourseParams::COURSE_ADMISSION_MODE_REGISTRATION|\OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PUBLIC, school_id: int|null, needs_basic_information: bool, requests_user_information: \OmegaUp\CourseParams::COURSE_REQUEST_USER_INFORMATION_NO|\OmegaUp\CourseParams::COURSE_REQUEST_USER_INFORMATION_OPTIONAL|\OmegaUp\CourseParams::COURSE_REQUEST_USER_INFORMATION_REQUIRED, show_scoreboard: bool, languages: null|string, archived: bool|null, minimum_progress_for_certificate: int|null} $params
      */
     public function __construct($params) {
-        if (!is_null($params['level'])) {
+        if ($params['level'] !== null) {
             \OmegaUp\Validators::validateInEnum(
                 $params['level'],
                 'level',
@@ -142,14 +142,14 @@ class CourseParams extends BaseParams {
                 ]
             );
         }
-        if (!is_null($params['admission_mode'])) {
+        if ($params['admission_mode'] !== null) {
             \OmegaUp\Validators::validateInEnum(
                 $params['admission_mode'],
                 'admission_mode',
                 \OmegaUp\CourseParams::VALID_ADMISSION_MODES
             );
         }
-        if (!is_null($params['requests_user_information'])) {
+        if ($params['requests_user_information'] !== null) {
             \OmegaUp\Validators::validateInEnum(
                 $params['requests_user_information'],
                 'requests_user_information',
@@ -161,13 +161,11 @@ class CourseParams extends BaseParams {
             );
         }
 
-        $languages = !is_null(
-            $params['languages']
-        ) ? explode(
+        $languages = $params['languages'] !== null ? explode(
             ',',
             $params['languages']
         ) : null;
-        if (!is_null($languages)) {
+        if ($languages !== null) {
             \OmegaUp\Validators::validateValidSubset(
                 $languages,
                 'languages',
@@ -176,7 +174,7 @@ class CourseParams extends BaseParams {
         }
 
         if (
-            !is_null($params['finish_time']) &&
+            $params['finish_time'] !== null &&
             $params['start_time'] > $params['finish_time']
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -201,7 +199,7 @@ class CourseParams extends BaseParams {
         $this->showScoreboard = $params['show_scoreboard'] ?? false;
         $this->minimumProgressForCertificate = $params['minimum_progress_for_certificate'] ?? null;
 
-        $this->unlimitedDuration = is_null($this->finishTime);
+        $this->unlimitedDuration = $this->finishTime === null;
         $this->public = $this->admissionMode === \OmegaUp\CourseParams::COURSE_ADMISSION_MODE_PUBLIC;
     }
 }

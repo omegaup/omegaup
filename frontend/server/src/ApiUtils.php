@@ -11,7 +11,7 @@ class ApiUtils {
     }
 
     public static function getStringTime(?int $time = null): string {
-        if (is_null($time)) {
+        if ($time === null) {
             return date('Y-m-d H:i:s', \OmegaUp\Time::get());
         }
         return date('Y-m-d H:i:s', $time);

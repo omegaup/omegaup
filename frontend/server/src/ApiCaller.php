@@ -153,7 +153,7 @@ class ApiCaller {
         $jsonEncodeFlags = 0;
         // If this request is being explicitly made from the browser,
         // pretty-print the response.
-        if (!is_null($r) && $r['prettyprint'] == 'true') {
+        if ($r !== null && $r['prettyprint'] == 'true') {
             $jsonEncodeFlags = JSON_PRETTY_PRINT;
         }
         static::setHttpHeaders($response);
@@ -280,7 +280,7 @@ class ApiCaller {
         // Reject GET for mutating endpoints
         $requestMethod = \OmegaUp\Request::getServerVar('REQUEST_METHOD');
         if (
-            !is_null($requestMethod) &&
+            $requestMethod !== null &&
             strtoupper($requestMethod) === 'GET' &&
             self::isMutatingMethod($methodName)
         ) {

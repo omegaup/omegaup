@@ -22,7 +22,7 @@ class Metrics {
     }
 
     public static function getInstance(): \OmegaUp\Metrics {
-        if (is_null(self::$instance)) {
+        if (self::$instance === null) {
             self::$instance = new \OmegaUp\Metrics();
             return self::$instance;
         }

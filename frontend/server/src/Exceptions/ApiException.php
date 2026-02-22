@@ -51,7 +51,7 @@ abstract class ApiException extends \Exception {
                 'error' => $this->getErrorMessage(),
                 'errorcode' => $this->code,
                 'header' => $this->header,
-                'cause' => !is_null($previous) ? $previous->getMessage() : null,
+                'cause' => $previous !== null ? $previous->getMessage() : null,
                 'trace' => $this->getTraceAsString(),
             ],
             $this->_customMessage

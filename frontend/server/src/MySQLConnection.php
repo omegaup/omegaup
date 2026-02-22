@@ -55,11 +55,11 @@ class MySQLConnection {
      * termination.
      */
     public static function getInstance(): MySQLConnection {
-        if (is_null(self::$_instance)) {
+        if (self::$_instance === null) {
             self::$_instance = new MySQLConnection();
 
             register_shutdown_function(function () {
-                if (is_null(self::$_instance)) {
+                if (self::$_instance === null) {
                     return;
                 }
                 self::$_instance->Flush();
@@ -158,7 +158,7 @@ class MySQLConnection {
 
         $chunks = [$inputChunks[0]];
         for ($i = 0; $i < count($params); ++$i) {
-            if (is_null($params[$i])) {
+            if ($params[$i] === null) {
                 $chunks[] = 'NULL';
             } elseif ($params[$i] instanceof \OmegaUp\Timestamp) {
                 $chunks[] = "FROM_UNIXTIME({$params[$i]->time})";
@@ -246,7 +246,7 @@ class MySQLConnection {
      * @return null|int|bool|float|string|\OmegaUp\Timestamp
      */
     private function MapValue($value, int $fieldType) {
-        if (is_null($value)) {
+        if ($value === null) {
             return null;
         }
         switch ($fieldType) {
@@ -278,7 +278,7 @@ class MySQLConnection {
      * @return null|array<string, mixed>
      */
     private function MapRow(?array $row, array $fieldTypes): ?array {
-        if (is_null($row)) {
+        if ($row === null) {
             return null;
         }
         /** @var mixed $value */
@@ -339,7 +339,7 @@ class MySQLConnection {
     }
 
     private static function getTypesLogger(): \Monolog\Logger {
-        if (is_null(MySQLConnection::$_typesLogger)) {
+        if (MySQLConnection::$_typesLogger === null) {
             MySQLConnection::$_typesLogger = new \Monolog\Logger('mysqltypes');
             MySQLConnection::$_typesLogger->pushHandler(
                 (new \Monolog\Handler\StreamHandler(
@@ -429,7 +429,7 @@ class MySQLConnection {
      */
     public function GetRow(string $sql, array $params = []): ?array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
-        if (is_null($result)) {
+        if ($result === null) {
             return null;
         }
         try {
@@ -451,7 +451,7 @@ class MySQLConnection {
      */
     public function GetAll(string $sql, array $params = []): array {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
-        if (is_null($result)) {
+        if ($result === null) {
             return [];
         }
         try {
@@ -461,7 +461,7 @@ class MySQLConnection {
             $fieldTypes = self::MapFieldTypes($result);
             $resultArray = [];
             /** @var array<string, mixed> $row */
-            while (!is_null($row = $result->fetch_assoc())) {
+            while ($row = $result->fetch_assoc() !== null) {
                 /** @var array<string, mixed> This cannot be null. */
                 $resultArray[] = self::MapRow($row, $fieldTypes);
             }
@@ -478,7 +478,7 @@ class MySQLConnection {
      */
     public function GetOne(string $sql, array $params = []) {
         $result = $this->Query($sql, $params, MYSQLI_USE_RESULT);
-        if (is_null($result)) {
+        if ($result === null) {
             return null;
         }
         try {

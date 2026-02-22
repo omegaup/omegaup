@@ -89,7 +89,7 @@ class RequestParamChecker implements
                 $type,
                 $codebase
             );
-            if (is_null($intersectedType)) {
+            if ($intersectedType === null) {
                 throw new \Exception(
                     'Unable to reconcile types ' .
                     strval($previousType) .
@@ -123,7 +123,7 @@ class RequestParamChecker implements
         $varType = $statements_source->getNodeTypeProvider()->getType(
             $expr->var
         );
-        if (is_null($varType)) {
+        if ($varType === null) {
             return null;
         }
         $foundRequest = false;
@@ -153,9 +153,9 @@ class RequestParamChecker implements
             }
             return null;
         }
-        if (!is_null($context->calling_function_id)) {
+        if ($context->calling_function_id !== null) {
             $functionId = strtolower($context->calling_function_id);
-        } elseif (!is_null($context->calling_method_id)) {
+        } elseif ($context->calling_method_id !== null) {
             $functionId = $context->calling_method_id;
         } else {
             throw new \Exception('Empty calling method/function id');
@@ -186,7 +186,7 @@ class RequestParamChecker implements
         $varType = $statements_source->getNodeTypeProvider()->getType(
             $expr->var
         );
-        if (is_null($varType)) {
+        if ($varType === null) {
             return null;
         }
         $foundRequest = false;
@@ -213,9 +213,9 @@ class RequestParamChecker implements
             return null;
         }
 
-        if (!is_null($context->calling_function_id)) {
+        if ($context->calling_function_id !== null) {
             $functionId = strtolower($context->calling_function_id);
-        } elseif (!is_null($context->calling_method_id)) {
+        } elseif ($context->calling_method_id !== null) {
             $functionId = $context->calling_method_id;
         } else {
             throw new \Exception('Empty calling method/function id');
@@ -256,7 +256,7 @@ class RequestParamChecker implements
         $returnType = $statements_source->getNodeTypeProvider()->getType(
             $expr
         );
-        if (is_null($returnType)) {
+        if ($returnType === null) {
             return null;
         }
 
@@ -328,7 +328,7 @@ class RequestParamChecker implements
             self::$parsedMethodTypeMapping[$functionId] = [];
 
             $docblock = $methodStmt->getDocComment();
-            if (is_null($docblock)) {
+            if ($docblock === null) {
                 continue;
             }
 
@@ -397,7 +397,7 @@ class RequestParamChecker implements
         );
         /** @psalm-suppress InternalMethod This code also appears in the examples, so it should be fine. */
         $methodStorage = $codebase->methods->getStorage($methodId);
-        if (is_null($methodStorage->location)) {
+        if ($methodStorage->location === null) {
             return [];
         }
         $statements = $codebase->getStatementsForFile(
@@ -427,9 +427,9 @@ class RequestParamChecker implements
     ): void {
         $callingFunctionId = $event->getContext()->calling_function_id;
         $callingMethodId = $event->getContext()->calling_method_id;
-        if (!is_null($callingFunctionId)) {
+        if ($callingFunctionId !== null) {
             $functionId = strtolower($callingFunctionId);
-        } elseif (!is_null($callingMethodId)) {
+        } elseif ($callingMethodId !== null) {
             $functionId = $callingMethodId;
         } else {
             // Not being called from within a function-like.
@@ -568,7 +568,7 @@ class RequestParamChecker implements
     public static function afterStatementAnalysis(
         \Psalm\Plugin\EventHandler\Event\AfterClassLikeAnalysisEvent $event
     ): ?bool {
-        if (is_null($event->getClasslikeStorage()->location)) {
+        if ($event->getClasslikeStorage()->location === null) {
             return null;
         }
 
@@ -581,7 +581,7 @@ class RequestParamChecker implements
         );
 
         $classlikeStorageLocation = $event->getClasslikeStorage()->location;
-        if (is_null($classlikeStorageLocation)) {
+        if ($classlikeStorageLocation === null) {
             throw new \Exception(
                 'Unable to get location for  ' .
                 strval($event->getClasslikeStorage())
@@ -606,7 +606,7 @@ class RequestParamChecker implements
                 } else {
                     $type = $param->type;
                 }
-                if (is_null($type)) {
+                if ($type === null) {
                     continue;
                 }
                 if ($type->getAttribute('resolvedName') == 'OmegaUp\\Request') {
@@ -618,13 +618,13 @@ class RequestParamChecker implements
             $docblock = $methodStmt->getDocComment();
             $parsedDocComment = \Psalm\DocComment::parsePreservingLength(
                 new \PhpParser\Comment\Doc(
-                    !is_null($docblock) ?
+                    $docblock !== null ?
                     strval($docblock->getText()) :
                     '/** */'
                 )
             );
             $docblockStart = (
-                !is_null($docblock) ?
+                $docblock !== null ?
                 $docblock->getStartFilePos() :
                 intval(
                     $methodStmt->getAttribute(
@@ -698,7 +698,7 @@ class RequestParamChecker implements
                     continue;
                 }
                 unset($missing[$requestParam->name]);
-                if (!is_null($requestParam->description)) {
+                if ($requestParam->description !== null) {
                     $expected[$requestParam->name]->description = $requestParam->description;
                 }
                 if (
@@ -913,7 +913,7 @@ class RequestParamDescription {
 
     public function __toString(): string {
         $result = $this->stringifyType() . " \${$this->name}";
-        if (!is_null($this->description)) {
+        if ($this->description !== null) {
             $result .= " {$this->description}";
         }
         return $result;

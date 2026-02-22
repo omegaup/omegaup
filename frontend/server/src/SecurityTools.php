@@ -187,7 +187,7 @@ class SecurityTools {
     ): string {
         \ParagonIE_Sodium_Compat::$fastMult = true;
 
-        if (is_null(self::$_gitserverSecretKey)) {
+        if (self::$_gitserverSecretKey === null) {
             self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
                 base64_decode(OMEGAUP_GITSERVER_SECRET_KEY)
             );
@@ -282,7 +282,7 @@ class SecurityTools {
     private static function getCourseCloneSecretKey() {
         \ParagonIE_Sodium_Compat::$fastMult = true;
 
-        if (is_null(self::$_courseCloneSecretKey)) {
+        if (self::$_courseCloneSecretKey === null) {
             self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
                 OMEGAUP_COURSE_CLONE_SECRET_KEY
             );

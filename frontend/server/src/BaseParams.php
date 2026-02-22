@@ -45,10 +45,10 @@ class BaseParams {
             // Get or calculate new value.
             /** @var null|mixed */
             $value = $this->$thisFieldName;
-            if (is_null($value)) {
+            if ($value === null) {
                 continue;
             }
-            if (!is_null($transform)) {
+            if ($transform !== null) {
                 /** @var mixed */
                 $value = $transform($value);
             }

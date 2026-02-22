@@ -45,7 +45,7 @@ class CdpBuilder {
         string $candidateLanguage,
         string $languagePreference,
     ): bool {
-        if (is_null($currentLanguage)) {
+        if ($currentLanguage === null) {
             return true;
         }
 
@@ -219,7 +219,7 @@ class CdpBuilder {
     private static function parseTestplan(?string $testplan): array {
         $points = [];
 
-        if (is_null($testplan)) {
+        if ($testplan === null) {
             return $points;
         }
         $lines = explode("\n", trim($testplan));

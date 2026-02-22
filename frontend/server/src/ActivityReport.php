@@ -21,7 +21,7 @@ class ActivityReport {
         /** @var array<int, int> */
         $ipMapping = [];
         foreach ($events as &$entry) {
-            if (is_null($entry['ip'])) {
+            if ($entry['ip'] === null) {
                 continue;
             }
             if (
@@ -43,17 +43,17 @@ class ActivityReport {
     private static function processData(array $data): array {
         $event = ['name' => $data['event_type']];
         if ($data['event_type'] === 'submit') {
-            if (!is_null($data['alias'])) {
+            if ($data['alias'] !== null) {
                 $event['problem'] = $data['alias'];
             }
         } elseif ($data['event_type'] === 'clone') {
-            if (!is_null($data['alias'])) {
+            if ($data['alias'] !== null) {
                 $event['courseAlias'] = $data['alias'];
             }
-            if (!is_null($data['name'])) {
+            if ($data['name'] !== null) {
                 $event['courseName'] = $data['name'];
             }
-            if (!is_null($data['clone_result'])) {
+            if ($data['clone_result'] !== null) {
                 $event['cloneResult'] = $data['clone_result'];
             }
         }

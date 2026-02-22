@@ -210,13 +210,11 @@ class ContestParams extends BaseParams {
      * @param array{admission_mode: "private"|"public"|"registration", alias: null|string, check_plagiarism: bool, contest_for_teams: bool, description: null|string, feedback: "detailed"|"none"|"summary"|null, finish_time: \OmegaUp\Timestamp, languages: null|string, penalty: int|null, penalty_calc_policy: "max"|"sum"|null, penalty_type: "contest_start"|"none"|"problem_open"|"runtime"|null, points_decay_factor: float|null, score_mode: "all_or_nothing"|"max_per_group"|"partial"|null, scoreboard: float|null, show_scoreboard_after: bool|null, start_time: \OmegaUp\Timestamp, submissions_gap: int|null, title: null|string, window_length?: int|null} $params
      */
     public function __construct($params) {
-        $languages = !is_null(
-            $params['languages']
-        ) ? explode(
+        $languages = $params['languages'] !== null ? explode(
             ',',
             $params['languages']
         ) : null;
-        if (!is_null($languages)) {
+        if ($languages !== null) {
             \OmegaUp\Validators::validateValidSubset(
                 $languages,
                 'languages',

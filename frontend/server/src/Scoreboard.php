@@ -48,9 +48,7 @@ class Scoreboard {
         $cache = null;
         // A few scoreboard options are not cacheable.
         if (
-            !$sortByName && is_null(
-                $filterUsersBy
-            ) && !$this->params->only_ac
+            !$sortByName && $filterUsersBy === null && !$this->params->only_ac
         ) {
             if ($this->params->admin) {
                 $cache = new \OmegaUp\Cache(
@@ -65,7 +63,7 @@ class Scoreboard {
             }
             /** @var null|Scoreboard */
             $result = $cache->get();
-            if (!is_null($result)) {
+            if ($result !== null) {
                 \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
                 return $result;
             }
@@ -147,8 +145,8 @@ class Scoreboard {
             $this->params->auth_token
         );
 
-        if (!is_null($cache)) {
-            $timeout =  is_null($this->params->finish_time) ?
+        if ($cache !== null) {
+            $timeout =  $this->params->finish_time === null ?
                 0 :
                 max(
                     0,
@@ -189,7 +187,7 @@ class Scoreboard {
             $result = $adminEventsCache->get();
         }
 
-        if (!is_null($result) && !$this->params->admin) {
+        if ($result !== null && !$this->params->admin) {
             \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
             return $result;
         }
@@ -244,7 +242,7 @@ class Scoreboard {
             $problemMapping
         );
 
-        $timeout = is_null($this->params->finish_time) ?
+        $timeout = $this->params->finish_time === null ?
             0 :
             max(
                 0,
@@ -351,7 +349,7 @@ class Scoreboard {
 
         // Cache scoreboard until the contest ends (or forever if it has already ended).
         // Contestant cache
-        $timeout =  is_null($params->finish_time) ?
+        $timeout =  $params->finish_time === null ?
             0 :
             max(
                 0,
@@ -476,7 +474,7 @@ class Scoreboard {
     ): ?\OmegaUp\Timestamp {
         if (
             $params->admin
-            || is_null($params->finish_time)
+            || $params->finish_time === null
             || (
                 (\OmegaUp\Time::get() >= $params->finish_time->time)
                 && $params->show_scoreboard_after
@@ -627,7 +625,7 @@ class Scoreboard {
                     continue;
                 }
                 if (
-                    !is_null($scoreboardTimeLimit)
+                    $scoreboardTimeLimit !== null
                     && !empty($run['time'])
                     && $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
@@ -827,7 +825,7 @@ class Scoreboard {
             }
 
             if (
-                !is_null($scoreboardTimeLimit)
+                $scoreboardTimeLimit !== null
                 && !empty($run['time'])
                 && $run['time']->time >= $scoreboardTimeLimit->time
             ) {
@@ -948,7 +946,7 @@ class Scoreboard {
         int $problemId,
         int $maxScore
     ): float {
-        if (is_null($scoreByGroup)) {
+        if ($scoreByGroup === null) {
             return 0.0;
         }
         $scoreByGroupArray = json_decode($scoreByGroup, associative: true);

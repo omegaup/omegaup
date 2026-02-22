@@ -43,7 +43,7 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
             $localizedText,
             $this->additionalParameters
         );
-        if (is_null($this->parameter)) {
+        if ($this->parameter === null) {
             return $localizedText;
         }
         // Try to translate the parameter name

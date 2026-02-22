@@ -20,10 +20,10 @@ class RabbitMQConnection {
      * termination.
      */
     public static function getInstance(): RabbitMQConnection {
-        if (is_null(self::$_instance)) {
+        if (self::$_instance === null) {
             self::$_instance = new RabbitMQConnection();
             register_shutdown_function(function () {
-                if (is_null(self::$_instance)) {
+                if (self::$_instance === null) {
                     return;
                 }
                 self::$_instance->connection->close();

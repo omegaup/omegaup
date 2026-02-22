@@ -67,7 +67,7 @@ class Request extends \ArrayObject {
      * @return array<int, mixed>|array<string, mixed>
      */
     public function execute(): array {
-        if (is_null($this->method) || is_null($this->methodName)) {
+        if ($this->method === null || $this->methodName === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
         \OmegaUp\NewRelicHelper::nameTransaction("/api/{$this->methodName}");
@@ -78,7 +78,7 @@ class Request extends \ArrayObject {
         if ($response === false) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
-        if (is_null($response) || !is_array($response)) {
+        if ($response === null || !is_array($response)) {
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError',
                 new \Exception('API did not return an array.')
@@ -103,8 +103,8 @@ class Request extends \ArrayObject {
      */
     public function isLoggedAsMainIdentity(): bool {
         return (
-            !is_null($this->user)
-            && !is_null($this->loginIdentity)
+            $this->user !== null
+            && $this->loginIdentity !== null
             && $this->user->main_identity_id === $this->loginIdentity->identity_id
         );
     }
@@ -224,7 +224,7 @@ class Request extends \ArrayObject {
             strval($mixedVal) :
             ''
         );
-        if (!is_null($validator)) {
+        if ($validator !== null) {
             try {
                 if (!$validator($val)) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -432,19 +432,19 @@ class Request extends \ArrayObject {
      * @return void
      */
     public function ensureIdentity(): void {
-        if (!is_null($this->user) || !is_null($this->identity)) {
+        if ($this->user !== null || $this->identity !== null) {
             return;
         }
         $this->user = null;
         $this->identity = null;
         $this->loginIdentity = null;
         $session = \OmegaUp\Controllers\Session::getCurrentSession($this);
-        if (is_null($session['identity'])) {
+        if ($session['identity'] === null) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];
         $this->loginIdentity = $session['loginIdentity'];
-        if (!is_null($session['user'])) {
+        if ($session['user'] !== null) {
             $this->user = $session['user'];
         }
     }
@@ -468,7 +468,7 @@ class Request extends \ArrayObject {
     public function ensureMainUserIdentity(): void {
         $this->ensureIdentity();
         if (
-            is_null($this->user)
+            $this->user === null
             || $this->user->main_identity_id != $this->identity->identity_id
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -485,7 +485,7 @@ class Request extends \ArrayObject {
      */
     public function ensureIdentityIsOver13(): void {
         $this->ensureIdentity();
-        if (is_null($this->user)) {
+        if ($this->user === null) {
             return;
         }
         if (\OmegaUp\Authorization::isUnderThirteenUser($this->user)) {
@@ -530,7 +530,7 @@ class Request extends \ArrayObject {
         array $default = [],
         bool $required = false
     ): array {
-        if (is_null($this[$param])) {
+        if ($this[$param] === null) {
             if ($required) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterEmpty',

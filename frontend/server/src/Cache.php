@@ -10,7 +10,7 @@ abstract class CacheAdapter {
     private static $_instance = null;
 
     public static function getInstance(): CacheAdapter {
-        if (is_null(CacheAdapter::$_instance)) {
+        if (CacheAdapter::$_instance === null) {
             /** @psalm-suppress TypeDoesNotContainType OMEGAUP_CACHE_IMPLEMENTATION is really a variable */
             if (OMEGAUP_CACHE_IMPLEMENTATION === 'redis') {
                 CacheAdapter::$_instance = new RedisCacheAdapter();
@@ -101,7 +101,7 @@ abstract class CacheAdapter {
 
         // If there was a value in the cache for the key.
         if ($returnValue !== false) {
-            if (!is_null($cacheUsed)) {
+            if ($cacheUsed !== null) {
                 $cacheUsed = true;
             }
             return $returnValue;
@@ -126,7 +126,7 @@ abstract class CacheAdapter {
             /** @var false|T */
             $returnValue = $this->fetch($key);
             if ($returnValue !== false) {
-                if (!is_null($cacheUsed)) {
+                if ($cacheUsed !== null) {
                     $cacheUsed = true;
                 }
                 return $returnValue;
@@ -137,7 +137,7 @@ abstract class CacheAdapter {
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
 
-            if (!is_null($cacheUsed)) {
+            if ($cacheUsed !== null) {
                 $cacheUsed = false;
             }
             return $returnValue;
@@ -355,7 +355,7 @@ class RedisCacheAdapter extends CacheAdapter {
         /** @var false|T */
         $current = $this->fetch($key);
         if ($current !== false) {
-            if (!is_null($cacheUsed)) {
+            if ($cacheUsed !== null) {
                 $cacheUsed = true;
             }
             return $current;
@@ -365,7 +365,7 @@ class RedisCacheAdapter extends CacheAdapter {
         while ($lock === false) {
             $current = $this->fetch($key);
             if ($current !== false) {
-                if (!is_null($cacheUsed)) {
+                if ($cacheUsed !== null) {
                     $cacheUsed = true;
                 }
                 /** @var T */
@@ -380,7 +380,7 @@ class RedisCacheAdapter extends CacheAdapter {
             /** @var false|T */
             $current = $this->fetch($key);
             if ($current !== false) {
-                if (!is_null($cacheUsed)) {
+                if ($cacheUsed !== null) {
                     $cacheUsed = true;
                 }
                 return $current;
@@ -390,7 +390,7 @@ class RedisCacheAdapter extends CacheAdapter {
             $returnValue = call_user_func($setFunc);
             $this->store($key, $returnValue, $timeout);
 
-            if (!is_null($cacheUsed)) {
+            if ($cacheUsed !== null) {
                 $cacheUsed = false;
             }
             return $returnValue;

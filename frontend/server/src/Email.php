@@ -20,7 +20,7 @@ class Email {
         string $subject,
         string $body
     ): void {
-        if (!is_null(self::$emailSender)) {
+        if (self::$emailSender !== null) {
             self::$emailSender->sendEmail($emails, $subject, $body);
             return;
         }

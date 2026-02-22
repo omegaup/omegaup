@@ -104,7 +104,7 @@ class ScoreboardParams {
             $params,
             required: false,
         );
-        if (!is_null($params['finish_time'])) {
+        if ($params['finish_time'] !== null) {
             if ($params['finish_time'] instanceof \OmegaUp\Timestamp) {
                 $this->finish_time = $params['finish_time'];
             } else {
@@ -133,9 +133,7 @@ class ScoreboardParams {
             required: false,
             default: null,
         );
-        $this->group_id = is_null(
-            $params['group_id']
-        ) ? null : intval(
+        $this->group_id = $params['group_id'] === null ? null : intval(
             $params['group_id']
         );
 
@@ -195,9 +193,7 @@ class ScoreboardParams {
             required: false,
             default: null,
         );
-        $this->auth_token = is_null(
-            $params['auth_token']
-        ) ? null : strval(
+        $this->auth_token = $params['auth_token'] === null ? null : strval(
             $params['auth_token']
         );
 

@@ -22,7 +22,7 @@ class Grader {
     private static $OMEGAUP_GRADER_FAKE = OMEGAUP_GRADER_FAKE;
 
     public static function getInstance(): \OmegaUp\Grader {
-        if (is_null(self::$_instance)) {
+        if (self::$_instance === null) {
             self::$_instance = new \OmegaUp\Grader();
         }
         return self::$_instance;
@@ -42,13 +42,13 @@ class Grader {
      */
     public function grade(\OmegaUp\DAO\VO\Runs $run, string $source): void {
         if (self::$OMEGAUP_GRADER_FAKE) {
-            if (is_null($run->submission_id)) {
+            if ($run->submission_id === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
             $submission = \OmegaUp\DAO\Submissions::getByPK(
                 $run->submission_id
             );
-            if (is_null($submission)) {
+            if ($submission === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
             file_put_contents("/tmp/{$submission->guid}", $source);
@@ -336,7 +336,7 @@ class Grader {
                     CURLOPT_TCP_KEEPINTVL => 15,
                 ]
             );
-            if (!is_null($postData)) {
+            if ($postData !== null) {
                 curl_setopt(
                     $curl,
                     CURLOPT_POSTFIELDS,

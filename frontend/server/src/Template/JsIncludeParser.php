@@ -11,7 +11,7 @@ class JsIncludeParser extends \Twig\TokenParser\AbstractTokenParser {
         $entrypoint = $stream->expect(\Twig\Token::STRING_TYPE)->getValue();
         /** @var string[] */
         $options = [];
-        while (!is_null($option = $stream->nextIf(\Twig\Token::NAME_TYPE))) {
+        while ($option = $stream->nextIf(\Twig\Token::NAME_TYPE) !== null) {
             /** @var string */
             $value = $option->getValue();
             $options[] = $value;

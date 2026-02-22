@@ -16,7 +16,7 @@ class FileHandler {
     }
 
     public static function getFileUploader(): \OmegaUp\FileUploader {
-        if (is_null(self::$fileUploader)) {
+        if (self::$fileUploader === null) {
             self::$fileUploader = new \OmegaUp\FileUploader();
         }
         return self::$fileUploader;
@@ -45,7 +45,7 @@ class FileHandler {
     public static function deleteFile(string $pathName): void {
         if (!@unlink($pathName)) {
             $errors = error_get_last();
-            if (is_null($errors)) {
+            if ($errors === null) {
                 throw new \RuntimeException(
                     "FATAL: Not able to delete file {$pathName}"
                 );
@@ -79,7 +79,7 @@ class FileHandler {
 
         if (!@rmdir($dir)) {
             $errors = error_get_last();
-            if (is_null($errors)) {
+            if ($errors === null) {
                 self::$log->error("Not able to delete dir {$dir}");
             } else {
                 self::$log->error(

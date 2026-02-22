@@ -175,7 +175,7 @@ class ProblemDeployer {
      * interactive problem.
      */
     public function generateLibinteractiveTemplates(?string $publishedCommit): void {
-        if (is_null($publishedCommit)) {
+        if ($publishedCommit === null) {
             return;
         }
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
@@ -324,7 +324,7 @@ class ProblemDeployer {
 
         if (!is_resource($proc)) {
             $errors = error_get_last();
-            if (is_null($errors)) {
+            if ($errors === null) {
                 $this->log->error("$cmd failed");
                 throw new \RuntimeException("$cmd failed");
             } else {
@@ -405,7 +405,7 @@ class ProblemDeployer {
             if ($create) {
                 $queryParams['create'] = 'true';
             }
-            if (!is_null($problemSettings)) {
+            if ($problemSettings !== null) {
                 $queryParams['settings'] = json_encode($problemSettings);
             }
             curl_setopt_array(
@@ -460,7 +460,7 @@ class ProblemDeployer {
             if (!empty($result['output'])) {
                 /** @var null|array{error: string} */
                 $output = json_decode($result['output'], associative: true);
-                if (is_null($output)) {
+                if ($output === null) {
                     $context = $result['output'];
                 } else {
                     $tokens = explode(': ', $output['error'], 2);

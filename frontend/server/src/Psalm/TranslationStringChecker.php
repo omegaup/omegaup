@@ -301,7 +301,7 @@ class TranslationStringChecker implements
      * @return list<string>
      */
     private static function getAllTranslationStrings(): array {
-        if (is_null(self::$allTranslationStrings)) {
+        if (self::$allTranslationStrings === null) {
             $filename = __DIR__ . '/../../../templates/en.lang';
             $translationFileContents = [];
             foreach (explode("\n", file_get_contents($filename)) as $line) {
@@ -320,7 +320,7 @@ class TranslationStringChecker implements
      * going to be written to.
      */
     private static function getTranslationStringsDirname(): string {
-        if (is_null(self::$translationStringsDirname)) {
+        if (self::$translationStringsDirname === null) {
             self::$translationStringsDirname  = dirname(
                 __DIR__,
                 3

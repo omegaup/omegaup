@@ -23,9 +23,7 @@ class UITools {
      */
     public static function redirectToLoginIfNotLoggedIn(): void {
         if (
-            !is_null(
-                \OmegaUp\Controllers\Session::getCurrentSession()['identity']
-            )
+            \OmegaUp\Controllers\Session::getCurrentSession()['identity'] !== null
         ) {
             return;
         }
@@ -52,7 +50,7 @@ class UITools {
      * @return array{twig: \Twig\Environment, twigContext: array<string, mixed>}
      */
     public static function getTwigInstance() {
-        if (!is_null(self::$twig)) {
+        if (self::$twig !== null) {
             return [
                 'twig' => self::$twig,
                 'twigContext' => self::$twigContext,
@@ -167,48 +165,46 @@ class UITools {
         return [
             'omegaUpLockDown' => boolval(OMEGAUP_LOCKDOWN),
             'inContest' => $inContest,
-            'isLoggedIn' => !is_null($identity),
+            'isLoggedIn' => $identity !== null,
             'isReviewer' => (
-                !is_null($identity) ?
+                $identity !== null ?
                 \OmegaUp\Authorization::isQualityReviewer($identity) :
                 false
             ),
             'gravatarURL51' => (
-                is_null($email) ?
+                $email === null ?
                 '' :
                 self::getFormattedGravatarURL(md5($email), '51')
             ),
             'gravatarURL128' => (
-                is_null($email) ?
+                $email === null ?
                 '' :
                 self::getFormattedGravatarURL(md5($email), '128')
             ),
             'currentUsername' => (
-                !is_null($identity) && !is_null($identity->username) ?
+                $identity !== null && $identity->username !== null ?
                 $identity->username :
                 ''
             ),
-            'currentName' => !is_null($identity) ? $identity->name : null,
+            'currentName' => $identity !== null ? $identity->name : null,
             'currentEmail' => $email ?? '',
             'associatedIdentities' => $associatedIdentities,
             'apiTokens' => $apiTokens,
             'isUnder13User' => $isUnder13User,
             'userVerificationDeadline' => $userVerificationDeadline,
             'userClassname' => $userClassname,
-            'userCountry' => (!is_null(
-                $identity
-            ) ? $identity->country_id : null) ?? 'xx',
+            'userCountry' => ($identity !== null ? $identity->country_id : null) ?? 'xx',
             'profileProgress' => \OmegaUp\Controllers\User::getProfileProgress(
                 $user
             ),
-            'isMainUserIdentity' => !is_null($user),
+            'isMainUserIdentity' => $user !== null,
             'isAdmin' => $isAdmin,
             'mentorCanChooseCoder' => $mentorCanChooseCoder,
             'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
             'navbarSection' => $navbarSection,
             'userTypes' => (
-                !is_null($identity) &&
-                !is_null($user) ?
+                $identity !== null &&
+                $user !== null ?
                 \OmegaUp\Controllers\User::getUserTypes($user, $identity) :
                 []
             ),

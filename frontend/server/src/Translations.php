@@ -52,7 +52,7 @@ class Translations {
      * @return \OmegaUp\Translations the singleton instance.
      */
     public static function getInstance(?\OmegaUp\DAO\VO\Identities $identity = null): \OmegaUp\Translations {
-        if (is_null(self::$_instance)) {
+        if (self::$_instance === null) {
             self::$_instance = new \OmegaUp\Translations($identity);
         }
         return self::$_instance;

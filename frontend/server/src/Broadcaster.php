@@ -32,8 +32,8 @@ class Broadcaster {
 
             $this->log->debug("Sending update $message");
             \OmegaUp\Grader::getInstance()->broadcast(
-                is_null($contest) ? null : $contest->alias,
-                is_null($contest) ? null : $contest->problemset_id,
+                $contest === null ? null : $contest->alias,
+                $contest === null ? null : $contest->problemset_id,
                 $problem->alias,
                 $message,
                 boolval($clarification->public),
@@ -62,7 +62,7 @@ class Broadcaster {
         \OmegaUp\DAO\VO\Clarifications $clarification
     ): void {
         if (
-            !is_null($clarification->answer) ||
+            $clarification->answer !== null ||
                 !$problem->email_clarifications
         ) {
             return;
@@ -77,7 +77,7 @@ class Broadcaster {
                 ),
                 'problem_alias' => strval($problem->alias),
                 'problem_name' => htmlspecialchars(strval($problem->title)),
-                'url' => is_null($contest) ?
+                'url' => $contest === null ?
                     ("https://omegaup.com/arena/problem/{$problem->alias}#clarifications") :
                     ("https://omegaup.com/arena/{$contest->alias}#clarifications"),
                 'user_name' => strval($identity->username),

@@ -130,14 +130,14 @@ class Validators {
         ?int $minLength,
         ?int $maxLength
     ): void {
-        if (!is_null($minLength) && strlen($parameter) < $minLength) {
+        if ($minLength !== null && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
                 $parameterName,
                 ['min_length' => strval($minLength)]
             );
         }
-        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+        if ($maxLength !== null && strlen($parameter) > $maxLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooLong',
                 $parameterName,
@@ -160,14 +160,14 @@ class Validators {
         ?int $minLength,
         ?int $maxLength
     ): bool {
-        if (!is_null($minLength) && strlen($parameter) < $minLength) {
+        if ($minLength !== null && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
                 parameter: null,
                 additionalParameters: ['min_length' => strval($minLength)],
             );
         }
-        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+        if ($maxLength !== null && strlen($parameter) > $maxLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooLong',
                 parameter: null,
@@ -531,14 +531,14 @@ class Validators {
         }
         // Coerce $parameter into a numeric value.
         $parameter = $parameter + 0;
-        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+        if ($lowerBound !== null && $parameter < $lowerBound) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooSmall',
                 $parameterName,
                 ['lower_bound' => strval($lowerBound)]
             );
         }
-        if (!is_null($upperBound) && $parameter > $upperBound) {
+        if ($upperBound !== null && $parameter > $upperBound) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNumberTooLarge',
                 $parameterName,
@@ -574,7 +574,7 @@ class Validators {
                 $parameterName
             );
         }
-        if (!is_null($lowerBound) && $parameter < $lowerBound) {
+        if ($lowerBound !== null && $parameter < $lowerBound) {
             $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooSmall',
                 $parameterName
@@ -585,7 +585,7 @@ class Validators {
             );
             throw $exception;
         }
-        if (!is_null($upperBound) && $parameter > $upperBound) {
+        if ($upperBound !== null && $parameter > $upperBound) {
             $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooLarge',
                 $parameterName
@@ -735,7 +735,7 @@ class Validators {
         string $parameterName,
         bool $required = true
     ): bool {
-        if (!is_null($parameter)) {
+        if ($parameter !== null) {
             return true;
         }
         if ($required) {

@@ -7,7 +7,7 @@ class Time {
     private static $time = null;
 
     public static function get(): int {
-        if (!is_null(self::$time)) {
+        if (self::$time !== null) {
             return self::$time;
         }
         return time();

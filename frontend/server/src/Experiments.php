@@ -73,21 +73,21 @@ class Experiments {
         array $defines = null,
         array $knownExperiments = null
     ) {
-        if (is_null($knownExperiments)) {
+        if ($knownExperiments === null) {
             $knownExperiments = self::KNOWN_EXPERIMENTS;
         }
-        if (is_null($defines)) {
+        if ($defines === null) {
             /** @var array<string, mixed> */
             $defines = get_defined_constants(true)['user'];
         }
 
         $this->loadExperimentsFromConfig($defines, $knownExperiments);
 
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             $this->loadExperimentsForIdentity($identity, $knownExperiments);
         }
 
-        if (!is_null($requestExperiments)) {
+        if ($requestExperiments !== null) {
             $this->loadExperimentsFromRequest(
                 $requestExperiments,
                 $knownExperiments
@@ -123,7 +123,7 @@ class Experiments {
         \OmegaUp\DAO\VO\Identities $identity,
         array $knownExperiments
     ): void {
-        if (is_null($identity->user_id)) {
+        if ($identity->user_id === null) {
             // No experiments can be enabled for unassociated identities.
             return;
         }
@@ -134,7 +134,7 @@ class Experiments {
         ) {
             if (
                 in_array($ue->experiment, $knownExperiments) &&
-                !is_null($ue->experiment) &&
+                $ue->experiment !== null &&
                 !$this->isEnabled($ue->experiment)
             ) {
                 $this->enabledExperiments[] = $ue->experiment;
@@ -235,7 +235,7 @@ class Experiments {
      * Returns the global instance of Experiments.
      */
     public static function getInstance(): Experiments {
-        if (is_null(self::$_instance)) {
+        if (self::$_instance === null) {
             /** @psalm-suppress RedundantCondition This is not set on tests. */
             if (isset($_REQUEST)) {
                 $request = $_REQUEST;
