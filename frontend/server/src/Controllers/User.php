@@ -70,35 +70,35 @@ class User extends \OmegaUp\Controllers\Controller {
     /** @var \OmegaUp\UrlHelper */
     public static $urlHelper;
 
-    const ALLOWED_SCHOLAR_DEGREES = [
+    public const ALLOWED_SCHOLAR_DEGREES = [
         'none', 'early_childhood', 'pre_primary', 'primary', 'lower_secondary',
         'upper_secondary', 'post_secondary', 'tertiary', 'bachelors', 'master',
         'doctorate',
     ];
-    const ALLOWED_GENDER_OPTIONS = [
+    public const ALLOWED_GENDER_OPTIONS = [
         'female','male','other','decline',
     ];
 
-    const SENDY_SUCCESS = '1';
+    public const SENDY_SUCCESS = '1';
 
     // Languages
-    const LANGUAGE_ES = 1;
-    const LANGUAGE_EN = 2;
-    const LANGUAGE_PT = 3;
-    const LANGUAGE_PSEUDO = 4;
+    public const LANGUAGE_ES = 1;
+    public const LANGUAGE_EN = 2;
+    public const LANGUAGE_PT = 3;
+    public const LANGUAGE_PSEUDO = 4;
 
-    const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
+    public const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
         'all', 'female',
     ];
 
     // User types
-    const USER_TYPE_STUDENT = 'student';
-    const USER_TYPE_CONTESTANT = 'contestant';
-    const USER_TYPE_TEACHER = 'teacher';
-    const USER_TYPE_COACH = 'coach';
-    const USER_TYPE_SELF_TAUGHT = 'self-taught';
-    const USER_TYPE_INDEPENDENT_TEACHER = 'independent-teacher';
-    const USER_TYPE_CURIOUS = 'curious';
+    public const USER_TYPE_STUDENT = 'student';
+    public const USER_TYPE_CONTESTANT = 'contestant';
+    public const USER_TYPE_TEACHER = 'teacher';
+    public const USER_TYPE_COACH = 'coach';
+    public const USER_TYPE_SELF_TAUGHT = 'self-taught';
+    public const USER_TYPE_INDEPENDENT_TEACHER = 'independent-teacher';
+    public const USER_TYPE_CURIOUS = 'curious';
 
     /**
      * Entry point for Create a User API

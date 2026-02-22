@@ -47,9 +47,9 @@ class Experiments {
     /**
      * The prefix for config-based define()s.
      */
-    const EXPERIMENT_PREFIX = 'EXPERIMENT_';
+    public const EXPERIMENT_PREFIX = 'EXPERIMENT_';
 
-    const EXPERIMENT_REQUEST_NAME = 'experiments';
+    public const EXPERIMENT_REQUEST_NAME = 'experiments';
 
     /** @var string[] */
     private $enabledExperiments = [];

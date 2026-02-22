@@ -3,8 +3,8 @@
 namespace OmegaUp\DAO\Enum;
 
 class RankFilter extends \OmegaUp\DAO\Enum\StatusBase {
-    const NONE = '';
-    const COUNTRY = 'country';
-    const STATE = 'state';
-    const SCHOOL = 'school';
+    public const NONE = '';
+    public const COUNTRY = 'country';
+    public const STATE = 'state';
+    public const SCHOOL = 'school';
 }

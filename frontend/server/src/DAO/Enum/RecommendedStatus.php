@@ -3,9 +3,9 @@
 namespace OmegaUp\DAO\Enum;
 
 class RecommendedStatus extends \OmegaUp\DAO\Enum\StatusBase {
-    const ALL = 0;
-    const RECOMMENDED = 1;
-    const NOT_RECOMMENDED = 2;
+    public const ALL = 0;
+    public const RECOMMENDED = 1;
+    public const NOT_RECOMMENDED = 2;
 
     public const SQL_FOR_STATUS = [
         'TRUE',

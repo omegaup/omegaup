@@ -45,7 +45,7 @@ class ScopedGitHub {
  * @psalm-type CurrentSession=array{apiTokenId: int|null, api_tokens: list<ApiToken>, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, mentor_can_choose_coder: bool,  is_under_13_user: bool, user_verification_deadline: \OmegaUp\Timestamp|null, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
-    const AUTH_TOKEN_ENTROPY_SIZE = 15;
+    public const AUTH_TOKEN_ENTROPY_SIZE = 15;
     /** @var null|CurrentSession */
     private static $_currentSession = null;
     /** @var null|\OmegaUp\SessionManager */

@@ -7,11 +7,11 @@ namespace OmegaUp;
  */
 class Validators {
     // The maximum length for aliases.
-    const ALIAS_MAX_LENGTH = 32;
-    const ZIP_MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
-    const ZIP_CASE_SIZE_LIMIT_BYTES = 8 * 1024; // 8 KB
-    const ZIP_ALLOWED_CASE_EXTENSIONS = ['in', 'out'];
-    const ZIP_FORBIDDEN_PATH_CHARS = ['..'];
+    public const ALIAS_MAX_LENGTH = 32;
+    public const ZIP_MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+    public const ZIP_CASE_SIZE_LIMIT_BYTES = 8 * 1024; // 8 KB
+    public const ZIP_ALLOWED_CASE_EXTENSIONS = ['in', 'out'];
+    public const ZIP_FORBIDDEN_PATH_CHARS = ['..'];
     /**
      * Check if email is valid
      */

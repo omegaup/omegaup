@@ -89,22 +89,22 @@ namespace OmegaUp\Controllers;
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
-    const ADMISSION_MODE_PUBLIC = 'public';
-    const ADMISSION_MODE_PRIVATE = 'private';
-    const ADMISSION_MODE_REGISTRATION = 'registration';
+    public const ADMISSION_MODE_PUBLIC = 'public';
+    public const ADMISSION_MODE_PRIVATE = 'private';
+    public const ADMISSION_MODE_REGISTRATION = 'registration';
 
     // Assignment type constants
-    const ASSIGNMENT_TYPE_HOMEWORK = 'homework';
-    const ASSIGNMENT_TYPE_LESSON = 'lesson';
-    const ASSIGNMENT_TYPE_TEST = 'test';
+    public const ASSIGNMENT_TYPE_HOMEWORK = 'homework';
+    public const ASSIGNMENT_TYPE_LESSON = 'lesson';
+    public const ASSIGNMENT_TYPE_TEST = 'test';
 
     // Course level constants
-    const COURSE_LEVEL_INTRODUCTORY = 'introductory';
-    const COURSE_LEVEL_INTERMEDIATE = 'intermediate';
-    const COURSE_LEVEL_ADVANCED = 'advanced';
+    public const COURSE_LEVEL_INTRODUCTORY = 'introductory';
+    public const COURSE_LEVEL_INTERMEDIATE = 'intermediate';
+    public const COURSE_LEVEL_ADVANCED = 'advanced';
 
     // Number of rows shown in course list
-    const PAGE_SIZE = 100;
+    public const PAGE_SIZE = 100;
 
     /**
      * Validate assignment_alias existis into the course and
