@@ -5341,7 +5341,10 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\UnauthorizedException si el usuario no está autenticado
      * @throws \OmegaUp\Exceptions\InvalidParameterException si el contenido es vacío o excede el límite
+     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $readme
      */
     public static function apiUpdateReadme(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -5383,7 +5386,10 @@ class User extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException si el parámetro username es inválido
      * @throws \OmegaUp\Exceptions\NotFoundException si el usuario o README no existe o ya está deshabilitado
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException si el usuario ya reportó este README
+     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $username
      */
     public static function apiReportReadme(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
