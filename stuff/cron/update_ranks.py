@@ -432,41 +432,78 @@ def update_school_of_the_month_candidates(
         logging.info('Skipping because already exist selected schools.')
         return
     remove_school_of_the_month_candidates(cur, first_day_of_next_month)
-    schools = compute_points_for_school(
+    schools_sql1 = get_school_of_the_month_candidates(
+        cur_readonly,
+        first_day_of_next_month,
+        first_day_of_current_month
+    )
+    schools_python = compute_points_for_school(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month
     )
-    if not schools:
+    if not schools_sql1:
         logging.info('No eligible schools found.')
         return
     if update_school_of_the_month:
         insert_school_of_the_month_candidates(
-            cur, first_day_of_next_month, schools)
-    else:
-        debug_school_of_the_month_candidates(first_day_of_next_month, schools)
+            cur, first_day_of_next_month, schools_sql1)
+    # else:
+        debug_school_of_the_month_candidates(
+            first_day_of_next_month, schools_sql1,
+            schools_python,
+            use_json_format=not update_school_of_the_month)
 
 
 def debug_school_of_the_month_candidates(
     first_day_of_next_month: datetime.date,
-    candidates: List[School],
+    candidates1: List[School],
+    candidates2: List[School],
+    use_json_format: bool,
 ) -> None:
     '''Log school of the month candidates'''
 
-    log_entries = []
-    for ranking, candidate in enumerate(candidates, start=1):
-        log_entry = {
-            "school_id": candidate.school_id,
-            "name": candidate.name,
-            "time": first_day_of_next_month.isoformat(),
-            "ranking": ranking,
-            "score": candidate.score,
-        }
-        log_entries.append(log_entry)
+    # log_entries = []
+    # for ranking, candidate in enumerate(candidates1, start=1):
+    #     log_entry = {
+    #         "school_id": candidate.school_id,
+    #         "name": candidate.name,
+    #         "time": first_day_of_next_month.isoformat(),
+    #         "ranking": ranking,
+    #         "score": candidate.score,
+    #     }
+    #     log_entries.append(log_entry)
 
-    log_message = json.dumps(log_entries, indent=4)
-    logging.info('School of the month candidates:')
-    logging.info(log_message)
+    # log_message = json.dumps(log_entries, indent=4)
+    # logging.info('School of the month candidates:')
+    # logging.info(log_message)
+    if use_json_format:
+        log_entries = []
+        for ranking, candidate in enumerate(candidates1, start=1):
+            log_entry = {
+                "school_id": candidate.school_id,
+                "name": candidate.name,
+                "time": first_day_of_next_month.isoformat(),
+                "ranking": ranking,
+                "score": candidate.score,
+            }
+            log_entries.append(log_entry)
+
+        log_message = json.dumps(log_entries, indent=4)
+        logging.info('School of the month candidates:')
+        logging.info(log_message)
+    else:
+        logging.info('School of the month candidates:')
+        logging.info('SQL candidates:')
+        for ranking, candidate in enumerate(candidates1, start=1):
+            logging.info(
+                'Ranking #1: %d, School ID: %d, Name: %s, Score: %d',
+                ranking, candidate.school_id, candidate.name, candidate.score)
+        logging.info('Python candidates:')
+        for ranking, candidate in enumerate(candidates2, start=1):
+            logging.info(
+                'Ranking #2: %d, School ID: %d, Name: %s, Score: %d',
+                ranking, candidate.school_id, candidate.name, candidate.score)
 
 
 def compute_points_for_school(
@@ -551,16 +588,28 @@ def compute_points_for_school(
     school_map: Dict[int, School] = {}
     for school in eligible_schools:
         school_map[school.school_id] = school
-    # Aggregate scores for each school
+    # Group users by school to find unique problems per school
+    school_problems: Dict[int, set] = {}
     for user in eligible_users:
         school_id = user.school_id
         if school_id is not None and school_id in school_map:
-            school = school_map[school_id]
-            updated_school = school._replace(
-                score=school.score +
-                user_problems[user.identity_id]['score']
+            if school_id not in school_problems:
+                school_problems[school_id] = set()
+            # Add all problems solved by this user to the school's set
+            school_problems[school_id].update(
+                user_problems[user.identity_id]['solved']
             )
-            school_map[school_id] = updated_school
+
+    # Calculate score for each school based on unique problems solved
+    for school_id, unique_problem_ids in school_problems.items():
+        total_score = 0.0
+        for problem_id in unique_problem_ids:
+            total_score += eligible_problems[problem_id].score
+
+        school = school_map[school_id]
+        updated_school = school._replace(score=total_score)
+        school_map[school_id] = updated_school
+
     # Create a list of updated schools with their scores
     eligible_schools = list(school_map.values())
     # Sort the updated schools by score in descending order
