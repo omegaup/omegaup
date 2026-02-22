@@ -20,7 +20,7 @@ class DuplicatedEntryInArrayException extends \OmegaUp\Exceptions\ApiException {
         string $message,
         string $duplicatedItem,
         array $duplicatedItemsInArray,
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             $message,

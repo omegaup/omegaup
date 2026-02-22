@@ -22,7 +22,7 @@ abstract class ApiException extends \Exception {
         string $message,
         string $header,
         int $code,
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
 

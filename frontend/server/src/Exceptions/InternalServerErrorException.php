@@ -5,7 +5,7 @@ namespace OmegaUp\Exceptions;
 class InternalServerErrorException extends \OmegaUp\Exceptions\ApiException {
     public function __construct(
         string $message = 'generalError',
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             $message,

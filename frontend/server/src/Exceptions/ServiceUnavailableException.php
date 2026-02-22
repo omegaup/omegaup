@@ -5,7 +5,7 @@ namespace OmegaUp\Exceptions;
 class ServiceUnavailableException extends \OmegaUp\Exceptions\ApiException {
     public function __construct(
         string $message = 'serviceUnavailable',
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             $message,
