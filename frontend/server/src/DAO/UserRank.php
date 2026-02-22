@@ -13,7 +13,8 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, country_id: null|string, username: string, name: null|string, classname: string}>, total: int}
  */
-class UserRank extends \OmegaUp\DAO\Base\UserRank {
+class UserRank extends \OmegaUp\DAO\Base\UserRank
+{
     /**
      * @param null|string|int $value
      * @return array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, timestamp: \OmegaUp\Timestamp, user_id: int, username: string}>, total: int}
@@ -157,7 +158,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`name`,
                 IFNULL(`ur`.`classname`, "user-rank-unranked") AS classname
         ';
-       $sqlFrom = '
+        $sqlFrom = '
             FROM
                 `User_Rank` `ur`
             WHERE
