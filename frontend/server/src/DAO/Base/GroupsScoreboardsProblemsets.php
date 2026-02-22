@@ -92,12 +92,12 @@ abstract class GroupsScoreboardsProblemsets {
             intval($Groups_Scoreboards_Problemsets->only_ac),
             intval($Groups_Scoreboards_Problemsets->weight),
             (
-                is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ?
+                $Groups_Scoreboards_Problemsets->group_scoreboard_id === null ?
                 null :
                 intval($Groups_Scoreboards_Problemsets->group_scoreboard_id)
             ),
             (
-                is_null($Groups_Scoreboards_Problemsets->problemset_id) ?
+                $Groups_Scoreboards_Problemsets->problemset_id === null ?
                 null :
                 intval($Groups_Scoreboards_Problemsets->problemset_id)
             ),
@@ -280,7 +280,7 @@ abstract class GroupsScoreboardsProblemsets {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -331,12 +331,12 @@ abstract class GroupsScoreboardsProblemsets {
                 );';
         $params = [
             (
-                is_null($Groups_Scoreboards_Problemsets->group_scoreboard_id) ?
+                $Groups_Scoreboards_Problemsets->group_scoreboard_id === null ?
                 null :
                 intval($Groups_Scoreboards_Problemsets->group_scoreboard_id)
             ),
             (
-                is_null($Groups_Scoreboards_Problemsets->problemset_id) ?
+                $Groups_Scoreboards_Problemsets->problemset_id === null ?
                 null :
                 intval($Groups_Scoreboards_Problemsets->problemset_id)
             ),

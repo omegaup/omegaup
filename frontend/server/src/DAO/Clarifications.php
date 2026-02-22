@@ -23,7 +23,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?int $offset,
         int $rowcount
     ): array {
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             $sqlProblemsets = '
             SELECT
                 problemset_id,
@@ -34,7 +34,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 contest_id = ?
             ';
             $params = [$contest->contest_id];
-        } elseif (!is_null($course)) {
+        } elseif ($course !== null) {
             $sqlProblemsets = '
             SELECT
                 problemset_id,
@@ -105,7 +105,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $countQuery = $sqlCount . $sqlFrom;
 
         $sqlLimit = '';
-        if (!is_null($offset)) {
+        if ($offset !== null) {
             $sqlLimit = 'LIMIT ?, ?';
             $params[] = max(0, $offset - 1) * $rowcount;
             $params[] = $rowcount;
@@ -122,7 +122,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         // If we didn't get an offset, we know the total number of rows
         // already, no need to query the database for it.
         $totalRows = count($clarifications);
-        if (!is_null($offset) && $offset != 0) {
+        if ($offset !== null && $offset != 0) {
             if ($totalRows != $rowcount) {
                 // If we did get an offset, but the number of rows we got is
                 // less than what we allowed, we've already reached the end
@@ -201,7 +201,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             c.clarification_id DESC
         ';
 
-        if (!is_null($offset)) {
+        if ($offset !== null) {
             $sql .= 'LIMIT ?, ?';
             $params[] = max(0, $offset);
             $params[] = $rowcount;
@@ -275,7 +275,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         }
 
         $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
-        if (!is_null($offset)) {
+        if ($offset !== null) {
             $sql .= 'LIMIT ?, ?';
             $val[] = max(0, $offset);
             $val[] = $rowcount;

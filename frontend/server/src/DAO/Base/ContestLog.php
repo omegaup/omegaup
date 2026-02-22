@@ -43,12 +43,12 @@ abstract class ContestLog {
                 );';
         $params = [
             (
-                is_null($Contest_Log->contest_id) ?
+                $Contest_Log->contest_id === null ?
                 null :
                 intval($Contest_Log->contest_id)
             ),
             (
-                is_null($Contest_Log->user_id) ?
+                $Contest_Log->user_id === null ?
                 null :
                 intval($Contest_Log->user_id)
             ),
@@ -235,7 +235,7 @@ abstract class ContestLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -288,12 +288,12 @@ abstract class ContestLog {
                 );';
         $params = [
             (
-                is_null($Contest_Log->contest_id) ?
+                $Contest_Log->contest_id === null ?
                 null :
                 intval($Contest_Log->contest_id)
             ),
             (
-                is_null($Contest_Log->user_id) ?
+                $Contest_Log->user_id === null ?
                 null :
                 intval($Contest_Log->user_id)
             ),

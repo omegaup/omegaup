@@ -49,7 +49,7 @@ abstract class Problemsets {
                 );';
         $params = [
             (
-                is_null($Problemsets->acl_id) ?
+                $Problemsets->acl_id === null ?
                 null :
                 intval($Problemsets->acl_id)
             ),
@@ -61,17 +61,17 @@ abstract class Problemsets {
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
             (
-                is_null($Problemsets->contest_id) ?
+                $Problemsets->contest_id === null ?
                 null :
                 intval($Problemsets->contest_id)
             ),
             (
-                is_null($Problemsets->assignment_id) ?
+                $Problemsets->assignment_id === null ?
                 null :
                 intval($Problemsets->assignment_id)
             ),
             (
-                is_null($Problemsets->interview_id) ?
+                $Problemsets->interview_id === null ?
                 null :
                 intval($Problemsets->interview_id)
             ),
@@ -265,7 +265,7 @@ abstract class Problemsets {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -330,7 +330,7 @@ abstract class Problemsets {
                 );';
         $params = [
             (
-                is_null($Problemsets->acl_id) ?
+                $Problemsets->acl_id === null ?
                 null :
                 intval($Problemsets->acl_id)
             ),
@@ -342,17 +342,17 @@ abstract class Problemsets {
             $Problemsets->scoreboard_url_admin,
             $Problemsets->type,
             (
-                is_null($Problemsets->contest_id) ?
+                $Problemsets->contest_id === null ?
                 null :
                 intval($Problemsets->contest_id)
             ),
             (
-                is_null($Problemsets->assignment_id) ?
+                $Problemsets->assignment_id === null ?
                 null :
                 intval($Problemsets->assignment_id)
             ),
             (
-                is_null($Problemsets->interview_id) ?
+                $Problemsets->interview_id === null ?
                 null :
                 intval($Problemsets->interview_id)
             ),

@@ -91,12 +91,12 @@ abstract class ProblemBookmarks {
                 $Problem_Bookmarks->created_at
             ),
             (
-                is_null($Problem_Bookmarks->identity_id) ?
+                $Problem_Bookmarks->identity_id === null ?
                 null :
                 intval($Problem_Bookmarks->identity_id)
             ),
             (
-                is_null($Problem_Bookmarks->problem_id) ?
+                $Problem_Bookmarks->problem_id === null ?
                 null :
                 intval($Problem_Bookmarks->problem_id)
             ),
@@ -277,7 +277,7 @@ abstract class ProblemBookmarks {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -326,12 +326,12 @@ abstract class ProblemBookmarks {
                 );';
         $params = [
             (
-                is_null($Problem_Bookmarks->identity_id) ?
+                $Problem_Bookmarks->identity_id === null ?
                 null :
                 intval($Problem_Bookmarks->identity_id)
             ),
             (
-                is_null($Problem_Bookmarks->problem_id) ?
+                $Problem_Bookmarks->problem_id === null ?
                 null :
                 intval($Problem_Bookmarks->problem_id)
             ),

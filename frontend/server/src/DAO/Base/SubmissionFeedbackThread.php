@@ -42,12 +42,12 @@ abstract class SubmissionFeedbackThread {
                 );';
         $params = [
             (
-                is_null($Submission_Feedback_Thread->submission_feedback_id) ?
+                $Submission_Feedback_Thread->submission_feedback_id === null ?
                 null :
                 intval($Submission_Feedback_Thread->submission_feedback_id)
             ),
             (
-                is_null($Submission_Feedback_Thread->identity_id) ?
+                $Submission_Feedback_Thread->identity_id === null ?
                 null :
                 intval($Submission_Feedback_Thread->identity_id)
             ),
@@ -231,7 +231,7 @@ abstract class SubmissionFeedbackThread {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -282,12 +282,12 @@ abstract class SubmissionFeedbackThread {
                 );';
         $params = [
             (
-                is_null($Submission_Feedback_Thread->submission_feedback_id) ?
+                $Submission_Feedback_Thread->submission_feedback_id === null ?
                 null :
                 intval($Submission_Feedback_Thread->submission_feedback_id)
             ),
             (
-                is_null($Submission_Feedback_Thread->identity_id) ?
+                $Submission_Feedback_Thread->identity_id === null ?
                 null :
                 intval($Submission_Feedback_Thread->identity_id)
             ),

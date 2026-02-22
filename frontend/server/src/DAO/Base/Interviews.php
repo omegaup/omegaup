@@ -44,12 +44,12 @@ abstract class Interviews {
                 );';
         $params = [
             (
-                is_null($Interviews->problemset_id) ?
+                $Interviews->problemset_id === null ?
                 null :
                 intval($Interviews->problemset_id)
             ),
             (
-                is_null($Interviews->acl_id) ?
+                $Interviews->acl_id === null ?
                 null :
                 intval($Interviews->acl_id)
             ),
@@ -57,7 +57,7 @@ abstract class Interviews {
             $Interviews->title,
             $Interviews->description,
             (
-                is_null($Interviews->window_length) ?
+                $Interviews->window_length === null ?
                 null :
                 intval($Interviews->window_length)
             ),
@@ -241,7 +241,7 @@ abstract class Interviews {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -296,12 +296,12 @@ abstract class Interviews {
                 );';
         $params = [
             (
-                is_null($Interviews->problemset_id) ?
+                $Interviews->problemset_id === null ?
                 null :
                 intval($Interviews->problemset_id)
             ),
             (
-                is_null($Interviews->acl_id) ?
+                $Interviews->acl_id === null ?
                 null :
                 intval($Interviews->acl_id)
             ),
@@ -309,7 +309,7 @@ abstract class Interviews {
             $Interviews->title,
             $Interviews->description,
             (
-                is_null($Interviews->window_length) ?
+                $Interviews->window_length === null ?
                 null :
                 intval($Interviews->window_length)
             ),

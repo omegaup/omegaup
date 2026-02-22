@@ -50,7 +50,7 @@ abstract class Runs {
                 );';
         $params = [
             (
-                is_null($Runs->submission_id) ?
+                $Runs->submission_id === null ?
                 null :
                 intval($Runs->submission_id)
             ),
@@ -63,7 +63,7 @@ abstract class Runs {
             intval($Runs->memory),
             floatval($Runs->score),
             (
-                is_null($Runs->contest_score) ?
+                $Runs->contest_score === null ?
                 null :
                 floatval($Runs->contest_score)
             ),
@@ -263,7 +263,7 @@ abstract class Runs {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -330,7 +330,7 @@ abstract class Runs {
                 );';
         $params = [
             (
-                is_null($Runs->submission_id) ?
+                $Runs->submission_id === null ?
                 null :
                 intval($Runs->submission_id)
             ),
@@ -343,7 +343,7 @@ abstract class Runs {
             intval($Runs->memory),
             floatval($Runs->score),
             (
-                is_null($Runs->contest_score) ?
+                $Runs->contest_score === null ?
                 null :
                 floatval($Runs->contest_score)
             ),

@@ -77,7 +77,7 @@ abstract class UserRank {
         $params = [
             $User_Rank->user_id,
             (
-                !is_null($User_Rank->ranking) ?
+                $User_Rank->ranking !== null ?
                 intval($User_Rank->ranking) :
                 null
             ),
@@ -88,13 +88,13 @@ abstract class UserRank {
             $User_Rank->country_id,
             $User_Rank->state_id,
             (
-                !is_null($User_Rank->school_id) ?
+                $User_Rank->school_id !== null ?
                 intval($User_Rank->school_id) :
                 null
             ),
             floatval($User_Rank->author_score),
             (
-                !is_null($User_Rank->author_ranking) ?
+                $User_Rank->author_ranking !== null ?
                 intval($User_Rank->author_ranking) :
                 null
             ),
@@ -139,7 +139,7 @@ abstract class UserRank {
                 );';
         $params = [
             (
-                is_null($User_Rank->ranking) ?
+                $User_Rank->ranking === null ?
                 null :
                 intval($User_Rank->ranking)
             ),
@@ -150,13 +150,13 @@ abstract class UserRank {
             $User_Rank->country_id,
             $User_Rank->state_id,
             (
-                is_null($User_Rank->school_id) ?
+                $User_Rank->school_id === null ?
                 null :
                 intval($User_Rank->school_id)
             ),
             floatval($User_Rank->author_score),
             (
-                is_null($User_Rank->author_ranking) ?
+                $User_Rank->author_ranking === null ?
                 null :
                 intval($User_Rank->author_ranking)
             ),
@@ -165,7 +165,7 @@ abstract class UserRank {
                 $User_Rank->timestamp
             ),
             (
-                is_null($User_Rank->user_id) ?
+                $User_Rank->user_id === null ?
                 null :
                 intval($User_Rank->user_id)
             ),
@@ -360,7 +360,7 @@ abstract class UserRank {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -429,12 +429,12 @@ abstract class UserRank {
                 );';
         $params = [
             (
-                is_null($User_Rank->user_id) ?
+                $User_Rank->user_id === null ?
                 null :
                 intval($User_Rank->user_id)
             ),
             (
-                is_null($User_Rank->ranking) ?
+                $User_Rank->ranking === null ?
                 null :
                 intval($User_Rank->ranking)
             ),
@@ -445,13 +445,13 @@ abstract class UserRank {
             $User_Rank->country_id,
             $User_Rank->state_id,
             (
-                is_null($User_Rank->school_id) ?
+                $User_Rank->school_id === null ?
                 null :
                 intval($User_Rank->school_id)
             ),
             floatval($User_Rank->author_score),
             (
-                is_null($User_Rank->author_ranking) ?
+                $User_Rank->author_ranking === null ?
                 null :
                 intval($User_Rank->author_ranking)
             ),

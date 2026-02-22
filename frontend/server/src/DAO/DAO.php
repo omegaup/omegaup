@@ -37,7 +37,7 @@ final class DAO {
      * @return string|null the timestamp in MySQL format.
      */
     final public static function toMySQLTimestamp($timestamp): ?string {
-        if (is_null($timestamp)) {
+        if ($timestamp === null) {
             return null;
         }
         // Temporary migration code to allow the timestamps to be in either

@@ -49,7 +49,7 @@ abstract class CoderOfTheMonth {
                 );';
         $params = [
             (
-                is_null($Coder_Of_The_Month->user_id) ?
+                $Coder_Of_The_Month->user_id === null ?
                 null :
                 intval($Coder_Of_The_Month->user_id)
             ),
@@ -57,17 +57,17 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->ranking) ?
+                $Coder_Of_The_Month->ranking === null ?
                 null :
                 intval($Coder_Of_The_Month->ranking)
             ),
             (
-                is_null($Coder_Of_The_Month->selected_by) ?
+                $Coder_Of_The_Month->selected_by === null ?
                 null :
                 intval($Coder_Of_The_Month->selected_by)
             ),
             (
-                is_null($Coder_Of_The_Month->school_id) ?
+                $Coder_Of_The_Month->school_id === null ?
                 null :
                 intval($Coder_Of_The_Month->school_id)
             ),
@@ -265,7 +265,7 @@ abstract class CoderOfTheMonth {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -330,7 +330,7 @@ abstract class CoderOfTheMonth {
                 );';
         $params = [
             (
-                is_null($Coder_Of_The_Month->user_id) ?
+                $Coder_Of_The_Month->user_id === null ?
                 null :
                 intval($Coder_Of_The_Month->user_id)
             ),
@@ -338,17 +338,17 @@ abstract class CoderOfTheMonth {
             $Coder_Of_The_Month->time,
             $Coder_Of_The_Month->interview_url,
             (
-                is_null($Coder_Of_The_Month->ranking) ?
+                $Coder_Of_The_Month->ranking === null ?
                 null :
                 intval($Coder_Of_The_Month->ranking)
             ),
             (
-                is_null($Coder_Of_The_Month->selected_by) ?
+                $Coder_Of_The_Month->selected_by === null ?
                 null :
                 intval($Coder_Of_The_Month->selected_by)
             ),
             (
-                is_null($Coder_Of_The_Month->school_id) ?
+                $Coder_Of_The_Month->school_id === null ?
                 null :
                 intval($Coder_Of_The_Month->school_id)
             ),

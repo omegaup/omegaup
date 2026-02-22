@@ -46,7 +46,7 @@ abstract class Schools {
             $Schools->state_id,
             $Schools->name,
             (
-                is_null($Schools->ranking) ?
+                $Schools->ranking === null ?
                 null :
                 intval($Schools->ranking)
             ),
@@ -229,7 +229,7 @@ abstract class Schools {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -285,7 +285,7 @@ abstract class Schools {
             $Schools->state_id,
             $Schools->name,
             (
-                is_null($Schools->ranking) ?
+                $Schools->ranking === null ?
                 null :
                 intval($Schools->ranking)
             ),

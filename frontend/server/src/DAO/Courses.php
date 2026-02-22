@@ -65,7 +65,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $openedCondition = 'false AS opened';
         $args = [];
-        if (!is_null($identity)) {
+        if ($identity !== null) {
             $openedCondition = '
                 EXISTS(
                     SELECT
@@ -216,7 +216,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $courses = [];
         foreach ($rs as $row) {
             $row['assignments'] = [];
-            $row['is_open'] = !is_null($row['accept_teacher']);
+            $row['is_open'] = $row['accept_teacher'] !== null;
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
             );
@@ -268,7 +268,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $row['course_id']
             );
             $row['is_open'] = boolval($row['is_open']);
-            $row['accept_teacher'] = !is_null($row['accept_teacher'])
+            $row['accept_teacher'] = $row['accept_teacher'] !== null
               ? boolval($row['accept_teacher'])
               : null;
             unset($row['course_id']);
@@ -847,8 +847,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
              * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
-                !is_null($a['name']) ? $a['name'] : $a['username'],
-                !is_null($b['name']) ? $b['name'] : $b['username']
+                $a['name'] !== null ? $a['name'] : $a['username'],
+                $b['name'] !== null ? $b['name'] : $b['username']
             )
         );
 
@@ -1087,7 +1087,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $row['course_id']
             );
             $row['is_open'] = boolval($row['is_open']);
-            $row['accept_teacher'] = !is_null($row['accept_teacher'])
+            $row['accept_teacher'] = $row['accept_teacher'] !== null
               ? boolval($row['accept_teacher'])
               : null;
             unset($row['course_id']);

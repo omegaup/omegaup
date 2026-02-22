@@ -44,7 +44,7 @@ abstract class QualityNominationLog {
                 );';
         $params = [
             (
-                is_null($QualityNomination_Log->qualitynomination_id) ?
+                $QualityNomination_Log->qualitynomination_id === null ?
                 null :
                 intval($QualityNomination_Log->qualitynomination_id)
             ),
@@ -52,7 +52,7 @@ abstract class QualityNominationLog {
                 $QualityNomination_Log->time
             ),
             (
-                is_null($QualityNomination_Log->user_id) ?
+                $QualityNomination_Log->user_id === null ?
                 null :
                 intval($QualityNomination_Log->user_id)
             ),
@@ -239,7 +239,7 @@ abstract class QualityNominationLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -294,7 +294,7 @@ abstract class QualityNominationLog {
                 );';
         $params = [
             (
-                is_null($QualityNomination_Log->qualitynomination_id) ?
+                $QualityNomination_Log->qualitynomination_id === null ?
                 null :
                 intval($QualityNomination_Log->qualitynomination_id)
             ),
@@ -302,7 +302,7 @@ abstract class QualityNominationLog {
                 $QualityNomination_Log->time
             ),
             (
-                is_null($QualityNomination_Log->user_id) ?
+                $QualityNomination_Log->user_id === null ?
                 null :
                 intval($QualityNomination_Log->user_id)
             ),

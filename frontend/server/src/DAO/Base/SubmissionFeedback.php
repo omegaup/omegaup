@@ -44,12 +44,12 @@ abstract class SubmissionFeedback {
                 );';
         $params = [
             (
-                is_null($Submission_Feedback->identity_id) ?
+                $Submission_Feedback->identity_id === null ?
                 null :
                 intval($Submission_Feedback->identity_id)
             ),
             (
-                is_null($Submission_Feedback->submission_id) ?
+                $Submission_Feedback->submission_id === null ?
                 null :
                 intval($Submission_Feedback->submission_id)
             ),
@@ -58,12 +58,12 @@ abstract class SubmissionFeedback {
                 $Submission_Feedback->date
             ),
             (
-                is_null($Submission_Feedback->range_bytes_start) ?
+                $Submission_Feedback->range_bytes_start === null ?
                 null :
                 intval($Submission_Feedback->range_bytes_start)
             ),
             (
-                is_null($Submission_Feedback->range_bytes_end) ?
+                $Submission_Feedback->range_bytes_end === null ?
                 null :
                 intval($Submission_Feedback->range_bytes_end)
             ),
@@ -247,7 +247,7 @@ abstract class SubmissionFeedback {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -302,12 +302,12 @@ abstract class SubmissionFeedback {
                 );';
         $params = [
             (
-                is_null($Submission_Feedback->identity_id) ?
+                $Submission_Feedback->identity_id === null ?
                 null :
                 intval($Submission_Feedback->identity_id)
             ),
             (
-                is_null($Submission_Feedback->submission_id) ?
+                $Submission_Feedback->submission_id === null ?
                 null :
                 intval($Submission_Feedback->submission_id)
             ),
@@ -316,12 +316,12 @@ abstract class SubmissionFeedback {
                 $Submission_Feedback->date
             ),
             (
-                is_null($Submission_Feedback->range_bytes_start) ?
+                $Submission_Feedback->range_bytes_start === null ?
                 null :
                 intval($Submission_Feedback->range_bytes_start)
             ),
             (
-                is_null($Submission_Feedback->range_bytes_end) ?
+                $Submission_Feedback->range_bytes_end === null ?
                 null :
                 intval($Submission_Feedback->range_bytes_end)
             ),

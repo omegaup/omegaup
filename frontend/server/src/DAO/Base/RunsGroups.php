@@ -42,7 +42,7 @@ abstract class RunsGroups {
                 );';
         $params = [
             (
-                is_null($Runs_Groups->run_id) ?
+                $Runs_Groups->run_id === null ?
                 null :
                 intval($Runs_Groups->run_id)
             ),
@@ -225,7 +225,7 @@ abstract class RunsGroups {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -276,7 +276,7 @@ abstract class RunsGroups {
                 );';
         $params = [
             (
-                is_null($Runs_Groups->run_id) ?
+                $Runs_Groups->run_id === null ?
                 null :
                 intval($Runs_Groups->run_id)
             ),

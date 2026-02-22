@@ -43,12 +43,12 @@ abstract class CourseIdentityRequestHistory {
                 );';
         $params = [
             (
-                is_null($Course_Identity_Request_History->identity_id) ?
+                $Course_Identity_Request_History->identity_id === null ?
                 null :
                 intval($Course_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Course_Identity_Request_History->course_id) ?
+                $Course_Identity_Request_History->course_id === null ?
                 null :
                 intval($Course_Identity_Request_History->course_id)
             ),
@@ -56,12 +56,12 @@ abstract class CourseIdentityRequestHistory {
                 $Course_Identity_Request_History->time
             ),
             (
-                is_null($Course_Identity_Request_History->accepted) ?
+                $Course_Identity_Request_History->accepted === null ?
                 null :
                 intval($Course_Identity_Request_History->accepted)
             ),
             (
-                is_null($Course_Identity_Request_History->admin_id) ?
+                $Course_Identity_Request_History->admin_id === null ?
                 null :
                 intval($Course_Identity_Request_History->admin_id)
             ),
@@ -243,7 +243,7 @@ abstract class CourseIdentityRequestHistory {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -296,12 +296,12 @@ abstract class CourseIdentityRequestHistory {
                 );';
         $params = [
             (
-                is_null($Course_Identity_Request_History->identity_id) ?
+                $Course_Identity_Request_History->identity_id === null ?
                 null :
                 intval($Course_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Course_Identity_Request_History->course_id) ?
+                $Course_Identity_Request_History->course_id === null ?
                 null :
                 intval($Course_Identity_Request_History->course_id)
             ),
@@ -309,12 +309,12 @@ abstract class CourseIdentityRequestHistory {
                 $Course_Identity_Request_History->time
             ),
             (
-                is_null($Course_Identity_Request_History->accepted) ?
+                $Course_Identity_Request_History->accepted === null ?
                 null :
                 intval($Course_Identity_Request_History->accepted)
             ),
             (
-                is_null($Course_Identity_Request_History->admin_id) ?
+                $Course_Identity_Request_History->admin_id === null ?
                 null :
                 intval($Course_Identity_Request_History->admin_id)
             ),

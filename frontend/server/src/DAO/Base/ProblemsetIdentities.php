@@ -79,12 +79,12 @@ abstract class ProblemsetIdentities {
             intval($Problemset_Identities->score),
             intval($Problemset_Identities->time),
             (
-                !is_null($Problemset_Identities->share_user_information) ?
+                $Problemset_Identities->share_user_information !== null ?
                 intval($Problemset_Identities->share_user_information) :
                 null
             ),
             (
-                !is_null($Problemset_Identities->privacystatement_consent_id) ?
+                $Problemset_Identities->privacystatement_consent_id !== null ?
                 intval($Problemset_Identities->privacystatement_consent_id) :
                 null
             ),
@@ -130,23 +130,23 @@ abstract class ProblemsetIdentities {
             intval($Problemset_Identities->score),
             intval($Problemset_Identities->time),
             (
-                is_null($Problemset_Identities->share_user_information) ?
+                $Problemset_Identities->share_user_information === null ?
                 null :
                 intval($Problemset_Identities->share_user_information)
             ),
             (
-                is_null($Problemset_Identities->privacystatement_consent_id) ?
+                $Problemset_Identities->privacystatement_consent_id === null ?
                 null :
                 intval($Problemset_Identities->privacystatement_consent_id)
             ),
             intval($Problemset_Identities->is_invited),
             (
-                is_null($Problemset_Identities->identity_id) ?
+                $Problemset_Identities->identity_id === null ?
                 null :
                 intval($Problemset_Identities->identity_id)
             ),
             (
-                is_null($Problemset_Identities->problemset_id) ?
+                $Problemset_Identities->problemset_id === null ?
                 null :
                 intval($Problemset_Identities->problemset_id)
             ),
@@ -339,7 +339,7 @@ abstract class ProblemsetIdentities {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -400,12 +400,12 @@ abstract class ProblemsetIdentities {
                 );';
         $params = [
             (
-                is_null($Problemset_Identities->identity_id) ?
+                $Problemset_Identities->identity_id === null ?
                 null :
                 intval($Problemset_Identities->identity_id)
             ),
             (
-                is_null($Problemset_Identities->problemset_id) ?
+                $Problemset_Identities->problemset_id === null ?
                 null :
                 intval($Problemset_Identities->problemset_id)
             ),
@@ -418,12 +418,12 @@ abstract class ProblemsetIdentities {
             intval($Problemset_Identities->score),
             intval($Problemset_Identities->time),
             (
-                is_null($Problemset_Identities->share_user_information) ?
+                $Problemset_Identities->share_user_information === null ?
                 null :
                 intval($Problemset_Identities->share_user_information)
             ),
             (
-                is_null($Problemset_Identities->privacystatement_consent_id) ?
+                $Problemset_Identities->privacystatement_consent_id === null ?
                 null :
                 intval($Problemset_Identities->privacystatement_consent_id)
             ),

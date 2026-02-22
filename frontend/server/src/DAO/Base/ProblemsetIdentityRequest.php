@@ -71,7 +71,7 @@ abstract class ProblemsetIdentityRequest {
                 $Problemset_Identity_Request->last_update
             ),
             (
-                !is_null($Problemset_Identity_Request->accepted) ?
+                $Problemset_Identity_Request->accepted !== null ?
                 intval($Problemset_Identity_Request->accepted) :
                 null
             ),
@@ -112,18 +112,18 @@ abstract class ProblemsetIdentityRequest {
                 $Problemset_Identity_Request->last_update
             ),
             (
-                is_null($Problemset_Identity_Request->accepted) ?
+                $Problemset_Identity_Request->accepted === null ?
                 null :
                 intval($Problemset_Identity_Request->accepted)
             ),
             $Problemset_Identity_Request->extra_note,
             (
-                is_null($Problemset_Identity_Request->identity_id) ?
+                $Problemset_Identity_Request->identity_id === null ?
                 null :
                 intval($Problemset_Identity_Request->identity_id)
             ),
             (
-                is_null($Problemset_Identity_Request->problemset_id) ?
+                $Problemset_Identity_Request->problemset_id === null ?
                 null :
                 intval($Problemset_Identity_Request->problemset_id)
             ),
@@ -310,7 +310,7 @@ abstract class ProblemsetIdentityRequest {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -365,12 +365,12 @@ abstract class ProblemsetIdentityRequest {
                 );';
         $params = [
             (
-                is_null($Problemset_Identity_Request->identity_id) ?
+                $Problemset_Identity_Request->identity_id === null ?
                 null :
                 intval($Problemset_Identity_Request->identity_id)
             ),
             (
-                is_null($Problemset_Identity_Request->problemset_id) ?
+                $Problemset_Identity_Request->problemset_id === null ?
                 null :
                 intval($Problemset_Identity_Request->problemset_id)
             ),
@@ -381,7 +381,7 @@ abstract class ProblemsetIdentityRequest {
                 $Problemset_Identity_Request->last_update
             ),
             (
-                is_null($Problemset_Identity_Request->accepted) ?
+                $Problemset_Identity_Request->accepted === null ?
                 null :
                 intval($Problemset_Identity_Request->accepted)
             ),

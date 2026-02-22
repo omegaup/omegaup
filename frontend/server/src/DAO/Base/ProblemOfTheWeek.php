@@ -41,7 +41,7 @@ abstract class ProblemOfTheWeek {
                 );';
         $params = [
             (
-                is_null($Problem_Of_The_Week->problem_id) ?
+                $Problem_Of_The_Week->problem_id === null ?
                 null :
                 intval($Problem_Of_The_Week->problem_id)
             ),
@@ -221,7 +221,7 @@ abstract class ProblemOfTheWeek {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -270,7 +270,7 @@ abstract class ProblemOfTheWeek {
                 );';
         $params = [
             (
-                is_null($Problem_Of_The_Week->problem_id) ?
+                $Problem_Of_The_Week->problem_id === null ?
                 null :
                 intval($Problem_Of_The_Week->problem_id)
             ),

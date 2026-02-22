@@ -62,23 +62,23 @@ abstract class SubmissionLog {
                 );';
         $params = [
             (
-                !is_null($Submission_Log->problemset_id) ?
+                $Submission_Log->problemset_id !== null ?
                 intval($Submission_Log->problemset_id) :
                 null
             ),
             $Submission_Log->submission_id,
             (
-                !is_null($Submission_Log->user_id) ?
+                $Submission_Log->user_id !== null ?
                 intval($Submission_Log->user_id) :
                 null
             ),
             (
-                !is_null($Submission_Log->identity_id) ?
+                $Submission_Log->identity_id !== null ?
                 intval($Submission_Log->identity_id) :
                 null
             ),
             (
-                !is_null($Submission_Log->ip) ?
+                $Submission_Log->ip !== null ?
                 intval($Submission_Log->ip) :
                 null
             ),
@@ -115,22 +115,22 @@ abstract class SubmissionLog {
                 );';
         $params = [
             (
-                is_null($Submission_Log->problemset_id) ?
+                $Submission_Log->problemset_id === null ?
                 null :
                 intval($Submission_Log->problemset_id)
             ),
             (
-                is_null($Submission_Log->user_id) ?
+                $Submission_Log->user_id === null ?
                 null :
                 intval($Submission_Log->user_id)
             ),
             (
-                is_null($Submission_Log->identity_id) ?
+                $Submission_Log->identity_id === null ?
                 null :
                 intval($Submission_Log->identity_id)
             ),
             (
-                is_null($Submission_Log->ip) ?
+                $Submission_Log->ip === null ?
                 null :
                 intval($Submission_Log->ip)
             ),
@@ -138,7 +138,7 @@ abstract class SubmissionLog {
                 $Submission_Log->time
             ),
             (
-                is_null($Submission_Log->submission_id) ?
+                $Submission_Log->submission_id === null ?
                 null :
                 intval($Submission_Log->submission_id)
             ),
@@ -319,7 +319,7 @@ abstract class SubmissionLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -374,27 +374,27 @@ abstract class SubmissionLog {
                 );';
         $params = [
             (
-                is_null($Submission_Log->problemset_id) ?
+                $Submission_Log->problemset_id === null ?
                 null :
                 intval($Submission_Log->problemset_id)
             ),
             (
-                is_null($Submission_Log->submission_id) ?
+                $Submission_Log->submission_id === null ?
                 null :
                 intval($Submission_Log->submission_id)
             ),
             (
-                is_null($Submission_Log->user_id) ?
+                $Submission_Log->user_id === null ?
                 null :
                 intval($Submission_Log->user_id)
             ),
             (
-                is_null($Submission_Log->identity_id) ?
+                $Submission_Log->identity_id === null ?
                 null :
                 intval($Submission_Log->identity_id)
             ),
             (
-                is_null($Submission_Log->ip) ?
+                $Submission_Log->ip === null ?
                 null :
                 intval($Submission_Log->ip)
             ),

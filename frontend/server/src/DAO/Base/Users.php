@@ -68,32 +68,32 @@ abstract class Users {
             $Users->facebook_user_id,
             $Users->git_token,
             (
-                is_null($Users->main_email_id) ?
+                $Users->main_email_id === null ?
                 null :
                 intval($Users->main_email_id)
             ),
             (
-                is_null($Users->main_identity_id) ?
+                $Users->main_identity_id === null ?
                 null :
                 intval($Users->main_identity_id)
             ),
             (
-                is_null($Users->has_learning_objective) ?
+                $Users->has_learning_objective === null ?
                 null :
                 intval($Users->has_learning_objective)
             ),
             (
-                is_null($Users->has_teaching_objective) ?
+                $Users->has_teaching_objective === null ?
                 null :
                 intval($Users->has_teaching_objective)
             ),
             (
-                is_null($Users->has_scholar_objective) ?
+                $Users->has_scholar_objective === null ?
                 null :
                 intval($Users->has_scholar_objective)
             ),
             (
-                is_null($Users->has_competitive_objective) ?
+                $Users->has_competitive_objective === null ?
                 null :
                 intval($Users->has_competitive_objective)
             ),
@@ -107,7 +107,7 @@ abstract class Users {
                 $Users->reset_sent_at
             ),
             (
-                is_null($Users->hide_problem_tags) ?
+                $Users->hide_problem_tags === null ?
                 null :
                 intval($Users->hide_problem_tags)
             ),
@@ -115,7 +115,7 @@ abstract class Users {
             intval($Users->is_private),
             $Users->preferred_language,
             (
-                is_null($Users->parent_verified) ?
+                $Users->parent_verified === null ?
                 null :
                 intval($Users->parent_verified)
             ),
@@ -130,7 +130,7 @@ abstract class Users {
                 $Users->parent_email_verification_deadline
             ),
             (
-                is_null($Users->parent_email_id) ?
+                $Users->parent_email_id === null ?
                 null :
                 intval($Users->parent_email_id)
             ),
@@ -361,7 +361,7 @@ abstract class Users {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -462,32 +462,32 @@ abstract class Users {
             $Users->facebook_user_id,
             $Users->git_token,
             (
-                is_null($Users->main_email_id) ?
+                $Users->main_email_id === null ?
                 null :
                 intval($Users->main_email_id)
             ),
             (
-                is_null($Users->main_identity_id) ?
+                $Users->main_identity_id === null ?
                 null :
                 intval($Users->main_identity_id)
             ),
             (
-                is_null($Users->has_learning_objective) ?
+                $Users->has_learning_objective === null ?
                 null :
                 intval($Users->has_learning_objective)
             ),
             (
-                is_null($Users->has_teaching_objective) ?
+                $Users->has_teaching_objective === null ?
                 null :
                 intval($Users->has_teaching_objective)
             ),
             (
-                is_null($Users->has_scholar_objective) ?
+                $Users->has_scholar_objective === null ?
                 null :
                 intval($Users->has_scholar_objective)
             ),
             (
-                is_null($Users->has_competitive_objective) ?
+                $Users->has_competitive_objective === null ?
                 null :
                 intval($Users->has_competitive_objective)
             ),
@@ -501,7 +501,7 @@ abstract class Users {
                 $Users->reset_sent_at
             ),
             (
-                is_null($Users->hide_problem_tags) ?
+                $Users->hide_problem_tags === null ?
                 null :
                 intval($Users->hide_problem_tags)
             ),
@@ -509,7 +509,7 @@ abstract class Users {
             intval($Users->is_private),
             $Users->preferred_language,
             (
-                is_null($Users->parent_verified) ?
+                $Users->parent_verified === null ?
                 null :
                 intval($Users->parent_verified)
             ),
@@ -524,7 +524,7 @@ abstract class Users {
                 $Users->parent_email_verification_deadline
             ),
             (
-                is_null($Users->parent_email_id) ?
+                $Users->parent_email_id === null ?
                 null :
                 intval($Users->parent_email_id)
             ),

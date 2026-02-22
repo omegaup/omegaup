@@ -87,12 +87,12 @@ abstract class ProblemsTags {
         $params = [
             $Problems_Tags->source,
             (
-                is_null($Problems_Tags->problem_id) ?
+                $Problems_Tags->problem_id === null ?
                 null :
                 intval($Problems_Tags->problem_id)
             ),
             (
-                is_null($Problems_Tags->tag_id) ?
+                $Problems_Tags->tag_id === null ?
                 null :
                 intval($Problems_Tags->tag_id)
             ),
@@ -273,7 +273,7 @@ abstract class ProblemsTags {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -322,12 +322,12 @@ abstract class ProblemsTags {
                 );';
         $params = [
             (
-                is_null($Problems_Tags->problem_id) ?
+                $Problems_Tags->problem_id === null ?
                 null :
                 intval($Problems_Tags->problem_id)
             ),
             (
-                is_null($Problems_Tags->tag_id) ?
+                $Problems_Tags->tag_id === null ?
                 null :
                 intval($Problems_Tags->tag_id)
             ),

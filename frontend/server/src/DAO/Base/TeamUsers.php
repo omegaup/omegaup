@@ -188,7 +188,7 @@ abstract class TeamUsers {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -235,12 +235,12 @@ abstract class TeamUsers {
                 );';
         $params = [
             (
-                is_null($Team_Users->team_id) ?
+                $Team_Users->team_id === null ?
                 null :
                 intval($Team_Users->team_id)
             ),
             (
-                is_null($Team_Users->identity_id) ?
+                $Team_Users->identity_id === null ?
                 null :
                 intval($Team_Users->identity_id)
             ),

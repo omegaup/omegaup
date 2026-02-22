@@ -78,7 +78,7 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
         foreach ($notifications as $notification) {
             $rowPlaceholders[] = '(?, ?, ?, ?)';
             $params[] = (
-                is_null($notification->user_id) ?
+                $notification->user_id === null ?
                 null :
                 intval($notification->user_id)
             );

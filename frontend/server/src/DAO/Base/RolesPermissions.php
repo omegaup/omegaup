@@ -188,7 +188,7 @@ abstract class RolesPermissions {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -235,12 +235,12 @@ abstract class RolesPermissions {
                 );';
         $params = [
             (
-                is_null($Roles_Permissions->role_id) ?
+                $Roles_Permissions->role_id === null ?
                 null :
                 intval($Roles_Permissions->role_id)
             ),
             (
-                is_null($Roles_Permissions->permission_id) ?
+                $Roles_Permissions->permission_id === null ?
                 null :
                 intval($Roles_Permissions->permission_id)
             ),

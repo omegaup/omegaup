@@ -46,12 +46,12 @@ abstract class Clarifications {
                 );';
         $params = [
             (
-                is_null($Clarifications->author_id) ?
+                $Clarifications->author_id === null ?
                 null :
                 intval($Clarifications->author_id)
             ),
             (
-                is_null($Clarifications->receiver_id) ?
+                $Clarifications->receiver_id === null ?
                 null :
                 intval($Clarifications->receiver_id)
             ),
@@ -61,12 +61,12 @@ abstract class Clarifications {
                 $Clarifications->time
             ),
             (
-                is_null($Clarifications->problem_id) ?
+                $Clarifications->problem_id === null ?
                 null :
                 intval($Clarifications->problem_id)
             ),
             (
-                is_null($Clarifications->problemset_id) ?
+                $Clarifications->problemset_id === null ?
                 null :
                 intval($Clarifications->problemset_id)
             ),
@@ -255,7 +255,7 @@ abstract class Clarifications {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -314,12 +314,12 @@ abstract class Clarifications {
                 );';
         $params = [
             (
-                is_null($Clarifications->author_id) ?
+                $Clarifications->author_id === null ?
                 null :
                 intval($Clarifications->author_id)
             ),
             (
-                is_null($Clarifications->receiver_id) ?
+                $Clarifications->receiver_id === null ?
                 null :
                 intval($Clarifications->receiver_id)
             ),
@@ -329,12 +329,12 @@ abstract class Clarifications {
                 $Clarifications->time
             ),
             (
-                is_null($Clarifications->problem_id) ?
+                $Clarifications->problem_id === null ?
                 null :
                 intval($Clarifications->problem_id)
             ),
             (
-                is_null($Clarifications->problemset_id) ?
+                $Clarifications->problemset_id === null ?
                 null :
                 intval($Clarifications->problemset_id)
             ),

@@ -41,7 +41,7 @@ abstract class UsersBadges {
                 );';
         $params = [
             (
-                is_null($Users_Badges->user_id) ?
+                $Users_Badges->user_id === null ?
                 null :
                 intval($Users_Badges->user_id)
             ),
@@ -223,7 +223,7 @@ abstract class UsersBadges {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -272,7 +272,7 @@ abstract class UsersBadges {
                 );';
         $params = [
             (
-                is_null($Users_Badges->user_id) ?
+                $Users_Badges->user_id === null ?
                 null :
                 intval($Users_Badges->user_id)
             ),

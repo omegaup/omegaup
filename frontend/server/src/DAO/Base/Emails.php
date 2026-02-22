@@ -41,7 +41,7 @@ abstract class Emails {
         $params = [
             $Emails->email,
             (
-                is_null($Emails->user_id) ?
+                $Emails->user_id === null ?
                 null :
                 intval($Emails->user_id)
             ),
@@ -217,7 +217,7 @@ abstract class Emails {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -265,7 +265,7 @@ abstract class Emails {
         $params = [
             $Emails->email,
             (
-                is_null($Emails->user_id) ?
+                $Emails->user_id === null ?
                 null :
                 intval($Emails->user_id)
             ),

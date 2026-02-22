@@ -61,7 +61,7 @@ abstract class Problems {
                 );';
         $params = [
             (
-                is_null($Problems->acl_id) ?
+                $Problems->acl_id === null ?
                 null :
                 intval($Problems->acl_id)
             ),
@@ -76,7 +76,7 @@ abstract class Problems {
             intval($Problems->submissions),
             intval($Problems->accepted),
             (
-                is_null($Problems->difficulty) ?
+                $Problems->difficulty === null ?
                 null :
                 floatval($Problems->difficulty)
             ),
@@ -88,7 +88,7 @@ abstract class Problems {
             intval($Problems->deprecated),
             intval($Problems->email_clarifications),
             (
-                is_null($Problems->quality) ?
+                $Problems->quality === null ?
                 null :
                 floatval($Problems->quality)
             ),
@@ -311,7 +311,7 @@ abstract class Problems {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -400,7 +400,7 @@ abstract class Problems {
                 );';
         $params = [
             (
-                is_null($Problems->acl_id) ?
+                $Problems->acl_id === null ?
                 null :
                 intval($Problems->acl_id)
             ),
@@ -415,7 +415,7 @@ abstract class Problems {
             intval($Problems->submissions),
             intval($Problems->accepted),
             (
-                is_null($Problems->difficulty) ?
+                $Problems->difficulty === null ?
                 null :
                 floatval($Problems->difficulty)
             ),
@@ -427,7 +427,7 @@ abstract class Problems {
             intval($Problems->deprecated),
             intval($Problems->email_clarifications),
             (
-                is_null($Problems->quality) ?
+                $Problems->quality === null ?
                 null :
                 floatval($Problems->quality)
             ),

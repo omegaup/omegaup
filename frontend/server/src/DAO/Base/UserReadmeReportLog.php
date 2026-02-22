@@ -91,12 +91,12 @@ abstract class UserReadmeReportLog {
                 $User_Readme_Report_Log->report_time
             ),
             (
-                is_null($User_Readme_Report_Log->readme_id) ?
+                $User_Readme_Report_Log->readme_id === null ?
                 null :
                 intval($User_Readme_Report_Log->readme_id)
             ),
             (
-                is_null($User_Readme_Report_Log->reporter_user_id) ?
+                $User_Readme_Report_Log->reporter_user_id === null ?
                 null :
                 intval($User_Readme_Report_Log->reporter_user_id)
             ),
@@ -277,7 +277,7 @@ abstract class UserReadmeReportLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -326,12 +326,12 @@ abstract class UserReadmeReportLog {
                 );';
         $params = [
             (
-                is_null($User_Readme_Report_Log->readme_id) ?
+                $User_Readme_Report_Log->readme_id === null ?
                 null :
                 intval($User_Readme_Report_Log->readme_id)
             ),
             (
-                is_null($User_Readme_Report_Log->reporter_user_id) ?
+                $User_Readme_Report_Log->reporter_user_id === null ?
                 null :
                 intval($User_Readme_Report_Log->reporter_user_id)
             ),

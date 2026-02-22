@@ -196,7 +196,7 @@ abstract class UserRoles {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -245,17 +245,17 @@ abstract class UserRoles {
                 );';
         $params = [
             (
-                is_null($User_Roles->user_id) ?
+                $User_Roles->user_id === null ?
                 null :
                 intval($User_Roles->user_id)
             ),
             (
-                is_null($User_Roles->role_id) ?
+                $User_Roles->role_id === null ?
                 null :
                 intval($User_Roles->role_id)
             ),
             (
-                is_null($User_Roles->acl_id) ?
+                $User_Roles->acl_id === null ?
                 null :
                 intval($User_Roles->acl_id)
             ),

@@ -31,7 +31,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             'dismissedBeforeAc' => false,
         ];
 
-        if (is_null($userId)) {
+        if ($userId === null) {
             return $response;
         }
 
@@ -51,7 +51,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sql,
             [$problemId, $userId]
         );
-        if (!is_null($suggestion)) {
+        if ($suggestion !== null) {
             $response['nominated'] = true;
             /** @var array{before_ac?: mixed} */
             $suggestionContents = json_decode(
@@ -83,7 +83,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sql,
             [$problemId, $userId]
         );
-        if (!is_null($dismissal)) {
+        if ($dismissal !== null) {
             $response['dismissed'] = true;
             /** @var array $dismissalContents */
             $dismissalContents = json_decode(
@@ -332,7 +332,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $params = [];
         $conditions = [];
 
-        if (!is_null($assigneeUserId)) {
+        if ($assigneeUserId !== null) {
             $sqlFrom .= '
             INNER JOIN
                 QualityNomination_Reviewers qnr
@@ -356,12 +356,12 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 ) . '")';
         }
 
-        if (!is_null($nominatorUserId)) {
+        if ($nominatorUserId !== null) {
             $conditions[] = ' qn.user_id = ?';
             $params[] = $nominatorUserId;
         }
 
-        if (!is_null($query) && !is_null($column)) {
+        if ($query !== null && $column !== null) {
             // Some columns are renamed in the query.
             if ($column == 'author_username') {
                 $column = 'authorIdentity.username';
@@ -383,7 +383,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 ' AND ',
                 $conditions
             );
-            if (!is_null($query)) {
+            if ($query !== null) {
                 $sqlFrom .= " AND {$sqlSearch} ";
             }
         } else {
@@ -476,7 +476,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sql,
             [$qualitynomination_id]
         );
-        if (is_null($result)) {
+        if ($result === null) {
             return null;
         }
         return self::processNomination($result);

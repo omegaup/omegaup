@@ -196,7 +196,7 @@ abstract class TeamsGroupRoles {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -245,17 +245,17 @@ abstract class TeamsGroupRoles {
                 );';
         $params = [
             (
-                is_null($Teams_Group_Roles->team_group_id) ?
+                $Teams_Group_Roles->team_group_id === null ?
                 null :
                 intval($Teams_Group_Roles->team_group_id)
             ),
             (
-                is_null($Teams_Group_Roles->role_id) ?
+                $Teams_Group_Roles->role_id === null ?
                 null :
                 intval($Teams_Group_Roles->role_id)
             ),
             (
-                is_null($Teams_Group_Roles->acl_id) ?
+                $Teams_Group_Roles->acl_id === null ?
                 null :
                 intval($Teams_Group_Roles->acl_id)
             ),

@@ -16,7 +16,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
      * @return null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments
      */
     public static function getProblemsetContainer(?int $problemsetId) {
-        if (is_null($problemsetId)) {
+        if ($problemsetId === null) {
             return null;
         }
 
@@ -25,14 +25,14 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
         $contest = \OmegaUp\DAO\Contests::getContestForProblemset(
             $problemsetId
         );
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             return $contest;
         }
 
         $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
             $problemsetId
         );
-        if (!is_null($assignment)) {
+        if ($assignment !== null) {
             return $assignment;
         }
 
@@ -54,8 +54,8 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             return false;
         }
         if (
-            !is_null($problemsetIdentity) &&
-            !is_null($problemsetIdentity->end_time)
+            $problemsetIdentity !== null &&
+            $problemsetIdentity->end_time !== null
         ) {
             return (
                 \OmegaUp\Time::get() > $problemsetIdentity->end_time->time

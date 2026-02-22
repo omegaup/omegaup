@@ -44,7 +44,7 @@ abstract class UserReadmes {
                 );';
         $params = [
             (
-                is_null($User_Readmes->user_id) ?
+                $User_Readmes->user_id === null ?
                 null :
                 intval($User_Readmes->user_id)
             ),
@@ -235,7 +235,7 @@ abstract class UserReadmes {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -290,7 +290,7 @@ abstract class UserReadmes {
                 );';
         $params = [
             (
-                is_null($User_Readmes->user_id) ?
+                $User_Readmes->user_id === null ?
                 null :
                 intval($User_Readmes->user_id)
             ),

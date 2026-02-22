@@ -91,12 +91,12 @@ abstract class ProblemsForfeited {
                 $Problems_Forfeited->forfeited_date
             ),
             (
-                is_null($Problems_Forfeited->user_id) ?
+                $Problems_Forfeited->user_id === null ?
                 null :
                 intval($Problems_Forfeited->user_id)
             ),
             (
-                is_null($Problems_Forfeited->problem_id) ?
+                $Problems_Forfeited->problem_id === null ?
                 null :
                 intval($Problems_Forfeited->problem_id)
             ),
@@ -277,7 +277,7 @@ abstract class ProblemsForfeited {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -326,12 +326,12 @@ abstract class ProblemsForfeited {
                 );';
         $params = [
             (
-                is_null($Problems_Forfeited->user_id) ?
+                $Problems_Forfeited->user_id === null ?
                 null :
                 intval($Problems_Forfeited->user_id)
             ),
             (
-                is_null($Problems_Forfeited->problem_id) ?
+                $Problems_Forfeited->problem_id === null ?
                 null :
                 intval($Problems_Forfeited->problem_id)
             ),

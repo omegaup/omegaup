@@ -188,7 +188,7 @@ abstract class QualityNominationReviewers {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -235,12 +235,12 @@ abstract class QualityNominationReviewers {
                 );';
         $params = [
             (
-                is_null($QualityNomination_Reviewers->qualitynomination_id) ?
+                $QualityNomination_Reviewers->qualitynomination_id === null ?
                 null :
                 intval($QualityNomination_Reviewers->qualitynomination_id)
             ),
             (
-                is_null($QualityNomination_Reviewers->user_id) ?
+                $QualityNomination_Reviewers->user_id === null ?
                 null :
                 intval($QualityNomination_Reviewers->user_id)
             ),

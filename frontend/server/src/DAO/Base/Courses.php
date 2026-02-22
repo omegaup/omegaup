@@ -62,12 +62,12 @@ abstract class Courses {
             $Courses->objective,
             $Courses->alias,
             (
-                is_null($Courses->group_id) ?
+                $Courses->group_id === null ?
                 null :
                 intval($Courses->group_id)
             ),
             (
-                is_null($Courses->acl_id) ?
+                $Courses->acl_id === null ?
                 null :
                 intval($Courses->acl_id)
             ),
@@ -80,7 +80,7 @@ abstract class Courses {
             ),
             $Courses->admission_mode,
             (
-                is_null($Courses->school_id) ?
+                $Courses->school_id === null ?
                 null :
                 intval($Courses->school_id)
             ),
@@ -90,7 +90,7 @@ abstract class Courses {
             $Courses->languages,
             intval($Courses->archived),
             (
-                is_null($Courses->minimum_progress_for_certificate) ?
+                $Courses->minimum_progress_for_certificate === null ?
                 null :
                 intval($Courses->minimum_progress_for_certificate)
             ),
@@ -305,7 +305,7 @@ abstract class Courses {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -392,12 +392,12 @@ abstract class Courses {
             $Courses->objective,
             $Courses->alias,
             (
-                is_null($Courses->group_id) ?
+                $Courses->group_id === null ?
                 null :
                 intval($Courses->group_id)
             ),
             (
-                is_null($Courses->acl_id) ?
+                $Courses->acl_id === null ?
                 null :
                 intval($Courses->acl_id)
             ),
@@ -410,7 +410,7 @@ abstract class Courses {
             ),
             $Courses->admission_mode,
             (
-                is_null($Courses->school_id) ?
+                $Courses->school_id === null ?
                 null :
                 intval($Courses->school_id)
             ),
@@ -420,7 +420,7 @@ abstract class Courses {
             $Courses->languages,
             intval($Courses->archived),
             (
-                is_null($Courses->minimum_progress_for_certificate) ?
+                $Courses->minimum_progress_for_certificate === null ?
                 null :
                 intval($Courses->minimum_progress_for_certificate)
             ),

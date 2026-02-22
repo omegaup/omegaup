@@ -43,12 +43,12 @@ abstract class QualityNominationComments {
                 );';
         $params = [
             (
-                is_null($QualityNomination_Comments->qualitynomination_id) ?
+                $QualityNomination_Comments->qualitynomination_id === null ?
                 null :
                 intval($QualityNomination_Comments->qualitynomination_id)
             ),
             (
-                is_null($QualityNomination_Comments->user_id) ?
+                $QualityNomination_Comments->user_id === null ?
                 null :
                 intval($QualityNomination_Comments->user_id)
             ),
@@ -56,7 +56,7 @@ abstract class QualityNominationComments {
                 $QualityNomination_Comments->time
             ),
             (
-                is_null($QualityNomination_Comments->vote) ?
+                $QualityNomination_Comments->vote === null ?
                 null :
                 intval($QualityNomination_Comments->vote)
             ),
@@ -239,7 +239,7 @@ abstract class QualityNominationComments {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -292,12 +292,12 @@ abstract class QualityNominationComments {
                 );';
         $params = [
             (
-                is_null($QualityNomination_Comments->qualitynomination_id) ?
+                $QualityNomination_Comments->qualitynomination_id === null ?
                 null :
                 intval($QualityNomination_Comments->qualitynomination_id)
             ),
             (
-                is_null($QualityNomination_Comments->user_id) ?
+                $QualityNomination_Comments->user_id === null ?
                 null :
                 intval($QualityNomination_Comments->user_id)
             ),
@@ -305,7 +305,7 @@ abstract class QualityNominationComments {
                 $QualityNomination_Comments->time
             ),
             (
-                is_null($QualityNomination_Comments->vote) ?
+                $QualityNomination_Comments->vote === null ?
                 null :
                 intval($QualityNomination_Comments->vote)
             ),

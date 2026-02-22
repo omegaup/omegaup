@@ -57,7 +57,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 $filteredBy
             ) . '_id` = ?';
         }
-        if (!is_null($order)) {
+        if ($order !== null) {
             $sqlFrom .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
             ) . '` ' . ($orderType === 'DESC' ? 'DESC' : 'ASC');

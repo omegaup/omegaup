@@ -87,7 +87,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
         );
 
         return array_map(function ($request) {
-            if (!is_null($request['admin_username'])) {
+            if ($request['admin_username'] !== null) {
                 $request['admin'] = [
                     'name' => $request['admin_name'],
                     'username' => $request['admin_username'],

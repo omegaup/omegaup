@@ -91,12 +91,12 @@ abstract class ProblemViewed {
                 $Problem_Viewed->view_time
             ),
             (
-                is_null($Problem_Viewed->problem_id) ?
+                $Problem_Viewed->problem_id === null ?
                 null :
                 intval($Problem_Viewed->problem_id)
             ),
             (
-                is_null($Problem_Viewed->identity_id) ?
+                $Problem_Viewed->identity_id === null ?
                 null :
                 intval($Problem_Viewed->identity_id)
             ),
@@ -277,7 +277,7 @@ abstract class ProblemViewed {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -326,12 +326,12 @@ abstract class ProblemViewed {
                 );';
         $params = [
             (
-                is_null($Problem_Viewed->problem_id) ?
+                $Problem_Viewed->problem_id === null ?
                 null :
                 intval($Problem_Viewed->problem_id)
             ),
             (
-                is_null($Problem_Viewed->identity_id) ?
+                $Problem_Viewed->identity_id === null ?
                 null :
                 intval($Problem_Viewed->identity_id)
             ),

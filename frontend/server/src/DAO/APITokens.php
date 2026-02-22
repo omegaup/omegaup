@@ -41,7 +41,7 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
                 at.token = ?
         ";
         $params = [$apiToken];
-        if (!is_null($username)) {
+        if ($username !== null) {
             $sql .= "
                 UNION
                 SELECT
@@ -65,7 +65,7 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
 
         /** @var list<array{apitoken_id: int, classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, is_main_identity: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
-        if (count($rs) === 1 && is_null($username)) {
+        if (count($rs) === 1 && $username === null) {
             $apiTokenId = $rs[0]['apitoken_id'];
             unset($rs[0]['apitoken_id'], $rs[0]['is_main_identity']);
             return [
@@ -74,7 +74,7 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
                 'apiTokenId' => $apiTokenId,
             ];
         }
-        if (count($rs) !== 2 || is_null($username)) {
+        if (count($rs) !== 2 || $username === null) {
             return null;
         }
         // Put the main user identity first.
@@ -128,7 +128,7 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
                 ',
                 [$apiTokenId],
             );
-            if (is_null($rs)) {
+            if ($rs === null) {
                 \OmegaUp\DAO\DAO::transRollback();
                 return null;
             }

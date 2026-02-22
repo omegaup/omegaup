@@ -60,17 +60,17 @@ abstract class AuthTokens {
                 );';
         $params = [
             (
-                !is_null($Auth_Tokens->user_id) ?
+                $Auth_Tokens->user_id !== null ?
                 intval($Auth_Tokens->user_id) :
                 null
             ),
             (
-                !is_null($Auth_Tokens->identity_id) ?
+                $Auth_Tokens->identity_id !== null ?
                 intval($Auth_Tokens->identity_id) :
                 null
             ),
             (
-                !is_null($Auth_Tokens->acting_identity_id) ?
+                $Auth_Tokens->acting_identity_id !== null ?
                 intval($Auth_Tokens->acting_identity_id) :
                 null
             ),
@@ -107,17 +107,17 @@ abstract class AuthTokens {
                 );';
         $params = [
             (
-                is_null($Auth_Tokens->user_id) ?
+                $Auth_Tokens->user_id === null ?
                 null :
                 intval($Auth_Tokens->user_id)
             ),
             (
-                is_null($Auth_Tokens->identity_id) ?
+                $Auth_Tokens->identity_id === null ?
                 null :
                 intval($Auth_Tokens->identity_id)
             ),
             (
-                is_null($Auth_Tokens->acting_identity_id) ?
+                $Auth_Tokens->acting_identity_id === null ?
                 null :
                 intval($Auth_Tokens->acting_identity_id)
             ),
@@ -300,7 +300,7 @@ abstract class AuthTokens {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -353,17 +353,17 @@ abstract class AuthTokens {
                 );';
         $params = [
             (
-                is_null($Auth_Tokens->user_id) ?
+                $Auth_Tokens->user_id === null ?
                 null :
                 intval($Auth_Tokens->user_id)
             ),
             (
-                is_null($Auth_Tokens->identity_id) ?
+                $Auth_Tokens->identity_id === null ?
                 null :
                 intval($Auth_Tokens->identity_id)
             ),
             (
-                is_null($Auth_Tokens->acting_identity_id) ?
+                $Auth_Tokens->acting_identity_id === null ?
                 null :
                 intval($Auth_Tokens->acting_identity_id)
             ),

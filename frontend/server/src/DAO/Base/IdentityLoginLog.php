@@ -64,7 +64,7 @@ abstract class IdentityLoginLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -113,12 +113,12 @@ abstract class IdentityLoginLog {
                 );';
         $params = [
             (
-                is_null($Identity_Login_Log->identity_id) ?
+                $Identity_Login_Log->identity_id === null ?
                 null :
                 intval($Identity_Login_Log->identity_id)
             ),
             (
-                is_null($Identity_Login_Log->ip) ?
+                $Identity_Login_Log->ip === null ?
                 null :
                 intval($Identity_Login_Log->ip)
             ),

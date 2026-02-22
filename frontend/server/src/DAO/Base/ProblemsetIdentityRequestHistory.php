@@ -43,12 +43,12 @@ abstract class ProblemsetIdentityRequestHistory {
                 );';
         $params = [
             (
-                is_null($Problemset_Identity_Request_History->identity_id) ?
+                $Problemset_Identity_Request_History->identity_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Problemset_Identity_Request_History->problemset_id) ?
+                $Problemset_Identity_Request_History->problemset_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->problemset_id)
             ),
@@ -56,12 +56,12 @@ abstract class ProblemsetIdentityRequestHistory {
                 $Problemset_Identity_Request_History->time
             ),
             (
-                is_null($Problemset_Identity_Request_History->accepted) ?
+                $Problemset_Identity_Request_History->accepted === null ?
                 null :
                 intval($Problemset_Identity_Request_History->accepted)
             ),
             (
-                is_null($Problemset_Identity_Request_History->admin_id) ?
+                $Problemset_Identity_Request_History->admin_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->admin_id)
             ),
@@ -243,7 +243,7 @@ abstract class ProblemsetIdentityRequestHistory {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -296,12 +296,12 @@ abstract class ProblemsetIdentityRequestHistory {
                 );';
         $params = [
             (
-                is_null($Problemset_Identity_Request_History->identity_id) ?
+                $Problemset_Identity_Request_History->identity_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->identity_id)
             ),
             (
-                is_null($Problemset_Identity_Request_History->problemset_id) ?
+                $Problemset_Identity_Request_History->problemset_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->problemset_id)
             ),
@@ -309,12 +309,12 @@ abstract class ProblemsetIdentityRequestHistory {
                 $Problemset_Identity_Request_History->time
             ),
             (
-                is_null($Problemset_Identity_Request_History->accepted) ?
+                $Problemset_Identity_Request_History->accepted === null ?
                 null :
                 intval($Problemset_Identity_Request_History->accepted)
             ),
             (
-                is_null($Problemset_Identity_Request_History->admin_id) ?
+                $Problemset_Identity_Request_History->admin_id === null ?
                 null :
                 intval($Problemset_Identity_Request_History->admin_id)
             ),

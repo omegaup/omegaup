@@ -152,7 +152,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $currentIdentity
     ): ?\OmegaUp\DAO\VO\Identities {
-        if (is_null($currentIdentity->identity_id)) {
+        if ($currentIdentity->identity_id === null) {
             return null;
         }
         $sql = '(
@@ -203,7 +203,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
-        if (is_null($rs)) {
+        if ($rs === null) {
             return null;
         }
 
@@ -272,7 +272,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         }
         return [
             'within_last_day' => (
-                !is_null($rs['reset_sent_at']) &&
+                $rs['reset_sent_at'] !== null &&
                 (
                     \OmegaUp\Time::get() - intval($rs['reset_sent_at']->time)
                 ) < 60 * 60 * 24
@@ -313,7 +313,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
      * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
-        if (is_null($identityId)) {
+        if ($identityId === null) {
             return null;
         }
         $sql = 'SELECT
@@ -360,7 +360,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $sql,
             [$identityId]
         );
-        if (is_null($identity)) {
+        if ($identity === null) {
             return null;
         }
 
@@ -449,7 +449,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function getAssociatedIdentities(
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
-        if (is_null($identity->user_id)) {
+        if ($identity->user_id === null) {
             return [];
         }
         $sql = '

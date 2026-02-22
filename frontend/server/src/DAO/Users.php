@@ -81,7 +81,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
      */
     public static function FindResetInfoByEmail(string $email): ?array {
         $user = self::findByEmail($email);
-        if (is_null($user)) {
+        if ($user === null) {
             return null;
         }
         return [
@@ -138,7 +138,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             [$userId]
         );
 
-        if (is_null($user)) {
+        if ($user === null) {
             return null;
         }
 
@@ -156,7 +156,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
      * @return array{classname: string, country_id: string, email: null|string}
      */
     final public static function getBasicProfileDataByPk(?int $userId): array {
-        if (is_null($userId)) {
+        if ($userId === null) {
             return [
                 'classname' => 'user-rank-unranked',
                 'country_id' => 'xx',
@@ -185,7 +185,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             [$userId]
         );
 
-        if (is_null($user)) {
+        if ($user === null) {
             return [
                 'classname' => 'user-rank-unranked',
                 'country_id' => 'xx',
@@ -197,7 +197,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     public static function getPreferredLanguage(?int $userId): ?string {
-        if (is_null($userId)) {
+        if ($userId === null) {
             return null;
         }
         $sql = 'SELECT
@@ -216,7 +216,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     public static function getHideTags(?int $identityId): bool {
-        if (is_null($identityId)) {
+        if ($identityId === null) {
             return false;
         }
         $sql = '
@@ -242,7 +242,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
 
     public static function getRankingClassName(?int $userId): string {
-        if (is_null($userId)) {
+        if ($userId === null) {
             return 'user-rank-unranked';
         }
         $sql = 'SELECT
@@ -486,7 +486,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             $sql,
             [$token]
         );
-        if (is_null($result)) {
+        if ($result === null) {
             return null;
         }
         return new \OmegaUp\DAO\VO\Users($result);

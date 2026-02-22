@@ -44,12 +44,12 @@ abstract class QualityNominations {
                 );';
         $params = [
             (
-                is_null($QualityNominations->user_id) ?
+                $QualityNominations->user_id === null ?
                 null :
                 intval($QualityNominations->user_id)
             ),
             (
-                is_null($QualityNominations->problem_id) ?
+                $QualityNominations->problem_id === null ?
                 null :
                 intval($QualityNominations->problem_id)
             ),
@@ -239,7 +239,7 @@ abstract class QualityNominations {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -294,12 +294,12 @@ abstract class QualityNominations {
                 );';
         $params = [
             (
-                is_null($QualityNominations->user_id) ?
+                $QualityNominations->user_id === null ?
                 null :
                 intval($QualityNominations->user_id)
             ),
             (
-                is_null($QualityNominations->problem_id) ?
+                $QualityNominations->problem_id === null ?
                 null :
                 intval($QualityNominations->problem_id)
             ),

@@ -41,7 +41,7 @@ abstract class Announcement {
                 );';
         $params = [
             (
-                is_null($Announcement->user_id) ?
+                $Announcement->user_id === null ?
                 null :
                 intval($Announcement->user_id)
             ),
@@ -223,7 +223,7 @@ abstract class Announcement {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -272,7 +272,7 @@ abstract class Announcement {
                 );';
         $params = [
             (
-                is_null($Announcement->user_id) ?
+                $Announcement->user_id === null ?
                 null :
                 intval($Announcement->user_id)
             ),

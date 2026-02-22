@@ -20,7 +20,7 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\Base\SchoolOfTheMonth {
         int $rowcount = 100,
         string $firstDayOfMonth = null
     ): array {
-        if (is_null($firstDayOfMonth)) {
+        if ($firstDayOfMonth === null) {
             $currentDate = date('Y-m-d', \OmegaUp\Time::get());
             $date = new \DateTimeImmutable($currentDate);
             $firstDayOfMonth = $date->modify(

@@ -44,27 +44,27 @@ abstract class Plagiarisms {
                 );';
         $params = [
             (
-                is_null($Plagiarisms->contest_id) ?
+                $Plagiarisms->contest_id === null ?
                 null :
                 intval($Plagiarisms->contest_id)
             ),
             (
-                is_null($Plagiarisms->submission_id_1) ?
+                $Plagiarisms->submission_id_1 === null ?
                 null :
                 intval($Plagiarisms->submission_id_1)
             ),
             (
-                is_null($Plagiarisms->submission_id_2) ?
+                $Plagiarisms->submission_id_2 === null ?
                 null :
                 intval($Plagiarisms->submission_id_2)
             ),
             (
-                is_null($Plagiarisms->score_1) ?
+                $Plagiarisms->score_1 === null ?
                 null :
                 intval($Plagiarisms->score_1)
             ),
             (
-                is_null($Plagiarisms->score_2) ?
+                $Plagiarisms->score_2 === null ?
                 null :
                 intval($Plagiarisms->score_2)
             ),
@@ -249,7 +249,7 @@ abstract class Plagiarisms {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -304,27 +304,27 @@ abstract class Plagiarisms {
                 );';
         $params = [
             (
-                is_null($Plagiarisms->contest_id) ?
+                $Plagiarisms->contest_id === null ?
                 null :
                 intval($Plagiarisms->contest_id)
             ),
             (
-                is_null($Plagiarisms->submission_id_1) ?
+                $Plagiarisms->submission_id_1 === null ?
                 null :
                 intval($Plagiarisms->submission_id_1)
             ),
             (
-                is_null($Plagiarisms->submission_id_2) ?
+                $Plagiarisms->submission_id_2 === null ?
                 null :
                 intval($Plagiarisms->submission_id_2)
             ),
             (
-                is_null($Plagiarisms->score_1) ?
+                $Plagiarisms->score_1 === null ?
                 null :
                 intval($Plagiarisms->score_1)
             ),
             (
-                is_null($Plagiarisms->score_2) ?
+                $Plagiarisms->score_2 === null ?
                 null :
                 intval($Plagiarisms->score_2)
             ),

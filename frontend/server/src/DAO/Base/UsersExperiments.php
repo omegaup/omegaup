@@ -63,7 +63,7 @@ abstract class UsersExperiments {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -110,7 +110,7 @@ abstract class UsersExperiments {
                 );';
         $params = [
             (
-                is_null($Users_Experiments->user_id) ?
+                $Users_Experiments->user_id === null ?
                 null :
                 intval($Users_Experiments->user_id)
             ),

@@ -50,22 +50,22 @@ abstract class Submissions {
                 );';
         $params = [
             (
-                is_null($Submissions->current_run_id) ?
+                $Submissions->current_run_id === null ?
                 null :
                 intval($Submissions->current_run_id)
             ),
             (
-                is_null($Submissions->identity_id) ?
+                $Submissions->identity_id === null ?
                 null :
                 intval($Submissions->identity_id)
             ),
             (
-                is_null($Submissions->problem_id) ?
+                $Submissions->problem_id === null ?
                 null :
                 intval($Submissions->problem_id)
             ),
             (
-                is_null($Submissions->problemset_id) ?
+                $Submissions->problemset_id === null ?
                 null :
                 intval($Submissions->problemset_id)
             ),
@@ -79,7 +79,7 @@ abstract class Submissions {
             intval($Submissions->submit_delay),
             $Submissions->type,
             (
-                is_null($Submissions->school_id) ?
+                $Submissions->school_id === null ?
                 null :
                 intval($Submissions->school_id)
             ),
@@ -275,7 +275,7 @@ abstract class Submissions {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -342,22 +342,22 @@ abstract class Submissions {
                 );';
         $params = [
             (
-                is_null($Submissions->current_run_id) ?
+                $Submissions->current_run_id === null ?
                 null :
                 intval($Submissions->current_run_id)
             ),
             (
-                is_null($Submissions->identity_id) ?
+                $Submissions->identity_id === null ?
                 null :
                 intval($Submissions->identity_id)
             ),
             (
-                is_null($Submissions->problem_id) ?
+                $Submissions->problem_id === null ?
                 null :
                 intval($Submissions->problem_id)
             ),
             (
-                is_null($Submissions->problemset_id) ?
+                $Submissions->problemset_id === null ?
                 null :
                 intval($Submissions->problemset_id)
             ),
@@ -371,7 +371,7 @@ abstract class Submissions {
             intval($Submissions->submit_delay),
             $Submissions->type,
             (
-                is_null($Submissions->school_id) ?
+                $Submissions->school_id === null ?
                 null :
                 intval($Submissions->school_id)
             ),

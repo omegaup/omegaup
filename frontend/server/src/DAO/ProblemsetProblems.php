@@ -75,7 +75,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     'problems' => [],
                 ];
             }
-            if (is_null($assignment['problem_alias'])) {
+            if ($assignment['problem_alias'] === null) {
                 continue;
             }
             $result[$assignmentAlias]['problems'][] = [
@@ -254,7 +254,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         foreach ($rs as &$problem) {
             // There are languages in problemset table, so we can get the list
             // directly from that table
-            if (!is_null($problem['problemset_languages'])) {
+            if ($problem['problemset_languages'] !== null) {
                 $problem['languages'] = join(',', array_intersect(
                     explode(',', $problem['problemset_languages']),
                     explode(',', $problem['languages'])
@@ -526,7 +526,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             $identity = \OmegaUp\DAO\Identities::getByPK(
                 intval($user->main_identity_id)
             );
-            if (is_null($identity)) {
+            if ($identity === null) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $problemsets = array_filter(

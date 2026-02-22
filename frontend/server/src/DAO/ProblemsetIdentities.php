@@ -33,14 +33,14 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             $identity->identity_id,
             intval($container->problemset_id)
         );
-        if (is_null($problemsetIdentity)) {
+        if ($problemsetIdentity === null) {
             // Identities that were added through a group are still considered
             // to be granted access.
             $problemset = \OmegaUp\DAO\Problemsets::getByPK(
                 intval($container->problemset_id)
             );
             $isInvited = (
-                !is_null($problemset) &&
+                $problemset !== null &&
                 \OmegaUp\DAO\GroupRoles::isContestant(
                     intval($identity->identity_id),
                     intval($problemset->acl_id)
@@ -59,7 +59,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 'share_user_information' => $shareUserInformation,
             ]);
         }
-        if (is_null($problemsetIdentity->access_time)) {
+        if ($problemsetIdentity->access_time === null) {
             // If its set to default time, update it
             $problemsetIdentity->access_time = new \OmegaUp\Timestamp(
                 $currentTime
@@ -78,7 +78,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             if (
                 !empty($windowLength) &&
                 (
-                    is_null($finishTime) ||
+                    $finishTime === null ||
                     $finishTime->time > $currentTime + $windowLength
                 )
             ) {

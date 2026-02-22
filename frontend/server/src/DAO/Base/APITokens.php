@@ -44,7 +44,7 @@ abstract class APITokens {
                 );';
         $params = [
             (
-                is_null($API_Tokens->user_id) ?
+                $API_Tokens->user_id === null ?
                 null :
                 intval($API_Tokens->user_id)
             ),
@@ -237,7 +237,7 @@ abstract class APITokens {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -292,7 +292,7 @@ abstract class APITokens {
                 );';
         $params = [
             (
-                is_null($API_Tokens->user_id) ?
+                $API_Tokens->user_id === null ?
                 null :
                 intval($API_Tokens->user_id)
             ),

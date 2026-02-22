@@ -107,12 +107,12 @@ abstract class ProblemsetProblems {
             intval($Problemset_Problems->order),
             intval($Problemset_Problems->is_extra_problem),
             (
-                is_null($Problemset_Problems->problemset_id) ?
+                $Problemset_Problems->problemset_id === null ?
                 null :
                 intval($Problemset_Problems->problemset_id)
             ),
             (
-                is_null($Problemset_Problems->problem_id) ?
+                $Problemset_Problems->problem_id === null ?
                 null :
                 intval($Problemset_Problems->problem_id)
             ),
@@ -301,7 +301,7 @@ abstract class ProblemsetProblems {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -358,12 +358,12 @@ abstract class ProblemsetProblems {
                 );';
         $params = [
             (
-                is_null($Problemset_Problems->problemset_id) ?
+                $Problemset_Problems->problemset_id === null ?
                 null :
                 intval($Problemset_Problems->problemset_id)
             ),
             (
-                is_null($Problemset_Problems->problem_id) ?
+                $Problemset_Problems->problem_id === null ?
                 null :
                 intval($Problemset_Problems->problem_id)
             ),

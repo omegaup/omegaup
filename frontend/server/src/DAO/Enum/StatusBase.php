@@ -77,7 +77,7 @@ class StatusBase {
         ?string $field,
         int $defaultValue
     ): int {
-        if (is_null($field)) {
+        if ($field === null) {
             return $defaultValue;
         }
         $index = array_search($field, static::NAME_FOR_STATUS);
@@ -88,7 +88,7 @@ class StatusBase {
             );
         }
         $convertedValue = static::getIntValue($index);
-        if (is_null($convertedValue)) {
+        if ($convertedValue === null) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 $fieldName

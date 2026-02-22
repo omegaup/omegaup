@@ -40,12 +40,12 @@ abstract class Teams {
                 );';
         $params = [
             (
-                is_null($Teams->team_group_id) ?
+                $Teams->team_group_id === null ?
                 null :
                 intval($Teams->team_group_id)
             ),
             (
-                is_null($Teams->identity_id) ?
+                $Teams->identity_id === null ?
                 null :
                 intval($Teams->identity_id)
             ),
@@ -221,7 +221,7 @@ abstract class Teams {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -268,12 +268,12 @@ abstract class Teams {
                 );';
         $params = [
             (
-                is_null($Teams->team_group_id) ?
+                $Teams->team_group_id === null ?
                 null :
                 intval($Teams->team_group_id)
             ),
             (
-                is_null($Teams->identity_id) ?
+                $Teams->identity_id === null ?
                 null :
                 intval($Teams->identity_id)
             ),

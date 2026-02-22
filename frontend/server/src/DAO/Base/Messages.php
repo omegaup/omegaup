@@ -44,12 +44,12 @@ abstract class Messages {
         $params = [
             intval($Messages->read),
             (
-                is_null($Messages->sender_id) ?
+                $Messages->sender_id === null ?
                 null :
                 intval($Messages->sender_id)
             ),
             (
-                is_null($Messages->recipient_id) ?
+                $Messages->recipient_id === null ?
                 null :
                 intval($Messages->recipient_id)
             ),
@@ -235,7 +235,7 @@ abstract class Messages {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -289,12 +289,12 @@ abstract class Messages {
         $params = [
             intval($Messages->read),
             (
-                is_null($Messages->sender_id) ?
+                $Messages->sender_id === null ?
                 null :
                 intval($Messages->sender_id)
             ),
             (
-                is_null($Messages->recipient_id) ?
+                $Messages->recipient_id === null ?
                 null :
                 intval($Messages->recipient_id)
             ),

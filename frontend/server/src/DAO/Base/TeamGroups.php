@@ -44,7 +44,7 @@ abstract class TeamGroups {
                 );';
         $params = [
             (
-                is_null($Team_Groups->acl_id) ?
+                $Team_Groups->acl_id === null ?
                 null :
                 intval($Team_Groups->acl_id)
             ),
@@ -235,7 +235,7 @@ abstract class TeamGroups {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -290,7 +290,7 @@ abstract class TeamGroups {
                 );';
         $params = [
             (
-                is_null($Team_Groups->acl_id) ?
+                $Team_Groups->acl_id === null ?
                 null :
                 intval($Team_Groups->acl_id)
             ),

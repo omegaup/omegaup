@@ -43,18 +43,18 @@ abstract class SchoolOfTheMonth {
                 );';
         $params = [
             (
-                is_null($School_Of_The_Month->school_id) ?
+                $School_Of_The_Month->school_id === null ?
                 null :
                 intval($School_Of_The_Month->school_id)
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->ranking) ?
+                $School_Of_The_Month->ranking === null ?
                 null :
                 intval($School_Of_The_Month->ranking)
             ),
             (
-                is_null($School_Of_The_Month->selected_by) ?
+                $School_Of_The_Month->selected_by === null ?
                 null :
                 intval($School_Of_The_Month->selected_by)
             ),
@@ -237,7 +237,7 @@ abstract class SchoolOfTheMonth {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -290,18 +290,18 @@ abstract class SchoolOfTheMonth {
                 );';
         $params = [
             (
-                is_null($School_Of_The_Month->school_id) ?
+                $School_Of_The_Month->school_id === null ?
                 null :
                 intval($School_Of_The_Month->school_id)
             ),
             $School_Of_The_Month->time,
             (
-                is_null($School_Of_The_Month->ranking) ?
+                $School_Of_The_Month->ranking === null ?
                 null :
                 intval($School_Of_The_Month->ranking)
             ),
             (
-                is_null($School_Of_The_Month->selected_by) ?
+                $School_Of_The_Month->selected_by === null ?
                 null :
                 intval($School_Of_The_Month->selected_by)
             ),

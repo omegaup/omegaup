@@ -65,7 +65,7 @@ abstract class ProblemsetAccessLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -116,17 +116,17 @@ abstract class ProblemsetAccessLog {
                 );';
         $params = [
             (
-                is_null($Problemset_Access_Log->problemset_id) ?
+                $Problemset_Access_Log->problemset_id === null ?
                 null :
                 intval($Problemset_Access_Log->problemset_id)
             ),
             (
-                is_null($Problemset_Access_Log->identity_id) ?
+                $Problemset_Access_Log->identity_id === null ?
                 null :
                 intval($Problemset_Access_Log->identity_id)
             ),
             (
-                is_null($Problemset_Access_Log->ip) ?
+                $Problemset_Access_Log->ip === null ?
                 null :
                 intval($Problemset_Access_Log->ip)
             ),

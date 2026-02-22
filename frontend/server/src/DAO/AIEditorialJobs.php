@@ -34,13 +34,9 @@ class AIEditorialJobs extends \OmegaUp\DAO\Base\AIEditorialJobs {
         \OmegaUp\DAO\VO\AIEditorialJobs $AI_Editorial_Jobs
     ): int {
         if (
-            is_null(
-                $AI_Editorial_Jobs->job_id
-            ) || is_null(
-                self::getByPK(
+            $AI_Editorial_Jobs->job_id === null || self::getByPK(
                     $AI_Editorial_Jobs->job_id
-                )
-            )
+                ) === null
         ) {
             return AIEditorialJobs::create($AI_Editorial_Jobs);
         }
@@ -81,15 +77,15 @@ class AIEditorialJobs extends \OmegaUp\DAO\Base\AIEditorialJobs {
         ?bool $isRetriable = null
     ): void {
         $job = self::getByPK($jobId);
-        if (is_null($job)) {
+        if ($job === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
         $job->status = $status;
-        if (!is_null($errorMessage)) {
+        if ($errorMessage !== null) {
             $job->error_message = $errorMessage;
         }
-        if (!is_null($isRetriable)) {
+        if ($isRetriable !== null) {
             $job->is_retriable = $isRetriable;
         }
 
@@ -107,20 +103,20 @@ class AIEditorialJobs extends \OmegaUp\DAO\Base\AIEditorialJobs {
         ?string $validationVerdict = null
     ): void {
         $job = self::getByPK($jobId);
-        if (is_null($job)) {
+        if ($job === null) {
             throw new \OmegaUp\Exceptions\NotFoundException('resourceNotFound');
         }
 
-        if (!is_null($mdEn)) {
+        if ($mdEn !== null) {
             $job->md_en = $mdEn;
         }
-        if (!is_null($mdEs)) {
+        if ($mdEs !== null) {
             $job->md_es = $mdEs;
         }
-        if (!is_null($mdPt)) {
+        if ($mdPt !== null) {
             $job->md_pt = $mdPt;
         }
-        if (!is_null($validationVerdict)) {
+        if ($validationVerdict !== null) {
             $job->validation_verdict = $validationVerdict;
         }
 
@@ -172,7 +168,7 @@ class AIEditorialJobs extends \OmegaUp\DAO\Base\AIEditorialJobs {
             $sql,
             [$problemId]
         );
-        if (is_null($rs)) {
+        if ($rs === null) {
             return null;
         }
 

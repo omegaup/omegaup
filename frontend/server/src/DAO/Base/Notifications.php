@@ -42,7 +42,7 @@ abstract class Notifications {
                 );';
         $params = [
             (
-                is_null($Notifications->user_id) ?
+                $Notifications->user_id === null ?
                 null :
                 intval($Notifications->user_id)
             ),
@@ -227,7 +227,7 @@ abstract class Notifications {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -278,7 +278,7 @@ abstract class Notifications {
                 );';
         $params = [
             (
-                is_null($Notifications->user_id) ?
+                $Notifications->user_id === null ?
                 null :
                 intval($Notifications->user_id)
             ),

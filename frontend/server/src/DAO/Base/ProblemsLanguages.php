@@ -188,7 +188,7 @@ abstract class ProblemsLanguages {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -235,12 +235,12 @@ abstract class ProblemsLanguages {
                 );';
         $params = [
             (
-                is_null($Problems_Languages->problem_id) ?
+                $Problems_Languages->problem_id === null ?
                 null :
                 intval($Problems_Languages->problem_id)
             ),
             (
-                is_null($Problems_Languages->language_id) ?
+                $Problems_Languages->language_id === null ?
                 null :
                 intval($Problems_Languages->language_id)
             ),

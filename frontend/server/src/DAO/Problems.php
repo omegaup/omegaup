@@ -58,7 +58,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $args[] = count($tags);
         }
 
-        if ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
+        if ($identityType === IDENTITY_NORMAL && $identityId !== null) {
             array_push(
                 $clauses,
                 [
@@ -84,7 +84,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ?int $identityId,
         ?int $userId
     ): array {
-        if (is_null($identityId) || is_null($userId)) {
+        if ($identityId === null || $userId === null) {
             return [];
         }
 
@@ -173,7 +173,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         $languageJoin = '';
-        if (!is_null($language) && $language !== 'all') {
+        if ($language !== null && $language !== 'all') {
             $languageJoin = '
                 INNER JOIN
                     Problems_Languages ON Problems_Languages.problem_id = p.problem_id
@@ -186,7 +186,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $clauses = [];
 
         $levelJoin = '';
-        if (!is_null($level)) {
+        if ($level !== null) {
             $levelJoin = '
             INNER JOIN
                 Problems_Tags pt ON p.problem_id = pt.problem_id
@@ -215,7 +215,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         // Convert the difficulty in text form to a range
-        if (is_null($difficultyRange)) {
+        if ($difficultyRange === null) {
             $difficultyRange = [];
             switch ($difficulty) {
                 case 'easy':
@@ -289,7 +289,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
-        if (!is_null($query)) {
+        if ($query !== null) {
             if (is_numeric($query)) {
                 $clauses[] = [
                     "(
@@ -337,8 +337,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 'p.visibility > ?',
                 [\OmegaUp\ProblemParams::VISIBILITY_DELETED],
             ];
-        } elseif ($identityType === IDENTITY_NORMAL && !is_null($identityId)) {
-            $userKey = is_null($userId) ? 'null' : $userId;
+        } elseif ($identityType === IDENTITY_NORMAL && $identityId !== null) {
+            $userKey = $userId === null ? 'null' : $userId;
             $callback = /** @return list<int> */ fn (): array =>
                 self::getAccessibleAclIds($identityId, $userId);
             $cacheKey = "{$identityId}-{$userKey}";
@@ -536,7 +536,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 showUserTags: $row['allow_user_add_tags']
             );
             $difficultyHistogram = [];
-            if (!is_null($row['difficulty_histogram'])) {
+            if ($row['difficulty_histogram'] !== null) {
                 /** @var list<int> */
                 $difficultyHistogram = json_decode(
                     $row['difficulty_histogram']
@@ -551,7 +551,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem['difficulty_histogram'] = $difficultyHistogram;
 
             $qualityHistogram = [];
-            if (!is_null($row['quality_histogram'])) {
+            if ($row['quality_histogram'] !== null) {
                 /** @var list<int> */
                 $qualityHistogram = json_decode(
                     $row['quality_histogram']
@@ -617,7 +617,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $problems = [];
         foreach ($rs as $row) {
             $problem = new \OmegaUp\DAO\VO\Problems($row);
-            if (is_null($problem->alias)) {
+            if ($problem->alias === null) {
                 continue;
             }
             $problems[$problem->alias] = $problem;
@@ -657,7 +657,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (is_null($rs)) {
+        if ($rs === null) {
                 return null;
         }
         return new \OmegaUp\DAO\VO\Problems($rs);
@@ -1046,7 +1046,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     public static function getPrivateCount(\OmegaUp\DAO\VO\Users $user): ?int {
-        if (is_null($user->user_id)) {
+        if ($user->user_id === null) {
             return 0;
         }
         $sql = 'SELECT
@@ -1402,12 +1402,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
             'Problems'
         ) . ' from Problems p where `visibility` > ? ';
-        if (!is_null($order)) {
+        if ($order !== null) {
             $sql .= ' ORDER BY `' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
             ) . '` ' . ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
-        if (!is_null($page)) {
+        if ($page !== null) {
             $sql .= ' LIMIT ' . (($page - 1) * $colsPerPage) . ', ' . intval(
                 $colsPerPage
             );

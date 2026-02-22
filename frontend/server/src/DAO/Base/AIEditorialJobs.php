@@ -75,12 +75,12 @@ abstract class AIEditorialJobs {
         $params = [
             $AI_Editorial_Jobs->job_id,
             (
-                !is_null($AI_Editorial_Jobs->problem_id) ?
+                $AI_Editorial_Jobs->problem_id !== null ?
                 intval($AI_Editorial_Jobs->problem_id) :
                 null
             ),
             (
-                !is_null($AI_Editorial_Jobs->user_id) ?
+                $AI_Editorial_Jobs->user_id !== null ?
                 intval($AI_Editorial_Jobs->user_id) :
                 null
             ),
@@ -131,12 +131,12 @@ abstract class AIEditorialJobs {
                 );';
         $params = [
             (
-                is_null($AI_Editorial_Jobs->problem_id) ?
+                $AI_Editorial_Jobs->problem_id === null ?
                 null :
                 intval($AI_Editorial_Jobs->problem_id)
             ),
             (
-                is_null($AI_Editorial_Jobs->user_id) ?
+                $AI_Editorial_Jobs->user_id === null ?
                 null :
                 intval($AI_Editorial_Jobs->user_id)
             ),
@@ -341,7 +341,7 @@ abstract class AIEditorialJobs {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -409,12 +409,12 @@ abstract class AIEditorialJobs {
         $params = [
             $AI_Editorial_Jobs->job_id,
             (
-                is_null($AI_Editorial_Jobs->problem_id) ?
+                $AI_Editorial_Jobs->problem_id === null ?
                 null :
                 intval($AI_Editorial_Jobs->problem_id)
             ),
             (
-                is_null($AI_Editorial_Jobs->user_id) ?
+                $AI_Editorial_Jobs->user_id === null ?
                 null :
                 intval($AI_Editorial_Jobs->user_id)
             ),

@@ -39,7 +39,7 @@ abstract class ACLs {
                 );';
         $params = [
             (
-                is_null($ACLs->owner_id) ?
+                $ACLs->owner_id === null ?
                 null :
                 intval($ACLs->owner_id)
             ),
@@ -213,7 +213,7 @@ abstract class ACLs {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -258,7 +258,7 @@ abstract class ACLs {
                 );';
         $params = [
             (
-                is_null($ACLs->owner_id) ?
+                $ACLs->owner_id === null ?
                 null :
                 intval($ACLs->owner_id)
             ),

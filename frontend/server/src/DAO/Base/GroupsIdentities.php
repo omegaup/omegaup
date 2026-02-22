@@ -65,17 +65,17 @@ abstract class GroupsIdentities {
             $Groups_Identities->group_id,
             $Groups_Identities->identity_id,
             (
-                !is_null($Groups_Identities->share_user_information) ?
+                $Groups_Identities->share_user_information !== null ?
                 intval($Groups_Identities->share_user_information) :
                 null
             ),
             (
-                !is_null($Groups_Identities->privacystatement_consent_id) ?
+                $Groups_Identities->privacystatement_consent_id !== null ?
                 intval($Groups_Identities->privacystatement_consent_id) :
                 null
             ),
             (
-                !is_null($Groups_Identities->accept_teacher) ?
+                $Groups_Identities->accept_teacher !== null ?
                 intval($Groups_Identities->accept_teacher) :
                 null
             ),
@@ -110,28 +110,28 @@ abstract class GroupsIdentities {
                 );';
         $params = [
             (
-                is_null($Groups_Identities->share_user_information) ?
+                $Groups_Identities->share_user_information === null ?
                 null :
                 intval($Groups_Identities->share_user_information)
             ),
             (
-                is_null($Groups_Identities->privacystatement_consent_id) ?
+                $Groups_Identities->privacystatement_consent_id === null ?
                 null :
                 intval($Groups_Identities->privacystatement_consent_id)
             ),
             (
-                is_null($Groups_Identities->accept_teacher) ?
+                $Groups_Identities->accept_teacher === null ?
                 null :
                 intval($Groups_Identities->accept_teacher)
             ),
             intval($Groups_Identities->is_invited),
             (
-                is_null($Groups_Identities->group_id) ?
+                $Groups_Identities->group_id === null ?
                 null :
                 intval($Groups_Identities->group_id)
             ),
             (
-                is_null($Groups_Identities->identity_id) ?
+                $Groups_Identities->identity_id === null ?
                 null :
                 intval($Groups_Identities->identity_id)
             ),
@@ -318,7 +318,7 @@ abstract class GroupsIdentities {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -373,27 +373,27 @@ abstract class GroupsIdentities {
                 );';
         $params = [
             (
-                is_null($Groups_Identities->group_id) ?
+                $Groups_Identities->group_id === null ?
                 null :
                 intval($Groups_Identities->group_id)
             ),
             (
-                is_null($Groups_Identities->identity_id) ?
+                $Groups_Identities->identity_id === null ?
                 null :
                 intval($Groups_Identities->identity_id)
             ),
             (
-                is_null($Groups_Identities->share_user_information) ?
+                $Groups_Identities->share_user_information === null ?
                 null :
                 intval($Groups_Identities->share_user_information)
             ),
             (
-                is_null($Groups_Identities->privacystatement_consent_id) ?
+                $Groups_Identities->privacystatement_consent_id === null ?
                 null :
                 intval($Groups_Identities->privacystatement_consent_id)
             ),
             (
-                is_null($Groups_Identities->accept_teacher) ?
+                $Groups_Identities->accept_teacher === null ?
                 null :
                 intval($Groups_Identities->accept_teacher)
             ),

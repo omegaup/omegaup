@@ -53,7 +53,7 @@ class Teams extends \OmegaUp\DAO\Base\Teams {
             $sql,
             [$identityId]
         );
-        if (is_null($row)) {
+        if ($row === null) {
             return null;
         }
         return new \OmegaUp\DAO\VO\Teams($row);

@@ -96,7 +96,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $contests = [];
         foreach ($rs as $row) {
             $contest = new \OmegaUp\DAO\VO\Contests($row);
-            if (!is_null($contest->contest_id)) {
+            if ($contest->contest_id !== null) {
                 $contests[$contest->contest_id] = $contest;
             }
         }
@@ -253,7 +253,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     public static function getPrivateContestsCount(
         \OmegaUp\DAO\VO\Users $user
     ): int {
-        if (is_null($user->user_id)) {
+        if ($user->user_id === null) {
             return 0;
         }
         $sql = 'SELECT
@@ -434,13 +434,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             WHERE
                 archived = ?";
 
-        if (!is_null($order)) {
+        if ($order !== null) {
             $sql .= ' ORDER BY `Contests`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
             ) . '` ' .
                 ($orderType == 'DESC' ? 'DESC' : 'ASC');
         }
-        if (!is_null($page)) {
+        if ($page !== null) {
             $sql .= ' LIMIT ' . (($page - 1) * $pageSize) . ', ' . intval(
                 $pageSize
             );
@@ -717,7 +717,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?int $dayLimit = 15
     ) {
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if ($identity === null || $identity->identity_id === null) {
             return null;
         }
 
@@ -728,7 +728,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             \OmegaUp\DAO\Enum\ActiveStatus::FUTURE
         );
         $withinDayLimitCondition = 'TRUE';
-        if (!is_null($dayLimit)) {
+        if ($dayLimit !== null) {
             $withinDayLimitCondition = "DATEDIFF(start_time, NOW()) < $dayLimit";
         }
 
@@ -819,7 +819,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $params
         );
 
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             $contest['participating'] = true;
         }
 
@@ -1368,7 +1368,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     public static function getContestForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Contests {
-        if (is_null($problemsetId)) {
+        if ($problemsetId === null) {
             return null;
         }
 
@@ -1447,7 +1447,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * Check if contest is virtual contest
      */
     public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest): bool {
-        return !is_null($contest->rerun_id);
+        return $contest->rerun_id !== null;
     }
 
     /**

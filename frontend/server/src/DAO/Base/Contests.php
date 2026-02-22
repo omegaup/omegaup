@@ -69,12 +69,12 @@ abstract class Contests {
                 );';
         $params = [
             (
-                is_null($Contests->problemset_id) ?
+                $Contests->problemset_id === null ?
                 null :
                 intval($Contests->problemset_id)
             ),
             (
-                is_null($Contests->acl_id) ?
+                $Contests->acl_id === null ?
                 null :
                 intval($Contests->acl_id)
             ),
@@ -90,12 +90,12 @@ abstract class Contests {
                 $Contests->last_updated
             ),
             (
-                is_null($Contests->window_length) ?
+                $Contests->window_length === null ?
                 null :
                 intval($Contests->window_length)
             ),
             (
-                is_null($Contests->rerun_id) ?
+                $Contests->rerun_id === null ?
                 null :
                 intval($Contests->rerun_id)
             ),
@@ -115,7 +115,7 @@ abstract class Contests {
             intval($Contests->recommended),
             intval($Contests->archived),
             (
-                is_null($Contests->certificate_cutoff) ?
+                $Contests->certificate_cutoff === null ?
                 null :
                 intval($Contests->certificate_cutoff)
             ),
@@ -355,7 +355,7 @@ abstract class Contests {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -460,12 +460,12 @@ abstract class Contests {
                 );';
         $params = [
             (
-                is_null($Contests->problemset_id) ?
+                $Contests->problemset_id === null ?
                 null :
                 intval($Contests->problemset_id)
             ),
             (
-                is_null($Contests->acl_id) ?
+                $Contests->acl_id === null ?
                 null :
                 intval($Contests->acl_id)
             ),
@@ -481,12 +481,12 @@ abstract class Contests {
                 $Contests->last_updated
             ),
             (
-                is_null($Contests->window_length) ?
+                $Contests->window_length === null ?
                 null :
                 intval($Contests->window_length)
             ),
             (
-                is_null($Contests->rerun_id) ?
+                $Contests->rerun_id === null ?
                 null :
                 intval($Contests->rerun_id)
             ),
@@ -506,7 +506,7 @@ abstract class Contests {
             intval($Contests->recommended),
             intval($Contests->archived),
             (
-                is_null($Contests->certificate_cutoff) ?
+                $Contests->certificate_cutoff === null ?
                 null :
                 intval($Contests->certificate_cutoff)
             ),

@@ -46,7 +46,7 @@ abstract class Certificates {
                 );';
         $params = [
             (
-                is_null($Certificates->identity_id) ?
+                $Certificates->identity_id === null ?
                 null :
                 intval($Certificates->identity_id)
             ),
@@ -55,23 +55,23 @@ abstract class Certificates {
             ),
             $Certificates->certificate_type,
             (
-                is_null($Certificates->course_id) ?
+                $Certificates->course_id === null ?
                 null :
                 intval($Certificates->course_id)
             ),
             (
-                is_null($Certificates->contest_id) ?
+                $Certificates->contest_id === null ?
                 null :
                 intval($Certificates->contest_id)
             ),
             (
-                is_null($Certificates->coder_of_the_month_id) ?
+                $Certificates->coder_of_the_month_id === null ?
                 null :
                 intval($Certificates->coder_of_the_month_id)
             ),
             $Certificates->verification_code,
             (
-                is_null($Certificates->contest_place) ?
+                $Certificates->contest_place === null ?
                 null :
                 intval($Certificates->contest_place)
             ),
@@ -259,7 +259,7 @@ abstract class Certificates {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -318,7 +318,7 @@ abstract class Certificates {
                 );';
         $params = [
             (
-                is_null($Certificates->identity_id) ?
+                $Certificates->identity_id === null ?
                 null :
                 intval($Certificates->identity_id)
             ),
@@ -327,23 +327,23 @@ abstract class Certificates {
             ),
             $Certificates->certificate_type,
             (
-                is_null($Certificates->course_id) ?
+                $Certificates->course_id === null ?
                 null :
                 intval($Certificates->course_id)
             ),
             (
-                is_null($Certificates->contest_id) ?
+                $Certificates->contest_id === null ?
                 null :
                 intval($Certificates->contest_id)
             ),
             (
-                is_null($Certificates->coder_of_the_month_id) ?
+                $Certificates->coder_of_the_month_id === null ?
                 null :
                 intval($Certificates->coder_of_the_month_id)
             ),
             $Certificates->verification_code,
             (
-                is_null($Certificates->contest_place) ?
+                $Certificates->contest_place === null ?
                 null :
                 intval($Certificates->contest_place)
             ),

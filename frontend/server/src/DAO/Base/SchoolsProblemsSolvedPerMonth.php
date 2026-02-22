@@ -41,13 +41,13 @@ abstract class SchoolsProblemsSolvedPerMonth {
                 );';
         $params = [
             (
-                is_null($Schools_Problems_Solved_Per_Month->school_id) ?
+                $Schools_Problems_Solved_Per_Month->school_id === null ?
                 null :
                 intval($Schools_Problems_Solved_Per_Month->school_id)
             ),
             $Schools_Problems_Solved_Per_Month->time,
             (
-                is_null($Schools_Problems_Solved_Per_Month->problems_solved) ?
+                $Schools_Problems_Solved_Per_Month->problems_solved === null ?
                 null :
                 intval($Schools_Problems_Solved_Per_Month->problems_solved)
             ),
@@ -225,7 +225,7 @@ abstract class SchoolsProblemsSolvedPerMonth {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -274,13 +274,13 @@ abstract class SchoolsProblemsSolvedPerMonth {
                 );';
         $params = [
             (
-                is_null($Schools_Problems_Solved_Per_Month->school_id) ?
+                $Schools_Problems_Solved_Per_Month->school_id === null ?
                 null :
                 intval($Schools_Problems_Solved_Per_Month->school_id)
             ),
             $Schools_Problems_Solved_Per_Month->time,
             (
-                is_null($Schools_Problems_Solved_Per_Month->problems_solved) ?
+                $Schools_Problems_Solved_Per_Month->problems_solved === null ?
                 null :
                 intval($Schools_Problems_Solved_Per_Month->problems_solved)
             ),

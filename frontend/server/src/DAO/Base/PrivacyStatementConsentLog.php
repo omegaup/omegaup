@@ -41,12 +41,12 @@ abstract class PrivacyStatementConsentLog {
                 );';
         $params = [
             (
-                is_null($PrivacyStatement_Consent_Log->identity_id) ?
+                $PrivacyStatement_Consent_Log->identity_id === null ?
                 null :
                 intval($PrivacyStatement_Consent_Log->identity_id)
             ),
             (
-                is_null($PrivacyStatement_Consent_Log->privacystatement_id) ?
+                $PrivacyStatement_Consent_Log->privacystatement_id === null ?
                 null :
                 intval($PrivacyStatement_Consent_Log->privacystatement_id)
             ),
@@ -227,7 +227,7 @@ abstract class PrivacyStatementConsentLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -276,12 +276,12 @@ abstract class PrivacyStatementConsentLog {
                 );';
         $params = [
             (
-                is_null($PrivacyStatement_Consent_Log->identity_id) ?
+                $PrivacyStatement_Consent_Log->identity_id === null ?
                 null :
                 intval($PrivacyStatement_Consent_Log->identity_id)
             ),
             (
-                is_null($PrivacyStatement_Consent_Log->privacystatement_id) ?
+                $PrivacyStatement_Consent_Log->privacystatement_id === null ?
                 null :
                 intval($PrivacyStatement_Consent_Log->privacystatement_id)
             ),

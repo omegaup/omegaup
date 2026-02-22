@@ -75,15 +75,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
                 ];
             }
             if (
-                !is_null(
-                    $row['feedback_thread']
-                ) && !is_null(
-                    $row['author_thread']
-                ) && !is_null(
-                    $row['date_thread']
-                ) && !is_null(
-                    $row['submission_feedback_thread_id']
-                )
+                $row['feedback_thread'] !== null && $row['author_thread'] !== null && $row['date_thread'] !== null && $row['submission_feedback_thread_id'] !== null
             ) {
                 $feedback[$row['submission_feedback_id']]['feedback_thread'][] = [
                     'author' => $row['author_thread'],
@@ -123,7 +115,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
         );
         $params = [$guid];
         $clause = 'AND sf.range_bytes_start IS NULL';
-        if (!is_null($rangeBytesStart)) {
+        if ($rangeBytesStart !== null) {
             $clause = 'AND sf.range_bytes_start = ?';
             $params[] = $rangeBytesStart;
         }
@@ -141,7 +133,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
 
         /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, range_bytes_end: int|null, range_bytes_start: int|null, submission_feedback_id: int, submission_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
-        if (is_null($rs)) {
+        if ($rs === null) {
             return null;
         }
         return new \OmegaUp\DAO\VO\SubmissionFeedback($rs);

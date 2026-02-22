@@ -43,12 +43,12 @@ abstract class IdentitiesSchools {
                 );';
         $params = [
             (
-                is_null($Identities_Schools->identity_id) ?
+                $Identities_Schools->identity_id === null ?
                 null :
                 intval($Identities_Schools->identity_id)
             ),
             (
-                is_null($Identities_Schools->school_id) ?
+                $Identities_Schools->school_id === null ?
                 null :
                 intval($Identities_Schools->school_id)
             ),
@@ -237,7 +237,7 @@ abstract class IdentitiesSchools {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -290,12 +290,12 @@ abstract class IdentitiesSchools {
                 );';
         $params = [
             (
-                is_null($Identities_Schools->identity_id) ?
+                $Identities_Schools->identity_id === null ?
                 null :
                 intval($Identities_Schools->identity_id)
             ),
             (
-                is_null($Identities_Schools->school_id) ?
+                $Identities_Schools->school_id === null ?
                 null :
                 intval($Identities_Schools->school_id)
             ),

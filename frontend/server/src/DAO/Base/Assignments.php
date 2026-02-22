@@ -50,17 +50,17 @@ abstract class Assignments {
                 );';
         $params = [
             (
-                is_null($Assignments->course_id) ?
+                $Assignments->course_id === null ?
                 null :
                 intval($Assignments->course_id)
             ),
             (
-                is_null($Assignments->problemset_id) ?
+                $Assignments->problemset_id === null ?
                 null :
                 intval($Assignments->problemset_id)
             ),
             (
-                is_null($Assignments->acl_id) ?
+                $Assignments->acl_id === null ?
                 null :
                 intval($Assignments->acl_id)
             ),
@@ -68,7 +68,7 @@ abstract class Assignments {
             $Assignments->description,
             $Assignments->alias,
             (
-                is_null($Assignments->publish_time_delay) ?
+                $Assignments->publish_time_delay === null ?
                 null :
                 intval($Assignments->publish_time_delay)
             ),
@@ -273,7 +273,7 @@ abstract class Assignments {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -340,17 +340,17 @@ abstract class Assignments {
                 );';
         $params = [
             (
-                is_null($Assignments->course_id) ?
+                $Assignments->course_id === null ?
                 null :
                 intval($Assignments->course_id)
             ),
             (
-                is_null($Assignments->problemset_id) ?
+                $Assignments->problemset_id === null ?
                 null :
                 intval($Assignments->problemset_id)
             ),
             (
-                is_null($Assignments->acl_id) ?
+                $Assignments->acl_id === null ?
                 null :
                 intval($Assignments->acl_id)
             ),
@@ -358,7 +358,7 @@ abstract class Assignments {
             $Assignments->description,
             $Assignments->alias,
             (
-                is_null($Assignments->publish_time_delay) ?
+                $Assignments->publish_time_delay === null ?
                 null :
                 intval($Assignments->publish_time_delay)
             ),

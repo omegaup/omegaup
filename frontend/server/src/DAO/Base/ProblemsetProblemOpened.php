@@ -96,17 +96,17 @@ abstract class ProblemsetProblemOpened {
                 $Problemset_Problem_Opened->open_time
             ),
             (
-                is_null($Problemset_Problem_Opened->problemset_id) ?
+                $Problemset_Problem_Opened->problemset_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->problemset_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->problem_id) ?
+                $Problemset_Problem_Opened->problem_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->problem_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->identity_id) ?
+                $Problemset_Problem_Opened->identity_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->identity_id)
             ),
@@ -295,7 +295,7 @@ abstract class ProblemsetProblemOpened {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -346,17 +346,17 @@ abstract class ProblemsetProblemOpened {
                 );';
         $params = [
             (
-                is_null($Problemset_Problem_Opened->problemset_id) ?
+                $Problemset_Problem_Opened->problemset_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->problemset_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->problem_id) ?
+                $Problemset_Problem_Opened->problem_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->problem_id)
             ),
             (
-                is_null($Problemset_Problem_Opened->identity_id) ?
+                $Problemset_Problem_Opened->identity_id === null ?
                 null :
                 intval($Problemset_Problem_Opened->identity_id)
             ),

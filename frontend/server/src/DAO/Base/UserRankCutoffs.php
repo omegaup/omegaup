@@ -64,7 +64,7 @@ abstract class UserRankCutoffs {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -113,12 +113,12 @@ abstract class UserRankCutoffs {
                 );';
         $params = [
             (
-                is_null($User_Rank_Cutoffs->score) ?
+                $User_Rank_Cutoffs->score === null ?
                 null :
                 floatval($User_Rank_Cutoffs->score)
             ),
             (
-                is_null($User_Rank_Cutoffs->percentile) ?
+                $User_Rank_Cutoffs->percentile === null ?
                 null :
                 floatval($User_Rank_Cutoffs->percentile)
             ),

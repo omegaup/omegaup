@@ -17,11 +17,11 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         ?string $graduationDate
     ): \OmegaUp\DAO\VO\IdentitiesSchools {
         // First get the current IdentitySchool and update its end_time
-        if (!is_null($identity->current_identity_school_id)) {
+        if ($identity->current_identity_school_id !== null) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
                 $identity->current_identity_school_id
             );
-            if (!is_null($identitySchool)) {
+            if ($identitySchool !== null) {
                 $identitySchool->end_time = new \OmegaUp\Timestamp(
                     \OmegaUp\Time::get()
                 );
@@ -34,7 +34,7 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
             'school_id' => $schoolId,
         ]);
 
-        if (!is_null($graduationDate)) {
+        if ($graduationDate !== null) {
             $newIdentitySchool->graduation_date = $graduationDate;
         }
 
@@ -47,7 +47,7 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         \OmegaUp\DAO\VO\Identities $identity,
         int $schoolId
     ): ?\OmegaUp\DAO\VO\IdentitiesSchools {
-        if (is_null($identity->identity_id)) {
+        if ($identity->identity_id === null) {
             return null;
         }
         $sql = 'SELECT
@@ -68,7 +68,7 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
         /** @var array{creation_time: \OmegaUp\Timestamp, end_time: \OmegaUp\Timestamp|null, graduation_date: null|string, identity_id: int, identity_school_id: int, school_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
 
-        if (is_null($rs)) {
+        if ($rs === null) {
             return null;
         }
 

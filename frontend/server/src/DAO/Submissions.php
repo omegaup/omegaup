@@ -230,7 +230,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $problemsetIdFilter = '';
         $val = [$identityId, $problemId];
 
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $problemsetIdFilter = 'AND s.problemset_id = ?';
             $val[] = $problemsetId;
         }
@@ -252,12 +252,12 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $sql,
             $val
         );
-        if (is_null($lastRunTime)) {
+        if ($lastRunTime === null) {
             return true;
         }
 
         $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             // Get submissions gap
             $submissionGap = max(
                 $submissionGap,
@@ -297,7 +297,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ?int $rowsPerPage = 100,
     ): array {
         $limitDate = gmdate('Y-m-d H:i:s', time() - 24 * 3600);
-        if (is_null($identityId)) {
+        if ($identityId === null) {
             $indexHint = 'USE INDEX(PRIMARY)';
         } else {
             $indexHint = '';
@@ -350,7 +350,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ";
         $params = [$limitDate, \OmegaUp\ProblemParams::VISIBILITY_PUBLIC];
 
-        if (!is_null($identityId)) {
+        if ($identityId !== null) {
             $sql .= '
                     AND i.identity_id = ?
             ';
@@ -439,7 +439,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             $username,
             $contestAlias,
         ];
-        if (!is_null($problemAlias)) {
+        if ($problemAlias !== null) {
             $clause = 'AND p.alias = ?';
             $params[] = $problemAlias;
         }

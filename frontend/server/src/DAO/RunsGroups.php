@@ -26,7 +26,7 @@ class RunsGroups extends \OmegaUp\DAO\Base\RunsGroups {
             $penaltyQuery = 'SUM(mspg.penalty) AS penalty';
         }
         $params = [$problemsetId];
-        if (!is_null($scoreboardTimeLimit)) {
+        if ($scoreboardTimeLimit !== null) {
             $timeQuery = 'mspg.`time` < ?';
             $params[] = $scoreboardTimeLimit;
         }

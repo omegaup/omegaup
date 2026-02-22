@@ -220,7 +220,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $suggestionsCountField = '0 AS suggestions';
         $suggestionsJoin = '';
 
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
 
             $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
@@ -229,24 +229,24 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $where[] = 's.problemset_id = ?';
             $val[] = $problemsetId;
         }
-        if (!is_null($problemId)) {
+        if ($problemId !== null) {
             $where[] = 's.problem_id = ?';
             $val[] = $problemId;
         }
-        if (!is_null($language)) {
+        if ($language !== null) {
             $where[] = 's.language = ?';
             $val[] = $language;
         }
-        if (!is_null($identityId)) {
+        if ($identityId !== null) {
             $where[] = 's.identity_id = ?';
             $val[] = $identityId;
         }
 
-        if (!is_null($status)) {
+        if ($status !== null) {
             $where[] = 's.status = ?';
             $val[] = $status;
         }
-        if (!is_null($verdict)) {
+        if ($verdict !== null) {
             if ($verdict === 'NO-AC') {
                 $where[] = 's.verdict <> ?';
                 $val[] = 'AC';
@@ -255,7 +255,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 $val[] = $verdict;
             }
         } else {
-            if (!is_null($execution)) {
+            if ($execution !== null) {
                 $executionArgs = \OmegaUp\Controllers\Run::EXECUTION[$execution];
                 $placeholders = array_fill(0, count($executionArgs), '?');
                 $placeholders = join(',', $placeholders);
@@ -263,7 +263,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 $val = array_merge($val, $executionArgs);
             }
 
-            if (!is_null($output)) {
+            if ($output !== null) {
                 $outputArgs = \OmegaUp\Controllers\Run::OUTPUT[$output];
                 $placeholders = array_fill(0, count($outputArgs), '?');
                 $placeholders = join(',', $placeholders);
@@ -288,10 +288,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val,
         );
 
-        if (is_null($offset) || $offset < 0) {
+        if ($offset === null || $offset < 0) {
             $offset = 0;
         }
-        if (is_null($rowCount)) {
+        if ($rowCount === null) {
             $rowCount = 100;
         }
 
@@ -527,7 +527,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ) AS classname';
         // Build SQL statement
         if ($showAllRuns) {
-            if (is_null($groupId)) {
+            if ($groupId === null) {
                 $sql = "
                     SELECT
                         i.identity_id,
@@ -641,7 +641,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             }
         } else {
             $val = [$problemsetId];
-            if (is_null($filterUsersBy)) {
+            if ($filterUsersBy === null) {
                 $sqlUserFilter = '';
             } else {
                 $sqlUserFilter = ' AND i.username LIKE ?';
@@ -947,7 +947,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         /** @var array{commit: string, contest_score: float|null, execution: string, judged_by: null|string, memory: int, output: string, penalty: int, run_id: int, runtime: int, score: float, status: string, status_memory: string, status_runtime: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
         $run = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
 
-        if (is_null($run)) {
+        if ($run === null) {
             return null;
         }
 
@@ -1001,7 +1001,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $whereClause = '';
         $params = [$problemId, $identityId];
 
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $cteSubmissionsFeedback = self::$ctesubmissionFeedbackForProblemset;
             $suggestionsCountField = 'IFNULL(ssff.suggestions, 0) AS suggestions';
             $suggestionsJoin = 'LEFT JOIN ssff ON ssff.submission_id = s.submission_id';
@@ -1084,7 +1084,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 $record['score_by_group'] ?? '',
                 associative: true
             );
-            if (is_null($record['score_by_group'])) {
+            if ($record['score_by_group'] === null) {
                 unset($record['score_by_group']);
             }
             $runs[] = $record;
@@ -1182,7 +1182,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problem_id = ? AND s.identity_id = ?
         ';
         $params = [$problemId, $identityId];
-        if (!is_null($problemsetId)) {
+        if ($problemsetId !== null) {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
@@ -1200,7 +1200,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?\OmegaUp\Timestamp $lastSubmissionTime = null
     ): \OmegaUp\Timestamp {
         $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        if (!is_null($contest)) {
+        if ($contest !== null) {
             // Get submissions gap
             $submissionGap = max(
                 $submissionGap,
@@ -1232,7 +1232,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $initialGap,
         ?\OmegaUp\Timestamp $lastActivityTime = null
     ): \OmegaUp\Timestamp {
-        if (is_null($lastActivityTime)) {
+        if ($lastActivityTime === null) {
             return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
@@ -1548,7 +1548,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $clauses = ['s.problem_id = ?'];
         $params[] = $problem->problem_id;
 
-        if (is_null($problemsetId)) {
+        if ($problemsetId === null) {
             $clauses[] = 's.problemset_id IS NULL';
         } else {
             $clauses[] = 's.problemset_id = ?';

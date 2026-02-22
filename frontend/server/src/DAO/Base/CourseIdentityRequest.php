@@ -75,18 +75,18 @@ abstract class CourseIdentityRequest {
                 $Course_Identity_Request->last_update
             ),
             (
-                !is_null($Course_Identity_Request->accepted) ?
+                $Course_Identity_Request->accepted !== null ?
                 intval($Course_Identity_Request->accepted) :
                 null
             ),
             $Course_Identity_Request->extra_note,
             (
-                !is_null($Course_Identity_Request->accept_teacher) ?
+                $Course_Identity_Request->accept_teacher !== null ?
                 intval($Course_Identity_Request->accept_teacher) :
                 null
             ),
             (
-                !is_null($Course_Identity_Request->share_user_information) ?
+                $Course_Identity_Request->share_user_information !== null ?
                 intval($Course_Identity_Request->share_user_information) :
                 null
             ),
@@ -128,28 +128,28 @@ abstract class CourseIdentityRequest {
                 $Course_Identity_Request->last_update
             ),
             (
-                is_null($Course_Identity_Request->accepted) ?
+                $Course_Identity_Request->accepted === null ?
                 null :
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
             (
-                is_null($Course_Identity_Request->accept_teacher) ?
+                $Course_Identity_Request->accept_teacher === null ?
                 null :
                 intval($Course_Identity_Request->accept_teacher)
             ),
             (
-                is_null($Course_Identity_Request->share_user_information) ?
+                $Course_Identity_Request->share_user_information === null ?
                 null :
                 intval($Course_Identity_Request->share_user_information)
             ),
             (
-                is_null($Course_Identity_Request->identity_id) ?
+                $Course_Identity_Request->identity_id === null ?
                 null :
                 intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Course_Identity_Request->course_id) ?
+                $Course_Identity_Request->course_id === null ?
                 null :
                 intval($Course_Identity_Request->course_id)
             ),
@@ -340,7 +340,7 @@ abstract class CourseIdentityRequest {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -399,12 +399,12 @@ abstract class CourseIdentityRequest {
                 );';
         $params = [
             (
-                is_null($Course_Identity_Request->identity_id) ?
+                $Course_Identity_Request->identity_id === null ?
                 null :
                 intval($Course_Identity_Request->identity_id)
             ),
             (
-                is_null($Course_Identity_Request->course_id) ?
+                $Course_Identity_Request->course_id === null ?
                 null :
                 intval($Course_Identity_Request->course_id)
             ),
@@ -415,18 +415,18 @@ abstract class CourseIdentityRequest {
                 $Course_Identity_Request->last_update
             ),
             (
-                is_null($Course_Identity_Request->accepted) ?
+                $Course_Identity_Request->accepted === null ?
                 null :
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
             (
-                is_null($Course_Identity_Request->accept_teacher) ?
+                $Course_Identity_Request->accept_teacher === null ?
                 null :
                 intval($Course_Identity_Request->accept_teacher)
             ),
             (
-                is_null($Course_Identity_Request->share_user_information) ?
+                $Course_Identity_Request->share_user_information === null ?
                 null :
                 intval($Course_Identity_Request->share_user_information)
             ),

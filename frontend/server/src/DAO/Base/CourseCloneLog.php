@@ -46,12 +46,12 @@ abstract class CourseCloneLog {
         $params = [
             $Course_Clone_Log->ip,
             (
-                is_null($Course_Clone_Log->course_id) ?
+                $Course_Clone_Log->course_id === null ?
                 null :
                 intval($Course_Clone_Log->course_id)
             ),
             (
-                is_null($Course_Clone_Log->new_course_id) ?
+                $Course_Clone_Log->new_course_id === null ?
                 null :
                 intval($Course_Clone_Log->new_course_id)
             ),
@@ -60,7 +60,7 @@ abstract class CourseCloneLog {
                 $Course_Clone_Log->timestamp
             ),
             (
-                is_null($Course_Clone_Log->user_id) ?
+                $Course_Clone_Log->user_id === null ?
                 null :
                 intval($Course_Clone_Log->user_id)
             ),
@@ -247,7 +247,7 @@ abstract class CourseCloneLog {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -305,12 +305,12 @@ abstract class CourseCloneLog {
         $params = [
             $Course_Clone_Log->ip,
             (
-                is_null($Course_Clone_Log->course_id) ?
+                $Course_Clone_Log->course_id === null ?
                 null :
                 intval($Course_Clone_Log->course_id)
             ),
             (
-                is_null($Course_Clone_Log->new_course_id) ?
+                $Course_Clone_Log->new_course_id === null ?
                 null :
                 intval($Course_Clone_Log->new_course_id)
             ),
@@ -319,7 +319,7 @@ abstract class CourseCloneLog {
                 $Course_Clone_Log->timestamp
             ),
             (
-                is_null($Course_Clone_Log->user_id) ?
+                $Course_Clone_Log->user_id === null ?
                 null :
                 intval($Course_Clone_Log->user_id)
             ),

@@ -50,12 +50,12 @@ abstract class Identities {
             $Identities->password,
             $Identities->name,
             (
-                is_null($Identities->user_id) ?
+                $Identities->user_id === null ?
                 null :
                 intval($Identities->user_id)
             ),
             (
-                is_null($Identities->language_id) ?
+                $Identities->language_id === null ?
                 null :
                 intval($Identities->language_id)
             ),
@@ -63,7 +63,7 @@ abstract class Identities {
             $Identities->state_id,
             $Identities->gender,
             (
-                is_null($Identities->current_identity_school_id) ?
+                $Identities->current_identity_school_id === null ?
                 null :
                 intval($Identities->current_identity_school_id)
             ),
@@ -253,7 +253,7 @@ abstract class Identities {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -317,12 +317,12 @@ abstract class Identities {
             $Identities->password,
             $Identities->name,
             (
-                is_null($Identities->user_id) ?
+                $Identities->user_id === null ?
                 null :
                 intval($Identities->user_id)
             ),
             (
-                is_null($Identities->language_id) ?
+                $Identities->language_id === null ?
                 null :
                 intval($Identities->language_id)
             ),
@@ -330,7 +330,7 @@ abstract class Identities {
             $Identities->state_id,
             $Identities->gender,
             (
-                is_null($Identities->current_identity_school_id) ?
+                $Identities->current_identity_school_id === null ?
                 null :
                 intval($Identities->current_identity_school_id)
             ),

@@ -57,7 +57,7 @@ abstract class CarouselItems {
             ),
             $Carousel_Items->status,
             (
-                is_null($Carousel_Items->user_id) ?
+                $Carousel_Items->user_id === null ?
                 null :
                 intval($Carousel_Items->user_id)
             ),
@@ -255,7 +255,7 @@ abstract class CarouselItems {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -327,7 +327,7 @@ abstract class CarouselItems {
             ),
             $Carousel_Items->status,
             (
-                is_null($Carousel_Items->user_id) ?
+                $Carousel_Items->user_id === null ?
                 null :
                 intval($Carousel_Items->user_id)
             ),

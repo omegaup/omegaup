@@ -218,7 +218,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     public static function getAssignmentForProblemset(?int $problemsetId): ?\OmegaUp\DAO\VO\Assignments {
-        if (is_null($problemsetId)) {
+        if ($problemsetId === null) {
             return null;
         }
 

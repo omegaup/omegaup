@@ -188,7 +188,7 @@ abstract class Favorites {
             ORDER BY
                 `{$sanitizedOrder}` {$tipoDeOrden}
         ";
-        if (!is_null($pagina)) {
+        if ($pagina !== null) {
             $sql .= (
                 ' LIMIT ' .
                 (($pagina - 1) * $filasPorPagina) .
@@ -235,12 +235,12 @@ abstract class Favorites {
                 );';
         $params = [
             (
-                is_null($Favorites->user_id) ?
+                $Favorites->user_id === null ?
                 null :
                 intval($Favorites->user_id)
             ),
             (
-                is_null($Favorites->problem_id) ?
+                $Favorites->problem_id === null ?
                 null :
                 intval($Favorites->problem_id)
             ),
