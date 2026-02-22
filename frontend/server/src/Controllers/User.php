@@ -27,7 +27,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string, problems_solved: int|null, score: float|null}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: CoderOfTheMonthList, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
- * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
+ * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, readme: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
  * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
@@ -90,6 +90,8 @@ class User extends \OmegaUp\Controllers\Controller {
     const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
         'all', 'female',
     ];
+
+    const README_REPORT_THRESHOLD = 10;
 
     // User types
     const USER_TYPE_STUDENT = 'student';
@@ -1631,6 +1633,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'state_id' => null,
             'verified' => null,
             'is_own_profile' => false,
+            'readme' => null,
         ];
     }
 
@@ -1664,13 +1667,29 @@ class User extends \OmegaUp\Controllers\Controller {
             $omitRank,
             $category
         );
+
+        $readmeContent = null;
+        if (!is_null($identity->user_id)) {
+            $readme = \OmegaUp\DAO\UserReadmes::getByUserId(
+                $identity->user_id
+            );
+            if (
+                !is_null($readme) &&
+                $readme->is_visible &&
+                !$readme->is_disabled
+            ) {
+                $readmeContent = $readme->content;
+            }
+        }
+
         return array_merge(
             $response,
             [
                 'classname' => \OmegaUp\DAO\Users::getRankingClassName(
                     $identity->user_id
                 ),
-                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages()
+                'programming_languages' => \OmegaUp\Controllers\User::getSupportedProgrammingLanguages(),
+                'readme' => $readmeContent,
             ]
         );
     }
@@ -5315,6 +5334,109 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'user_compare',
         ];
+    }
+
+    /**
+     * Actualiza el README del perfil del usuario autenticado.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException si el usuario no está autenticado
+     * @throws \OmegaUp\Exceptions\InvalidParameterException si el contenido es vacío o excede el límite
+     * @return array{status: string}
+     */
+    public static function apiUpdateReadme(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['readme'],
+            'readme',
+            1,
+            10000
+        );
+        $content = strval($r['readme']);
+
+        $readme = \OmegaUp\DAO\UserReadmes::getByUserId(
+            intval($r->user->user_id)
+        );
+
+        if (is_null($readme)) {
+            $readme = new \OmegaUp\DAO\VO\UserReadmes([
+                'user_id' => $r->user->user_id,
+                'content' => $content,
+                'is_visible' => true,
+                'is_disabled' => false,
+                'report_count' => 0,
+            ]);
+            \OmegaUp\DAO\UserReadmes::create($readme);
+        } else {
+            $readme->content = $content;
+            $readme->is_disabled = false;
+            \OmegaUp\DAO\UserReadmes::update($readme);
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Reporta el README del perfil de un usuario.
+     *
+     * @throws \OmegaUp\Exceptions\UnauthorizedException si el usuario no está autenticado
+     * @throws \OmegaUp\Exceptions\InvalidParameterException si el parámetro username es inválido
+     * @throws \OmegaUp\Exceptions\NotFoundException si el usuario o README no existe o ya está deshabilitado
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException si el usuario ya reportó este README
+     * @return array{status: string}
+     */
+    public static function apiReportReadme(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
+        $targetUser = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        if (is_null($targetUser) || is_null($targetUser->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $readme = \OmegaUp\DAO\UserReadmes::getByUserId($targetUser->user_id);
+        if (is_null($readme) || $readme->is_disabled) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+
+        if (
+            \OmegaUp\DAO\UserReadmeReportLog::hasAlreadyReported(
+                intval($readme->readme_id),
+                intval($r->user->user_id)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'readmeAlreadyReported'
+            );
+        }
+
+        \OmegaUp\DAO\UserReadmeReportLog::create(
+            new \OmegaUp\DAO\VO\UserReadmeReportLog([
+                'readme_id' => $readme->readme_id,
+                'reporter_user_id' => $r->user->user_id,
+            ])
+        );
+
+        \OmegaUp\DAO\UserReadmes::incrementReportCount(
+            intval($readme->readme_id)
+        );
+
+        $updatedReadme = \OmegaUp\DAO\UserReadmes::getByUserId(
+            $targetUser->user_id
+        );
+        if (
+            !is_null($updatedReadme) &&
+            $updatedReadme->report_count >= self::README_REPORT_THRESHOLD
+        ) {
+            \OmegaUp\DAO\UserReadmes::setDisabled(
+                intval($updatedReadme->readme_id),
+                true
+            );
+        }
+
+        return ['status' => 'ok'];
     }
 }
 
