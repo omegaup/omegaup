@@ -104,7 +104,6 @@ CREATE TABLE `Auth_Tokens` (
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
   KEY `identity_id` (`identity_id`),
-  KEY `acting_identity_id` (`identity_id`),
   KEY `fk_ati_acting_identity_id` (`acting_identity_id`),
   CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
@@ -194,7 +193,6 @@ CREATE TABLE `Coder_Of_The_Month` (
   `problems_solved` int NOT NULL DEFAULT '0',
   `certificate_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   PRIMARY KEY (`coder_of_the_month_id`),
-  KEY `coder_of_the_month_id` (`coder_of_the_month_id`),
   KEY `fk_cotmu_user_id` (`user_id`),
   KEY `selected_by` (`selected_by`),
   KEY `school_id` (`school_id`),
@@ -385,7 +383,6 @@ CREATE TABLE `Favorites` (
   `user_id` int NOT NULL,
   `problem_id` int NOT NULL,
   PRIMARY KEY (`user_id`,`problem_id`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_f_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_f_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
@@ -716,7 +713,6 @@ CREATE TABLE `Problem_Viewed` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `view_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`problem_id`,`identity_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_pv_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_pvi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
@@ -767,7 +763,6 @@ CREATE TABLE `Problems_Forfeited` (
   `problem_id` int NOT NULL,
   `forfeited_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`problem_id`),
-  KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`),
   CONSTRAINT `fk_pfp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_pfu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
@@ -779,7 +774,6 @@ CREATE TABLE `Problems_Languages` (
   `problem_id` int NOT NULL,
   `language_id` int NOT NULL,
   PRIMARY KEY (`problem_id`,`language_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `language_id` (`language_id`),
   CONSTRAINT `fk_pl_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
   CONSTRAINT `fk_pl_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`)
@@ -792,7 +786,6 @@ CREATE TABLE `Problems_Tags` (
   `tag_id` int NOT NULL,
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
-  KEY `problem_id` (`problem_id`),
   KEY `tag_id` (`tag_id`),
   CONSTRAINT `fk_ptp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_ptt_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `Tags` (`tag_id`)
@@ -891,7 +884,6 @@ CREATE TABLE `Problemset_Problems` (
   `order` int NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
   `is_extra_problem` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problemset_id`,`problem_id`),
-  KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
   KEY `idx_problemset_problems_ids` (`problem_id`,`problemset_id`),
   CONSTRAINT `fk_ppp_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
@@ -1066,7 +1058,6 @@ CREATE TABLE `School_Of_The_Month` (
   `score` double NOT NULL DEFAULT '0',
   PRIMARY KEY (`school_of_the_month_id`),
   UNIQUE KEY `rank_time` (`ranking`,`time`),
-  KEY `school_of_the_month_id` (`school_of_the_month_id`),
   KEY `school_id` (`school_id`),
   KEY `selected_by` (`selected_by`),
   KEY `idx_time` (`time`),
