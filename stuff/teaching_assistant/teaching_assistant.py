@@ -1093,8 +1093,16 @@ def handle_input() -> None:  # pylint: disable=R0915, R0912
             BASE_URL = "http://localhost:8001"
 
         try:
-            USERNAME = args.username or input("Enter your username: ")
-            PASSWORD = args.password or getpass("Enter your password: ")
+            USERNAME = (
+                args.username
+                or os.environ.get("OMEGAUP_USERNAME")
+                or input("Enter your username: ")
+            )
+            PASSWORD = (
+                args.password
+                or os.environ.get("OMEGAUP_PASSWORD")
+                or getpass("Enter your password: ")
+            )
             SUBMISSION_ID_MODE = args.submission_id_mode
             if SUBMISSION_ID_MODE not in ["true", "false"]:
                 SUBMISSION_ID_MODE = input(
@@ -1123,7 +1131,11 @@ def handle_input() -> None:  # pylint: disable=R0915, R0912
                  "inteligencia artificial.")
             LLM_PROVIDER = args.llm
             provider_name = LLM_PROVIDER.upper() if LLM_PROVIDER else "LLM"
-            KEY = args.key or getpass(f"Enter your {provider_name} API key: ")
+            KEY = (
+                args.key
+                or os.environ.get("OMEGAUP_LLM_KEY")
+                or getpass(f"Enter your {provider_name} API key: ")
+            )
             SKIP_CONFIRM = args.skip_confirm
         except KeyboardInterrupt:
             LOG.info("User interrupted input")
