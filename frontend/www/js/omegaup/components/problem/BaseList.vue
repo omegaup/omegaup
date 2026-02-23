@@ -162,11 +162,7 @@
                     : ''
                 } m-1 p-2`"
                 :href="hrefForProblemTag(selectedTags, tag.name)"
-                >{{
-                  Object.prototype.hasOwnProperty.call(T, tag.name)
-                    ? T[tag.name]
-                    : tag.name
-                }}</a
+                >{{ getTagTranslation(tag.name) }}</a
               >
             </td>
             <td
@@ -302,6 +298,14 @@ export default class BaseList extends Vue {
 
   get UserRankingFeatureGuideURL(): string {
     return getBlogUrl('UserRankingFeatureGuideURL');
+  }
+
+  getTagTranslation(tagName: string): string {
+    // Map problemTopic* to problemTag* for translation lookup
+    const mappedTagName = tagName.replace('Topic', 'Tag');
+    return Object.prototype.hasOwnProperty.call(this.T, mappedTagName)
+      ? this.T[mappedTagName]
+      : tagName;
   }
 }
 </script>
