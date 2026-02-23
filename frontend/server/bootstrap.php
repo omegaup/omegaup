@@ -55,6 +55,7 @@ $contentSecurityPolicy = [
         'https://*.analytics.google.com',
         'https://*.googletagmanager.com',
         'https://accounts.google.com',
+        'https://*.clarity.ms',
     ],
     'img-src' => [
         // Problems can embed images from anywhere in the internet, so we need
@@ -79,6 +80,7 @@ $contentSecurityPolicy = [
         'https://www.google-analytics.com',
         'https://connect.facebook.net',
         'https://platform.twitter.com',
+        'https://www.clarity.ms',
     ],
     'frame-src' => [
         '\'self\'',
