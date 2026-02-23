@@ -583,14 +583,14 @@ def main() -> None:
     try:
         try:
             aggregate_reviewers_feedback(dbconn)
-        except:  # noqa: bare-except
+        except Exception:
             logging.exception(
                 'Failed to calculate problem quality seal and category.')
             raise
 
         try:
             aggregate_feedback(dbconn)
-        except:  # noqa: bare-except
+        except Exception:
             logging.exception(
                 'Failed to aggregate feedback and update problem tags.')
             raise
@@ -602,7 +602,7 @@ def main() -> None:
             update_problem_of_the_week(dbconn, "easy")
             # TODO(heduenas): Compute "hard" problem of the week when we get
             # enough feedback records.
-        except:  # noqa: bare-except
+        except Exception:
             logging.exception('Failed to update problem of the week')
             raise
     finally:

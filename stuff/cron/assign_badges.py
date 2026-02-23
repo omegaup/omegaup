@@ -93,7 +93,7 @@ def process_badges(
             logging.info('New owners: %s', new_owners)
             if new_owners:
                 save_new_owners(badge, new_owners, cur)
-        except:  # noqa: bare-except
+        except Exception:
             logging.exception('Something went wrong with badge: %s.', badge)
             raise
 
