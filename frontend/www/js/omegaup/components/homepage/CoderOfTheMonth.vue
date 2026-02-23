@@ -24,7 +24,6 @@
           :src="coderOfTheMonth.gravatar_92"
           height="80"
           :alt="coderOfTheMonth.username"
-          draggable="false"
         />
       </a>
       <h5 class="card-title">

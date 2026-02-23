@@ -123,7 +123,6 @@
         ]"
         :image-src="'/media/homepage/courses_section.svg'"
         :image-to-right="true"
-        draggable="false"
       ></omegaup-section>
       <omegaup-sponsors
         :title="T.homepageSponsorsSectionTitle"
@@ -132,7 +131,6 @@
             class: 'img-fluid mx-auto d-block my-4',
             src: '/media/homepage/airbnb_logo.svg',
             alt: 'airbnbLogo',
-            draggable="false",
             href: 'https://news.airbnb.com/2025-community-fund/',
           },
         ]"

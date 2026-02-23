@@ -7,7 +7,6 @@
       alt=""
       aria-hidden="true"
       width="16"
-      draggable="false"
     />
   </span>
 </template>
