@@ -6,7 +6,7 @@ services:
       context: ./stuff/docker/
     image: omegaup/dev-php:20231008
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     volumes:
       - type: bind
         source: .
@@ -17,9 +17,12 @@ services:
         volume:
           nocopy: true
     depends_on:
-      - mysql
-      - gitserver
-      - grader
+      mysql:
+        condition: service_healthy
+      gitserver:
+        condition: service_started
+      grader:
+        condition: service_started
     ports:
       - target: 8001
         published: 8001
@@ -37,9 +40,10 @@ services:
     image: omegaup/gitserver:v1.9.13
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/gitserver
@@ -64,9 +68,10 @@ services:
     image: omegaup/backend:v1.9.35
     entrypoint: ["/usr/bin/omegaup-broadcaster"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/broadcaster
@@ -81,10 +86,12 @@ services:
     image: omegaup/backend:v1.9.35
     entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
-      - mysql
-      - gitserver
+      mysql:
+        condition: service_healthy
+      gitserver:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/grader
@@ -108,9 +115,10 @@ services:
     image: omegaup/runner:v1.9.35
     entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
     user: "${UID_GID}"
-    restart: always
+    restart: on-failure
     depends_on:
-      - grader
+      grader:
+        condition: service_started
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/runner
@@ -122,7 +130,7 @@ services:
   mysql:
     image: mysql:8.0.34
     platform: linux/amd64
-    restart: always
+    restart: on-failure
     environment:
       MYSQL_DATABASE: 'omegaup'
       MYSQL_USER: 'omegaup'
@@ -144,10 +152,22 @@ services:
         mode: host
     cap_add:
       - SYS_NICE
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uomegaup", "-pomegaup"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    restart: always
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
       RABBITMQ_DEFAULT_PASS: 'omegaup'
@@ -168,7 +188,12 @@ services:
 
   redis:
     image: redis
-    restart: always
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     command: ['redis-server', '/etc/redis/redis.conf']
     expose:
       - '6379'
