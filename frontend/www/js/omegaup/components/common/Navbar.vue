@@ -704,5 +704,56 @@ nav.navbar {
     max-height: 45vh;
     max-width: 80vw;
   }
+
+  .navbar-collapse {
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+
+    .navbar-nav {
+      align-items: center;
+      width: 100%;
+
+      .nav-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 0.5rem 0;
+      }
+    }
+
+    .dropdown-menu {
+      width: 100%;
+      text-align: center;
+      padding: 0.5rem 0;
+
+      .dropdown-item {
+        text-align: center;
+        padding: 0.5rem 1rem;
+      }
+    }
+  }
+
+  .nav-user-link {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .username {
+    max-width: none;
+    text-align: center;
+  }
+
+  .navbar.justify-content-end {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    z-index: 1030;
+  }
 }
 </style>
