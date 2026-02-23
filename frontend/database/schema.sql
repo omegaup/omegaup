@@ -156,6 +156,21 @@ CREATE TABLE `Certificates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Challenges` (
+  `challenge_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador único del desafío',
+  `challenge_name` varchar(255) NOT NULL COMMENT 'Nombre del desafío',
+  `difficulty` enum('Easy','Medium','Hard') NOT NULL COMMENT 'Nivel de dificultad del desafío',
+  `start_time` datetime NOT NULL COMMENT 'Hora de inicio del desafío',
+  `end_time` datetime NOT NULL COMMENT 'Hora de finalización del desafío',
+  `completed_users` int NOT NULL DEFAULT '0' COMMENT 'Número de usuarios que completaron el desafío',
+  PRIMARY KEY (`challenge_id`),
+  KEY `idx_difficulty` (`difficulty`),
+  KEY `idx_start_time` (`start_time`),
+  KEY `idx_end_time` (`end_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena información sobre desafíos de programación.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Clarifications` (
   `clarification_id` int NOT NULL AUTO_INCREMENT,
   `author_id` int NOT NULL COMMENT 'Autor de la clarificación.',
@@ -1278,6 +1293,31 @@ CREATE TABLE `Teams_Group_Roles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Challenges` (
+  `user_id` int NOT NULL COMMENT 'Identificador del usuario',
+  `challenge_id` int NOT NULL COMMENT 'Identificador del desafío',
+  `completed` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Bandera que indica si el usuario completó el desafío',
+  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Última actualización de la tabla',
+  PRIMARY KEY (`user_id`,`challenge_id`),
+  KEY `fk_uc_challenge_id` (`challenge_id`),
+  KEY `idx_completed` (`completed`),
+  KEY `idx_last_update` (`last_update`),
+  CONSTRAINT `fk_uc_challenge_id` FOREIGN KEY (`challenge_id`) REFERENCES `Challenges` (`challenge_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_uc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registra los desafíos completados por cada usuario.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `User_Freezes` (
+  `user_id` int NOT NULL COMMENT 'Identificador del usuario',
+  `freeze_available` int NOT NULL DEFAULT '0' COMMENT 'Cantidad de pausa de racha disponibles para el usuario',
+  `freeze_used` int NOT NULL DEFAULT '0' COMMENT 'Cantidad de pausa de racha usados por el usuario',
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `fk_freeze_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registra los pausa de racha disponibles y usados por cada usuario.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
   `ranking` int DEFAULT NULL,
@@ -1423,6 +1463,20 @@ CREATE TABLE `Users_Experiments` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ueu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los experimentos habilitados para un usuario.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Users_Streaks` (
+  `user_id` int NOT NULL COMMENT 'Identificador de usuario',
+  `streak_count` int NOT NULL DEFAULT '0' COMMENT 'Total de días de racha',
+  `submission_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Último envío de problema',
+  `easy_solved` int NOT NULL DEFAULT '0' COMMENT 'Total de problemas fáciles resueltos',
+  `medium_solved` int NOT NULL DEFAULT '0' COMMENT 'Total de problemas regulares resueltos',
+  `hard_solved` int NOT NULL DEFAULT '0' COMMENT 'Total de problemas difíciles resueltos',
+  PRIMARY KEY (`user_id`),
+  KEY `idx_submission_time` (`submission_time`),
+  CONSTRAINT `fk_us_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda la racha mantenida por los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
