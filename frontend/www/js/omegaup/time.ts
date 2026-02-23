@@ -319,11 +319,16 @@ export function formatContestDuration(
 }
 
 /**
- * Converts a date to a GMT (UTC) date.
+ * Converts a UTC date to a local date with the same year/month/day.
  *
- * @param date - The local date to be converted.
- * @returns The same date, but in GMT.
+ * When the server sends a date-only value (like birth_date) as a POSIX
+ * timestamp at midnight UTC, creating a JS Date from it can show the previous
+ * day in timezones west of UTC. This function extracts the UTC components and
+ * constructs a local Date with the same year, month, and day values.
+ *
+ * @param date - The date whose UTC components should be preserved.
+ * @returns A local Date with the same year/month/day as the UTC representation.
  */
 export function convertLocalDateToGMTDate(date: Date): Date {
-  return new Date(date.toUTCString().replace('GMT', ''));
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
