@@ -26,6 +26,9 @@ export interface RunsState {
   filters?: RunFilters;
 
   totalRuns: number;
+  loading: boolean;
+  endOfResults: boolean;
+  offset: number;
 }
 
 export const runsStoreConfig = {
@@ -34,6 +37,9 @@ export const runsStoreConfig = {
     index: {},
     filters: {},
     totalRuns: 0,
+    loading: false,
+    endOfResults: false,
+    offset: 0,
   },
   mutations: {
     addRun(state: RunsState, run: types.Run) {
@@ -47,6 +53,9 @@ export const runsStoreConfig = {
       }
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
+    },
+    addRuns(state: RunsState, newRuns: types.Run[]) {
+      state.runs = [...state.runs, ...newRuns];
     },
     setTotalRuns(state: RunsState, totalRuns: number) {
       Vue.set(state, 'totalRuns', totalRuns);
@@ -83,6 +92,9 @@ export const myRunsStore = new Vuex.Store<RunsState>({
     runs: [],
     index: {},
     totalRuns: 0,
+    endOfResults: false,
+    loading: false,
+    offset: 0,
   },
   mutations: {
     addRun(state, run: types.Run) {
@@ -96,6 +108,9 @@ export const myRunsStore = new Vuex.Store<RunsState>({
       }
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
+    },
+    addRuns(state, runs: types.Run[]) {
+      state.runs = [...state.runs, ...runs];
     },
     clear(state) {
       state.runs.splice(0);
