@@ -29,16 +29,16 @@
                       :placeholder="T.wordsKeyword"
                       @keyup.enter="onSearchQuery"
                     />
-                    <button
-                      class="btn reset-btn nav-link"
-                      type="reset"
-                      @click="onReset"
-                    >
-                      &times;
-                    </button>
                     <div class="input-group-append">
+                      <button
+                        class="btn reset-btn nav-link"
+                        type="reset"
+                        @click="onReset"
+                      >
+                        &times;
+                      </button>
                       <input
-                        class="btn btn-primary btn-style btn-md btn-block active nav-link"
+                        class="btn btn-primary btn-style nav-link"
                         type="submit"
                         :value="T.wordsSearch"
                       />
@@ -768,11 +768,7 @@ export default ArenaContestList;
 
 .btn-primary {
   background-color: var(--arena-button-border-color) !important;
-  height: 2.5rem;
   width: 7.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .contest-card {
