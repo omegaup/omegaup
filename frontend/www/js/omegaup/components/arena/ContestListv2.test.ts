@@ -469,4 +469,33 @@ describe('ContestListv2.vue', () => {
     await wrapper.vm.$nextTick();
     expect(vm.currentOrder).toBe(ContestOrder.Title);
   });
+
+  it('Should apply URL filter only to the initial active tab, not all tabs', () => {
+    // Simulate URL: ?tab_name=past&filter=recommended
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Past,
+        filter: ContestFilter.OnlyRecommended,
+        sortOrder: ContestOrder.Title,
+      },
+    });
+
+    const vm = wrapper.vm as InstanceType<typeof arena_ContestList>;
+
+    // Active tab (Past) should have the URL filter/order applied
+    expect(vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
+    expect(vm.currentOrder).toBe(ContestOrder.Title);
+
+    // Inactive tabs should start with defaults, not inherit URL params
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Current;
+    expect(vm.currentFilter).toBe(ContestFilter.All);
+    expect(vm.currentOrder).toBe(ContestOrder.None);
+
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Future;
+    expect(vm.currentFilter).toBe(ContestFilter.All);
+    expect(vm.currentOrder).toBe(ContestOrder.None);
+  });
 });

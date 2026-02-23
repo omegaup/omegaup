@@ -492,16 +492,24 @@ class ArenaContestList extends Vue {
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentPage: number = this.page;
-  // Per-tab independent filter and sort-order state (fixes #9258)
+  // Per-tab independent filter and sort-order state (fixes #9258).
+  // Apply the URL's filter/order only to the active tab on load;
+  // other tabs start with defaults so they are not pre-filtered.
   tabFilters: Record<ContestTab, ContestFilter> = {
-    [ContestTab.Current]: this.filter,
-    [ContestTab.Future]: ContestFilter.All,
-    [ContestTab.Past]: ContestFilter.All,
+    [ContestTab.Current]:
+      this.tab === ContestTab.Current ? this.filter : ContestFilter.All,
+    [ContestTab.Future]:
+      this.tab === ContestTab.Future ? this.filter : ContestFilter.All,
+    [ContestTab.Past]:
+      this.tab === ContestTab.Past ? this.filter : ContestFilter.All,
   };
   tabOrders: Record<ContestTab, ContestOrder> = {
-    [ContestTab.Current]: this.sortOrder,
-    [ContestTab.Future]: ContestOrder.None,
-    [ContestTab.Past]: ContestOrder.None,
+    [ContestTab.Current]:
+      this.tab === ContestTab.Current ? this.sortOrder : ContestOrder.None,
+    [ContestTab.Future]:
+      this.tab === ContestTab.Future ? this.sortOrder : ContestOrder.None,
+    [ContestTab.Past]:
+      this.tab === ContestTab.Past ? this.sortOrder : ContestOrder.None,
   };
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
