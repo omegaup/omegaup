@@ -177,7 +177,7 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="(loading || refreshing) && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`current-${index}`"
@@ -251,7 +251,7 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="(loading || refreshing) && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`future-${index}`"
@@ -328,7 +328,7 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="(loading || refreshing) && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`past-${index}`"
@@ -497,6 +497,7 @@ class ArenaContestList extends Vue {
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
+  scrollLoadPrevCount: number = 0;
   // Flag to track if state change came from browser navigation (back/forward button)
   // When true, we should use replaceState instead of pushState to avoid corrupting history
   isFromBrowserNavigation: boolean = false;
@@ -557,10 +558,10 @@ class ArenaContestList extends Vue {
   beforeDestroy() {
     // Placeholder for cleanup when infinite scroll is re-implemented
   }
-  async loadMoreContests() {
+  loadMoreContests() {
     if (this.isScrollLoading || !this.hasMore || this.loading) return;
 
-    this.isScrollLoading = true;
+    this.scrollLoadPrevCount = this.contestList.length;
     const nextPage = this.currentPage + 1;
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
@@ -571,22 +572,10 @@ class ArenaContestList extends Vue {
       filter: this.currentFilter,
     };
 
-    try {
-      await this.fetchPage(params, urlObj);
-      this.currentPage = nextPage;
-
-      // Check if there are more contests to load (based on pageSize)
-      this.hasMore = this.contestList.length % this.pageSize === 0;
-    } catch (error) {
-      console.error('Error loading more contests:', error);
-      // On error, re-enable the button after a delay to prevent spam
-      setTimeout(() => {
-        this.isScrollLoading = false;
-      }, 2000);
-      return;
-    } finally {
-      this.isScrollLoading = false;
-    }
+    this.isScrollLoading = true;
+    this.currentPage = nextPage;
+    this.fetchPage(params, urlObj);
+    // isScrollLoading is cleared by @Watch('loading') when the API responds
   }
 
   fetchPage(params: UrlParams, urlObj: URL) {
@@ -719,6 +708,15 @@ class ArenaContestList extends Vue {
   ) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
+  }
+
+  @Watch('loading')
+  onLoadingChanged(newValue: boolean) {
+    if (!newValue && this.isScrollLoading) {
+      this.isScrollLoading = false;
+      const addedCount = this.contestList.length - this.scrollLoadPrevCount;
+      this.hasMore = addedCount > 0 && addedCount % this.pageSize === 0;
+    }
   }
 }
 
