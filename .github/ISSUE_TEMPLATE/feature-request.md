@@ -1,10 +1,14 @@
 ---
 name: Feature request
 about: Help us improve the platform by describing your ideas using this format.
-title: "[FEATURE]"
+title: '[FEATURE]'
 labels: 'feature-request'
 assignees: ''
 ---
+
+## Checklist
+
+- [ ] I have searched existing issues and confirmed this is not a duplicate (Required)
 
 _Provide a title for this suggestion in the following format:_
 
