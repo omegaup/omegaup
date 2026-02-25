@@ -6,9 +6,11 @@ being processed.
 '''
 
 import unittest
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, cast
 
 import aggregate_feedback
+
+# pylint: disable=missing-function-docstring
 
 
 class _FakeCursor:
@@ -26,23 +28,27 @@ class _FakeCursor:
     def __enter__(self) -> "_FakeCursor":
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None: 
-        del exc_type, exc, tb
-        return False
+    def __exit__(
+            self,
+            exc_type: Any,
+            exc_val: Any,
+            exc_tb: Any) -> None:
+        del exc_type, exc_val, exc_tb
 
 
 class _FakeDBConnection:
-    '''Minimal db connection stub used by aggregate_feedback.aggregate_feedback.'''
+    '''Minimal db connection stub used by
+    aggregate_feedback.aggregate_feedback.'''
 
     def __init__(self, problem_ids: List[int]) -> None:
         self._problem_ids = problem_ids
         self.rollback_calls = 0
         self.conn = self
 
-    def cursor(self) -> _FakeCursor:  
+    def cursor(self) -> _FakeCursor:
         return _FakeCursor(self._problem_ids)
 
-    def rollback(self) -> None: 
+    def rollback(self) -> None:
         self.rollback_calls += 1
 
 
@@ -57,21 +63,23 @@ class AggregateFeedbackTest(unittest.TestCase):
 
         called_ids: List[int] = []
 
-        def fake_fill_rank_cutoffs(db: Any) -> Any:
-            del db
+        def fake_fill_rank_cutoffs(dbconn_arg: Any) -> Any:
+            del dbconn_arg
             return []
 
-        def fake_get_global_averages(db: Any, rank_cutoffs: Any) -> Any:
-            del db, rank_cutoffs
+        def fake_get_global_averages(
+                dbconn_arg: Any, rank_cutoffs_arg: Any) -> Any:
+            del dbconn_arg, rank_cutoffs_arg
             return (None, None)
 
         def fake_aggregate_problem_feedback(
-                db: Any,
+                dbconn_arg: Any,
                 problem_id: int,
-                rank_cutoffs: Any,
-                global_quality_average: Any,
-                global_difficulty_average: Any) -> None:
-            del db, rank_cutoffs, global_quality_average, global_difficulty_average
+                rank_cutoffs_arg: Any,
+                global_quality_average_arg: Any,
+                global_difficulty_average_arg: Any) -> None:
+            del (dbconn_arg, rank_cutoffs_arg, global_quality_average_arg,
+                 global_difficulty_average_arg)
             called_ids.append(problem_id)
             if problem_id == failing_problem_id:
                 raise RuntimeError('simulated failure for testing')
@@ -82,14 +90,15 @@ class AggregateFeedbackTest(unittest.TestCase):
         original_aggregate_problem_feedback = (
             aggregate_feedback.aggregate_problem_feedback)
 
-        aggregate_feedback.fill_rank_cutoffs = fake_fill_rank_cutoffs
-        aggregate_feedback.get_global_quality_and_difficulty_average = (
-            fake_get_global_averages)
-        aggregate_feedback.aggregate_problem_feedback = (
-            fake_aggregate_problem_feedback)
+        aggregate_feedback.fill_rank_cutoffs = cast(
+            Any, fake_fill_rank_cutoffs)
+        aggregate_feedback.get_global_quality_and_difficulty_average = cast(
+            Any, fake_get_global_averages)
+        aggregate_feedback.aggregate_problem_feedback = cast(
+            Any, fake_aggregate_problem_feedback)
 
         try:
-            aggregate_feedback.aggregate_feedback(dbconn)
+            aggregate_feedback.aggregate_feedback(cast(Any, dbconn))
         finally:
             aggregate_feedback.fill_rank_cutoffs = original_fill_rank_cutoffs
             aggregate_feedback.get_global_quality_and_difficulty_average = (
@@ -103,4 +112,3 @@ class AggregateFeedbackTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
