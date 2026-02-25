@@ -381,16 +381,37 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
      global_difficulty_average) = get_global_quality_and_difficulty_average(
          dbconn, rank_cutoffs)
 
+    processed_problems = 0
+    failed_problems = 0
+
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
-        for row in cur.fetchall():
-            aggregate_problem_feedback(dbconn, row[0], rank_cutoffs,
-                                       global_quality_average,
-                                       global_difficulty_average)
+        for (problem_id,) in cur.fetchall():
+            processed_problems += 1
+            try:
+                aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
+                                           global_quality_average,
+                                           global_difficulty_average)
+            except Exception:  # pylint: disable=broad-except
+                failed_problems += 1
+                logging.exception(
+                    'Failed to aggregate feedback for problem %d',
+                    problem_id)
+                try:
+                    dbconn.conn.rollback()
+                except Exception:  # pylint: disable=broad-except
+                    logging.exception(
+                        'Failed to rollback transaction for problem %d',
+                        problem_id)
+
+    logging.info(
+        'Finished aggregating feedback for problems. processed=%d failed=%d',
+        processed_problems,
+        failed_problems)
 
 
 def aggregate_reviewers_feedback_for_problem(
