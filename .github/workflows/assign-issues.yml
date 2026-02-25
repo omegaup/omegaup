@@ -8,6 +8,11 @@ env:
     # Maximum number of open issues a user can have assigned in THIS repository.
     MAX_OPEN_ASSIGNMENTS: 2
 
+# Prevent race condition when multiple users comment /assign simultaneously
+concurrency:
+    group: assign-issue-${{ github.event.issue.number || 'scheduled' }}
+    cancel-in-progress: false
+
 jobs:
     handle-comment:
         runs-on: ubuntu-22.04

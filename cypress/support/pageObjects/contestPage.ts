@@ -80,7 +80,7 @@ export class ContestPage {
     const encodedContestAlias = encodeURIComponent(contestAlias);
     const scoreboardRefreshUrl = `/api/scoreboard/refresh/alias/${encodedContestAlias}/token/secret`;
 
-    cy.request(scoreboardRefreshUrl).then((resp) => {
+    cy.request({ method: 'POST', url: scoreboardRefreshUrl }).then((resp) => {
       expect(resp.status).to.eq(200);
     });
   }
