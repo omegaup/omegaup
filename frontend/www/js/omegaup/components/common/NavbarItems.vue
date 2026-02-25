@@ -136,6 +136,7 @@
                   data-nav-problems-create-options
                   aria-expanded="false"
                   aria-controls="collapse-links"
+                  @click.stop
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
