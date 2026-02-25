@@ -7,6 +7,8 @@ on:
 env:
     # Maximum number of open issues a user can have assigned in THIS repository.
     MAX_OPEN_ASSIGNMENTS: 2
+    # Space or comma-separated list of usernames allowed to open issues that support /assign.
+    ALLOWED_ISSUE_CREATORS: "heduenas pabo99 carlosabcs tvanessa"
 
 jobs:
     handle-comment:
@@ -152,53 +154,39 @@ jobs:
 
                         // Evaluate the permissions to do assignments
                         const issueCreator = issue.user.login;
-                        let issueCreatorAssociation;
 
-                        // Fetch author_association via REST API (source of truth)
-                        try {
-                          const issueDetails = await github.rest.issues.get({
-                            owner,
-                            repo,
-                            issue_number: issueNumber,
-                          });
-                          issueCreatorAssociation = issueDetails.data.author_association;
-                        } catch (error) {
-                          console.error(`Error fetching issue details for #${issueNumber}:`, error);
-                          await github.rest.issues.createComment({
-                            owner,
-                            repo,
-                            issue_number: issueNumber,
-                            body: `❌ Failed to verify issue permissions. Please contact a maintainer or try again later.`,
-                          });
-                          return;
-                        }
-
-                        console.log(
-                          `Issue #${issueNumber} creator ${issueCreator} has association: ${issueCreatorAssociation}`
+                        // Only allow /assign on issues created by users listed in ALLOWED_ISSUE_CREATORS
+                        const allowedCreatorsEnv = process.env.ALLOWED_ISSUE_CREATORS || "";
+                        const allowedCreators = new Set(
+                          allowedCreatorsEnv
+                            .split(/[,\s]+/)
+                            .map((name) => name.trim())
+                            .filter(Boolean)
                         );
 
-                        // Allow /assign on issues created by OWNER, MEMBER, or COLLABORATOR
-                        const allowedAssociations = ["OWNER", "MEMBER", "COLLABORATOR"];
+                        console.log(
+                          `Issue #${issueNumber} creator ${issueCreator}, allowed creators:`,
+                          Array.from(allowedCreators)
+                        );
 
-                        console.log(`DEBUG - issueCreatorAssociation = ${issueCreatorAssociation}`);
-
-                        if (!allowedAssociations.includes(issueCreatorAssociation)) {
+                        if (!allowedCreators.has(issueCreator)) {
                           await github.rest.issues.createComment({
                             owner,
                             repo,
                             issue_number: issueNumber,
                             body:
                               `❌ @${user} The \`/assign\` feature is only available for issues created by ` +
-                              `OWNER, MEMBER, or COLLABORATOR user associations. This issue was created by ` +
-                              `@${issueCreator} who has the association: ${issueCreatorAssociation}.`,
+                              `specific maintainers configured for this repository.\n\n` +
+                              `This issue was created by @${issueCreator}, who is not in that list.`,
                           });
                           console.log(
-                            `Denied /assign for ${user} - Issue creator ${issueCreator} has insufficient association (${issueCreatorAssociation})`
+                            `Denied /assign for ${user} - Issue creator ${issueCreator} is not in ALLOWED_ISSUE_CREATORS`
                           );
                           return;
                         }
+
                         console.log(
-                          `Issue creator ${issueCreator} has sufficient association (${issueCreatorAssociation}), allowing /assign for ${user}`
+                          `Issue creator ${issueCreator} is allowed by ALLOWED_ISSUE_CREATORS, allowing /assign for ${user}`
                         );
                       }
 
