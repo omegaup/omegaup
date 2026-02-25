@@ -771,16 +771,18 @@ div > section {
   min-height: 0;
 }
 
-/* Target GoldenLayout panels */
-::v-deep .lm_item_container {
-  background: var(--vs-background-color);
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+
+/* Fix GoldenLayout maximize panel visibility */
+
+:deep(.lm_item_container) {
+  background-color: var(--vs-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
-// /* For Dark theme */
-::v-deep .lm_item_container:has(.vs-dark){
-  background: var(--vs-dark-background-color);
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+// for dark
+:deep(.lm_item_container) .vs-dark {
+  background-color: var(--vs-dark-background-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 div {
