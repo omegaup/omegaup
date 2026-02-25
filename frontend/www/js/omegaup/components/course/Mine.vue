@@ -1,11 +1,20 @@
 <template>
   <div class="card">
-    <h3 class="card-header mb-0">{{ T.courseListAdminCourses }}</h3>
-    <div class="card-body pb-0">
-      <div v-if="isMainUserIdentity" class="float-right">
-        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
-      </div>
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">{{ T.courseListAdminCourses }}</h3>
+
+      <a
+        v-if="isMainUserIdentity"
+        class="btn btn-primary"
+        href="/course/new/"
+      >
+        {{ T.courseNew }}
+      </a>
     </div>
+
+    <div class="card-body pb-0"></div>
+
     <template v-if="courses.admin.activeTab !== ''">
       <omegaup-course-filtered-list
         :courses="courses.admin"
@@ -13,6 +22,7 @@
         :show-percentage="false"
       ></omegaup-course-filtered-list>
     </template>
+
   </div>
 </template>
 
