@@ -45,8 +45,15 @@ jobs:
             const result = await github.graphql(query, variables);
             const linkedIssues = result.repository.pullRequest.closingIssuesReferences.nodes;
             const prAuthor = context.payload.pull_request.user.login.toLowerCase();
+            const authorAssociation = context.payload.pull_request.author_association;
 
-            console.log(`PR Author: ${prAuthor}`);
+            console.log(`PR Author: ${prAuthor}, association: ${authorAssociation}`);
+
+            // Skip this check for organization members and Dependabot
+            if (authorAssociation === "MEMBER" || prAuthor === "dependabot[bot]") {
+              console.log("Skipping linked-issue & assignee check for member/dependabot author.");
+              return;
+            }
 
             if (linkedIssues.length === 0) {
               const prBody = context.payload.pull_request.body || "";
