@@ -21,53 +21,52 @@ const carouselConfig: {
   };
 }[] = [
   {
-    image: '/media/homepage/cursoofmi.png',
+    image: '/media/homepage/ofmi.png',
     title: {
-      en: 'OFMI on YouTube',
-      es: 'OFMI en YouTube',
-      pt: 'OFMI no YouTube',
+      en: 'Registration is now open!',
+      es: '¡Ya está abierta la convocatoria!',
+      pt: 'Inscrições abertas!',
     },
     description: {
       en:
-        'Holidays can also be a great time to learn at your own pace. If you want to keep training your mind and reinforce concepts, we invite you to check out our course. Learn, explore, and enjoy the process. Knowledge doesn’t take a vacation.',
+        'Discover, learn, and participate in the community that drives female talent in programming. 5th Mexican Female Informatics Olympiad (OFMI).',
       es:
-        'Las vacaciones también pueden ser un buen momento para aprender a tu ritmo. Si quieres seguir entrenando tu mente y reforzar conceptos, te invitamos a ver nuestro curso. Aprende, explora y disfruta el proceso. El conocimiento no se toma vacaciones.',
+        'Descubre, aprende y participa en la comunidad que impulsa el talento femenino en la programación. 5ª Olimpiada Femenil Mexicana de Informática (OFMI).',
       pt:
-        'As férias também podem ser um bom momento para aprender no seu próprio ritmo. Se você quer continuar treinando sua mente e reforçando conceitos, convidamos você a assistir ao nosso curso. Aprenda, explore e aproveite o processo. O conhecimento não tira férias.',
+        'Descubra, aprenda e participe da comunidade que impulsiona o talento feminino na programação. 5ª Olimpíada Feminina Mexicana de Informática (OFMI).',
     },
     button: {
       text: {
-        en: 'OFMI Course',
-        es: 'Curso OFMI',
-        pt: 'Curso OFMI',
+        en: 'View call',
+        es: 'Ver convocatoria',
+        pt: 'Ver convocatória',
       },
-      href:
-        'https://www.youtube.com/watch?v=eJThxTLg8QM&list=PLdSCJwXErQ8E2us6mFvv6rV_HLaowbqbC',
+      href: 'https://ofmi.omegaup.com/convocatoria',
       target: '_blank',
     },
   },
   {
-    image: '/media/homepage/copa.png',
+    image: '/media/homepage/carousel_slide_4.svg',
     title: {
-      en: 'Copa de Comunidades de Programación',
-      es: 'Copa de Comunidades de Programación',
-      pt: 'Copa de Comunidades de Programação',
+      en: 'Start preparing with Intro OFMI',
+      es: 'Empieza a prepararte con Intro OFMI',
+      pt: 'Comece a se preparar com o Intro OFMI',
     },
     description: {
       en:
-        'Congratulations to all the winners and thank you for participating! 💪 Keep practicing and get ready for the next edition! 🚀',
+        'New to competitive programming? Take the Intro OFMI course and start building the skills needed to participate in the Olympiad.',
       es:
-        '¡Felicitaciones a todos los ganadores y gracias por su participación! 💪 ¡Sigue practicando y prepárate para la próxima edición! 🚀',
+        '¿Eres nueva en la programación competitiva? Toma el curso Intro OFMI y comienza a desarrollar las habilidades necesarias para participar en la olimpiada.',
       pt:
-        'Parabéns a todos os vencedores e obrigado pela participação! 💪 Continue praticando e prepare-se para a próxima edição! 🚀',
+        'Nova na programação competitiva? Faça o curso Intro OFMI e comece a desenvolver as habilidades necessárias para participar da olimpíada.',
     },
     button: {
       text: {
-        en: 'Final Ranklist',
-        es: 'Ranklist final',
-        pt: 'Ranklist final',
+        en: 'Start course',
+        es: 'Comenzar curso',
+        pt: 'Começar curso',
       },
-      href: 'https://omegaup.github.io/CCP/',
+      href: 'https://omegaup.com/course/Intro-OFMI/',
       target: '_blank',
     },
   },

@@ -77,7 +77,9 @@
                           data-toggle="tooltip"
                           rel="tooltip"
                           :title="T.studentProgressOnlyLecturesDescription"
-                          ><img src="/media/question.png"
+                          ><img
+                            src="/media/question.png"
+                            :alt="T.studentProgressOnlyLecturesDescription"
                         /></a>
                       </span>
                     </span>
