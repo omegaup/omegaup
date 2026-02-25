@@ -767,8 +767,22 @@ export default class Ephemeral extends Vue {
 @import '../../../sass/main.scss';
 
 div > section {
-  min-height: 60em;
+  height: 100%;
+  min-height: 0;
 }
+
+/* Target GoldenLayout panels */
+::v-deep .lm_item_container {
+  background: var(--vs-background-color);
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+// /* For Dark theme */
+::v-deep .lm_item_container:has(.vs-dark){
+  background: var(--vs-dark-background-color);
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
 div {
   &.vs-dark {
     background: var(--vs-dark-background-color);
