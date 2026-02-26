@@ -12,7 +12,8 @@ module.exports = {
 
   entry: {
     omegaup: [
-      '@babel/polyfill',
+      'core-js/stable',
+      'regenerator-runtime/runtime',
       'unfetch/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup-legacy.js',

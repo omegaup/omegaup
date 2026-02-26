@@ -169,6 +169,7 @@ const translations: { [key: string]: string; } = {
   banningDeclinedByReviewer: "Suspensi\u00f3n denegada por juez.",
   banningProblemDueToReport: "Suspendiendo problema por reporte de una cuenta.",
   birthdayInTheFuture: "No tienes edad suficiente para usar omegaUp",
+  bookmarkedProblems: "Problemas marcados",
   bulkOperationError: "Hubo un error al ejecutar la operaci\u00f3n",
   bulkUserAddError: "Se produjo un error al agregar las cuentas. Los siguientes nombres o correos electr\u00f3nicos no se encontraron en omegaUp:<br><br><b>%(userEmail)</b>.<br><br>Sin embargo, el resto de cuentas se han agregado correctamente.",
   bulkUserAddSuccess: "Cuentas exitosamente agregadas.",
