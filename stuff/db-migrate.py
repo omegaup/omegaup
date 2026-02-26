@@ -31,8 +31,6 @@ import sys
 import time
 from typing import Iterator, List, Optional, Sequence, Tuple
 
-import boto3  # type: ignore
-
 import database_utils
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
@@ -99,6 +97,7 @@ def _set_aws_rds_timeout(args: argparse.Namespace,
                          auth: Sequence[str],
                          timeout: Optional[int] = None) -> None:
     '''Set the MySQL through AWS RDS timeouts.'''
+    import boto3  # type: ignore  # pylint: disable=import-outside-toplevel
     del auth  # unused
     rds = boto3.client('rds')
 
