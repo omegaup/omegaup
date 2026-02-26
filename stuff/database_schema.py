@@ -62,8 +62,9 @@ def _check_mutually_exclusive_schema_modifications(
 
 
 def get_modified_files(root: str) -> Set[str]:
-    '''Get the list of modified files in the current commit.'''
-    merge_base = subprocess.run(
+    '''Get the list of modified files in the current branch relative to the
+    upstream merge base.'''
+    upstream_branch = subprocess.run(
         [
             '/usr/bin/git',
             'rev-parse',
@@ -76,6 +77,54 @@ def get_modified_files(root: str) -> Set[str]:
         stdout=subprocess.PIPE,
         cwd=root,
     ).stdout.strip() or 'origin/main'
+
+    # Compute the merge-base between HEAD and upstream branch. This can fail
+    # if the upstream branch does not exist locally, so handle errors and
+    # fall back to the upstream diff when possible.
+    merge_base_process = subprocess.run(
+        [
+            '/usr/bin/git',
+            'merge-base',
+            'HEAD',
+            upstream_branch,
+        ],
+        check=False,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        cwd=root,
+    )
+    merge_base = merge_base_process.stdout.strip()
+    if merge_base_process.returncode != 0 or not merge_base:
+        upstream_ref = subprocess.run(
+            [
+                '/usr/bin/git',
+                'rev-parse',
+                '--verify',
+                upstream_branch,
+            ],
+            check=False,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=root,
+        )
+        if upstream_ref.returncode != 0:
+            print(
+                (f'{git_tools.COLORS.FAIL}Error: could not resolve '
+                 f'upstream {upstream_branch!r}. Please run `git fetch` to '
+                 f'update remotes, then retry.{git_tools.COLORS.NORMAL}'),
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        print(
+            (f'{git_tools.COLORS.HEADER}Warning: could not determine '
+             f'merge-base with upstream {upstream_branch!r}; falling back '
+             f'to direct diff against {upstream_branch!r}.'
+             f'{git_tools.COLORS.NORMAL}'),
+            file=sys.stderr,
+        )
+        merge_base = upstream_branch
+
     return set(
         filename.decode('utf-8') for filename in subprocess.run(
             [
