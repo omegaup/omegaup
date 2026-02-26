@@ -89,6 +89,7 @@
               </label>
             </div>
           </div>
+          <!-- id-lint on -->
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
               name="recaptcha"
@@ -251,6 +252,7 @@
               </label>
             </div>
           </div>
+          <!-- id-lint on -->
         </div>
 
         <div class="row justify-content-md-center">
