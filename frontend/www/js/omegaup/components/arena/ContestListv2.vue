@@ -407,6 +407,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { getExternalUrl } from '../../urlHelper';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -605,7 +606,7 @@ class ArenaContestList extends Vue {
   }
 
   getTimeLink(time: Date): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
+    return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time.toISOString()}`;
   }
 
   orderByTitle() {
