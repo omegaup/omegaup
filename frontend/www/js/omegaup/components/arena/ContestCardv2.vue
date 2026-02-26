@@ -1,5 +1,8 @@
 <template>
-  <b-card class="mb-2 h-100 shadow-sm contest-card-vertical">
+  <b-card
+    class="shadow-sm contest-card-vertical w-100 h-100"
+    body-class="d-flex flex-column"
+  >
     <div class="d-flex justify-content-between align-items-start mb-2">
       <h5
         class="m-0 font-weight-bold text-truncate w-100"
@@ -192,6 +195,7 @@ export default class ContestCardv2 extends Vue {
 .contest-card-vertical {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   border: 1px solid var(--contest-card-border-color);
+  height: 100% !important;
 
   &:hover {
     transform: translateY(-5px);

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-container fluid class="p-5">
     <div class="col-sm-12">
       <h1 class="title">{{ T.wordsContests }}</h1>
     </div>
@@ -190,30 +190,38 @@
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
-                    {{
-                      ui.formatString(T.contestEndTime, {
-                        endDate: finishContestDate(contestItem),
-                      })
-                    }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <b-row>
+              <b-col
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                cols="12"
+                class="mb-4"
+              >
+                <omegaup-contest-card :contest="contestItem">
+                  <template #contest-button-scoreboard>
+                    <div></div>
+                  </template>
+                  <template #contest-button-virtual>
+                    <div></div>
+                  </template>
+                  <template #contest-button-practice>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a :href="getTimeLink(contestItem.finish_time)">
+                        {{
+                          ui.formatString(T.contestEndTime, {
+                            endDate: finishContestDate(contestItem),
+                          })
+                        }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                </omegaup-contest-card>
+              </b-col>
+            </b-row>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Current">
             <div
@@ -264,33 +272,41 @@
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartTime, {
-                        startDate: startContestDate(contestItem),
-                      })
-                    }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <b-row>
+              <b-col
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                cols="12"
+                class="mb-4"
+              >
+                <omegaup-contest-card :contest="contestItem">
+                  <template #contest-button-scoreboard>
+                    <div></div>
+                  </template>
+                  <template #contest-button-virtual>
+                    <div></div>
+                  </template>
+                  <template #contest-button-practice>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a :href="getTimeLink(contestItem.start_time)">
+                        {{
+                          ui.formatString(T.contestStartTime, {
+                            startDate: startContestDate(contestItem),
+                          })
+                        }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-button-enter>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </b-col>
+            </b-row>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Future">
             <div
@@ -341,33 +357,38 @@
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-enroll-status>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
-                    {{
-                      ui.formatString(T.contestStartedTime, {
-                        startedDate: startContestDate(contestItem),
-                      })
-                    }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-button-see-details>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <b-row>
+              <b-col
+                v-for="contestItem in contestList"
+                :key="contestItem.contest_id"
+                cols="12"
+                class="mb-4"
+              >
+                <omegaup-contest-card :contest="contestItem">
+                  <template #contest-enroll-status>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a :href="getTimeLink(contestItem.start_time)">
+                        {{
+                          ui.formatString(T.contestStartedTime, {
+                            startedDate: startContestDate(contestItem),
+                          })
+                        }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-button-enter>
+                    <div></div>
+                  </template>
+                  <template #contest-button-see-details>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </b-col>
+            </b-row>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Past">
             <div
@@ -399,7 +420,7 @@
         </b-tab>
       </b-tabs>
     </b-card>
-  </div>
+  </b-container>
 </template>
 
 <script lang="ts">
@@ -776,7 +797,8 @@ export default ArenaContestList;
 }
 
 .contest-card {
-  height: 150px;
+  min-height: 150px;
+  height: auto;
   padding: 1rem;
 }
 
