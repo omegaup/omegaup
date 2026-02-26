@@ -5,7 +5,7 @@ namespace OmegaUp\Exceptions;
 class MethodNotAllowedException extends \OmegaUp\Exceptions\ApiException {
     public function __construct(
         string $message = 'methodNotAllowed',
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             $message,

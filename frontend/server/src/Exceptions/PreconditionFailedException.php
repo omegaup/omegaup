@@ -5,7 +5,7 @@ namespace OmegaUp\Exceptions;
 class PreconditionFailedException extends \OmegaUp\Exceptions\ApiException {
     public function __construct(
         string $message = 'userNotAllowed',
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct(
             $message,
