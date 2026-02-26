@@ -149,7 +149,7 @@ services:
       - SYS_NICE
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:4.0-management-alpine
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: 'omegaup'
@@ -170,7 +170,7 @@ services:
         mode: host
 
   redis:
-    image: redis
+    image: redis:7.4-alpine
     restart: always
     command: ['redis-server', '/etc/redis/redis.conf']
     expose:
