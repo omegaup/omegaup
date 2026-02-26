@@ -262,6 +262,7 @@ CREATE TABLE `Contests` (
   KEY `fk_cc_rerun_id` (`rerun_id`),
   KEY `idx_contests_title_archived` (`title`,`archived`),
   KEY `idx_contests_problemset_finish` (`finish_time`,`problemset_id`),
+  KEY `idx_contests_acl_problemset` (`acl_id`,`problemset_id`),
   FULLTEXT KEY `title` (`title`,`description`),
   CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
@@ -535,6 +536,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
+  KEY `idx_identities_current_school_user` (`current_identity_school_id`,`identity_id`,`user_id`),
   FULLTEXT KEY `ft_user_username` (`username`,`name`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
@@ -752,6 +754,7 @@ CREATE TABLE `Problems` (
   KEY `idx_quality_seal` (`quality_seal`),
   KEY `idx_problems_title` (`title`),
   KEY `idx_problems_quality_acl` (`quality`,`acl_id`),
+  KEY `idx_problems_acl_visibility` (`acl_id`,`visibility`),
   FULLTEXT KEY `ft_alias_title` (`alias`,`title`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
@@ -1186,6 +1189,7 @@ CREATE TABLE `Submissions` (
   KEY `idx_submissions_identity_verdict_type_problem` (`identity_id`,`verdict`,`type`,`problem_id`),
   KEY `idx_submissions_identity_problem_time` (`identity_id`,`problem_id`,`time` DESC),
   KEY `idx_submissions_identity_problem_problemset_time` (`identity_id`,`problem_id`,`problemset_id`,`time` DESC),
+  KEY `idx_submissions_time_identity` (`time`,`identity_id`),
   CONSTRAINT `fk_s_current_run_id` FOREIGN KEY (`current_run_id`) REFERENCES `Runs` (`run_id`),
   CONSTRAINT `fk_s_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_s_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
