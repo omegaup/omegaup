@@ -194,6 +194,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-button-scoreboard>
                 <div></div>
@@ -268,6 +270,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-button-scoreboard>
                 <div></div>
@@ -345,6 +349,8 @@
               v-for="contestItem in contestList"
               :key="contestItem.contest_id"
               :contest="contestItem"
+              @download-calendar="onDownloadCalendar"
+              @subscribe-calendar="onSubscribeCalendar"
             >
               <template #contest-enroll-status>
                 <div></div>
@@ -719,6 +725,14 @@ class ArenaContestList extends Vue {
   ) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
+  }
+
+  onDownloadCalendar(alias: string): void {
+    this.$emit('download-calendar', alias);
+  }
+
+  onSubscribeCalendar(alias: string): void {
+    this.$emit('subscribe-calendar', alias);
   }
 }
 
