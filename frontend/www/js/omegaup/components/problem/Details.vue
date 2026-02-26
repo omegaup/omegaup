@@ -33,6 +33,17 @@
         class="tab-pane fade py-4 p-lg-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
+        <div class="d-flex justify-content-end mb-3">
+          <a
+            :href="printableUrl"
+            target="_blank"
+            class="btn btn-secondary btn-sm"
+            :title="T.problemPrintableVersion"
+          >
+            <font-awesome-icon :icon="['fas', 'print']" />
+            {{ T.problemPrintableVersion }}
+          </a>
+        </div>
         <omegaup-problem-settings-summary
           :problem="problem"
           :show-visibility-indicators="showVisibilityIndicators"
@@ -421,6 +432,7 @@ import {
   faEyeSlash,
   faBan,
   faExternalLinkAlt,
+  faPrint,
 } from '@fortawesome/free-solid-svg-icons';
 import { SubmissionRequest } from '../../arena/submissions';
 import { ArenaCourseFeedback } from '../arena/Feedback.vue';
@@ -430,6 +442,7 @@ library.add(
   faEyeSlash,
   faBan,
   faExternalLinkAlt,
+  faPrint,
 );
 
 export interface Tab {
@@ -530,6 +543,13 @@ export default class ProblemDetails extends Vue {
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
+
+  get printableUrl(): string {
+    if (this.contestAlias) {
+      return `/arena/${this.contestAlias}/problem/${this.problem.alias}/print/`;
+    }
+    return `/arena/problem/${this.problem.alias}/print/`;
+  }
 
   get availableTabs(): Tab[] {
     const tabs = [
