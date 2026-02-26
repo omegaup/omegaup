@@ -43,13 +43,14 @@ def get_current_owners(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
-    cur_readonly.execute(f'''
+    cur_readonly.execute(
+        '''
         SELECT
             ub.user_id
         FROM
             Users_Badges ub
         WHERE
-            ub.badge_alias = '{badge}';''')
+            ub.badge_alias = %s;''', (badge, ))
     return set(row['user_id'] for row in cur_readonly)
 
 
@@ -89,6 +90,8 @@ def process_badges(
     '''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
     has_failures = False
+    successful = 0
+    failed_badges = []
     for badge in badges:
         logging.info('==== Badge %s ====', badge)
         try:
@@ -100,10 +103,16 @@ def process_badges(
             if new_owners:
                 save_new_owners(badge, new_owners, cur)
             dbconn.conn.commit()
-        except:  # noqa: bare-except
+            successful += 1
+        except Exception:  # pylint: disable=broad-except
             dbconn.conn.rollback()
             has_failures = True
+            failed_badges.append(badge)
             logging.exception('Something went wrong with badge: %s.', badge)
+    logging.info('Successfully processed %d badges.', successful)
+    if failed_badges:
+        logging.error('Badges that failed to process: %s',
+                      ', '.join(failed_badges))
     return has_failures
 
 
