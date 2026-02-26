@@ -149,6 +149,25 @@ export enum MonacoThemes {
   VSLight = 'vs',
   VSDark = 'vs-dark',
 }
+
+/**
+ * Get all user templates from localStorage (legacy support)
+ * Note: This is now handled server-side via the CodeTemplate API
+ * @returns Empty object as templates are now stored server-side
+ */
+export function getUserTemplates(): { [extension: string]: string } {
+  return {};
+}
+
+/**
+ * Get a specific user template for an extension from localStorage (legacy support)
+ * Note: This is now handled server-side via the CodeTemplate API
+ * @returns null as templates are now stored server-side
+ */
+export function getUserTemplate(): string | null {
+  return null;
+}
+
 export const DUMMY_PROBLEM: types.ProblemInfo = {
   alias: 'dummy-problem',
   settings: {

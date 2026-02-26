@@ -396,11 +396,22 @@ const storeOptions: StoreOptions<GraderStore> = {
         state.sessionStorageSources = JSON.parse(itemString);
       }
       if (!state.sessionStorageSources) {
+        const baseTemplates = state.request.input.interactive
+          ? { ...interactiveTemplates }
+          : { ...sourceTemplates };
+
+        // Merge user templates with default templates
+        const userTemplates = Util.getUserTemplates();
+        const mergedSources = { ...baseTemplates };
+        for (const ext in userTemplates) {
+          if (userTemplates[ext]) {
+            mergedSources[ext] = userTemplates[ext];
+          }
+        }
+
         state.sessionStorageSources = {
           language: initialLanguage,
-          sources: state.request.input.interactive
-            ? { ...interactiveTemplates }
-            : { ...sourceTemplates },
+          sources: mergedSources,
         };
       }
       // do not persist storage sources
@@ -442,13 +453,19 @@ const storeOptions: StoreOptions<GraderStore> = {
         if (state.sessionStorageSources.sources[extension]) {
           state.request.source = state.sessionStorageSources.sources[extension];
         }
-      } else if (state.request.input.interactive) {
-        if (interactiveTemplates[extension]) {
-          state.request.source = interactiveTemplates[extension];
-        }
       } else {
-        if (sourceTemplates[extension]) {
-          state.request.source = sourceTemplates[extension];
+        // Check for user-saved template first
+        const userTemplate = Util.getUserTemplate();
+        if (userTemplate) {
+          state.request.source = userTemplate;
+        } else if (state.request.input.interactive) {
+          if (interactiveTemplates[extension]) {
+            state.request.source = interactiveTemplates[extension];
+          }
+        } else {
+          if (sourceTemplates[extension]) {
+            state.request.source = sourceTemplates[extension];
+          }
         }
       }
 
