@@ -8,3 +8,12 @@
 @import 'components/_markdown';
 @import 'components/_buttons.scss';
 @import 'components/_navbar.scss'; // added
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
