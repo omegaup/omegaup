@@ -23,6 +23,18 @@
           (fileObject) => $emit('download-input-file', fileObject)
         "
       />
+      <div class="row mt-3">
+        <div class="col-md-12">
+          <button
+            data-problem-creator-cases-save-btn
+            class="btn btn-primary"
+            type="button"
+            @click="saveCases"
+          >
+            {{ T.problemEditSaveCase }}
+          </button>
+        </div>
+      </div>
     </b-col>
   </b-row>
 </template>
@@ -52,6 +64,8 @@ export default class CasesTab extends Vue {
 
   shouldShowAddWindow = false;
   shouldShowCaseEditWindow = false;
+
+  T = T;
 
   openCaseEditWindow() {
     this.shouldShowAddWindow = false;
@@ -116,6 +130,11 @@ export default class CasesTab extends Vue {
         this.$cookies.set('has-visited-cases-tab', true, -1);
       });
     }
+  }
+
+  saveCases() {
+    this.$store.commit('persistDraft');
+    this.$emit('show-update-success-message');
   }
 }
 </script>

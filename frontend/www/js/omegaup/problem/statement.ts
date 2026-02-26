@@ -3,6 +3,9 @@ import Vue from 'vue';
 import { types } from '../api_types';
 import problem_StatementEdit from '../components/problem/StatementEdit.vue';
 import { OmegaUp } from '../omegaup';
+import * as ui from '../ui';
+import T from '../lang';
+import * as localStorageHelper from '../localStorage';
 
 const defaultStatement = `# Descripción
 
@@ -41,10 +44,68 @@ Case #2: 15
 * Los
 * Límites`;
 
+const STORAGE_KEY = 'omegaup:editor:statement:draft';
+const STORAGE_TIMESTAMP_KEY = 'omegaup:editor:statement:timestamp';
+
+function isValidMarkdown(content: string): boolean {
+  if (typeof content !== 'string' || content.trim().length === 0) {
+    return false;
+  }
+
+  if (!/[a-zA-Z0-9]/.test(content)) {
+    return false;
+  }
+
+  if (content.trim().length < 5) {
+    return false;
+  }
+
+  return true;
+}
+
+function getValidDraft(): string | null {
+  const storedDraft = localStorageHelper.safeGetItem(STORAGE_KEY);
+  const storedTimestamp = localStorageHelper.safeGetItem(STORAGE_TIMESTAMP_KEY);
+
+  if (!storedDraft) {
+    return null;
+  }
+
+  if (!isValidMarkdown(storedDraft)) {
+    console.warn('Invalid or corrupted draft detected, ignoring');
+    localStorageHelper.clearDraft(STORAGE_KEY, STORAGE_TIMESTAMP_KEY);
+    return null;
+  }
+
+  if (localStorageHelper.isDraftExpired(storedTimestamp)) {
+    console.warn('Draft expired, using default');
+    localStorageHelper.clearDraft(STORAGE_KEY, STORAGE_TIMESTAMP_KEY);
+    return null;
+  }
+
+  return storedDraft;
+}
+
+function saveDraft(markdown: string): void {
+  localStorageHelper.saveDraftWithTimestamp(
+    STORAGE_KEY,
+    STORAGE_TIMESTAMP_KEY,
+    markdown,
+  );
+}
+
 OmegaUp.on('ready', () => {
-  // Ask the user if they want to restore the last draft
-  const markdownStatement =
-    localStorage.getItem('wmdinput') || defaultStatement;
+  const validDraft = getValidDraft();
+  const markdownStatement = validDraft || defaultStatement;
+
+  const isStorageAvailable = localStorageHelper.checkLocalStorageAvailability();
+  if (!isStorageAvailable) {
+    console.warn('localStorage is unavailable - draft autosave is disabled');
+
+    setTimeout(() => {
+      ui.warning(T.localStorageUnavailableInBrowsingMode);
+    }, 1000);
+  }
 
   new Vue({
     el: '#main-container',
@@ -72,7 +133,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'update:statement': (statement: types.ProblemStatement) => {
-            localStorage.setItem('wmdinput', statement.markdown);
+            saveDraft(statement.markdown);
           },
         },
       });

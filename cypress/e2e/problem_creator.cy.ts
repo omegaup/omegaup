@@ -294,6 +294,27 @@ describe('Problem creator Test', () => {
           });
         });
       });
+
+      it(`Should persist cases after Save across reload - ${mode.name}`, () => {
+        mode.visit();
+        cy.get('[data-problem-creator-tab="cases"]').click();
+        cy.get('[data-add-window]').click();
+        cy.get('[data-problem-creator-add-panel-tab="case"]').click();
+        cy.get('[data-problem-creator-case-input="name"]').type(
+          'Persisted case',
+        );
+        cy.get('[data-problem-creator-add-panel-submit]').click();
+        cy.get('[data-problem-creator-cases-save-btn]').click();
+
+        cy.reload();
+        mode.visit();
+        cy.get('[data-problem-creator-tab="cases"]').click();
+        cy.get('[data-sidebar-ungrouped-cases="count"]')
+          .invoke('text')
+          .then((text) => {
+            expect(parseInt(text.trim(), 10)).to.be.greaterThan(0);
+          });
+      });
     });
   });
 });

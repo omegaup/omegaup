@@ -111,8 +111,13 @@ export default class SolutionTab extends Vue {
     this.markdownEditor.run();
   }
 
+  created(): void {
+    this.currentSolutionMarkdown = this.currentSolutionMarkdownProp;
+  }
+
   updateMarkdown() {
     this.$store.commit('updateSolutionMarkdown', this.currentSolutionMarkdown);
+    this.$store.commit('persistDraft');
     this.$emit('show-update-success-message');
   }
 
