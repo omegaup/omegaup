@@ -70,6 +70,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrName,
         int $rowcount = 100
     ) {
+        if (strlen(trim($usernameOrName)) < 2) {
+            return [];
+        }
         $sql = "SELECT
                     sq.name,
                     sq.username,
@@ -78,11 +81,11 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     SELECT
                         i.name,
                         i.username,
-                        IFNULL(MATCH(name, username) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                        IFNULL(MATCH(username, name) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
                     FROM
                         Identities i
                     WHERE
-                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
+                        MATCH(username, name) AGAINST (? IN BOOLEAN MODE)
                     UNION DISTINCT
                     SELECT DISTINCT
                         i.name,
