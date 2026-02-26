@@ -495,7 +495,7 @@ OmegaUp.on('ready', async () => {
             });
           break;
         case 'executeRun':
-          api.Run.execute()
+          api.Run.execute({})
             .then(time.remoteTimeAdapter)
             .then((response) => {
               problemDetailsView.nextExecutionTimestamp =
