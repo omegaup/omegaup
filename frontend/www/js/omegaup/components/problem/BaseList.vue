@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="table-responsive mb-0">
-      <table class="table">
+      <table class="table problem-list-table">
         <thead>
           <tr class="sticky-top bg-white text-center">
             <th scope="col" class="align-middle text-nowrap">
@@ -17,6 +17,13 @@
                   "
                 ></omegaup-common-sort-controls
               ></span>
+            </th>
+            <th
+              v-if="loggedIn"
+              scope="col"
+              class="align-middle text-nowrap problem-list-status-col"
+            >
+              <span>{{ T.wordsStatus }}</span>
             </th>
             <th scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsTitle }}</span>
@@ -123,6 +130,26 @@
         <tbody data-problems>
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
+            <td
+              v-if="loggedIn"
+              class="align-middle text-center problem-list-status-col"
+            >
+              <span
+                v-if="solvedProblemAliasesSet.has(problem.alias)"
+                class="badge badge-success"
+              >
+                {{ T.ProblemStatusSolved }}
+              </span>
+              <span
+                v-else-if="unsolvedProblemAliasesSet.has(problem.alias)"
+                class="badge badge-warning"
+              >
+                {{ T.ProblemStatusAttempted }}
+              </span>
+              <span v-else class="badge badge-secondary">{{
+                T.ProblemStatusUnattempted
+              }}</span>
+            </td>
             <td class="align-middle">
               <a
                 :href="`/arena/problem/${problem.alias}/`"
@@ -273,11 +300,21 @@ export default class BaseList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() path!: string;
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) unsolvedProblemAliases!: string[];
 
   T = T;
   ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
+
+  get solvedProblemAliasesSet(): Set<string> {
+    return new Set(this.solvedProblemAliases);
+  }
+
+  get unsolvedProblemAliasesSet(): Set<string> {
+    return new Set(this.unsolvedProblemAliases);
+  }
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
@@ -318,9 +355,16 @@ export default class BaseList extends Vue {
   border-radius: 0rem 0rem 0.25rem 0.25rem;
 }
 
-table {
+.problem-list-table {
+  min-width: 1100px;
   border-collapse: separate;
   border-spacing: 0;
+}
+
+.problem-list-status-col {
+  width: 6rem;
+  min-width: 6rem;
+  white-space: nowrap;
 }
 
 thead tr th {

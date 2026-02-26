@@ -1,3 +1,6 @@
+ProblemStatusAttempted = "Tentado"
+ProblemStatusSolved = "Resolvido"
+ProblemStatusUnattempted = "Não tentado"
 U13CannotPerform = "Coder menor de 13 anos não pode realizar esta ação."
 aboutToStart = "Você está prestes a iniciar o concurso. Seu tempo começará depois de clicar em Começar Concurso."
 acceptPrivacyPolicy = "Li e aceito a [Política de Uso e Privacidade](%(PrivacyPolicyURL)) do site, bem como o [Código de Conduta](%(CodeofConductPolicyURL))."

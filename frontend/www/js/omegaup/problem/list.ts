@@ -68,7 +68,26 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       searchResultProblems: searchResultProblems,
+      solvedProblemAliases: [] as string[],
+      unsolvedProblemAliases: [] as string[],
     }),
+    mounted: function () {
+      if (payload.loggedIn) {
+        Promise.all([
+          api.User.problemsSolved({}),
+          api.User.listUnsolvedProblems({}),
+        ])
+          .then(([solvedRes, unsolvedRes]) => {
+            this.solvedProblemAliases = (solvedRes.problems || []).map(
+              (p: { alias: string }) => p.alias,
+            );
+            this.unsolvedProblemAliases = (unsolvedRes.problems || []).map(
+              (p: { alias: string }) => p.alias,
+            );
+          })
+          .catch(ui.apiError);
+      }
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
@@ -85,6 +104,8 @@ OmegaUp.on('ready', () => {
           sortOrder: sortOrder,
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
+          solvedProblemAliases: this.solvedProblemAliases,
+          unsolvedProblemAliases: this.unsolvedProblemAliases,
         },
         on: {
           'wizard-search': (queryParameters: {

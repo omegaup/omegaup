@@ -1,6 +1,6 @@
 <template>
   <div
-    class="card-header d-flex justify-content-between align-items-center container-lg"
+    class="card-header d-flex justify-content-between align-items-center container-fluid"
   >
     <form
       action="/problem/"
