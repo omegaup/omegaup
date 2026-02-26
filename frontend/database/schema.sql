@@ -566,9 +566,23 @@ CREATE TABLE `Identity_Login_Log` (
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `identity_id` (`identity_id`),
-  KEY `idx_loginlog_time_identity` (`time`,`identity_id`),
-  CONSTRAINT `fk_illi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
+  KEY `idx_loginlog_time_identity` (`time`,`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos'
+/*!50100 PARTITION BY RANGE (UNIX_TIMESTAMP(`time`))
+(PARTITION p_history VALUES LESS THAN (1735689600),
+ PARTITION p_2025_q1 VALUES LESS THAN (1743465600),
+ PARTITION p_2025_q2 VALUES LESS THAN (1751328000),
+ PARTITION p_2025_q3 VALUES LESS THAN (1759276800),
+ PARTITION p_2025_q4 VALUES LESS THAN (1767225600),
+ PARTITION p_2026_q1 VALUES LESS THAN (1775001600),
+ PARTITION p_2026_q2 VALUES LESS THAN (1782864000),
+ PARTITION p_2026_q3 VALUES LESS THAN (1790812800),
+ PARTITION p_2026_q4 VALUES LESS THAN (1798761600),
+ PARTITION p_2027_q1 VALUES LESS THAN (1806537600),
+ PARTITION p_2027_q2 VALUES LESS THAN (1814400000),
+ PARTITION p_2027_q3 VALUES LESS THAN (1822348800),
+ PARTITION p_2027_q4 VALUES LESS THAN (1830297600),
+ PARTITION p_future VALUES LESS THAN MAXVALUE) */;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -798,11 +812,23 @@ CREATE TABLE `Problemset_Access_Log` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `ip` int unsigned NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `problemset_id` (`problemset_id`),
-  KEY `identity_id` (`identity_id`),
-  CONSTRAINT `fk_palc_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`),
-  CONSTRAINT `fk_pali_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de acceso a listas de problemas';
+  KEY `idx_pal_problemset_identity_time` (`problemset_id`,`identity_id`,`time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de acceso a listas de problemas'
+/*!50100 PARTITION BY RANGE (UNIX_TIMESTAMP(`time`))
+(PARTITION p_history VALUES LESS THAN (1735689600),
+ PARTITION p_2025_q1 VALUES LESS THAN (1743465600),
+ PARTITION p_2025_q2 VALUES LESS THAN (1751328000),
+ PARTITION p_2025_q3 VALUES LESS THAN (1759276800),
+ PARTITION p_2025_q4 VALUES LESS THAN (1767225600),
+ PARTITION p_2026_q1 VALUES LESS THAN (1775001600),
+ PARTITION p_2026_q2 VALUES LESS THAN (1782864000),
+ PARTITION p_2026_q3 VALUES LESS THAN (1790812800),
+ PARTITION p_2026_q4 VALUES LESS THAN (1798761600),
+ PARTITION p_2027_q1 VALUES LESS THAN (1806537600),
+ PARTITION p_2027_q2 VALUES LESS THAN (1814400000),
+ PARTITION p_2027_q3 VALUES LESS THAN (1822348800),
+ PARTITION p_2027_q4 VALUES LESS THAN (1830297600),
+ PARTITION p_future VALUES LESS THAN MAXVALUE) */;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
