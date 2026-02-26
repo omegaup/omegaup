@@ -5,6 +5,7 @@
     </div>
     <div class="card-body">
       <div class="row justify-content-md-center">
+        <div class="col-md-5 mx-2 login-section">
         <div class="col-md-4 col-md-offset-2 introjs-federated">
           <h4>{{ T.loginFederated }}</h4>
           <div class="row">
@@ -47,6 +48,7 @@
           </div>
         </div>
 
+        <div class="col-md-5 mx-2 login-section">
         <div class="col-md-4 col-md-offset-2 introjs-native">
           <h4>{{ T.loginNative }}</h4>
           <form class="form-horizontal">
@@ -285,6 +287,28 @@ export default class Login extends Vue {
 </script>
 
 <style scoped>
+.login-section {
+  background-color: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.login-section:hover {
+  border-color: #adb5bd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+h4 {
+  color: #212529;
+  font-weight: 600;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
 .github-login-btn {
   background-color: var(--btn-github-background-color);
   border: 1px solid var(--btn-github-border-color);
