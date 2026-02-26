@@ -2026,19 +2026,34 @@ verdictHelpTLE = "Your program is too slow and failed to finish within the time 
 verdictHelpTO = "Your program is too slow and failed to finish within the time limit of the problem."
 verdictHelpVE = "Something went wrong with the problem's validator, and it may or may not be your fault. Most of the time this happens because your program made something the validator didn't take into account, but you should let the problem writer / contest organizer know about this."
 verdictHelpWA = "Your program failed to give the correct answer for all cases. Mosty likely you failed to consider some possible cases."
-verdictJE = "Judge error (do not re-submit)"
-verdictML = "Memory limit exceeded"
-verdictMLE = "Memory limit exceeded"
-verdictOL = "Wrong answer (output limit exceeded)"
-verdictOLE = "Wrong answer (output limit exceeded)"
-verdictPA = "Partially accepted"
-verdictRE = "Runtime error"
-verdictRFE = "Runtime error (restricted function)"
-verdictRTE = "Runtime error"
-verdictTLE = "Time limit exceeded"
-verdictTO = "Time limit exceeded"
-verdictVE = "Validator error (do not re-submit)"
-verdictWA = "Wrong Answer"
+{
+verdictJE = "Judge error (do not re-submit)",
+verdictML = "Memory limit exceeded",
+verdictMLE = "Memory limit exceeded",
+verdictOL = "Wrong answer (output limit exceeded)",
+verdictOLE = "Wrong answer (output limit exceeded)",
+verdictPA = "Partially accepted",
+verdictRE = "Runtime error",
+verdictRFE = "Runtime error (restricted function)",
+verdictRTE = "Runtime error",
+verdictTLE = "Time limit exceeded",
+verdictTO = "Time limit exceeded",
+verdictVE = "Validator error (do not re-submit)",
+verdictWA = "Wrong Answer",
+verdictJE_tooltip: "An error occurred on the judge's side. Please do not re-submit.",
+verdictML_tooltip: "Your program exceeded the memory limit.",
+verdictMLE_tooltip: "Your program exceeded the memory limit.",
+verdictOL_tooltip: "Your program produced more output than allowed.",
+verdictOLE_tooltip: "Your program produced more output than allowed.",
+verdictPA_tooltip: "Your solution passed some test cases but not all.",
+verdictRE_tooltip: "Your program crashed during execution.",
+verdictRFE_tooltip: "Your program used a restricted function.",
+verdictRTE_tooltip: "Your program crashed during execution.",
+verdictTLE_tooltip: "Your program exceeded the time limit.",
+verdictTO_tooltip: "Your program exceeded the time limit.",
+verdictVE_tooltip: "An error occurred in the validator. Please do not re-submit.",
+verdictWA_tooltip: "Your solution produced incorrect output." 
+}
 verificationEmailBody = "Welcome to omegaUp! Please click on the following link to login and verify your email: <a href=\"https://omegaup.com/user/verifyemail/%(verification_id)/\">https://omegaup.com/user/verifyemail/%(verification_id)/</a>"
 verificationEmailSubject = "Welcome to omegaUp!"
 verificationEmailSuccessfully = "Your email address has been verified."
