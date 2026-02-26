@@ -4850,6 +4850,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
                 'fullWidth' => true,
+                'arenaMode' => true,
                 'title' => new \OmegaUp\TranslationString(
                     'courseAssignmentTitle',
                     [
@@ -5022,6 +5023,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'scoreboard' => $scoreboard,
                 ],
                 'fullWidth' => true,
+                'arenaMode' => true,
                 'title' => new \OmegaUp\TranslationString(
                     'courseAssignmentTitle',
                     [

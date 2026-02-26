@@ -145,7 +145,7 @@ export class CoursePage {
     cy.intercept('POST', '**/submission/**').as('submitRun');
 
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-    cy.get('[data-new-run]').click();
+    cy.get('[data-new-run]').scrollIntoView().click();
     cy.get('[name="language"]').select(runOptions.language);
 
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
@@ -162,7 +162,10 @@ export class CoursePage {
     runOptions: RunOptions,
   ): void {
     cy.get(`a[data-problem="${problemOptions.problemAlias}"]`).click();
-    cy.waitUntil(() => cy.get('[data-new-run] a').should('be.visible'));
+    cy.get('[data-new-run] a', { timeout: 10000 })
+      .should('exist')
+      .scrollIntoView()
+      .should('be.visible');
     cy.get('[data-new-run] a').click();
     cy.get('[name="language"]').select(runOptions.language);
     cy.fixture(runOptions.fixturePath).then((fileContent) => {
