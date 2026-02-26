@@ -2292,4 +2292,15 @@
 	"wordsWarningProblem": "Conservar con una advertencia",
 	"wordsYes": "S\u00ed",
 	"zipPrepare": "Preparar archivo zip"
+,
+	"keyboardShortcutsTitle": "Atajos de teclado",
+	"keyboardShortcutsHelp": "Mostrar ayuda de atajos de teclado",
+	"keyboardShortcutsCloseModal": "Cerrar ventana",
+	"keyboardShortcutsSearchProblems": "Buscar problemas",
+	"keyboardShortcutsNewSubmission": "Nuevo env\u00edo",
+	"keyboardShortcutsNavigateLists": "Navegar listas"
+,
+	"keyboardShortcutsNavigateUp": "Navegar hacia arriba",
+	"keyboardShortcutsNavigateDown": "Navegar hacia abajo",
+	"keyboardShortcutsOpenProblem": "Abrir problema seleccionado"
 }

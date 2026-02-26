@@ -90,6 +90,18 @@ export default class Typeahead extends Vue {
       (option) => option.key === newValue.key,
     );
   }
+
+  focus(): void {
+    const tagsInput = this.$children[0] as any;
+    if (tagsInput && typeof tagsInput.focus === 'function') {
+      tagsInput.focus();
+    } else {
+      const input = this.$el.querySelector('input');
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+      }
+    }
+  }
 }
 </script>
 

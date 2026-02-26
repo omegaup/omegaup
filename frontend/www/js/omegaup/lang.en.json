@@ -2292,4 +2292,15 @@
 	"wordsWarningProblem": "Keep with a warning",
 	"wordsYes": "Yes",
 	"zipPrepare": "Prepare zip file"
+,
+	"keyboardShortcutsTitle": "Keyboard Shortcuts",
+	"keyboardShortcutsHelp": "Show keyboard shortcuts help",
+	"keyboardShortcutsCloseModal": "Close modal",
+	"keyboardShortcutsSearchProblems": "Search problems",
+	"keyboardShortcutsNewSubmission": "New submission",
+	"keyboardShortcutsNavigateLists": "Navigate lists"
+,
+	"keyboardShortcutsNavigateUp": "Navigate up",
+	"keyboardShortcutsNavigateDown": "Navigate down",
+	"keyboardShortcutsOpenProblem": "Open selected problem"
 }

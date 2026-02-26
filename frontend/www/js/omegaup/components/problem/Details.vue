@@ -396,6 +396,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
+import { shortcutManager } from '../../keyboard-shortcuts';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_Runs from '../arena/Runs.vue';
@@ -810,6 +811,32 @@ export default class ProblemDetails extends Vue {
   @Watch('runDetailsData')
   onRunDetailsChanged(newValue: types.RunDetails): void {
     this.currentRunDetailsData = newValue;
+  }
+
+  mounted() {
+    shortcutManager.registerShortcut({
+      key: 'n',
+      ctrlKey: true,
+      description: T.keyboardShortcutsNewSubmission,
+      action: () => {
+        this.onNewSubmission();
+      },
+    });
+
+    shortcutManager.registerShortcut({
+      key: 'Escape',
+      description: T.keyboardShortcutsCloseModal,
+      action: () => {
+        if (this.currentPopupDisplayed !== PopupDisplayed.None) {
+          this.onPopupDismissed();
+        }
+      },
+    });
+  }
+
+  beforeDestroy() {
+    shortcutManager.unregisterShortcut('n', true);
+    shortcutManager.unregisterShortcut('Escape');
   }
 }
 </script>
