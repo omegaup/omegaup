@@ -319,51 +319,103 @@ export function formatContestDuration(
   return formatDelta(delta);
 }
 
-export function formatRelativeHoursMinutes(targetDate: Date): string {
-  const diffMs = targetDate.getTime() - Date.now();
-  const totalMinutes = Math.floor(Math.abs(diffMs) / (1000 * 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours > 0 && minutes > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  if (hours > 0) {
-    return `${hours}h`;
-  }
-  return `${minutes}m`;
-}
-
 export function formatDateForContest(date: Date): string {
   let currentLocale;
+  let dateFormat: string;
   switch (T.locale) {
     case 'pt':
       currentLocale = ptLocale;
+      dateFormat = 'd MMMM yyyy';
       break;
     case 'en':
       currentLocale = enLocale;
+      dateFormat = 'MMMM d, yyyy';
       break;
     default:
       currentLocale = esLocale;
+      dateFormat = 'd MMMM yyyy';
       break;
   }
-  return format(date, 'd MMM yyyy', { locale: currentLocale });
+  return format(date, dateFormat, { locale: currentLocale });
 }
 
-export function getContestDateForDisplay(targetDate: Date): string {
-  const now = Date.now();
-  const targetTime = targetDate.getTime();
-  const diffMs = Math.abs(targetTime - now);
-  const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+function interpolate(
+  template: string,
+  values: Record<string, string | number>,
+): string {
+  return template.replace(/%\(([^)]+)\)/g, (_, key) =>
+    String(values[key] ?? ''),
+  );
+}
 
-  if (diffMs < FORTY_EIGHT_HOURS) {
-    if (targetTime > now) {
-      return formatRelativeHoursMinutes(targetDate);
+const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+const FIFTEEN_DAYS_MS = 15 * 24 * 60 * 60 * 1000;
+
+function buildDurationString(diffMs: number): string {
+  if (diffMs < FORTY_EIGHT_HOURS_MS) {
+    const totalHours = Math.floor(diffMs / (60 * 60 * 1000));
+    if (totalHours >= 1) {
+      return totalHours === 1
+        ? T.contestDurationHour
+        : interpolate(T.contestDurationHours, { N: totalHours });
     }
-    return formatRelativeHoursMinutes(targetDate);
+    const totalMinutes = Math.floor(diffMs / (60 * 1000));
+    return totalMinutes === 1
+      ? T.contestDurationMinute
+      : interpolate(T.contestDurationMinutes, { N: totalMinutes });
   }
+  const totalDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  return totalDays === 1
+    ? T.contestDurationDay
+    : interpolate(T.contestDurationDays, { N: totalDays });
+}
 
-  return formatDateForContest(targetDate);
+/**
+ * Returns the display string for a past contest's finish time.
+ * E.g. "Ended 5 minutes ago" or "Ended: February 1, 2026"
+ */
+export function getDisplayForPastContest(finishDate: Date): string {
+  const diffMs = Date.now() - finishDate.getTime();
+  if (diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestEndedAgo, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestEndedOn, {
+    endDate: formatDateForContest(finishDate),
+  });
+}
+
+/**
+ * Returns the display string for a currently-running contest's finish time.
+ * E.g. "Ends in 3 days" or "Ends: March 27, 2026"
+ */
+export function getDisplayForCurrentContest(finishDate: Date): string {
+  const diffMs = finishDate.getTime() - Date.now();
+  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestEndsIn, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestEndTime, {
+    endDate: formatDateForContest(finishDate),
+  });
+}
+
+/**
+ * Returns the display string for a future contest's start time.
+ * E.g. "Starts in 2 hours" or "Starts: May 26, 2026"
+ */
+export function getDisplayForFutureContest(startDate: Date): string {
+  const diffMs = startDate.getTime() - Date.now();
+  if (diffMs > 0 && diffMs < FIFTEEN_DAYS_MS) {
+    return interpolate(T.contestStartsIn, {
+      duration: buildDurationString(diffMs),
+    });
+  }
+  return interpolate(T.contestStartsOn, {
+    startDate: formatDateForContest(startDate),
+  });
 }
 
 /**
