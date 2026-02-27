@@ -249,6 +249,16 @@ password=omegaup
 EOF
 ln -sf ~/.mysql.docker.cnf .my.cnf
 ```
+
+---
+
+If you encounter errors related to Node.js version mismatch or `yarn install` failing after pulling the latest changes, rebuild the frontend container:
+
+```bash
+docker compose build frontend
+docker compose up
+```
+
 ---
 ### Issue : `phpminiadmin` / `venv` Permission denied during `docker compose up`
 
