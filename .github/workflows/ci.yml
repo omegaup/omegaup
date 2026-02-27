@@ -313,6 +313,7 @@ jobs:
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
   cypress:
+    name: cypress (${{ matrix.name }})
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     strategy:
@@ -320,11 +321,17 @@ jobs:
       matrix:
         include:
           - shard: 1
+            name: contest-group
             specs: 'cypress/e2e/contest.cy.ts,cypress/e2e/problem_collection.cy.ts,cypress/e2e/group.cy.ts'
           - shard: 2
+            name: courses
             specs: 'cypress/e2e/course_2Part.cy.ts,cypress/e2e/course.cy.ts,cypress/e2e/certificate.cy.ts,cypress/e2e/navigation.cy.ts'
           - shard: 3
-            specs: 'cypress/e2e/problem_creator.cy.ts,cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts'
+            name: ide-basics
+            specs: 'cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts'
+          - shard: 4
+            name: problem-creator
+            specs: 'cypress/e2e/problem_creator.cy.ts'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
