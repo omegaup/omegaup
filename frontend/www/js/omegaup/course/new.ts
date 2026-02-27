@@ -20,7 +20,7 @@ OmegaUp.on('ready', () => {
       'omegaup-course-form': course_Form,
     },
     data: () => ({
-      invalidParameterName: '',
+      invalidParameterName: null as null | string,
       searchResultSchools: searchResultSchools,
     }),
     render: function (createElement) {
@@ -59,7 +59,8 @@ OmegaUp.on('ready', () => {
                     resolve(data.school_id);
                   })
                   .catch((error) => {
-                    ui.apiError({ error: error.message });
+                    ui.apiError(error);
+                    this.invalidParameterName = 'school';
                   });
               } else {
                 reject(new Error(T.schoolNotSelected));
@@ -77,18 +78,22 @@ OmegaUp.on('ready', () => {
                     );
                   })
                   .catch((error) => {
-                    ui.apiError({ error: error.message });
+                    ui.apiError(error);
                     this.invalidParameterName = error.parameter || '';
                   });
               })
               .catch((error) => {
-                ui.apiError({ error: error.message });
+                ui.error(error.message);
+                this.invalidParameterName = 'school';
               });
           },
           cancel: () => {
             window.location.href = '/course/';
           },
           'update-search-result-schools': (query: string) => {
+            if (this.invalidParameterName === 'school') {
+              this.invalidParameterName = '';
+            }
             api.School.list({ query })
               .then(({ results }) => {
                 if (!results.length) {
@@ -112,6 +117,12 @@ OmegaUp.on('ready', () => {
           'invalid-languages': () => {
             ui.error(T.courseNewFormLanguagesRequired);
             this.invalidParameterName = 'languages';
+          },
+          'clear-language-error': () => {
+            if (this.invalidParameterName === 'languages') {
+              this.invalidParameterName = null;
+              ui.dismissNotifications();
+            }
           },
         },
       });

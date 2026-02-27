@@ -50,7 +50,7 @@ def get_current_owners(
         FROM
             Users_Badges ub
         WHERE
-            ub.badge_alias = %s;''', (badge, ))
+            ub.badge_alias = %s;''', (badge,))
     return set(row['user_id'] for row in cur_readonly)
 
 

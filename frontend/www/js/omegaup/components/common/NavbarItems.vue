@@ -112,6 +112,9 @@
             <a class="dropdown-item" href="/problem/" data-nav-problems-list>{{
               T.navViewProblemsAll
             }}</a>
+            <a class="dropdown-item" href="/profile/#problems">{{
+              T.bookmarkedProblems
+            }}</a>
             <hr
               style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
             />
@@ -205,31 +208,25 @@
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
-            href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+            :href="YouTubeTutorialsURL"
             target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a
-            class="dropdown-item"
-            href="https://discord.com/invite/K3JFd9d3wk"
-            target="_blank"
-            >{{ T.navDiscord }}</a
-          >
-          <a
-            class="dropdown-item"
-            href="http://blog.omegaup.com/"
-            target="_blank"
-            >{{ T.navBlog }}</a
-          >
+          <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
+            T.navDiscord
+          }}</a>
+          <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
+            T.navBlog
+          }}</a>
           <a
             class="dropdown-item text-wrap"
-            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
+            :href="AlgorithmsBookURL"
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
           <a
             class="dropdown-item text-wrap"
-            href="https://hdl.handle.net/11059/16567"
+            :href="CompetitiveProgrammingBookURL"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -245,6 +242,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import { getExternalUrl } from '../../urlHelper';
 
 @Component
 export default class NavbarItems extends Vue {
@@ -258,5 +256,48 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  get OmegaUpBlogURL(): string {
+    return getExternalUrl('OmegaUpBlogURL');
+  }
+
+  get YouTubeTutorialsURL(): string {
+    return getExternalUrl('YouTubeTutorialsURL');
+  }
+
+  get DiscordInviteURL(): string {
+    return getExternalUrl('DiscordInviteURL');
+  }
+
+  get AlgorithmsBookURL(): string {
+    return getExternalUrl('AlgorithmsBookURL');
+  }
+
+  get CompetitiveProgrammingBookURL(): string {
+    return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+@media only screen and (max-width: 992px) {
+  .help-dropdown {
+    min-width: auto !important;
+    width: auto !important;
+    max-width: 85vw !important;
+    left: auto !important;
+    right: 0 !important;
+
+    .dropdown-item {
+      white-space: normal !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+      line-height: 1.4 !important;
+      padding: 0.5rem 1rem !important;
+      max-width: 100% !important;
+      display: block !important;
+    }
+  }
+}
+</style>
