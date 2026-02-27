@@ -5,6 +5,7 @@
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
       </span>
+
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <template v-if="!isEmbedded">
           <label>
@@ -48,6 +49,16 @@
                 :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
                 aria-hidden="true"
               />
+            </button>
+            <button
+              class="btn btn-sm mr-2 my-sm-0"
+              :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
+              data-copy-button
+              :title="'Copy code'"
+              aria-label="Copy code"
+              @click.prevent="handleCopy"
+            >
+              <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
             </button>
           </label>
         </template>
@@ -158,8 +169,9 @@ import {
   faDownload,
   faSun,
   faMoon,
+  faCopy,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faCopy);
 
 import T from '../lang';
 
@@ -208,6 +220,8 @@ export default class Ephemeral extends Vue {
   zipHref: string | null = null;
   zipDownload: string | null = null;
   now: number = Date.now();
+  isCopySuccess = false;
+  copySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -468,6 +482,24 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleCopy() {
+    const code = store.getters['request.source'] || '';
+
+    navigator.clipboard
+      .writeText(code)
+      .then(() => {
+        this.isCopySuccess = true;
+        if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+        this.copySuccessTimer = setTimeout(() => {
+          this.isCopySuccess = false;
+        }, 2000);
+      })
+      .catch(Util.asyncError);
+  }
+  beforeDestroy() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+  }
+
   handleDownload(e: Event) {
     // the state is dirty when we need to re-configure zip file
     // if not, download the url (continue default behavior)
