@@ -439,6 +439,33 @@ export namespace types {
       );
     }
 
+    export function CarouselManagementPayload(
+      elementId: string = 'payload',
+    ): types.CarouselManagementPayload {
+      return ((x) => {
+        x.carouselItems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (
+              typeof x.expiration_date !== 'undefined' &&
+              x.expiration_date !== null
+            )
+              x.expiration_date = ((x: number) => new Date(x * 1000))(
+                x.expiration_date,
+              );
+            return x;
+          });
+        })(x.carouselItems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CertificateDetailsPayload(
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
@@ -2970,6 +2997,10 @@ export namespace types {
   }
 
   export interface CarouselItemListPayload {
+    carouselItems: types.CarouselItem[];
+  }
+
+  export interface CarouselManagementPayload {
     carouselItems: types.CarouselItem[];
   }
 

@@ -267,6 +267,14 @@
                     <a class="dropdown-item" href="/nomination/mine/">{{
                       T.navMyQualityNomination
                     }}</a>
+                    <div v-if="isAdmin" class="dropdown-divider"></div>
+                    <a
+                      v-if="isAdmin"
+                      class="dropdown-item"
+                      href="/admin/carousel/"
+                      data-nav-carousel-management
+                      >{{ T.navCarouselManagement }}</a
+                    >
                   </template>
                   <div class="dropdown-divider"></div>
                   <!-- Logout button for desktop - navbar menu -->
