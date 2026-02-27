@@ -208,31 +208,25 @@
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
-            href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
+            :href="YouTubeTutorialsURL"
             target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a
-            class="dropdown-item"
-            href="https://discord.com/invite/K3JFd9d3wk"
-            target="_blank"
-            >{{ T.navDiscord }}</a
-          >
-          <a
-            class="dropdown-item"
-            href="http://blog.omegaup.com/"
-            target="_blank"
-            >{{ T.navBlog }}</a
-          >
+          <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
+            T.navDiscord
+          }}</a>
+          <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
+            T.navBlog
+          }}</a>
           <a
             class="dropdown-item text-wrap"
-            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
+            :href="AlgorithmsBookURL"
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
           <a
             class="dropdown-item text-wrap"
-            href="https://hdl.handle.net/11059/16567"
+            :href="CompetitiveProgrammingBookURL"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -248,6 +242,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import { getExternalUrl } from '../../urlHelper';
 
 @Component
 export default class NavbarItems extends Vue {
@@ -261,6 +256,26 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
+
+  get OmegaUpBlogURL(): string {
+    return getExternalUrl('OmegaUpBlogURL');
+  }
+
+  get YouTubeTutorialsURL(): string {
+    return getExternalUrl('YouTubeTutorialsURL');
+  }
+
+  get DiscordInviteURL(): string {
+    return getExternalUrl('DiscordInviteURL');
+  }
+
+  get AlgorithmsBookURL(): string {
+    return getExternalUrl('AlgorithmsBookURL');
+  }
+
+  get CompetitiveProgrammingBookURL(): string {
+    return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
 }
 </script>
 
