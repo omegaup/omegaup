@@ -3,6 +3,6 @@
 namespace OmegaUp\DAO\Enum;
 
 class ParticipatingStatus extends \OmegaUp\DAO\Enum\StatusBase {
-    const NO = 0;
-    const YES = 1;
+    public const NO = 0;
+    public const YES = 1;
 }

@@ -9,13 +9,13 @@ namespace OmegaUp\DAO\Enum;
  * sorting order.
  */
 class ContestOrderStatus extends \OmegaUp\DAO\Enum\StatusBase {
-    const NONE = 0;
-    const TITLE = 1;
-    const ENDS = 2;
-    const DURATION = 3;
-    const ORGANIZER = 4;
-    const CONTESTANTS = 5;
-    const SIGNED_UP = 6;
+    public const NONE = 0;
+    public const TITLE = 1;
+    public const ENDS = 2;
+    public const DURATION = 3;
+    public const ORGANIZER = 4;
+    public const CONTESTANTS = 5;
+    public const SIGNED_UP = 6;
 
     public const SQL_FOR_STATUS = [
         self::NONE => '',

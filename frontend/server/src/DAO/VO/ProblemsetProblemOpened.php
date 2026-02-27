@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class ProblemsetProblemOpened extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'problemset_id' => true,
         'problem_id' => true,
         'identity_id' => true,

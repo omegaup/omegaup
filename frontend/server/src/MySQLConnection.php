@@ -3,11 +3,11 @@
 namespace OmegaUp;
 
 class FieldType {
-    const TYPE_STRING = 0;
-    const TYPE_INT = 1;
-    const TYPE_FLOAT = 2;
-    const TYPE_BOOL = 3;
-    const TYPE_TIMESTAMP = 4;
+    public const TYPE_STRING = 0;
+    public const TYPE_INT = 1;
+    public const TYPE_FLOAT = 2;
+    public const TYPE_BOOL = 3;
+    public const TYPE_TIMESTAMP = 4;
 }
 
 /**

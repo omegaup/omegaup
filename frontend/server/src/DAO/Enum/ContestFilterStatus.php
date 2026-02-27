@@ -3,9 +3,9 @@
 namespace OmegaUp\DAO\Enum;
 
 class ContestFilterStatus extends \OmegaUp\DAO\Enum\StatusBase {
-    const SIGNED_UP = 0;
-    const ONLY_RECOMMENDED = 1;
-    const ALL = 2;
+    public const SIGNED_UP = 0;
+    public const ONLY_RECOMMENDED = 1;
+    public const ALL = 2;
 
     public const NAME_FOR_STATUS = [
         self::SIGNED_UP => 'signedup',

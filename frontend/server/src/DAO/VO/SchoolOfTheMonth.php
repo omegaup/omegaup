@@ -15,7 +15,7 @@ namespace OmegaUp\DAO\VO;
  * @access public
  */
 class SchoolOfTheMonth extends \OmegaUp\DAO\VO\VO {
-    const FIELD_NAMES = [
+    public const FIELD_NAMES = [
         'school_of_the_month_id' => true,
         'school_id' => true,
         'time' => true,

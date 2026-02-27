@@ -66,21 +66,21 @@ namespace OmegaUp\Controllers;
 
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
-    const SOLUTION_NOT_FOUND = 'not_found';
-    const SOLUTION_UNLOCKED = 'unlocked';
-    const SOLUTION_LOCKED = 'locked';
-    const SOLUTION_NOT_LOGGED_IN = 'not_logged_in';
-    const RESTRICTED_TAG_NAMES = [
+    public const SOLUTION_NOT_FOUND = 'not_found';
+    public const SOLUTION_UNLOCKED = 'unlocked';
+    public const SOLUTION_LOCKED = 'locked';
+    public const SOLUTION_NOT_LOGGED_IN = 'not_logged_in';
+    public const RESTRICTED_TAG_NAMES = [
         'problemRestrictedTagKarel',
         'problemRestrictedTagLanguage',
         'problemRestrictedTagOnlyOutput',
         'problemRestrictedTagInteractive',
         'problemRestrictedTagNoSubmissions',
     ];
-    const DEFAULT_LANGUAGE = 'es';
-    const VALID_LANGUAGES = ['en', 'es', 'pt'];
-    const VALID_SORTING_MODES = ['asc', 'desc'];
-    const VALID_SORTING_COLUMNS = [
+    public const DEFAULT_LANGUAGE = 'es';
+    public const VALID_LANGUAGES = ['en', 'es', 'pt'];
+    public const VALID_SORTING_MODES = ['asc', 'desc'];
+    public const VALID_SORTING_COLUMNS = [
         'title',
         'quality',
         'difficulty',
@@ -94,7 +94,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     ];
 
     // ISO 639-1 langs
-    const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
+    public const ISO639_1 = ['ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy',
         'as', 'av', 'ae', 'ay', 'az', 'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi',
         'bs', 'br', 'bg', 'my', 'ca', 'ch', 'ce', 'ny', 'zh', 'cv', 'kw', 'co',
         'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo', 'et', 'ee', 'fo',
@@ -111,20 +111,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy',
         'wo', 'fy', 'xh', 'yi', 'yo', 'za', 'zu'];
 
-    const IMAGE_EXTENSIONS = [
+    public const IMAGE_EXTENSIONS = [
         'bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png', 'svg',
         'svgz', 'tif', 'tiff',
     ];
 
-    const SOURCE_EXTENSIONS = [
+    public const SOURCE_EXTENSIONS = [
         'py', 'cpp', 'c', 'java', 'kp', 'kj', 'in', 'out',
     ];
 
     // Number of rows shown in problems list
-    const PAGE_SIZE = 100;
+    public const PAGE_SIZE = 100;
 
     // quality values
-    const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
+    public const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
 
     /**
      * Returns a ProblemParams instance from the Request values.
