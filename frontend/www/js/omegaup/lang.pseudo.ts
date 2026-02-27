@@ -292,6 +292,7 @@ const translations: { [key: string]: string; } = {
   compareUserNotFound: "(U53r n07 f0und)",
   compareUsersTitle: "(C0mpar3 U53r5)",
   compareVsMe: "(C0mpar3 v5 m3)",
+  contentCreationRateLimitExceeded: "(Y0u hav3 3xc33d3d 7h3 maximum numb3r 0f a110w3d cr3a7i0n5 p3r h0ur. P13a53 7ry again 1a73r.)",
   contentCreator: "(C0n7ribu70r)",
   contentOrderUpdated: "(C0n73n7'5 0rd3r ha5 b33n upda73d)",
   contestAddUserContestant: "(C0n7357an7)",
