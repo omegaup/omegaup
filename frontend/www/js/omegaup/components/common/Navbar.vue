@@ -288,19 +288,6 @@
                 </div>
               </li>
             </ul>
-
-            <!-- Logout button for mobile -->
-            <a
-              v-if="isLoggedIn"
-              class="navbar justify-content-end d-lg-none align-items-start pt-4 d-flex align-items-center"
-              href="#"
-              @click.prevent="logoutModalVisible = true"
-            >
-              <font-awesome-icon :icon="['fas', 'power-off']" />
-              <span class="ml-2">
-                {{ T.omegaupTitleLogout }}
-              </span>
-            </a>
           </div>
         </div>
 
