@@ -491,9 +491,24 @@ class ArenaContestList extends Vue {
   ContestFilter = ContestFilter;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
-  currentOrder: ContestOrder = this.sortOrder;
-  currentFilter: ContestFilter = this.filter;
   currentPage: number = this.page;
+  // Per-tab independent filter and sort-order state
+  tabFilters: Record<ContestTab, ContestFilter> = {
+    [ContestTab.Current]:
+      this.tab === ContestTab.Current ? this.filter : ContestFilter.All,
+    [ContestTab.Future]:
+      this.tab === ContestTab.Future ? this.filter : ContestFilter.All,
+    [ContestTab.Past]:
+      this.tab === ContestTab.Past ? this.filter : ContestFilter.All,
+  };
+  tabOrders: Record<ContestTab, ContestOrder> = {
+    [ContestTab.Current]:
+      this.tab === ContestTab.Current ? this.sortOrder : ContestOrder.None,
+    [ContestTab.Future]:
+      this.tab === ContestTab.Future ? this.sortOrder : ContestOrder.None,
+    [ContestTab.Past]:
+      this.tab === ContestTab.Past ? this.sortOrder : ContestOrder.None,
+  };
   refreshing: boolean = false;
   isScrollLoading: boolean = false;
   hasMore: boolean = true;
@@ -609,40 +624,57 @@ class ArenaContestList extends Vue {
     return `${getExternalUrl('TimeAndDateBaseURL')}?iso=${time.toISOString()}`;
   }
 
+  get currentFilter(): ContestFilter {
+    return this.tabFilters[this.currentTab];
+  }
+
+  get currentOrder(): ContestOrder {
+    return this.tabOrders[this.currentTab];
+  }
+
   orderByTitle() {
-    this.currentOrder = ContestOrder.Title;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.Title);
+    this.fetchInitialContests();
   }
 
   orderByEnds() {
-    this.currentOrder = ContestOrder.Ends;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.Ends);
+    this.fetchInitialContests();
   }
 
   orderByDuration() {
-    this.currentOrder = ContestOrder.Duration;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.Duration);
+    this.fetchInitialContests();
   }
 
   orderByOrganizer() {
-    this.currentOrder = ContestOrder.Organizer;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.Organizer);
+    this.fetchInitialContests();
   }
 
   orderByContestants() {
-    this.currentOrder = ContestOrder.Contestants;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.Contestants);
+    this.fetchInitialContests();
   }
 
   orderBySignedUp() {
-    this.currentOrder = ContestOrder.SignedUp;
+    Vue.set(this.tabOrders, this.currentTab, ContestOrder.SignedUp);
+    this.fetchInitialContests();
   }
 
   filterBySignedUp() {
-    this.currentFilter = ContestFilter.SignedUp;
+    Vue.set(this.tabFilters, this.currentTab, ContestFilter.SignedUp);
+    this.fetchInitialContests();
   }
 
   filterByRecommended() {
-    this.currentFilter = ContestFilter.OnlyRecommended;
+    Vue.set(this.tabFilters, this.currentTab, ContestFilter.OnlyRecommended);
+    this.fetchInitialContests();
   }
 
   filterByAll() {
-    this.currentFilter = ContestFilter.All;
+    Vue.set(this.tabFilters, this.currentTab, ContestFilter.All);
+    this.fetchInitialContests();
   }
 
   get showMoreContestButtonText(): string {
@@ -681,13 +713,13 @@ class ArenaContestList extends Vue {
   @Watch('sortOrder')
   onSortOrderPropChanged(newValue: ContestOrder) {
     this.isFromBrowserNavigation = true;
-    this.currentOrder = newValue;
+    Vue.set(this.tabOrders, this.currentTab, newValue);
   }
 
   @Watch('filter')
   onFilterPropChanged(newValue: ContestFilter) {
     this.isFromBrowserNavigation = true;
-    this.currentFilter = newValue;
+    Vue.set(this.tabFilters, this.currentTab, newValue);
   }
 
   @Watch('page')
@@ -696,27 +728,9 @@ class ArenaContestList extends Vue {
     this.currentPage = newValue;
   }
 
-  // Watchers for internal state - fetch data when user interacts with UI
+  // Watcher for tab change - fetch data when user switches tabs
   @Watch('currentTab', { immediate: true, deep: true })
   onCurrentTabChanged(newValue: ContestTab, oldValue: undefined | ContestTab) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentOrder', { immediate: true, deep: true })
-  onCurrentOrderChanged(
-    newValue: ContestOrder,
-    oldValue: undefined | ContestOrder,
-  ) {
-    if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
-  }
-
-  @Watch('currentFilter', { immediate: true, deep: true })
-  onCurrentFilterChanged(
-    newValue: ContestFilter,
-    oldValue: undefined | ContestFilter,
-  ) {
     if (typeof oldValue === 'undefined') return;
     this.fetchInitialContests();
   }

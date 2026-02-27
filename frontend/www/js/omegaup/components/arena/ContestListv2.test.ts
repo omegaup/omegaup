@@ -409,4 +409,93 @@ describe('ContestListv2.vue', () => {
     const tabChangeParams = allEvents[allEvents.length - 1][0].params;
     expect(tabChangeParams.replaceState).toBe(false);
   });
+
+  it('Should maintain independent filter state per tab', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const vm = wrapper.vm as InstanceType<typeof arena_ContestList>;
+
+    // Change filter on current tab to recommended
+    const dropdownFilterBy = wrapper.findComponent({ ref: 'dropdownFilterBy' });
+    await dropdownFilterBy
+      .find('[data-filter-by-recommended]')
+      .trigger('click');
+    expect(vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
+
+    // Switch to past tab
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Past;
+    await wrapper.vm.$nextTick();
+
+    // Past tab should still have the default "All" filter
+    expect(vm.currentFilter).toBe(ContestFilter.All);
+
+    // Switch back to current tab — filter should still be OnlyRecommended
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Current;
+    await wrapper.vm.$nextTick();
+    expect(vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
+  });
+
+  it('Should maintain independent sort order per tab', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Current,
+      },
+    });
+
+    const vm = wrapper.vm as InstanceType<typeof arena_ContestList>;
+
+    // Change order on current tab to Title
+    const dropdownOrderBy = wrapper.findComponent({ ref: 'dropdownOrderBy' });
+    await dropdownOrderBy.find('[data-order-by-title]').trigger('click');
+    expect(vm.currentOrder).toBe(ContestOrder.Title);
+
+    // Switch to future tab — order should be the default None
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Future;
+    await wrapper.vm.$nextTick();
+    expect(vm.currentOrder).toBe(ContestOrder.None);
+
+    // Switch back to current tab — order should still be Title
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Current;
+    await wrapper.vm.$nextTick();
+    expect(vm.currentOrder).toBe(ContestOrder.Title);
+  });
+
+  it('Should apply URL filter only to the initial active tab, not all tabs', () => {
+    // Simulate URL: ?tab_name=past&filter=recommended
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+        tab: ContestTab.Past,
+        filter: ContestFilter.OnlyRecommended,
+        sortOrder: ContestOrder.Title,
+      },
+    });
+
+    const vm = wrapper.vm as InstanceType<typeof arena_ContestList>;
+
+    // Active tab (Past) should have the URL filter/order applied
+    expect(vm.currentFilter).toBe(ContestFilter.OnlyRecommended);
+    expect(vm.currentOrder).toBe(ContestOrder.Title);
+
+    // Inactive tabs should start with defaults, not inherit URL params
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Current;
+    expect(vm.currentFilter).toBe(ContestFilter.All);
+    expect(vm.currentOrder).toBe(ContestOrder.None);
+
+    ((wrapper.vm as unknown) as { currentTab: ContestTab }).currentTab =
+      ContestTab.Future;
+    expect(vm.currentFilter).toBe(ContestFilter.All);
+    expect(vm.currentOrder).toBe(ContestOrder.None);
+  });
 });
