@@ -201,7 +201,10 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="contestItem.finish_time.toLocaleString()"
+                  >
                     {{ currentContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -271,7 +274,10 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.start_time)">
+                  <a
+                    :href="getTimeLink(contestItem.start_time)"
+                    :title="contestItem.start_time.toLocaleString()"
+                  >
                     {{ futureContestDate(contestItem) }}
                   </a>
                 </b-card-text>
@@ -344,7 +350,10 @@
               <template #text-contest-date>
                 <b-card-text>
                   <font-awesome-icon icon="calendar-alt" />
-                  <a :href="getTimeLink(contestItem.finish_time)">
+                  <a
+                    :href="getTimeLink(contestItem.finish_time)"
+                    :title="contestItem.finish_time.toLocaleString()"
+                  >
                     {{ pastContestDate(contestItem) }}
                   </a>
                 </b-card-text>
