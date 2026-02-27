@@ -1,4 +1,5 @@
 services:
+
   frontend:
     build:
       dockerfile: ./Dockerfile.dev-php
@@ -30,10 +31,10 @@ services:
       MYSQL_TCP_PORT: 13306
       OPENAI_API_KEY: ""
       DEEPSEEK_API_KEY: ""
-      AI_WORKER_ENABLED: "true"
-      REDIS_PASSWORD: "redis"
-      REDIS_HOST: "redis"
-      REDIS_PORT: "6379"
+      AI_WORKER_ENABLED: 'true'
+      REDIS_PASSWORD: 'redis'
+      REDIS_HOST: 'redis'
+      REDIS_PORT: '6379'
 
   init-omegaupdata:
     image: alpine:3.20
@@ -95,9 +96,9 @@ services:
         target: /etc/omegaup/broadcaster
         read_only: true
     expose:
-      - "6060"
-      - "32672"
-      - "22291"
+      - '6060'
+      - '32672'
+      - '22291'
 
   grader:
     image: omegaup/backend:v1.9.35
@@ -128,12 +129,7 @@ services:
 
   runner:
     image: omegaup/runner:v1.9.35
-    entrypoint: ["wait-for-it",
-        "grader:11302",
-        "--",
-        "/usr/bin/omegaup-runner",
-        "-noop-sandbox",
-      ]
+    entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -144,17 +140,17 @@ services:
         target: /etc/omegaup/runner
         read_only: true
     expose:
-      - "6060"
+      - '6060'
 
   mysql:
     image: mysql:8.0.34
     platform: linux/amd64
     restart: always
     environment:
-      MYSQL_DATABASE: "omegaup"
-      MYSQL_USER: "omegaup"
-      MYSQL_PASSWORD: "omegaup"
-      MYSQL_ROOT_PASSWORD: "omegaup"
+      MYSQL_DATABASE: 'omegaup'
+      MYSQL_USER: 'omegaup'
+      MYSQL_PASSWORD: 'omegaup'
+      MYSQL_ROOT_PASSWORD: 'omegaup'
       MYSQL_TCP_PORT: 13306
     command:
       - --max_execution_time=30000
@@ -163,7 +159,7 @@ services:
     expose:
       - '13306'
     volumes:
-      - "dbdata:/var/lib/mysql"
+      - 'dbdata:/var/lib/mysql'
     ports:
       - target: 13306
         published: 13306
@@ -176,13 +172,13 @@ services:
     image: rabbitmq:3-management-alpine
     restart: always
     environment:
-      RABBITMQ_DEFAULT_USER: "omegaup"
-      RABBITMQ_DEFAULT_PASS: "omegaup"
+      RABBITMQ_DEFAULT_USER: 'omegaup'
+      RABBITMQ_DEFAULT_PASS: 'omegaup'
     expose:
       - '5672'
       - '15672'
     volumes:
-      - "rabbitmq:/var/lib/rabbitmq"
+      - 'rabbitmq:/var/lib/rabbitmq'
     ports:
       - target: 5672
         published: 5672
@@ -196,7 +192,7 @@ services:
   redis:
     image: redis
     restart: always
-    command: ["redis-server", "/etc/redis/redis.conf"]
+    command: ['redis-server', '/etc/redis/redis.conf']
     expose:
       - '6379'
     volumes:
