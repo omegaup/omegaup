@@ -1611,7 +1611,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             return null;
         }
 
-        if (strpos($resourcePath, '/') !== 0) {
+        if (!str_starts_with($resourcePath, '/')) {
             $resourcePath = "/{$resourcePath}";
         }
         $accessKeyId = AWS_CLI_ACCESS_KEY_ID;
