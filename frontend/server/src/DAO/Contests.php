@@ -1621,6 +1621,102 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ];
     }
 
+    public static function updateContestantsCount(
+        \OmegaUp\DAO\VO\Contests $contest
+    ): int {
+        $sql = 'UPDATE Contests c
+                SET contestants = (
+                    SELECT COUNT(*) FROM (
+                        SELECT
+                        i.identity_id
+                        FROM
+                        (
+                            SELECT
+                                raw_identities.identity_id
+                            FROM
+                            (
+                                SELECT
+                                    pi.identity_id
+                                FROM
+                                    Problemset_Identities pi
+                                WHERE
+                                    pi.problemset_id = ?
+
+                                UNION
+
+                                SELECT
+                                    gi.identity_id
+                                FROM
+                                    Group_Roles gr
+                                INNER JOIN
+                                    Groups_Identities gi
+                                ON
+                                    gi.group_id = gr.group_id
+                                WHERE
+                                    gr.acl_id = ?
+                                    AND gr.role_id = ? -- contestant role
+                            ) AS raw_identities
+                            GROUP BY
+                            raw_identities.identity_id
+                        ) AS ri
+                        INNER JOIN
+                            Identities i
+                        ON
+                            i.identity_id = ri.identity_id
+                        WHERE
+                        (
+                            i.user_id NOT IN (
+                                SELECT
+                                    ur.user_id
+                                FROM
+                                    User_Roles ur
+                                WHERE
+                                    ur.acl_id IN (?, ?)
+                                    AND ur.role_id = ? -- administrator role
+                            )
+                            AND i.identity_id NOT IN (
+                            SELECT
+                                gi.identity_id
+                            FROM
+                                Group_Roles gr
+                            INNER JOIN
+                                Groups_Identities gi ON gi.group_id = gr.group_id
+                            WHERE
+                                gr.acl_id IN (?, ?)
+                                AND gr.role_id = ?  -- administrator role
+                            )
+                            AND i.user_id != (
+                                SELECT
+                                    a.owner_id
+                                FROM
+                                    ACLs a
+                                WHERE
+                                    a.acl_id = ?
+                            )
+                            OR i.user_id IS NULL
+                        )
+                    ) AS participants
+                )
+                WHERE
+                    c.contest_id = ?;';
+        $params = [
+            $contest->problemset_id,
+            $contest->acl_id,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
+            $contest->acl_id,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $contest->acl_id,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $contest->acl_id,
+            $contest->contest_id,
+        ];
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
     private static function getOrder(
         int $orderBy,
         string $defaultOrder = '`original_finish_time`',
