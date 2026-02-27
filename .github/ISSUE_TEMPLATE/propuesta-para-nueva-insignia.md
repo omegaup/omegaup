@@ -1,5 +1,5 @@
 ---
-name: Propuesta para nueva insignia
+name: Propuesta para nueva insignia (Spanish)
 about: Propón una nueva insignia en omegaUp
 title: "[Badge Proposal] Nombre de la Insignia"
 labels: ''
