@@ -74,10 +74,7 @@ export default class MonacoEditor extends Vue {
     if (this._model) {
       const languageInfo = Util.supportedLanguages[value];
       this._model.updateOptions({ tabSize: languageInfo.tabSize ?? 2 });
-      monaco.editor.setModelLanguage(
-        this._model,
-        languageInfo.modelMapping,
-      );
+      monaco.editor.setModelLanguage(this._model, languageInfo.modelMapping);
     }
   }
 
