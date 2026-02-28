@@ -208,7 +208,7 @@ def get_cotm_eligible_users(
 
     if not last_12_coders:
         last_12_coders_clause = ''
-        last_12_coders_params: tuple = ()
+        last_12_coders_params: tuple[str, ...] = ()
     else:
         placeholders = ', '.join(['%s'] * len(last_12_coders))
         last_12_coders_clause = f'AND i.username NOT IN ({placeholders})'
