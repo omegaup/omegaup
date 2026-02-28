@@ -780,25 +780,25 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     rg.score
                 ) AS score_by_group
             FROM
-                Problemset_Problems pp
-            INNER JOIN
                 Submissions s
+            INNER JOIN
+                Problemset_Problems pp
             ON
-                s.problemset_id = pp.problemset_id AND
-                s.problem_id = pp.problem_id
+                pp.problemset_id = s.problemset_id AND
+                pp.problem_id = s.problem_id
             INNER JOIN
                 Runs r ON s.current_run_id = r.run_id
             LEFT JOIN
-                Contests c ON c.problemset_id = pp.problemset_id
+                Contests c ON c.problemset_id = s.problemset_id
             LEFT JOIN
                 Runs_Groups rg ON r.run_id = rg.run_id
             WHERE
-                pp.problemset_id = ? AND
+                s.problemset_id = ? AND
                 s.status = 'ready' AND
                 s.`type` = 'normal' AND
                 $verdictCondition
             GROUP BY
-                score_mode,
+                c.score_mode,
                 r.score,
                 r.penalty,
                 r.contest_score,
