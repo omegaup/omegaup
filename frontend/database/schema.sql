@@ -478,6 +478,7 @@ CREATE TABLE `Groups_Identities` (
   `is_invited` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si la identidad ingresará al curso por invitación o le fue compartido el link del curso abierto con registro',
   PRIMARY KEY (`identity_id`,`group_id`),
   KEY `group_id` (`group_id`),
+  KEY `idx_groups_identities_group_identity` (`group_id`,`identity_id`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
@@ -1430,4 +1431,3 @@ CREATE TABLE `Users_Experiments` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
