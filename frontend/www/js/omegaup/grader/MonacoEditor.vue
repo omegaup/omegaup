@@ -72,10 +72,9 @@ export default class MonacoEditor extends Vue {
   @Watch('language')
   onLanguageChange(value: string): void {
     if (this._model) {
-      monaco.editor.setModelLanguage(
-        this._model,
-        Util.supportedLanguages[value].modelMapping,
-      );
+      const languageInfo = Util.supportedLanguages[value];
+      this._model.updateOptions({ tabSize: languageInfo.tabSize ?? 2 });
+      monaco.editor.setModelLanguage(this._model, languageInfo.modelMapping);
     }
   }
 
@@ -100,11 +99,13 @@ export default class MonacoEditor extends Vue {
     const container = this.$refs.editorContainer as HTMLElement;
     if (!container) return;
 
+    const languageInfo = Util.supportedLanguages[this.language];
     this._editor = monaco.editor.create(container, {
       autoIndent: 'brackets',
+      tabSize: languageInfo.tabSize ?? 2,
       formatOnPaste: true,
       formatOnType: true,
-      language: Util.supportedLanguages[this.language].modelMapping,
+      language: languageInfo.modelMapping,
       readOnly: this.readOnly,
       theme: this.theme,
       value: this.contents,
