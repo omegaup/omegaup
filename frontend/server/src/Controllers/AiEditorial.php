@@ -154,7 +154,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\InternalServerErrorException(
                     'redisConnectionFailed',
                     null,
-                    ['host' => $redisHost, 'port' => $redisPort,]
+                    ['host' => $redisHost, 'port' => strval($redisPort),]
                 );
             }
 
