@@ -82,7 +82,7 @@ def main() -> None:
     try:
         standardize_tags(dbconn)
         dbconn.conn.commit()
-    except:  # noqa: bare-except
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to standardize tags.')
     finally:
         dbconn.conn.close()

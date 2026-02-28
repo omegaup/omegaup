@@ -201,8 +201,6 @@ def get_cotm_eligible_users(
 ) -> List[UserRank]:
     '''Returns the list of eligible users for coder of the month'''
 
-    last_12_coders_str = ', '.join(f"'{coder}'" for coder in last_12_coders)
-
     if category == 'female':
         gender_clause = " AND i.gender = 'female'"
     else:
@@ -210,8 +208,11 @@ def get_cotm_eligible_users(
 
     if not last_12_coders:
         last_12_coders_clause = ''
+        last_12_coders_params: tuple[str, ...] = ()
     else:
-        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
+        placeholders = ', '.join(['%s'] * len(last_12_coders))
+        last_12_coders_clause = f'AND i.username NOT IN ({placeholders})'
+        last_12_coders_params = tuple(last_12_coders)
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category
@@ -277,6 +278,7 @@ def get_cotm_eligible_users(
     cur_readonly.execute(sql, (
         first_day_of_current_month,
         first_day_of_next_month,
+        *last_12_coders_params,
     ))
 
     usernames: List[UserRank] = []
@@ -328,8 +330,8 @@ def get_eligible_problems(
 
 def get_user_problems(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    identity_ids_str: str,
-    problem_ids_str: str,
+    identity_ids: List[int],
+    problem_ids: List[int],
     eligible_users: List[UserRank],
     first_day_of_current_month: datetime.date,
 ) -> Dict[int, UserProblems]:
@@ -344,8 +346,10 @@ def get_user_problems(
     first_day_of_next_month = get_first_day_of_next_month(
         first_day_of_current_month)
 
-    problems_admins = get_problems_admins(cur_readonly, problem_ids_str)
+    problems_admins = get_problems_admins(cur_readonly, problem_ids)
 
+    id_placeholders = ', '.join(['%s'] * len(identity_ids))
+    prob_placeholders = ', '.join(['%s'] * len(problem_ids))
     cur_readonly.execute(f'''
             WITH
                 ProblemsForfeitedByUser AS (
@@ -374,14 +378,14 @@ def get_user_problems(
                 pfbu.user_id = i.user_id
                 AND pfbu.problem_id = s.problem_id
             WHERE
-                s.identity_id IN ({identity_ids_str})
-                AND s.problem_id IN ({problem_ids_str})
+                s.identity_id IN ({id_placeholders})
+                AND s.problem_id IN ({prob_placeholders})
                 AND s.verdict = 'AC'
                 AND s.type = 'normal'
                 AND pfbu.forfeited_date IS NULL
             GROUP BY
                 s.identity_id, s.problem_id;
-    ''')
+    ''', (*identity_ids, *problem_ids))
 
     # Populate user_problems dictionary with the problems solved by each user
     for row in cur_readonly.fetchall():
@@ -401,10 +405,11 @@ def get_user_problems(
 
 def get_problems_admins(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-    problem_ids_str: str,
+    problem_ids: List[int],
 ) -> Dict[int, List[int]]:
     '''Get the list of problems admins'''
 
+    placeholders = ', '.join(['%s'] * len(problem_ids))
     cur_readonly.execute(f'''
         SELECT
             p.problem_id,
@@ -416,7 +421,7 @@ def get_problems_admins(
         INNER JOIN
             Identities AS ai ON a.owner_id = ai.user_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         UNION DISTINCT
         SELECT
             p.problem_id,
@@ -429,7 +434,7 @@ def get_problems_admins(
         INNER JOIN
             Identities uri ON ur.user_id = uri.user_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         UNION DISTINCT
         SELECT
             p.problem_id,
@@ -442,10 +447,10 @@ def get_problems_admins(
         INNER JOIN
             Groups_Identities gi ON gi.group_id = gr.group_id
         WHERE
-            p.problem_id IN ({problem_ids_str})
+            p.problem_id IN ({placeholders})
         ORDER BY
             problem_id;
-    ''')
+    ''', (*problem_ids, *problem_ids, *problem_ids))
 
     problems_admins: Dict[int, List[int]] = {}
 

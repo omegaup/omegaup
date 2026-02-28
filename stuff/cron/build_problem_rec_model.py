@@ -410,7 +410,7 @@ def main() -> None:
             logging.error(
                 'Model NOT saved. Resulting accuracy was too low: '
                 '%f below %f', score, args.min_map_score)
-    except:  # noqa: bare-except
+    except Exception:
         logging.exception('Failed to update recommendation model.')
         raise
     finally:
