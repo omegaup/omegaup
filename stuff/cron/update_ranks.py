@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence, Dict
+from typing import List, NamedTuple, Sequence, Dict, Set
 
 import mysql.connector
 import mysql.connector.cursor
@@ -589,7 +589,7 @@ def compute_points_for_school(
     for school in eligible_schools:
         school_map[school.school_id] = school
     # Group users by school to find unique problems per school
-    school_problems: Dict[int, set] = {}
+    school_problems: Dict[int, Set[int]] = {}
     for user in eligible_users:
         school_id = user.school_id
         if school_id is not None and school_id in school_map:
