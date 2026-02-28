@@ -29,8 +29,8 @@ services:
     environment:
       CI: "${CI:-false}"
       MYSQL_TCP_PORT: 13306
-      OPENAI_API_KEY: ""
-      DEEPSEEK_API_KEY: ""
+      OPENAI_API_KEY: ''
+      DEEPSEEK_API_KEY: ''
       AI_WORKER_ENABLED: 'true'
       REDIS_PASSWORD: 'redis'
       REDIS_HOST: 'redis'
@@ -39,7 +39,7 @@ services:
   init-omegaupdata:
     image: alpine:3.20
     user: "0:0"
-    restart: "no"
+    restart: 'no'
     command:
       [
         "/bin/sh",
