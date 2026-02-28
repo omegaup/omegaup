@@ -143,7 +143,7 @@
                   data-nav-problems-create-options
                   :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
                   :aria-controls="createProblemCollapseLinksId"
-                  @click="onCreateProblemClick"
+                  @click="onCreateProblemClick($event)"
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
@@ -222,12 +222,9 @@
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a
-            class="dropdown-item"
-            :href="YouTubeTutorialsURL"
-            target="_blank"
-            >{{ T.navTutorials }}</a
-          >
+          <a class="dropdown-item" :href="YouTubeTutorialsURL" target="_blank">{{
+            T.navTutorials
+          }}</a>
           <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
             T.navDiscord
           }}</a>
@@ -279,6 +276,24 @@ export default class NavbarItems extends Vue {
   isCreateProblemSubmenuOpen = false;
   hideCreateProblemSubmenuTimeout: number | null = null;
 
+  // When opened via click, don't auto-close on mouseleave (Cypress stability)
+  isCreateProblemSubmenuPinned = false;
+
+  private readonly onDocumentClickCapture = (event: MouseEvent): void => {
+    const wrapper = this.$refs.createProblemWrapper as HTMLElement | undefined;
+    const target = event.target as Node | null;
+    if (!wrapper || !target) return;
+
+    if (!wrapper.contains(target)) {
+      this.isCreateProblemSubmenuOpen = false;
+      this.isCreateProblemSubmenuPinned = false;
+    }
+  };
+
+  mounted(): void {
+    document.addEventListener('click', this.onDocumentClickCapture, true);
+  }
+
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
@@ -304,14 +319,18 @@ export default class NavbarItems extends Vue {
       clearTimeout(this.hideCreateProblemSubmenuTimeout);
       this.hideCreateProblemSubmenuTimeout = null;
     }
+    this.isCreateProblemSubmenuPinned = false;
     this.isCreateProblemSubmenuOpen = true;
   }
 
   onCreateProblemMouseLeave(event: MouseEvent): void {
+    if (this.isCreateProblemSubmenuPinned) {
+      return;
+    }
+
     const wrapper = this.$refs.createProblemWrapper as HTMLElement | undefined;
     const nextTarget = event.relatedTarget as Node | null;
 
-    // If mouse moved to another element inside wrapper, don't close submenu.
     if (wrapper && nextTarget && wrapper.contains(nextTarget)) {
       return;
     }
@@ -325,11 +344,17 @@ export default class NavbarItems extends Vue {
     }, 150);
   }
 
-  onCreateProblemClick(): void {
+  onCreateProblemClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
     this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
+    this.isCreateProblemSubmenuPinned = this.isCreateProblemSubmenuOpen;
   }
 
   beforeDestroy(): void {
+    document.removeEventListener('click', this.onDocumentClickCapture, true);
+
     if (this.hideCreateProblemSubmenuTimeout !== null) {
       clearTimeout(this.hideCreateProblemSubmenuTimeout);
       this.hideCreateProblemSubmenuTimeout = null;
