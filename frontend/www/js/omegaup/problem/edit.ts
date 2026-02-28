@@ -157,52 +157,60 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'add-tag': (alias: string, tagname: string, isPublic: boolean) => {
+          'add-tag': (payload: {
+            alias: string;
+            tagname: string;
+            isPublic: boolean;
+          }) => {
             api.Problem.addTag({
-              problem_alias: alias,
-              name: tagname,
-              public: isPublic,
+              problem_alias: payload.alias,
+              name: payload.tagname,
+              public: payload.isPublic,
             })
               .then(() => {
                 ui.success(T.tagAdded);
-                if (isPublic) {
-                  this.selectedPublicTags.push(tagname);
+                if (payload.isPublic) {
+                  this.selectedPublicTags.push(payload.tagname);
                 } else {
-                  this.selectedPrivateTags.push(tagname);
+                  this.selectedPrivateTags.push(payload.tagname);
                 }
               })
               .catch(ui.apiError);
           },
-          'remove-tag': (alias: string, tagname: string, isPublic: boolean) => {
+          'remove-tag': (payload: {
+            alias: string;
+            tagname: string;
+            isPublic: boolean;
+          }) => {
             api.Problem.removeTag({
-              problem_alias: alias,
-              name: tagname,
+              problem_alias: payload.alias,
+              name: payload.tagname,
             })
               .then(() => {
                 ui.success(T.tagRemoved);
                 // FIXME: For some reason this is not being reactive
-                if (isPublic) {
+                if (payload.isPublic) {
                   this.selectedPublicTags = this.selectedPublicTags.filter(
-                    (tag) => tag !== tagname,
+                    (tag) => tag !== payload.tagname,
                   );
                 } else {
                   this.selectedPrivateTags = this.selectedPrivateTags.filter(
-                    (tag) => tag !== tagname,
+                    (tag) => tag !== payload.tagname,
                   );
                 }
               })
               .catch(ui.apiError);
           },
-          'change-allow-user-add-tag': (
-            alias: string,
-            title: string,
-            allowTags: boolean,
-          ) => {
+          'change-allow-user-add-tag': (payload: {
+            alias: string;
+            title: string;
+            allowTags: boolean;
+          }) => {
             api.Problem.update({
-              problem_alias: alias,
-              title: title,
-              allow_user_add_tags: allowTags,
-              message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
+              problem_alias: payload.alias,
+              title: payload.title,
+              allow_user_add_tags: payload.allowTags,
+              message: `${T.problemEditFormAllowUserAddTags}: ${payload.allowTags}`,
             })
               .then(() => {
                 ui.success(T.problemEditUpdatedSuccessfully);
