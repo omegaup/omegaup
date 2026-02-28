@@ -381,7 +381,8 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
      global_difficulty_average) = get_global_quality_and_difficulty_average(
          dbconn, rank_cutoffs)
 
-    processed_problems = 0
+    attempted_problems = 0
+    successful_problems = 0
     failed_problems = 0
 
     with dbconn.cursor() as cur:
@@ -391,15 +392,17 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
         for (problem_id,) in cur.fetchall():
-            processed_problems += 1
+            attempted_problems += 1
             try:
                 aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
                                            global_quality_average,
                                            global_difficulty_average)
+                successful_problems += 1
             except Exception:  # pylint: disable=broad-except
                 failed_problems += 1
                 logging.exception(
-                    'Failed to aggregate feedback for problem %d',
+                    'Failed to aggregate feedback for problem %d. '
+                    'Continuing with remaining problems.',
                     problem_id)
                 try:
                     dbconn.conn.rollback()
@@ -409,8 +412,10 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
                         problem_id)
 
     logging.info(
-        'Finished aggregating feedback for problems. processed=%d failed=%d',
-        processed_problems,
+        'Finished aggregating feedback: '
+        'attempted=%d successful=%d failed=%d',
+        attempted_problems,
+        successful_problems,
         failed_problems)
 
 
