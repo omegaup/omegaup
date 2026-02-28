@@ -132,10 +132,10 @@
 
             <template v-else>
               <div
+                ref="createProblemWrapper"
                 class="collapse-submenu"
                 @mouseenter="onCreateProblemMouseEnter"
                 @mouseleave="onCreateProblemMouseLeave"
-                ref="createProblemWrapper"
               >
                 <button
                   type="button"
@@ -222,9 +222,12 @@
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a class="dropdown-item" :href="YouTubeTutorialsURL" target="_blank">{{
-            T.navTutorials
-          }}</a>
+          <a
+            class="dropdown-item"
+            :href="YouTubeTutorialsURL"
+            target="_blank"
+            >{{ T.navTutorials }}</a
+          >
           <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
             T.navDiscord
           }}</a>
