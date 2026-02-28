@@ -152,14 +152,16 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
 
             if (!$connected) {
                 throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                    'generalError'
+                    'redisConnectionFailed',
+                    null,
+                    ['host' => $redisHost, 'port' => $redisPort,]
                 );
             }
 
             /** @psalm-suppress RedundantCondition REDIS_PASS is really a variable */
             if (REDIS_PASS !== '' && !$redis->auth(REDIS_PASS)) {
                 throw new \OmegaUp\Exceptions\InternalServerErrorException(
-                    'generalError'
+                    'redisAuthenticationFailed'
                 );
             }
 
