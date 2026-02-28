@@ -55,7 +55,7 @@
                     </div>
                   </template>
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-ends
                     @click="orderByEnds"
                   >
@@ -66,7 +66,7 @@
                     />{{ T.contestOrderByEnds }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-title
                     @click="orderByTitle"
                   >
@@ -77,7 +77,7 @@
                     />{{ T.contestOrderByTitle }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-duration
                     @click="orderByDuration"
                   >
@@ -88,7 +88,7 @@
                     />{{ T.contestOrderByDuration }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-organizer
                     @click="orderByOrganizer"
                   >
@@ -99,7 +99,7 @@
                     />{{ T.contestOrderByOrganizer }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-contestants
                     @click="orderByContestants"
                   >
@@ -110,7 +110,7 @@
                     />{{ T.contestOrderByContestants }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-order-by-signed-up
                     @click="orderBySignedUp"
                   >
@@ -132,7 +132,7 @@
                     {{ T.contestFilterBy }}
                   </template>
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-filter-by-all
                     @click="filterByAll"
                   >
@@ -143,7 +143,7 @@
                     />{{ T.contestFilterByAll }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-filter-by-signed-up
                     @click="filterBySignedUp"
                   >
@@ -154,7 +154,7 @@
                     />{{ T.contestFilterBySignedUp }}</b-dropdown-item
                   >
                   <b-dropdown-item
-                    href="#"
+                    button
                     data-filter-by-recommended
                     @click="filterByRecommended"
                   >
