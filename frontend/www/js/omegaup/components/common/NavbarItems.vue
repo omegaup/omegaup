@@ -131,26 +131,34 @@
             </template>
 
             <template v-else>
-              <hr
-                style="margin-top: 0em; margin-bottom: 0em; border-width: 2px"
-              />
+              <div class="collapse-submenu">
+                <button
+                  type="button"
+                  class="dropdown-item dropdown-toggle"
+                  data-nav-problems-create-options
+                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
+                  @click.stop.prevent="onCreateProblemClick"
+                >
+                  {{ T.myproblemsListCreateProblem }}
+                </button>
 
-              <h6 class="dropdown-header">
-                {{ T.myproblemsListCreateProblem }}
-              </h6>
-
-              <a class="dropdown-item" href="/problem/creator/">{{
-                T.myproblemsListCreateZipFileProblem
-              }}</a>
-
-              <a
-                class="dropdown-item"
-                href="/problem/new/"
-                data-nav-problems-create
-                >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
-              >
+                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
+                  <a
+                    class="dropdown-item"
+                    href="/problem/creator/"
+                    @click.stop
+                    >{{ T.myproblemsListCreateZipFileProblem }}</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="/problem/new/"
+                    data-nav-problems-create
+                    @click.stop
+                    >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
+                  >
+                </div>
+              </div>
             </template>
-
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
             }}</a>
@@ -258,6 +266,9 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
+  // Used by Cypress selector + click toggle
+  isCreateProblemSubmenuOpen = false;
+
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
@@ -276,6 +287,10 @@ export default class NavbarItems extends Vue {
 
   get CompetitiveProgrammingBookURL(): string {
     return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
+
+  onCreateProblemClick(): void {
+    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
   }
 }
 </script>
