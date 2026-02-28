@@ -29,6 +29,7 @@ from database.school_of_the_month import (
     get_current_problems_solved_per_month,
     insert_updated_problems_solved_per_month,
     get_last_12_schools_of_the_month,
+    get_candidate_schools_list,
 )
 from utils import (
     UserRank,
@@ -42,12 +43,6 @@ sys.path.insert(
                  "."))
 import lib.db  # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
-
-logging.basicConfig(
-    filename='update_ranks.log',
-    level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s'
-)
 
 
 class Cutoff(NamedTuple):
@@ -432,78 +427,183 @@ def update_school_of_the_month_candidates(
         logging.info('Skipping because already exist selected schools.')
         return
     remove_school_of_the_month_candidates(cur, first_day_of_next_month)
-    schools_sql1 = get_school_of_the_month_candidates(
-        cur_readonly,
-        first_day_of_next_month,
-        first_day_of_current_month
-    )
     schools_python = compute_points_for_school(
         cur_readonly,
         first_day_of_current_month,
         first_day_of_next_month
     )
-    if not schools_sql1:
+    if not schools_python:
         logging.info('No eligible schools found.')
         return
     if update_school_of_the_month:
         insert_school_of_the_month_candidates(
-            cur, first_day_of_next_month, schools_sql1)
-    # else:
+            cur, first_day_of_next_month, schools_python)
+    else:
+        schools_sql = get_school_of_the_month_candidates(
+            cur_readonly,
+            first_day_of_next_month,
+            first_day_of_current_month
+        )
         debug_school_of_the_month_candidates(
-            first_day_of_next_month, schools_sql1,
+            first_day_of_next_month, schools_sql,
             schools_python,
-            use_json_format=not update_school_of_the_month)
+            use_json_format=True)
 
 
 def debug_school_of_the_month_candidates(
     first_day_of_next_month: datetime.date,
-    candidates1: List[School],
-    candidates2: List[School],
-    use_json_format: bool,
+    schools_sql: List[School],
+    schools_python: List[School],
+    use_json_format: bool = True,
 ) -> None:
-    '''Log school of the month candidates'''
+    '''Log school of the month comparison data for both methods'''
 
-    # log_entries = []
-    # for ranking, candidate in enumerate(candidates1, start=1):
-    #     log_entry = {
-    #         "school_id": candidate.school_id,
-    #         "name": candidate.name,
-    #         "time": first_day_of_next_month.isoformat(),
-    #         "ranking": ranking,
-    #         "score": candidate.score,
-    #     }
-    #     log_entries.append(log_entry)
+    # Perform comparison
+    sql_dict = {s.school_id: s for s in schools_sql}
+    python_dict = {s.school_id: s for s in schools_python}
 
-    # log_message = json.dumps(log_entries, indent=4)
-    # logging.info('School of the month candidates:')
-    # logging.info(log_message)
-    if use_json_format:
-        log_entries = []
-        for ranking, candidate in enumerate(candidates1, start=1):
-            log_entry = {
-                "school_id": candidate.school_id,
-                "name": candidate.name,
-                "time": first_day_of_next_month.isoformat(),
-                "ranking": ranking,
-                "score": candidate.score,
-            }
-            log_entries.append(log_entry)
+    sql_ids = set(sql_dict.keys())
+    python_ids = set(python_dict.keys())
 
-        log_message = json.dumps(log_entries, indent=4)
-        logging.info('School of the month candidates:')
-        logging.info(log_message)
+    same_count = len(schools_sql) == len(schools_python)
+    same_schools = sql_ids == python_ids
+
+    # Check scores with tolerance
+    common_ids = sql_ids & python_ids
+    score_differences = []
+    for school_id in common_ids:
+        diff = abs(sql_dict[school_id].score - python_dict[school_id].score)
+        if diff > 0.01:
+            score_differences.append(school_id)
+    same_scores = len(score_differences) == 0
+
+    # Check order (top 10)
+    if len(schools_sql) >= 10 and len(schools_python) >= 10:
+        top10_sql = [s.school_id for s in schools_sql[:10]]
+        top10_python = [s.school_id for s in schools_python[:10]]
+        same_order = top10_sql == top10_python
     else:
-        logging.info('School of the month candidates:')
-        logging.info('SQL candidates:')
-        for ranking, candidate in enumerate(candidates1, start=1):
+        same_order = True
+
+    all_match = same_count and same_schools and same_scores and same_order
+
+    if use_json_format:
+        # JSON format for production (New Relic compatible)
+        comparison_data = {
+            "time": first_day_of_next_month.isoformat(),
+            "comparison_result": {
+                "identical": all_match,
+                "same_count": same_count,
+                "same_schools": same_schools,
+                "same_scores": same_scores,
+                "same_order": same_order,
+                "score_differences_count": len(score_differences)
+            },
+            "sql_method": {
+                "count": len(schools_sql),
+                "top_10": [
+                    {
+                        "rank": i,
+                        "school_id": s.school_id,
+                        "name": s.name,
+                        "score": round(s.score, 2)
+                    }
+                    for i, s in enumerate(schools_sql[:10], 1)
+                ]
+            },
+            "python_method": {
+                "count": len(schools_python),
+                "top_10": [
+                    {
+                        "rank": i,
+                        "school_id": s.school_id,
+                        "name": s.name,
+                        "score": round(s.score, 2)
+                    }
+                    for i, s in enumerate(schools_python[:10], 1)
+                ]
+            }
+        }
+        logging.info(
+            'School of the Month comparison: %s',
+            json.dumps(comparison_data)
+        )
+    else:
+        # Human-readable format for test environment
+        logging.info('=' * 75)
+        logging.info('SCHOOL OF THE MONTH - METHOD COMPARISON')
+        logging.info('=' * 75)
+        logging.info('Comparison date: %s',
+                     first_day_of_next_month.isoformat())
+        logging.info('')
+        logging.info('COMPARISON RESULT:')
+        logging.info(
+            '  Identical results: %s',
+            'YES' if all_match else 'NO'
+        )
+        logging.info(
+            '  Same count:        %s (SQL: %d, Python: %d)',
+            'YES' if same_count else 'NO',
+            len(schools_sql),
+            len(schools_python)
+        )
+        logging.info(
+            '  Same schools:      %s',
+            'YES' if same_schools else 'NO'
+        )
+        logging.info(
+            '  Same scores:       %s (%d differences)',
+            'YES' if same_scores else 'NO',
+            len(score_differences)
+        )
+        logging.info(
+            '  Same order:        %s',
+            'YES' if same_order else 'NO'
+        )
+        logging.info('')
+        logging.info('TOP 10 COMPARISON:')
+        logging.info(
+            '%-6s %-30s %-30s %-8s',
+            'Rank', 'SchoolId (SQL vs Python)',
+            'Score (SQL vs Python)', 'Match'
+        )
+        logging.info('-' * 75)
+
+        max_len = max(len(schools_sql), len(schools_python))
+        for i in range(min(10, max_len)):
+            sql_id = (
+                schools_sql[i].school_id if i < len(schools_sql) else '-'
+            )
+            sql_score = (
+                f"{schools_sql[i].score:.2f}"
+                if i < len(schools_sql) else '-'
+            )
+            python_id = (
+                schools_python[i].school_id
+                if i < len(schools_python) else '-'
+            )
+            python_score = (
+                f"{schools_python[i].score:.2f}"
+                if i < len(schools_python) else '-'
+            )
+
+            school_ids_comparison = f"{sql_id} vs {python_id}"
+            scores_comparison = f"{sql_score} vs {python_score}"
+
+            match = 'OK' if (
+                i < len(schools_sql) and
+                i < len(schools_python) and
+                schools_sql[i].school_id == schools_python[i].school_id and
+                abs(schools_sql[i].score - schools_python[i].score) <= 0.01
+            ) else 'DIFF'
+
             logging.info(
-                'Ranking #1: %d, School ID: %d, Name: %s, Score: %d',
-                ranking, candidate.school_id, candidate.name, candidate.score)
-        logging.info('Python candidates:')
-        for ranking, candidate in enumerate(candidates2, start=1):
-            logging.info(
-                'Ranking #2: %d, School ID: %d, Name: %s, Score: %d',
-                ranking, candidate.school_id, candidate.name, candidate.score)
+                '%-6s %-30s %-30s %-8s',
+                i + 1, school_ids_comparison,
+                scores_comparison, match
+            )
+
+        logging.info('=' * 75)
 
 
 def compute_points_for_school(
@@ -521,10 +621,10 @@ def compute_points_for_school(
 
     last_12_schools_ids = {school.school_id for school in last_12_schools}
 
-    eligible_schools = get_school_of_the_month_candidates(
+    eligible_schools = get_candidate_schools_list(
         cur_readonly,
+        first_day_of_current_month,
         first_day_of_next_month,
-        first_day_of_current_month
     )
     eligible_users = get_cotm_eligible_users(
         cur_readonly,

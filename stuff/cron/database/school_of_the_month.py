@@ -352,3 +352,58 @@ def get_last_12_schools_of_the_month(
             )
         )
     return schools
+
+
+def get_candidate_schools_list(
+    cur_readonly: mysql.connector.cursor.MySQLCursorDict,
+    first_day_of_current_month: datetime.date,
+    first_day_of_next_month: datetime.date
+) -> List[School]:
+    '''
+    Returns a list of candidate schools before calculating scores and
+    filtering out the last 12 recent winners.
+    '''
+    logging.info("Getting candidate schools list")
+    sql = '''
+        SELECT
+            `s`.`school_id`,
+            `s`.`name`
+        FROM
+            `Schools` AS `s`
+        INNER JOIN (
+            SELECT DISTINCT
+                `su`.`school_id`
+            FROM
+                `Submissions` AS `su`
+            INNER JOIN
+                `Problems` AS `p` ON `p`.`problem_id` = `su`.`problem_id`
+            INNER JOIN
+                `Identities` AS `i`
+                ON `i`.`identity_id` = `su`.`identity_id`
+            INNER JOIN
+                `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
+            WHERE
+                `su`.`verdict` = "AC"
+                AND `p`.`visibility` >= 1
+                AND `p`.`quality_seal` = 1
+                AND `su`.`school_id` IS NOT NULL
+                AND `u`.`main_email_id` IS NOT NULL
+                AND `i`.`user_id` IS NOT NULL
+                AND `su`.`time` BETWEEN %s AND %s
+        ) AS `eligible_schools`
+            ON `eligible_schools`.`school_id` = `s`.`school_id`
+        ORDER BY
+            `s`.`school_id`;
+    '''
+    cur_readonly.execute(
+        sql, (first_day_of_current_month, first_day_of_next_month))
+    candidates: List[School] = []
+    for row in cur_readonly.fetchall():
+        candidates.append(
+            School(
+                school_id=row['school_id'],
+                name=row['name'],
+                score=0.0,  # Score will be calculated in python
+            )
+        )
+    return candidates
