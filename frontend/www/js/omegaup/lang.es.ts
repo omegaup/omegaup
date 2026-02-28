@@ -2,7 +2,8 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "Coder menor de 13 a\u00f1os no puede realizar esta acci\u00f3n.",
   aboutToStart: "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciar\u00e1.",
-  acceptPrivacyPolicy: "He le\u00eddo y acepto la [Pol\u00edtica de Uso y Privacidad](%(PrivacyPolicyURL)) del sitio, as\u00ed como el [C\u00f3digo de Conducta](%(CodeofConductPolicyURL)).",
+  acceptCodeOfConduct: "He le\u00eddo y acepto el [C\u00f3digo de Conducta](%(CodeofConductPolicyURL)).",
+  acceptPrivacyPolicy: "He le\u00eddo y acepto la [Pol\u00edtica de Uso y Privacidad](%(PrivacyPolicyURL)) del sitio.",
   accountDeleteCancel: "Cancelar",
   accountDeleteConfirmationMessage: "\u00bfEst\u00e1s segura de que quieres eliminar tu cuenta?",
   accountDeleteMessage: "Haga clic en el siguiente bot\u00f3n si desea eliminar su cuenta y toda su informaci\u00f3n personal de omegaUp. Esta operaci\u00f3n se realizar\u00e1 inmediatamente despu\u00e9s de que confirmes que quieres realizarla y no es reversible.",
@@ -1960,6 +1961,7 @@ const translations: { [key: string]: string; } = {
   userEditProfileImage: "Imagen de perfil",
   userEditSchoolGrade: "Grado escolar",
   userEditSchoolSuccess: "La informaci\u00f3n de la escuela se actualiz\u00f3 correctamente.",
+  userEditShowProblemTags: "Mostrar etiquetas de problemas",
   userEditSuccess: "Perfil actualizado correctamente",
   userEditSuccessfulEmailUpdate: "Email actualizado correctamente. En unos minutos recibir\u00e1s m\u00e1s instrucciones en tu email. No olvides revisar tu carpeta de Spam.",
   userEditTertiary: "Vocacional",
