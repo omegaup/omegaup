@@ -131,10 +131,11 @@
             </template>
 
             <template v-else>
-              <form
+              <div
                 class="collapse-submenu"
                 @mouseenter="onCreateProblemMouseEnter"
                 @mouseleave="onCreateProblemMouseLeave"
+                ref="createProblemWrapper"
               >
                 <button
                   type="button"
@@ -162,7 +163,7 @@
                     >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                   >
                 </div>
-              </form>
+              </div>
             </template>
 
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
@@ -306,7 +307,15 @@ export default class NavbarItems extends Vue {
     this.isCreateProblemSubmenuOpen = true;
   }
 
-  onCreateProblemMouseLeave(): void {
+  onCreateProblemMouseLeave(event: MouseEvent): void {
+    const wrapper = this.$refs.createProblemWrapper as HTMLElement | undefined;
+    const nextTarget = event.relatedTarget as Node | null;
+
+    // If mouse moved to another element inside wrapper, don't close submenu.
+    if (wrapper && nextTarget && wrapper.contains(nextTarget)) {
+      return;
+    }
+
     if (this.hideCreateProblemSubmenuTimeout !== null) {
       clearTimeout(this.hideCreateProblemSubmenuTimeout);
     }
