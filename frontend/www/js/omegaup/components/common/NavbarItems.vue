@@ -143,23 +143,29 @@
                   data-nav-problems-create-options
                   :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
                   :aria-controls="createProblemCollapseLinksId"
-                  @click="onCreateProblemClick($event)"
+                  @click.stop.prevent="onCreateProblemClick"
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
 
                 <div
-                  v-show="isCreateProblemSubmenuOpen"
                   :id="createProblemCollapseLinksId"
-                  class="collapse-links pl-3"
+                  class="collapse collapse-links pl-3"
+                  :class="{ show: isCreateProblemSubmenuOpen }"
+                  @mouseenter="onCreateProblemMouseEnter"
+                  @mouseleave="onCreateProblemMouseLeave"
                 >
-                  <a class="dropdown-item" href="/problem/creator/">{{
-                    T.myproblemsListCreateZipFileProblem
-                  }}</a>
+                  <a
+                    class="dropdown-item"
+                    href="/problem/creator/"
+                    @click.stop
+                    >{{ T.myproblemsListCreateZipFileProblem }}</a
+                  >
                   <a
                     class="dropdown-item"
                     href="/problem/new/"
                     data-nav-problems-create
+                    @click.stop
                     >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                   >
                 </div>
@@ -273,46 +279,24 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-  // Unique id to avoid ESLint warning about static ids in .vue files
+  // Unique id to avoid static id warnings.
   createProblemCollapseLinksId = `collapse-links-${this._uid}`;
 
   isCreateProblemSubmenuOpen = false;
   hideCreateProblemSubmenuTimeout: number | null = null;
 
-  // When opened via click, don't auto-close on mouseleave (Cypress stability)
-  isCreateProblemSubmenuPinned = false;
-
-  private readonly onDocumentClickCapture = (event: MouseEvent): void => {
-    const wrapper = this.$refs.createProblemWrapper as HTMLElement | undefined;
-    const target = event.target as Node | null;
-    if (!wrapper || !target) return;
-
-    if (!wrapper.contains(target)) {
-      this.isCreateProblemSubmenuOpen = false;
-      this.isCreateProblemSubmenuPinned = false;
-    }
-  };
-
-  mounted(): void {
-    document.addEventListener('click', this.onDocumentClickCapture, true);
-  }
-
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
-
   get YouTubeTutorialsURL(): string {
     return getExternalUrl('YouTubeTutorialsURL');
   }
-
   get DiscordInviteURL(): string {
     return getExternalUrl('DiscordInviteURL');
   }
-
   get AlgorithmsBookURL(): string {
     return getExternalUrl('AlgorithmsBookURL');
   }
-
   get CompetitiveProgrammingBookURL(): string {
     return getExternalUrl('CompetitiveProgrammingBookURL');
   }
@@ -322,15 +306,10 @@ export default class NavbarItems extends Vue {
       clearTimeout(this.hideCreateProblemSubmenuTimeout);
       this.hideCreateProblemSubmenuTimeout = null;
     }
-    this.isCreateProblemSubmenuPinned = false;
     this.isCreateProblemSubmenuOpen = true;
   }
 
   onCreateProblemMouseLeave(event: MouseEvent): void {
-    if (this.isCreateProblemSubmenuPinned) {
-      return;
-    }
-
     const wrapper = this.$refs.createProblemWrapper as HTMLElement | undefined;
     const nextTarget = event.relatedTarget as Node | null;
 
@@ -347,17 +326,11 @@ export default class NavbarItems extends Vue {
     }, 150);
   }
 
-  onCreateProblemClick(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
+  onCreateProblemClick(): void {
     this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
-    this.isCreateProblemSubmenuPinned = this.isCreateProblemSubmenuOpen;
   }
 
   beforeDestroy(): void {
-    document.removeEventListener('click', this.onDocumentClickCapture, true);
-
     if (this.hideCreateProblemSubmenuTimeout !== null) {
       clearTimeout(this.hideCreateProblemSubmenuTimeout);
       this.hideCreateProblemSubmenuTimeout = null;
