@@ -1961,6 +1961,7 @@ const translations: { [key: string]: string; } = {
   userEditProfileImage: "(Pr0fi13 imag3)",
   userEditSchoolGrade: "(Sch001 grad3)",
   userEditSchoolSuccess: "(Sch001'5 inf0rma7i0n 5ucc355fu11y upda73d.)",
+  userEditShowProblemTags: "(Sh0w pr0b13m 7ag5)",
   userEditSuccess: "(Pr0fi13 5ucc355fu11y upda73d.)",
   userEditSuccessfulEmailUpdate: "(Emai1 upda73d 5ucc355fu11y! In a f3w minu735, y0u wi11 r3c3iv3 m0r3 in57ruc7i0n5 in y0ur 3mai1. D0n'7 f0rg37 70 ch3ck y0ur Spam f01d3r.)",
   userEditTertiary: "(C0mmuni7y C0113g3)",

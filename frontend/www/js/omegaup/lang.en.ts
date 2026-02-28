@@ -1961,6 +1961,7 @@ const translations: { [key: string]: string; } = {
   userEditProfileImage: "Profile image",
   userEditSchoolGrade: "School grade",
   userEditSchoolSuccess: "School's information successfully updated.",
+  userEditShowProblemTags: "Show problem tags",
   userEditSuccess: "Profile successfully updated.",
   userEditSuccessfulEmailUpdate: "Email updated successfully! In a few minutes, you will receive more instructions in your email. Don't forget to check your Spam folder.",
   userEditTertiary: "Community College",
