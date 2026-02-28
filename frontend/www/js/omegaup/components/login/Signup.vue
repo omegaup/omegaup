@@ -58,19 +58,38 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-8 introjs-terms-and-conditions">
-            <input
-              v-model="termsAndPolicies"
-              data-signup-accept-policies
-              type="checkbox"
-              required
-            />
-            <label for="checkbox">
-              <omegaup-markdown
-                :markdown="formattedAcceptPolicyMarkdown"
-              ></omegaup-markdown>
-            </label>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-privacy-policy"
+                v-model="privacyPolicyAccepted"
+                data-signup-accept-policies
+                type="checkbox"
+                required
+              />
+              <label for="accept-privacy-policy" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptPolicyMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-code-of-conduct"
+                v-model="codeOfConductAccepted"
+                data-signup-accept-conduct
+                type="checkbox"
+                required
+              />
+              <label for="accept-code-of-conduct" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptConductMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
           </div>
+          <!-- id-lint on -->
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
               name="recaptcha"
@@ -204,14 +223,36 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-10 introjs-terms-and-conditions">
-            <input v-model="termsAndPolicies" type="checkbox" />
-            <label for="checkbox" class="pl-1">
-              <omegaup-markdown
-                :markdown="formattedAcceptPolicyMarkdown"
-              ></omegaup-markdown>
-            </label>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-privacy-policy-birthdate"
+                v-model="privacyPolicyAccepted"
+                data-signup-accept-policies
+                type="checkbox"
+              />
+              <label for="accept-privacy-policy-birthdate" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptPolicyMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-code-of-conduct-birthdate"
+                v-model="codeOfConductAccepted"
+                data-signup-accept-conduct
+                type="checkbox"
+              />
+              <label for="accept-code-of-conduct-birthdate" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptConductMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
           </div>
+          <!-- id-lint on -->
         </div>
 
         <div class="row justify-content-md-center">
@@ -291,7 +332,8 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   isUnder13: boolean = true;
   over13Checked: boolean = false;
-  termsAndPolicies: boolean = false;
+  privacyPolicyAccepted: boolean = false;
+  codeOfConductAccepted: boolean = false;
   introStarted: boolean = false;
 
   mounted() {
@@ -377,16 +419,22 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 
+  get termsAndPolicies(): boolean {
+    return this.privacyPolicyAccepted && this.codeOfConductAccepted;
+  }
+
   get formattedAcceptPolicyMarkdown(): string {
     const policyUrl = getBlogUrl('PrivacyPolicyURL');
-    const conductUrl = getBlogUrl('CodeofConductPolicyURL');
-
-    const formattedstring = ui.formatString(T.acceptPrivacyPolicy, {
+    return ui.formatString(T.acceptPrivacyPolicy, {
       PrivacyPolicyURL: policyUrl,
+    });
+  }
+
+  get formattedAcceptConductMarkdown(): string {
+    const conductUrl = getBlogUrl('CodeofConductPolicyURL');
+    return ui.formatString(T.acceptCodeOfConduct, {
       CodeofConductPolicyURL: conductUrl,
     });
-
-    return formattedstring;
   }
 
   get maxDateForTimepicker() {
@@ -426,3 +474,21 @@ export default class Signup extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+}
+
+.checkbox-wrapper label {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+</style>
