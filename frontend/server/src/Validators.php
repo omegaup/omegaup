@@ -475,9 +475,30 @@ class Validators {
             return;
         }
 
-        // Validate that we are working with a date
-        // @TODO This strtotime() allows nice strings like "next Thursday".
-        if (!is_string($parameter) || strtotime($parameter) === false) {
+        if (
+            !is_string($parameter) ||
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
+        }
+
+        $date = \DateTimeImmutable::createFromFormat(
+            '!Y-m-d',
+            $parameter,
+            new \DateTimeZone('UTC')
+        );
+        $errors = \DateTimeImmutable::getLastErrors();
+        if (
+            $date === false ||
+            ($errors !== false && (
+                $errors['warning_count'] > 0 ||
+                $errors['error_count'] > 0
+            )) ||
+            $date->format('Y-m-d') !== $parameter
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 $parameterName
