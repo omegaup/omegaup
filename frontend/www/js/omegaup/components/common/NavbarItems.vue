@@ -148,9 +148,9 @@
                 </button>
 
                 <div
+                  v-show="isCreateProblemSubmenuOpen"
                   :id="createProblemCollapseLinksId"
                   class="collapse-links pl-3"
-                  v-show="isCreateProblemSubmenuOpen"
                 >
                   <a class="dropdown-item" href="/problem/creator/">{{
                     T.myproblemsListCreateZipFileProblem
@@ -221,9 +221,12 @@
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a class="dropdown-item" :href="YouTubeTutorialsURL" target="_blank">{{
-            T.navTutorials
-          }}</a>
+          <a
+            class="dropdown-item"
+            :href="YouTubeTutorialsURL"
+            target="_blank"
+            >{{ T.navTutorials }}</a
+          >
           <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
             T.navDiscord
           }}</a>
