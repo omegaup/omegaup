@@ -127,6 +127,7 @@
               }}</a>
             </template>
             <template v-else>
+<<<<<<< Updated upstream
               <form class="collapse-submenu">
                 <button
                   type="button"
@@ -138,9 +139,28 @@
                   aria-controls="collapse-links"
                   @click.stop
                 >
+=======
+              <form
+                  class="collapse-submenu"
+                  @mouseenter="onCreateProblemMouseEnter"
+                  @mouseleave="onCreateProblemMouseLeave"
+                  >
+               <button
+                   type="button"
+                    class="dropdown-item dropdown-toggle"
+                    data-nav-problems-create-options
+                     :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
+                     aria-controls="collapse-links"
+                     @click="onCreateProblemClick"
+                     >
+>>>>>>> Stashed changes
                   {{ T.myproblemsListCreateProblem }}
                 </button>
-                <div class="collapse collapse-links pl-3">
+                <div
+                       id="collapse-links"
+                       class="collapse-links pl-3"
+                       v-show="isCreateProblemSubmenuOpen"
+                    >
                   <a class="dropdown-item" href="/problem/creator/">{{
                     T.myproblemsListCreateZipFileProblem
                   }}</a>
@@ -258,6 +278,7 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
+<<<<<<< Updated upstream
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
@@ -302,3 +323,38 @@ export default class NavbarItems extends Vue {
   }
 }
 </style>
+=======
+  isCreateProblemSubmenuOpen = false;
+  hideCreateProblemSubmenuTimeout: number | null = null;
+
+  onCreateProblemMouseEnter(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+      this.hideCreateProblemSubmenuTimeout = null;
+    }
+    this.isCreateProblemSubmenuOpen = true;
+  }
+
+  onCreateProblemMouseLeave(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+    }
+    this.hideCreateProblemSubmenuTimeout = window.setTimeout(() => {
+      this.isCreateProblemSubmenuOpen = false;
+      this.hideCreateProblemSubmenuTimeout = null;
+    }, 200);
+  }
+
+  onCreateProblemClick(): void {
+    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
+  }
+
+  beforeDestroy(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+      this.hideCreateProblemSubmenuTimeout = null;
+    }
+  }
+}
+</script>
+>>>>>>> Stashed changes
