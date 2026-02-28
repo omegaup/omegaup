@@ -679,7 +679,7 @@ def update_schools_stats(
                 'Failed to update candidates to school of the month')
             raise
         logging.info('Schools stats updated')
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logging.exception('Failed to update all schools stats')
 
 
