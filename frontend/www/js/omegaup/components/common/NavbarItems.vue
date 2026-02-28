@@ -46,6 +46,7 @@
           T.wordsContests
         }}</a>
       </li>
+
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-courses nav-item-align"
@@ -86,6 +87,7 @@
       >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
+
       <li
         class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
@@ -121,46 +123,35 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
+
             <template v-if="!isLoggedIn">
               <a class="dropdown-item" href="/problem/creator/">{{
                 T.createZipFileForProblem
               }}</a>
             </template>
+
             <template v-else>
-<<<<<<< Updated upstream
-              <form class="collapse-submenu">
+              <form
+                class="collapse-submenu"
+                @mouseenter="onCreateProblemMouseEnter"
+                @mouseleave="onCreateProblemMouseLeave"
+              >
                 <button
                   type="button"
                   class="dropdown-item dropdown-toggle"
-                  data-toggle="collapse"
-                  data-target=".collapse-links"
                   data-nav-problems-create-options
-                  aria-expanded="false"
-                  aria-controls="collapse-links"
-                  @click.stop
+                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
+                  :aria-controls="createProblemCollapseLinksId"
+                  @click="onCreateProblemClick"
                 >
-=======
-              <form
-                  class="collapse-submenu"
-                  @mouseenter="onCreateProblemMouseEnter"
-                  @mouseleave="onCreateProblemMouseLeave"
-                  >
-               <button
-                   type="button"
-                    class="dropdown-item dropdown-toggle"
-                    data-nav-problems-create-options
-                     :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
-                     aria-controls="collapse-links"
-                     @click="onCreateProblemClick"
-                     >
->>>>>>> Stashed changes
                   {{ T.myproblemsListCreateProblem }}
                 </button>
+
                 <div
-                       id="collapse-links"
-                       class="collapse-links pl-3"
-                       v-show="isCreateProblemSubmenuOpen"
-                    >
+                  :id="createProblemCollapseLinksId"
+                  class="collapse-links pl-3"
+                  v-show="isCreateProblemSubmenuOpen"
+                >
                   <a class="dropdown-item" href="/problem/creator/">{{
                     T.myproblemsListCreateZipFileProblem
                   }}</a>
@@ -173,12 +164,14 @@
                 </div>
               </form>
             </template>
+
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
             }}</a>
           </slot>
         </div>
       </li>
+
       <li
         class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
@@ -215,6 +208,7 @@
           }}</a>
         </div>
       </li>
+
       <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
@@ -227,12 +221,9 @@
           {{ T.navHelp }}
         </a>
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
-          <a
-            class="dropdown-item"
-            :href="YouTubeTutorialsURL"
-            target="_blank"
-            >{{ T.navTutorials }}</a
-          >
+          <a class="dropdown-item" :href="YouTubeTutorialsURL" target="_blank">{{
+            T.navTutorials
+          }}</a>
           <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
             T.navDiscord
           }}</a>
@@ -278,7 +269,12 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
-<<<<<<< Updated upstream
+  // Unique id to avoid ESLint warning about static ids in .vue files
+  createProblemCollapseLinksId = `collapse-links-${this._uid}`;
+
+  isCreateProblemSubmenuOpen = false;
+  hideCreateProblemSubmenuTimeout: number | null = null;
+
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
@@ -297,6 +293,35 @@ export default class NavbarItems extends Vue {
 
   get CompetitiveProgrammingBookURL(): string {
     return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
+
+  onCreateProblemMouseEnter(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+      this.hideCreateProblemSubmenuTimeout = null;
+    }
+    this.isCreateProblemSubmenuOpen = true;
+  }
+
+  onCreateProblemMouseLeave(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+    }
+    this.hideCreateProblemSubmenuTimeout = window.setTimeout(() => {
+      this.isCreateProblemSubmenuOpen = false;
+      this.hideCreateProblemSubmenuTimeout = null;
+    }, 150);
+  }
+
+  onCreateProblemClick(): void {
+    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
+  }
+
+  beforeDestroy(): void {
+    if (this.hideCreateProblemSubmenuTimeout !== null) {
+      clearTimeout(this.hideCreateProblemSubmenuTimeout);
+      this.hideCreateProblemSubmenuTimeout = null;
+    }
   }
 }
 </script>
@@ -323,38 +348,3 @@ export default class NavbarItems extends Vue {
   }
 }
 </style>
-=======
-  isCreateProblemSubmenuOpen = false;
-  hideCreateProblemSubmenuTimeout: number | null = null;
-
-  onCreateProblemMouseEnter(): void {
-    if (this.hideCreateProblemSubmenuTimeout !== null) {
-      clearTimeout(this.hideCreateProblemSubmenuTimeout);
-      this.hideCreateProblemSubmenuTimeout = null;
-    }
-    this.isCreateProblemSubmenuOpen = true;
-  }
-
-  onCreateProblemMouseLeave(): void {
-    if (this.hideCreateProblemSubmenuTimeout !== null) {
-      clearTimeout(this.hideCreateProblemSubmenuTimeout);
-    }
-    this.hideCreateProblemSubmenuTimeout = window.setTimeout(() => {
-      this.isCreateProblemSubmenuOpen = false;
-      this.hideCreateProblemSubmenuTimeout = null;
-    }, 200);
-  }
-
-  onCreateProblemClick(): void {
-    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
-  }
-
-  beforeDestroy(): void {
-    if (this.hideCreateProblemSubmenuTimeout !== null) {
-      clearTimeout(this.hideCreateProblemSubmenuTimeout);
-      this.hideCreateProblemSubmenuTimeout = null;
-    }
-  }
-}
-</script>
->>>>>>> Stashed changes
