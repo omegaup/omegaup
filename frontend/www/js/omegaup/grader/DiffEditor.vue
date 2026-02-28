@@ -1,5 +1,5 @@
 <template>
-  <div class="diff-editor-wrapper" :class="theme">
+  <div ref="wrapper" class="diff-editor-wrapper" :class="theme">
     <div class="diff-header">
       <div class="header-section">
         <span class="header-label">Original</span>
@@ -27,6 +27,7 @@ export default class DiffEditor extends Vue {
   _originalModel: monaco.editor.ITextModel | null = null;
   _modifiedModel: monaco.editor.ITextModel | null = null;
   _editor: monaco.editor.IStandaloneDiffEditor | null = null;
+  _resizeObserver: ResizeObserver | null = null;
 
   get theme(): string {
     return store.getters['theme'];
@@ -40,12 +41,16 @@ export default class DiffEditor extends Vue {
 
   @Watch('originalContents')
   onOriginalContentsChange(value: string): void {
-    if (this._originalModel) this._originalModel.setValue(value);
+    if (this._originalModel && this._originalModel.getValue() !== value) {
+      this._originalModel.setValue(value);
+    }
   }
 
   @Watch('modifiedContents')
   onModifiedContentsChange(value: string): void {
-    if (this._modifiedModel) this._modifiedModel.setValue(value);
+    if (this._modifiedModel && this._modifiedModel.getValue() !== value) {
+      this._modifiedModel.setValue(value);
+    }
   }
 
   @Watch('theme')
@@ -76,6 +81,7 @@ export default class DiffEditor extends Vue {
           "'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Courier New', monospace",
         scrollBeyondLastLine: false,
         minimap: { enabled: false },
+        automaticLayout: true,
       },
     );
 
@@ -83,9 +89,16 @@ export default class DiffEditor extends Vue {
       original: this._originalModel,
       modified: this._modifiedModel,
     });
+
+    // Observe wrapper for robust resizing detection
+    this._resizeObserver = new ResizeObserver(() => {
+      this.onResize();
+    });
+    this._resizeObserver.observe(this.$refs.wrapper as HTMLElement);
   }
 
   beforeDestroy(): void {
+    if (this._resizeObserver) this._resizeObserver.disconnect();
     if (this._editor) this._editor.dispose();
     if (this._originalModel) this._originalModel.dispose();
     if (this._modifiedModel) this._modifiedModel.dispose();
