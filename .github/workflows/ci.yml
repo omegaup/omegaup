@@ -313,8 +313,25 @@ jobs:
         run: php frontend/server/cmd/APITool.php --file api.py | yapf > /dev/null
 
   cypress:
+    name: cypress (${{ matrix.name }})
     runs-on: ubuntu-22.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            name: contest-group
+            specs: 'cypress/e2e/contest.cy.ts,cypress/e2e/problem_collection.cy.ts,cypress/e2e/group.cy.ts'
+          - shard: 2
+            name: courses
+            specs: 'cypress/e2e/course_2Part.cy.ts,cypress/e2e/course.cy.ts,cypress/e2e/certificate.cy.ts,cypress/e2e/navigation.cy.ts'
+          - shard: 3
+            name: ide-basics
+            specs: 'cypress/e2e/ide.cy.ts,cypress/e2e/basic_commands.cy.ts'
+          - shard: 4
+            name: problem-creator
+            specs: 'cypress/e2e/problem_creator.cy.ts'
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -338,7 +355,7 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          ./node_modules/.bin/cypress run --browser chrome
+          ./node_modules/.bin/cypress run --browser chrome --spec '${{ matrix.specs }}'
 
       - name: Collect container logs
         if: ${{ always() }}
@@ -353,14 +370,14 @@ jobs:
         if: ${{ always() && hashFiles('cypress/screenshots/**/*') != '' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: cypress-screenshots-${{ github.run_attempt }}
+          name: cypress-screenshots-shard-${{ matrix.shard }}-${{ github.run_attempt }}
           path: cypress/screenshots
 
       - name: Upload cypress videos artifacts
         if: ${{ always() && hashFiles('cypress/videos/**/*') != '' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: cypress-videos-${{ github.run_attempt }}
+          name: cypress-videos-shard-${{ matrix.shard }}-${{ github.run_attempt }}
           path: cypress/videos
 
   python:
