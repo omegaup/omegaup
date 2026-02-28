@@ -2,7 +2,8 @@
 const translations: { [key: string]: string; } = {
   U13CannotPerform: "(C0d3r und3r 13 y3ar5 can n07 p3rf0rm 7hi5 ac7i0n.)",
   aboutToStart: "(Y0u ar3 ab0u7 70 57ar7 7h3 c0n7357. Onc3 y0u c1ick S7ar7 C0n7357 y0ur 7im3 wi11 b3gin.)",
-  acceptPrivacyPolicy: "(I hav3 r3ad and acc3p7 7h3 5i73'5 [U53 and Privacy P01icy](%(PrivacyPolicyURL)), a5 w311 a5 7h3 [C0d3 0f C0nduc7](%(CodeofConductPolicyURL)).)",
+  acceptCodeOfConduct: "(I hav3 r3ad and acc3p7 7h3 [C0d3 0f C0nduc7](%(CodeofConductPolicyURL)).)",
+  acceptPrivacyPolicy: "(I hav3 r3ad and acc3p7 7h3 5i73'5 [U53 and Privacy P01icy](%(PrivacyPolicyURL)).)",
   accountDeleteCancel: "(Canc31)",
   accountDeleteConfirmationMessage: "(Ar3 y0u 5ur3 y0u wan7 70 d31373 y0ur acc0un7?)",
   accountDeleteMessage: "(C1ick 7h3 f0110wing bu770n if y0u wi5h 70 d31373 y0ur acc0un7 and a11 y0ur p3r50na1 inf0rma7i0n fr0m 0m3gaUp. Thi5 0p3ra7i0n wi11 7ak3 p1ac3 imm3dia731y af73r y0u c0nfirm 7ha7 y0u wan7 70 d0 i7 and i7 i5 n07 r3v3r5ib13.)",
