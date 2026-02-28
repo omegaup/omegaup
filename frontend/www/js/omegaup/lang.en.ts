@@ -1712,6 +1712,8 @@ const translations: { [key: string]: string; } = {
   rankSolved: "Solved problems",
   rankingNoUsers: "We don't have data to display on the Ranking graph.",
   recordNotFound: "Record not found.",
+  redisAuthenticationFailed: "Redis authentication failed",
+  redisConnectionFailed: "Failed to connect to Redis at %(host):%(port)",
   registerForContest: "Register for contest",
   registerForContestChallenges: "Challenge",
   registerForContestRules: "Rules",
