@@ -30,11 +30,14 @@ export class LoginPage {
   registerSingleUser(loginOptions: LoginOptions): void {
     cy.get('[data-login-button]').click();
     cy.get('.introjs-skipbutton').click();
+    cy.get('a[href="#signup"]').click();
+    cy.get('.introjs-skipbutton').click();
     cy.get('[data-signup-username]').type(loginOptions.username);
     cy.get('[data-signup-password]').type(loginOptions.password);
     cy.get('[data-signup-repeat-password]').type(loginOptions.password);
     cy.get('[data-signup-email]').type(`${loginOptions.username}@omegaup.com`);
     cy.get('[data-signup-accept-policies]').check();
+    cy.get('[data-signup-accept-conduct]').check();
     cy.get('[data-signup-submit]').click();
   }
 

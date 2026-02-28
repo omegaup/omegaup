@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -205,6 +208,12 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Install yarn dependencies
         run: yarn install
@@ -409,9 +418,12 @@ jobs:
           pytest stuff/teaching_assistant/test_ta_course_mode_pre.py -s
 
       - name: Run the teaching assistant for course mode
+        env:
+          OMEGAUP_PASSWORD: teacher123
+          OMEGAUP_LLM_KEY: omegaup
         run: |
           cd stuff/teaching_assistant
-          python teaching_assistant.py --test_mode --skip-confirm --username teacher --password teacher123 --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup --key omegaup
+          python teaching_assistant.py --test_mode --skip-confirm --username teacher --student_name student --language English --course_alias course --ta_feedback_indicator AI-generated --submission_id_mode false --assignment_alias assignment --llm omegaup
 
       - name: Run post check for course mode
         run: |
