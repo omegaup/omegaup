@@ -41,6 +41,11 @@ export default class MonacoEditor extends Vue {
 
   T = T; //getting translations
 
+  autoDetectActive: boolean = true;
+  isDetecting: boolean = false;
+  _detectTimeout: ReturnType<typeof setTimeout> | null = null;
+  isManualLanguageChange: boolean = false;
+
   get theme(): string {
     return store.getters['theme'];
   }
@@ -77,6 +82,8 @@ export default class MonacoEditor extends Vue {
         Util.supportedLanguages[value].modelMapping,
       );
     }
+    window.dispatchEvent(new Event('grader:language-detect-clear'));
+    this.isManualLanguageChange = false;
   }
 
   @Watch('contents')
@@ -92,6 +99,27 @@ export default class MonacoEditor extends Vue {
         theme: value,
       });
     }
+  }
+
+  created(): void {
+    try {
+      const pref = localStorage.getItem('grader:autoDetectLanguage');
+      this.autoDetectActive = pref !== 'false';
+    } catch (e) {
+      // ignore
+    }
+    window.addEventListener(
+      'grader:auto-detect-preference',
+      this.onAutoDetectPreference as any,
+    );
+    window.addEventListener(
+      'trigger-auto-detect',
+      this.detectLanguageImmediate as any,
+    );
+    window.addEventListener(
+      'grader:manual-language-change',
+      this.onManualLanguageChange as any,
+    );
   }
 
   mounted(): void {
@@ -113,8 +141,19 @@ export default class MonacoEditor extends Vue {
     this._model = this._editor.getModel();
     if (!this._model) return;
 
-    this._model.onDidChangeContent(() => {
+    this._model.onDidChangeContent((e) => {
       store.dispatch(this.storeMapping.contents, this._model?.getValue() || '');
+      if (this._detectTimeout) clearTimeout(this._detectTimeout);
+      const isPaste =
+        e.changes.length > 1 || e.changes.some((c) => c.text.length > 20);
+      if (isPaste) {
+        setTimeout(() => this.detectLanguageImmediate(), 100);
+      } else {
+        this._detectTimeout = setTimeout(
+          () => this.detectLanguageImmediate(),
+          2000,
+        );
+      }
     });
 
     window.addEventListener('resize', this.onResize);
@@ -126,7 +165,30 @@ export default class MonacoEditor extends Vue {
       'code-and-language-set',
       this.onCodeAndLanguageSet,
     );
+    window.removeEventListener(
+      'grader:auto-detect-preference',
+      this.onAutoDetectPreference as any,
+    );
+    window.removeEventListener(
+      'trigger-auto-detect',
+      this.detectLanguageImmediate as any,
+    );
+    window.removeEventListener(
+      'grader:manual-language-change',
+      this.onManualLanguageChange as any,
+    );
     window.removeEventListener('resize', this.onResize);
+    if (this._detectTimeout) clearTimeout(this._detectTimeout);
+  }
+
+  onManualLanguageChange(): void {
+    this.isManualLanguageChange = true;
+
+    if (this._detectTimeout) {
+      clearTimeout(this._detectTimeout);
+      this._detectTimeout = null;
+    }
+    window.dispatchEvent(new Event('grader:language-detect-clear'));
   }
 
   onResize(): void {
@@ -146,6 +208,57 @@ export default class MonacoEditor extends Vue {
   onFontSizeChange(): void {
     if (this._editor) {
       this._editor.updateOptions({ fontSize: this.selectedFontSize });
+    }
+  }
+
+  detectLanguageImmediate(): void {
+    if (
+      this.isDetecting ||
+      !this.autoDetectActive ||
+      this.isManualLanguageChange
+    ) {
+      this.isManualLanguageChange = false;
+      return;
+    }
+    const code = this._model?.getValue() || this.contents || '';
+    if (!code || code.trim().length < 20) {
+      window.dispatchEvent(new Event('grader:language-detect-clear'));
+      return;
+    }
+
+    this.isDetecting = true;
+    try {
+      const detected = Util.detectLanguageFromCode(code);
+      if (
+        detected &&
+        detected.language &&
+        detected.language !== this.language
+      ) {
+        const currentFamily = Util.LANGUAGE_FAMILIES[this.language];
+        const detectedFamily = Util.LANGUAGE_FAMILIES[detected.language];
+        if (
+          currentFamily &&
+          detectedFamily &&
+          currentFamily === detectedFamily
+        ) {
+          window.dispatchEvent(new Event('grader:language-detect-clear'));
+          return;
+        }
+        window.dispatchEvent(
+          new CustomEvent('grader:language-detected', { detail: detected }),
+        );
+      } else {
+        window.dispatchEvent(new Event('grader:language-detect-clear'));
+      }
+    } finally {
+      this.isDetecting = false;
+    }
+  }
+
+  onAutoDetectPreference(e: CustomEvent): void {
+    this.autoDetectActive = Boolean(e.detail);
+    if (!this.autoDetectActive) {
+      window.dispatchEvent(new Event('grader:language-detect-clear'));
     }
   }
 }
