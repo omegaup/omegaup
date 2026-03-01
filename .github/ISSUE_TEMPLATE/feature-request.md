@@ -1,5 +1,5 @@
 ---
-name: Feature request
+name: Feature request (English)
 about: Help us improve the platform by describing your ideas using this format.
 title: '[FEATURE]'
 labels: 'feature-request'

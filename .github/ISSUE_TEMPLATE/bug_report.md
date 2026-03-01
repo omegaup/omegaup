@@ -1,5 +1,5 @@
 ---
-name: Bug Report
+name: Bug Report (English)
 about: Help us improve by reporting bugs using this format
 title: '[BUG]'
 labels: 'bug'

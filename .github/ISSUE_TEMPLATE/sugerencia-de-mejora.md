@@ -1,5 +1,5 @@
 ---
-name: Sugerencia de mejora
+name: Sugerencia de mejora (Spanish)
 about: Ayúdanos a mejorar la plataforma describiendo tus ideas con este formato
 title:
   '[FEATURE] Como un [tipo de usuario], quiero [funcionalidad o mejora esperada]

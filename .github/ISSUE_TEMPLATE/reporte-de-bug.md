@@ -1,5 +1,5 @@
 ---
-name: Reporte de bug
+name: Reporte de bug (Spanish)
 about: Ayúdanos a mejorar reportando bugs usando este formato
 title: '[BUG]'
 labels: 'bug'

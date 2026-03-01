@@ -1,5 +1,5 @@
 ---
-name: Mejora de documentación
+name: Mejora de documentación (Spanish)
 about: Ayúdanos a mejorar solicitando cambios, aclaraciones o mejoras en la documentación con este formato
 title: '[DOCS] Descripción breve de la mejora propuesta'
 labels: 'documentation'
@@ -28,4 +28,4 @@ _Describe el cambio sugerido o la mejora esperada._
 
 _Proveer contexto nos ayuda a encontrar la solución adecuada_
 
-_Ejemplo: Enlaces, capturas, referencias externas que ayuden a entender la mejora"_
+*Ejemplo: Enlaces, capturas, referencias externas que ayuden a entender la mejora"*
