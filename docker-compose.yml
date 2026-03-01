@@ -34,7 +34,24 @@ services:
       AI_WORKER_ENABLED: "true"
       REDIS_PASSWORD: "redis"
       REDIS_HOST: "redis"
-      REDIS_PORT: "6379"
+      REDIS_PORT: 6379
+
+  init-omegaupdata:
+    image: alpine:3.20
+    user: "0:0"
+    restart: 'no'
+    command:
+      [
+        "/bin/sh",
+        "-lc",
+        "mkdir -p /var/lib/omegaup/problems.git && chown -R ${UID_GID:-1000:1000} /var/lib/omegaup",
+      ]
+    volumes:
+      - type: volume
+        source: omegaupdata
+        target: /var/lib/omegaup
+        volume:
+          nocopy: true
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
@@ -42,7 +59,10 @@ services:
     user: "${UID_GID}"
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_started
+      init-omegaupdata:
+        condition: service_completed_successfully
     volumes:
       - type: bind
         source: ./stuff/docker/etc/omegaup/gitserver
