@@ -646,6 +646,17 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Expire rank cache
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
+        if (!is_null($problemsetId)) {
+            $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
+                $problemsetId
+            );
+            if (!is_null($assignment) && !is_null($assignment->course_id)) {
+                \OmegaUp\Cache::invalidateAllKeys(
+                    \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS
+                );
+            }
+        }
+
         return $response;
     }
 
@@ -1600,7 +1611,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             return null;
         }
 
-        if (strpos($resourcePath, '/') !== 0) {
+        if (!str_starts_with($resourcePath, '/')) {
             $resourcePath = "/{$resourcePath}";
         }
         $accessKeyId = AWS_CLI_ACCESS_KEY_ID;

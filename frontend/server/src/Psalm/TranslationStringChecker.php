@@ -17,6 +17,7 @@ class TranslationStringChecker implements
         'errorWhileSendingMail',
         'generalError',
         'loginRequired',
+        'methodNotAllowed',
         'problemDeployerFailed',
         'resourceNotFound',
         'serviceUnavailableError',
@@ -142,7 +143,7 @@ class TranslationStringChecker implements
             // string.
             return true;
         }
-        if (strpos($constructorClassName, 'omegaup\\exceptions\\') !== 0) {
+        if (!str_starts_with($constructorClassName, 'omegaup\\exceptions\\')) {
             // Not the constructor of an exception.
             return false;
         }
