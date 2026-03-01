@@ -12,7 +12,7 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
     corepack enable && \
     corepack prepare yarn@stable --activate

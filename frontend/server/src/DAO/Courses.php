@@ -22,6 +22,14 @@ namespace OmegaUp\DAO;
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
+     * Search for courses by name.
+     *
+     * Historically this performed a `LIKE '%...%'` query, which prevented the
+     * database from using any index and scaled poorly on large datasets.  The
+     * implementation now relies on a FULLTEXT index on `name` and BOOLEAN MODE
+     * prefix matching.  Note that only prefixes of individual words are
+     * matched; substrings inside a word will no longer return a result.
+     *
      * @return list<\OmegaUp\DAO\VO\Courses>
      */
     public static function findByName(string $name): array {
@@ -29,16 +37,28 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             \OmegaUp\DAO\VO\Courses::FIELD_NAMES,
             'c'
         );
+        // matching by name used to rely on a wildcard LIKE which prevented
+        // MySQL from using any index.  A FULLTEXT index has been added on
+        // `Courses(name)` so that searches are efficient; boolean mode is used
+        // to allow prefix matching with the trailing '*' operator.  A partial
+        // term is still handled correctly by appending the wildcard here.
         $sql = "SELECT DISTINCT
                 {$fields}
                 FROM Courses c
-                WHERE c.name
-                LIKE CONCAT('%', ?, '%') LIMIT 10";
+                WHERE MATCH(c.name) AGAINST (? IN BOOLEAN MODE)
+                LIMIT 10";
 
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificates_status: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, recommended: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, teaching_assistant_enabled: bool}> */
+        // boolean fulltext search supports prefix matching with a trailing
+        // '*' operator.  We append it so that passing a partial term still
+        // returns results.  An empty string should yield no rows.
+        $search = trim($name);
+        if ($search !== '') {
+            $search .= '*';
+        }
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$name]
+            [$search]
         );
 
         $finalResult = [];
