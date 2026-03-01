@@ -23,9 +23,11 @@ class Submission extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $pageSize
+     * @omegaup-request-param int|null $submissionIdCursor
      */
     public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $page = $r->ensureOptionalInt('page') ?? 1;
+        $submissionIdCursor = $r->ensureOptionalInt('submissionIdCursor');
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT ;
@@ -43,6 +45,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
                         page: $page,
                         rowsPerPage: $pageSize,
+                        submissionIdCursor: $submissionIdCursor,
                     ),
                     'page' => $page,
                 ],
@@ -63,11 +66,13 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $pageSize
+     * @omegaup-request-param int|null $submissionIdCursor
      *
      */
     public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $username = $r->ensureString('username');
         $page = $r->ensureOptionalInt('page') ?? 1;
+        $submissionIdCursor = $r->ensureOptionalInt('submissionIdCursor');
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
@@ -106,6 +111,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                         identityId: $identity->identity_id,
                         page: $page,
                         rowsPerPage: $pageSize,
+                        submissionIdCursor: $submissionIdCursor,
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
@@ -125,10 +131,12 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string|null $username
      * @omegaup-request-param int|null $page
      * @omegaup-request-param int|null $pageSize
+     * @omegaup-request-param int|null $submissionIdCursor
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $username = $r->ensureOptionalString('username');
         $page = $r->ensureOptionalInt('page') ?? 1;
+        $submissionIdCursor = $r->ensureOptionalInt('submissionIdCursor');
         $pageSize = $r->ensureOptionalInt(
             'pageSize'
         ) ?? self::SUBMISSION_LIST_PAGE_SIZE_DEFAULT;
@@ -144,6 +152,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 'submissions' =>  \OmegaUp\DAO\Submissions::getLatestSubmissions(
                     page: $page,
                     rowsPerPage: $pageSize,
+                    submissionIdCursor: $submissionIdCursor,
                 ),
             ];
         }
@@ -169,6 +178,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 identityId: $identity->identity_id,
                 page: $page,
                 rowsPerPage: $pageSize,
+                submissionIdCursor: $submissionIdCursor,
             ),
         ];
     }
