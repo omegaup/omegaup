@@ -808,7 +808,7 @@ const translations: { [key: string]: string; } = {
   generalError: "(O0p5. I'v3 3nc0un73r3d an in73rna1 3rr0r. P13a53 7ry again.)",
   gitServerError: "(An 3rr0r 0ccurr3d whi13 c0mmunica7ing wi7h 7h3 Gi7 53rv3r.)",
   graderDiffEditorModified: "(M0difi3d)",
-  graderDiffEditorOriginal: "(0rigin41)",
+  graderDiffEditorOriginal: "(Origina1)",
   graderDiffEditorReadOnly: "(R3ad-0n1y)",
   groupAdminAdded: "(Gr0up admin 5ucc355fu11y add3d.)",
   groupAdminRemoved: "(Gr0up admin 5ucc355fu11y r3m0v3d.)",

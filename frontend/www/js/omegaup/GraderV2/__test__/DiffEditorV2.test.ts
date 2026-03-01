@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import DiffEditorV2 from '../DiffEditorV2.vue';
-import store from '../../grader/GraderStore';
 
 // Mock Monaco Editor since it doesn't run in JSDOM
 jest.mock('monaco-editor', () => ({

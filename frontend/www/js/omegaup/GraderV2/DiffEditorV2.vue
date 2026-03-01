@@ -7,7 +7,9 @@
       <div class="header-divider"></div>
       <div class="header-section">
         <span class="header-label">{{ T.graderDiffEditorModified }}</span>
-        <span v-if="readOnly" class="readonly-badge">{{ T.graderDiffEditorReadOnly }}</span>
+        <span v-if="readOnly" class="readonly-badge">{{
+          T.graderDiffEditorReadOnly
+        }}</span>
       </div>
     </div>
     <div ref="editorContainer" class="diff-editor-container"></div>
