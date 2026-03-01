@@ -10,8 +10,6 @@ from typing import Any, List, Tuple, cast
 
 import aggregate_feedback
 
-# pylint: disable=missing-function-docstring
-
 
 class _FakeCursor:
     '''Minimal cursor stub for aggregate_feedback.aggregate_feedback.'''
@@ -20,9 +18,11 @@ class _FakeCursor:
         self._problem_ids = problem_ids
 
     def execute(self, query: str, params: Any = None) -> None:
+        '''Executes a fake SQL query without touching a real database.'''
         del query, params
 
     def fetchall(self) -> List[Tuple[int]]:
+        '''Returns all fake problem_id rows for this cursor.'''
         return [(problem_id,) for problem_id in self._problem_ids]
 
     def __enter__(self) -> "_FakeCursor":
@@ -46,9 +46,11 @@ class _FakeDBConnection:
         self.conn = self
 
     def cursor(self) -> _FakeCursor:
+        '''Creates a new fake cursor over the configured problem_ids.'''
         return _FakeCursor(self._problem_ids)
 
     def rollback(self) -> None:
+        '''Records that a rollback was requested on the fake connection.'''
         self.rollback_calls += 1
 
 
