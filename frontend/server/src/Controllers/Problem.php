@@ -5165,6 +5165,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
+     * @omegaup-request-param null|string $username
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
