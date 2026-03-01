@@ -144,7 +144,7 @@ OmegaUp.on('ready', async () => {
           }: {
             target: Vue & { currentNextExecutionTimestamp: Date };
           }) => {
-            api.Run.execute()
+            api.Run.execute({})
               .then(time.remoteTimeAdapter)
               .then((response) => {
                 target.currentNextExecutionTimestamp =

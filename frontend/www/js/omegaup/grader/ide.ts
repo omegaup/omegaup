@@ -33,7 +33,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'execute-run': () => {
-            api.Run.executeForIDE()
+            api.Run.executeForIDE({})
               .then(time.remoteTimeAdapter)
               .then((response) => {
                 ideComponent.nextExecutionTimestamp =
