@@ -51,7 +51,7 @@ class SecurityTools {
     ): bool {
         if (
             !defined('PASSWORD_ARGON2ID') &&
-            strpos($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX) === 0
+            str_starts_with($hashedPassword, self::ARGON2ID_CRYPT_HASH_PREFIX)
         ) {
             return sodium_crypto_pwhash_str_verify(
                 $hashedPassword,
@@ -102,10 +102,10 @@ class SecurityTools {
     public static function isOldHash(string $hashedPassword): bool {
         if (!defined('PASSWORD_ARGON2ID')) {
             if (
-                strpos(
+                !str_starts_with(
                     $hashedPassword,
                     self::ARGON2ID_CRYPT_HASH_PREFIX
-                ) !== 0
+                )
             ) {
                 return true;
             }

@@ -186,16 +186,16 @@ A project from last year's GSoC introduced the Problem Creator, a visual editor 
 
 * A technical [pdesign doc](https://docs.google.com/document/d/1qpBwJQ6QIiIXgWpb_qa6OJ8KpJPcd11x3qKiefdgPAw/edit?tab=t.0) has been written for this project. 
 * Completed backend changes:
-  * #8470 CDP classes and validations, added core CDP classes and validation logic.
-  * #8479 New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
-  * #8554 CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
-  * #8606 Language support in CDPBuilder, added multi-language support with priority based on languagePreference
-  * #8613 Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
-  * Initial UI change completed: #8593 CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases 
+  * [#8470](https://github.com/omegaup/omegaup/pull/8470) CDP classes and validations, added core CDP classes and validation logic.
+  * [#8479](https://github.com/omegaup/omegaup/pull/8479) New method in ProblemDeployer to modify problem ZIPs, enables updating problem ZIP contents during deployment.
+  * [#8554](https://github.com/omegaup/omegaup/pull/8554) CDPBuilder fixes and unit test coverage, fixed issues in CdpBuilder and added a unit test to ensure correctness.
+  * [#8606](https://github.com/omegaup/omegaup/pull/8606) Language support in CDPBuilder, added multi-language support with priority based on languagePreference
+  * [#8613](https://github.com/omegaup/omegaup/pull/8613) Backend logic for editing cases and CDP, added server-side logic to support case editing and CDP updates.
+  * Initial UI change completed: [#8593](https://github.com/omegaup/omegaup/pull/8593) CasesForm and DeleteConfirmationForm components, introduced the base UI forms required for managing cases
 * Pending work (mostly UI-related)
-  * #8471 Integrate CDP into the problem form and handle external ZIPs
-  * #8492 UI implementation for the editing interface
-  * #8595 UI integration: Edit view, CaseEdit, and Sidebar
+  * [#8471](https://github.com/omegaup/omegaup/pull/8471) Integrate CDP into the problem form and handle external ZIPs
+  * [#8492](https://github.com/omegaup/omegaup/pull/8492) UI implementation for the editing interface
+  * [#8595](https://github.com/omegaup/omegaup/pull/8595) UI integration: Edit view, CaseEdit, and Sidebar
 
 **Expected results**:
 
@@ -237,6 +237,7 @@ If you are interested spending this summer collaborating with us, first of all, 
 
  - First, create an account at [omegaUp.com](https://omegaUp.com).
  - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/contest/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
+#### note: alternative url for the test: [omegaUp Test](https://omegaup.com/arena/gsoc2026)
 
 ### Phase Two: Familiarize yourself with our codebase
 
