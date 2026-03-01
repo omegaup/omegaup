@@ -176,17 +176,13 @@ export default class MonacoEditor extends Vue {
 
   onReset(): void {
     const extension = Util.supportedLanguages[this.language].extension;
-    let defaultTemplate = '';
-
     if (this.isInteractive) {
       // For interactive problems, use original interactive templates
-      defaultTemplate = templates.originalInteractiveTemplates[extension];
-    } else {
-      // For regular problems, use source templates
-      defaultTemplate = templates.sourceTemplates[extension];
+      this.contents = templates.originalInteractiveTemplates[extension];
+      return;
     }
-
-    this.contents = defaultTemplate;
+    // For regular problems, use source templates
+    this.contents = templates.sourceTemplates[extension];
   }
 }
 </script>
