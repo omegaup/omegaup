@@ -64,6 +64,39 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
+     * @return array{identity_id: int, is_private: bool, main_identity_id: int|null}|null
+     */
+    public static function getIdentityPrivacyDataByUsername(
+        string $username
+    ): ?array {
+        $sql = 'SELECT
+                    i.identity_id,
+                    u.main_identity_id,
+                    IFNULL(u.is_private, 0) AS is_private
+                FROM
+                    `Identities` i
+                LEFT JOIN
+                    `Users` u
+                ON
+                    u.user_id = i.user_id
+                WHERE
+                    i.username = ?
+                LIMIT
+                    0, 1';
+        /** @var array{identity_id: int, is_private: bool|int, main_identity_id: int|null}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$username]);
+        if (empty($rs)) {
+            return null;
+        }
+
+        return [
+            'identity_id' => $rs['identity_id'],
+            'is_private' => boolval($rs['is_private']),
+            'main_identity_id' => $rs['main_identity_id'],
+        ];
+    }
+
+    /**
      * @return list<array{key: string, value: string}>
      */
     public static function findByUsernameOrName(
