@@ -78,18 +78,14 @@ class Submission extends \OmegaUp\Controllers\Controller {
             null,
             self::MAX_SUBMISSION_LIST_PAGE_SIZE
         );
-        $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
-        if (is_null($identity)) {
+        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername($username);
+        if (is_null($identityPrivacyData)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
-            !is_null(
-                $user
-            ) &&
-            ($user->main_identity_id == $identity->identity_id) &&
-            $user->is_private
+            ($identityPrivacyData['main_identity_id'] == $identityPrivacyData['identity_id']) &&
+            $identityPrivacyData['is_private']
         ) {
             // Only the user's main identity is private.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -103,7 +99,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     'includeUser' => false,
                     'username' => $username,
                     'submissions' => \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                        identityId: $identity->identity_id,
+                        identityId: $identityPrivacyData['identity_id'],
                         page: $page,
                         rowsPerPage: $pageSize,
                     ),
@@ -147,17 +143,13 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         }
-        $identity = \OmegaUp\DAO\Identities::FindByUsername($username);
-        if (is_null($identity)) {
+        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername($username);
+        if (is_null($identityPrivacyData)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $user = \OmegaUp\DAO\Users::FindByUsername($username);
         if (
-            !is_null(
-                $user
-            ) &&
-            ($user->main_identity_id == $identity->identity_id) &&
-            $user->is_private
+            ($identityPrivacyData['main_identity_id'] == $identityPrivacyData['identity_id']) &&
+            $identityPrivacyData['is_private']
         ) {
             // Only the user's main identity is private.
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -166,7 +158,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
         }
         return [
             'submissions' =>  \OmegaUp\DAO\Submissions::getLatestSubmissions(
-                identityId: $identity->identity_id,
+                identityId: $identityPrivacyData['identity_id'],
                 page: $page,
                 rowsPerPage: $pageSize,
             ),
