@@ -355,9 +355,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns all contests that an identity can manage.
      *
-     * Uses UNION instead of OR to allow each branch to use indexes efficiently,
-     * avoiding temporary tables and filesort from the original query.
-     *
      * @return list<Contest>
      */
     final public static function getAllContestsAdminedByIdentity(
@@ -366,9 +363,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $pageSize = 1000
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
-        $adminRole = \OmegaUp\Authorization::ADMIN_ROLE;
-        $offset = max(0, $page - 1) * $pageSize;
-
         $sql = "
             SELECT
                 $columns,
@@ -378,39 +372,36 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Contests
             INNER JOIN
                 Problemsets AS ps ON ps.problemset_id = Contests.problemset_id
+            INNER JOIN
+                ACLs AS a ON a.acl_id = Contests.acl_id
+            INNER JOIN
+                Identities AS ai ON a.owner_id = ai.user_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = Contests.acl_id
+            LEFT JOIN
+                Identities uri ON uri.user_id = ur.user_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = Contests.acl_id
+            LEFT JOIN
+                Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                Contests.contest_id IN (
-                    SELECT contest_id FROM (
-                        SELECT c.contest_id
-                        FROM Identities ai
-                        INNER JOIN ACLs a ON a.owner_id = ai.user_id
-                        INNER JOIN Contests c ON c.acl_id = a.acl_id
-                        WHERE ai.identity_id = ? AND c.archived = 0
-                        UNION
-                        SELECT c.contest_id
-                        FROM Identities uri
-                        INNER JOIN User_Roles ur ON ur.user_id = uri.user_id
-                        INNER JOIN Contests c ON c.acl_id = ur.acl_id
-                        WHERE uri.identity_id = ? AND ur.role_id = ? AND c.archived = 0
-                        UNION
-                        SELECT c.contest_id
-                        FROM Groups_Identities gi
-                        INNER JOIN Group_Roles gr ON gr.group_id = gi.group_id
-                        INNER JOIN Contests c ON c.acl_id = gr.acl_id
-                        WHERE gi.identity_id = ? AND gr.role_id = ? AND c.archived = 0
-                    ) AS admin_contests
-                )
+                ai.identity_id = ? OR
+                (ur.role_id = ? AND uri.identity_id = ?) OR
+                (gr.role_id = ? AND gi.identity_id = ?)
+                AND archived = 0
+            GROUP BY
+                Contests.contest_id
             ORDER BY
                 Contests.contest_id DESC
             LIMIT ?, ?;";
 
         $params = [
             $identityId,
-            $adminRole,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
-            $adminRole,
+            \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
-            $offset,
+            max(0, $page - 1) * $pageSize,
             $pageSize,
         ];
 
