@@ -1712,6 +1712,8 @@ const translations: { [key: string]: string; } = {
   rankSolved: "(S01v3d pr0b13m5)",
   rankingNoUsers: "(W3 d0n'7 hav3 da7a 70 di5p1ay 0n 7h3 Ranking graph.)",
   recordNotFound: "(R3c0rd n07 f0und.)",
+  redisAuthenticationFailed: "(R3di5 au7h3n7ica7i0n fai13d)",
+  redisConnectionFailed: "(Fai13d 70 c0nn3c7 70 R3di5 a7 %(host):%(port))",
   registerForContest: "(R3gi573r f0r c0n7357)",
   registerForContestChallenges: "(Cha113ng3)",
   registerForContestRules: "(Ru135)",
