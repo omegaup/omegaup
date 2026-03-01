@@ -68,6 +68,8 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       searchResultProblems: searchResultProblems,
+      solvedProblemAliases: payload.solvedProblemAliases ?? [],
+      unsolvedProblemAliases: payload.unsolvedProblemAliases ?? [],
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
@@ -85,6 +87,8 @@ OmegaUp.on('ready', () => {
           sortOrder: sortOrder,
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
+          solvedProblemAliases: this.solvedProblemAliases,
+          unsolvedProblemAliases: this.unsolvedProblemAliases,
         },
         on: {
           'wizard-search': (queryParameters: {
