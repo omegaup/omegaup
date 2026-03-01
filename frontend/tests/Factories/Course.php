@@ -54,6 +54,7 @@ class Course {
             'name' => $courseName,
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => $courseStartTime,
             'unlimited_duration' => is_null($courseDuration),
             'admission_mode' => $admissionMode,
