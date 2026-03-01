@@ -52,6 +52,24 @@ const props: types.ProblemFormPayload = {
 
 // TODO: Add tests that simulates user interaction
 describe('Settings.vue', () => {
+  it('Should generate alias with accented and multilingual text', () => {
+    const wrapper = shallowMount(Form, { propsData: { data: props } });
+
+    const cases = [
+      { title: 'Árbol ñandú 中文', alias: 'Arbol-nandu-' },
+      { title: 'Æsir and Œuvre', alias: 'AEsir-and-OEuvre' },
+      { title: 'Ꜳrvíztűrő tükörfúrógép', alias: 'AArvizturo-tukorfurogep' },
+      { title: 'Crème brûlée déjà vu', alias: 'Creme-brulee-deja-vu' },
+      { title: 'São Paulo - año 2026', alias: 'Sao-Paulo---ano-2026' },
+    ];
+
+    for (const sample of cases) {
+      wrapper.setData({ title: sample.title });
+      (wrapper.vm as any).onGenerateAlias();
+      expect((wrapper.vm as any).alias).toBe(sample.alias);
+    }
+  });
+
   it('Should call the function that opens collapsed panels', async () => {
     // We need to use any here because `.options.methods` is not inside the public API, yet that's the only way
     // to access the method in order to spy on it and check whether or not it has been called.
