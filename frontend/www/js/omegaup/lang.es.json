@@ -1,7 +1,4 @@
 {
-	"ProblemStatusAttempted": "Intentado",
-	"ProblemStatusSolved": "Resuelto",
-	"ProblemStatusUnattempted": "Sin intentar",
 	"U13CannotPerform": "Coder menor de 13 a\u00f1os no puede realizar esta acci\u00f3n.",
 	"aboutToStart": "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas clic en entrar, tu tiempo iniciar\u00e1.",
 	"acceptPrivacyPolicy": "He le\u00eddo y acepto la [Pol\u00edtica de Uso y Privacidad](%(PrivacyPolicyURL)) del sitio, as\u00ed como el [C\u00f3digo de Conducta](%(CodeofConductPolicyURL)).",
@@ -1421,6 +1418,9 @@
 	"problemSettingsSummaryTitleWithProblemsetTitleAndLetter": "%(problemset_title) - %(letter). %(problem_title)",
 	"problemSolutionNotVisible": "No tienes permiso para ver la soluci\u00f3n del problema. Intenta resolver el problema primero.",
 	"problemSolutionSystemInMaintainance": "La funcionalidad para ver soluciones de un problema se encuentra en mantenimiento.\n\nVolveremos pronto.",
+	"problemStatusAttempted": "Intentado",
+	"problemStatusSolved": "Resuelto",
+	"problemStatusUnattempted": "Sin intentar",
 	"problemSuccessfullyAdded": "Problema agregado correctamente",
 	"problemSuccessfullyRemoved": "Problema eliminado correctamente",
 	"problemSuccessfullyUpdated": "Problema actualizado correctamente",

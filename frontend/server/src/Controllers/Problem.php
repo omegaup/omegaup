@@ -49,7 +49,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, isBookmarked?: bool, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, reviewedProblemLevel?: null|string, reviewedPublicTags?: list<string>, reviewedQualitySeal?: bool, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
- * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
+ * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, solvedProblemAliases: list<string>, unsolvedProblemAliases: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
@@ -5224,6 +5224,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
             authors: $authors
         );
 
+        $solvedProblemAliases = [];
+        $unsolvedProblemAliases = [];
+        if (!is_null($r->identity)) {
+            $solvedRes = \OmegaUp\Controllers\User::apiProblemsSolved($r);
+            $solvedProblemAliases = array_map(
+                fn($p) => $p['alias'],
+                $solvedRes['problems'] ?? []
+            );
+            $unsolvedRes = \OmegaUp\Controllers\User::apiListUnsolvedProblems(
+                $r
+            );
+            $unsolvedProblemAliases = array_map(
+                fn($p) => $p['alias'],
+                $unsolvedRes['problems'] ?? []
+            );
+        }
+
         return [
             'templateProperties' => [
                 'payload' => [
@@ -5240,6 +5257,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
+                    'solvedProblemAliases' => $solvedProblemAliases,
+                    'unsolvedProblemAliases' => $unsolvedProblemAliases,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'

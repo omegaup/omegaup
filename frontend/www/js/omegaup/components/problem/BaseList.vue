@@ -138,16 +138,16 @@
                 v-if="solvedProblemAliasesSet.has(problem.alias)"
                 class="badge badge-success"
               >
-                {{ T.ProblemStatusSolved }}
+                {{ T.problemStatusSolved }}
               </span>
               <span
                 v-else-if="unsolvedProblemAliasesSet.has(problem.alias)"
                 class="badge badge-warning"
               >
-                {{ T.ProblemStatusAttempted }}
+                {{ T.problemStatusAttempted }}
               </span>
               <span v-else class="badge badge-secondary">{{
-                T.ProblemStatusUnattempted
+                T.problemStatusUnattempted
               }}</span>
             </td>
             <td class="align-middle">

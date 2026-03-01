@@ -4369,8 +4369,10 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
+    solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
+    unsolvedProblemAliases: string[];
   }
 
   export interface ProblemPrintDetailsPayload {
