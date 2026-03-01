@@ -1740,6 +1740,7 @@ const translations: { [key: string]: string; } = {
   requestFeedback: "La solicitud de retroalimentaci\u00f3n ha sido enviada a todos los administradores",
   requestFeedbackConfirm: "\u00bfDeseas solicitar retroalimentaci\u00f3n a tus docentes sobre este env\u00edo?",
   requestFeedbackMessage: "Necesito su ayuda en este env\u00edo.",
+  resetToDefault: "Restablecer a la definici\u00f3n de c\u00f3digo predeterminada",
   resourceNotFound: "Recurso no encontrado.",
   reviewerNomination: "Calificar el problema como revisor",
   reviewerNominationFormTitle: "Califica este problema.",
