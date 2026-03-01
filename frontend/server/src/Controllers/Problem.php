@@ -859,7 +859,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
 
                 // After normalization problemTag becomes problemtag
-                if (strpos($tagName, 'problemtag') === 0) {
+                if (str_starts_with($tagName, 'problemtag')) {
                     // Starts with 'problemtag'
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'tagPrefixRestricted',

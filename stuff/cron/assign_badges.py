@@ -43,13 +43,13 @@ def get_current_owners(
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
 ) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
-    cur_readonly.execute(f'''
+    cur_readonly.execute('''
         SELECT
             ub.user_id
         FROM
             Users_Badges ub
         WHERE
-            ub.badge_alias = '{badge}';''')
+            ub.badge_alias = %s;''', (badge,))
     return set(row['user_id'] for row in cur_readonly)
 
 
@@ -79,23 +79,40 @@ def save_new_owners(badge: str, users: Set[int],
 
 def process_badges(
     current_timestamp: Optional[datetime.datetime],
+    dbconn: lib.db.Connection,
     cur: mysql.connector.cursor.MySQLCursorDict,
     cur_readonly: mysql.connector.cursor.MySQLCursorDict,
-) -> None:
-    '''Processes all badges'''
+) -> bool:
+    '''Processes all badges.
+
+    Returns True if at least one badge failed, False otherwise.
+    '''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
+    has_failures = False
+    successful = 0
+    failed_badges = []
     for badge in badges:
         logging.info('==== Badge %s ====', badge)
         try:
-            all_owners = get_all_owners(badge, current_timestamp, cur_readonly)
+            all_owners = get_all_owners(badge, current_timestamp,
+                                        cur_readonly)
             current_owners = get_current_owners(badge, cur_readonly)
             new_owners = all_owners - current_owners
             logging.info('New owners: %s', new_owners)
             if new_owners:
                 save_new_owners(badge, new_owners, cur)
-        except:  # noqa: bare-except
+            dbconn.conn.commit()
+            successful += 1
+        except Exception:  # pylint: disable=broad-except
+            dbconn.conn.rollback()
+            has_failures = True
+            failed_badges.append(badge)
             logging.exception('Something went wrong with badge: %s.', badge)
-            raise
+    logging.info('Successfully processed %d badges.', successful)
+    if failed_badges:
+        logging.error('Badges that failed to process: %s',
+                      ', '.join(failed_badges))
+    return has_failures
 
 
 def main() -> None:
@@ -121,11 +138,14 @@ def main() -> None:
         with dbconn.cursor(buffered=True,
                            dictionary=True) as cur, dbconn_readonly.cursor(
                                buffered=True, dictionary=True) as cur_readonly:
-            process_badges(args.current_timestamp, cur, cur_readonly)
+            has_failures = process_badges(args.current_timestamp, dbconn,
+                                          cur, cur_readonly)
         dbconn.conn.commit()
     finally:
         dbconn.conn.close()
         logging.info('Finished')
+    if has_failures:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

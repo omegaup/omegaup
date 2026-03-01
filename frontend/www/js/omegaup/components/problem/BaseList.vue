@@ -28,15 +28,20 @@
             <th scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsTitle }}</span>
               <span
+                v-if="showProblemTags"
                 class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
                 >{{ T.tagSourceLevel }}</span
               >
-              <span class="badge custom-badge custom-badge-owner mr-1 p-2">{{
-                T.tagSourceOwner
-              }}</span>
-              <span class="badge custom-badge custom-badge-voted p-2">{{
-                T.tagSourceVoted
-              }}</span>
+              <span
+                v-if="showProblemTags"
+                class="badge custom-badge custom-badge-owner mr-1 p-2"
+                >{{ T.tagSourceOwner }}</span
+              >
+              <span
+                v-if="showProblemTags"
+                class="badge custom-badge custom-badge-voted p-2"
+                >{{ T.tagSourceVoted }}</span
+              >
               <omegaup-common-sort-controls
                 column="title"
                 :column-type="omegaup.ColumnType.String"
@@ -300,6 +305,7 @@ export default class BaseList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() path!: string;
+  @Prop({ default: true }) showProblemTags!: boolean;
   @Prop({ default: () => [] }) solvedProblemAliases!: string[];
   @Prop({ default: () => [] }) unsolvedProblemAliases!: string[];
 
