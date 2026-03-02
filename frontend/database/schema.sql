@@ -1352,6 +1352,7 @@ CREATE TABLE `User_Roles` (
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
   KEY `acl_id` (`acl_id`),
+  KEY `idx_user_roles_role_acl_user` (`role_id`,`acl_id`,`user_id`),
   CONSTRAINT `fk_ur_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`),
   CONSTRAINT `fk_ur_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`),
   CONSTRAINT `fk_ura_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
