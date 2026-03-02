@@ -930,6 +930,7 @@ CREATE TABLE `QualityNomination_Comments` (
   PRIMARY KEY (`qualitynomination_comment_id`),
   KEY `user_id` (`user_id`),
   KEY `qualitynomination_id` (`qualitynomination_id`),
+  KEY `idx_qnc_nomination_user_comment` (`qualitynomination_id`,`user_id`,`qualitynomination_comment_id`),
   CONSTRAINT `fk_qnc_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`),
   CONSTRAINT `fk_qnc_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Comentarios para una nominación';
@@ -977,6 +978,7 @@ CREATE TABLE `QualityNominations` (
   KEY `problem_id` (`problem_id`),
   KEY `idx_nomination` (`nomination`),
   KEY `idx_nomination_problem` (`nomination`,`problem_id`),
+  KEY `idx_nomination_qualitynomination` (`nomination`,`qualitynomination_id`),
   CONSTRAINT `fk_qn_problem_id` FOREIGN KEY (`problem_id`) REFERENCES `Problems` (`problem_id`),
   CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='La cola de nominación a promoción / democión de problemas';
