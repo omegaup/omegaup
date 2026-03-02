@@ -142,7 +142,7 @@ import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_Runsv2 from '../arena/Runsv2.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
-import omegaup_problemMarkdown from './Markdown.vue';
+import omegaup_problemMarkdown from './ProblemMarkdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import user_Username from '../user/Username.vue';
 

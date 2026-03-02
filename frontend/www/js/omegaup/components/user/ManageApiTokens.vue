@@ -29,37 +29,41 @@
         {{ T.profileApiTokensEmpty }}
       </div>
     </div>
-    <table v-else class="table table-striped table-over">
-      <thead>
-        <tr>
-          <th>{{ T.apiTokenName }}</th>
-          <th>{{ T.apiTokenTimestamp }}</th>
-          <th>{{ T.apiTokenLastTimeUsed }}</th>
-          <th>{{ T.apiTokenResetTime }}</th>
-          <th>{{ T.apiTokenRemaining }}</th>
-          <th>{{ T.apiTokenLimit }}</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="apiToken in apiTokens" :key="apiToken.name">
-          <td>{{ apiToken.name }}</td>
-          <td>{{ formatTime(apiToken.timestamp) }}</td>
-          <td>{{ formatTime(apiToken.last_used) }}</td>
-          <td>{{ formatTime(apiToken.rate_limit.reset) }}</td>
-          <td>{{ apiToken.rate_limit.remaining }}</td>
-          <td>{{ apiToken.rate_limit.limit }}</td>
-          <td>
-            <button
-              class="btn btn-secondary"
-              @click="$emit('revoke-api-token', apiToken.name)"
-            >
-              {{ T.apiTokenRevoke }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else class="table-responsive">
+      <table class="table table-striped table-over">
+        <thead>
+          <tr>
+            <th>{{ T.apiTokenName }}</th>
+            <th>{{ T.apiTokenTimestamp }}</th>
+            <th>{{ T.apiTokenLastTimeUsed }}</th>
+            <th>{{ T.apiTokenResetTime }}</th>
+            <th>{{ T.apiTokenRemaining }}</th>
+            <th>{{ T.apiTokenLimit }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="apiToken in apiTokens" :key="apiToken.name">
+            <td data-label="Token">{{ apiToken.name }}</td>
+            <td data-label="Timestamp">{{ formatTime(apiToken.timestamp) }}</td>
+            <td data-label="Last used">{{ formatTime(apiToken.last_used) }}</td>
+            <td data-label="Reset time">
+              {{ formatTime(apiToken.rate_limit.reset) }}
+            </td>
+            <td data-label="Remaining">{{ apiToken.rate_limit.remaining }}</td>
+            <td data-label="Limit">{{ apiToken.rate_limit.limit }}</td>
+            <td>
+              <button
+                class="btn btn-secondary btn-sm"
+                @click="$emit('revoke-api-token', apiToken.name)"
+              >
+                {{ T.apiTokenRevoke }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -103,3 +107,19 @@ export default class ManageApiTokens extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  white-space: nowrap;
+
+  th,
+  td {
+    vertical-align: middle;
+  }
+}
+</style>

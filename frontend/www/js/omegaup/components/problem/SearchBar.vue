@@ -53,7 +53,7 @@
         </label>
       </div>
       <div class="form-group mr-2">
-        <label>
+        <label class="ml-4 large:ml-0">
           <input
             v-model="currentOnlyQualitySeal"
             name="only_quality_seal"

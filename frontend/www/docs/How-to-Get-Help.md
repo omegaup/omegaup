@@ -1,7 +1,7 @@
 We know that you will have a lot of questions about how things work at omegaUp, technical and otherwise.
 This is a guide on how to get better answers.
 
-Whenever you get stuck installing the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) or reading through the [codebase](https://github.com/omegaup/omegaup) or wondering about how the GSoC application process works at omegaUp, please follow these steps to get your question answered:
+Whenever you get stuck installing the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) or reading through the [codebase](https://github.com/omegaup/omegaup) or wondering about how the GSoC application process works at omegaUp, please follow these steps to get your question answered:
 
 ### 1. Do a quick search for your question
 The following resources are super powerful when looking for answers:

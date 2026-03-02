@@ -1,10 +1,10 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import user_Password_Edit from './PasswordEdit.vue';
 import T from '../../lang';
 
 describe('PasswordEdit.vue', () => {
   it('Should emit password update', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    const wrapper = mount(user_Password_Edit);
 
     const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -26,7 +26,7 @@ describe('PasswordEdit.vue', () => {
   });
 
   it('Should not emit password update when there is new password mismatch', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    const wrapper = mount(user_Password_Edit);
 
     const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -42,7 +42,7 @@ describe('PasswordEdit.vue', () => {
   });
 
   it('Should enable submit button when there is no new password mismatch nor empty passwords', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    const wrapper = mount(user_Password_Edit);
 
     const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -55,7 +55,7 @@ describe('PasswordEdit.vue', () => {
   });
 
   it('Should disable submit button when there is new password mismatch or empty inputs', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    const wrapper = mount(user_Password_Edit);
 
     let oldPassword = 'oldPassword';
     const newPassword = 'newPassword';

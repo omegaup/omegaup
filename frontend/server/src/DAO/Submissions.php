@@ -236,11 +236,14 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         }
 
         $sql = "SELECT
-                    MAX(s.time)
+                    s.time
                 FROM
                     Submissions s
                 WHERE
                     s.identity_id = ? AND s.problem_id = ? {$problemsetIdFilter}
+                ORDER BY
+                    s.time DESC
+                LIMIT 1
                 FOR UPDATE;
         ";
 

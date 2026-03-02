@@ -33,7 +33,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * List can only be retreived by an admin
+     * List can only be retrieved by an admin
      */
     public function testCourseStudentListNonAdmin() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
@@ -443,6 +443,111 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(
             100.0,
             $results['progress'][2]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
+        );
+    }
+
+    public function testStudentsProgressUpdatedAfterSubmissionInAssignment() {
+        $numProblems = 2;
+        $problemsData = [];
+        for ($i = 0; $i < $numProblems; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignment,
+            $problemsData
+        );
+
+        [
+            'user' => $user,
+            'identity' => $participant
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($courseData['admin']);
+
+        $resultsBefore = \OmegaUp\Controllers\Course::apiStudentsProgress(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseData['course']->alias,
+                'page' => 1,
+                'length' => 100,
+            ])
+        );
+
+        $expectedStudents = 1;
+        $this->assertSame($expectedStudents, count($resultsBefore['progress']));
+        $expectedProgressOneSolved = intval((1 / $numProblems) * 100);
+        $this->assertSame(
+            $expectedProgressOneSolved,
+            intval(
+                $resultsBefore['progress'][0]['assignments'][$assignment]['progress']
+            )
+        );
+        $expectedScorePerProblem = 100.0;
+        $this->assertSame(
+            $expectedScorePerProblem,
+            $resultsBefore['progress'][0]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
+        );
+        $this->assertArrayNotHasKey(
+            $problemsData[1]['problem']->alias,
+            $resultsBefore['progress'][0]['assignments'][$assignment]['problems']
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($courseData['admin']);
+
+        $resultsAfter = \OmegaUp\Controllers\Course::apiStudentsProgress(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseData['course']->alias,
+                'page' => 1,
+                'length' => 100,
+            ])
+        );
+
+        $this->assertSame($expectedStudents, count($resultsAfter['progress']));
+        $expectedProgressAllSolved = intval(
+            ($numProblems / $numProblems) * 100
+        );
+        $this->assertSame(
+            $expectedProgressAllSolved,
+            intval(
+                $resultsAfter['progress'][0]['assignments'][$assignment]['progress']
+            )
+        );
+        $this->assertSame(
+            $expectedScorePerProblem,
+            $resultsAfter['progress'][0]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
+        );
+        $this->assertSame(
+            $expectedScorePerProblem,
+            $resultsAfter['progress'][0]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
     }
 

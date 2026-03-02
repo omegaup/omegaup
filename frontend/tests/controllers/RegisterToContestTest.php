@@ -433,7 +433,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $invited] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
 
-        // The first one is explictly invited
+        // The first one is explicitly invited
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $invited);
 
         // And can access to the contest
@@ -485,7 +485,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
         ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Update admission_mode to regsitration
+        // Update admission_mode to registration
         $adminLogin = self::login($contestData['director']);
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
