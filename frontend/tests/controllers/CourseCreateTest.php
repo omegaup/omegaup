@@ -35,6 +35,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => \OmegaUp\Test\Utils::createRandomString(),
             'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => (\OmegaUp\Time::get() + 60),
             'finish_time' => (\OmegaUp\Time::get() + 120)
         ]);
@@ -48,6 +49,26 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $r['name']
             )
         );
+    }
+
+    public function testCreateCourseWithoutObjectiveFails() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+            ]));
+            $this->fail('Should have thrown exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterEmpty', $e->getMessage());
+            $this->assertSame('objective', $e->parameter);
+        }
     }
 
     public function testCreateAndUpdateCourseWithObjective() {
