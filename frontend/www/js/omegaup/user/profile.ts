@@ -360,8 +360,13 @@ OmegaUp.on('ready', () => {
                   userBasicInformation.username,
                 );
                 userProfile.profile.username = userBasicInformation.username;
+                userProfile.profile.name = userBasicInformation.name;
+                userProfile.profile.gender = userBasicInformation.gender;
                 userProfile.profile.country_id =
                   userBasicInformation.country_id;
+                userProfile.profile.state_id = userBasicInformation.state_id;
+                userProfile.profile.birth_date =
+                  userBasicInformation.birth_date ?? undefined;
                 ui.success(T.userEditSuccess);
               })
               .catch(ui.apiError);
