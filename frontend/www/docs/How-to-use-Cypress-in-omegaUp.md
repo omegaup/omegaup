@@ -138,6 +138,33 @@ You can select an element with the selector tool to get the necessary command to
 
 If you don't want to run the test with GUI, you can use `npx cypress run` or `./node_modules/.bin cypress run` to execute the tests without an interface. A video will be created inside `./cypress/videos` so you can see how the test was performed.
 
+## Coverage with Codecov
+
+Cypress E2E coverage is reported to Codecov with a dedicated `cypress` flag and enforced with an 80% minimum target in CI.
+
+To reproduce coverage locally (CI-equivalent flow):
+
+```bash
+yarn coverage:e2e:clean
+CYPRESS_COVERAGE=true yarn build
+yarn test:e2e:coverage
+yarn coverage:e2e:report
+```
+
+If you run Cypress **inside the `frontend` Docker container**, use Electron instead of Chrome:
+
+```bash
+docker compose exec -T frontend yarn coverage:e2e:clean
+docker compose exec -T -e CYPRESS_COVERAGE=true frontend yarn build
+docker compose exec -T frontend yarn test:e2e:coverage:docker
+docker compose exec -T frontend yarn coverage:e2e:report
+```
+
+Expected artifacts:
+
+- `.nyc_output/*.json` (raw merged coverage data)
+- `coverage/cypress/lcov.info` (report uploaded to Codecov in CI)
+
 ## Writing Tests for Cypress
 
 The tests are contained within `./cypress/e2e` and have the filename format `name.cy.ts`. (Subfolders can be created if necessary.)

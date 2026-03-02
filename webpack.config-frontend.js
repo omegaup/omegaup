@@ -6,6 +6,8 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
+const shouldInstrumentForCypressCoverage =
+  process.env.CYPRESS_COVERAGE === 'true';
 
 module.exports = {
   name: 'frontend',
@@ -247,6 +249,31 @@ module.exports = {
         },
         exclude: /node_modules/,
       },
+      ...(shouldInstrumentForCypressCoverage
+        ? [
+            {
+              // Instrument all first-party JS/TS/Vue scripts after transpilation.
+              test: /\.(js|ts|vue)($|\?)/,
+              enforce: 'post',
+              exclude: [
+                /node_modules/,
+                /\.test\.ts$/,
+                /\/third_party\//,
+                /\/js\/dist\//,
+                /\/omegaup\/api\.ts$/,
+                /\/omegaup\/api_types\.ts$/,
+                /\/omegaup\/lang.*\.ts$/,
+              ],
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                configFile: false,
+                cacheDirectory: true,
+                plugins: ['babel-plugin-istanbul'],
+              },
+            },
+          ]
+        : []),
       {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
