@@ -34,7 +34,7 @@ describe('Requests.vue', () => {
     textAddParticipant: T.contestAdduserAddContestant,
   };
 
-  it('Should handle initital props', () => {
+  it('Should handle initial props', () => {
     const wrapper = shallowMount(common_Requests, { propsData });
 
     expect(wrapper.text()).toContain(T.contestAdduserAddContestant);

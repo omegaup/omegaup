@@ -10,9 +10,10 @@
           ></div>
           <textarea
             ref="markdownInput"
-            v-model.lazy="currentSolutionMarkdown"
+            v-model="currentSolutionMarkdown"
             data-problem-creator-solution-editor-markdown
             class="wmd-input"
+            @change="currentSolutionMarkdown = $event.target.value"
           ></textarea>
         </div>
         <div class="col-md-6 d-flex flex-column">
@@ -52,9 +53,8 @@ import { TabIndex } from '../Tabs.vue';
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 import VueCookies from 'vue-cookies';
+import ProblemMarkdown from '../../ProblemMarkdown.vue';
 Vue.use(VueCookies, { expire: -1 });
-
-import omegaup_problemMarkdown from '../../Markdown.vue';
 
 const markdownConverter = new markdown.Converter({
   preview: true,
@@ -62,7 +62,7 @@ const markdownConverter = new markdown.Converter({
 
 @Component({
   components: {
-    'omegaup-markdown': omegaup_problemMarkdown,
+    'omegaup-markdown': ProblemMarkdown,
   },
 })
 export default class SolutionTab extends Vue {
@@ -188,6 +188,9 @@ export default class SolutionTab extends Vue {
     overflow-y: auto;
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
+    width: 100%;
+    margin-top: 35px;
+    overflow-wrap: anywhere;
   }
 }
 </style>

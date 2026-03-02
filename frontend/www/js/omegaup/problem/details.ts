@@ -90,6 +90,8 @@ OmegaUp.on('ready', async () => {
       createdGuid: '',
       searchResultUsers: searchResultEmpty,
       searchResultProblems: searchResultEmpty,
+      isBookmarked: payload.isBookmarked,
+      isLoadingBookmark: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -126,6 +128,7 @@ OmegaUp.on('ready', async () => {
           searchResultProblems: this.searchResultProblems,
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
+          bookmarkedStatus: this.isBookmarked,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -435,6 +438,27 @@ OmegaUp.on('ready', async () => {
                 );
               })
               .catch(ui.apiError);
+          },
+          'toggle-bookmark': (problemAlias: string) => {
+            if (this.isLoadingBookmark) {
+              return;
+            }
+            this.isLoadingBookmark = true;
+            api.ProblemBookmark.toggle({ problem_alias: problemAlias })
+              .then((response) => {
+                this.isBookmarked = response.bookmarked;
+                ui.success(
+                  response.bookmarked
+                    ? T.problemBookmarkAdded
+                    : T.problemBookmarkRemoved,
+                );
+              })
+              .catch((error) => {
+                ui.apiError(error);
+              })
+              .finally(() => {
+                this.isLoadingBookmark = false;
+              });
           },
         },
       });

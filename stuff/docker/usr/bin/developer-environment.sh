@@ -44,6 +44,12 @@ define('TEMPLATE_CACHE_DIR', '/tmp/templates');
 define('OMEGAUP_GITSERVER_URL', 'http://omegaup-gitserver-1:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
+define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
+define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
+define('OMEGAUP_GRADER_SECRET', 'secret');
+define('OMEGAUP_COURSE_CLONE_SECRET_KEY', '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE');
+define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+define('OMEGAUP_GOOGLE_CLIENTID', '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com');
 define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
 EOF
 ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"

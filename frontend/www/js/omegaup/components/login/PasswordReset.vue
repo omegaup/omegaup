@@ -5,20 +5,18 @@
       <form>
         <div class="form-group">
           <h5>{{ T.passwordResetPassword }}</h5>
-          <input
+          <omegaup-password-input
             v-model="password"
-            type="password"
             name="password"
-            class="form-control"
+            autocomplete="new-password"
           />
         </div>
         <div class="form-group">
           <h5>{{ T.passwordResetPasswordConfirmation }}</h5>
-          <input
+          <omegaup-password-input
             v-model="passwordConfirmation"
-            type="password"
             name="password_confirmation"
-            class="form-control"
+            autocomplete="new-password"
           />
         </div>
         <div class="form-group">
@@ -46,8 +44,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import omegaup_PasswordInput from '../common/PasswordInput.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-password-input': omegaup_PasswordInput,
+  },
+})
 export default class PasswordRecover extends Vue {
   @Prop() email?: string;
   @Prop() resetToken?: string;

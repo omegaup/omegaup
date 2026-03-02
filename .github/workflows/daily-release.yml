@@ -8,12 +8,15 @@ on:
   schedule:
     - cron: '0 3 * * 0'
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Fetch all refs
         run: |

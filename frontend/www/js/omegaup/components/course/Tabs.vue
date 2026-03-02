@@ -279,8 +279,8 @@ export default class CourseTabs extends Vue {
 
 .card > .row.no-gutters {
   background-color: $omegaup-white;
-  height: 12.5rem;
-  overflow-y: auto;
+  min-height: 13.5rem;
+  overflow-y: visible;
 
   .course-data p {
     font-size: 0.9rem;

@@ -170,7 +170,7 @@ If you are interested spending this summer collaborating with us, first of all, 
  - Join our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2020') and greet fellow candidates and omegaUp volunteers.
 
 # Communications
-## If you have questions about the [development evironment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
+## If you have questions about the [development environment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/I-Want-to-Develop-in-omegaUp.md) or the [codebase](https://github.com/omegaup/omegaup) or how the GSoC application process works at omegaUp, please follow our [Getting Help page](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md) to effectively getting your question answered.
 
 Communication with our organization and fellow candidates is carried through our [slack channel](https://omegaup-slack.herokuapp.com/) (token is 'GSOC2020'). We encourage you to join it :)
 

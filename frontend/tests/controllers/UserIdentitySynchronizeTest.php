@@ -172,7 +172,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($graduationDate);
         $this->assertSame($locale->language_id, $identityDb->language_id);
 
-        // Double check language update with the appropiate API
+        // Double check language update with the appropriate API
         $this->assertSame(
             $locale->name,
             \OmegaUp\Controllers\Identity::getPreferredLanguage($identityDb)
