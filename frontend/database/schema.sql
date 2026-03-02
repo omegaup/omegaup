@@ -480,6 +480,7 @@ CREATE TABLE `Groups_Identities` (
   KEY `group_id` (`group_id`),
   KEY `identity_id` (`identity_id`),
   KEY `fk_gipc_privacystatement_consent_id` (`privacystatement_consent_id`),
+  KEY `idx_groups_identities_group_identity` (`group_id`,`identity_id`),
   CONSTRAINT `fk_gii_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_gipc_privacystatement_consent_id` FOREIGN KEY (`privacystatement_consent_id`) REFERENCES `PrivacyStatement_Consent_Log` (`privacystatement_consent_id`),
   CONSTRAINT `fk_gu_group_id` FOREIGN KEY (`group_id`) REFERENCES `Groups_` (`group_id`)
