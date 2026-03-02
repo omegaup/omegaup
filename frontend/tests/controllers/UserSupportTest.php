@@ -133,7 +133,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         $originalEmail = 'original_mail@omegaup.com';
-        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        $identityPassword = \OmegaUp\Test\Utils::createRandomPassword();
         // Creates a common user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
@@ -258,7 +258,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Finally, users can update their password with the generated token
         $reset_token = explode('reset_token=', $response['link'])[1];
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         $response = \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request([
             'email' => $email,
             'reset_token' => $reset_token,

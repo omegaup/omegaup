@@ -9,6 +9,12 @@ class Utils {
     /** @var bool */
     public static $committed = false;
 
+    /**
+     * Default admin password used in test fixtures.
+     * Must match the password in badge test.json files.
+     */
+    const ADMIN_PASSWORD = 'T3stt3st!';
+
     public static function cleanup(): void {
         /** @var string $p */
         foreach ($_REQUEST as $p) {
@@ -18,6 +24,10 @@ class Utils {
 
     public static function createRandomString(): string {
         return md5(uniqid(strval(rand()), true));
+    }
+
+    public static function createRandomPassword(): string {
+        return 'P@s5' . md5(uniqid(strval(rand()), true));
     }
 
     /**
@@ -161,7 +171,7 @@ class Utils {
         ['user' => $admin] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'username' => 'admintest',
-                'password' => 'testtesttest',
+                'password' => self::ADMIN_PASSWORD,
             ])
         );
         \OmegaUp\DAO\ACLs::create(new \OmegaUp\DAO\VO\ACLs([
@@ -175,7 +185,7 @@ class Utils {
         ]));
         \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'username' => 'test',
-            'password' => 'testtesttest',
+            'password' => self::ADMIN_PASSWORD,
         ]));
         \OmegaUp\Controllers\User::$sendEmailOnVerify = true;
 

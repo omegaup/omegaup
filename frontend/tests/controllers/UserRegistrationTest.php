@@ -55,7 +55,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserLoggedViaGoogleAndThenNativeMode() {
         $time = \OmegaUp\Time::get();
         $username = "X{$time}";
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
 
         try {
             \OmegaUp\Controllers\Session::loginViaGoogleEmail(
@@ -332,7 +332,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\User::$permissionKey = uniqid();
         $r = new \OmegaUp\Request([
             'username' => "Z{$username}",
-            'password' => \OmegaUp\Test\Utils::createRandomString(),
+            'password' => \OmegaUp\Test\Utils::createRandomPassword(),
             'email' => $email,
             'permission_key' => \OmegaUp\Controllers\User::$permissionKey
         ]);
@@ -356,10 +356,11 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify that the token is generated.
         $under13BirthDateTimestamp = strtotime('-10 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
                 'username' => $randomString,
-                'password' => $randomString,
+                'password' => $password,
                 'parent_email' => "{$randomString}@{$randomString}.com",
                 'birth_date' => $under13BirthDateTimestamp,
             ]),
@@ -378,10 +379,11 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // Verify that the token is not generated.
         $over13BirthDateTimestamp = strtotime('-15 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         \OmegaUp\Controllers\User::apiCreate(
             new \OmegaUp\Request([
                  'username' => $randomString,
-                 'password' => $randomString,
+                 'password' => $password,
                  'email' => "{$randomString}@{$randomString}.com",
                  'birth_date' => $over13BirthDateTimestamp,
             ]),
@@ -428,11 +430,12 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserParentalTokenNotGeneratedDueInvalidParameters() {
         $over13BirthDateTimestamp = strtotime('-15 years');
         $randomString = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         try {
             \OmegaUp\Controllers\User::apiCreate(
                 new \OmegaUp\Request([
                     'username' => $randomString,
-                    'password' => $randomString,
+                    'password' => $password,
                     'email' => "{$randomString}@{$randomString}.com",
                     'parent_email' => "{$randomString}@{$randomString}.com",
                     'birth_date' => $over13BirthDateTimestamp,

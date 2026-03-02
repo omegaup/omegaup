@@ -41,6 +41,7 @@
                 data-signup-password
                 name="reg_password"
                 autocomplete="new-password"
+                :show-strength-feedback="true"
               />
             </div>
           </div>
@@ -206,6 +207,7 @@
                 data-signup-password
                 name="reg_password"
                 autocomplete="new-password"
+                :show-strength-feedback="true"
               />
             </div>
           </div>

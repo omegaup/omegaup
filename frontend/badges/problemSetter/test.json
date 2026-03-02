@@ -6,14 +6,14 @@
       "apicalls": [
         {
           "username": "admintest",
-          "password": "testtesttest",
+          "password": "T3stt3st!",
           "requests": [
             {
               "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
-                "password": "test_user_0",
+                "password": "T3st_us3r_0!",
                 "birth_date": 946684800
                 
               }
@@ -23,7 +23,7 @@
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
-                "password": "test_user_1",
+                "password": "T3st_us3r_1!",
                 "birth_date": 946684800
               }
             }
@@ -31,7 +31,7 @@
         },
         {
           "username": "test_user_0",
-          "password": "test_user_0",
+          "password": "T3st_us3r_0!",
           "requests": [
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",

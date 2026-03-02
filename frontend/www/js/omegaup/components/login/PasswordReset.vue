@@ -9,6 +9,7 @@
             v-model="password"
             name="password"
             autocomplete="new-password"
+            :show-strength-feedback="true"
           />
         </div>
         <div class="form-group">

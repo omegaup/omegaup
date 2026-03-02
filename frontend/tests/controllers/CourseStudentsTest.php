@@ -119,7 +119,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create identities for a group
-        $password = \OmegaUp\Test\Utils::createRandomString();
+        $password = \OmegaUp\Test\Utils::createRandomPassword();
         [$_, $associatedIdentity] = \OmegaUp\Test\Factories\Identity::createIdentitiesFromAGroup(
             $associatedGroup,
             $creatorLogin,

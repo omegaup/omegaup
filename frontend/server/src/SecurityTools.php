@@ -69,6 +69,38 @@ class SecurityTools {
             8,
             72
         );
+
+        // Password must contain at least one uppercase letter
+        if (!preg_match('/[A-Z]/', $password)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMustContainUppercase',
+                'password'
+            );
+        }
+
+        // Password must contain at least one lowercase letter
+        if (!preg_match('/[a-z]/', $password)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMustContainLowercase',
+                'password'
+            );
+        }
+
+        // Password must contain at least one digit
+        if (!preg_match('/[0-9]/', $password)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMustContainDigit',
+                'password'
+            );
+        }
+
+        // Password must contain at least one special character
+        if (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'passwordMustContainSpecialChar',
+                'password'
+            );
+        }
     }
 
     /**
