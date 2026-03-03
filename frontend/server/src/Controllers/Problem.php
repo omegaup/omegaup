@@ -5165,7 +5165,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param bool|null $some_tags
      * @omegaup-request-param ''|'asc'|'desc'|null $sort_order
-     * @omegaup-request-param null|string $username
      */
     public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
@@ -5227,18 +5226,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $solvedProblemAliases = [];
         $unsolvedProblemAliases = [];
-        if (!is_null($r->identity)) {
-            $solvedRes = \OmegaUp\Controllers\User::apiProblemsSolved($r);
+        if (!is_null($r->identity) && !is_null($r->identity->identity_id)) {
+            $solvedProblems = \OmegaUp\Controllers\User::getSolvedProblems(
+                intval($r->identity->identity_id)
+            );
             $solvedProblemAliases = array_map(
                 fn($p) => $p['alias'],
-                $solvedRes['problems'] ?? []
+                $solvedProblems
             );
-            $unsolvedRes = \OmegaUp\Controllers\User::apiListUnsolvedProblems(
-                $r
+            $unsolvedProblems = \OmegaUp\Controllers\User::getUnsolvedProblems(
+                intval($r->identity->identity_id)
             );
             $unsolvedProblemAliases = array_map(
                 fn($p) => $p['alias'],
-                $unsolvedRes['problems'] ?? []
+                $unsolvedProblems
             );
         }
 
