@@ -390,7 +390,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Update should have failed due to future birthday');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('birthdayInTheFuture', $e->getMessage());
+            $this->assertSame('parameterDateTooLarge', $e->getMessage());
             $this->assertSame('birth_date', $e->parameter);
         }
     }
@@ -736,5 +736,106 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $payload['profile']['name'],
             $identityToGetInformation->name
         );
+    }
+
+    /**
+     * Test that natural language date strings like "next Thursday"
+     * are rejected for birth_date
+     */
+    public function testNaturalLanguageBirthDateRejected() {
+        // Create the user to edit
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Try to set birth_date with natural language string
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'birth_date' => 'next Thursday',
+            ]));
+            $this->fail(
+                'Update should have failed due to natural language date string'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
+        }
+    }
+
+    /**
+     * Test that only YYYY-MM-DD format is accepted for birth_date
+     */
+    public function testInvalidDateFormatRejected() {
+        // Create the user to edit
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Try various invalid date formats
+        $invalidDates = [
+            '01-01-1990',     // DD-MM-YYYY
+            '01/01/1990',     // DD/MM/YYYY
+            '1990/01/01',     // YYYY/MM/DD
+            'January 1, 1990', // Natural language format
+            '1990-1-1',       // Missing leading zeros
+            'yesterday',      // Relative date
+            'next week',      // Relative date
+        ];
+
+        foreach ($invalidDates as $invalidDate) {
+            try {
+                \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'birth_date' => $invalidDate,
+                ]));
+                $this->fail(
+                    "Update should have failed for invalid date format: {$invalidDate}"
+                );
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertSame('parameterInvalid', $e->getMessage());
+                $this->assertSame('birth_date', $e->parameter);
+            }
+        }
+    }
+
+    /**
+     * Test that valid YYYY-MM-DD format is accepted for birth_date
+     */
+    public function testValidDateFormatAccepted() {
+        // Create the user to edit
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Valid YYYY-MM-DD format should work
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'birth_date' => '1990-01-15',
+        ]));
+
+        // Check user from db
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($login->auth_token);
+        $this->assertSame('1990-01-15', $userDb->birth_date);
+    }
+
+    /**
+     * Test that graduation_date also rejects natural language strings
+     */
+    public function testNaturalLanguageGraduationDateRejected() {
+        // Create the user to edit
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Try to set graduation_date with natural language string
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'graduation_date' => 'next Thursday',
+            ]));
+            $this->fail(
+                'Update should have failed due to natural language date string'
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('graduation_date', $e->parameter);
+        }
     }
 }
