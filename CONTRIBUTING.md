@@ -94,16 +94,39 @@ If you need help:
 
 We appreciate your contributions and collaboration 
 
-## First-Time Contributor Walkthrough
 
-If this is your first contribution to omegaUp, follow these steps:
 
-1. Fork the repository to your GitHub account.
-2. Clone your fork locally or edit files directly on GitHub.
-3. Read the README.md and CONTRIBUTING.md carefully.
-4. Make your changes in a separate branch (recommended).
-5. Commit your changes with a clear message.
-6. Open a Pull Request (PR) to the main repository.
-7. Wait for review and respond to feedback if requested.
+## First-Time Contributor Guide
 
-Following these steps will help ensure a smooth contribution process.
+Welcome to omegaUp! If you're contributing for the first time, follow this structured guide to avoid confusion.
+
+1️⃣ Understand the Project
+- Read `README.md` to understand the project overview.
+- Carefully review this `CONTRIBUTING.md` file.
+- Check open issues labeled `documentation`, `good first issue`, or `help wanted`.
+
+2️⃣ Fork and Prepare
+- Fork the repository to your GitHub account.
+- It is recommended to create a new branch for your changes.
+- Make sure your fork is up to date with the main repository.
+
+3️⃣ Make Your Changes
+- Keep changes focused on a single issue.
+- Follow existing formatting and coding style.
+- Write clear commit messages (example: `docs: improve onboarding clarity`).
+
+4️⃣ Test and Review
+- Re-read your changes before committing.
+- Ensure links and formatting work correctly.
+
+5️⃣ Open a Pull Request
+- Go to your fork and click **Compare & Pull Request**.
+- Clearly describe what you changed and why.
+- Reference the issue number (example: `Closes #8766`).
+
+6️⃣ Respond to Feedback
+- Be open to suggestions.
+- Make requested changes promptly.
+- Engage respectfully in discussions.
+
+Following these steps will help ensure a smooth and successful contribution experience 🎉
