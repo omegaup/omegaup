@@ -474,7 +474,8 @@ class Validators {
         if (!self::isPresent($parameter, $parameterName, required: true)) {
             return;
         }
-
+ // Validate that we are working with a date
+    // @TODO This strtotime() allows nice strings like "next Thursday".
         if (
             !is_string($parameter) ||
             !preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)
