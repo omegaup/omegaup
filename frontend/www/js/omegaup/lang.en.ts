@@ -2308,6 +2308,8 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Keep with a warning",
   wordsYes: "Yes",
   zipPrepare: "Prepare zip file",
+  courseListEmptyTitle: "You do not have any courses yet",
+  courseListEmptyDescription: "Create your first course to start organizing lessons and students.",
 };
 
 export {translations as default};
