@@ -395,6 +395,38 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testBirthDateRejectsNaturalLanguageString() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'birth_date' => 'next Thursday',
+            ]));
+            $this->fail('Update should have failed due to invalid birth_date');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
+        }
+    }
+
+    public function testGraduationDateRejectsNaturalLanguageString() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'graduation_date' => 'next Thursday',
+            ]));
+            $this->fail('Update should have failed due to invalid graduation_date');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('graduation_date', $e->parameter);
+        }
+    }
+
     /**
      * https://github.com/omegaup/omegaup/issues/997
      * Superseded by https://github.com/omegaup/omegaup/issues/1228

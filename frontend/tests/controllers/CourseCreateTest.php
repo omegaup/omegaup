@@ -48,6 +48,21 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $r['name']
             )
         );
+        // prefix search should also return the course (matches behaviour now
+        // that fulltext boolean mode is used).  We take the first 3 characters
+        // of the name as a quick smoke test.
+        $this->assertNotEmpty(
+            \OmegaUp\DAO\Courses::findByName(
+                substr($r['name'], 0, 3)
+            )
+        );
+
+        // ensure migrations added the fulltext index so boolean mode searches
+        // can make use of it
+        $indexes = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "SHOW INDEX FROM Courses WHERE Key_name = 'idx_courses_name'"
+        );
+        $this->assertNotEmpty($indexes);
     }
 
     public function testCreateAndUpdateCourseWithObjective() {

@@ -194,10 +194,11 @@ export default class Ephemeral extends Vue {
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
   readonly themeToRef: { [key: string]: string } = {
-    [Util.MonacoThemes
-      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
-    [Util.MonacoThemes
-      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
+    // use local copies of golden-layout themes to avoid external network
+    // requests that could trigger CSP violations when devtools try to load
+    // source maps from the original CDN.
+    [Util.MonacoThemes.VSLight]: '/third_party/golden-layout/goldenlayout-light-theme.css',
+    [Util.MonacoThemes.VSDark]: '/third_party/golden-layout/goldenlayout-dark-theme.css',
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -789,5 +790,8 @@ div {
 a:hover {
   color: var(--zip-button-color--hover);
 }
-@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
+/* bring the base stylesheet in from our local vendor copy instead of
+   pulling from golden-layout.com; the remote file includes a source map
+   which causes CSP connect-src violations in the browser. */
+@import '../../../third_party/golden-layout/goldenlayout-base.css';
 </style>
