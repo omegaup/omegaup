@@ -438,8 +438,6 @@ export namespace omegaup {
 
     _documentReady: boolean = false;
     _initialized: boolean = false;
-    /** Cleanup function returned by initLogoutListener. Stored so tests can
-     *  verify it was registered and pages can call it on unload if needed. */
     _cleanupLogoutListener: (() => void) | null = null;
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
@@ -472,9 +470,6 @@ export namespace omegaup {
             this.username = data.session.identity.username;
             this.identity = data.session.identity;
             this.email = data.session.email;
-            // Start listening for logout events broadcast from other tabs.
-            // When received we redirect to '/' (home/login page), matching
-            // the same destination used by the regular logout flow.
             this._cleanupLogoutListener = initLogoutListener(() => {
               window.location.href = '/';
             });
@@ -546,5 +541,5 @@ export namespace omegaup {
     }
   }
 }
-
+x 
 export const OmegaUp = new omegaup.OmegaUp();
