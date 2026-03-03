@@ -51,7 +51,7 @@ The list of technologies we will use to build the application are as follows:
 
 | Technology          | Purpose                | Version  |
 | ------------------- | ---------------------- | -------- |
-| MySql            | Database             | [8.0.39] |
+| MySql            | Database             | [8.0.34] |
 | PHP              | Controllers        | [8.1.2]   |
 | Python           | Cronjobs             | [3.10.12] |
 | Typescript       | Frontend             | [4.4.4]  |

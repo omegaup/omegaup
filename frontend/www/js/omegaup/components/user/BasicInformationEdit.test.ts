@@ -124,7 +124,7 @@ describe('BasicInformationEdit.vue', () => {
     await wrapper
       .find('input[data-name]')
       .setValue(
-        'A name that exceeds the allowed limit of charachters for this field',
+        'A name that exceeds the allowed limit of characters for this field',
       );
 
     await wrapper.find('button[type="submit"]').trigger('submit');

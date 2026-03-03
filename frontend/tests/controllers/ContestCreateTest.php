@@ -131,6 +131,56 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('31', $e->getErrorMessage());
+        }
+    }
+
+    /**
+     * Sys-admins can create contests up to 60 days
+     */
+    public function testCreateVeryLongContestAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $r = $contestData['request'];
+
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($admin);
+        $r['auth_token'] = $login->auth_token;
+
+        // Exactly 60 days
+        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 60);
+
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        $this->assertSame('ok', $response['status']);
+    }
+
+    /**
+     * Sys-admins still cannot exceed 60 days
+     */
+    public function testCreateTooLongContestAsSysAdmin() {
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $r = $contestData['request'];
+
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($admin);
+        $r['auth_token'] = $login->auth_token;
+
+        // Longer than 60 days
+        $r['finish_time'] = $r['start_time'] + (60 * 60 * 24 * 61);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('contestLengthTooLong', $e->getMessage());
+            $this->assertStringContainsString('60', $e->getErrorMessage());
         }
     }
 

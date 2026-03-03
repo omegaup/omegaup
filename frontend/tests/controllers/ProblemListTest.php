@@ -1120,7 +1120,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test 'page', 'order_by' and 'sort_order' parametes of the apiList() method, and search by title.
+     * Test 'page', 'order_by' and 'sort_order' parameters of the apiList() method, and search by title.
      */
     public function testProblemListPager() {
         // Create a user and some problems with submissions for the tests.

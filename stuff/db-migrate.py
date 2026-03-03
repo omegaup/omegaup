@@ -146,13 +146,13 @@ def _set_mysql_timeout(args: argparse.Namespace,
     else:
         timeout_str = str(timeout)
     database_utils.mysql(
-        'SET GLOBAL interactive_timeout = %s;' % timeout_str,
+        f'SET GLOBAL interactive_timeout = {timeout_str};',
         dbname='mysql',
         auth=auth,
         container_check=not args.skip_container_check,
     )
     database_utils.mysql(
-        'SET GLOBAL wait_timeout = %s;' % timeout_str,
+        f'SET GLOBAL wait_timeout = {timeout_str};',
         dbname='mysql',
         auth=auth,
         container_check=not args.skip_container_check,
@@ -198,14 +198,14 @@ def _connection_timeout_wrapper(  # pylint: disable=too-many-arguments
                 try:
                     if aws:
                         database_utils.mysql(
-                            'CALL mysql.rds_kill(%s);' % line.split()[0],
+                            f'CALL mysql.rds_kill({line.split()[0]});',
                             dbname='mysql',
                             auth=auth,
                             container_check=not args.skip_container_check,
                         )
                     else:
                         database_utils.mysql(
-                            'KILL %s;' % line.split()[0],
+                            f'KILL {line.split()[0]};',
                             dbname='mysql',
                             auth=auth,
                             container_check=not args.skip_container_check,
@@ -291,7 +291,7 @@ def migrate(args: argparse.Namespace,
             if args.limit and revision > args.limit:
                 break
             if args.noop:
-                sys.stderr.write('Installing %s\n' % path)
+                sys.stderr.write(f'Installing {path}\n')
                 continue
             logging.info('Running script for revision %d...', revision)
             comment = "migrate"
@@ -309,7 +309,7 @@ def migrate(args: argparse.Namespace,
                         )
                         # Run the script
                         database_utils.mysql(
-                            'source %s;' % database_utils.quote(path),
+                            f'source {database_utils.quote(path)};',
                             dbname=dbname,
                             auth=auth,
                             container_check=not args.skip_container_check,
@@ -358,7 +358,7 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
         expected_revision += 1
         if expected_revision != revision:
             print(
-                'Expected revision %d for path %s' % (expected_revision, path))
+                f'Expected revision {expected_revision} for path {path}')
             valid = False
     if not valid:
         sys.exit(1)
@@ -397,15 +397,15 @@ def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''
     ensure(args, auth)
     database_utils.mysql(
-        'DELETE FROM `Revision` WHERE `id` >= %d;' % args.revision,
+        f'DELETE FROM `Revision` WHERE `id` >= {args.revision};',
         dbname='_omegaup_metadata',
         auth=auth,
         container_check=not args.skip_container_check,
     )
     if args.revision > 0:
         database_utils.mysql(
-            ('INSERT INTO `Revision` '
-             'VALUES(%d, CURRENT_TIMESTAMP, "manual reset");') % args.revision,
+            (f'INSERT INTO `Revision` '
+             f'VALUES({args.revision}, CURRENT_TIMESTAMP, "manual reset");'),
             dbname='_omegaup_metadata',
             auth=auth,
             container_check=not args.skip_container_check,
@@ -434,14 +434,14 @@ def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
         for dbname in databases:
             logging.info('Dropping database %s', dbname)
             database_utils.mysql(
-                'DROP DATABASE IF EXISTS `%s`;' % dbname,
+                f'DROP DATABASE IF EXISTS `{dbname}`;',
                 auth=auth,
                 container_check=not args.skip_container_check,
             )
             logging.info('Creating database %s', dbname)
             database_utils.mysql(
-                'CREATE DATABASE `%s` CHARACTER SET UTF8 COLLATE '
-                'utf8_general_ci;' % dbname,
+                f'CREATE DATABASE `{dbname}` CHARACTER SET UTF8 COLLATE '
+                'utf8_general_ci;',
                 auth=auth,
                 container_check=not args.skip_container_check,
             )
@@ -469,7 +469,7 @@ def schema(args: argparse.Namespace, auth: Sequence[str]) -> None:
             container_check=not args.skip_container_check,
         ))
     database_utils.mysql(
-        'DROP DATABASE `%s`;' % _SCHEMA_DB,
+        f'DROP DATABASE `{_SCHEMA_DB}`;',
         auth=auth,
         container_check=not args.skip_container_check,
     )

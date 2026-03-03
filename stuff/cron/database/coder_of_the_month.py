@@ -4,10 +4,15 @@
 
 import datetime
 import logging
-from typing import Dict, List, NamedTuple, Optional, TypedDict
+from typing import Dict, List, NamedTuple
 
 import mysql.connector
 import mysql.connector.cursor
+from utils import (
+    UserProblems,
+    UserRank,
+    get_first_day_of_next_month,
+)
 
 
 class Problem(NamedTuple):
@@ -15,40 +20,6 @@ class Problem(NamedTuple):
     problem_id: int
     alias: str
     score: float
-
-
-class UserRank(NamedTuple):
-    '''User information for coder of the month candidates'''
-    user_id: int
-    identity_id: int
-    username: str
-    country_id: str
-    school_id: Optional[int]
-    problems_solved: int
-    score: float
-    classname: str
-
-
-class UserProblems(TypedDict):
-    '''Problems solved by a user and their calculated score'''
-    solved: List[int]
-    score: float
-
-
-def get_first_day_of_next_month(
-    first_day_of_current_month: datetime.date
-) -> datetime.date:
-    '''Get the first day of the next month'''
-
-    if first_day_of_current_month.month == 12:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year + 1, 1, 1)
-    else:
-        first_day_of_next_month = datetime.date(
-            first_day_of_current_month.year,
-            first_day_of_current_month.month + 1, 1)
-
-    return first_day_of_next_month
 
 
 def check_existing_coder_of_the_month(
@@ -211,8 +182,7 @@ def get_cotm_eligible_users(
     if not last_12_coders:
         last_12_coders_clause = ''
     else:
-        last_12_coders_clause = 'AND i.username NOT IN (%s)' % (
-            last_12_coders_str)
+        last_12_coders_clause = f'AND i.username NOT IN ({last_12_coders_str})'
     logging.info(
         'Getting the list of eligible users in the category [%s] for coder of '
         'the month', category

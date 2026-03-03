@@ -77,8 +77,8 @@ class I18nLinter(linters.Linter):
 
         result: List[str] = []
         for key in sorted(strings.keys()):
-            result.append('%s = "%s"\n' %
-                          (key, strings[key][lang].replace('"', r'\"')))
+            escaped_value = strings[key][lang].replace('"', r'\"')
+            result.append(f'{key} = "{escaped_value}"\n')
         return ''.join(result)
 
     @staticmethod
