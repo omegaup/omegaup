@@ -136,10 +136,18 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testDownload() {
         $adminLogin = self::login($this->admin);
+
+        $problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => 'all',
+            ]),
+            $adminLogin,
+        );
+
         $login = self::login($this->identity);
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $this->problemData,
+            $problemDataWithDiff,
             $this->identity,
             $login
         );
@@ -195,6 +203,29 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             fclose($fp);
 
             $this->assertSame($content, $fileContent);
+        }
+    }
+
+    public function testDownloadBlockedWhenShowDiffNone() {
+        $login = self::login($this->identity);
+
+        // Default problem has show_diff='none'
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
         }
     }
 
