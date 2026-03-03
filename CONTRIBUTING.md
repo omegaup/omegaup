@@ -93,3 +93,17 @@ If you need help:
   https://github.com/omegaup/omegaup/issues/new
 
 We appreciate your contributions and collaboration 
+
+## First-Time Contributor Walkthrough
+
+If this is your first contribution to omegaUp, follow these steps:
+
+1. Fork the repository to your GitHub account.
+2. Clone your fork locally or edit files directly on GitHub.
+3. Read the README.md and CONTRIBUTING.md carefully.
+4. Make your changes in a separate branch (recommended).
+5. Commit your changes with a clear message.
+6. Open a Pull Request (PR) to the main repository.
+7. Wait for review and respond to feedback if requested.
+
+Following these steps will help ensure a smooth contribution process.
