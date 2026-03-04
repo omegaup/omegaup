@@ -134,8 +134,8 @@ services:
       MYSQL_TCP_PORT: 13306
     command:
       - --max_execution_time=30000
-      - --lock_wait_timeout=10
-      - --wait_timeout=20
+      - --lock_wait_timeout=60
+      - --wait_timeout=300
     expose:
       - '13306'
     volumes:
