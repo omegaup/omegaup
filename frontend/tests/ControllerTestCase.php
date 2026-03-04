@@ -511,6 +511,9 @@ class NoOpGrader extends \OmegaUp\Grader {
     /** @var \OmegaUp\DAO\VO\Runs[] */
     private $_runs = [];
 
+    /** @var bool|null */
+    private $_lastRejudgeDebug = null;
+
     public function grade(\OmegaUp\DAO\VO\Runs $run, string $source): void {
         $sql = '
             SELECT
@@ -534,6 +537,11 @@ class NoOpGrader extends \OmegaUp\Grader {
      */
     public function rejudge(array $runs, bool $debug): void {
         $this->_runs += $runs;
+        $this->_lastRejudgeDebug = $debug;
+    }
+
+    public function getLastRejudgeDebug(): ?bool {
+        return $this->_lastRejudgeDebug;
     }
 
     public function getSource(string $guid): string {
@@ -642,5 +650,9 @@ class ScopedGraderDetour {
 
     public function getRuns(): array {
         return $this->_instance->getRuns();
+    }
+
+    public function getLastRejudgeDebug(): ?bool {
+        return $this->_instance->getLastRejudgeDebug();
     }
 }
