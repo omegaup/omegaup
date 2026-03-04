@@ -642,6 +642,8 @@ const translations: { [key: string]: string; } = {
   courseListAdminCourses: "Cursos que administro",
   courseListArchivedCourses: "Cursos archivados",
   courseListCurrentCourses: "Cursos actuales",
+  courseListEmptyDescription: "Create your first course to start organizing lessons and students.",
+  courseListEmptyTitle: "A\u00fan no tienes cursos",
   courseListPastCourses: "Cursos pasados",
   courseListSubmissionsByGroup: "Env\u00edos realizados por estudiantes de este curso",
   courseListTeachingAssistantCourses: "Cursos a los que ayudo",
@@ -2308,8 +2310,6 @@ const translations: { [key: string]: string; } = {
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
   zipPrepare: "Preparar archivo zip",
-  courseListEmptyTitle: "Aún no tienes cursos",
-  courseListEmptyDescription: "Crea tu primer curso para comenzar a organizar lecciones y estudiantes.",
 };
 
 export {translations as default};

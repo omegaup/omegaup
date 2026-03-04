@@ -2,7 +2,6 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h3 class="mb-0">{{ T.courseListAdminCourses }}</h3>
-
       <a
         v-if="isMainUserIdentity && hasCourses"
         class="btn btn-primary"
@@ -11,9 +10,7 @@
         {{ T.courseNew }}
       </a>
     </div>
-
     <div class="card-body pb-0"></div>
-
     <template v-if="hasCourses">
       <omegaup-course-filtered-list
         :courses="courses.admin"
@@ -21,22 +18,18 @@
         :show-percentage="false"
       />
     </template>
-
     <div v-else class="text-center py-5">
       <font-awesome-icon
         icon="graduation-cap"
         size="3x"
         class="mb-3 text-muted"
       />
-
       <h4 class="mb-2">
         {{ T.courseListEmptyTitle }}
       </h4>
-
       <p class="text-muted mb-4">
         {{ T.courseListEmptyDescription }}
       </p>
-
       <a
         v-if="isMainUserIdentity"
         class="btn btn-primary btn-lg"
@@ -64,6 +57,7 @@ library.add(fas);
 @Component({
   components: {
     'omegaup-course-filtered-list': course_FilteredList,
+    'font-awesome-icon': FontAwesomeIcon,
   },
 })
 export default class Mine extends Vue {
@@ -73,14 +67,14 @@ export default class Mine extends Vue {
   T = T;
   ui = ui;
 
-get hasCourses(): boolean {
-  const filtered = this.courses.admin.filteredCourses;
+  get hasCourses(): boolean {
+    const filtered = this.courses.admin.filteredCourses;
 
-  if (!filtered) return false;
+    if (!filtered) return false;
 
-  return Object.values(filtered).some(
-    (group: any) => group.courses && group.courses.length > 0
-  );
-}
+    return Object.values(filtered).some(
+      (group: any) => group.courses && group.courses.length > 0,
+    );
+  }
 }
 </script>
