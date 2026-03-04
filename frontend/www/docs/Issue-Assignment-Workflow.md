@@ -1,6 +1,6 @@
 ## Issue Assignment Workflow
 
-This repository uses the [`takanome-dev/assign-issue-action`](https://github.com/takanome-dev/assign-issue-action) to keep issue assignments fair and active.
+This repository uses a custom GitHub workflow (`.github/workflows/assign-issues.yml`) to keep issue assignments fair and active.
 
 ### Commands
 - `/assign`: self-assign the issue.
