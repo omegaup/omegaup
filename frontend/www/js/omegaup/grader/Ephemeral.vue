@@ -51,12 +51,14 @@
               />
             </button>
             <button
+              v-clipboard="() => store.getters['request.source'] || ''"
               class="btn btn-sm mr-2 my-sm-0"
               :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
               data-copy-button
-              :title="'Copy code'"
-              aria-label="Copy code"
-              @click.prevent="handleCopy"
+              :title="T.wordsCopyToClipboard"
+              :aria-label="T.wordsCopyToClipboard"
+              copy-to-clipboard
+              @click.prevent="handleCopyFeedback"
             >
               <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
             </button>
@@ -136,6 +138,7 @@ import * as monaco from 'monaco-editor';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import Clipboard from 'v-clipboard';
 import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
@@ -148,6 +151,7 @@ import DiffEditor from './DiffEditor.vue';
 import IDESettings from './IDESettings.vue';
 import MonacoEditor from './MonacoEditor.vue';
 import TextEditor from './TextEditor.vue';
+
 import ZipViewer from './ZipViewer.vue';
 import store, { GraderResults } from './GraderStore';
 import * as Util from './util';
@@ -172,7 +176,7 @@ import {
   faCopy,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faCopy);
-
+Vue.use(Clipboard);
 import T from '../lang';
 
 interface GraderComponent extends Vue {
@@ -482,20 +486,14 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
-  handleCopy() {
-    const code = store.getters['request.source'] || '';
-
-    navigator.clipboard
-      .writeText(code)
-      .then(() => {
-        this.isCopySuccess = true;
-        if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
-        this.copySuccessTimer = setTimeout(() => {
-          this.isCopySuccess = false;
-        }, 2000);
-      })
-      .catch(Util.asyncError);
+  handleCopyFeedback() {
+    this.isCopySuccess = true;
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.copySuccessTimer = setTimeout(() => {
+      this.isCopySuccess = false;
+    }, 2000);
   }
+
   beforeDestroy() {
     if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
   }
