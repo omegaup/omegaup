@@ -40,6 +40,7 @@
                   v-if="item.getLogo()"
                   :src="item.getLogo().url"
                   :title="item.getLogo().title"
+                  :alt="item.getLogo().title"
                 />
                 {{ item.toString() }}
               </a>

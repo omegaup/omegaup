@@ -18,7 +18,7 @@ jobs:
             issues: write
             pull-requests: write
         steps:
-            - uses: actions/stale@v10
+            - uses: actions/stale@997185467fa4f803885201cee163a9f38240193d
               with:
                   # Mark issues as stale after 45 days of inactivity
                   days-before-issue-stale: 45
