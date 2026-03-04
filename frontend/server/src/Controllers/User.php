@@ -1755,9 +1755,14 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = array_merge(
             $response,
             [
-                'roles' => \OmegaUp\DAO\UserRoles::getSystemRoles(
-                    $user->user_id
-                ),
+                'roles' => array_values(array_unique(array_merge(
+                    \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id),
+                    !is_null($user->main_identity_id)
+                        ? \OmegaUp\DAO\GroupRoles::getSystemRoles(
+                            $user->main_identity_id
+                        )
+                        : []
+                ))),
             ]
         );
         return $response;
@@ -4629,8 +4634,14 @@ class User extends \OmegaUp\Controllers\Controller {
             $userExperimentsList[] = $userExperiment->experiment;
         }
 
-        // TODO: Also support GroupRoles.
-        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
+        $systemRoles = array_values(array_unique(array_merge(
+            \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id),
+            !is_null($user->main_identity_id)
+                ? \OmegaUp\DAO\GroupRoles::getSystemRoles(
+                    $user->main_identity_id
+                )
+                : []
+        )));
 
         $roles = \OmegaUp\DAO\Roles::getAll();
         $rolesList = [];
