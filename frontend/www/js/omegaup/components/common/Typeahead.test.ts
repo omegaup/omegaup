@@ -17,17 +17,25 @@ describe('Typeahead.vue', () => {
   });
 
   it('Should call update-existing-options with a longer query', async () => {
+    jest.useFakeTimers();
     const wrapper = mount(common_Typeahead, {
       propsData: {
         existingOptions: [],
+        debounceDelay: 300,
       },
     });
 
     const tagsInput = wrapper.findComponent(VoerroTagsInput);
     tagsInput.vm.$emit('change', 'query');
+
+    // Fast-forward past the debounce delay
+    jest.advanceTimersByTime(300);
+
     expect(wrapper.emitted()).toEqual({
       'update-existing-options': [['query']],
     });
+
+    jest.useRealTimers();
   });
 
   it('Should call update:value with a non-empty tag', () => {

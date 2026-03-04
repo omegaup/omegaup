@@ -210,7 +210,8 @@ export default class Members extends Vue {
 <style scoped lang="scss">
 @media (max-width: 576px) {
   .input {
-    max-width: 13rem;
+    width: 100%;
+    max-width: 100%;
     margin-top: 0.6rem;
   }
   .responsive-table {

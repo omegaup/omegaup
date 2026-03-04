@@ -198,16 +198,24 @@ describe('time', () => {
   });
 
   describe('convertLocalDateToGMTDate', () => {
-    it('Should convert local dates to GMT (UTC) dates correctly', () => {
+    it('Should preserve UTC year/month/day as local date components', () => {
       const dateNow = new Date();
       const result = time.convertLocalDateToGMTDate(dateNow);
 
       expect(result.getFullYear()).toEqual(dateNow.getUTCFullYear());
       expect(result.getMonth()).toEqual(dateNow.getUTCMonth());
       expect(result.getDate()).toEqual(dateNow.getUTCDate());
-      expect(result.getHours()).toEqual(dateNow.getUTCHours());
-      expect(result.getMinutes()).toEqual(dateNow.getUTCMinutes());
-      expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
+    });
+
+    it('Should handle midnight UTC dates that shift day in negative timezones', () => {
+      // Simulate a birth_date timestamp from the server: 2000-01-15 midnight UTC
+      const serverTimestamp = Date.UTC(2000, 0, 15);
+      const dateFromServer = new Date(serverTimestamp);
+      const result = time.convertLocalDateToGMTDate(dateFromServer);
+
+      expect(result.getFullYear()).toEqual(2000);
+      expect(result.getMonth()).toEqual(0);
+      expect(result.getDate()).toEqual(15);
     });
   });
 

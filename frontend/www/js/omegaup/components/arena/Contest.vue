@@ -1,240 +1,256 @@
 <template>
-  <omegaup-arena
-    :active-tab="activeTab"
-    :title="ui.contestTitle(contest)"
-    :clarifications="currentClarifications"
-    :should-show-runs="contestAdmin"
-    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
-  >
-    <template #socket-status>
-      <sup :class="socketClass" :title="socketStatusTitle">{{
-        socketStatus
-      }}</sup>
-    </template>
-    <template v-if="contestAdmin" #edit-button>
-      <a
-        class="edit-contest-button ml-2"
-        :href="`/contest/${contest.alias}/edit/`"
-      >
-        <font-awesome-icon icon="edit" />
-      </a>
-    </template>
-    <template #clock>
-      <div v-if="isContestFinished" class="alert alert-warning" role="alert">
-        <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
+  <div>
+    <!-- Show error UI when tab is blocked -->
+    <div v-if="isBlocked" class="container mt-5">
+      <div class="alert alert-danger text-center" role="alert">
+        <h4 class="alert-heading">{{ T.arenaContestMultipleTabsDetected }}</h4>
+        <p class="mb-0">{{ blockedMessage }}</p>
       </div>
-      <omegaup-countdown
-        v-show="!isContestStarted"
-        :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
-        :target-time="contest.start_time"
-        @finish="now = new Date()"
-      ></omegaup-countdown>
-      <omegaup-countdown
-        v-show="isContestStarted"
-        class="clock"
-        :target-time="deadline"
-        @finish="now = new Date()"
-      ></omegaup-countdown>
-    </template>
-    <template #arena-problems>
-      <div data-contest>
-        <div class="tab navleft">
-          <div class="navbar mb-2">
-            <omegaup-arena-navbar-problems
-              :problems="problems"
-              :active-problem="activeProblemAlias"
-              :in-assignment="false"
-              :digits-after-decimal-point="
-                contest.score_mode == 'all_or_nothing'
-                  ? 0
-                  : digitsAfterDecimalPoint
-              "
-              @disable-active-problem="activeProblem = null"
-              @navigate-to-problem="onNavigateToProblem"
-            ></omegaup-arena-navbar-problems>
-            <omegaup-arena-navbar-miniranking
-              :users="miniRankingUsers"
-              :show-ranking="true"
-            ></omegaup-arena-navbar-miniranking>
-          </div>
-          <omegaup-arena-summary
-            v-if="activeProblem === null"
-            :title="ui.contestTitle(contest)"
-            :description="contest.description"
-            :start-time="contest.start_time"
-            :finish-time="contest.finish_time"
-            :scoreboard="contest.scoreboard"
-            :window-length="contest.window_length"
-            :admin="contest.director"
-            :show-ranking="false"
-          ></omegaup-arena-summary>
-          <div v-else class="problem main">
-            <omegaup-problem-details
-              :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="currentNextSubmissionTimestamp"
-              :next-execution-timestamp="currentNextExecutionTimestamp"
-              :languages="contest.languages.split(',')"
-              :problem="problemInfo"
-              :active-tab="'problems'"
-              :runs="runs"
-              :popup-displayed="popupDisplayed"
-              :guid="guid"
-              :run-details-data="currentRunDetailsData"
-              :contest-alias="contest.alias"
-              :is-contest-finished="isContestFinished"
-              :in-contest-or-course="true"
-              :use-new-verdict-table="false"
-              @update:activeTab="
-                (selectedTab) =>
-                  $emit('reset-hash', {
-                    selectedTab,
-                    alias: activeProblemAlias,
-                  })
-              "
-              @submit-run="onRunSubmitted"
-              @execute-run="onRunExecuted"
-              @show-run="onRunDetails"
-              @new-submission-popup-displayed="
-                $emit('new-submission-popup-displayed')
-              "
-            >
-              <template #quality-nomination-buttons><div></div></template>
-              <template #best-solvers-list><div></div></template>
-            </omegaup-problem-details>
+    </div>
+
+    <!-- Normal arena content when not blocked -->
+    <omegaup-arena
+      v-else
+      :active-tab="activeTab"
+      :title="ui.contestTitle(contest)"
+      :clarifications="currentClarifications"
+      :should-show-runs="contestAdmin"
+      @update:activeTab="
+        (selectedTab) => $emit('update:activeTab', selectedTab)
+      "
+    >
+      <template #socket-status>
+        <sup :class="socketClass" :title="socketStatusTitle">{{
+          socketStatus
+        }}</sup>
+      </template>
+      <template v-if="contestAdmin" #edit-button>
+        <a
+          class="edit-contest-button ml-2"
+          :href="`/contest/${contest.alias}/edit/`"
+        >
+          <font-awesome-icon icon="edit" />
+        </a>
+      </template>
+      <template #clock>
+        <div v-if="isContestFinished" class="alert alert-warning" role="alert">
+          <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
+        </div>
+        <omegaup-countdown
+          v-show="!isContestStarted"
+          :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
+          :target-time="contest.start_time"
+          @finish="now = new Date()"
+        ></omegaup-countdown>
+        <omegaup-countdown
+          v-show="isContestStarted"
+          class="clock"
+          :target-time="deadline"
+          @finish="now = new Date()"
+        ></omegaup-countdown>
+      </template>
+      <template #arena-problems>
+        <div data-contest>
+          <div class="tab navleft">
+            <div class="navbar mb-2">
+              <omegaup-arena-navbar-problems
+                :problems="problems"
+                :active-problem="activeProblemAlias"
+                :in-assignment="false"
+                :digits-after-decimal-point="
+                  contest.score_mode == 'all_or_nothing'
+                    ? 0
+                    : digitsAfterDecimalPoint
+                "
+                @disable-active-problem="activeProblem = null"
+                @navigate-to-problem="onNavigateToProblem"
+              ></omegaup-arena-navbar-problems>
+              <omegaup-arena-navbar-miniranking
+                :users="miniRankingUsers"
+                :show-ranking="true"
+              ></omegaup-arena-navbar-miniranking>
+            </div>
+            <omegaup-arena-summary
+              v-if="activeProblem === null"
+              :title="ui.contestTitle(contest)"
+              :description="contest.description"
+              :start-time="contest.start_time"
+              :finish-time="contest.finish_time"
+              :scoreboard="contest.scoreboard"
+              :window-length="contest.window_length"
+              :admin="contest.director"
+              :show-ranking="false"
+            ></omegaup-arena-summary>
+            <div v-else class="problem main">
+              <omegaup-problem-details
+                :user="{ loggedIn: true, admin: false, reviewer: false }"
+                :next-submission-timestamp="currentNextSubmissionTimestamp"
+                :next-execution-timestamp="currentNextExecutionTimestamp"
+                :languages="contest.languages.split(',')"
+                :problem="problemInfo"
+                :active-tab="'problems'"
+                :runs="runs"
+                :popup-displayed="popupDisplayed"
+                :guid="guid"
+                :run-details-data="currentRunDetailsData"
+                :contest-alias="contest.alias"
+                :is-contest-finished="isContestFinished"
+                :in-contest-or-course="true"
+                :use-new-verdict-table="false"
+                @update:activeTab="
+                  (selectedTab) =>
+                    $emit('reset-hash', {
+                      selectedTab,
+                      alias: activeProblemAlias,
+                    })
+                "
+                @submit-run="onRunSubmitted"
+                @execute-run="onRunExecuted"
+                @show-run="onRunDetails"
+                @new-submission-popup-displayed="
+                  $emit('new-submission-popup-displayed')
+                "
+              >
+                <template #quality-nomination-buttons><div></div></template>
+                <template #best-solvers-list><div></div></template>
+              </omegaup-problem-details>
+            </div>
           </div>
         </div>
-      </div>
-    </template>
-    <template #arena-scoreboard>
-      <omegaup-arena-scoreboard
-        :problems="problems"
-        :ranking="ranking"
-        :ranking-chart-options="rankingChartOptions"
-        :last-updated="lastUpdated"
-        :digits-after-decimal-point="digitsAfterDecimalPoint"
-        :show-penalty="showPenalty"
-        :show-invited-users-filter="
-          contest.admission_mode !== AdmissionMode.Private
-        "
-        :show-all-contestants="
-          contest.default_show_all_contestants_in_scoreboard
-        "
-      >
-        <template #scoreboard-header><div></div></template>
-      </omegaup-arena-scoreboard>
-    </template>
-    <template #arena-runs>
-      <omegaup-arena-runs
-        v-if="contestAdmin"
-        :contest-alias="contest.alias"
-        :runs="allRuns"
-        :total-runs="totalRuns"
-        :show-all-runs="true"
-        :show-contest="false"
-        :show-problem="true"
-        :show-details="true"
-        :show-disqualify="true"
-        :show-pager="true"
-        :show-rejudge="true"
-        :show-user="true"
-        :problemset-problems="Object.values(problems)"
-        :is-contest-finished="isContestFinished"
-        :in-contest="true"
-        :search-result-users="searchResultUsers"
-        :search-result-problems="searchResultProblems"
-        @details="(run) => onRunAdminDetails(run.guid)"
-        @rejudge="(run) => $emit('rejudge', run)"
-        @disqualify="(request) => $emit('disqualify', request)"
-        @requalify="(run) => $emit('requalify', run)"
-        @update-search-result-users-contest="
-          (request) => $emit('update-search-result-users-contest', request)
-        "
-        @update-search-result-users="
-          (request) => $emit('update-search-result-users', request)
-        "
-        @filter-changed="(request) => $emit('apply-filter', request)"
-      >
-        <template #title><div></div></template>
-        <template #runs><div></div></template>
-      </omegaup-arena-runs>
-      <omegaup-overlay
-        v-if="contestAdmin"
-        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
-        @hide-overlay="onPopupDismissed"
-      >
-        <template #popup>
-          <omegaup-arena-rundetails-popup
-            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
-            :data="currentRunDetailsData"
-            @dismiss="onPopupDismissed"
-          ></omegaup-arena-rundetails-popup>
-        </template>
-      </omegaup-overlay>
-    </template>
-    <template #arena-clarifications>
-      <omegaup-arena-clarification-list
-        :problems="problems"
-        :users="users"
-        :problem-alias="problems.length != 0 ? problems[0].alias : null"
-        :username="contestAdmin && users.length != 0 ? users[0].username : null"
-        :clarifications="currentClarifications"
-        :is-admin="contestAdmin"
-        :show-new-clarification-popup="showNewClarificationPopup"
-        @new-clarification="
-          (contestClarification) =>
-            $emit('new-clarification', {
-              ...contestClarification,
-              contestClarificationRequest: {
-                type: ContestClarificationType.AllProblems,
+      </template>
+      <template #arena-scoreboard>
+        <omegaup-arena-scoreboard
+          :problems="problems"
+          :ranking="ranking"
+          :ranking-chart-options="rankingChartOptions"
+          :last-updated="lastUpdated"
+          :digits-after-decimal-point="digitsAfterDecimalPoint"
+          :show-penalty="showPenalty"
+          :show-invited-users-filter="
+            contest.admission_mode !== AdmissionMode.Private
+          "
+          :show-all-contestants="
+            contest.default_show_all_contestants_in_scoreboard
+          "
+        >
+          <template #scoreboard-header><div></div></template>
+        </omegaup-arena-scoreboard>
+      </template>
+      <template #arena-runs>
+        <omegaup-arena-runs
+          v-if="contestAdmin"
+          :contest-alias="contest.alias"
+          :runs="allRuns"
+          :total-runs="totalRuns"
+          :show-all-runs="true"
+          :show-contest="false"
+          :show-problem="true"
+          :show-details="true"
+          :show-disqualify="true"
+          :show-pager="true"
+          :show-rejudge="true"
+          :show-user="true"
+          :problemset-problems="Object.values(problems)"
+          :is-contest-finished="isContestFinished"
+          :in-contest="true"
+          :search-result-users="searchResultUsers"
+          :search-result-problems="searchResultProblems"
+          @details="(run) => onRunAdminDetails(run.guid)"
+          @rejudge="(run) => $emit('rejudge', run)"
+          @disqualify="(request) => $emit('disqualify', request)"
+          @requalify="(run) => $emit('requalify', run)"
+          @update-search-result-users-contest="
+            (request) => $emit('update-search-result-users-contest', request)
+          "
+          @update-search-result-users="
+            (request) => $emit('update-search-result-users', request)
+          "
+          @filter-changed="(request) => $emit('apply-filter', request)"
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
+        <omegaup-overlay
+          v-if="contestAdmin"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
+        >
+          <template #popup>
+            <omegaup-arena-rundetails-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+              :data="currentRunDetailsData"
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-rundetails-popup>
+          </template>
+        </omegaup-overlay>
+      </template>
+      <template #arena-clarifications>
+        <omegaup-arena-clarification-list
+          :problems="problems"
+          :users="users"
+          :problem-alias="problems.length != 0 ? problems[0].alias : null"
+          :username="
+            contestAdmin && users.length != 0 ? users[0].username : null
+          "
+          :clarifications="currentClarifications"
+          :is-admin="contestAdmin"
+          :show-new-clarification-popup="showNewClarificationPopup"
+          @new-clarification="
+            (contestClarification) =>
+              $emit('new-clarification', {
+                ...contestClarification,
+                contestClarificationRequest: {
+                  type: ContestClarificationType.AllProblems,
+                  contestAlias: contest.alias,
+                },
+              })
+          "
+          @clarification-response="
+            (response) =>
+              $emit('clarification-response', {
                 contestAlias: contest.alias,
-              },
-            })
-        "
-        @clarification-response="
-          (response) =>
-            $emit('clarification-response', {
-              contestAlias: contest.alias,
-              clarification: response,
-              contestClarificationRequest: {
-                type: ContestClarificationType.AllProblems,
-                contestAlias: contest.alias,
-              },
-            })
-        "
-        @update:activeTab="
-          (selectedTab) => $emit('update:activeTab', selectedTab)
-        "
-      ></omegaup-arena-clarification-list>
-    </template>
-  </omegaup-arena>
+                clarification: response,
+                contestClarificationRequest: {
+                  type: ContestClarificationType.AllProblems,
+                  contestAlias: contest.alias,
+                },
+              })
+          "
+          @update:activeTab="
+            (selectedTab) => $emit('update:activeTab', selectedTab)
+          "
+        ></omegaup-arena-clarification-list>
+      </template>
+    </omegaup-arena>
+  </div>
 </template>
 
 <script lang="ts">
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import * as Highcharts from 'highcharts/highstock';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
+import { ContestClarificationType } from '../../arena/clarifications';
+import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 import T from '../../lang';
-import arena_Arena from './Arena.vue';
-import arena_ClarificationList from './ClarificationList.vue';
-import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_NavbarMiniranking from './NavbarMiniranking.vue';
-import arena_Runs from './Runs.vue';
+import { omegaup } from '../../omegaup';
+import * as ui from '../../ui';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
-import arena_Summary from './Summary.vue';
-import arena_Scoreboard from './Scoreboard.vue';
+import { AdmissionMode } from '../common/Publish.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
-import { omegaup } from '../../omegaup';
-import { ContestClarificationType } from '../../arena/clarifications';
-import { SocketStatus } from '../../arena/events_socket';
-import { AdmissionMode } from '../common/Publish.vue';
-import { SubmissionRequest } from '../../arena/submissions';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import arena_Arena from './Arena.vue';
+import arena_ClarificationList from './ClarificationList.vue';
+import arena_NavbarMiniranking from './NavbarMiniranking.vue';
+import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_Runs from './Runs.vue';
+import arena_Scoreboard from './Scoreboard.vue';
+import arena_Summary from './Summary.vue';
 library.add(fas);
 
 @Component({
@@ -289,6 +305,8 @@ export default class ArenaContest extends Vue {
   @Prop({ default: false }) lockdown!: boolean;
   @Prop({ default: false })
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
+  @Prop({ default: false }) isBlocked!: boolean;
+  @Prop({ default: null }) blockedMessage!: string | null;
 
   T = T;
   ui = ui;

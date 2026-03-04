@@ -10,6 +10,11 @@ env:
     # Space or comma-separated list of usernames allowed to open issues that support /assign.
     ALLOWED_ISSUE_CREATORS: "heduenas pabo99 carlosabcs tvanessa"
 
+# Prevent race condition when multiple users comment /assign simultaneously
+concurrency:
+    group: assign-issue-${{ github.event.issue.number || 'scheduled' }}
+    cancel-in-progress: false
+
 jobs:
     handle-comment:
         runs-on: ubuntu-22.04

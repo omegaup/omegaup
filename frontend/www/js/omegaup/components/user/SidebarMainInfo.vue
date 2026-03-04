@@ -2,7 +2,11 @@
   <div class="card">
     <div class="card-header">
       <div class="text-center rounded-circle bottom-margin mt-3">
-        <img class="rounded-circle" :src="profile.gravatar_92" />
+        <img
+          class="rounded-circle"
+          :src="profile.gravatar_92"
+          :alt="profile.username"
+        />
       </div>
       <div class="mb-3 text-center mt-2">
         <omegaup-countryflag

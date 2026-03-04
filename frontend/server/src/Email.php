@@ -26,7 +26,7 @@ class Email {
         }
         if (!OMEGAUP_EMAIL_SEND_EMAILS) {
             self::$log->info(
-                'Not sending email beacause OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:'
+                'Not sending email because OMEGAUP_EMAIL_SEND_EMAILS = FALSE, this is what I would have sent:'
             );
             self::$log->info('     to = ' . join(',', $emails));
             self::$log->info('subject = ' . $subject);
