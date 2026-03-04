@@ -380,17 +380,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.max_points
                         FROM
                     Assignments a
-                INNER JOIN (
-                    SELECT DISTINCT
-                        s.problemset_id
-                    FROM
-                        Submissions s
-                    INNER JOIN
-                        Problemset_Problems psp
-                        ON psp.problemset_id = s.problemset_id
-                    AND psp.problem_id = s.problem_id
-                    WHERE
-                        s.identity_id = ?
+                            EXISTS (
+                                SELECT
+                                    *
+                                FROM
+                                    Problemset_Problems psp
+                                INNER JOIN
+                                    Submissions s ON s.problemset_id = psp.problemset_id AND s.problem_id = psp.problem_id
+                                WHERE
+                                    psp.problemset_id = a.problemset_id AND
+                                    s.identity_id = ?
                 ) attempted
                     ON attempted.problemset_id = a.problemset_id
                 GROUP BY
