@@ -4358,6 +4358,7 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
+    attemptedProblemAliases: string[];
     column: string;
     columns: string[];
     keyword: string;
@@ -4372,7 +4373,6 @@ export namespace types {
     solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
-    unsolvedProblemAliases: string[];
   }
 
   export interface ProblemPrintDetailsPayload {

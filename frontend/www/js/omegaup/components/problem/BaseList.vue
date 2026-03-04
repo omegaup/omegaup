@@ -18,13 +18,6 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th
-              v-if="loggedIn"
-              scope="col"
-              class="align-middle text-nowrap problem-list-status-col"
-            >
-              <span>{{ T.wordsStatus }}</span>
-            </th>
             <th scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsTitle }}</span>
               <span
@@ -135,26 +128,6 @@
         <tbody data-problems>
           <tr v-for="problem in problems" :key="problem.problem_id">
             <td class="align-middle">{{ problem.problem_id }}</td>
-            <td
-              v-if="loggedIn"
-              class="align-middle text-center problem-list-status-col"
-            >
-              <span
-                v-if="solvedProblemAliasesSet.has(problem.alias)"
-                class="badge badge-success"
-              >
-                {{ T.problemStatusSolved }}
-              </span>
-              <span
-                v-else-if="unsolvedProblemAliasesSet.has(problem.alias)"
-                class="badge badge-warning"
-              >
-                {{ T.problemStatusAttempted }}
-              </span>
-              <span v-else class="badge badge-secondary">{{
-                T.problemStatusUnattempted
-              }}</span>
-            </td>
             <td class="align-middle">
               <a
                 :href="`/arena/problem/${problem.alias}/`"
@@ -237,7 +210,27 @@
               }}/{{ problem.submissions }})
             </td>
             <td v-if="loggedIn" class="text-right align-middle">
-              {{ problem.score.toFixed(2) }}
+              <span
+                v-if="solvedProblemAliasesSet.has(problem.alias)"
+                :title="T.problemStatusSolved"
+                class="badge badge-success"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
+              <span
+                v-else-if="attemptedProblemAliasesSet.has(problem.alias)"
+                :title="T.problemStatusAttempted"
+                class="badge badge-warning"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
+              <span
+                v-else
+                :title="T.problemStatusUnattempted"
+                class="badge badge-secondary"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
             </td>
             <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
@@ -307,7 +300,7 @@ export default class BaseList extends Vue {
   @Prop() path!: string;
   @Prop({ default: true }) showProblemTags!: boolean;
   @Prop({ default: () => [] }) solvedProblemAliases!: string[];
-  @Prop({ default: () => [] }) unsolvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   ui = ui;
@@ -318,8 +311,8 @@ export default class BaseList extends Vue {
     return new Set(this.solvedProblemAliases);
   }
 
-  get unsolvedProblemAliasesSet(): Set<string> {
-    return new Set(this.unsolvedProblemAliases);
+  get attemptedProblemAliasesSet(): Set<string> {
+    return new Set(this.attemptedProblemAliases);
   }
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,

@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-3">
+  <div class="container-lg p-3">
     <h2 class="text-center mt-5">
       {{ T.wordsProblems }}
     </h2>
@@ -51,7 +51,7 @@
       :column-name="columnName"
       :path="'/problem/'"
       :solved-problem-aliases="solvedProblemAliases"
-      :unsolved-problem-aliases="unsolvedProblemAliases"
+      :attempted-problem-aliases="attemptedProblemAliases"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
@@ -95,7 +95,7 @@ export default class List extends Vue {
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: () => [] }) solvedProblemAliases!: string[];
-  @Prop({ default: () => [] }) unsolvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   omegaup = omegaup;
@@ -108,12 +108,8 @@ export default class List extends Vue {
 </script>
 
 <style>
-.searchbar-width {
-  width: 100%;
-}
-
-.searchbar-width .form-inline {
-  width: 100%;
+.form-control {
+  max-width: 14rem;
 }
 
 .searchbar-width .tags-input-wrapper-default {
@@ -124,6 +120,5 @@ export default class List extends Vue {
   position: sticky;
   top: 62px;
   z-index: 10;
-  width: 100%;
 }
 </style>
