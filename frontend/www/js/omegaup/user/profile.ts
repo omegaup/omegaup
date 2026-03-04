@@ -482,7 +482,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'request-delete-account': () => {
-            api.User.deleteRequest()
+            api.User.deleteRequest({})
               .then(({ token }) => {
                 api.User.deleteConfirm({ token })
                   .then(() => {
