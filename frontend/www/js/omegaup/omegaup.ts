@@ -541,5 +541,5 @@ export namespace omegaup {
     }
   }
 }
-x 
+
 export const OmegaUp = new omegaup.OmegaUp();
