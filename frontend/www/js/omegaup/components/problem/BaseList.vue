@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="table-responsive mb-0">
-      <table class="table problem-list-table">
+      <table class="table">
         <thead>
           <tr class="sticky-top bg-white text-center">
             <th scope="col" class="align-middle text-nowrap">
@@ -354,16 +354,9 @@ export default class BaseList extends Vue {
   border-radius: 0rem 0rem 0.25rem 0.25rem;
 }
 
-.problem-list-table {
-  min-width: 1100px;
+table {
   border-collapse: separate;
   border-spacing: 0;
-}
-
-.problem-list-status-col {
-  width: 6rem;
-  min-width: 6rem;
-  white-space: nowrap;
 }
 
 thead tr th {
