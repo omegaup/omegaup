@@ -379,7 +379,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             ) AS total_assignment_score,
                             a.max_points
                         FROM
-                    Assignments a
+                            Assignments a
+                        WHERE
                             EXISTS (
                                 SELECT
                                     *
@@ -390,10 +391,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                                 WHERE
                                     psp.problemset_id = a.problemset_id AND
                                     s.identity_id = ?
-                ) attempted
-                    ON attempted.problemset_id = a.problemset_id
-                GROUP BY
-                    a.assignment_id
+                            )
+                        GROUP BY
+                            a.assignment_id
                     ) cbpr
                     GROUP BY cbpr.course_id
                 ) pr ON c.course_id = pr.course_id
