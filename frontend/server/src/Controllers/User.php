@@ -2620,23 +2620,40 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         $newGraduationDate = $currentGraduationDate;
-        $graduationDateTimestamp = $r->ensureOptionalTimestamp(
-            'graduation_date'
-        );
-        if (!is_null($graduationDateTimestamp)) {
-            $newGraduationDate = $graduationDateTimestamp;
+        if (!is_null($r['graduation_date'])) {
+            if (is_numeric($r['graduation_date'])) {
+                $graduationDate = new \OmegaUp\Timestamp(
+                    intval($r['graduation_date'])
+                );
+            } else {
+                \OmegaUp\Validators::validateDate(
+                    $r['graduation_date'],
+                    'graduation_date'
+                );
+                $graduationDate = new \OmegaUp\Timestamp(
+                    strtotime($r['graduation_date'])
+                );
+            }
+            $newGraduationDate = $graduationDate;
         }
-        $birthDateTimestamp = $r->ensureOptionalTimestamp(
-            'birth_date'
-        );
-        if (!is_null($birthDateTimestamp)) {
-            if ($birthDateTimestamp->time >= strtotime('-5 year', \OmegaUp\Time::get())) {
+        if (!is_null($r['birth_date'])) {
+            if (is_numeric($r['birth_date'])) {
+                $birthDate = intval($r['birth_date']);
+            } else {
+                \OmegaUp\Validators::validateDate(
+                    $r['birth_date'],
+                    'birth_date'
+                );
+                $birthDate = strtotime($r['birth_date']);
+            }
+
+            if ($birthDate >= strtotime('-5 year', \OmegaUp\Time::get())) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'birthdayInTheFuture',
                     'birth_date'
                 );
             }
-            $r['birth_date'] = $birthDateTimestamp->time;
+            $r['birth_date'] = $birthDate;
         }
         if (!is_null($r['locale'])) {
             // find language in Language
