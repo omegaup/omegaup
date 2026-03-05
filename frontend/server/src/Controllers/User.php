@@ -4855,7 +4855,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        return strpos($identity->username, ':') !== false;
+        return str_contains($identity->username, ':');
     }
 
     /**
