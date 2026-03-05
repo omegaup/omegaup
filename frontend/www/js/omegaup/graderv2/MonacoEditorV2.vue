@@ -11,25 +11,24 @@
     role="region"
     :aria-label="`Code editor for ${filename}`"
   >
-    <div class="editor-toolbar" role="toolbar" :aria-label="T.monacoEditorToolbarAriaLabel">
+    <div
+      class="editor-toolbar"
+      role="toolbar"
+      :aria-label="T.monacoEditorToolbarAriaLabel"
+    >
       <span class="toolbar-filename" :title="filename">
         <i class="far fa-file-code file-icon" aria-hidden="true"></i>
         {{ filename }}
       </span>
 
       <div class="toolbar-right">
-        <label for="font-size-select" class="toolbar-label">{{ T.fontSize }}</label>
+        <label class="toolbar-label">{{ T.fontSize }}</label>
         <select
           v-model="selectedFontSize"
-          id="font-size-select"
           class="toolbar-select"
           :aria-label="T.monacoEditorFontSizeAriaLabel"
           @change="onFontSizeChange"
         >
-          <!--
-            T.monacoEditorFontSizeOption should be defined as '{size}px' in your lang file.
-            This makes the unit suffix translatable (e.g. some locales use 'pt').
-          -->
           <option v-for="size in fontSizes" :key="size" :value="size">
             {{ T.monacoEditorFontSizeOption.replace('{size}', String(size)) }}
           </option>
@@ -61,8 +60,16 @@
 
         <button
           class="toolbar-btn"
-          :title="isFullscreen ? T.monacoEditorExitFullscreen : T.monacoEditorFullscreen"
-          :aria-label="isFullscreen ? T.monacoEditorExitFullscreenLabel : T.monacoEditorEnterFullscreen"
+          :title="
+            isFullscreen
+              ? T.monacoEditorExitFullscreen
+              : T.monacoEditorFullscreen
+          "
+          :aria-label="
+            isFullscreen
+              ? T.monacoEditorExitFullscreenLabel
+              : T.monacoEditorEnterFullscreen
+          "
           :aria-pressed="isFullscreen"
           @click="toggleFullscreen"
         >
@@ -135,7 +142,7 @@ const FULLSCREEN_LAYOUT_DELAY_MS = 100;
 // These mirror the values already used by MonacoThemes / supportedLanguages so
 // they are declared here for clarity rather than duplicated in constants.ts.
 const FALLBACKS = {
-  THEME: Util.MonacoThemes.VSLight,   // 'vs'
+  THEME: Util.MonacoThemes.VSLight, // 'vs'
   LANGUAGE: 'javascript',
   MODULE: 'untitled',
   EXTENSION: 'js',
@@ -202,7 +209,9 @@ export default class MonacoEditor extends Vue {
   }
 
   get hasChanges(): boolean {
-    return this.defaultContents !== '' && this.contents !== this.defaultContents;
+    return (
+      this.defaultContents !== '' && this.contents !== this.defaultContents
+    );
   }
 
   // ── Watchers ──────────────────────────────────────────────────────────────
@@ -235,7 +244,7 @@ export default class MonacoEditor extends Vue {
   mounted(): void {
     window.addEventListener(
       EVENTS.CODE_AND_LANGUAGE_SET,
-      this.onCodeAndLanguageSet as EventListener,
+      this.onCodeAndLanguageSet,
     );
     document.addEventListener('keydown', this.handleKeydown);
 
@@ -245,7 +254,9 @@ export default class MonacoEditor extends Vue {
     this.defaultContents = this.contents;
 
     const langObj = Util.supportedLanguages[this.language];
-    const modelMapping = langObj ? langObj.modelMapping : FALLBACKS.MODEL_MAPPING;
+    const modelMapping = langObj
+      ? langObj.modelMapping
+      : FALLBACKS.MODEL_MAPPING;
 
     this._editor = monaco.editor.create(container, {
       autoIndent: 'brackets',
@@ -287,7 +298,7 @@ export default class MonacoEditor extends Vue {
 
     window.removeEventListener(
       EVENTS.CODE_AND_LANGUAGE_SET,
-      this.onCodeAndLanguageSet as EventListener,
+      this.onCodeAndLanguageSet,
     );
     document.removeEventListener('keydown', this.handleKeydown);
 
@@ -386,7 +397,10 @@ export default class MonacoEditor extends Vue {
 
   &.monaco-root--fullscreen {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100vw !important;
     height: 100vh !important;
     z-index: 9999;
@@ -397,7 +411,9 @@ export default class MonacoEditor extends Vue {
   // MonacoThemes.VSDark = 'vs-dark'
   &.vs-dark {
     border-color: #404040;
-    &.monaco-root--fullscreen { background: #1e1e1e; }
+    &.monaco-root--fullscreen {
+      background: #1e1e1e;
+    }
   }
 }
 
@@ -408,7 +424,8 @@ export default class MonacoEditor extends Vue {
   padding: 0 12px;
   height: 40px;
   background: var(--monaco-editor-toolbar-background-color, #fafafa);
-  border-bottom: 1px solid var(--monaco-editor-toolbar-border-bottom-color, #e5e7eb);
+  border-bottom: 1px solid
+    var(--monaco-editor-toolbar-border-bottom-color, #e5e7eb);
   font-size: 13px;
 
   .vs-dark & {
@@ -424,7 +441,9 @@ export default class MonacoEditor extends Vue {
   font-weight: 600;
   color: #1f2937;
 
-  .vs-dark & { color: #e5e5e5; }
+  .vs-dark & {
+    color: #e5e5e5;
+  }
 }
 
 .toolbar-right {
@@ -439,7 +458,9 @@ export default class MonacoEditor extends Vue {
   margin: 0;
   font-weight: 600;
 
-  .vs-dark & { color: #9ca3af; }
+  .vs-dark & {
+    color: #9ca3af;
+  }
 }
 
 .toolbar-select {
@@ -482,6 +503,7 @@ export default class MonacoEditor extends Vue {
 
   .vs-dark & {
     color: #9ca3af;
+
     &:hover {
       background: rgba(255, 255, 255, 0.1);
       color: #d4d4d4;
@@ -492,7 +514,10 @@ export default class MonacoEditor extends Vue {
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -512,9 +537,16 @@ export default class MonacoEditor extends Vue {
     color: #e5e5e5;
   }
 
-  h3 { margin-top: 0; }
-  p { margin-bottom: 20px; color: #4b5563; }
-  .vs-dark p { color: #9ca3af; }
+  h3 {
+    margin-top: 0;
+  }
+  p {
+    margin-bottom: 20px;
+    color: #4b5563;
+  }
+  .vs-dark p {
+    color: #9ca3af;
+  }
 }
 
 .modal-actions {
@@ -531,11 +563,23 @@ export default class MonacoEditor extends Vue {
   font-weight: 500;
 }
 
-.btn-secondary { background: #f3f4f6; color: #1a1a1a; }
-.btn-danger { background: #dc2626; color: #fff; }
+.btn-secondary {
+  background: #f3f4f6;
+  color: #1a1a1a;
+}
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
 
 .sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0;
-  margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 </style>
