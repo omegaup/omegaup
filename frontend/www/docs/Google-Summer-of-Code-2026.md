@@ -20,7 +20,9 @@ This project aims to improve the platform’s performance by optimizing SQL quer
 * One Integration test that analyzes the EXPLAIN of all queries to determine if it's efficient or not.
 * One integration test that analyzes the performance of all queries by running them on a synthetic dataset with dimensions comparable to those of production. 
 
-The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in [this doc](https://docs.google.com/document/d/1kEOL3HoJT-dYeguU315jju1nkQLC2ew9o5-bm5iiwkQ/edit?tab=t.0#heading=h.jd9bc5b8hoah).
+The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in this doc:
+https://docs.google.com/document/d/1kEOL3HoJT-dYeguU315jju1nkQLC2ew9o5-bm5iiwkQ/edit
+
 
 **Current status**:
 
