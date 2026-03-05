@@ -83,7 +83,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.username = ?
                 LIMIT
                     0, 1';
-        /** @var array{identity_id: int, is_private: bool|int, main_identity_id: int|null}|null */
+        /** @var array{identity_id: int, is_private: int, main_identity_id: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$username]
