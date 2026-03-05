@@ -279,17 +279,23 @@ class Request extends \ArrayObject {
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
+        if ($val instanceof \OmegaUp\Timestamp) {
+            $timestampVal = $val;
+        } elseif (is_string($val) && !is_numeric($val)) {
+            // Handle strict YYYY-MM-DD format string dates
+            \OmegaUp\Validators::validateDate($val, $key);
+            $timestampVal = new \OmegaUp\Timestamp(strtotime($val));
+        } else {
+            $timestampVal = new \OmegaUp\Timestamp(intval($val));
+        }
+        // Validate range after converting all possible input types to a
+        // Timestamp, so that string dates are also checked against bounds.
         \OmegaUp\Validators::validateTimestampInRange(
-            $val,
+            $timestampVal,
             $key,
             $lowerBound,
             $upperBound
         );
-        if ($val instanceof \OmegaUp\Timestamp) {
-            $timestampVal = $val;
-        } else {
-            $timestampVal = new \OmegaUp\Timestamp(intval($val));
-        }
         $this[$key] = $timestampVal;
         return $timestampVal;
     }

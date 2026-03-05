@@ -737,4 +737,98 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $identityToGetInformation->name
         );
     }
+
+    /**
+     * @return list<array{string}>
+     */
+    public function invalidDateProvider(): array {
+        return [
+            ['01-01-1990'],       // DD-MM-YYYY
+            ['01/01/1990'],       // DD/MM/YYYY
+            ['1990/01/01'],       // YYYY/MM/DD
+            ['January 1, 1990'], // Natural language format
+            ['1990-1-1'],         // Missing leading zeros
+            ['yesterday'],        // Relative date
+            ['next week'],        // Relative date
+            ['next Thursday'],    // Relative date
+            ['2024-02-30'],       // Invalid day (Feb 30)
+        ];
+    }
+
+    /**
+     * @dataProvider invalidDateProvider
+     */
+    public function testBirthDateRejectsInvalidFormats(
+        string $invalidDate
+    ): void {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'birth_date' => $invalidDate,
+            ]));
+            $this->fail(
+                "Update should have failed for birth_date '{$invalidDate}'"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('birth_date', $e->parameter);
+        }
+    }
+
+    /**
+     * @dataProvider invalidDateProvider
+     */
+    public function testGraduationDateRejectsInvalidFormats(
+        string $invalidDate
+    ): void {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'graduation_date' => $invalidDate,
+            ]));
+            $this->fail(
+                "Update should have failed for graduation_date '{$invalidDate}'"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertSame('parameterInvalid', $e->getMessage());
+            $this->assertSame('graduation_date', $e->parameter);
+        }
+    }
+
+    /**
+     * @return list<array{int|\OmegaUp\Timestamp|string, string}>
+     */
+    public function validDateProvider(): array {
+        $timestamp = strtotime('1990-01-01');
+        return [
+            [new \OmegaUp\Timestamp($timestamp), 'Timestamp object'],
+            [$timestamp, 'Numeric timestamp (int)'],
+            [strval($timestamp), 'String numeric timestamp'],
+            ['1990-01-01', 'YYYY-MM-DD string'],
+        ];
+    }
+
+    /**
+     * @dataProvider validDateProvider
+     * @param int|\OmegaUp\Timestamp|string $validDate
+     */
+    public function testBirthDateAcceptsValidFormats(
+        $validDate,
+        string $description
+    ): void {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'birth_date' => $validDate,
+        ]));
+        $this->assertTrue(
+            true,
+            "birth_date should accept {$description}"
+        );
+    }
 }

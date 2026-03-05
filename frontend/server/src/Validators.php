@@ -475,9 +475,39 @@ class Validators {
             return;
         }
 
-        // Validate that we are working with a date
-        // @TODO This strtotime() allows nice strings like "next Thursday".
-        if (!is_string($parameter) || strtotime($parameter) === false) {
+        // Reject non-string values and enforce strict YYYY-MM-DD format to
+        // prevent ambiguous natural language dates like "next Thursday".
+        if (
+            !is_string($parameter) ||
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $parameterName
+            );
+        }
+
+        // Use DateTimeImmutable for robust date validation. The '!' prefix
+        // resets all fields to the Unix epoch, ensuring only the date part
+        // matters. UTC timezone avoids daylight-saving ambiguity.
+        $date = \DateTimeImmutable::createFromFormat(
+            '!Y-m-d',
+            $parameter,
+            new \DateTimeZone('UTC')
+        );
+        $errors = \DateTimeImmutable::getLastErrors();
+
+        // Roundtrip check: format the parsed date back to 'Y-m-d' and compare
+        // against the original string. This catches invalid dates such as
+        // "2024-02-30" where PHP would silently roll over to March.
+        if (
+            $date === false ||
+            ($errors !== false && (
+                $errors['warning_count'] > 0 ||
+                $errors['error_count'] > 0
+            )) ||
+            $date->format('Y-m-d') !== $parameter
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 $parameterName
