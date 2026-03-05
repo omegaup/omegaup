@@ -51,14 +51,16 @@
               />
             </button>
             <button
-              v-clipboard="() => store.getters['request.source'] || ''"
+              v-clipboard="getCopySource"
+              v-clipboard:success="handleCopyFeedback"
+              v-clipboard:error="handleCopyError"
+              type="button"
               class="btn btn-sm mr-2 my-sm-0"
               :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
               data-copy-button
               :title="T.wordsCopyToClipboard"
               :aria-label="T.wordsCopyToClipboard"
               copy-to-clipboard
-              @click.prevent="handleCopyFeedback"
             >
               <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
             </button>
@@ -492,6 +494,13 @@ export default class Ephemeral extends Vue {
     this.copySuccessTimer = setTimeout(() => {
       this.isCopySuccess = false;
     }, 2000);
+  }
+  getCopySource(): string {
+    return store.getters['request.source'] || '';
+  }
+  handleCopyError() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.isCopySuccess = false;
   }
 
   beforeDestroy() {
