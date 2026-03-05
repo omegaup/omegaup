@@ -163,20 +163,23 @@
               />
             </td>
             <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
-            <td>
-              <omegaup-countryflag
-                :country="user.country"
-              ></omegaup-countryflag>
-              <omegaup-user-username
-                :classname="user.classname"
-                :linkify="true"
-                :username="user.username"
-              ></omegaup-user-username>
-              <span v-if="user.name && length !== 5"
-                ><br />
-                {{ user.name }}</span
-              >
-            </td>
+           <td class="coder-column">
+  <div class="coder-cell">
+    <omegaup-countryflag
+      :country="user.country"
+    ></omegaup-countryflag>
+    <omegaup-user-username
+      :classname="user.classname"
+      :linkify="true"
+      :username="user.username"
+    ></omegaup-user-username>
+    
+    <span v-if="user.name && length !== 5" class="coder-name">
+  
+      {{ user.name }}
+    </span>
+  </div>
+</td>
             <td class="text-right">{{ user.score.toFixed(2) }}</td>
             <td v-if="!isIndex" class="text-right pr-4">
               {{ user.problems_solved }}
@@ -234,7 +237,7 @@ interface Rank {
   username: string;
   name?: string;
   score: number;
-  problemsSolvedUser: number;
+  problems_solved: number;
 }
 
 @Component({
@@ -251,7 +254,7 @@ export default class UserRank extends Vue {
   @Prop() length!: number;
   @Prop({ default: false }) isIndex!: boolean;
   @Prop() isLogged!: boolean;
-  @Prop({ default: () => {} }) availableFilters!: { [key: string]: string };
+  @Prop({ default: () => ({}) }) availableFilters!: { [key: string]: string };
   @Prop({ default: null }) filter!: string | null;
   @Prop() ranking!: Rank[];
   @Prop() lastUpdated!: Date;
@@ -386,4 +389,28 @@ export default class UserRank extends Vue {
   width: 40px;
   font-size: 0.75rem;
 }
+
+.coder-column{
+  vertical-align: middle;
+}
+.coder-name {
+  margin-left: 6px;
+
+}
+.coder-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  
+}
+
+.coder-cell img {
+  vertical-align: middle;
+}
+[data-user-rank] table td,
+[data-user-rank] table th {
+  vertical-align: middle !important;
+}
+
+
 </style>
