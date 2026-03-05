@@ -739,22 +739,39 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test that natural language date strings like "next Thursday"
-     * are rejected for birth_date
+     * @return list<array{0: string}>
      */
-    public function testNaturalLanguageBirthDateRejected() {
-        // Create the user to edit
+    public function invalidBirthDateProvider(): array {
+        return [
+            'DD-MM-YYYY' => ['01-01-1990'],
+            'DD/MM/YYYY' => ['01/01/1990'],
+            'YYYY/MM/DD' => ['1990/01/01'],
+            'natural language format' => ['January 1, 1990'],
+            'missing leading zeros' => ['1990-1-1'],
+            'relative date yesterday' => ['yesterday'],
+            'relative date next week' => ['next week'],
+            'natural language next Thursday' => ['next Thursday'],
+        ];
+    }
+
+    /**
+     * Test that invalid date formats are rejected for birth_date.
+     *
+     * @dataProvider invalidBirthDateProvider
+     */
+    public function testInvalidDateFormatRejected(
+        string $invalidDate
+    ) {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Try to set birth_date with natural language string
         try {
             \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'birth_date' => 'next Thursday',
+                'birth_date' => $invalidDate,
             ]));
             $this->fail(
-                'Update should have failed due to natural language date string'
+                "Update should have failed for invalid date format: {$invalidDate}"
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('parameterInvalid', $e->getMessage());
@@ -763,57 +780,50 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test that only YYYY-MM-DD format is accepted for birth_date
+     * @return list<array{0: string, 1: \OmegaUp\Timestamp|int|string}>
      */
-    public function testInvalidDateFormatRejected() {
-        // Create the user to edit
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
-
-        // Try various invalid date formats
-        $invalidDates = [
-            '01-01-1990',     // DD-MM-YYYY
-            '01/01/1990',     // DD/MM/YYYY
-            '1990/01/01',     // YYYY/MM/DD
-            'January 1, 1990', // Natural language format
-            '1990-1-1',       // Missing leading zeros
-            'yesterday',      // Relative date
-            'next week',      // Relative date
+    public function validBirthDateProvider(): array {
+        // 1990-01-15 00:00:00 UTC
+        $timestamp = 632448000;
+        return [
+            'Timestamp object' => [
+                '1990-01-15',
+                new \OmegaUp\Timestamp($timestamp),
+            ],
+            'integer timestamp' => [
+                '1990-01-15',
+                $timestamp,
+            ],
+            'numeric string timestamp' => [
+                '1990-01-15',
+                strval($timestamp),
+            ],
+            'YYYY-MM-DD string' => [
+                '1990-01-15',
+                '1990-01-15',
+            ],
         ];
-
-        foreach ($invalidDates as $invalidDate) {
-            try {
-                \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                    'birth_date' => $invalidDate,
-                ]));
-                $this->fail(
-                    "Update should have failed for invalid date format: {$invalidDate}"
-                );
-            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                $this->assertSame('parameterInvalid', $e->getMessage());
-                $this->assertSame('birth_date', $e->parameter);
-            }
-        }
     }
 
     /**
-     * Test that valid YYYY-MM-DD format is accepted for birth_date
+     * Test that all valid date input types are accepted for birth_date.
+     *
+     * @dataProvider validBirthDateProvider
      */
-    public function testValidDateFormatAccepted() {
-        // Create the user to edit
+    public function testValidDateFormatAccepted(
+        string $expectedDate,
+        $birthDateInput
+    ) {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Valid YYYY-MM-DD format should work
         \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'birth_date' => '1990-01-15',
+            'birth_date' => $birthDateInput,
         ]));
 
-        // Check user from db
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($login->auth_token);
-        $this->assertSame('1990-01-15', $userDb->birth_date);
+        $this->assertSame($expectedDate, $userDb->birth_date);
     }
 
     /**
