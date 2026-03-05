@@ -2625,11 +2625,15 @@ class User extends \OmegaUp\Controllers\Controller {
             $newGraduationDate = $graduationDateTimestamp;
         }
         $birthDateTimestamp = $r->ensureOptionalTimestamp(
-            'birth_date',
-            lowerBound: null,
-            upperBound: strtotime('-5 year', \OmegaUp\Time::get())
+            'birth_date'
         );
         if (!is_null($birthDateTimestamp)) {
+            if ($birthDateTimestamp->time >= strtotime('-5 year', \OmegaUp\Time::get())) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'birthdayInTheFuture',
+                    'birth_date'
+                );
+            }
             $r['birth_date'] = $birthDateTimestamp->time;
         }
         if (!is_null($r['locale'])) {
