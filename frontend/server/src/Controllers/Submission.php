@@ -78,7 +78,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
             null,
             self::MAX_SUBMISSION_LIST_PAGE_SIZE
         );
-        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername($username);
+        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername(
+            $username
+        );
         if (is_null($identityPrivacyData)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -143,7 +145,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         }
-        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername($username);
+        $identityPrivacyData = \OmegaUp\DAO\Identities::getIdentityPrivacyDataByUsername(
+            $username
+        );
         if (is_null($identityPrivacyData)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
