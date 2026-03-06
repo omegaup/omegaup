@@ -69,10 +69,7 @@ describe('problem/ProblemMarkdown.vue', () => {
 
   describe('Computed property: html', () => {
     it('uses makeHtml when no imageMapping or problemSettings', () => {
-      const makeHtmlSpy = jest.spyOn(
-        markdown.Converter.prototype,
-        'makeHtml',
-      );
+      const makeHtmlSpy = jest.spyOn(markdown.Converter.prototype, 'makeHtml');
       const makeHtmlWithImagesSpy = jest.spyOn(
         markdown.Converter.prototype,
         'makeHtmlWithImages',
@@ -250,7 +247,7 @@ describe('problem/ProblemMarkdown.vue', () => {
     it('clipboard button calls ui.copyToClipboard on click', async () => {
       const copyToClipboardSpy = jest
         .spyOn(ui, 'copyToClipboard')
-        .mockImplementation(() => { });
+        .mockImplementation(() => {});
 
       const wrapper = mount(ProblemMarkdown, {
         propsData: {
@@ -326,17 +323,18 @@ describe('problem/ProblemMarkdown.vue', () => {
       await wrapper.vm.$nextTick();
 
       // Config should be created
-      expect(window.MathJax).toBeDefined();
-      expect(window.MathJax!.tex).toBeDefined();
-      expect(window.MathJax!.tex.inlineMath).toEqual([
+      const mj = window.MathJax;
+      expect(mj).toBeDefined();
+      expect(mj?.tex).toBeDefined();
+      expect(mj?.tex.inlineMath).toEqual([
         ['$', '$'],
         ['\\(', '\\)'],
       ]);
-      expect(window.MathJax!.startup).toBeDefined();
+      expect(mj?.startup).toBeDefined();
 
       // Element should be queued (falls through from config creation)
-      expect(window.MathJax!.startup.elements).toBeDefined();
-      expect(window.MathJax!.startup.elements!.length).toBeGreaterThan(0);
+      expect(mj?.startup.elements).toBeDefined();
+      expect(mj?.startup.elements?.length).toBeGreaterThan(0);
 
       // Script tag should be created
       const scriptTag = document.getElementById(
@@ -376,7 +374,7 @@ describe('problem/ProblemMarkdown.vue', () => {
         startup: {
           typeset: true,
           elements: [],
-          ready: () => { },
+          ready: () => {},
         },
         options: {},
         loader: {},
@@ -389,7 +387,7 @@ describe('problem/ProblemMarkdown.vue', () => {
       await wrapper.vm.$nextTick();
 
       // Element should be queued since typeset function doesn't exist
-      expect(window.MathJax!.startup.elements!.length).toBe(1);
+      expect(window.MathJax?.startup.elements?.length).toBe(1);
     });
 
     it('calls MathJax.typeset directly when fully loaded', async () => {
@@ -399,7 +397,7 @@ describe('problem/ProblemMarkdown.vue', () => {
         startup: {
           typeset: true,
           elements: [],
-          ready: () => { },
+          ready: () => {},
         },
         typeset: typesetMock,
         options: {},
@@ -423,24 +421,25 @@ describe('problem/ProblemMarkdown.vue', () => {
       });
 
       // Now MathJax config should exist with a ready callback
-      expect(window.MathJax!.startup.ready).toBeDefined();
+      const mj = window.MathJax;
+      expect(mj?.startup.ready).toBeDefined();
 
       // Simulate MathJax library finishing load: set typeset and defaultReady
       const typesetMock = jest.fn();
       const defaultReadyMock = jest.fn();
-      window.MathJax!.typeset = typesetMock;
-      window.MathJax!.startup.defaultReady = defaultReadyMock;
+      (mj as any).typeset = typesetMock;
+      (mj as any).startup.defaultReady = defaultReadyMock;
 
       // There should be a queued element
-      expect(window.MathJax!.startup.elements!.length).toBeGreaterThan(0);
+      expect(mj?.startup.elements?.length).toBeGreaterThan(0);
 
       // Call ready() — simulates MathJax library calling this internally
-      window.MathJax!.startup.ready();
+      mj?.startup.ready();
 
       expect(defaultReadyMock).toHaveBeenCalled();
       expect(typesetMock).toHaveBeenCalled();
       // Elements array should be emptied (spliced)
-      expect(window.MathJax!.startup.elements!.length).toBe(0);
+      expect(mj?.startup.elements?.length).toBe(0);
     });
   });
 
@@ -452,7 +451,7 @@ describe('problem/ProblemMarkdown.vue', () => {
     it('calls renderMermaidDiagrams on the root element', async () => {
       const renderMermaidSpy = jest
         .spyOn(markdown.Converter.prototype, 'renderMermaidDiagrams')
-        .mockImplementation(() => { });
+        .mockImplementation(() => {});
 
       const wrapper = mount(ProblemMarkdown, {
         propsData: { markdown: '# Hello' },
@@ -465,7 +464,7 @@ describe('problem/ProblemMarkdown.vue', () => {
 
     it('catches synchronous errors from renderMermaidDiagrams', async () => {
       // Must mock console.error because test.setup.ts throws on it
-      jest.spyOn(console, 'error').mockImplementation(() => { });
+      jest.spyOn(console, 'error').mockImplementation(() => {});
 
       jest
         .spyOn(markdown.Converter.prototype, 'renderMermaidDiagrams')
@@ -520,7 +519,7 @@ describe('problem/ProblemMarkdown.vue', () => {
         .spyOn(markdown.Converter.prototype, 'makeHtml')
         .mockReturnValue(
           '<template data-template-name="output-only:download"></template>' +
-          '<template data-template-name="libinteractive:download"></template>',
+            '<template data-template-name="libinteractive:download"></template>',
         );
 
       const wrapper = mount(ProblemMarkdown, {
@@ -549,8 +548,9 @@ describe('problem/ProblemMarkdown.vue', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.emitted('rendered')).toBeTruthy();
-      expect(wrapper.emitted('rendered')!.length).toBeGreaterThanOrEqual(1);
+      const renderedEvents = wrapper.emitted('rendered');
+      expect(renderedEvents).toBeTruthy();
+      expect(renderedEvents?.length).toBeGreaterThanOrEqual(1);
     });
 
     it('emits "rendered" event when markdown prop changes', async () => {
@@ -561,14 +561,13 @@ describe('problem/ProblemMarkdown.vue', () => {
       await wrapper.vm.$nextTick();
 
       // Clear previous emissions by noting current count
-      const initialCount = wrapper.emitted('rendered')!.length;
+      const renderedEvents = wrapper.emitted('rendered');
+      const initialCount = renderedEvents?.length ?? 0;
 
       await wrapper.setProps({ markdown: '# Updated' });
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.emitted('rendered')!.length).toBeGreaterThan(
-        initialCount,
-      );
+      expect(wrapper.emitted('rendered')?.length).toBeGreaterThan(initialCount);
     });
   });
 
@@ -580,7 +579,7 @@ describe('problem/ProblemMarkdown.vue', () => {
     it('mounted() calls renderMathJax, injectTemplates, and renderMermaid', async () => {
       const renderMermaidDiagramsSpy = jest
         .spyOn(markdown.Converter.prototype, 'renderMermaidDiagrams')
-        .mockImplementation(() => { });
+        .mockImplementation(() => {});
 
       const wrapper = mount(ProblemMarkdown, {
         propsData: {
@@ -664,7 +663,7 @@ describe('problem/ProblemMarkdown.vue', () => {
         .spyOn(markdown.Converter.prototype, 'makeHtml')
         .mockReturnValue(
           '<template data-template-name="output-only:download"></template>' +
-          '<template data-template-name="libinteractive:download"></template>',
+            '<template data-template-name="libinteractive:download"></template>',
         );
 
       const wrapper = mount(ProblemMarkdown, {
@@ -747,7 +746,7 @@ describe('problem/ProblemMarkdown.vue', () => {
     it('calls renderMermaid when markdown prop changes', async () => {
       const renderMermaidSpy = jest
         .spyOn(markdown.Converter.prototype, 'renderMermaidDiagrams')
-        .mockImplementation(() => { });
+        .mockImplementation(() => {});
 
       const wrapper = mount(ProblemMarkdown, {
         propsData: { markdown: '# First' },
