@@ -42,6 +42,19 @@
     {% if recaptchaFile %}
         <script type="text/javascript" src="{{ recaptchaFile }}"></script>
     {% endif %}
+
+    <link rel="manifest" href="/manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registered:', registration.scope);
+          }).catch(err => {
+            console.error('ServiceWorker registration failed:', err);
+          });
+        });
+      }
+    </script>
   </head>
 
   <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
