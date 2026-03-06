@@ -97,6 +97,29 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Verifies that apiCreate returns the contest alias in the response.
+     */
+    public function testCreateClarificationReturnsContestAlias() {
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(isGraderExpectedToBeCalled: true);
+
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+
+        $this->assertSame(
+            $contestData['request']['alias'],
+            $clarificationData['response']['contest_alias'],
+            'contest_alias in apiCreate response must match the contest alias used'
+        );
+    }
+
+    /**
      * Creates a valid clarification, to a problem.
      */
     public function testProblemClarificationsAsAuthor() {
