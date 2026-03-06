@@ -208,7 +208,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             'answer' => $clarification->answer,
             'author' => $r->identity->username,
             'clarification_id' => intval($clarification->clarification_id),
-            'contest_alias' => null,
+            'contest_alias' => $contestAlias,
             'message' => strval($clarification->message),
             'problem_alias' => strval($problem->alias),
             'public' => $clarification->public,
