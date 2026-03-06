@@ -3958,7 +3958,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
         $courseAlias = $r->ensureString(
@@ -4032,7 +4032,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
         $courseAlias = $r->ensureString(
@@ -4258,7 +4258,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
 
         $courses = self::getCoursesList(
@@ -4468,7 +4468,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
         $courseAlias = $r->ensureString(
@@ -5513,7 +5513,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     public static function apiActivityReport(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
         $courseAlias = $r->ensureString(
             'course_alias',
@@ -6299,7 +6299,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getClarificationsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
 
         $course = self::validateCourseExists(

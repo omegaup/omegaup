@@ -937,7 +937,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ?int $nominator,
         ?int $assignee
     ): array {
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? self::PAGE_SIZE;
 
         $types = $r->getStringList('types', ['promotion', 'demotion']);
@@ -1264,7 +1264,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
         self::validateMemberOfReviewerGroup($r->identity);
 
@@ -1296,7 +1296,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $page = $r->ensureOptionalInt('page') ?? 1;
+        $page = $r->ensureOptionalInt('page', lowerBound: 1) ?? 1;
         $length = $r->ensureOptionalInt('length') ?? self::PAGE_SIZE;
 
         return [

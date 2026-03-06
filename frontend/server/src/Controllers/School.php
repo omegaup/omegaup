@@ -272,7 +272,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getRankForTypeScript(\OmegaUp\Request $r): array {
-        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page', lowerBound: 1);
         $r->ensureOptionalInt('length');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
