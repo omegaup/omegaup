@@ -99,8 +99,3 @@ table td {
 }
 </style>
 
-<style>
-.scroll-to-top-button {
-  display: none !important;
-}
-</style>
