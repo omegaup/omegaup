@@ -20,7 +20,7 @@
     <tbody>
       <tr v-for="(coder, index) in coders" :key="index">
         <td class="text-center">
-          <img :src="coder.gravatar_32" />
+          <img :src="coder.gravatar_32" :alt="coder.username" />
         </td>
         <td class="text-center align-middle">
           <omegaup-user-username

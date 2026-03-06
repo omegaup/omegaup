@@ -58,19 +58,38 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-8 introjs-terms-and-conditions">
-            <input
-              v-model="termsAndPolicies"
-              data-signup-accept-policies
-              type="checkbox"
-              required
-            />
-            <label for="checkbox">
-              <omegaup-markdown
-                :markdown="formattedAcceptPolicyMarkdown"
-              ></omegaup-markdown>
-            </label>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-privacy-policy"
+                v-model="privacyPolicyAccepted"
+                data-signup-accept-policies
+                type="checkbox"
+                required
+              />
+              <label for="accept-privacy-policy" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptPolicyMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-code-of-conduct"
+                v-model="codeOfConductAccepted"
+                data-signup-accept-conduct
+                type="checkbox"
+                required
+              />
+              <label for="accept-code-of-conduct" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptConductMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
           </div>
+          <!-- id-lint on -->
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
               name="recaptcha"
@@ -204,14 +223,36 @@
         </div>
 
         <div class="row justify-content-md-center">
+          <!-- id-lint off -->
           <div class="col-md-10 introjs-terms-and-conditions">
-            <input v-model="termsAndPolicies" type="checkbox" />
-            <label for="checkbox" class="pl-1">
-              <omegaup-markdown
-                :markdown="formattedAcceptPolicyMarkdown"
-              ></omegaup-markdown>
-            </label>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-privacy-policy-birthdate"
+                v-model="privacyPolicyAccepted"
+                data-signup-accept-policies
+                type="checkbox"
+              />
+              <label for="accept-privacy-policy-birthdate" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptPolicyMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input
+                id="accept-code-of-conduct-birthdate"
+                v-model="codeOfConductAccepted"
+                data-signup-accept-conduct
+                type="checkbox"
+              />
+              <label for="accept-code-of-conduct-birthdate" class="pl-1">
+                <omegaup-markdown
+                  :markdown="formattedAcceptConductMarkdown"
+                ></omegaup-markdown>
+              </label>
+            </div>
           </div>
+          <!-- id-lint on -->
         </div>
 
         <div class="row justify-content-md-center">
@@ -257,7 +298,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -276,8 +317,9 @@ Vue.use(VueCookies, { expire: -1 });
 })
 export default class Signup extends Vue {
   @Prop() validateRecaptcha!: boolean;
-  @Prop() hasVisitedSection!: boolean;
+  @Prop({ default: false }) hasVisitedSection!: boolean;
   @Prop({ default: false }) useSignupFormWithBirthDate!: boolean;
+  @Prop({ default: 'login' }) activeTab!: string;
 
   T = T;
   ui = ui;
@@ -290,61 +332,83 @@ export default class Signup extends Vue {
   recaptchaResponse: string = '';
   isUnder13: boolean = true;
   over13Checked: boolean = false;
-  termsAndPolicies: boolean = false;
+  privacyPolicyAccepted: boolean = false;
+  codeOfConductAccepted: boolean = false;
+  introStarted: boolean = false;
 
   mounted() {
-    const title = T.signUpFormInteractiveGuideTitle;
+    this.maybeStartIntro();
+  }
 
-    if (!this.hasVisitedSection) {
+  @Watch('activeTab')
+  onActiveTabChanged(newValue: string): void {
+    if (newValue === 'signup') {
+      this.maybeStartIntro();
+    }
+  }
+
+  maybeStartIntro(): void {
+    if (this.introStarted || this.hasVisitedSection) {
+      return;
+    }
+    if (this.activeTab !== 'signup') {
+      return;
+    }
+
+    this.$nextTick(() => {
+      if (this.introStarted || this.hasVisitedSection) {
+        return;
+      }
+      const title = T.signUpFormInteractiveGuideTitle;
+      const steps: Array<{
+        title: string;
+        intro: string;
+        element?: Element;
+      }> = [
+        {
+          title,
+          intro: T.signUpFormInteractiveGuideWelcome,
+        },
+      ];
+      const addStep = (selector: string, intro: string): void => {
+        const element = document.querySelector(selector);
+        if (!element) {
+          return;
+        }
+        steps.push({
+          element,
+          title,
+          intro,
+        });
+      };
+
+      addStep('.introjs-username', T.signUpFormInteractiveGuideUsername);
+      addStep('.introjs-email', T.signUpFormInteractiveGuideEmail);
+      addStep('.introjs-password', T.signUpFormInteractiveGuidePassword);
+      addStep(
+        '.introjs-confirmpassword',
+        T.signUpFormInteractiveGuideConfirmPassword,
+      );
+      addStep(
+        '.introjs-terms-and-conditions',
+        T.signUpFormInteractiveGuideTermsAndConditions,
+      );
+      addStep('.introjs-register', T.signUpFormInteractiveGuideRegister);
+
+      if (steps.length <= 1) {
+        return;
+      }
+      this.introStarted = true;
       introJs()
         .setOptions({
           nextLabel: T.interactiveGuideNextButton,
           prevLabel: T.interactiveGuidePreviousButton,
           doneLabel: T.interactiveGuideDoneButton,
-          steps: [
-            {
-              title,
-              intro: T.signUpFormInteractiveGuideWelcome,
-            },
-            {
-              element: document.querySelector('.introjs-username') as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideUsername,
-            },
-            {
-              element: document.querySelector('.introjs-email') as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideEmail,
-            },
-            {
-              element: document.querySelector('.introjs-password') as Element,
-              title,
-              intro: T.signUpFormInteractiveGuidePassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-confirmpassword',
-              ) as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideConfirmPassword,
-            },
-            {
-              element: document.querySelector(
-                '.introjs-terms-and-conditions',
-              ) as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideTermsAndConditions,
-            },
-            {
-              element: document.querySelector('.introjs-register') as Element,
-              title,
-              intro: T.signUpFormInteractiveGuideRegister,
-            },
-          ],
+          steps,
         })
         .start();
       this.$cookies.set('has-visited-signup', true, -1);
-    }
+    });
   }
 
   verify(response: string): void {
@@ -355,16 +419,22 @@ export default class Signup extends Vue {
     this.recaptchaResponse = '';
   }
 
+  get termsAndPolicies(): boolean {
+    return this.privacyPolicyAccepted && this.codeOfConductAccepted;
+  }
+
   get formattedAcceptPolicyMarkdown(): string {
     const policyUrl = getBlogUrl('PrivacyPolicyURL');
-    const conductUrl = getBlogUrl('CodeofConductPolicyURL');
-
-    const formattedstring = ui.formatString(T.acceptPrivacyPolicy, {
+    return ui.formatString(T.acceptPrivacyPolicy, {
       PrivacyPolicyURL: policyUrl,
+    });
+  }
+
+  get formattedAcceptConductMarkdown(): string {
+    const conductUrl = getBlogUrl('CodeofConductPolicyURL');
+    return ui.formatString(T.acceptCodeOfConduct, {
       CodeofConductPolicyURL: conductUrl,
     });
-
-    return formattedstring;
   }
 
   get maxDateForTimepicker() {
@@ -404,3 +474,21 @@ export default class Signup extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+}
+
+.checkbox-wrapper label {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+</style>

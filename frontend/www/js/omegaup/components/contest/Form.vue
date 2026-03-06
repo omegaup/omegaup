@@ -1271,6 +1271,9 @@ export default class Form extends Vue {
 
   clearFieldError(fieldName: FieldName | string): void {
     delete this.localErrors[fieldName];
+    if (Object.keys(this.localErrors).length === 0) {
+      ui.dismissNotifications();
+    }
     this.$forceUpdate();
   }
 
