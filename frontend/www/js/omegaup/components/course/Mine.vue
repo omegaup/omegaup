@@ -73,7 +73,7 @@ export default class Mine extends Vue {
     if (!filtered) return false;
 
     return Object.values(filtered).some(
-      (group: any) => group.courses && group.courses.length > 0,
+      (group: types.CoursesByTimeType) => group.courses?.length > 0,
     );
   }
 }
