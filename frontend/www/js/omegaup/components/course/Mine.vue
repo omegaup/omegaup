@@ -24,12 +24,8 @@
         size="3x"
         class="mb-3 text-muted"
       />
-      <h4 class="mb-2">
-        {{ T.courseListEmptyTitle }}
-      </h4>
-      <p class="text-muted mb-4">
-        {{ T.courseListEmptyDescription }}
-      </p>
+      <h4 class="mb-2">{{ T.courseListEmptyTitle }}</h4>
+      <p class="text-muted mb-4">{{ T.courseListEmptyDescription }}</p>
       <a
         v-if="isMainUserIdentity"
         class="btn btn-primary btn-lg"
