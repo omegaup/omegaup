@@ -163,23 +163,25 @@
               />
             </td>
             <th scope="row" class="pl-4 column-width">{{ user.rank }}</th>
-           <td class="coder-column">
-  <div class="coder-cell">
-    <omegaup-countryflag
-      :country="user.country"
-    ></omegaup-countryflag>
-    <omegaup-user-username
-      :classname="user.classname"
-      :linkify="true"
-      :username="user.username"
-    ></omegaup-user-username>
-    
-    <span v-if="user.name && length !== 5" class="coder-name">
-  
-      {{ user.name }}
-    </span>
-  </div>
-</td>
+            <td class="coder-column">
+              <div class="coder-cell">
+                <span class="coder-flag">
+                  <omegaup-countryflag
+                    :country="user.country"
+                  ></omegaup-countryflag>
+                </span>
+                <span class="coder-username">
+                  <omegaup-user-username
+                    :classname="user.classname"
+                    :linkify="true"
+                    :username="user.username"
+                  ></omegaup-user-username>
+                </span>
+                <span v-if="user.name && length !== 5" class="coder-name">
+                  {{ user.name }}
+                </span>
+              </div>
+            </td>
             <td class="text-right">{{ user.score.toFixed(2) }}</td>
             <td v-if="!isIndex" class="text-right pr-4">
               {{ user.problems_solved }}
@@ -284,7 +286,6 @@ export default class UserRank extends Vue {
       datetime: time.formatDateLocalHHMM(this.lastUpdated),
     });
   }
-
   onSubmit(): void {
     if (!this.searchedUsername) return;
     window.location.href = `/profile/${encodeURIComponent(
@@ -367,6 +368,7 @@ export default class UserRank extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
+
 .empty-category {
   color: var(--arena-contest-list-empty-category-font-color);
 }
@@ -382,7 +384,7 @@ export default class UserRank extends Vue {
 }
 
 .column-width {
-  max-width: 4rem;
+  min-width: 6rem;
 }
 
 .selection-column {
@@ -390,27 +392,44 @@ export default class UserRank extends Vue {
   font-size: 0.75rem;
 }
 
-.coder-column{
+.coder-column {
   vertical-align: middle;
 }
-.coder-name {
-  margin-left: 6px;
 
-}
 .coder-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  
+  gap: 0.25rem;
 }
 
 .coder-cell img {
   vertical-align: middle;
 }
+
+.coder-flag {
+  width: 24px;
+  display: inline-flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.coder-username {
+  width: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coder-username a {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 [data-user-rank] table td,
 [data-user-rank] table th {
   vertical-align: middle !important;
 }
-
-
 </style>
