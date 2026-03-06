@@ -53,11 +53,6 @@
     {% endif %}
     <main role="main" class="flex-grow-1{% if not fullWidth %} container-lg py-5 px-3 px-md-5{% endif %}">
       <div id="global-notifications" role="status" aria-live="polite" aria-atomic="false" aria-relevant="additions"></div>
-      {% if OMEGAUP_MAINTENANCE %}
-        <div id="announcement" class="alert alert-info mt-0">
-          {{ OMEGAUP_MAINTENANCE|raw }}
-        </div>
-      {% endif %}
 
       <script type="text/json" id="payload">{{ payload|json_encode|raw }}</script>
       {% entrypoint %}
