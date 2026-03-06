@@ -6,6 +6,7 @@
  */
 // eslint-disable-next-line no-unused-vars
 module.exports = (on, config) => {
+    require('@cypress/code-coverage/task')(on, config);
     on('task', {
         log(message) {
             console.log(message);
@@ -13,4 +14,5 @@ module.exports = (on, config) => {
             return null;
         },
     });
+    return config;
 };

@@ -329,8 +329,12 @@ jobs:
       - name: Install yarn dependencies
         run: yarn install
 
+      - name: Clean Cypress coverage artifacts
+        run: yarn coverage:e2e:clean
+
       - name: Build webpack resources
-        run: yarn build
+        run: |
+          CYPRESS_COVERAGE=true yarn build
 
       - name: Wait for dependencies
         run: |
@@ -338,7 +342,19 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          ./node_modules/.bin/cypress run --browser chrome
+          yarn test:e2e:coverage
+
+      - name: Generate Cypress coverage report
+        run: |
+          yarn coverage:e2e:report
+          test -s coverage/cypress/lcov.info
+
+      - name: Upload cypress code coverage
+        run: |
+          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
+          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
+          chmod +x codecov
+          ./codecov -f coverage/cypress/lcov.info -F cypress
 
       - name: Collect container logs
         if: ${{ always() }}
