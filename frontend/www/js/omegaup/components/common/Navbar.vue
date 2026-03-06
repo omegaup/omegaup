@@ -5,7 +5,11 @@
       data-enable-hover-dropdown
     >
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+        <a
+          class="navbar-brand p-3 mr-0 mr-sm-3"
+          href="/"
+          @click="handleLogoClick"
+        >
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -490,6 +494,14 @@ export default class Navbar extends Vue {
           : this.formattedSignupURL;
     }
   }
+
+  handleLogoClick(event: MouseEvent): void {
+    if (window.location.pathname === '/') {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    // For any other path, the default <a> behavior will navigate to '/'
+  }
 }
 </script>
 
@@ -574,7 +586,9 @@ nav.navbar {
   }
 
   a[data-logout-button] {
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
     border-radius: 4px;
   }
 
