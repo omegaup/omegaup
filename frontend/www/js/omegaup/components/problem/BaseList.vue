@@ -102,6 +102,9 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
+            <th v-if="loggedIn" scope="col" class="align-middle text-nowrap">
+              <span>{{ T.wordsNotes }}</span>
+            </th>
             <th scope="col" class="align-middle text-nowrap">
               <span>
                 <a
@@ -212,6 +215,26 @@
             <td v-if="loggedIn" class="text-right align-middle">
               {{ problem.score.toFixed(2) }}
             </td>
+            <td v-if="loggedIn" class="text-center align-middle">
+              <button
+                class="btn btn-link p-0"
+                :title="
+                  notes[problem.problem_id]
+                    ? T.problemNoteEdit
+                    : T.problemNoteAdd
+                "
+                @click="openNoteModal(problem.alias, problem.problem_id)"
+              >
+                <font-awesome-icon
+                  :icon="['fas', 'sticky-note']"
+                  class="note-icon"
+                  :class="{
+                    'note-active': !!notes[problem.problem_id],
+                    'note-inactive': !notes[problem.problem_id],
+                  }"
+                />
+              </button>
+            </td>
             <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
             </td>
@@ -224,6 +247,14 @@
         :pager-items="pagerItems"
       ></omegaup-common-paginator>
     </div>
+    <omegaup-problem-note-modal
+      v-if="showNoteModal"
+      :initial-note-text="noteModalText"
+      :problem-alias="noteModalAlias"
+      @save-note="onSaveNote"
+      @delete-note="onDeleteNote"
+      @close="showNoteModal = false"
+    ></omegaup-problem-note-modal>
   </div>
 </template>
 
@@ -236,6 +267,7 @@ import * as ui from '../../ui';
 
 import common_Paginator from '../common/Paginator.vue';
 import common_SortControls from '../common/SortControls.vue';
+import problem_NoteModal from './NoteModal.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
@@ -248,14 +280,16 @@ import {
   faMedal,
   faExclamationTriangle,
   faBan,
+  faStickyNote,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
+library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan, faStickyNote);
 
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-sort-controls': common_SortControls,
+    'omegaup-problem-note-modal': problem_NoteModal,
   },
   directives: {
     tooltip: VTooltip,
@@ -279,11 +313,16 @@ export default class BaseList extends Vue {
   @Prop() columnName!: string;
   @Prop() path!: string;
   @Prop({ default: true }) showProblemTags!: boolean;
+  @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
 
   T = T;
   ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
+  showNoteModal = false;
+  noteModalAlias = '';
+  noteModalText = '';
+
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
@@ -304,6 +343,22 @@ export default class BaseList extends Vue {
     let tags = selectedTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
     return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
+  }
+
+  openNoteModal(problemAlias: string, problemId: number): void {
+    this.noteModalAlias = problemAlias;
+    this.noteModalText = this.notes[problemId] || '';
+    this.showNoteModal = true;
+  }
+
+  onSaveNote(alias: string, text: string): void {
+    this.showNoteModal = false;
+    this.$emit('save-note', alias, text);
+  }
+
+  onDeleteNote(alias: string): void {
+    this.showNoteModal = false;
+    this.$emit('delete-note', alias);
   }
 
   get UserRankingFeatureGuideURL(): string {
@@ -331,5 +386,18 @@ table {
 
 thead tr th {
   border: none;
+}
+
+.note-icon {
+  font-size: 1.2em;
+}
+
+.note-active {
+  color: #678dd7;
+}
+
+.note-inactive {
+  color: #ccc;
+  opacity: 0.5;
 }
 </style>

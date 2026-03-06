@@ -1189,6 +1189,13 @@ const translations: { [key: string]: string; } = {
   problemBookmarkAdded: "Bookmark added successfully",
   problemBookmarkRemove: "Remove bookmark",
   problemBookmarkRemoved: "Bookmark removed successfully",
+  problemNoteAdd: "Add note",
+  problemNoteCharLimit: "Maximum 2000 characters",
+  problemNoteDeleted: "Note deleted successfully",
+  problemNoteEdit: "Edit note",
+  problemNotePlaceholder: "Write your observations, edge cases, or learning points...",
+  problemNoteSaved: "Note saved successfully",
+  problemNoteTitle: "Problem Note",
   problemCollectionAuthors: "Authors",
   problemCollectionBackCollections: "\u25c4 Back to collections",
   problemCollectionEducationLevel: "By educational level",
@@ -2210,6 +2217,7 @@ const translations: { [key: string]: string; } = {
   wordsNoComment: "No comment",
   wordsNoSubmissions: "Lecture (No submissions)",
   wordsNone: "None",
+  wordsNotes: "Notes",
   wordsNotApplicable: "N/A",
   wordsNumHomeworks: "Num. of homework assignments",
   wordsNumTests: "Num. of tests",
@@ -2313,4 +2321,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "Prepare zip file",
 };
 
-export {translations as default};
+export { translations as default };

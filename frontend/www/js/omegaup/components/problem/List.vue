@@ -50,8 +50,15 @@
       :sort-order="sortOrder"
       :column-name="columnName"
       :path="'/problem/'"
+      :notes="notes"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
+      "
+      @save-note="
+        (alias, text) => $emit('save-note', alias, text)
+      "
+      @delete-note="
+        (alias) => $emit('delete-note', alias)
       "
     ></omegaup-problem-base-list>
   </div>
@@ -92,6 +99,7 @@ export default class List extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
 
   T = T;
   omegaup = omegaup;

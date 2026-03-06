@@ -91,2195 +91,1289 @@ export function apiCall<
 }
 
 export const ACL = {
-  userOwnedAclReport: apiCall<
-    messages.ACLUserOwnedAclReportRequest,
-    messages.ACLUserOwnedAclReportResponse
-  >('/api/aCL/userOwnedAclReport/'),
+    userOwnedAclReport: apiCall<
+      messages.ACLUserOwnedAclReportRequest,
+      messages.ACLUserOwnedAclReportResponse
+    >('/api/aCL/userOwnedAclReport/'),
 };
 
 export const Admin = {
-  getMaintenanceMode: apiCall<
-    messages.AdminGetMaintenanceModeRequest,
-    messages.AdminGetMaintenanceModeResponse
-  >('/api/admin/getMaintenanceMode/'),
-  platformReportStats: apiCall<
-    messages.AdminPlatformReportStatsRequest,
-    messages.AdminPlatformReportStatsResponse
-  >('/api/admin/platformReportStats/'),
-  setMaintenanceMode: apiCall<
-    messages.AdminSetMaintenanceModeRequest,
-    messages.AdminSetMaintenanceModeResponse
-  >('/api/admin/setMaintenanceMode/'),
+    getMaintenanceMode: apiCall<
+      messages.AdminGetMaintenanceModeRequest,
+      messages.AdminGetMaintenanceModeResponse
+    >('/api/admin/getMaintenanceMode/'),
+    platformReportStats: apiCall<
+      messages.AdminPlatformReportStatsRequest,
+      messages.AdminPlatformReportStatsResponse
+    >('/api/admin/platformReportStats/'),
+    setMaintenanceMode: apiCall<
+      messages.AdminSetMaintenanceModeRequest,
+      messages.AdminSetMaintenanceModeResponse
+    >('/api/admin/setMaintenanceMode/'),
 };
 
 export const AiEditorial = {
-  generate: apiCall<
-    messages.AiEditorialGenerateRequest,
-    messages.AiEditorialGenerateResponse
-  >('/api/aiEditorial/generate/'),
-  review: apiCall<
-    messages.AiEditorialReviewRequest,
-    messages.AiEditorialReviewResponse
-  >('/api/aiEditorial/review/'),
-  status: apiCall<
-    messages.AiEditorialStatusRequest,
-    messages._AiEditorialStatusServerResponse,
-    messages.AiEditorialStatusResponse
-  >('/api/aiEditorial/status/', (x) => {
-    if (typeof x.job !== 'undefined' && x.job !== null)
-      x.job = ((x) => {
-        x.created_at = ((x: number) => new Date(x * 1000))(x.created_at);
-        return x;
-      })(x.job);
-    return x;
-  }),
-  updateJob: apiCall<
-    messages.AiEditorialUpdateJobRequest,
-    messages.AiEditorialUpdateJobResponse
-  >('/api/aiEditorial/updateJob/'),
+    generate: apiCall<
+      messages.AiEditorialGenerateRequest,
+      messages.AiEditorialGenerateResponse
+    >('/api/aiEditorial/generate/'),
+    review: apiCall<
+      messages.AiEditorialReviewRequest,
+      messages.AiEditorialReviewResponse
+    >('/api/aiEditorial/review/'),
+    status: apiCall<
+      messages.AiEditorialStatusRequest,
+      messages._AiEditorialStatusServerResponse,
+      messages.AiEditorialStatusResponse
+    >('/api/aiEditorial/status/',
+      (x) => { if (typeof x.job !== 'undefined' &&  x.job !== null) x.job = ((x) => { x.created_at = ((x: number) => new Date(x * 1000))(x.created_at); return x; })(x.job); return x; }),
+    updateJob: apiCall<
+      messages.AiEditorialUpdateJobRequest,
+      messages.AiEditorialUpdateJobResponse
+    >('/api/aiEditorial/updateJob/'),
 };
 
 export const Authorization = {
-  problem: apiCall<
-    messages.AuthorizationProblemRequest,
-    messages.AuthorizationProblemResponse
-  >('/api/authorization/problem/'),
+    problem: apiCall<
+      messages.AuthorizationProblemRequest,
+      messages.AuthorizationProblemResponse
+    >('/api/authorization/problem/'),
 };
 
 export const Badge = {
-  badgeDetails: apiCall<
-    messages.BadgeBadgeDetailsRequest,
-    messages._BadgeBadgeDetailsServerResponse,
-    messages.BadgeBadgeDetailsResponse
-  >('/api/badge/badgeDetails/', (x) => {
-    if (
-      typeof x.assignation_time !== 'undefined' &&
-      x.assignation_time !== null
-    )
-      x.assignation_time = ((x: number) => new Date(x * 1000))(
-        x.assignation_time,
-      );
-    if (
-      typeof x.first_assignation !== 'undefined' &&
-      x.first_assignation !== null
-    )
-      x.first_assignation = ((x: number) => new Date(x * 1000))(
-        x.first_assignation,
-      );
-    return x;
-  }),
-  list: apiCall<messages.BadgeListRequest, messages.BadgeListResponse>(
-    '/api/badge/list/',
-  ),
-  myBadgeAssignationTime: apiCall<
-    messages.BadgeMyBadgeAssignationTimeRequest,
-    messages._BadgeMyBadgeAssignationTimeServerResponse,
-    messages.BadgeMyBadgeAssignationTimeResponse
-  >('/api/badge/myBadgeAssignationTime/', (x) => {
-    if (
-      typeof x.assignation_time !== 'undefined' &&
-      x.assignation_time !== null
-    )
-      x.assignation_time = ((x: number) => new Date(x * 1000))(
-        x.assignation_time,
-      );
-    return x;
-  }),
-  myList: apiCall<
-    messages.BadgeMyListRequest,
-    messages._BadgeMyListServerResponse,
-    messages.BadgeMyListResponse
-  >('/api/badge/myList/', (x) => {
-    x.badges = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.assignation_time !== 'undefined' &&
-          x.assignation_time !== null
-        )
-          x.assignation_time = ((x: number) => new Date(x * 1000))(
-            x.assignation_time,
-          );
-        if (
-          typeof x.first_assignation !== 'undefined' &&
-          x.first_assignation !== null
-        )
-          x.first_assignation = ((x: number) => new Date(x * 1000))(
-            x.first_assignation,
-          );
-        return x;
-      });
-    })(x.badges);
-    return x;
-  }),
-  userList: apiCall<
-    messages.BadgeUserListRequest,
-    messages._BadgeUserListServerResponse,
-    messages.BadgeUserListResponse
-  >('/api/badge/userList/', (x) => {
-    x.badges = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.assignation_time !== 'undefined' &&
-          x.assignation_time !== null
-        )
-          x.assignation_time = ((x: number) => new Date(x * 1000))(
-            x.assignation_time,
-          );
-        if (
-          typeof x.first_assignation !== 'undefined' &&
-          x.first_assignation !== null
-        )
-          x.first_assignation = ((x: number) => new Date(x * 1000))(
-            x.first_assignation,
-          );
-        return x;
-      });
-    })(x.badges);
-    return x;
-  }),
+    badgeDetails: apiCall<
+      messages.BadgeBadgeDetailsRequest,
+      messages._BadgeBadgeDetailsServerResponse,
+      messages.BadgeBadgeDetailsResponse
+    >('/api/badge/badgeDetails/',
+      (x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; }),
+    list: apiCall<
+      messages.BadgeListRequest,
+      messages.BadgeListResponse
+    >('/api/badge/list/'),
+    myBadgeAssignationTime: apiCall<
+      messages.BadgeMyBadgeAssignationTimeRequest,
+      messages._BadgeMyBadgeAssignationTimeServerResponse,
+      messages.BadgeMyBadgeAssignationTimeResponse
+    >('/api/badge/myBadgeAssignationTime/',
+      (x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); return x; }),
+    myList: apiCall<
+      messages.BadgeMyListRequest,
+      messages._BadgeMyListServerResponse,
+      messages.BadgeMyListResponse
+    >('/api/badge/myList/',
+      (x) => { x.badges = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; }); })(x.badges); return x; }),
+    userList: apiCall<
+      messages.BadgeUserListRequest,
+      messages._BadgeUserListServerResponse,
+      messages.BadgeUserListResponse
+    >('/api/badge/userList/',
+      (x) => { x.badges = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.assignation_time !== 'undefined' &&  x.assignation_time !== null) x.assignation_time = ((x: number) => new Date(x * 1000))(x.assignation_time); if (typeof x.first_assignation !== 'undefined' &&  x.first_assignation !== null) x.first_assignation = ((x: number) => new Date(x * 1000))(x.first_assignation); return x; }); })(x.badges); return x; }),
 };
 
 export const CarouselItems = {
-  create: apiCall<
-    messages.CarouselItemsCreateRequest,
-    messages.CarouselItemsCreateResponse
-  >('/api/carouselItems/create/'),
-  delete: apiCall<
-    messages.CarouselItemsDeleteRequest,
-    messages.CarouselItemsDeleteResponse
-  >('/api/carouselItems/delete/'),
-  list: apiCall<
-    messages.CarouselItemsListRequest,
-    messages._CarouselItemsListServerResponse,
-    messages.CarouselItemsListResponse
-  >('/api/carouselItems/list/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
-  listActive: apiCall<
-    messages.CarouselItemsListActiveRequest,
-    messages._CarouselItemsListActiveServerResponse,
-    messages.CarouselItemsListActiveResponse
-  >('/api/carouselItems/listActive/', (x) => {
-    x.carouselItems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (
-          typeof x.expiration_date !== 'undefined' &&
-          x.expiration_date !== null
-        )
-          x.expiration_date = ((x: number) => new Date(x * 1000))(
-            x.expiration_date,
-          );
-        return x;
-      });
-    })(x.carouselItems);
-    return x;
-  }),
-  update: apiCall<
-    messages.CarouselItemsUpdateRequest,
-    messages.CarouselItemsUpdateResponse
-  >('/api/carouselItems/update/'),
+    create: apiCall<
+      messages.CarouselItemsCreateRequest,
+      messages.CarouselItemsCreateResponse
+    >('/api/carouselItems/create/'),
+    delete: apiCall<
+      messages.CarouselItemsDeleteRequest,
+      messages.CarouselItemsDeleteResponse
+    >('/api/carouselItems/delete/'),
+    list: apiCall<
+      messages.CarouselItemsListRequest,
+      messages._CarouselItemsListServerResponse,
+      messages.CarouselItemsListResponse
+    >('/api/carouselItems/list/',
+      (x) => { x.carouselItems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.expiration_date !== 'undefined' &&  x.expiration_date !== null) x.expiration_date = ((x: number) => new Date(x * 1000))(x.expiration_date); return x; }); })(x.carouselItems); return x; }),
+    listActive: apiCall<
+      messages.CarouselItemsListActiveRequest,
+      messages._CarouselItemsListActiveServerResponse,
+      messages.CarouselItemsListActiveResponse
+    >('/api/carouselItems/listActive/',
+      (x) => { x.carouselItems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.expiration_date !== 'undefined' &&  x.expiration_date !== null) x.expiration_date = ((x: number) => new Date(x * 1000))(x.expiration_date); return x; }); })(x.carouselItems); return x; }),
+    update: apiCall<
+      messages.CarouselItemsUpdateRequest,
+      messages.CarouselItemsUpdateResponse
+    >('/api/carouselItems/update/'),
 };
 
 export const Certificate = {
-  generateContestCertificates: apiCall<
-    messages.CertificateGenerateContestCertificatesRequest,
-    messages.CertificateGenerateContestCertificatesResponse
-  >('/api/certificate/generateContestCertificates/'),
-  getCertificatePdf: apiCall<
-    messages.CertificateGetCertificatePdfRequest,
-    messages.CertificateGetCertificatePdfResponse
-  >('/api/certificate/getCertificatePdf/'),
-  getUserCertificates: apiCall<
-    messages.CertificateGetUserCertificatesRequest,
-    messages._CertificateGetUserCertificatesServerResponse,
-    messages.CertificateGetUserCertificatesResponse
-  >('/api/certificate/getUserCertificates/', (x) => {
-    x.certificates = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.date = ((x: number) => new Date(x * 1000))(x.date);
-        return x;
-      });
-    })(x.certificates);
-    return x;
-  }),
-  validateCertificate: apiCall<
-    messages.CertificateValidateCertificateRequest,
-    messages.CertificateValidateCertificateResponse
-  >('/api/certificate/validateCertificate/'),
+    generateContestCertificates: apiCall<
+      messages.CertificateGenerateContestCertificatesRequest,
+      messages.CertificateGenerateContestCertificatesResponse
+    >('/api/certificate/generateContestCertificates/'),
+    getCertificatePdf: apiCall<
+      messages.CertificateGetCertificatePdfRequest,
+      messages.CertificateGetCertificatePdfResponse
+    >('/api/certificate/getCertificatePdf/'),
+    getUserCertificates: apiCall<
+      messages.CertificateGetUserCertificatesRequest,
+      messages._CertificateGetUserCertificatesServerResponse,
+      messages.CertificateGetUserCertificatesResponse
+    >('/api/certificate/getUserCertificates/',
+      (x) => { x.certificates = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); return x; }); })(x.certificates); return x; }),
+    validateCertificate: apiCall<
+      messages.CertificateValidateCertificateRequest,
+      messages.CertificateValidateCertificateResponse
+    >('/api/certificate/validateCertificate/'),
 };
 
 export const Clarification = {
-  create: apiCall<
-    messages.ClarificationCreateRequest,
-    messages._ClarificationCreateServerResponse,
-    messages.ClarificationCreateResponse
-  >('/api/clarification/create/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  details: apiCall<
-    messages.ClarificationDetailsRequest,
-    messages._ClarificationDetailsServerResponse,
-    messages.ClarificationDetailsResponse
-  >('/api/clarification/details/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  update: apiCall<
-    messages.ClarificationUpdateRequest,
-    messages.ClarificationUpdateResponse
-  >('/api/clarification/update/'),
+    create: apiCall<
+      messages.ClarificationCreateRequest,
+      messages._ClarificationCreateServerResponse,
+      messages.ClarificationCreateResponse
+    >('/api/clarification/create/',
+      (x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    details: apiCall<
+      messages.ClarificationDetailsRequest,
+      messages._ClarificationDetailsServerResponse,
+      messages.ClarificationDetailsResponse
+    >('/api/clarification/details/',
+      (x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    update: apiCall<
+      messages.ClarificationUpdateRequest,
+      messages.ClarificationUpdateResponse
+    >('/api/clarification/update/'),
 };
 
 export const Contest = {
-  activityReport: apiCall<
-    messages.ContestActivityReportRequest,
-    messages._ContestActivityReportServerResponse,
-    messages.ContestActivityReportResponse
-  >('/api/contest/activityReport/', (x) => {
-    x.events = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.events);
-    return x;
-  }),
-  addAdmin: apiCall<
-    messages.ContestAddAdminRequest,
-    messages.ContestAddAdminResponse
-  >('/api/contest/addAdmin/'),
-  addGroup: apiCall<
-    messages.ContestAddGroupRequest,
-    messages.ContestAddGroupResponse
-  >('/api/contest/addGroup/'),
-  addGroupAdmin: apiCall<
-    messages.ContestAddGroupAdminRequest,
-    messages.ContestAddGroupAdminResponse
-  >('/api/contest/addGroupAdmin/'),
-  addProblem: apiCall<
-    messages.ContestAddProblemRequest,
-    messages.ContestAddProblemResponse
-  >('/api/contest/addProblem/'),
-  addUser: apiCall<
-    messages.ContestAddUserRequest,
-    messages.ContestAddUserResponse
-  >('/api/contest/addUser/'),
-  adminDetails: apiCall<
-    messages.ContestAdminDetailsRequest,
-    messages._ContestAdminDetailsServerResponse,
-    messages.ContestAdminDetailsResponse
-  >('/api/contest/adminDetails/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (
-      typeof x.submission_deadline !== 'undefined' &&
-      x.submission_deadline !== null
-    )
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
-        x.submission_deadline,
-      );
-    return x;
-  }),
-  adminList: apiCall<
-    messages.ContestAdminListRequest,
-    messages._ContestAdminListServerResponse,
-    messages.ContestAdminListResponse
-  >('/api/contest/adminList/', (x) => {
-    x.contests = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (
-          typeof x.original_finish_time !== 'undefined' &&
-          x.original_finish_time !== null
-        )
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.contests);
-    return x;
-  }),
-  admins: apiCall<
-    messages.ContestAdminsRequest,
-    messages.ContestAdminsResponse
-  >('/api/contest/admins/'),
-  arbitrateRequest: apiCall<
-    messages.ContestArbitrateRequestRequest,
-    messages.ContestArbitrateRequestResponse
-  >('/api/contest/arbitrateRequest/'),
-  archive: apiCall<
-    messages.ContestArchiveRequest,
-    messages.ContestArchiveResponse
-  >('/api/contest/archive/'),
-  clarifications: apiCall<
-    messages.ContestClarificationsRequest,
-    messages._ContestClarificationsServerResponse,
-    messages.ContestClarificationsResponse
-  >('/api/contest/clarifications/', (x) => {
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    return x;
-  }),
-  clone: apiCall<messages.ContestCloneRequest, messages.ContestCloneResponse>(
-    '/api/contest/clone/',
-  ),
-  contestants: apiCall<
-    messages.ContestContestantsRequest,
-    messages.ContestContestantsResponse
-  >('/api/contest/contestants/'),
-  create: apiCall<
-    messages.ContestCreateRequest,
-    messages.ContestCreateResponse
-  >('/api/contest/create/'),
-  createVirtual: apiCall<
-    messages.ContestCreateVirtualRequest,
-    messages.ContestCreateVirtualResponse
-  >('/api/contest/createVirtual/'),
-  details: apiCall<
-    messages.ContestDetailsRequest,
-    messages._ContestDetailsServerResponse,
-    messages.ContestDetailsResponse
-  >('/api/contest/details/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (
-      typeof x.submission_deadline !== 'undefined' &&
-      x.submission_deadline !== null
-    )
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
-        x.submission_deadline,
-      );
-    return x;
-  }),
-  getNumberOfContestants: apiCall<
-    messages.ContestGetNumberOfContestantsRequest,
-    messages.ContestGetNumberOfContestantsResponse
-  >('/api/contest/getNumberOfContestants/'),
-  list: apiCall<
-    messages.ContestListRequest,
-    messages._ContestListServerResponse,
-    messages.ContestListResponse
-  >('/api/contest/list/', (x) => {
-    x.results = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        x.original_finish_time = ((x: number) => new Date(x * 1000))(
-          x.original_finish_time,
-        );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.results);
-    return x;
-  }),
-  listParticipating: apiCall<
-    messages.ContestListParticipatingRequest,
-    messages._ContestListParticipatingServerResponse,
-    messages.ContestListParticipatingResponse
-  >('/api/contest/listParticipating/', (x) => {
-    x.contests = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (
-          typeof x.original_finish_time !== 'undefined' &&
-          x.original_finish_time !== null
-        )
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.contests);
-    return x;
-  }),
-  myList: apiCall<
-    messages.ContestMyListRequest,
-    messages._ContestMyListServerResponse,
-    messages.ContestMyListResponse
-  >('/api/contest/myList/', (x) => {
-    x.contests = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (
-          typeof x.original_finish_time !== 'undefined' &&
-          x.original_finish_time !== null
-        )
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.contests);
-    return x;
-  }),
-  open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
-    '/api/contest/open/',
-  ),
-  problemClarifications: apiCall<
-    messages.ContestProblemClarificationsRequest,
-    messages._ContestProblemClarificationsServerResponse,
-    messages.ContestProblemClarificationsResponse
-  >('/api/contest/problemClarifications/', (x) => {
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    return x;
-  }),
-  problems: apiCall<
-    messages.ContestProblemsRequest,
-    messages._ContestProblemsServerResponse,
-    messages.ContestProblemsResponse
-  >('/api/contest/problems/', (x) => {
-    x.problems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.versions = ((x) => {
-          x.log = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.author = ((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              })(x.author);
-              x.committer = ((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              })(x.committer);
-              return x;
-            });
-          })(x.log);
-          return x;
-        })(x.versions);
-        return x;
-      });
-    })(x.problems);
-    return x;
-  }),
-  publicDetails: apiCall<
-    messages.ContestPublicDetailsRequest,
-    messages._ContestPublicDetailsServerResponse,
-    messages.ContestPublicDetailsResponse
-  >('/api/contest/publicDetails/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    return x;
-  }),
-  registerForContest: apiCall<
-    messages.ContestRegisterForContestRequest,
-    messages.ContestRegisterForContestResponse
-  >('/api/contest/registerForContest/'),
-  removeAdmin: apiCall<
-    messages.ContestRemoveAdminRequest,
-    messages.ContestRemoveAdminResponse
-  >('/api/contest/removeAdmin/'),
-  removeGroup: apiCall<
-    messages.ContestRemoveGroupRequest,
-    messages.ContestRemoveGroupResponse
-  >('/api/contest/removeGroup/'),
-  removeGroupAdmin: apiCall<
-    messages.ContestRemoveGroupAdminRequest,
-    messages.ContestRemoveGroupAdminResponse
-  >('/api/contest/removeGroupAdmin/'),
-  removeProblem: apiCall<
-    messages.ContestRemoveProblemRequest,
-    messages.ContestRemoveProblemResponse
-  >('/api/contest/removeProblem/'),
-  removeUser: apiCall<
-    messages.ContestRemoveUserRequest,
-    messages.ContestRemoveUserResponse
-  >('/api/contest/removeUser/'),
-  replaceTeamsGroup: apiCall<
-    messages.ContestReplaceTeamsGroupRequest,
-    messages.ContestReplaceTeamsGroupResponse
-  >('/api/contest/replaceTeamsGroup/'),
-  report: apiCall<
-    messages.ContestReportRequest,
-    messages._ContestReportServerResponse,
-    messages.ContestReportResponse
-  >('/api/contest/report/', (x) => {
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  requests: apiCall<
-    messages.ContestRequestsRequest,
-    messages._ContestRequestsServerResponse,
-    messages.ContestRequestsResponse
-  >('/api/contest/requests/', (x) => {
-    x.users = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.last_update !== 'undefined' && x.last_update !== null)
-          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
-        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
-        return x;
-      });
-    })(x.users);
-    return x;
-  }),
-  role: apiCall<messages.ContestRoleRequest, messages.ContestRoleResponse>(
-    '/api/contest/role/',
-  ),
-  runs: apiCall<
-    messages.ContestRunsRequest,
-    messages._ContestRunsServerResponse,
-    messages.ContestRunsResponse
-  >('/api/contest/runs/', (x) => {
-    x.runs = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.runs);
-    return x;
-  }),
-  runsDiff: apiCall<
-    messages.ContestRunsDiffRequest,
-    messages.ContestRunsDiffResponse
-  >('/api/contest/runsDiff/'),
-  scoreboard: apiCall<
-    messages.ContestScoreboardRequest,
-    messages._ContestScoreboardServerResponse,
-    messages.ContestScoreboardResponse
-  >('/api/contest/scoreboard/', (x) => {
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  scoreboardEvents: apiCall<
-    messages.ContestScoreboardEventsRequest,
-    messages.ContestScoreboardEventsResponse
-  >('/api/contest/scoreboardEvents/'),
-  scoreboardMerge: apiCall<
-    messages.ContestScoreboardMergeRequest,
-    messages.ContestScoreboardMergeResponse
-  >('/api/contest/scoreboardMerge/'),
-  searchUsers: apiCall<
-    messages.ContestSearchUsersRequest,
-    messages.ContestSearchUsersResponse
-  >('/api/contest/searchUsers/'),
-  setRecommended: apiCall<
-    messages.ContestSetRecommendedRequest,
-    messages.ContestSetRecommendedResponse
-  >('/api/contest/setRecommended/'),
-  stats: apiCall<
-    messages.ContestStatsRequest,
-    messages._ContestStatsServerResponse,
-    messages.ContestStatsResponse
-  >('/api/contest/stats/', (x) => {
-    if (typeof x.max_wait_time !== 'undefined' && x.max_wait_time !== null)
-      x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time);
-    return x;
-  }),
-  update: apiCall<
-    messages.ContestUpdateRequest,
-    messages.ContestUpdateResponse
-  >('/api/contest/update/'),
-  updateEndTimeForIdentity: apiCall<
-    messages.ContestUpdateEndTimeForIdentityRequest,
-    messages.ContestUpdateEndTimeForIdentityResponse
-  >('/api/contest/updateEndTimeForIdentity/'),
-  users: apiCall<
-    messages.ContestUsersRequest,
-    messages._ContestUsersServerResponse,
-    messages.ContestUsersResponse
-  >('/api/contest/users/', (x) => {
-    x.users = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.access_time !== 'undefined' && x.access_time !== null)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        if (typeof x.end_time !== 'undefined' && x.end_time !== null)
-          x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-        return x;
-      });
-    })(x.users);
-    return x;
-  }),
+    activityReport: apiCall<
+      messages.ContestActivityReportRequest,
+      messages._ContestActivityReportServerResponse,
+      messages.ContestActivityReportResponse
+    >('/api/contest/activityReport/',
+      (x) => { x.events = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.events); return x; }),
+    addAdmin: apiCall<
+      messages.ContestAddAdminRequest,
+      messages.ContestAddAdminResponse
+    >('/api/contest/addAdmin/'),
+    addGroup: apiCall<
+      messages.ContestAddGroupRequest,
+      messages.ContestAddGroupResponse
+    >('/api/contest/addGroup/'),
+    addGroupAdmin: apiCall<
+      messages.ContestAddGroupAdminRequest,
+      messages.ContestAddGroupAdminResponse
+    >('/api/contest/addGroupAdmin/'),
+    addProblem: apiCall<
+      messages.ContestAddProblemRequest,
+      messages.ContestAddProblemResponse
+    >('/api/contest/addProblem/'),
+    addUser: apiCall<
+      messages.ContestAddUserRequest,
+      messages.ContestAddUserResponse
+    >('/api/contest/addUser/'),
+    adminDetails: apiCall<
+      messages.ContestAdminDetailsRequest,
+      messages._ContestAdminDetailsServerResponse,
+      messages.ContestAdminDetailsResponse
+    >('/api/contest/adminDetails/',
+      (x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); if (typeof x.submission_deadline !== 'undefined' &&  x.submission_deadline !== null) x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); return x; }),
+    adminList: apiCall<
+      messages.ContestAdminListRequest,
+      messages._ContestAdminListServerResponse,
+      messages.ContestAdminListResponse
+    >('/api/contest/adminList/',
+      (x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); if (typeof x.original_finish_time !== 'undefined' &&  x.original_finish_time !== null) x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; }),
+    admins: apiCall<
+      messages.ContestAdminsRequest,
+      messages.ContestAdminsResponse
+    >('/api/contest/admins/'),
+    arbitrateRequest: apiCall<
+      messages.ContestArbitrateRequestRequest,
+      messages.ContestArbitrateRequestResponse
+    >('/api/contest/arbitrateRequest/'),
+    archive: apiCall<
+      messages.ContestArchiveRequest,
+      messages.ContestArchiveResponse
+    >('/api/contest/archive/'),
+    clarifications: apiCall<
+      messages.ContestClarificationsRequest,
+      messages._ContestClarificationsServerResponse,
+      messages.ContestClarificationsResponse
+    >('/api/contest/clarifications/',
+      (x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; }),
+    clone: apiCall<
+      messages.ContestCloneRequest,
+      messages.ContestCloneResponse
+    >('/api/contest/clone/'),
+    contestants: apiCall<
+      messages.ContestContestantsRequest,
+      messages.ContestContestantsResponse
+    >('/api/contest/contestants/'),
+    create: apiCall<
+      messages.ContestCreateRequest,
+      messages.ContestCreateResponse
+    >('/api/contest/create/'),
+    createVirtual: apiCall<
+      messages.ContestCreateVirtualRequest,
+      messages.ContestCreateVirtualResponse
+    >('/api/contest/createVirtual/'),
+    details: apiCall<
+      messages.ContestDetailsRequest,
+      messages._ContestDetailsServerResponse,
+      messages.ContestDetailsResponse
+    >('/api/contest/details/',
+      (x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); if (typeof x.submission_deadline !== 'undefined' &&  x.submission_deadline !== null) x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); return x; }),
+    getNumberOfContestants: apiCall<
+      messages.ContestGetNumberOfContestantsRequest,
+      messages.ContestGetNumberOfContestantsResponse
+    >('/api/contest/getNumberOfContestants/'),
+    list: apiCall<
+      messages.ContestListRequest,
+      messages._ContestListServerResponse,
+      messages.ContestListResponse
+    >('/api/contest/list/',
+      (x) => { x.results = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.results); return x; }),
+    listParticipating: apiCall<
+      messages.ContestListParticipatingRequest,
+      messages._ContestListParticipatingServerResponse,
+      messages.ContestListParticipatingResponse
+    >('/api/contest/listParticipating/',
+      (x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); if (typeof x.original_finish_time !== 'undefined' &&  x.original_finish_time !== null) x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; }),
+    myList: apiCall<
+      messages.ContestMyListRequest,
+      messages._ContestMyListServerResponse,
+      messages.ContestMyListResponse
+    >('/api/contest/myList/',
+      (x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); if (typeof x.original_finish_time !== 'undefined' &&  x.original_finish_time !== null) x.original_finish_time = ((x: number) => new Date(x * 1000))(x.original_finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; }),
+    open: apiCall<
+      messages.ContestOpenRequest,
+      messages.ContestOpenResponse
+    >('/api/contest/open/'),
+    problemClarifications: apiCall<
+      messages.ContestProblemClarificationsRequest,
+      messages._ContestProblemClarificationsServerResponse,
+      messages.ContestProblemClarificationsResponse
+    >('/api/contest/problemClarifications/',
+      (x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; }),
+    problems: apiCall<
+      messages.ContestProblemsRequest,
+      messages._ContestProblemsServerResponse,
+      messages.ContestProblemsResponse
+    >('/api/contest/problems/',
+      (x) => { x.problems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.versions = ((x) => { x.log = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.author = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.author); x.committer = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.committer); return x; }); })(x.log); return x; })(x.versions); return x; }); })(x.problems); return x; }),
+    publicDetails: apiCall<
+      messages.ContestPublicDetailsRequest,
+      messages._ContestPublicDetailsServerResponse,
+      messages.ContestPublicDetailsResponse
+    >('/api/contest/publicDetails/',
+      (x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }),
+    registerForContest: apiCall<
+      messages.ContestRegisterForContestRequest,
+      messages.ContestRegisterForContestResponse
+    >('/api/contest/registerForContest/'),
+    removeAdmin: apiCall<
+      messages.ContestRemoveAdminRequest,
+      messages.ContestRemoveAdminResponse
+    >('/api/contest/removeAdmin/'),
+    removeGroup: apiCall<
+      messages.ContestRemoveGroupRequest,
+      messages.ContestRemoveGroupResponse
+    >('/api/contest/removeGroup/'),
+    removeGroupAdmin: apiCall<
+      messages.ContestRemoveGroupAdminRequest,
+      messages.ContestRemoveGroupAdminResponse
+    >('/api/contest/removeGroupAdmin/'),
+    removeProblem: apiCall<
+      messages.ContestRemoveProblemRequest,
+      messages.ContestRemoveProblemResponse
+    >('/api/contest/removeProblem/'),
+    removeUser: apiCall<
+      messages.ContestRemoveUserRequest,
+      messages.ContestRemoveUserResponse
+    >('/api/contest/removeUser/'),
+    replaceTeamsGroup: apiCall<
+      messages.ContestReplaceTeamsGroupRequest,
+      messages.ContestReplaceTeamsGroupResponse
+    >('/api/contest/replaceTeamsGroup/'),
+    report: apiCall<
+      messages.ContestReportRequest,
+      messages._ContestReportServerResponse,
+      messages.ContestReportResponse
+    >('/api/contest/report/',
+      (x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    requests: apiCall<
+      messages.ContestRequestsRequest,
+      messages._ContestRequestsServerResponse,
+      messages.ContestRequestsResponse
+    >('/api/contest/requests/',
+      (x) => { x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.last_update !== 'undefined' &&  x.last_update !== null) x.last_update = ((x: number) => new Date(x * 1000))(x.last_update); x.request_time = ((x: number) => new Date(x * 1000))(x.request_time); return x; }); })(x.users); return x; }),
+    role: apiCall<
+      messages.ContestRoleRequest,
+      messages.ContestRoleResponse
+    >('/api/contest/role/'),
+    runs: apiCall<
+      messages.ContestRunsRequest,
+      messages._ContestRunsServerResponse,
+      messages.ContestRunsResponse
+    >('/api/contest/runs/',
+      (x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }),
+    runsDiff: apiCall<
+      messages.ContestRunsDiffRequest,
+      messages.ContestRunsDiffResponse
+    >('/api/contest/runsDiff/'),
+    scoreboard: apiCall<
+      messages.ContestScoreboardRequest,
+      messages._ContestScoreboardServerResponse,
+      messages.ContestScoreboardResponse
+    >('/api/contest/scoreboard/',
+      (x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    scoreboardEvents: apiCall<
+      messages.ContestScoreboardEventsRequest,
+      messages.ContestScoreboardEventsResponse
+    >('/api/contest/scoreboardEvents/'),
+    scoreboardMerge: apiCall<
+      messages.ContestScoreboardMergeRequest,
+      messages.ContestScoreboardMergeResponse
+    >('/api/contest/scoreboardMerge/'),
+    searchUsers: apiCall<
+      messages.ContestSearchUsersRequest,
+      messages.ContestSearchUsersResponse
+    >('/api/contest/searchUsers/'),
+    setRecommended: apiCall<
+      messages.ContestSetRecommendedRequest,
+      messages.ContestSetRecommendedResponse
+    >('/api/contest/setRecommended/'),
+    stats: apiCall<
+      messages.ContestStatsRequest,
+      messages._ContestStatsServerResponse,
+      messages.ContestStatsResponse
+    >('/api/contest/stats/',
+      (x) => { if (typeof x.max_wait_time !== 'undefined' &&  x.max_wait_time !== null) x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time); return x; }),
+    update: apiCall<
+      messages.ContestUpdateRequest,
+      messages.ContestUpdateResponse
+    >('/api/contest/update/'),
+    updateEndTimeForIdentity: apiCall<
+      messages.ContestUpdateEndTimeForIdentityRequest,
+      messages.ContestUpdateEndTimeForIdentityResponse
+    >('/api/contest/updateEndTimeForIdentity/'),
+    users: apiCall<
+      messages.ContestUsersRequest,
+      messages._ContestUsersServerResponse,
+      messages.ContestUsersResponse
+    >('/api/contest/users/',
+      (x) => { x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.access_time !== 'undefined' &&  x.access_time !== null) x.access_time = ((x: number) => new Date(x * 1000))(x.access_time); if (typeof x.end_time !== 'undefined' &&  x.end_time !== null) x.end_time = ((x: number) => new Date(x * 1000))(x.end_time); return x; }); })(x.users); return x; }),
 };
 
 export const Course = {
-  activityReport: apiCall<
-    messages.CourseActivityReportRequest,
-    messages._CourseActivityReportServerResponse,
-    messages.CourseActivityReportResponse
-  >('/api/course/activityReport/', (x) => {
-    x.events = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.events);
-    return x;
-  }),
-  addAdmin: apiCall<
-    messages.CourseAddAdminRequest,
-    messages.CourseAddAdminResponse
-  >('/api/course/addAdmin/'),
-  addGroupAdmin: apiCall<
-    messages.CourseAddGroupAdminRequest,
-    messages.CourseAddGroupAdminResponse
-  >('/api/course/addGroupAdmin/'),
-  addGroupTeachingAssistant: apiCall<
-    messages.CourseAddGroupTeachingAssistantRequest,
-    messages.CourseAddGroupTeachingAssistantResponse
-  >('/api/course/addGroupTeachingAssistant/'),
-  addProblem: apiCall<
-    messages.CourseAddProblemRequest,
-    messages.CourseAddProblemResponse
-  >('/api/course/addProblem/'),
-  addStudent: apiCall<
-    messages.CourseAddStudentRequest,
-    messages.CourseAddStudentResponse
-  >('/api/course/addStudent/'),
-  addTeachingAssistant: apiCall<
-    messages.CourseAddTeachingAssistantRequest,
-    messages.CourseAddTeachingAssistantResponse
-  >('/api/course/addTeachingAssistant/'),
-  adminDetails: apiCall<
-    messages.CourseAdminDetailsRequest,
-    messages._CourseAdminDetailsServerResponse,
-    messages.CourseAdminDetailsResponse
-  >('/api/course/adminDetails/', (x) => {
-    x.assignments = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.assignments);
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    return x;
-  }),
-  admins: apiCall<messages.CourseAdminsRequest, messages.CourseAdminsResponse>(
-    '/api/course/admins/',
-  ),
-  arbitrateRequest: apiCall<
-    messages.CourseArbitrateRequestRequest,
-    messages.CourseArbitrateRequestResponse
-  >('/api/course/arbitrateRequest/'),
-  archive: apiCall<
-    messages.CourseArchiveRequest,
-    messages.CourseArchiveResponse
-  >('/api/course/archive/'),
-  assignmentDetails: apiCall<
-    messages.CourseAssignmentDetailsRequest,
-    messages._CourseAssignmentDetailsServerResponse,
-    messages.CourseAssignmentDetailsResponse
-  >('/api/course/assignmentDetails/', (x) => {
-    x.courseAssignments = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.courseAssignments);
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    return x;
-  }),
-  assignmentScoreboard: apiCall<
-    messages.CourseAssignmentScoreboardRequest,
-    messages._CourseAssignmentScoreboardServerResponse,
-    messages.CourseAssignmentScoreboardResponse
-  >('/api/course/assignmentScoreboard/', (x) => {
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  assignmentScoreboardEvents: apiCall<
-    messages.CourseAssignmentScoreboardEventsRequest,
-    messages.CourseAssignmentScoreboardEventsResponse
-  >('/api/course/assignmentScoreboardEvents/'),
-  clarifications: apiCall<
-    messages.CourseClarificationsRequest,
-    messages._CourseClarificationsServerResponse,
-    messages.CourseClarificationsResponse
-  >('/api/course/clarifications/', (x) => {
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    return x;
-  }),
-  clone: apiCall<messages.CourseCloneRequest, messages.CourseCloneResponse>(
-    '/api/course/clone/',
-  ),
-  create: apiCall<messages.CourseCreateRequest, messages.CourseCreateResponse>(
-    '/api/course/create/',
-  ),
-  createAssignment: apiCall<
-    messages.CourseCreateAssignmentRequest,
-    messages.CourseCreateAssignmentResponse
-  >('/api/course/createAssignment/'),
-  details: apiCall<
-    messages.CourseDetailsRequest,
-    messages._CourseDetailsServerResponse,
-    messages.CourseDetailsResponse
-  >('/api/course/details/', (x) => {
-    x.assignments = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.assignments);
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    return x;
-  }),
-  generateTokenForCloneCourse: apiCall<
-    messages.CourseGenerateTokenForCloneCourseRequest,
-    messages.CourseGenerateTokenForCloneCourseResponse
-  >('/api/course/generateTokenForCloneCourse/'),
-  getProblemUsers: apiCall<
-    messages.CourseGetProblemUsersRequest,
-    messages.CourseGetProblemUsersResponse
-  >('/api/course/getProblemUsers/'),
-  introDetails: apiCall<
-    messages.CourseIntroDetailsRequest,
-    messages._CourseIntroDetailsServerResponse,
-    messages.CourseIntroDetailsResponse
-  >('/api/course/introDetails/', (x) => {
-    x.course = ((x) => {
-      x.assignments = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.assignments);
-      x.clarifications = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        });
-      })(x.clarifications);
-      if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-      return x;
-    })(x.course);
-    return x;
-  }),
-  listAssignments: apiCall<
-    messages.CourseListAssignmentsRequest,
-    messages._CourseListAssignmentsServerResponse,
-    messages.CourseListAssignmentsResponse
-  >('/api/course/listAssignments/', (x) => {
-    x.assignments = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.assignments);
-    return x;
-  }),
-  listSolvedProblems: apiCall<
-    messages.CourseListSolvedProblemsRequest,
-    messages.CourseListSolvedProblemsResponse
-  >('/api/course/listSolvedProblems/'),
-  listStudents: apiCall<
-    messages.CourseListStudentsRequest,
-    messages.CourseListStudentsResponse
-  >('/api/course/listStudents/'),
-  listUnsolvedProblems: apiCall<
-    messages.CourseListUnsolvedProblemsRequest,
-    messages.CourseListUnsolvedProblemsResponse
-  >('/api/course/listUnsolvedProblems/'),
-  myProgress: apiCall<
-    messages.CourseMyProgressRequest,
-    messages.CourseMyProgressResponse
-  >('/api/course/myProgress/'),
-  problemClarifications: apiCall<
-    messages.CourseProblemClarificationsRequest,
-    messages._CourseProblemClarificationsServerResponse,
-    messages.CourseProblemClarificationsResponse
-  >('/api/course/problemClarifications/', (x) => {
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    return x;
-  }),
-  registerForCourse: apiCall<
-    messages.CourseRegisterForCourseRequest,
-    messages.CourseRegisterForCourseResponse
-  >('/api/course/registerForCourse/'),
-  removeAdmin: apiCall<
-    messages.CourseRemoveAdminRequest,
-    messages.CourseRemoveAdminResponse
-  >('/api/course/removeAdmin/'),
-  removeAssignment: apiCall<
-    messages.CourseRemoveAssignmentRequest,
-    messages.CourseRemoveAssignmentResponse
-  >('/api/course/removeAssignment/'),
-  removeGroupAdmin: apiCall<
-    messages.CourseRemoveGroupAdminRequest,
-    messages.CourseRemoveGroupAdminResponse
-  >('/api/course/removeGroupAdmin/'),
-  removeGroupTeachingAssistant: apiCall<
-    messages.CourseRemoveGroupTeachingAssistantRequest,
-    messages.CourseRemoveGroupTeachingAssistantResponse
-  >('/api/course/removeGroupTeachingAssistant/'),
-  removeProblem: apiCall<
-    messages.CourseRemoveProblemRequest,
-    messages.CourseRemoveProblemResponse
-  >('/api/course/removeProblem/'),
-  removeStudent: apiCall<
-    messages.CourseRemoveStudentRequest,
-    messages.CourseRemoveStudentResponse
-  >('/api/course/removeStudent/'),
-  removeTeachingAssistant: apiCall<
-    messages.CourseRemoveTeachingAssistantRequest,
-    messages.CourseRemoveTeachingAssistantResponse
-  >('/api/course/removeTeachingAssistant/'),
-  requestFeedback: apiCall<
-    messages.CourseRequestFeedbackRequest,
-    messages.CourseRequestFeedbackResponse
-  >('/api/course/requestFeedback/'),
-  requests: apiCall<
-    messages.CourseRequestsRequest,
-    messages._CourseRequestsServerResponse,
-    messages.CourseRequestsResponse
-  >('/api/course/requests/', (x) => {
-    x.users = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.last_update !== 'undefined' && x.last_update !== null)
-          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
-        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
-        return x;
-      });
-    })(x.users);
-    return x;
-  }),
-  runs: apiCall<
-    messages.CourseRunsRequest,
-    messages._CourseRunsServerResponse,
-    messages.CourseRunsResponse
-  >('/api/course/runs/', (x) => {
-    x.runs = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.runs);
-    return x;
-  }),
-  searchUsers: apiCall<
-    messages.CourseSearchUsersRequest,
-    messages.CourseSearchUsersResponse
-  >('/api/course/searchUsers/'),
-  studentProgress: apiCall<
-    messages.CourseStudentProgressRequest,
-    messages._CourseStudentProgressServerResponse,
-    messages.CourseStudentProgressResponse
-  >('/api/course/studentProgress/', (x) => {
-    x.problems = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.runs = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (typeof x.feedback !== 'undefined' && x.feedback !== null)
-              x.feedback = ((x) => {
-                x.date = ((x: number) => new Date(x * 1000))(x.date);
-                return x;
-              })(x.feedback);
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.runs);
-        return x;
-      });
-    })(x.problems);
-    return x;
-  }),
-  studentsProgress: apiCall<
-    messages.CourseStudentsProgressRequest,
-    messages.CourseStudentsProgressResponse
-  >('/api/course/studentsProgress/'),
-  toggleTeachingAssistant: apiCall<
-    messages.CourseToggleTeachingAssistantRequest,
-    messages.CourseToggleTeachingAssistantResponse
-  >('/api/course/toggleTeachingAssistant/'),
-  update: apiCall<messages.CourseUpdateRequest, messages.CourseUpdateResponse>(
-    '/api/course/update/',
-  ),
-  updateAssignment: apiCall<
-    messages.CourseUpdateAssignmentRequest,
-    messages.CourseUpdateAssignmentResponse
-  >('/api/course/updateAssignment/'),
-  updateAssignmentsOrder: apiCall<
-    messages.CourseUpdateAssignmentsOrderRequest,
-    messages.CourseUpdateAssignmentsOrderResponse
-  >('/api/course/updateAssignmentsOrder/'),
-  updateProblemsOrder: apiCall<
-    messages.CourseUpdateProblemsOrderRequest,
-    messages.CourseUpdateProblemsOrderResponse
-  >('/api/course/updateProblemsOrder/'),
+    activityReport: apiCall<
+      messages.CourseActivityReportRequest,
+      messages._CourseActivityReportServerResponse,
+      messages.CourseActivityReportResponse
+    >('/api/course/activityReport/',
+      (x) => { x.events = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.events); return x; }),
+    addAdmin: apiCall<
+      messages.CourseAddAdminRequest,
+      messages.CourseAddAdminResponse
+    >('/api/course/addAdmin/'),
+    addGroupAdmin: apiCall<
+      messages.CourseAddGroupAdminRequest,
+      messages.CourseAddGroupAdminResponse
+    >('/api/course/addGroupAdmin/'),
+    addGroupTeachingAssistant: apiCall<
+      messages.CourseAddGroupTeachingAssistantRequest,
+      messages.CourseAddGroupTeachingAssistantResponse
+    >('/api/course/addGroupTeachingAssistant/'),
+    addProblem: apiCall<
+      messages.CourseAddProblemRequest,
+      messages.CourseAddProblemResponse
+    >('/api/course/addProblem/'),
+    addStudent: apiCall<
+      messages.CourseAddStudentRequest,
+      messages.CourseAddStudentResponse
+    >('/api/course/addStudent/'),
+    addTeachingAssistant: apiCall<
+      messages.CourseAddTeachingAssistantRequest,
+      messages.CourseAddTeachingAssistantResponse
+    >('/api/course/addTeachingAssistant/'),
+    adminDetails: apiCall<
+      messages.CourseAdminDetailsRequest,
+      messages._CourseAdminDetailsServerResponse,
+      messages.CourseAdminDetailsResponse
+    >('/api/course/adminDetails/',
+      (x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }),
+    admins: apiCall<
+      messages.CourseAdminsRequest,
+      messages.CourseAdminsResponse
+    >('/api/course/admins/'),
+    arbitrateRequest: apiCall<
+      messages.CourseArbitrateRequestRequest,
+      messages.CourseArbitrateRequestResponse
+    >('/api/course/arbitrateRequest/'),
+    archive: apiCall<
+      messages.CourseArchiveRequest,
+      messages.CourseArchiveResponse
+    >('/api/course/archive/'),
+    assignmentDetails: apiCall<
+      messages.CourseAssignmentDetailsRequest,
+      messages._CourseAssignmentDetailsServerResponse,
+      messages.CourseAssignmentDetailsResponse
+    >('/api/course/assignmentDetails/',
+      (x) => { x.courseAssignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courseAssignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }),
+    assignmentScoreboard: apiCall<
+      messages.CourseAssignmentScoreboardRequest,
+      messages._CourseAssignmentScoreboardServerResponse,
+      messages.CourseAssignmentScoreboardResponse
+    >('/api/course/assignmentScoreboard/',
+      (x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    assignmentScoreboardEvents: apiCall<
+      messages.CourseAssignmentScoreboardEventsRequest,
+      messages.CourseAssignmentScoreboardEventsResponse
+    >('/api/course/assignmentScoreboardEvents/'),
+    clarifications: apiCall<
+      messages.CourseClarificationsRequest,
+      messages._CourseClarificationsServerResponse,
+      messages.CourseClarificationsResponse
+    >('/api/course/clarifications/',
+      (x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; }),
+    clone: apiCall<
+      messages.CourseCloneRequest,
+      messages.CourseCloneResponse
+    >('/api/course/clone/'),
+    create: apiCall<
+      messages.CourseCreateRequest,
+      messages.CourseCreateResponse
+    >('/api/course/create/'),
+    createAssignment: apiCall<
+      messages.CourseCreateAssignmentRequest,
+      messages.CourseCreateAssignmentResponse
+    >('/api/course/createAssignment/'),
+    details: apiCall<
+      messages.CourseDetailsRequest,
+      messages._CourseDetailsServerResponse,
+      messages.CourseDetailsResponse
+    >('/api/course/details/',
+      (x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }),
+    generateTokenForCloneCourse: apiCall<
+      messages.CourseGenerateTokenForCloneCourseRequest,
+      messages.CourseGenerateTokenForCloneCourseResponse
+    >('/api/course/generateTokenForCloneCourse/'),
+    getProblemUsers: apiCall<
+      messages.CourseGetProblemUsersRequest,
+      messages.CourseGetProblemUsersResponse
+    >('/api/course/getProblemUsers/'),
+    introDetails: apiCall<
+      messages.CourseIntroDetailsRequest,
+      messages._CourseIntroDetailsServerResponse,
+      messages.CourseIntroDetailsResponse
+    >('/api/course/introDetails/',
+      (x) => { x.course = ((x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.course); return x; }),
+    listAssignments: apiCall<
+      messages.CourseListAssignmentsRequest,
+      messages._CourseListAssignmentsServerResponse,
+      messages.CourseListAssignmentsResponse
+    >('/api/course/listAssignments/',
+      (x) => { x.assignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.assignments); return x; }),
+    listSolvedProblems: apiCall<
+      messages.CourseListSolvedProblemsRequest,
+      messages.CourseListSolvedProblemsResponse
+    >('/api/course/listSolvedProblems/'),
+    listStudents: apiCall<
+      messages.CourseListStudentsRequest,
+      messages.CourseListStudentsResponse
+    >('/api/course/listStudents/'),
+    listUnsolvedProblems: apiCall<
+      messages.CourseListUnsolvedProblemsRequest,
+      messages.CourseListUnsolvedProblemsResponse
+    >('/api/course/listUnsolvedProblems/'),
+    myProgress: apiCall<
+      messages.CourseMyProgressRequest,
+      messages.CourseMyProgressResponse
+    >('/api/course/myProgress/'),
+    problemClarifications: apiCall<
+      messages.CourseProblemClarificationsRequest,
+      messages._CourseProblemClarificationsServerResponse,
+      messages.CourseProblemClarificationsResponse
+    >('/api/course/problemClarifications/',
+      (x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; }),
+    registerForCourse: apiCall<
+      messages.CourseRegisterForCourseRequest,
+      messages.CourseRegisterForCourseResponse
+    >('/api/course/registerForCourse/'),
+    removeAdmin: apiCall<
+      messages.CourseRemoveAdminRequest,
+      messages.CourseRemoveAdminResponse
+    >('/api/course/removeAdmin/'),
+    removeAssignment: apiCall<
+      messages.CourseRemoveAssignmentRequest,
+      messages.CourseRemoveAssignmentResponse
+    >('/api/course/removeAssignment/'),
+    removeGroupAdmin: apiCall<
+      messages.CourseRemoveGroupAdminRequest,
+      messages.CourseRemoveGroupAdminResponse
+    >('/api/course/removeGroupAdmin/'),
+    removeGroupTeachingAssistant: apiCall<
+      messages.CourseRemoveGroupTeachingAssistantRequest,
+      messages.CourseRemoveGroupTeachingAssistantResponse
+    >('/api/course/removeGroupTeachingAssistant/'),
+    removeProblem: apiCall<
+      messages.CourseRemoveProblemRequest,
+      messages.CourseRemoveProblemResponse
+    >('/api/course/removeProblem/'),
+    removeStudent: apiCall<
+      messages.CourseRemoveStudentRequest,
+      messages.CourseRemoveStudentResponse
+    >('/api/course/removeStudent/'),
+    removeTeachingAssistant: apiCall<
+      messages.CourseRemoveTeachingAssistantRequest,
+      messages.CourseRemoveTeachingAssistantResponse
+    >('/api/course/removeTeachingAssistant/'),
+    requestFeedback: apiCall<
+      messages.CourseRequestFeedbackRequest,
+      messages.CourseRequestFeedbackResponse
+    >('/api/course/requestFeedback/'),
+    requests: apiCall<
+      messages.CourseRequestsRequest,
+      messages._CourseRequestsServerResponse,
+      messages.CourseRequestsResponse
+    >('/api/course/requests/',
+      (x) => { x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.last_update !== 'undefined' &&  x.last_update !== null) x.last_update = ((x: number) => new Date(x * 1000))(x.last_update); x.request_time = ((x: number) => new Date(x * 1000))(x.request_time); return x; }); })(x.users); return x; }),
+    runs: apiCall<
+      messages.CourseRunsRequest,
+      messages._CourseRunsServerResponse,
+      messages.CourseRunsResponse
+    >('/api/course/runs/',
+      (x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }),
+    searchUsers: apiCall<
+      messages.CourseSearchUsersRequest,
+      messages.CourseSearchUsersResponse
+    >('/api/course/searchUsers/'),
+    studentProgress: apiCall<
+      messages.CourseStudentProgressRequest,
+      messages._CourseStudentProgressServerResponse,
+      messages.CourseStudentProgressResponse
+    >('/api/course/studentProgress/',
+      (x) => { x.problems = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); return x; })(x.feedback); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }); })(x.problems); return x; }),
+    studentsProgress: apiCall<
+      messages.CourseStudentsProgressRequest,
+      messages.CourseStudentsProgressResponse
+    >('/api/course/studentsProgress/'),
+    toggleTeachingAssistant: apiCall<
+      messages.CourseToggleTeachingAssistantRequest,
+      messages.CourseToggleTeachingAssistantResponse
+    >('/api/course/toggleTeachingAssistant/'),
+    update: apiCall<
+      messages.CourseUpdateRequest,
+      messages.CourseUpdateResponse
+    >('/api/course/update/'),
+    updateAssignment: apiCall<
+      messages.CourseUpdateAssignmentRequest,
+      messages.CourseUpdateAssignmentResponse
+    >('/api/course/updateAssignment/'),
+    updateAssignmentsOrder: apiCall<
+      messages.CourseUpdateAssignmentsOrderRequest,
+      messages.CourseUpdateAssignmentsOrderResponse
+    >('/api/course/updateAssignmentsOrder/'),
+    updateProblemsOrder: apiCall<
+      messages.CourseUpdateProblemsOrderRequest,
+      messages.CourseUpdateProblemsOrderResponse
+    >('/api/course/updateProblemsOrder/'),
 };
 
 export const Grader = {
-  status: apiCall<messages.GraderStatusRequest, messages.GraderStatusResponse>(
-    '/api/grader/status/',
-  ),
+    status: apiCall<
+      messages.GraderStatusRequest,
+      messages.GraderStatusResponse
+    >('/api/grader/status/'),
 };
 
 export const Group = {
-  addUser: apiCall<messages.GroupAddUserRequest, messages.GroupAddUserResponse>(
-    '/api/group/addUser/',
-  ),
-  create: apiCall<messages.GroupCreateRequest, messages.GroupCreateResponse>(
-    '/api/group/create/',
-  ),
-  createScoreboard: apiCall<
-    messages.GroupCreateScoreboardRequest,
-    messages.GroupCreateScoreboardResponse
-  >('/api/group/createScoreboard/'),
-  details: apiCall<messages.GroupDetailsRequest, messages.GroupDetailsResponse>(
-    '/api/group/details/',
-  ),
-  list: apiCall<messages.GroupListRequest, messages.GroupListResponse>(
-    '/api/group/list/',
-  ),
-  members: apiCall<messages.GroupMembersRequest, messages.GroupMembersResponse>(
-    '/api/group/members/',
-  ),
-  myList: apiCall<
-    messages.GroupMyListRequest,
-    messages._GroupMyListServerResponse,
-    messages.GroupMyListResponse
-  >('/api/group/myList/', (x) => {
-    x.groups = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
-        return x;
-      });
-    })(x.groups);
-    return x;
-  }),
-  removeUser: apiCall<
-    messages.GroupRemoveUserRequest,
-    messages.GroupRemoveUserResponse
-  >('/api/group/removeUser/'),
-  update: apiCall<messages.GroupUpdateRequest, messages.GroupUpdateResponse>(
-    '/api/group/update/',
-  ),
+    addUser: apiCall<
+      messages.GroupAddUserRequest,
+      messages.GroupAddUserResponse
+    >('/api/group/addUser/'),
+    create: apiCall<
+      messages.GroupCreateRequest,
+      messages.GroupCreateResponse
+    >('/api/group/create/'),
+    createScoreboard: apiCall<
+      messages.GroupCreateScoreboardRequest,
+      messages.GroupCreateScoreboardResponse
+    >('/api/group/createScoreboard/'),
+    details: apiCall<
+      messages.GroupDetailsRequest,
+      messages.GroupDetailsResponse
+    >('/api/group/details/'),
+    list: apiCall<
+      messages.GroupListRequest,
+      messages.GroupListResponse
+    >('/api/group/list/'),
+    members: apiCall<
+      messages.GroupMembersRequest,
+      messages.GroupMembersResponse
+    >('/api/group/members/'),
+    myList: apiCall<
+      messages.GroupMyListRequest,
+      messages._GroupMyListServerResponse,
+      messages.GroupMyListResponse
+    >('/api/group/myList/',
+      (x) => { x.groups = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.create_time = ((x: number) => new Date(x * 1000))(x.create_time); return x; }); })(x.groups); return x; }),
+    removeUser: apiCall<
+      messages.GroupRemoveUserRequest,
+      messages.GroupRemoveUserResponse
+    >('/api/group/removeUser/'),
+    update: apiCall<
+      messages.GroupUpdateRequest,
+      messages.GroupUpdateResponse
+    >('/api/group/update/'),
 };
 
 export const GroupScoreboard = {
-  addContest: apiCall<
-    messages.GroupScoreboardAddContestRequest,
-    messages.GroupScoreboardAddContestResponse
-  >('/api/groupScoreboard/addContest/'),
-  details: apiCall<
-    messages.GroupScoreboardDetailsRequest,
-    messages._GroupScoreboardDetailsServerResponse,
-    messages.GroupScoreboardDetailsResponse
-  >('/api/groupScoreboard/details/', (x) => {
-    x.contests = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.contests);
-    return x;
-  }),
-  list: apiCall<
-    messages.GroupScoreboardListRequest,
-    messages.GroupScoreboardListResponse
-  >('/api/groupScoreboard/list/'),
-  removeContest: apiCall<
-    messages.GroupScoreboardRemoveContestRequest,
-    messages.GroupScoreboardRemoveContestResponse
-  >('/api/groupScoreboard/removeContest/'),
+    addContest: apiCall<
+      messages.GroupScoreboardAddContestRequest,
+      messages.GroupScoreboardAddContestResponse
+    >('/api/groupScoreboard/addContest/'),
+    details: apiCall<
+      messages.GroupScoreboardDetailsRequest,
+      messages._GroupScoreboardDetailsServerResponse,
+      messages.GroupScoreboardDetailsResponse
+    >('/api/groupScoreboard/details/',
+      (x) => { x.contests = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.contests); return x; }),
+    list: apiCall<
+      messages.GroupScoreboardListRequest,
+      messages.GroupScoreboardListResponse
+    >('/api/groupScoreboard/list/'),
+    removeContest: apiCall<
+      messages.GroupScoreboardRemoveContestRequest,
+      messages.GroupScoreboardRemoveContestResponse
+    >('/api/groupScoreboard/removeContest/'),
 };
 
 export const Identity = {
-  bulkCreate: apiCall<
-    messages.IdentityBulkCreateRequest,
-    messages.IdentityBulkCreateResponse
-  >('/api/identity/bulkCreate/'),
-  bulkCreateForTeams: apiCall<
-    messages.IdentityBulkCreateForTeamsRequest,
-    messages.IdentityBulkCreateForTeamsResponse
-  >('/api/identity/bulkCreateForTeams/'),
-  changePassword: apiCall<
-    messages.IdentityChangePasswordRequest,
-    messages.IdentityChangePasswordResponse
-  >('/api/identity/changePassword/'),
-  create: apiCall<
-    messages.IdentityCreateRequest,
-    messages.IdentityCreateResponse
-  >('/api/identity/create/'),
-  selectIdentity: apiCall<
-    messages.IdentitySelectIdentityRequest,
-    messages.IdentitySelectIdentityResponse
-  >('/api/identity/selectIdentity/'),
-  update: apiCall<
-    messages.IdentityUpdateRequest,
-    messages.IdentityUpdateResponse
-  >('/api/identity/update/'),
-  updateIdentityTeam: apiCall<
-    messages.IdentityUpdateIdentityTeamRequest,
-    messages.IdentityUpdateIdentityTeamResponse
-  >('/api/identity/updateIdentityTeam/'),
+    bulkCreate: apiCall<
+      messages.IdentityBulkCreateRequest,
+      messages.IdentityBulkCreateResponse
+    >('/api/identity/bulkCreate/'),
+    bulkCreateForTeams: apiCall<
+      messages.IdentityBulkCreateForTeamsRequest,
+      messages.IdentityBulkCreateForTeamsResponse
+    >('/api/identity/bulkCreateForTeams/'),
+    changePassword: apiCall<
+      messages.IdentityChangePasswordRequest,
+      messages.IdentityChangePasswordResponse
+    >('/api/identity/changePassword/'),
+    create: apiCall<
+      messages.IdentityCreateRequest,
+      messages.IdentityCreateResponse
+    >('/api/identity/create/'),
+    selectIdentity: apiCall<
+      messages.IdentitySelectIdentityRequest,
+      messages.IdentitySelectIdentityResponse
+    >('/api/identity/selectIdentity/'),
+    update: apiCall<
+      messages.IdentityUpdateRequest,
+      messages.IdentityUpdateResponse
+    >('/api/identity/update/'),
+    updateIdentityTeam: apiCall<
+      messages.IdentityUpdateIdentityTeamRequest,
+      messages.IdentityUpdateIdentityTeamResponse
+    >('/api/identity/updateIdentityTeam/'),
 };
 
 export const Notification = {
-  myList: apiCall<
-    messages.NotificationMyListRequest,
-    messages._NotificationMyListServerResponse,
-    messages.NotificationMyListResponse
-  >('/api/notification/myList/', (x) => {
-    x.notifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
-        return x;
-      });
-    })(x.notifications);
-    return x;
-  }),
-  readNotifications: apiCall<
-    messages.NotificationReadNotificationsRequest,
-    messages.NotificationReadNotificationsResponse
-  >('/api/notification/readNotifications/'),
+    myList: apiCall<
+      messages.NotificationMyListRequest,
+      messages._NotificationMyListServerResponse,
+      messages.NotificationMyListResponse
+    >('/api/notification/myList/',
+      (x) => { x.notifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.notifications); return x; }),
+    readNotifications: apiCall<
+      messages.NotificationReadNotificationsRequest,
+      messages.NotificationReadNotificationsResponse
+    >('/api/notification/readNotifications/'),
 };
 
 export const Problem = {
-  addAdmin: apiCall<
-    messages.ProblemAddAdminRequest,
-    messages.ProblemAddAdminResponse
-  >('/api/problem/addAdmin/'),
-  addGroupAdmin: apiCall<
-    messages.ProblemAddGroupAdminRequest,
-    messages.ProblemAddGroupAdminResponse
-  >('/api/problem/addGroupAdmin/'),
-  addTag: apiCall<
-    messages.ProblemAddTagRequest,
-    messages.ProblemAddTagResponse
-  >('/api/problem/addTag/'),
-  adminList: apiCall<
-    messages.ProblemAdminListRequest,
-    messages.ProblemAdminListResponse
-  >('/api/problem/adminList/'),
-  admins: apiCall<
-    messages.ProblemAdminsRequest,
-    messages.ProblemAdminsResponse
-  >('/api/problem/admins/'),
-  bestScore: apiCall<
-    messages.ProblemBestScoreRequest,
-    messages.ProblemBestScoreResponse
-  >('/api/problem/bestScore/'),
-  clarifications: apiCall<
-    messages.ProblemClarificationsRequest,
-    messages._ProblemClarificationsServerResponse,
-    messages.ProblemClarificationsResponse
-  >('/api/problem/clarifications/', (x) => {
-    x.clarifications = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.clarifications);
-    return x;
-  }),
-  convertZipToCdp: apiCall<
-    messages.ProblemConvertZipToCdpRequest,
-    messages.ProblemConvertZipToCdpResponse
-  >('/api/problem/convertZipToCdp/'),
-  create: apiCall<
-    messages.ProblemCreateRequest,
-    messages.ProblemCreateResponse
-  >('/api/problem/create/'),
-  delete: apiCall<
-    messages.ProblemDeleteRequest,
-    messages.ProblemDeleteResponse
-  >('/api/problem/delete/'),
-  details: apiCall<
-    messages.ProblemDetailsRequest,
-    messages._ProblemDetailsServerResponse,
-    messages.ProblemDetailsResponse
-  >('/api/problem/details/', (x) => {
-    x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
-    if (
-      typeof x.nextExecutionTimestamp !== 'undefined' &&
-      x.nextExecutionTimestamp !== null
-    )
-      x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
-        x.nextExecutionTimestamp,
-      );
-    if (
-      typeof x.nextSubmissionTimestamp !== 'undefined' &&
-      x.nextSubmissionTimestamp !== null
-    )
-      x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-        x.nextSubmissionTimestamp,
-      );
-    if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
-      x.problemsetter = ((x) => {
-        if (typeof x.creation_date !== 'undefined' && x.creation_date !== null)
-          x.creation_date = ((x: number) => new Date(x * 1000))(
-            x.creation_date,
-          );
-        return x;
-      })(x.problemsetter);
-    if (typeof x.runs !== 'undefined' && x.runs !== null)
-      x.runs = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (typeof x.details !== 'undefined' && x.details !== null)
-            x.details = ((x) => {
-              if (typeof x.feedback !== 'undefined' && x.feedback !== null)
-                x.feedback = ((x) => {
-                  x.date = ((x: number) => new Date(x * 1000))(x.date);
-                  if (
-                    typeof x.feedback_thread !== 'undefined' &&
-                    x.feedback_thread !== null
-                  )
-                    x.feedback_thread = ((x) => {
-                      if (!Array.isArray(x)) {
-                        return x;
-                      }
-                      return x.map((x) => {
-                        x.timestamp = ((x: number) => new Date(x * 1000))(
-                          x.timestamp,
-                        );
-                        return x;
-                      });
-                    })(x.feedback_thread);
-                  return x;
-                })(x.feedback);
-              return x;
-            })(x.details);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        });
-      })(x.runs);
-    if (typeof x.solvers !== 'undefined' && x.solvers !== null)
-      x.solvers = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        });
-      })(x.solvers);
-    return x;
-  }),
-  list: apiCall<messages.ProblemListRequest, messages.ProblemListResponse>(
-    '/api/problem/list/',
-  ),
-  listForTypeahead: apiCall<
-    messages.ProblemListForTypeaheadRequest,
-    messages.ProblemListForTypeaheadResponse
-  >('/api/problem/listForTypeahead/'),
-  myList: apiCall<
-    messages.ProblemMyListRequest,
-    messages.ProblemMyListResponse
-  >('/api/problem/myList/'),
-  randomKarelProblem: apiCall<
-    messages.ProblemRandomKarelProblemRequest,
-    messages.ProblemRandomKarelProblemResponse
-  >('/api/problem/randomKarelProblem/'),
-  randomLanguageProblem: apiCall<
-    messages.ProblemRandomLanguageProblemRequest,
-    messages.ProblemRandomLanguageProblemResponse
-  >('/api/problem/randomLanguageProblem/'),
-  rejudge: apiCall<
-    messages.ProblemRejudgeRequest,
-    messages.ProblemRejudgeResponse
-  >('/api/problem/rejudge/'),
-  removeAdmin: apiCall<
-    messages.ProblemRemoveAdminRequest,
-    messages.ProblemRemoveAdminResponse
-  >('/api/problem/removeAdmin/'),
-  removeGroupAdmin: apiCall<
-    messages.ProblemRemoveGroupAdminRequest,
-    messages.ProblemRemoveGroupAdminResponse
-  >('/api/problem/removeGroupAdmin/'),
-  removeTag: apiCall<
-    messages.ProblemRemoveTagRequest,
-    messages.ProblemRemoveTagResponse
-  >('/api/problem/removeTag/'),
-  runs: apiCall<
-    messages.ProblemRunsRequest,
-    messages._ProblemRunsServerResponse,
-    messages.ProblemRunsResponse
-  >('/api/problem/runs/', (x) => {
-    x.runs = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.runs);
-    return x;
-  }),
-  runsDiff: apiCall<
-    messages.ProblemRunsDiffRequest,
-    messages.ProblemRunsDiffResponse
-  >('/api/problem/runsDiff/'),
-  selectVersion: apiCall<
-    messages.ProblemSelectVersionRequest,
-    messages.ProblemSelectVersionResponse
-  >('/api/problem/selectVersion/'),
-  solution: apiCall<
-    messages.ProblemSolutionRequest,
-    messages.ProblemSolutionResponse
-  >('/api/problem/solution/'),
-  stats: apiCall<messages.ProblemStatsRequest, messages.ProblemStatsResponse>(
-    '/api/problem/stats/',
-  ),
-  tags: apiCall<messages.ProblemTagsRequest, messages.ProblemTagsResponse>(
-    '/api/problem/tags/',
-  ),
-  update: apiCall<
-    messages.ProblemUpdateRequest,
-    messages.ProblemUpdateResponse
-  >('/api/problem/update/'),
-  updateProblemLevel: apiCall<
-    messages.ProblemUpdateProblemLevelRequest,
-    messages.ProblemUpdateProblemLevelResponse
-  >('/api/problem/updateProblemLevel/'),
-  updateSolution: apiCall<
-    messages.ProblemUpdateSolutionRequest,
-    messages.ProblemUpdateSolutionResponse
-  >('/api/problem/updateSolution/'),
-  updateStatement: apiCall<
-    messages.ProblemUpdateStatementRequest,
-    messages.ProblemUpdateStatementResponse
-  >('/api/problem/updateStatement/'),
-  versions: apiCall<
-    messages.ProblemVersionsRequest,
-    messages._ProblemVersionsServerResponse,
-    messages.ProblemVersionsResponse
-  >('/api/problem/versions/', (x) => {
-    x.log = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.author = ((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.author);
-        x.committer = ((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.committer);
-        return x;
-      });
-    })(x.log);
-    return x;
-  }),
+    addAdmin: apiCall<
+      messages.ProblemAddAdminRequest,
+      messages.ProblemAddAdminResponse
+    >('/api/problem/addAdmin/'),
+    addGroupAdmin: apiCall<
+      messages.ProblemAddGroupAdminRequest,
+      messages.ProblemAddGroupAdminResponse
+    >('/api/problem/addGroupAdmin/'),
+    addTag: apiCall<
+      messages.ProblemAddTagRequest,
+      messages.ProblemAddTagResponse
+    >('/api/problem/addTag/'),
+    adminList: apiCall<
+      messages.ProblemAdminListRequest,
+      messages.ProblemAdminListResponse
+    >('/api/problem/adminList/'),
+    admins: apiCall<
+      messages.ProblemAdminsRequest,
+      messages.ProblemAdminsResponse
+    >('/api/problem/admins/'),
+    bestScore: apiCall<
+      messages.ProblemBestScoreRequest,
+      messages.ProblemBestScoreResponse
+    >('/api/problem/bestScore/'),
+    clarifications: apiCall<
+      messages.ProblemClarificationsRequest,
+      messages._ProblemClarificationsServerResponse,
+      messages.ProblemClarificationsResponse
+    >('/api/problem/clarifications/',
+      (x) => { x.clarifications = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.clarifications); return x; }),
+    convertZipToCdp: apiCall<
+      messages.ProblemConvertZipToCdpRequest,
+      messages.ProblemConvertZipToCdpResponse
+    >('/api/problem/convertZipToCdp/'),
+    create: apiCall<
+      messages.ProblemCreateRequest,
+      messages.ProblemCreateResponse
+    >('/api/problem/create/'),
+    delete: apiCall<
+      messages.ProblemDeleteRequest,
+      messages.ProblemDeleteResponse
+    >('/api/problem/delete/'),
+    details: apiCall<
+      messages.ProblemDetailsRequest,
+      messages._ProblemDetailsServerResponse,
+      messages.ProblemDetailsResponse
+    >('/api/problem/details/',
+      (x) => { x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); if (typeof x.nextExecutionTimestamp !== 'undefined' &&  x.nextExecutionTimestamp !== null) x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); if (typeof x.nextSubmissionTimestamp !== 'undefined' &&  x.nextSubmissionTimestamp !== null) x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); if (typeof x.problemsetter !== 'undefined' &&  x.problemsetter !== null) x.problemsetter = ((x) => { if (typeof x.creation_date !== 'undefined' &&  x.creation_date !== null) x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date); return x; })(x.problemsetter); if (typeof x.runs !== 'undefined' &&  x.runs !== null) x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.details !== 'undefined' &&  x.details !== null) x.details = ((x) => { if (typeof x.feedback !== 'undefined' &&  x.feedback !== null) x.feedback = ((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; })(x.feedback); return x; })(x.details); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); if (typeof x.solvers !== 'undefined' &&  x.solvers !== null) x.solvers = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.solvers); return x; }),
+    list: apiCall<
+      messages.ProblemListRequest,
+      messages.ProblemListResponse
+    >('/api/problem/list/'),
+    listForTypeahead: apiCall<
+      messages.ProblemListForTypeaheadRequest,
+      messages.ProblemListForTypeaheadResponse
+    >('/api/problem/listForTypeahead/'),
+    myList: apiCall<
+      messages.ProblemMyListRequest,
+      messages.ProblemMyListResponse
+    >('/api/problem/myList/'),
+    randomKarelProblem: apiCall<
+      messages.ProblemRandomKarelProblemRequest,
+      messages.ProblemRandomKarelProblemResponse
+    >('/api/problem/randomKarelProblem/'),
+    randomLanguageProblem: apiCall<
+      messages.ProblemRandomLanguageProblemRequest,
+      messages.ProblemRandomLanguageProblemResponse
+    >('/api/problem/randomLanguageProblem/'),
+    rejudge: apiCall<
+      messages.ProblemRejudgeRequest,
+      messages.ProblemRejudgeResponse
+    >('/api/problem/rejudge/'),
+    removeAdmin: apiCall<
+      messages.ProblemRemoveAdminRequest,
+      messages.ProblemRemoveAdminResponse
+    >('/api/problem/removeAdmin/'),
+    removeGroupAdmin: apiCall<
+      messages.ProblemRemoveGroupAdminRequest,
+      messages.ProblemRemoveGroupAdminResponse
+    >('/api/problem/removeGroupAdmin/'),
+    removeTag: apiCall<
+      messages.ProblemRemoveTagRequest,
+      messages.ProblemRemoveTagResponse
+    >('/api/problem/removeTag/'),
+    runs: apiCall<
+      messages.ProblemRunsRequest,
+      messages._ProblemRunsServerResponse,
+      messages.ProblemRunsResponse
+    >('/api/problem/runs/',
+      (x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }),
+    runsDiff: apiCall<
+      messages.ProblemRunsDiffRequest,
+      messages.ProblemRunsDiffResponse
+    >('/api/problem/runsDiff/'),
+    selectVersion: apiCall<
+      messages.ProblemSelectVersionRequest,
+      messages.ProblemSelectVersionResponse
+    >('/api/problem/selectVersion/'),
+    solution: apiCall<
+      messages.ProblemSolutionRequest,
+      messages.ProblemSolutionResponse
+    >('/api/problem/solution/'),
+    stats: apiCall<
+      messages.ProblemStatsRequest,
+      messages.ProblemStatsResponse
+    >('/api/problem/stats/'),
+    tags: apiCall<
+      messages.ProblemTagsRequest,
+      messages.ProblemTagsResponse
+    >('/api/problem/tags/'),
+    update: apiCall<
+      messages.ProblemUpdateRequest,
+      messages.ProblemUpdateResponse
+    >('/api/problem/update/'),
+    updateProblemLevel: apiCall<
+      messages.ProblemUpdateProblemLevelRequest,
+      messages.ProblemUpdateProblemLevelResponse
+    >('/api/problem/updateProblemLevel/'),
+    updateSolution: apiCall<
+      messages.ProblemUpdateSolutionRequest,
+      messages.ProblemUpdateSolutionResponse
+    >('/api/problem/updateSolution/'),
+    updateStatement: apiCall<
+      messages.ProblemUpdateStatementRequest,
+      messages.ProblemUpdateStatementResponse
+    >('/api/problem/updateStatement/'),
+    versions: apiCall<
+      messages.ProblemVersionsRequest,
+      messages._ProblemVersionsServerResponse,
+      messages.ProblemVersionsResponse
+    >('/api/problem/versions/',
+      (x) => { x.log = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.author = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.author); x.committer = ((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; })(x.committer); return x; }); })(x.log); return x; }),
 };
 
 export const ProblemBookmark = {
-  exists: apiCall<
-    messages.ProblemBookmarkExistsRequest,
-    messages.ProblemBookmarkExistsResponse
-  >('/api/problemBookmark/exists/'),
-  list: apiCall<
-    messages.ProblemBookmarkListRequest,
-    messages.ProblemBookmarkListResponse
-  >('/api/problemBookmark/list/'),
-  toggle: apiCall<
-    messages.ProblemBookmarkToggleRequest,
-    messages.ProblemBookmarkToggleResponse
-  >('/api/problemBookmark/toggle/'),
+    exists: apiCall<
+      messages.ProblemBookmarkExistsRequest,
+      messages.ProblemBookmarkExistsResponse
+    >('/api/problemBookmark/exists/'),
+    list: apiCall<
+      messages.ProblemBookmarkListRequest,
+      messages.ProblemBookmarkListResponse
+    >('/api/problemBookmark/list/'),
+    toggle: apiCall<
+      messages.ProblemBookmarkToggleRequest,
+      messages.ProblemBookmarkToggleResponse
+    >('/api/problemBookmark/toggle/'),
 };
 
 export const ProblemForfeited = {
-  getCounts: apiCall<
-    messages.ProblemForfeitedGetCountsRequest,
-    messages.ProblemForfeitedGetCountsResponse
-  >('/api/problemForfeited/getCounts/'),
+    getCounts: apiCall<
+      messages.ProblemForfeitedGetCountsRequest,
+      messages.ProblemForfeitedGetCountsResponse
+    >('/api/problemForfeited/getCounts/'),
+};
+
+export const ProblemNote = {
+    delete: apiCall<
+      messages.ProblemNoteDeleteRequest,
+      messages.ProblemNoteDeleteResponse
+    >('/api/problemNote/delete/'),
+    get: apiCall<
+      messages.ProblemNoteGetRequest,
+      messages.ProblemNoteGetResponse
+    >('/api/problemNote/get/'),
+    list: apiCall<
+      messages.ProblemNoteListRequest,
+      messages.ProblemNoteListResponse
+    >('/api/problemNote/list/'),
+    save: apiCall<
+      messages.ProblemNoteSaveRequest,
+      messages.ProblemNoteSaveResponse
+    >('/api/problemNote/save/'),
 };
 
 export const Problemset = {
-  details: apiCall<
-    messages.ProblemsetDetailsRequest,
-    messages._ProblemsetDetailsServerResponse,
-    messages.ProblemsetDetailsResponse
-  >('/api/problemset/details/', (x) => {
-    if (
-      typeof x.courseAssignments !== 'undefined' &&
-      x.courseAssignments !== null
-    )
-      x.courseAssignments = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.courseAssignments);
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (typeof x.start_time !== 'undefined' && x.start_time !== null)
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (
-      typeof x.submission_deadline !== 'undefined' &&
-      x.submission_deadline !== null
-    )
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
-        x.submission_deadline,
-      );
-    if (typeof x.users !== 'undefined' && x.users !== null)
-      x.users = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (typeof x.access_time !== 'undefined' && x.access_time !== null)
-            x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-          return x;
-        });
-      })(x.users);
-    return x;
-  }),
-  scoreboard: apiCall<
-    messages.ProblemsetScoreboardRequest,
-    messages._ProblemsetScoreboardServerResponse,
-    messages.ProblemsetScoreboardResponse
-  >('/api/problemset/scoreboard/', (x) => {
-    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
-  scoreboardEvents: apiCall<
-    messages.ProblemsetScoreboardEventsRequest,
-    messages.ProblemsetScoreboardEventsResponse
-  >('/api/problemset/scoreboardEvents/'),
+    details: apiCall<
+      messages.ProblemsetDetailsRequest,
+      messages._ProblemsetDetailsServerResponse,
+      messages.ProblemsetDetailsResponse
+    >('/api/problemset/details/',
+      (x) => { if (typeof x.courseAssignments !== 'undefined' &&  x.courseAssignments !== null) x.courseAssignments = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; }); })(x.courseAssignments); if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); if (typeof x.start_time !== 'undefined' &&  x.start_time !== null) x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); if (typeof x.submission_deadline !== 'undefined' &&  x.submission_deadline !== null) x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); if (typeof x.users !== 'undefined' &&  x.users !== null) x.users = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.access_time !== 'undefined' &&  x.access_time !== null) x.access_time = ((x: number) => new Date(x * 1000))(x.access_time); return x; }); })(x.users); return x; }),
+    scoreboard: apiCall<
+      messages.ProblemsetScoreboardRequest,
+      messages._ProblemsetScoreboardServerResponse,
+      messages.ProblemsetScoreboardResponse
+    >('/api/problemset/scoreboard/',
+      (x) => { if (typeof x.finish_time !== 'undefined' &&  x.finish_time !== null) x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
+    scoreboardEvents: apiCall<
+      messages.ProblemsetScoreboardEventsRequest,
+      messages.ProblemsetScoreboardEventsResponse
+    >('/api/problemset/scoreboardEvents/'),
 };
 
 export const QualityNomination = {
-  create: apiCall<
-    messages.QualityNominationCreateRequest,
-    messages.QualityNominationCreateResponse
-  >('/api/qualityNomination/create/'),
-  details: apiCall<
-    messages.QualityNominationDetailsRequest,
-    messages._QualityNominationDetailsServerResponse,
-    messages.QualityNominationDetailsResponse
-  >('/api/qualityNomination/details/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    x.votes = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (typeof x.time !== 'undefined' && x.time !== null)
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.votes);
-    return x;
-  }),
-  list: apiCall<
-    messages.QualityNominationListRequest,
-    messages._QualityNominationListServerResponse,
-    messages.QualityNominationListResponse
-  >('/api/qualityNomination/list/', (x) => {
-    x.nominations = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        x.votes = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (typeof x.time !== 'undefined' && x.time !== null)
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.votes);
-        return x;
-      });
-    })(x.nominations);
-    return x;
-  }),
-  myAssignedList: apiCall<
-    messages.QualityNominationMyAssignedListRequest,
-    messages._QualityNominationMyAssignedListServerResponse,
-    messages.QualityNominationMyAssignedListResponse
-  >('/api/qualityNomination/myAssignedList/', (x) => {
-    x.nominations = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        x.votes = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (typeof x.time !== 'undefined' && x.time !== null)
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.votes);
-        return x;
-      });
-    })(x.nominations);
-    return x;
-  }),
-  myList: apiCall<
-    messages.QualityNominationMyListRequest,
-    messages._QualityNominationMyListServerResponse,
-    messages.QualityNominationMyListResponse
-  >('/api/qualityNomination/myList/', (x) => {
-    x.nominations = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        x.votes = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (typeof x.time !== 'undefined' && x.time !== null)
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.votes);
-        return x;
-      });
-    })(x.nominations);
-    return x;
-  }),
-  resolve: apiCall<
-    messages.QualityNominationResolveRequest,
-    messages.QualityNominationResolveResponse
-  >('/api/qualityNomination/resolve/'),
+    create: apiCall<
+      messages.QualityNominationCreateRequest,
+      messages.QualityNominationCreateResponse
+    >('/api/qualityNomination/create/'),
+    details: apiCall<
+      messages.QualityNominationDetailsRequest,
+      messages._QualityNominationDetailsServerResponse,
+      messages.QualityNominationDetailsResponse
+    >('/api/qualityNomination/details/',
+      (x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); x.votes = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.time !== 'undefined' &&  x.time !== null) x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.votes); return x; }),
+    list: apiCall<
+      messages.QualityNominationListRequest,
+      messages._QualityNominationListServerResponse,
+      messages.QualityNominationListResponse
+    >('/api/qualityNomination/list/',
+      (x) => { x.nominations = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); x.votes = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.time !== 'undefined' &&  x.time !== null) x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.votes); return x; }); })(x.nominations); return x; }),
+    myAssignedList: apiCall<
+      messages.QualityNominationMyAssignedListRequest,
+      messages._QualityNominationMyAssignedListServerResponse,
+      messages.QualityNominationMyAssignedListResponse
+    >('/api/qualityNomination/myAssignedList/',
+      (x) => { x.nominations = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); x.votes = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.time !== 'undefined' &&  x.time !== null) x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.votes); return x; }); })(x.nominations); return x; }),
+    myList: apiCall<
+      messages.QualityNominationMyListRequest,
+      messages._QualityNominationMyListServerResponse,
+      messages.QualityNominationMyListResponse
+    >('/api/qualityNomination/myList/',
+      (x) => { x.nominations = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); x.votes = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { if (typeof x.time !== 'undefined' &&  x.time !== null) x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.votes); return x; }); })(x.nominations); return x; }),
+    resolve: apiCall<
+      messages.QualityNominationResolveRequest,
+      messages.QualityNominationResolveResponse
+    >('/api/qualityNomination/resolve/'),
 };
 
 export const Reset = {
-  create: apiCall<messages.ResetCreateRequest, messages.ResetCreateResponse>(
-    '/api/reset/create/',
-  ),
-  generateToken: apiCall<
-    messages.ResetGenerateTokenRequest,
-    messages.ResetGenerateTokenResponse
-  >('/api/reset/generateToken/'),
-  update: apiCall<messages.ResetUpdateRequest, messages.ResetUpdateResponse>(
-    '/api/reset/update/',
-  ),
+    create: apiCall<
+      messages.ResetCreateRequest,
+      messages.ResetCreateResponse
+    >('/api/reset/create/'),
+    generateToken: apiCall<
+      messages.ResetGenerateTokenRequest,
+      messages.ResetGenerateTokenResponse
+    >('/api/reset/generateToken/'),
+    update: apiCall<
+      messages.ResetUpdateRequest,
+      messages.ResetUpdateResponse
+    >('/api/reset/update/'),
 };
 
 export const Run = {
-  counts: apiCall<messages.RunCountsRequest, messages.RunCountsResponse>(
-    '/api/run/counts/',
-  ),
-  create: apiCall<
-    messages.RunCreateRequest,
-    messages._RunCreateServerResponse,
-    messages.RunCreateResponse
-  >('/api/run/create/', (x) => {
-    x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-      x.nextSubmissionTimestamp,
-    );
-    x.submission_deadline = ((x: number) => new Date(x * 1000))(
-      x.submission_deadline,
-    );
-    return x;
-  }),
-  details: apiCall<
-    messages.RunDetailsRequest,
-    messages._RunDetailsServerResponse,
-    messages.RunDetailsResponse
-  >('/api/run/details/', (x) => {
-    x.feedback = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.date = ((x: number) => new Date(x * 1000))(x.date);
-        if (
-          typeof x.feedback_thread !== 'undefined' &&
-          x.feedback_thread !== null
-        )
-          x.feedback_thread = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
-              return x;
-            });
-          })(x.feedback_thread);
-        return x;
-      });
-    })(x.feedback);
-    return x;
-  }),
-  disqualify: apiCall<
-    messages.RunDisqualifyRequest,
-    messages.RunDisqualifyResponse
-  >('/api/run/disqualify/'),
-  execute: apiCall<
-    messages.RunExecuteRequest,
-    messages._RunExecuteServerResponse,
-    messages.RunExecuteResponse
-  >('/api/run/execute/', (x) => {
-    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
-      x.nextExecutionTimestamp,
-    );
-    return x;
-  }),
-  executeForIDE: apiCall<
-    messages.RunExecuteForIDERequest,
-    messages._RunExecuteForIDEServerResponse,
-    messages.RunExecuteForIDEResponse
-  >('/api/run/executeForIDE/', (x) => {
-    x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(
-      x.nextExecutionTimestamp,
-    );
-    return x;
-  }),
-  getSubmissionFeedback: apiCall<
-    messages.RunGetSubmissionFeedbackRequest,
-    messages._RunGetSubmissionFeedbackServerResponse,
-    messages.RunGetSubmissionFeedbackResponse
-  >('/api/run/getSubmissionFeedback/', (x) => {
-    if (!Array.isArray(x)) {
-      return x;
-    }
-    return x.map((x) => {
-      x.date = ((x: number) => new Date(x * 1000))(x.date);
-      if (
-        typeof x.feedback_thread !== 'undefined' &&
-        x.feedback_thread !== null
-      )
-        x.feedback_thread = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
-            return x;
-          });
-        })(x.feedback_thread);
-      return x;
-    });
-  }),
-  list: apiCall<
-    messages.RunListRequest,
-    messages._RunListServerResponse,
-    messages.RunListResponse
-  >('/api/run/list/', (x) => {
-    x.runs = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.runs);
-    return x;
-  }),
-  rejudge: apiCall<messages.RunRejudgeRequest, messages.RunRejudgeResponse>(
-    '/api/run/rejudge/',
-  ),
-  requalify: apiCall<
-    messages.RunRequalifyRequest,
-    messages.RunRequalifyResponse
-  >('/api/run/requalify/'),
-  source: apiCall<messages.RunSourceRequest, messages.RunSourceResponse>(
-    '/api/run/source/',
-  ),
-  status: apiCall<
-    messages.RunStatusRequest,
-    messages._RunStatusServerResponse,
-    messages.RunStatusResponse
-  >('/api/run/status/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
-    return x;
-  }),
+    counts: apiCall<
+      messages.RunCountsRequest,
+      messages.RunCountsResponse
+    >('/api/run/counts/'),
+    create: apiCall<
+      messages.RunCreateRequest,
+      messages._RunCreateServerResponse,
+      messages.RunCreateResponse
+    >('/api/run/create/',
+      (x) => { x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(x.nextSubmissionTimestamp); x.submission_deadline = ((x: number) => new Date(x * 1000))(x.submission_deadline); return x; }),
+    details: apiCall<
+      messages.RunDetailsRequest,
+      messages._RunDetailsServerResponse,
+      messages.RunDetailsResponse
+    >('/api/run/details/',
+      (x) => { x.feedback = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; }); })(x.feedback); return x; }),
+    disqualify: apiCall<
+      messages.RunDisqualifyRequest,
+      messages.RunDisqualifyResponse
+    >('/api/run/disqualify/'),
+    execute: apiCall<
+      messages.RunExecuteRequest,
+      messages._RunExecuteServerResponse,
+      messages.RunExecuteResponse
+    >('/api/run/execute/',
+      (x) => { x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); return x; }),
+    executeForIDE: apiCall<
+      messages.RunExecuteForIDERequest,
+      messages._RunExecuteForIDEServerResponse,
+      messages.RunExecuteForIDEResponse
+    >('/api/run/executeForIDE/',
+      (x) => { x.nextExecutionTimestamp = ((x: number) => new Date(x * 1000))(x.nextExecutionTimestamp); return x; }),
+    getSubmissionFeedback: apiCall<
+      messages.RunGetSubmissionFeedbackRequest,
+      messages._RunGetSubmissionFeedbackServerResponse,
+      messages.RunGetSubmissionFeedbackResponse
+    >('/api/run/getSubmissionFeedback/',
+      (x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.date = ((x: number) => new Date(x * 1000))(x.date); if (typeof x.feedback_thread !== 'undefined' &&  x.feedback_thread !== null) x.feedback_thread = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.feedback_thread); return x; }); }),
+    list: apiCall<
+      messages.RunListRequest,
+      messages._RunListServerResponse,
+      messages.RunListResponse
+    >('/api/run/list/',
+      (x) => { x.runs = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.runs); return x; }),
+    rejudge: apiCall<
+      messages.RunRejudgeRequest,
+      messages.RunRejudgeResponse
+    >('/api/run/rejudge/'),
+    requalify: apiCall<
+      messages.RunRequalifyRequest,
+      messages.RunRequalifyResponse
+    >('/api/run/requalify/'),
+    source: apiCall<
+      messages.RunSourceRequest,
+      messages.RunSourceResponse
+    >('/api/run/source/'),
+    status: apiCall<
+      messages.RunStatusRequest,
+      messages._RunStatusServerResponse,
+      messages.RunStatusResponse
+    >('/api/run/status/',
+      (x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }),
 };
 
 export const School = {
-  create: apiCall<messages.SchoolCreateRequest, messages.SchoolCreateResponse>(
-    '/api/school/create/',
-  ),
-  list: apiCall<messages.SchoolListRequest, messages.SchoolListResponse>(
-    '/api/school/list/',
-  ),
-  selectSchoolOfTheMonth: apiCall<
-    messages.SchoolSelectSchoolOfTheMonthRequest,
-    messages.SchoolSelectSchoolOfTheMonthResponse
-  >('/api/school/selectSchoolOfTheMonth/'),
+    create: apiCall<
+      messages.SchoolCreateRequest,
+      messages.SchoolCreateResponse
+    >('/api/school/create/'),
+    list: apiCall<
+      messages.SchoolListRequest,
+      messages.SchoolListResponse
+    >('/api/school/list/'),
+    selectSchoolOfTheMonth: apiCall<
+      messages.SchoolSelectSchoolOfTheMonthRequest,
+      messages.SchoolSelectSchoolOfTheMonthResponse
+    >('/api/school/selectSchoolOfTheMonth/'),
 };
 
 export const Scoreboard = {
-  refresh: apiCall<
-    messages.ScoreboardRefreshRequest,
-    messages.ScoreboardRefreshResponse
-  >('/api/scoreboard/refresh/'),
+    refresh: apiCall<
+      messages.ScoreboardRefreshRequest,
+      messages.ScoreboardRefreshResponse
+    >('/api/scoreboard/refresh/'),
 };
 
 export const Session = {
-  currentSession: apiCall<
-    messages.SessionCurrentSessionRequest,
-    messages._SessionCurrentSessionServerResponse,
-    messages.SessionCurrentSessionResponse
-  >('/api/session/currentSession/', (x) => {
-    if (typeof x.session !== 'undefined' && x.session !== null)
-      x.session = ((x) => {
-        x.api_tokens = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
-            x.rate_limit = ((x) => {
-              x.reset = ((x: number) => new Date(x * 1000))(x.reset);
-              return x;
-            })(x.rate_limit);
-            x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
-            return x;
-          });
-        })(x.api_tokens);
-        if (
-          typeof x.user_verification_deadline !== 'undefined' &&
-          x.user_verification_deadline !== null
-        )
-          x.user_verification_deadline = ((x: number) => new Date(x * 1000))(
-            x.user_verification_deadline,
-          );
-        return x;
-      })(x.session);
-    return x;
-  }),
+    currentSession: apiCall<
+      messages.SessionCurrentSessionRequest,
+      messages._SessionCurrentSessionServerResponse,
+      messages.SessionCurrentSessionResponse
+    >('/api/session/currentSession/',
+      (x) => { if (typeof x.session !== 'undefined' &&  x.session !== null) x.session = ((x) => { x.api_tokens = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.last_used = ((x: number) => new Date(x * 1000))(x.last_used); x.rate_limit = ((x) => { x.reset = ((x: number) => new Date(x * 1000))(x.reset); return x; })(x.rate_limit); x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.api_tokens); if (typeof x.user_verification_deadline !== 'undefined' &&  x.user_verification_deadline !== null) x.user_verification_deadline = ((x: number) => new Date(x * 1000))(x.user_verification_deadline); return x; })(x.session); return x; }),
 };
 
 export const Submission = {
-  list: apiCall<
-    messages.SubmissionListRequest,
-    messages._SubmissionListServerResponse,
-    messages.SubmissionListResponse
-  >('/api/submission/list/', (x) => {
-    x.submissions = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.submissions);
-    return x;
-  }),
-  setFeedback: apiCall<
-    messages.SubmissionSetFeedbackRequest,
-    messages.SubmissionSetFeedbackResponse
-  >('/api/submission/setFeedback/'),
-  setFeedbackList: apiCall<
-    messages.SubmissionSetFeedbackListRequest,
-    messages.SubmissionSetFeedbackListResponse
-  >('/api/submission/setFeedbackList/'),
+    list: apiCall<
+      messages.SubmissionListRequest,
+      messages._SubmissionListServerResponse,
+      messages.SubmissionListResponse
+    >('/api/submission/list/',
+      (x) => { x.submissions = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.time = ((x: number) => new Date(x * 1000))(x.time); return x; }); })(x.submissions); return x; }),
+    setFeedback: apiCall<
+      messages.SubmissionSetFeedbackRequest,
+      messages.SubmissionSetFeedbackResponse
+    >('/api/submission/setFeedback/'),
+    setFeedbackList: apiCall<
+      messages.SubmissionSetFeedbackListRequest,
+      messages.SubmissionSetFeedbackListResponse
+    >('/api/submission/setFeedbackList/'),
 };
 
 export const Tag = {
-  frequentTags: apiCall<
-    messages.TagFrequentTagsRequest,
-    messages.TagFrequentTagsResponse
-  >('/api/tag/frequentTags/'),
-  list: apiCall<messages.TagListRequest, messages.TagListResponse>(
-    '/api/tag/list/',
-  ),
+    frequentTags: apiCall<
+      messages.TagFrequentTagsRequest,
+      messages.TagFrequentTagsResponse
+    >('/api/tag/frequentTags/'),
+    list: apiCall<
+      messages.TagListRequest,
+      messages.TagListResponse
+    >('/api/tag/list/'),
 };
 
 export const TeamsGroup = {
-  addMembers: apiCall<
-    messages.TeamsGroupAddMembersRequest,
-    messages.TeamsGroupAddMembersResponse
-  >('/api/teamsGroup/addMembers/'),
-  create: apiCall<
-    messages.TeamsGroupCreateRequest,
-    messages.TeamsGroupCreateResponse
-  >('/api/teamsGroup/create/'),
-  details: apiCall<
-    messages.TeamsGroupDetailsRequest,
-    messages.TeamsGroupDetailsResponse
-  >('/api/teamsGroup/details/'),
-  list: apiCall<
-    messages.TeamsGroupListRequest,
-    messages.TeamsGroupListResponse
-  >('/api/teamsGroup/list/'),
-  removeMember: apiCall<
-    messages.TeamsGroupRemoveMemberRequest,
-    messages.TeamsGroupRemoveMemberResponse
-  >('/api/teamsGroup/removeMember/'),
-  removeTeam: apiCall<
-    messages.TeamsGroupRemoveTeamRequest,
-    messages.TeamsGroupRemoveTeamResponse
-  >('/api/teamsGroup/removeTeam/'),
-  teams: apiCall<
-    messages.TeamsGroupTeamsRequest,
-    messages.TeamsGroupTeamsResponse
-  >('/api/teamsGroup/teams/'),
-  teamsMembers: apiCall<
-    messages.TeamsGroupTeamsMembersRequest,
-    messages.TeamsGroupTeamsMembersResponse
-  >('/api/teamsGroup/teamsMembers/'),
-  update: apiCall<
-    messages.TeamsGroupUpdateRequest,
-    messages.TeamsGroupUpdateResponse
-  >('/api/teamsGroup/update/'),
+    addMembers: apiCall<
+      messages.TeamsGroupAddMembersRequest,
+      messages.TeamsGroupAddMembersResponse
+    >('/api/teamsGroup/addMembers/'),
+    create: apiCall<
+      messages.TeamsGroupCreateRequest,
+      messages.TeamsGroupCreateResponse
+    >('/api/teamsGroup/create/'),
+    details: apiCall<
+      messages.TeamsGroupDetailsRequest,
+      messages.TeamsGroupDetailsResponse
+    >('/api/teamsGroup/details/'),
+    list: apiCall<
+      messages.TeamsGroupListRequest,
+      messages.TeamsGroupListResponse
+    >('/api/teamsGroup/list/'),
+    removeMember: apiCall<
+      messages.TeamsGroupRemoveMemberRequest,
+      messages.TeamsGroupRemoveMemberResponse
+    >('/api/teamsGroup/removeMember/'),
+    removeTeam: apiCall<
+      messages.TeamsGroupRemoveTeamRequest,
+      messages.TeamsGroupRemoveTeamResponse
+    >('/api/teamsGroup/removeTeam/'),
+    teams: apiCall<
+      messages.TeamsGroupTeamsRequest,
+      messages.TeamsGroupTeamsResponse
+    >('/api/teamsGroup/teams/'),
+    teamsMembers: apiCall<
+      messages.TeamsGroupTeamsMembersRequest,
+      messages.TeamsGroupTeamsMembersResponse
+    >('/api/teamsGroup/teamsMembers/'),
+    update: apiCall<
+      messages.TeamsGroupUpdateRequest,
+      messages.TeamsGroupUpdateResponse
+    >('/api/teamsGroup/update/'),
 };
 
 export const Time = {
-  get: apiCall<messages.TimeGetRequest, messages.TimeGetResponse>(
-    '/api/time/get/',
-  ),
+    get: apiCall<
+      messages.TimeGetRequest,
+      messages.TimeGetResponse
+    >('/api/time/get/'),
 };
 
 export const User = {
-  acceptPrivacyPolicy: apiCall<
-    messages.UserAcceptPrivacyPolicyRequest,
-    messages.UserAcceptPrivacyPolicyResponse
-  >('/api/user/acceptPrivacyPolicy/'),
-  addExperiment: apiCall<
-    messages.UserAddExperimentRequest,
-    messages.UserAddExperimentResponse
-  >('/api/user/addExperiment/'),
-  addGroup: apiCall<
-    messages.UserAddGroupRequest,
-    messages.UserAddGroupResponse
-  >('/api/user/addGroup/'),
-  addRole: apiCall<messages.UserAddRoleRequest, messages.UserAddRoleResponse>(
-    '/api/user/addRole/',
-  ),
-  associateIdentity: apiCall<
-    messages.UserAssociateIdentityRequest,
-    messages.UserAssociateIdentityResponse
-  >('/api/user/associateIdentity/'),
-  changePassword: apiCall<
-    messages.UserChangePasswordRequest,
-    messages.UserChangePasswordResponse
-  >('/api/user/changePassword/'),
-  coderOfTheMonth: apiCall<
-    messages.UserCoderOfTheMonthRequest,
-    messages._UserCoderOfTheMonthServerResponse,
-    messages.UserCoderOfTheMonthResponse
-  >('/api/user/coderOfTheMonth/', (x) => {
-    if (typeof x.coderinfo !== 'undefined' && x.coderinfo !== null)
-      x.coderinfo = ((x) => {
-        if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
-          x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-        if (
-          typeof x.graduation_date !== 'undefined' &&
-          x.graduation_date !== null
-        )
-          x.graduation_date = ((x: number) => new Date(x * 1000))(
-            x.graduation_date,
-          );
-        return x;
-      })(x.coderinfo);
-    return x;
-  }),
-  coderOfTheMonthList: apiCall<
-    messages.UserCoderOfTheMonthListRequest,
-    messages.UserCoderOfTheMonthListResponse
-  >('/api/user/coderOfTheMonthList/'),
-  compare: apiCall<
-    messages.UserCompareRequest,
-    messages._UserCompareServerResponse,
-    messages.UserCompareResponse
-  >('/api/user/compare/', (x) => {
-    if (typeof x.user1 !== 'undefined' && x.user1 !== null)
-      x.user1 = ((x) => {
-        x.profile = ((x) => {
-          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
-            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          if (
-            typeof x.graduation_date !== 'undefined' &&
-            x.graduation_date !== null
-          )
-            x.graduation_date = ((x: number) => new Date(x * 1000))(
-              x.graduation_date,
-            );
-          return x;
-        })(x.profile);
-        return x;
-      })(x.user1);
-    if (typeof x.user2 !== 'undefined' && x.user2 !== null)
-      x.user2 = ((x) => {
-        x.profile = ((x) => {
-          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
-            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          if (
-            typeof x.graduation_date !== 'undefined' &&
-            x.graduation_date !== null
-          )
-            x.graduation_date = ((x: number) => new Date(x * 1000))(
-              x.graduation_date,
-            );
-          return x;
-        })(x.profile);
-        return x;
-      })(x.user2);
-    return x;
-  }),
-  contestStats: apiCall<
-    messages.UserContestStatsRequest,
-    messages._UserContestStatsServerResponse,
-    messages.UserContestStatsResponse
-  >('/api/user/contestStats/', (x) => {
-    x.contests = ((x) => {
-      if (x instanceof Object) {
-        Object.keys(x).forEach(
-          (y) =>
-            (x[y] = ((x) => {
-              x.data = ((x) => {
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-                x.last_updated = ((x: number) => new Date(x * 1000))(
-                  x.last_updated,
-                );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              })(x.data);
-              return x;
-            })(x[y])),
-        );
-      }
-      return x;
-    })(x.contests);
-    return x;
-  }),
-  create: apiCall<messages.UserCreateRequest, messages.UserCreateResponse>(
-    '/api/user/create/',
-  ),
-  createAPIToken: apiCall<
-    messages.UserCreateAPITokenRequest,
-    messages.UserCreateAPITokenResponse
-  >('/api/user/createAPIToken/'),
-  deleteConfirm: apiCall<
-    messages.UserDeleteConfirmRequest,
-    messages.UserDeleteConfirmResponse
-  >('/api/user/deleteConfirm/'),
-  deleteRequest: apiCall<
-    messages.UserDeleteRequestRequest,
-    messages.UserDeleteRequestResponse
-  >('/api/user/deleteRequest/'),
-  extraInformation: apiCall<
-    messages.UserExtraInformationRequest,
-    messages._UserExtraInformationServerResponse,
-    messages.UserExtraInformationResponse
-  >('/api/user/extraInformation/', (x) => {
-    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
-      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (typeof x.last_login !== 'undefined' && x.last_login !== null)
-      x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
-    return x;
-  }),
-  generateGitToken: apiCall<
-    messages.UserGenerateGitTokenRequest,
-    messages.UserGenerateGitTokenResponse
-  >('/api/user/generateGitToken/'),
-  generateOmiUsers: apiCall<
-    messages.UserGenerateOmiUsersRequest,
-    messages.UserGenerateOmiUsersResponse
-  >('/api/user/generateOmiUsers/'),
-  lastPrivacyPolicyAccepted: apiCall<
-    messages.UserLastPrivacyPolicyAcceptedRequest,
-    messages.UserLastPrivacyPolicyAcceptedResponse
-  >('/api/user/lastPrivacyPolicyAccepted/'),
-  list: apiCall<messages.UserListRequest, messages.UserListResponse>(
-    '/api/user/list/',
-  ),
-  listAPITokens: apiCall<
-    messages.UserListAPITokensRequest,
-    messages._UserListAPITokensServerResponse,
-    messages.UserListAPITokensResponse
-  >('/api/user/listAPITokens/', (x) => {
-    x.tokens = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
-        x.rate_limit = ((x) => {
-          x.reset = ((x: number) => new Date(x * 1000))(x.reset);
-          return x;
-        })(x.rate_limit);
-        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
-        return x;
-      });
-    })(x.tokens);
-    return x;
-  }),
-  listAssociatedIdentities: apiCall<
-    messages.UserListAssociatedIdentitiesRequest,
-    messages.UserListAssociatedIdentitiesResponse
-  >('/api/user/listAssociatedIdentities/'),
-  listUnsolvedProblems: apiCall<
-    messages.UserListUnsolvedProblemsRequest,
-    messages.UserListUnsolvedProblemsResponse
-  >('/api/user/listUnsolvedProblems/'),
-  login: apiCall<messages.UserLoginRequest, messages.UserLoginResponse>(
-    '/api/user/login/',
-  ),
-  mailingListBackfill: apiCall<
-    messages.UserMailingListBackfillRequest,
-    messages.UserMailingListBackfillResponse
-  >('/api/user/mailingListBackfill/'),
-  problemsCreated: apiCall<
-    messages.UserProblemsCreatedRequest,
-    messages.UserProblemsCreatedResponse
-  >('/api/user/problemsCreated/'),
-  problemsSolved: apiCall<
-    messages.UserProblemsSolvedRequest,
-    messages.UserProblemsSolvedResponse
-  >('/api/user/problemsSolved/'),
-  profile: apiCall<
-    messages.UserProfileRequest,
-    messages._UserProfileServerResponse,
-    messages.UserProfileResponse
-  >('/api/user/profile/', (x) => {
-    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
-      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (typeof x.graduation_date !== 'undefined' && x.graduation_date !== null)
-      x.graduation_date = ((x: number) => new Date(x * 1000))(
-        x.graduation_date,
-      );
-    return x;
-  }),
-  profileStatistics: apiCall<
-    messages.UserProfileStatisticsRequest,
-    messages.UserProfileStatisticsResponse
-  >('/api/user/profileStatistics/'),
-  removeExperiment: apiCall<
-    messages.UserRemoveExperimentRequest,
-    messages.UserRemoveExperimentResponse
-  >('/api/user/removeExperiment/'),
-  removeGroup: apiCall<
-    messages.UserRemoveGroupRequest,
-    messages.UserRemoveGroupResponse
-  >('/api/user/removeGroup/'),
-  removeRole: apiCall<
-    messages.UserRemoveRoleRequest,
-    messages.UserRemoveRoleResponse
-  >('/api/user/removeRole/'),
-  revokeAPIToken: apiCall<
-    messages.UserRevokeAPITokenRequest,
-    messages.UserRevokeAPITokenResponse
-  >('/api/user/revokeAPIToken/'),
-  selectCoderOfTheMonth: apiCall<
-    messages.UserSelectCoderOfTheMonthRequest,
-    messages.UserSelectCoderOfTheMonthResponse
-  >('/api/user/selectCoderOfTheMonth/'),
-  stats: apiCall<messages.UserStatsRequest, messages.UserStatsResponse>(
-    '/api/user/stats/',
-  ),
-  statusVerified: apiCall<
-    messages.UserStatusVerifiedRequest,
-    messages.UserStatusVerifiedResponse
-  >('/api/user/statusVerified/'),
-  update: apiCall<messages.UserUpdateRequest, messages.UserUpdateResponse>(
-    '/api/user/update/',
-  ),
-  updateBasicInfo: apiCall<
-    messages.UserUpdateBasicInfoRequest,
-    messages.UserUpdateBasicInfoResponse
-  >('/api/user/updateBasicInfo/'),
-  updateMainEmail: apiCall<
-    messages.UserUpdateMainEmailRequest,
-    messages.UserUpdateMainEmailResponse
-  >('/api/user/updateMainEmail/'),
-  validateFilter: apiCall<
-    messages.UserValidateFilterRequest,
-    messages.UserValidateFilterResponse
-  >('/api/user/validateFilter/'),
-  verifyEmail: apiCall<
-    messages.UserVerifyEmailRequest,
-    messages.UserVerifyEmailResponse
-  >('/api/user/verifyEmail/'),
+    acceptPrivacyPolicy: apiCall<
+      messages.UserAcceptPrivacyPolicyRequest,
+      messages.UserAcceptPrivacyPolicyResponse
+    >('/api/user/acceptPrivacyPolicy/'),
+    addExperiment: apiCall<
+      messages.UserAddExperimentRequest,
+      messages.UserAddExperimentResponse
+    >('/api/user/addExperiment/'),
+    addGroup: apiCall<
+      messages.UserAddGroupRequest,
+      messages.UserAddGroupResponse
+    >('/api/user/addGroup/'),
+    addRole: apiCall<
+      messages.UserAddRoleRequest,
+      messages.UserAddRoleResponse
+    >('/api/user/addRole/'),
+    associateIdentity: apiCall<
+      messages.UserAssociateIdentityRequest,
+      messages.UserAssociateIdentityResponse
+    >('/api/user/associateIdentity/'),
+    changePassword: apiCall<
+      messages.UserChangePasswordRequest,
+      messages.UserChangePasswordResponse
+    >('/api/user/changePassword/'),
+    coderOfTheMonth: apiCall<
+      messages.UserCoderOfTheMonthRequest,
+      messages._UserCoderOfTheMonthServerResponse,
+      messages.UserCoderOfTheMonthResponse
+    >('/api/user/coderOfTheMonth/',
+      (x) => { if (typeof x.coderinfo !== 'undefined' &&  x.coderinfo !== null) x.coderinfo = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.coderinfo); return x; }),
+    coderOfTheMonthList: apiCall<
+      messages.UserCoderOfTheMonthListRequest,
+      messages.UserCoderOfTheMonthListResponse
+    >('/api/user/coderOfTheMonthList/'),
+    compare: apiCall<
+      messages.UserCompareRequest,
+      messages._UserCompareServerResponse,
+      messages.UserCompareResponse
+    >('/api/user/compare/',
+      (x) => { if (typeof x.user1 !== 'undefined' &&  x.user1 !== null) x.user1 = ((x) => { x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(x.user1); if (typeof x.user2 !== 'undefined' &&  x.user2 !== null) x.user2 = ((x) => { x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(x.user2); return x; }),
+    contestStats: apiCall<
+      messages.UserContestStatsRequest,
+      messages._UserContestStatsServerResponse,
+      messages.UserContestStatsResponse
+    >('/api/user/contestStats/',
+      (x) => { x.contests = ((x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ((x) => { x.data = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.data); return x; })(x[y])); } return x; })(x.contests); return x; }),
+    create: apiCall<
+      messages.UserCreateRequest,
+      messages.UserCreateResponse
+    >('/api/user/create/'),
+    createAPIToken: apiCall<
+      messages.UserCreateAPITokenRequest,
+      messages.UserCreateAPITokenResponse
+    >('/api/user/createAPIToken/'),
+    deleteConfirm: apiCall<
+      messages.UserDeleteConfirmRequest,
+      messages.UserDeleteConfirmResponse
+    >('/api/user/deleteConfirm/'),
+    deleteRequest: apiCall<
+      messages.UserDeleteRequestRequest,
+      messages.UserDeleteRequestResponse
+    >('/api/user/deleteRequest/'),
+    extraInformation: apiCall<
+      messages.UserExtraInformationRequest,
+      messages._UserExtraInformationServerResponse,
+      messages.UserExtraInformationResponse
+    >('/api/user/extraInformation/',
+      (x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.last_login !== 'undefined' &&  x.last_login !== null) x.last_login = ((x: number) => new Date(x * 1000))(x.last_login); return x; }),
+    generateGitToken: apiCall<
+      messages.UserGenerateGitTokenRequest,
+      messages.UserGenerateGitTokenResponse
+    >('/api/user/generateGitToken/'),
+    generateOmiUsers: apiCall<
+      messages.UserGenerateOmiUsersRequest,
+      messages.UserGenerateOmiUsersResponse
+    >('/api/user/generateOmiUsers/'),
+    lastPrivacyPolicyAccepted: apiCall<
+      messages.UserLastPrivacyPolicyAcceptedRequest,
+      messages.UserLastPrivacyPolicyAcceptedResponse
+    >('/api/user/lastPrivacyPolicyAccepted/'),
+    list: apiCall<
+      messages.UserListRequest,
+      messages.UserListResponse
+    >('/api/user/list/'),
+    listAPITokens: apiCall<
+      messages.UserListAPITokensRequest,
+      messages._UserListAPITokensServerResponse,
+      messages.UserListAPITokensResponse
+    >('/api/user/listAPITokens/',
+      (x) => { x.tokens = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.last_used = ((x: number) => new Date(x * 1000))(x.last_used); x.rate_limit = ((x) => { x.reset = ((x: number) => new Date(x * 1000))(x.reset); return x; })(x.rate_limit); x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.tokens); return x; }),
+    listAssociatedIdentities: apiCall<
+      messages.UserListAssociatedIdentitiesRequest,
+      messages.UserListAssociatedIdentitiesResponse
+    >('/api/user/listAssociatedIdentities/'),
+    listUnsolvedProblems: apiCall<
+      messages.UserListUnsolvedProblemsRequest,
+      messages.UserListUnsolvedProblemsResponse
+    >('/api/user/listUnsolvedProblems/'),
+    login: apiCall<
+      messages.UserLoginRequest,
+      messages.UserLoginResponse
+    >('/api/user/login/'),
+    mailingListBackfill: apiCall<
+      messages.UserMailingListBackfillRequest,
+      messages.UserMailingListBackfillResponse
+    >('/api/user/mailingListBackfill/'),
+    problemsCreated: apiCall<
+      messages.UserProblemsCreatedRequest,
+      messages.UserProblemsCreatedResponse
+    >('/api/user/problemsCreated/'),
+    problemsSolved: apiCall<
+      messages.UserProblemsSolvedRequest,
+      messages.UserProblemsSolvedResponse
+    >('/api/user/problemsSolved/'),
+    profile: apiCall<
+      messages.UserProfileRequest,
+      messages._UserProfileServerResponse,
+      messages.UserProfileResponse
+    >('/api/user/profile/',
+      (x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; }),
+    profileStatistics: apiCall<
+      messages.UserProfileStatisticsRequest,
+      messages.UserProfileStatisticsResponse
+    >('/api/user/profileStatistics/'),
+    removeExperiment: apiCall<
+      messages.UserRemoveExperimentRequest,
+      messages.UserRemoveExperimentResponse
+    >('/api/user/removeExperiment/'),
+    removeGroup: apiCall<
+      messages.UserRemoveGroupRequest,
+      messages.UserRemoveGroupResponse
+    >('/api/user/removeGroup/'),
+    removeRole: apiCall<
+      messages.UserRemoveRoleRequest,
+      messages.UserRemoveRoleResponse
+    >('/api/user/removeRole/'),
+    revokeAPIToken: apiCall<
+      messages.UserRevokeAPITokenRequest,
+      messages.UserRevokeAPITokenResponse
+    >('/api/user/revokeAPIToken/'),
+    selectCoderOfTheMonth: apiCall<
+      messages.UserSelectCoderOfTheMonthRequest,
+      messages.UserSelectCoderOfTheMonthResponse
+    >('/api/user/selectCoderOfTheMonth/'),
+    stats: apiCall<
+      messages.UserStatsRequest,
+      messages.UserStatsResponse
+    >('/api/user/stats/'),
+    statusVerified: apiCall<
+      messages.UserStatusVerifiedRequest,
+      messages.UserStatusVerifiedResponse
+    >('/api/user/statusVerified/'),
+    update: apiCall<
+      messages.UserUpdateRequest,
+      messages.UserUpdateResponse
+    >('/api/user/update/'),
+    updateBasicInfo: apiCall<
+      messages.UserUpdateBasicInfoRequest,
+      messages.UserUpdateBasicInfoResponse
+    >('/api/user/updateBasicInfo/'),
+    updateMainEmail: apiCall<
+      messages.UserUpdateMainEmailRequest,
+      messages.UserUpdateMainEmailResponse
+    >('/api/user/updateMainEmail/'),
+    validateFilter: apiCall<
+      messages.UserValidateFilterRequest,
+      messages.UserValidateFilterResponse
+    >('/api/user/validateFilter/'),
+    verifyEmail: apiCall<
+      messages.UserVerifyEmailRequest,
+      messages.UserVerifyEmailResponse
+    >('/api/user/verifyEmail/'),
 };
+

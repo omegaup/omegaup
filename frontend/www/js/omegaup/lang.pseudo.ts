@@ -1189,6 +1189,13 @@ const translations: { [key: string]: string; } = {
   problemBookmarkAdded: "(B00kmark add3d 5ucc355fu11y)",
   problemBookmarkRemove: "(R3m0v3 b00kmark)",
   problemBookmarkRemoved: "(B00kmark r3m0v3d 5ucc355fu11y)",
+  problemNoteAdd: "(Add n073)",
+  problemNoteCharLimit: "(Maximum 2000 charac73r5)",
+  problemNoteDeleted: "(N073 d31373d 5ucc355fu11y)",
+  problemNoteEdit: "(Edi7 n073)",
+  problemNotePlaceholder: "(Wri73 y0ur 0b53rva7i0n5, 3dg3 ca535, 0r 13arning p0in75...)",
+  problemNoteSaved: "(N073 5av3d 5ucc355fu11y)",
+  problemNoteTitle: "(Pr0b13m N073)",
   problemCollectionAuthors: "(Au7h0r5)",
   problemCollectionBackCollections: "(\u25c4 Back 70 c0113c7i0n5)",
   problemCollectionEducationLevel: "(By 3duca7i0na1 13v31)",
@@ -2210,6 +2217,7 @@ const translations: { [key: string]: string; } = {
   wordsNoComment: "(N0 c0mm3n7)",
   wordsNoSubmissions: "(L3c7ur3 (N0 5ubmi55i0n5))",
   wordsNone: "(N0n3)",
+  wordsNotes: "(N0735)",
   wordsNotApplicable: "(N/A)",
   wordsNumHomeworks: "(Num. 0f h0m3w0rk a55ignm3n75)",
   wordsNumTests: "(Num. 0f 73575)",
@@ -2313,4 +2321,4 @@ const translations: { [key: string]: string; } = {
   zipPrepare: "(Pr3par3 zip fi13)",
 };
 
-export {translations as default};
+export { translations as default };
