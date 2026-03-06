@@ -28,7 +28,6 @@
         </button>
       </div>
 
-     
       <button
         class="btn btn-sm btn-outline-secondary"
         :title="T.problemPresentationModeToggleLimits"
