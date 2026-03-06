@@ -136,6 +136,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import { shortcutManager } from '../../keyboard-shortcuts';
 
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
@@ -314,6 +315,32 @@ export default class ProblemDetails extends Vue {
         },
       );
     }
+  }
+
+  mounted() {
+    shortcutManager.registerShortcut({
+      key: 'n',
+      ctrlKey: true,
+      description: T.keyboardShortcutsNewSubmission,
+      action: () => {
+        this.onNewSubmission();
+      },
+    });
+
+    shortcutManager.registerShortcut({
+      key: 'Escape',
+      description: T.keyboardShortcutsCloseModal,
+      action: () => {
+        if (this.currentPopupDisplayed !== PopupDisplayed.None) {
+          this.onPopupDismissed();
+        }
+      },
+    });
+  }
+
+  beforeDestroy() {
+    shortcutManager.unregisterShortcut('n', true);
+    shortcutManager.unregisterShortcut('Escape');
   }
 }
 </script>
