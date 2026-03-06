@@ -211,23 +211,8 @@
             </td>
             <td v-if="loggedIn" class="text-right align-middle">
               <span
-                v-if="solvedProblemAliasesSet.has(problem.alias)"
-                :title="T.problemStatusSolved"
-                class="badge badge-success"
-              >
-                {{ problem.score.toFixed(2) }}
-              </span>
-              <span
-                v-else-if="attemptedProblemAliasesSet.has(problem.alias)"
-                :title="T.problemStatusAttempted"
-                class="badge badge-warning"
-              >
-                {{ problem.score.toFixed(2) }}
-              </span>
-              <span
-                v-else
-                :title="T.problemStatusUnattempted"
-                class="badge badge-secondary"
+                :title="getProblemStatusTitle(problem)"
+                :class="['badge', getProblemStatusClass(problem)]"
               >
                 {{ problem.score.toFixed(2) }}
               </span>
@@ -314,6 +299,27 @@ export default class BaseList extends Vue {
   get attemptedProblemAliasesSet(): Set<string> {
     return new Set(this.attemptedProblemAliases);
   }
+
+  getProblemStatusTitle(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusSolved;
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusAttempted;
+    }
+    return T.problemStatusUnattempted;
+  }
+
+  getProblemStatusClass(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-success';
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-warning';
+    }
+    return 'badge-secondary';
+  }
+
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
