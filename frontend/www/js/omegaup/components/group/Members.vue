@@ -26,33 +26,33 @@
       </form>
     </div>
     <table class="table table-striped d-none d-md-table" data-table-members>
-        <thead>
-          <tr>
-            <th>{{ T.groupEditMembersCoder }}</th>
-            <th>{{ T.contestEditRegisteredAdminDelete }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="identity in identities" :key="identity.username">
-            <td>
-              <omegaup-user-username
-                :classname="identity.classname"
-                :linkify="true"
-                :username="identity.username"
-              ></omegaup-user-username>
-            </td>
-            <td>
-              <button
-                class="btn btn-link"
-                :title="T.groupEditMembersRemove"
-                @click="$emit('remove', identity.username)"
-              >
-                <font-awesome-icon :icon="['fas', 'trash-alt']" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <thead>
+        <tr>
+          <th>{{ T.groupEditMembersCoder }}</th>
+          <th>{{ T.contestEditRegisteredAdminDelete }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="identity in identities" :key="identity.username">
+          <td>
+            <omegaup-user-username
+              :classname="identity.classname"
+              :linkify="true"
+              :username="identity.username"
+            ></omegaup-user-username>
+          </td>
+          <td>
+            <button
+              class="btn btn-link"
+              :title="T.groupEditMembersRemove"
+              @click="$emit('remove', identity.username)"
+            >
+              <font-awesome-icon :icon="['fas', 'trash-alt']" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <table
       class="table table-striped responsive-table d-none d-md-table"
       data-table-identities
@@ -306,7 +306,7 @@ export default class Members extends Vue {
 </script>
 
 <style scoped lang="scss">
-@media (max-width: 768px){
+@media (max-width: 768px) {
   .input {
     width: 100%;
     max-width: 100%;
