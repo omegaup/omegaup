@@ -401,6 +401,13 @@ export default class ViewProfile extends Vue {
     }
   }
 
+  @Watch('selectedTab')
+  onSelectedTabPropChanged(newValue: string | null) {
+    if (newValue !== null) {
+      this.currentSelectedTab = getInitialSelectedTab(this.profile, newValue);
+    }
+  }
+
   @Watch('currentSelectedTab')
   onCurrentSelectedTabChanged(newValue: string) {
     this.$emit('update:selectedTab', newValue);
