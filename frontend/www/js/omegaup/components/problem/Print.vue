@@ -98,4 +98,3 @@ table td {
   gap: 0.5rem;
 }
 </style>
-
