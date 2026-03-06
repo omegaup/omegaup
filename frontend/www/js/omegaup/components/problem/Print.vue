@@ -1,11 +1,13 @@
 <template>
   <div class="mt-4 presentation-wrapper" :style="{ fontSize: fontSize + 'px' }">
-    <div class="presentation-controls d-flex align-items-center flex-wrap mb-3 p-2 bg-light border rounded">
+    <div
+      class="presentation-controls d-flex align-items-center flex-wrap mb-3 p-2 bg-light border rounded"
+    >
       <a href="" class="mr-3" @click.prevent="$emit('print-page')">
         <font-awesome-icon
           :title="T.contestAndProblemPrintButtonDesc"
           :icon="['fas', 'print']"
-        /></a>
+      /></a>
 
       <div class="d-flex align-items-center mr-3">
         <span class="mr-2 text-muted small">{{ T.fontSize }}:</span>
@@ -95,9 +97,10 @@ table td {
 .presentation-controls {
   gap: 0.5rem;
 }
+</style>
 
-// Hide the scroll-to-top button on the print/presentation page
-:global(.scroll-to-top-button) {
+<style>
+.scroll-to-top-button {
   display: none !important;
 }
 </style>
