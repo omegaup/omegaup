@@ -115,7 +115,9 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'invalid-languages': () => {
-            ui.error(T.courseNewFormLanguagesRequired);
+            ui.error(T.courseNewFormLanguagesRequired, () => {
+              this.invalidParameterName = '';
+            });
             this.invalidParameterName = 'languages';
           },
           'clear-language-error': () => {

@@ -93,11 +93,13 @@ export function displayStatus({
   type,
   autoHide,
   position,
+  onDismiss,
 }: {
   message: string;
   type: MessageType;
   autoHide?: boolean;
   position?: NotificationPosition;
+  onDismiss?: () => void;
 }): void {
   // Dispatch to Vuex store - the store action handles all visibility logic
   notificationsStore.dispatch('displayStatus', {
@@ -105,31 +107,40 @@ export function displayStatus({
     type,
     autoHide,
     position,
+    onDismiss,
   });
 }
 
-export function error(message: string): void {
-  displayStatus({ message, type: MessageType.Danger });
+export function error(message: string, onDismiss?: () => void): void {
+  displayStatus({ message, type: MessageType.Danger, onDismiss });
 }
 
-export function info(message: string): void {
-  displayStatus({ message, type: MessageType.Info });
+export function info(message: string, onDismiss?: () => void): void {
+  displayStatus({ message, type: MessageType.Info, onDismiss });
 }
 
-export function success(message: string, autoHide: boolean = true): void {
-  displayStatus({ message, type: MessageType.Success, autoHide });
+export function success(
+  message: string,
+  autoHide: boolean = true,
+  onDismiss?: () => void,
+): void {
+  displayStatus({ message, type: MessageType.Success, autoHide, onDismiss });
 }
 
-export function warning(message: string): void {
-  displayStatus({ message, type: MessageType.Warning });
+export function warning(message: string, onDismiss?: () => void): void {
+  displayStatus({ message, type: MessageType.Warning, onDismiss });
 }
 
-export function apiError(response: { error?: string; payload?: any }): void {
+export function apiError(
+  response: { error?: string; payload?: any },
+  onDismiss?: () => void,
+): void {
   console.error(response);
   error(
     response.error && response.payload
       ? formatString(response.error, response.payload)
       : (response.error || 'error').toString(),
+    onDismiss,
   );
 }
 
