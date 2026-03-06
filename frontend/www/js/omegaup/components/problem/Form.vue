@@ -633,15 +633,20 @@ export default class ProblemForm extends Vue {
       .map((tag) => tag.tagname);
   }
 
-  addTag(alias: string, tagname: string, isPublic: boolean): void {
+  addTag(payload: { alias: string; tagname: string; isPublic: boolean }): void {
+    const { tagname, isPublic } = payload;
     this.selectedTags.push({
-      tagname: tagname,
+      tagname,
       public: isPublic,
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  removeTag(alias: string, tagname: string, isPublic: boolean): void {
+  removeTag(payload: {
+    alias: string;
+    tagname: string;
+    isPublic: boolean;
+  }): void {
+    const { tagname } = payload;
     this.selectedTags = this.selectedTags.filter(
       (tag) => tag.tagname !== tagname,
     );
