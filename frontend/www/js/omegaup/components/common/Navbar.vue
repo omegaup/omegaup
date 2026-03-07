@@ -431,7 +431,12 @@ export default class Navbar extends Vue {
 
   get formattedLoginURL(): string {
     let path = window.location.pathname;
-    if (path === '/login' || path === '/login/') {
+    if (
+      path === '/login' ||
+      path === '/login/' ||
+      path === '/logout' ||
+      path === '/logout/'
+    ) {
       path = '/';
     }
     return `/login/?redirect=${encodeURIComponent(path)}#login`;
@@ -439,7 +444,12 @@ export default class Navbar extends Vue {
 
   get formattedSignupURL(): string {
     let path = window.location.pathname;
-    if (path === '/login' || path === '/login/') {
+    if (
+      path === '/login' ||
+      path === '/login/' ||
+      path === '/logout' ||
+      path === '/logout/'
+    ) {
       path = '/';
     }
     return `/login/?redirect=${encodeURIComponent(path)}#signup`;
