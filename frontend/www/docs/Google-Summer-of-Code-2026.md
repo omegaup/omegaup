@@ -20,7 +20,9 @@ This project aims to improve the platform’s performance by optimizing SQL quer
 * One Integration test that analyzes the EXPLAIN of all queries to determine if it's efficient or not.
 * One integration test that analyzes the performance of all queries by running them on a synthetic dataset with dimensions comparable to those of production. 
 
-The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in [this doc](https://docs.google.com/document/d/1X_fAm97L6_v9P8_R0S_Lp7X6e7x7j7z-X5z5-x5z5z5).
+The goal is to ensure quick response times for frequent operations and ensure scalability under high-load scenarios. More details about the requirements can be found in this doc:
+https://docs.google.com/document/d/1kEOL3HoJT-dYeguU315jju1nkQLC2ew9o5-bm5iiwkQ/edit
+
 
 **Current status**:
 
@@ -236,8 +238,7 @@ If you are interested spending this summer collaborating with us, first of all, 
 ### Phase One: Complete our test 
 
  - First, create an account at [omegaUp.com](https://omegaUp.com).
- - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/contest/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
-#### note: alternative url for the test: [omegaUp Test](https://omegaup.com/arena/gsoc2026)
+ - Join to our GSoC 2026 [omegaUp Test](https://omegaup.com/arena/gsoc2026). The test consists of 3 problems, you have to solve at least 2 of them in order to pass. **In the case of plagiarism, we will disqualify those applicants involved**, so please don't share your solutions with your fellow applicants.
 
 ### Phase Two: Familiarize yourself with our codebase
 
