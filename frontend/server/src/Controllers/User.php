@@ -193,9 +193,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'verification_id' => \OmegaUp\SecurityTools::randomString(50),
             'is_private' => boolval($createUserParams->isPrivate),
             'birth_date' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
-                intval(
-                    $createUserParams->birthDate
-                )
+                $createUserParams->birthDate
             ),
         ];
         if (
@@ -203,7 +201,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 '-13 year',
                 \OmegaUp\Time::get()
             )
-            && !is_null($createUserParams->parentEmail)
         ) {
             // Fill all the columns referring to user's parent
             $userData['parental_verification_token'] = \OmegaUp\SecurityTools::randomHexString(
