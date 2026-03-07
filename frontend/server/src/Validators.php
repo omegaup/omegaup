@@ -596,22 +596,15 @@ class Validators {
         } elseif ($parameter instanceof \OmegaUp\Timestamp) {
             $parameter = $parameter->time;
         } elseif (is_string($parameter)) {
-            // Only accept strict YYYY-MM-DD format to reject ambiguous
-            // natural language dates like "next Thursday"
-            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    $parameterName
-                );
-            }
-            $parts = explode('-', $parameter);
-            if (!checkdate(intval($parts[1]), intval($parts[2]), intval($parts[0]))) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterInvalid',
-                    $parameterName
-                );
-            }
-            $parameter = strtotime($parameter);
+             // Only accept strict YYYY-MM-DD format
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $parameter)) {
+        throw new \OmegaUp\Exceptions\InvalidParameterException(
+            'parameterInvalid',
+            $parameterName
+        );
+    }
+
+    $parameter = strtotime($parameter);
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotADate',
