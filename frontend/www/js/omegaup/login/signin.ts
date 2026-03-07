@@ -34,8 +34,7 @@ OmegaUp.on('ready', () => {
       return;
     }
 
-    const isLogoutPath =
-      pathname === '/logout' || pathname === '/logout/';
+    const isLogoutPath = pathname === '/logout' || pathname === '/logout/';
 
     if (pathname && pathname.indexOf('/') === 0 && !isLogoutPath) {
       window.location.href = pathname + '?fromLogin';
