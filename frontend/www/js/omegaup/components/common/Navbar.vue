@@ -635,10 +635,6 @@ nav.navbar {
   .nav-user .collapse-links {
     display: none;
   }
-
-  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
-  }
 }
 
 .progress {
