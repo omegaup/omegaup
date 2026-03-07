@@ -248,6 +248,7 @@
                 icon="info-circle"
               />
               <omegaup-problem-statementedit
+                data-course-objective
                 :statement="objectiveStatement"
                 markdown-type="solutions"
                 :show-edit-controls="false"
@@ -270,6 +271,7 @@
                 >{{ T.courseNewFormDescription }}</span
               >
               <omegaup-problem-statementedit
+                data-course-new-description
                 :statement="descriptionStatement"
                 markdown-type="solutions"
                 :show-edit-controls="false"
@@ -383,13 +385,20 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   level = this.course.level ?? '';
   objective = this.course.objective ?? '';
-  descriptionStatement = {
+  descriptionStatement: {
+    markdown: string;
+    language: string;
+    images: Record<string, unknown>;
+  } = {
     markdown: this.description ?? '',
     language: 'en',
     images: {},
   };
-
-  objectiveStatement = {
+  objectiveStatement: {
+    markdown: string;
+    language: string;
+    images: Record<string, unknown>;
+  } = {
     markdown: this.objective ?? '',
     language: 'en',
     images: {},
@@ -626,17 +635,17 @@ export default class CourseDetails extends Vue {
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
-
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .omegaup-course-details ::v-deep .wmd-button-bar {
   margin-bottom: 6px;
 }
-
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .omegaup-course-details ::v-deep .wmd-input {
   width: 100% !important;
   min-height: 160px;
   box-sizing: border-box;
 }
-
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .omegaup-course-details ::v-deep [data-statement-edit-markdown] {
   width: 100% !important;
   min-height: 160px;
@@ -647,13 +656,13 @@ export default class CourseDetails extends Vue {
   background: #fafafa;
   border: 1px solid #ddd;
 }
-
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .omegaup-course-details ::v-deep pre {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: hidden;
 }
-
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 .omegaup-course-details ::v-deep code {
   white-space: pre-wrap;
   word-break: break-word;
