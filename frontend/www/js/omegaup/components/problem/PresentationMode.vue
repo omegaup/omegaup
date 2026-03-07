@@ -127,7 +127,7 @@ export default class ProblemPresentationMode extends Vue {
 }
 
 .limits-wrapper {
-  :deep(.presentation-limits-table) {
+  ::v-deep .presentation-limits-table {
     font-size: 36px;
 
     table {
