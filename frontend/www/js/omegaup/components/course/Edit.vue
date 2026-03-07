@@ -351,6 +351,7 @@ const availableTabs = [
   'students',
   'admins',
   'clone',
+  'archive',
 ];
 const emptyAssignment: types.CourseAssignment = {
   problemset_id: 0,
@@ -469,6 +470,23 @@ export default class CourseEdit extends Vue {
       return;
     }
     this.showTab = newValue;
+  }
+  mounted(): void {
+    this.updateTabFromHash();
+    window.addEventListener('hashchange', this.updateTabFromHash);
+  }
+
+  beforeDestroy(): void {
+    window.removeEventListener('hashchange', this.updateTabFromHash);
+  }
+
+  updateTabFromHash(): void {
+    const hash = window.location.hash.replace('#', '');
+    if (availableTabs.includes(hash)) {
+      this.showTab = hash;
+    } else {
+      this.showTab = 'course';
+    }
   }
 }
 </script>
