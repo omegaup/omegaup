@@ -36,7 +36,7 @@
       </a>
       <a
         v-if="showClassroomViewLink"
-        :href="`/arena/problem/${problem.alias}/print/`"
+        :href="`/arena/problem/${problem.alias}/presentation/`"
         target="_blank"
         class="ml-2"
         :title="T.problemClassroomView"

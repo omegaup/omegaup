@@ -98,6 +98,7 @@ module.exports = {
     problem_list: './frontend/www/js/omegaup/problem/list.ts',
     problem_mine: './frontend/www/js/omegaup/problem/mine.ts',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
+    problem_presentation: './frontend/www/js/omegaup/problem/presentation.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
     problem_statement: './frontend/www/js/omegaup/problem/statement.ts',
     qualitynomination_list:
