@@ -1,6 +1,8 @@
 <template>
   <div class="presentation-mode-root container-fluid px-4">
-    <div class="presentation-controls d-flex align-items-center flex-wrap mb-3 p-2 bg-light border rounded">
+    <div
+      class="presentation-controls d-flex align-items-center flex-wrap mb-3 p-2 bg-light border rounded"
+    >
       <div class="d-flex align-items-center mr-3">
         <span class="mr-2 text-muted small">{{ T.fontSize }}:</span>
         <button
@@ -111,7 +113,7 @@ export default class ProblemPresentationMode extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
 .presentation-controls {
@@ -126,26 +128,36 @@ export default class ProblemPresentationMode extends Vue {
   white-space: nowrap;
 }
 
-.limits-wrapper {
-  ::v-deep .presentation-limits-table {
+.presentation-limits-table {
+  font-size: 36px;
+
+  table {
     font-size: 36px;
 
-    table {
-      font-size: 36px;
-
-      td,
-      th {
-        padding: 0.5rem;
-      }
+    td,
+    th {
+      padding: 0.5rem;
     }
   }
 }
 
 /* Font size classes for the content wrapper */
-.presentation-font-48 { font-size: 48px; }
-.presentation-font-54 { font-size: 54px; }
-.presentation-font-60 { font-size: 60px; }
-.presentation-font-66 { font-size: 66px; }
-.presentation-font-72 { font-size: 72px; }
-.presentation-font-78 { font-size: 78px; }
+.presentation-font-48 {
+  font-size: 48px;
+}
+.presentation-font-54 {
+  font-size: 54px;
+}
+.presentation-font-60 {
+  font-size: 60px;
+}
+.presentation-font-66 {
+  font-size: 66px;
+}
+.presentation-font-72 {
+  font-size: 72px;
+}
+.presentation-font-78 {
+  font-size: 78px;
+}
 </style>
