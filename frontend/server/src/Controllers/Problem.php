@@ -6950,6 +6950,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $result;
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             return null;
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            return null;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
