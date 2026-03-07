@@ -809,6 +809,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test that all valid date input types are accepted for birth_date.
      *
+     * @param \OmegaUp\Timestamp|int|string $birthDateInput
      * @dataProvider validBirthDateProvider
      */
     public function testValidDateFormatAccepted(
