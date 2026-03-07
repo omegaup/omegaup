@@ -780,7 +780,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @return list<array{0: string, 1: \OmegaUp\Timestamp|int|string}>
+     * @return array<string, array{0: string, 1: \OmegaUp\Timestamp|int|string}>
      */
     public function validBirthDateProvider(): array {
         // 1990-01-15 00:00:00 UTC
