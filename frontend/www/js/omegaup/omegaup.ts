@@ -3,6 +3,7 @@ import * as api from './api';
 import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
+import { initLogoutListener } from './logoutSync';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -437,6 +438,7 @@ export namespace omegaup {
 
     _documentReady: boolean = false;
     _initialized: boolean = false;
+    _cleanupLogoutListener: (() => void) | null = null;
     _listeners: { [name: string]: EventListenerList } = {
       ready: new EventListenerList([
         () => {
@@ -468,6 +470,9 @@ export namespace omegaup {
             this.username = data.session.identity.username;
             this.identity = data.session.identity;
             this.email = data.session.email;
+            this._cleanupLogoutListener = initLogoutListener(() => {
+              window.location.href = '/';
+            });
           }
           time._setRemoteDeltaTime(t0 - data.time * 1000);
 

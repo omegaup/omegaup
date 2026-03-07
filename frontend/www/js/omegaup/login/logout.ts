@@ -1,6 +1,11 @@
 import { OmegaUp } from '../omegaup';
+import { broadcastLogout } from '../logoutSync';
 
 OmegaUp.on('ready', () => {
+  // Notify all other open tabs that this session is being terminated so
+  // they redirect immediately instead of waiting for the next API failure.
+  broadcastLogout();
+
   // Remove ephemeral sources
   for (const key of Object.keys(sessionStorage)) {
     if (key.startsWith('ephemeral-sources-')) continue;
