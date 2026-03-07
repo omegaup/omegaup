@@ -748,66 +748,63 @@ class Runs extends \OmegaUp\DAO\Base\Runs
      */
     final public static function getProblemsetRuns(
         int $problemsetId,
-        bool $onlyAC = false
+        bool $onlyAC = false,
+        bool $onlyBest = false
     ): array {
         $verdictCondition = ($onlyAC ?
             "s.verdict IN ('AC') " :
             "s.verdict NOT IN ('CE', 'JE', 'VE') "
         );
 
-        $sql = "
-        WITH RankedSubmissions AS (
+        if ($onlyBest) {
+            $sql = "
             SELECT 
-                r.score,
-                r.penalty,
-                r.contest_score,
-                s.problem_id,
-                s.identity_id,
-                IFNULL(s.`type`, 'normal') AS `type`,
-                s.`time`,
-                s.submit_delay,
-                s.guid,
-                s.submission_id,
-                c.score_mode,
-                rg.group_name,
-                rg.score as group_score,
-                ROW_NUMBER() OVER (
-                    PARTITION BY s.identity_id, s.problem_id 
-                    ORDER BY r.score DESC, r.penalty ASC, s.submission_id ASC
-                ) as run_rank
-            FROM Problemset_Problems pp
-            INNER JOIN Submissions s ON s.problemset_id = pp.problemset_id 
-                                    AND s.problem_id = pp.problem_id
+                rs.score, rs.penalty, rs.contest_score, rs.problem_id, 
+                rs.identity_id, rs.type, rs.time, rs.submit_delay, rs.guid,
+                (
+                    SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
+                    FROM Runs_Groups rg
+                    WHERE rg.run_id = rs.current_run_id
+                ) AS score_by_group
+            FROM (
+                SELECT 
+                    r.score, r.penalty, r.contest_score, s.problem_id, s.identity_id,
+                    IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay,
+                    s.guid, s.current_run_id,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY s.identity_id, s.problem_id 
+                        ORDER BY r.score DESC, r.penalty ASC, s.submission_id ASC
+                    ) as run_rank
+                FROM Submissions s
+                INNER JOIN Runs r ON s.current_run_id = r.run_id
+                WHERE s.problemset_id = ? 
+                  AND s.status = 'ready' 
+                  AND s.type = 'normal'
+                  AND $verdictCondition
+            ) AS rs
+            WHERE rs.run_rank = 1;
+            ";
+        } else {
+            $sql = "
+            SELECT 
+                r.score, r.penalty, r.contest_score, s.problem_id, s.identity_id,
+                IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay, s.guid,
+                (
+                    SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
+                    FROM Runs_Groups rg
+                    WHERE rg.run_id = s.current_run_id
+                ) AS score_by_group
+            FROM Submissions s
             INNER JOIN Runs r ON s.current_run_id = r.run_id
-            LEFT JOIN Contests c ON c.problemset_id = pp.problemset_id
-            LEFT JOIN Runs_Groups rg ON r.run_id = rg.run_id
-            WHERE pp.problemset_id = ? 
+            WHERE s.problemset_id = ? 
               AND s.status = 'ready' 
-              AND s.`type` = 'normal'
-              AND $verdictCondition
-        )
-        SELECT 
-            IF(score_mode = 'all_or_nothing' AND score <> 1, 0, score) AS score,
-            penalty,
-            IFNULL(IF(score_mode = 'all_or_nothing' AND score <> 1, 0, contest_score), 0.0) AS contest_score,
-            problem_id,
-            identity_id,
-            `type`,
-            `time`,
-            submit_delay,
-            guid,
-            JSON_OBJECTAGG(IFNULL(group_name, ''), group_score) AS score_by_group
-        FROM RankedSubmissions
-        WHERE run_rank = 1
-        GROUP BY submission_id; -- التجميع هنا فقط لعمل JSON_OBJECTAGG للـ groups
-    ";
+              AND s.type = 'normal'
+              AND $verdictCondition;
+            ";
+        }
 
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$problemsetId]
-        );
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$problemsetId]);
     }
-
     /**
      * Get best contest score of a user for a problem in a problemset.
      */
