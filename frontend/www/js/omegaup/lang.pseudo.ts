@@ -2230,6 +2230,7 @@ const translations: { [key: string]: string; } = {
   wordsPractice: "(Prac7ic3)",
   wordsPrevPage: "(Pr3vi0u5 pag3)",
   wordsPrevious: "(Pr3vi0u5)",
+  wordsPreview: "(Pr3vi3w)",
   wordsPrivacyPolicy: "(Privacy P01icy)",
   wordsPrivacyPolicyAccepted: "(Y0u hav3 acc3p73d 7h3 privacy p01icy)",
   wordsPrivate: "(Priva73)",
