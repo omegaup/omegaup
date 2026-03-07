@@ -739,7 +739,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * @return list<array{0: string}>
+     * @return array<string, list<string>>
      */
     public function invalidBirthDateProvider(): array {
         return [
