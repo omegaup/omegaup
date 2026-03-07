@@ -390,7 +390,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Update should have failed due to future birthday');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertSame('parameterDateTooLarge', $e->getMessage());
+            $this->assertSame('birthdayInTheFuture', $e->getMessage());
             $this->assertSame('birth_date', $e->parameter);
         }
     }
