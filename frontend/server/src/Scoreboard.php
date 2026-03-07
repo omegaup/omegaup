@@ -605,23 +605,18 @@ class Scoreboard {
         foreach ($contestRuns as $run) {
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
-            $contestScore = $run['contest_score'];
-            $score = $run['score'];
             $isTest = $run['type'] == 'test';
 
             $problem =&
                 $identitiesInfo[$identityId]['problems'][$problemMapping[$problemId]['order']];
 
             if (!array_key_exists($identityId, $testOnly)) {
-                // Hay un usuario en la lista de Runs,
-                // que no fue regresado por \OmegaUp\DAO\Runs::getAllRelevantIdentities()
                 continue;
             }
 
-            if ($testOnly[$identityId]) {
-                $testOnly[$identityId] = $isTest;
-            }
+            $testOnly[$identityId] = $testOnly[$identityId] && $isTest;
             $noRuns[$identityId] = false;
+
             if (!$showAllRuns) {
                 if ($isTest || ($scoreboardPct === 0 && !$showScoreboardAfter)) {
                     continue;
@@ -631,41 +626,30 @@ class Scoreboard {
                     && !empty($run['time'])
                     && $run['time']->time >= $scoreboardTimeLimit->time
                 ) {
-                    $problem['runs']++;
+                    $problem['runs']++; 
                     $problem['pending'] = true;
                     continue;
                 }
             }
 
-            $totalPenalty = $run['penalty'] + $problem['runs'] * $contestPenalty;
-            $roundedScore = round(floatval($contestScore), 2);
-            if (
-                $problem['points'] < $roundedScore ||
-                $problem['points'] == $roundedScore &&
-                $problem['penalty'] > $totalPenalty
-            ) {
-                $problem['points'] = $roundedScore;
-                $problem['percent'] = round($score * 100, 2);
-                $problem['penalty'] = $totalPenalty;
+            $problem['points'] = round(floatval($run['contest_score']), 2);
+            $problem['percent'] = round($run['score'] * 100, 2);
+            $problem['penalty'] = $run['penalty'];
 
-                if ($withRunDetails === true && !empty($run['guid'])) {
-                    $runDetails = [];
-
-                    $runDetailsRequest = new \OmegaUp\Request([
-                        'run_alias' => $run['guid'],
-                        'auth_token' => $authToken,
-                    ]);
-                    $runDetails = \OmegaUp\Controllers\Run::apiDetails(
-                        $runDetailsRequest
-                    );
-                    unset($runDetails['source']);
-                    $problem['run_details'] = $runDetails;
-                }
+            if ($withRunDetails === true && !empty($run['guid'])) {
+                $runDetailsRequest = new \OmegaUp\Request([
+                    'run_alias' => $run['guid'],
+                    'auth_token' => $authToken,
+                ]);
+                $runDetails = \OmegaUp\Controllers\Run::apiDetails($runDetailsRequest);
+                unset($runDetails['source']);
+                $problem['run_details'] = $runDetails;
             }
+
             if ($scoreMode == 'max_per_group') {
                 $problem['runs'] = $run['submission_count'] ?? 0;
             } else {
-                $problem['runs']++;
+                $problem['runs'] = $run['total_submissions'] ?? ($problem['runs'] + 1);
             }
         }
 
@@ -790,7 +774,7 @@ class Scoreboard {
         }
     }
 
-    /**
+   /**
      * @param \OmegaUp\ScoreboardParams $params
      * @param list<array{contest_score: float, guid: string, identity_id: int, penalty: int, problem_id: int, score: float, score_by_group: null|string, submit_delay: int, time: \OmegaUp\Timestamp, type: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
@@ -812,7 +796,7 @@ class Scoreboard {
 
         /** @var list<ScoreboardEvent> */
         $result = [];
-        /** @var array<int, array<int, array{points: int, penalty: int}>> */
+        /** @var array<int, array<int, array{points: float, penalty: float}>> */
         $identityProblemsScore = [];
         $identityProblemsScoreByGroup = [];
         $contestStart = $params->start_time;
@@ -820,7 +804,6 @@ class Scoreboard {
             $params
         );
 
-        // Calculate score for each contestant x problem x run
         foreach ($contestRuns as $run) {
             if (!$params->admin && $run['type'] != 'normal') {
                 continue;
@@ -836,6 +819,7 @@ class Scoreboard {
 
             $identityId = $run['identity_id'];
             $problemId = $run['problem_id'];
+
             if ($params->score_mode === 'max_per_group') {
                 if (!isset($run['score_by_group'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -855,13 +839,9 @@ class Scoreboard {
             }
 
             if (!isset($identityProblemsScore[$identityId])) {
-                $identityProblemsScore[$identityId] = [
-                    $problemId => [
-                        'points' => 0.0,
-                        'penalty' => 0.0,
-                    ],
-                ];
-            } elseif (!isset($identityProblemsScore[$identityId][$problemId])) {
+                $identityProblemsScore[$identityId] = [];
+            }
+            if (!isset($identityProblemsScore[$identityId][$problemId])) {
                 $identityProblemsScore[$identityId][$problemId] = [
                     'points' => 0.0,
                     'penalty' => 0.0,
@@ -869,16 +849,8 @@ class Scoreboard {
             }
 
             $problemData =& $identityProblemsScore[$identityId][$problemId];
-
-            if ($problemData['points'] >= $contestScore && $params->show_all_runs) {
-                continue;
-            }
-
-            $problemData['points'] = max(
-                $problemData['points'],
-                round(floatval($contestScore), 2)
-            );
-            $problemData['penalty'] = 0.0;
+            $problemData['points'] = round(floatval($contestScore), 2);
+            $problemData['penalty'] = round(floatval($run['penalty']), 2);
 
             if (!isset($contestIdentities[$identityId])) {
                 continue;
@@ -895,8 +867,8 @@ class Scoreboard {
                 ),
                 'problem' => [
                     'alias' => $problemMapping[$problemId]['alias'],
-                    'points' => round(floatval($contestScore), 2),
-                    'penalty' => 0.0,
+                    'points' => $problemData['points'],
+                    'penalty' => $problemData['penalty'],
                 ],
                 'country' => $identity['country_id'] ?? 'xx',
                 'classname' => $identity['classname'],
@@ -907,19 +879,18 @@ class Scoreboard {
                 ],
             ];
 
-            foreach ($identityProblemsScore[$identityId] as $problem) {
-                $data['total']['points'] += $problem['points'];
+            foreach ($identityProblemsScore[$identityId] as $problemScore) {
+                $data['total']['points'] += $problemScore['points'];
                 if ($params->penalty_calc_policy == 'sum') {
-                    $data['total']['penalty'] += $problem['penalty'];
+                    $data['total']['penalty'] += $problemScore['penalty'];
                 } else {
                     $data['total']['penalty'] = max(
                         $data['total']['penalty'],
-                        $problem['penalty']
+                        $problemScore['penalty']
                     );
                 }
             }
 
-            // Add contestant results to scoreboard data
             $result[] = $data;
         }
 
