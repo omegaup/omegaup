@@ -3,7 +3,6 @@ import Vue from 'vue';
 import Chartsv2 from './Chartsv2.vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as ui from '../../ui';
 
 jest.mock('highcharts-vue', () => ({
   Chart: {
@@ -15,11 +14,7 @@ jest.mock('highcharts-vue', () => ({
   },
 }));
 
-function makeRun(
-  date: string,
-  verdict: string,
-  runs: number,
-): omegaup.RunInfo {
+function makeRun(date: string, verdict: string, runs: number): omegaup.RunInfo {
   return { date, verdict, runs };
 }
 
@@ -52,16 +47,12 @@ describe('Chartsv2.vue', () => {
   describe('Rendering & Defaults', () => {
     it('mounts with empty data without crashing', () => {
       const wrapper = mountComponent([]);
-      expect(
-        wrapper.findComponent({ name: 'highcharts' }).exists(),
-      ).toBe(true);
+      expect(wrapper.findComponent({ name: 'highcharts' }).exists()).toBe(true);
     });
 
     it('mounts with sample data', () => {
       const wrapper = mountComponent(freshData());
-      expect(
-        wrapper.findComponent({ name: 'highcharts' }).exists(),
-      ).toBe(true);
+      expect(wrapper.findComponent({ name: 'highcharts' }).exists()).toBe(true);
     });
 
     it('has correct default state', () => {
@@ -181,8 +172,9 @@ describe('Chartsv2.vue', () => {
         selected?: boolean;
       }> = (wrapper.vm as any).normalizedRunCounts;
       const ac = counts.find((c) => c.name === 'AC');
-      expect(ac!.sliced).toBe(true);
-      expect(ac!.selected).toBe(true);
+      expect(ac).toBeDefined();
+      expect(ac?.sliced).toBe(true);
+      expect(ac?.selected).toBe(true);
     });
 
     it('does not mark non-AC entries with sliced or selected', () => {
