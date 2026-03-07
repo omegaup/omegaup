@@ -227,6 +227,17 @@
           <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
             T.navBlog
           }}</a>
+          <hr />
+          <a class="dropdown-item" href="/problem/statement/">
+            Problem Statement Editor
+          </a>
+
+          <a class="dropdown-item" href="/grader/ephemeral/">
+            Ephemeral Grader
+          </a>
+
+          <a class="dropdown-item" href="/karel.js/"> Karel.js </a>
+          <hr />
           <a
             class="dropdown-item text-wrap"
             :href="AlgorithmsBookURL"
