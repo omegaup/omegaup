@@ -283,11 +283,13 @@
                       @input="clearFieldError(FieldName.Description)"
                     ></textarea>
                   </template>
+                  <!-- eslint-disable vue/no-v-html -->
                   <div
                     v-else
                     class="wmd-preview border rounded p-2"
                     v-html="descriptionPreviewHtml"
                   ></div>
+                  <!-- eslint-enable vue/no-v-html -->
                   <small
                     class="character-counter"
                     :class="{ 'text-danger': isExceedingDescription }"
