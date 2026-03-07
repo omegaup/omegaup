@@ -24,7 +24,8 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         ?string $order = null,
         string $orderType = 'ASC',
         ?string $filteredBy = null,
-        $value = null
+        $value = null,
+        ?int $rankingCursor = null
     ): array {
         $sql = '
               SELECT
@@ -41,37 +42,65 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
               SELECT
                 COUNT(1)';
         $params = [];
-        $sqlFrom = '
-              FROM
-                `User_Rank` `ur`
-              WHERE
-                `ur`.`ranking` IS NOT NULL';
+        $whereClauses = ['`ur`.`ranking` IS NOT NULL'];
         if ($filteredBy === 'state' && is_string($value)) {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
-            $sqlFrom .= ' AND `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
+            $whereClauses[] = '`ur`.`country_id` = ?';
+            $whereClauses[] = '`ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sqlFrom .= ' AND `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+            $whereClauses[] = '`ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $filteredBy
             ) . '_id` = ?';
         }
+
+        $countParams = $params;
+        $orderByClause = '';
         if (!is_null($order)) {
-            $sqlFrom .= ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orderByClause = ' ORDER BY `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $order
             ) . '` ' . ($orderType === 'DESC' ? 'DESC' : 'ASC');
         }
-        $paramsLimit = [
-            max(0, $page - 1) * intval($colsPerPage), // Offset
-            intval($colsPerPage),
-        ];
-        $sqlLimit = ' LIMIT ?, ?';
+
+        $useKeysetPagination = (
+            !is_null($rankingCursor) &&
+            (is_null($order) || $order === 'ranking') &&
+            $orderType === 'ASC'
+        );
+        $dataWhereClauses = $whereClauses;
+        if ($useKeysetPagination) {
+            $dataWhereClauses[] = '`ur`.`ranking` > ?';
+            $params[] = $rankingCursor;
+            if (is_null($order)) {
+                $orderByClause = ' ORDER BY `ur`.`ranking` ASC';
+            }
+        }
+
+        $sqlFromCount = '
+              FROM
+                `User_Rank` `ur`
+              WHERE
+                ' . implode(' AND ', $whereClauses);
+        $sqlFromData = '
+              FROM
+                `User_Rank` `ur`
+              WHERE
+                ' . implode(' AND ', $dataWhereClauses);
+
+        $paramsLimit = $useKeysetPagination
+            ? [intval($colsPerPage)]
+            : [
+                max(0, $page - 1) * intval($colsPerPage),
+                intval($colsPerPage),
+            ];
+        $sqlLimit = $useKeysetPagination ? ' LIMIT ?' : ' LIMIT ?, ?';
         // Get total rows
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "{$sqlCount}{$sqlFrom}",
-            $params
+            "{$sqlCount}{$sqlFromCount}",
+            $countParams
         ) ?? 0;
 
         $params = array_merge($params, $paramsLimit);
@@ -79,7 +108,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         // Get rows
         /** @var list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int|null, score: float, timestamp: \OmegaUp\Timestamp, user_id: int, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$sql}{$sqlFrom}{$sqlLimit}",
+            "{$sql}{$sqlFromData}{$orderByClause}{$sqlLimit}",
             $params
         );
         return [
@@ -93,7 +122,8 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
      */
     public static function getAuthorsRank(
         int $page,
-        int $rowsPerPage
+        int $rowsPerPage,
+        ?int $authorRankingCursor = null
     ): array {
         $sqlSelect = '
             SELECT
@@ -115,25 +145,34 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`author_score` IS NOT NULL AND
                 `ur`.`author_ranking` IS NOT NULL
         ';
+        $sqlFromCount = $sqlFrom;
+        if (!is_null($authorRankingCursor)) {
+            $sqlFrom .= ' AND `ur`.`author_ranking` > ?';
+        }
         $sqlOrderBy = '
             ORDER BY
                     `ur`.`author_ranking` ASC
         ';
-        $sqlLimit = ' LIMIT ?, ?';
+        $sqlLimit = is_null($authorRankingCursor) ? ' LIMIT ?, ?' : ' LIMIT ?';
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "{$sqlCount}{$sqlFrom}",
+            "{$sqlCount}{$sqlFromCount}",
             []
         ) ?? 0;
 
         /** @var list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
-            [
-                max(0, $page - 1) * $rowsPerPage,
-                $rowsPerPage
-            ]
+            is_null($authorRankingCursor)
+                ? [
+                    max(0, $page - 1) * $rowsPerPage,
+                    $rowsPerPage
+                ]
+                : [
+                    $authorRankingCursor,
+                    $rowsPerPage
+                ]
         );
         return [
             'ranking' => $allData,
