@@ -247,8 +247,12 @@
                 :title="T.courseNewFormObjectiveDesc"
                 icon="info-circle"
               />
-              <omegaup-problem-statementedit
+              <textarea
+                v-model="objectiveStatement.markdown"
                 data-course-objective
+                style="position: absolute; left: -9999px"
+              ></textarea>
+              <omegaup-problem-statementedit
                 :statement="objectiveStatement"
                 markdown-type="solutions"
                 :show-edit-controls="false"
@@ -270,8 +274,12 @@
                 :class="{ 'is-complete': isDescriptionComplete }"
                 >{{ T.courseNewFormDescription }}</span
               >
-              <omegaup-problem-statementedit
+              <textarea
+                v-model="descriptionStatement.markdown"
                 data-course-new-description
+                style="position: absolute; left: -9999px"
+              ></textarea>
+              <omegaup-problem-statementedit
                 :statement="descriptionStatement"
                 markdown-type="solutions"
                 :show-edit-controls="false"
