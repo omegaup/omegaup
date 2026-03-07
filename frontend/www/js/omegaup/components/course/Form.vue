@@ -250,7 +250,7 @@
               <textarea
                 v-model="objectiveStatement.markdown"
                 data-course-objective
-                style="position: absolute; left: -9999px"
+                style="opacity:0; position:absolute;"
               ></textarea>
               <omegaup-problem-statementedit
                 :statement="objectiveStatement"
@@ -277,7 +277,7 @@
               <textarea
                 v-model="descriptionStatement.markdown"
                 data-course-new-description
-                style="position: absolute; left: -9999px"
+                style="opacity:0; position:absolute;"
               ></textarea>
               <omegaup-problem-statementedit
                 :statement="descriptionStatement"
