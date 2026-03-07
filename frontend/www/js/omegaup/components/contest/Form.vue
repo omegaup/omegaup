@@ -244,7 +244,11 @@
                       <button
                         type="button"
                         class="btn"
-                        :class="descriptionEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                        :class="
+                          descriptionEditMode
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary'
+                        "
                         @click="descriptionEditMode = true"
                       >
                         {{ T.wordsEdit }}
@@ -252,7 +256,11 @@
                       <button
                         type="button"
                         class="btn"
-                        :class="!descriptionEditMode ? 'btn-primary' : 'btn-outline-secondary'"
+                        :class="
+                          !descriptionEditMode
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary'
+                        "
                         @click="descriptionEditMode = false"
                       >
                         {{ T.wordsPreview }}
