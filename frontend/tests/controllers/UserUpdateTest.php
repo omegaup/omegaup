@@ -785,6 +785,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function validBirthDateProvider(): array {
         // 1990-01-15 00:00:00 UTC
         $timestamp = 632448000;
+        $expectedDate = gmdate('Y-m-d', $timestamp);
         return [
             'Timestamp object' => [
                 '1990-01-15',
