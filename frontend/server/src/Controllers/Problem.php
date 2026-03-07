@@ -6936,6 +6936,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'details' => $details,
                 ],
                 'hideFooterAndHeader' => true,
+                'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblemPrint',
                     [

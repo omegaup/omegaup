@@ -68,10 +68,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faSearchMinus, faSearchPlus, faTable);
 
-const MIN_FONT_SIZE = 48;
-const MAX_FONT_SIZE = 76;
-const FONT_STEP = 6;
-const DEFAULT_FONT_SIZE = 48;
+const FONT_SIZES = [48, 54, 60, 66, 72, 78];
+const DEFAULT_FONT_SIZE_INDEX = 0;
 
 @Component({
   components: {
@@ -84,15 +82,19 @@ export default class ProblemPresentationMode extends Vue {
   @Prop() problem!: types.ProblemInfo;
 
   T = T;
-  fontSize = DEFAULT_FONT_SIZE;
+  fontSizeIndex = DEFAULT_FONT_SIZE_INDEX;
   showLimits = false;
 
+  get fontSize(): number {
+    return FONT_SIZES[this.fontSizeIndex];
+  }
+
   get isFontAtMin(): boolean {
-    return this.fontSize <= MIN_FONT_SIZE;
+    return this.fontSizeIndex <= 0;
   }
 
   get isFontAtMax(): boolean {
-    return this.fontSize >= MAX_FONT_SIZE;
+    return this.fontSizeIndex >= FONT_SIZES.length - 1;
   }
 
   get fontSizeClass(): string {
@@ -100,24 +102,17 @@ export default class ProblemPresentationMode extends Vue {
   }
 
   decreaseFontSize(): void {
-    this.fontSize = Math.max(MIN_FONT_SIZE, this.fontSize - FONT_STEP);
+    if (!this.isFontAtMin) this.fontSizeIndex--;
   }
 
   increaseFontSize(): void {
-    this.fontSize = Math.min(MAX_FONT_SIZE, this.fontSize + FONT_STEP);
+    if (!this.isFontAtMax) this.fontSizeIndex++;
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-.presentation-mode-root {
-  /* Hide scroll-to-top button in presentation mode */
-  :global(#scroll-to-top) {
-    display: none !important;
-  }
-}
 
 .presentation-controls {
   gap: 0.5rem;
@@ -152,5 +147,5 @@ export default class ProblemPresentationMode extends Vue {
 .presentation-font-60 { font-size: 60px; }
 .presentation-font-66 { font-size: 66px; }
 .presentation-font-72 { font-size: 72px; }
-.presentation-font-76 { font-size: 76px; }
+.presentation-font-78 { font-size: 78px; }
 </style>
