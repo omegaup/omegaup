@@ -680,16 +680,12 @@ nav.navbar {
     display: none !important;
   }
 
-  .nav-problems .collapse-links {
+  .nav-problems .collapse-links:not(.show) {
     display: none;
   }
 
-  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
-    display: block;
-  }
-
-  .nav-user .collapse-links {
-    display: none;
+  .nav-user .collapse-links:not(.show) {
+  display: none;
   }
 }
 
