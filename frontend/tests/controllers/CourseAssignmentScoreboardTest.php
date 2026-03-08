@@ -1,10 +1,12 @@
 <?php
 
-class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
+class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase
+{
     /**
      * Get score of a given assignment happy path
      */
-    public function testGetAssignmentScoreboard() {
+    public function testGetAssignmentScoreboard()
+    {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
@@ -121,7 +123,8 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Get scoreboard events of a given assignment happy path
      */
-    public function testGetAssignmentScoreboardEvents() {
+    public function testGetAssignmentScoreboardEvents()
+    {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
