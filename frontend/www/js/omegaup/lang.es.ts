@@ -2241,6 +2241,7 @@ const translations: { [key: string]: string; } = {
   wordsPractice: "Pr\u00e1ctica",
   wordsPrevPage: "P\u00e1gina anterior",
   wordsPrevious: "Anterior",
+  wordsPreview: "Vista previa",
   wordsPrivacyPolicy: "Pol\u00edtica de Privacidad",
   wordsPrivacyPolicyAccepted: "Has aceptado la pol\u00edtica de privacidad",
   wordsPrivate: "Privado",

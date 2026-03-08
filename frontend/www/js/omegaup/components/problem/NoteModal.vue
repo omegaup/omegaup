@@ -15,22 +15,22 @@
         </div>
         <div class="form-group mb-2">
           <div class="tab-bar">
-            <button
-              type="button"
+            <span
               class="tab-btn"
               :class="{ active: activeTab === 'write' }"
+              :style="tabStyle(activeTab === 'write')"
               @click="activeTab = 'write'"
             >
               {{ T.wordsEdit }}
-            </button>
-            <button
-              type="button"
+            </span>
+            <span
               class="tab-btn"
               :class="{ active: activeTab === 'preview' }"
+              :style="tabStyle(activeTab === 'preview')"
               @click="activeTab = 'preview'"
             >
               {{ T.wordsPreview }}
-            </button>
+            </span>
           </div>
           <div v-show="activeTab === 'write'">
             <div class="toolbar">
@@ -220,6 +220,15 @@ export default class NoteModal extends Vue {
     if (this.initialNoteText.length > 0) {
       this.activeTab = 'preview';
     }
+  }
+
+  tabStyle(isActive: boolean): Record<string, string> {
+    return {
+      color: isActive ? '#495057' : '#6c757d',
+      background: isActive ? '#fff' : 'transparent',
+      fontWeight: isActive ? '600' : '400',
+      borderColor: isActive ? '#dee2e6 #dee2e6 #fff' : 'transparent',
+    };
   }
 
   get hasExistingNote(): boolean {
