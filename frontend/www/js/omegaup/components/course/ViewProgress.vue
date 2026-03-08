@@ -16,7 +16,14 @@
               }}
             </h6>
           </div>
-          <div class="table-responsive">
+          <div v-if="sortedStudents.length === 0" class="text-center p-5">
+  <h3>No students enrolled yet</h3>
+  <p class="text-muted">
+    Add students to this course to track their progress.
+  </p>
+</div>
+
+<div v-else class="table-responsive">
             <table class="table table-striped table-fixed mb-0 d-block">
               <thead>
                 <tr>
