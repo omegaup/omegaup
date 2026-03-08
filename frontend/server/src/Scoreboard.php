@@ -109,13 +109,13 @@ class Scoreboard
             $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $this->params->problemset_id,
                 $this->params->only_ac,
-                true
+                onlyBest: false
             );
         } else {
             $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $this->params->problemset_id,
                 $this->params->only_ac,
-                ($this->params->score_mode !== 'max_per_group')
+                ($this->params->score_mode === 'partial')
             );
         }
 
@@ -229,8 +229,8 @@ class Scoreboard
         $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
             $this->params->problemset_id,
             $this->params->only_ac,
-            ($this->params->score_mode !== 'max_per_group')
-        );
+            false
+            );
         $problemMapping = [];
 
         $order = 0;
@@ -345,14 +345,17 @@ class Scoreboard
         );
 
         $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
-            $params->problemset_id
+            $params->problemset_id,
+            $params->only_ac,
+            false
         );
-        if ($params->score_mode === 'max_per_group') {
+
+        if ($params->score_mode === 'partial') {
             // The way to calculate the score is different in this mode
-            $contestRunsForEvents = \OmegaUp\DAO\Runs::getProblemsetRuns(
+            $contestRuns = \OmegaUp\DAO\Runs::getProblemsetRuns(
                 $params->problemset_id,
                 $params->only_ac,
-                ($params->score_mode !== 'max_per_group')
+                true
             );
         } else {
             $contestRuns = $contestRunsForEvents;
