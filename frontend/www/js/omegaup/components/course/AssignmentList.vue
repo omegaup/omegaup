@@ -2,11 +2,17 @@
   <div class="omegaup-course-assignmentlist card">
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
-      <div v-if="content.length === 0" class="card-body">
-        <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
-        </div>
-      </div>
+      <div v-if="content.length === 0" class="empty-state text-center p-5">
+  <h5>No problems added yet</h5>
+<p>Add your first problem to start building this course content.</p>
+<button
+  data-course-add-new-content
+  class="btn btn-primary mt-3"
+  @click.prevent="$emit('emit-new')"
+>
+    {{ T.courseAddContent }}
+  </button>
+</div>
       <table v-else class="table table-striped">
         <thead>
           <tr>
@@ -101,6 +107,7 @@
           <div class="form-group col-md-12 mb-0">
             <div class="text-right">
               <button
+                v-if="content.length > 0"
                 data-course-add-new-content
                 class="btn btn-primary"
                 type="submit"
@@ -187,6 +194,14 @@ export default class CourseAssignmentList extends Vue {
 <style lang="scss" scoped>
 .disabled {
   color: lightgrey;
+}
+
+.empty-state {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .table td {
