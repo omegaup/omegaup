@@ -290,19 +290,26 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            if (is_numeric($query)) {
+            $curatedQuery = trim(strval(preg_replace('/\W+/', ' ', $query)));
+            if ($curatedQuery !== '') {
+                if (is_numeric($query)) {
+                    $clauses[] = [
+                        '(
+                            MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE) OR
+                            p.problem_id = ?
+                        )',
+                        [$curatedQuery, intval($query)],
+                    ];
+                } else {
+                    $clauses[] = [
+                        'MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)',
+                        [$curatedQuery],
+                    ];
+                }
+            } elseif (is_numeric($query)) {
                 $clauses[] = [
-                    "(
-                    p.title LIKE CONCAT('%', ?, '%') OR
-                    p.alias LIKE CONCAT('%', ?, '%') OR
-                    p.problem_id = ?
-                    )",
-                    [$query, $query, intval($query)],
-                ];
-            } else {
-                $clauses[] = [
-                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                    [$query, $query],
+                    'p.problem_id = ?',
+                    [intval($query)],
                 ];
             }
         }
