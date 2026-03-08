@@ -143,7 +143,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param list<string> $authors
      * @return array{count: int, problems: list<array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
-    final public static function byIdentityType(
+    final public static function byIdentyType(
         string $identityType,
         ?string $language,
         string $orderBy,
@@ -294,9 +294,26 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             if ($curatedQuery !== '') {
                 if (is_numeric($query)) {
                     $clauses[] = [
-                        '(
-                            MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE) OR
-                            p.problem_id = ?
+                        'p.problem_id IN (
+                            SELECT
+                                search_results.problem_id
+                            FROM
+                                (
+                                    SELECT
+                                        p2.problem_id
+                                    FROM
+                                        Problems p2
+                                    WHERE
+                                        MATCH(p2.title, p2.alias)
+                                        AGAINST (? IN BOOLEAN MODE)
+                                    UNION
+                                    SELECT
+                                        p2.problem_id
+                                    FROM
+                                        Problems p2
+                                    WHERE
+                                        p2.problem_id = ?
+                                ) AS search_results
                         )',
                         [$curatedQuery, intval($query)],
                     ];
