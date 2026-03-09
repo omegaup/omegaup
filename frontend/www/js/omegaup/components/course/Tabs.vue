@@ -24,11 +24,11 @@
       </li>
     </ul>
     <div class="tab-content">
-      <div class="row m-0 mt-4">
-        <div class="col-md-4 col-lg-3 p-0 ml-4">
+      <div class="row m-0 mt-4 course-filters">
+        <div class="col-md-4 col-lg-3 p-0 ml-4 ">
           <input
             v-model="searchText"
-            class="form-control introjs-search"
+            class="form-control introjs-search "
             type="text"
             :placeholder="T.courseCardsListSearch"
           />
@@ -356,6 +356,11 @@ export default class CourseTabs extends Vue {
     width: calc(50% - 25px);
     flex: 0 0 calc(50% - 25px);
     max-width: calc(50% - 25px);
+  }
+  .row.m-0.mt-4.course-filters > div {
+    max-width: 100%;
+    flex: 0 0 50%;
+    margin-left: 0 !important;
   }
 }
 
