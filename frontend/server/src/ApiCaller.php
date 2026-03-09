@@ -198,6 +198,8 @@ class ApiCaller {
         $lower = strtolower($methodName);
 
         $readOnlyAllowlist = [
+            'execute',
+            'executeforide',
             'listassociatedidentities',
             'statusverified',
         ];
