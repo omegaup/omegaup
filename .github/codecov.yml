@@ -11,12 +11,20 @@ coverage:
       javascript:
         flags:
           - javascript
+      cypress:
+        flags:
+          - cypress
+        target: 80%
+        threshold: 0%
 
 flags:
   php:
     paths:
       - frontend/server/
   javascript:
+    paths:
+      - frontend/www/
+  cypress:
     paths:
       - frontend/www/
 

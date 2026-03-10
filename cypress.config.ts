@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
-  experimentalStudio: true,
   chromeWebSecurity: false,
   experimentalMemoryManagement: true,
   numTestsKeptInMemory: 0,
