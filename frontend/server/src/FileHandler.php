@@ -27,7 +27,7 @@ class FileHandler {
         string $prefix = '',
         int $mode = 0700
     ): string {
-        if (substr($dir, -1) != '/') {
+        if (!str_ends_with($dir, '/')) {
             $dir .= '/';
         }
 
