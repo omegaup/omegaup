@@ -1,21 +1,21 @@
 <template>
   <div class="card ranking-width">
-    <ul class="nav nav-tabs justify-content-arround" role="tablist">
+    <ul class="nav nav-tabs justify-content-around" role="tablist">
       <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
-          :href="getTabName(tab)"
-          class="nav-link"
-          data-toggle="tab"
-          role="tab"
-          :aria-controls="tab.id"
-          :class="{ active: currentSelectedTab === tab.id }"
-          :aria-selected="currentSelectedTab === tab.id"
-          @click="getSelectedTab(tab)"
-        >
-          {{ tab.title }}
-        </a>
+  :href="getTabName(tab)"
+  class="nav-link"
+  role="tab"
+  :aria-controls="tab.id"
+  :class="{ active: currentSelectedTab === tab.id }"
+  :aria-selected="currentSelectedTab === tab.id"
+  @click.prevent="getSelectedTab(tab)"
+>
+  {{ tab.title }}
+</a>
       </li>
     </ul>
+
     <component
       :is="currentTabComponent"
       class="tab"
@@ -75,10 +75,12 @@ export default class CoderOfTheMonthList extends Vue {
   @Prop() selectedTab!: string;
 
   T = T;
+
+  // initial tab
   currentSelectedTab = this.selectedTab;
 
   get availableTabs(): { id: string; component: string; title: string }[] {
-    const availableTabs = [
+    return [
       {
         id: 'codersOfTheMonth',
         component: 'omegaup-coders-list',
@@ -104,51 +106,72 @@ export default class CoderOfTheMonthList extends Vue {
             : T.codersOfTheMonthFemaleListCandidate,
       },
     ];
-
-    return availableTabs;
   }
 
   get visibleCoders(): types.CoderOfTheMonthList[] {
     switch (this.currentSelectedTab) {
+      case 'codersOfPreviousMonth':
+        return this.codersOfPreviousMonth;
+
+      case 'candidatesToCoderOfTheMonth':
+        return this.candidatesToCoderOfTheMonth;
+
       case 'codersOfTheMonth':
       default:
         return this.codersOfCurrentMonth;
-      case 'codersOfPreviousMonth':
-        return this.codersOfPreviousMonth;
-      case 'candidatesToCoderOfTheMonth':
-        return this.candidatesToCoderOfTheMonth;
     }
   }
 
   get currentTabComponent(): string {
     return (
       this.availableTabs.find((tab) => tab.id === this.currentSelectedTab)
-        ?.component ?? 'codersOfTheMonth'
+        ?.component ?? 'omegaup-coders-list'
     );
   }
 
   getSelectedTab(tab: { id: string; component: string; title: string }): void {
     this.currentSelectedTab = tab.id;
-    window.location.hash = tab.id;
+    window.history.pushState(null, '', `#${tab.id}`);
   }
 
   getTabName(tab: { id: string; component: string; title: string }): string {
     return `#${tab.id}`;
   }
+
+  mounted(): void {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      this.currentSelectedTab = hash;
+    }
+
+    window.addEventListener('popstate', () => {
+      const newHash = window.location.hash.replace('#', '');
+      if (newHash) {
+        this.currentSelectedTab = newHash;
+      }
+    });
+  }
 }
 </script>
 
 <style scoped>
+
 .nav-link.active,
 .nav-link:hover {
   border: none;
   border-left: 0.0625rem solid #dee2e6;
   border-right: 0.0625rem solid #dee2e6;
-  border-top-left-radius: 0rem;
-  border-top-right-radius: 0rem;
 }
+
 .nav .nav-tabs {
   border-bottom: 0rem;
+}
+
+.nav-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 .nav-link {
@@ -156,8 +179,11 @@ export default class CoderOfTheMonthList extends Vue {
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
 }
+
 .ranking-width {
-  max-width: 55rem;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
 }
+
 </style>
