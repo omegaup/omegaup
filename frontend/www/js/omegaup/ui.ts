@@ -129,14 +129,6 @@ export function success(
   message: string,
   options?: NotificationOptions,
 ): void {
-  // For backward compatibility, if a boolean is passed, treat it as autoHide
-  if (typeof options === 'boolean') {
-    displayStatus({
-      message,
-      type: MessageType.Success,
-      autoHide: options,
-    });
-  } else {
     // Default autoHide to true for success messages unless explicitly set to false
     displayStatus({
       message,
@@ -145,7 +137,6 @@ export function success(
       position: options?.position,
       onDismiss: options?.onDismiss,
     });
-  }
 }
 
 export function warning(message: string, options?: NotificationOptions): void {
