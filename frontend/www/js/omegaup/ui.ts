@@ -10,6 +10,12 @@ import notificationsStore, {
 // Re-export MessageType and NotificationPosition for backward compatibility and convenience
 export { MessageType, NotificationPosition };
 
+export interface NotificationOptions {
+  onDismiss?: () => void;
+  autoHide?: boolean;
+  position?: NotificationPosition;
+}
+
 export function navigateTo(href: string): void {
   const [pathname, hash] = href.split('#');
   if (pathname === window.location.pathname && hash != null) {
@@ -111,36 +117,51 @@ export function displayStatus({
   });
 }
 
-export function error(message: string, onDismiss?: () => void): void {
-  displayStatus({ message, type: MessageType.Danger, onDismiss });
+export function error(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Danger, ...options });
 }
 
-export function info(message: string, onDismiss?: () => void): void {
-  displayStatus({ message, type: MessageType.Info, onDismiss });
+export function info(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Info, ...options });
 }
 
 export function success(
   message: string,
-  autoHide: boolean = true,
-  onDismiss?: () => void,
+  options?: NotificationOptions,
 ): void {
-  displayStatus({ message, type: MessageType.Success, autoHide, onDismiss });
+  // For backward compatibility, if a boolean is passed, treat it as autoHide
+  if (typeof options === 'boolean') {
+    displayStatus({
+      message,
+      type: MessageType.Success,
+      autoHide: options,
+    });
+  } else {
+    // Default autoHide to true for success messages unless explicitly set to false
+    displayStatus({
+      message,
+      type: MessageType.Success,
+      autoHide: options?.autoHide !== false,
+      position: options?.position,
+      onDismiss: options?.onDismiss,
+    });
+  }
 }
 
-export function warning(message: string, onDismiss?: () => void): void {
-  displayStatus({ message, type: MessageType.Warning, onDismiss });
+export function warning(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Warning, ...options });
 }
 
 export function apiError(
   response: { error?: string; payload?: any },
-  onDismiss?: () => void,
+  options?: NotificationOptions,
 ): void {
   console.error(response);
   error(
     response.error && response.payload
       ? formatString(response.error, response.payload)
       : (response.error || 'error').toString(),
-    onDismiss,
+    options,
   );
 }
 
