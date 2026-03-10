@@ -82,8 +82,8 @@ services:
 
   grader:
     image: omegaup/backend:v1.9.35
-    entrypoint: ["sh", "-c", "mkdir -p /var/lib/omegaup/ephemeral && exec wait-for-it mysql:13306 -- /usr/bin/omegaup-grader"]
-    user: "${UID_GID}"
+    user: root
+    entrypoint: ["sh", "-c", "mkdir -p /var/lib/omegaup/ephemeral && chown -R ${UID_GID} /var/lib/omegaup && exec setpriv --reuid=$(echo ${UID_GID} | cut -d: -f1) --regid=$(echo ${UID_GID} | cut -d: -f2) --clear-groups wait-for-it mysql:13306 -- /usr/bin/omegaup-grader"]
     restart: always
     depends_on:
       - mysql

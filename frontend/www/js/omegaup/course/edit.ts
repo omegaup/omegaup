@@ -329,7 +329,6 @@ OmegaUp.on('ready', () => {
                 if (assignment.assignment_type == 'lesson') {
                   ui.success(T.courseAssignmentLectureAdded);
                 } else {
-                  console.log(data.solutionStatus);
                   if (data.solutionStatus === 'not_found') {
                     ui.success(T.courseAssignmentProblemAdded);
                   } else {
