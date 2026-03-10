@@ -125,18 +125,15 @@ export function info(message: string, options?: NotificationOptions): void {
   displayStatus({ message, type: MessageType.Info, ...options });
 }
 
-export function success(
-  message: string,
-  options?: NotificationOptions,
-): void {
-    // Default autoHide to true for success messages unless explicitly set to false
-    displayStatus({
-      message,
-      type: MessageType.Success,
-      autoHide: options?.autoHide !== false,
-      position: options?.position,
-      onDismiss: options?.onDismiss,
-    });
+export function success(message: string, options?: NotificationOptions): void {
+  // Default autoHide to true for success messages unless explicitly set to false
+  displayStatus({
+    message,
+    type: MessageType.Success,
+    autoHide: options?.autoHide !== false,
+    position: options?.position,
+    onDismiss: options?.onDismiss,
+  });
 }
 
 export function warning(message: string, options?: NotificationOptions): void {
@@ -173,7 +170,8 @@ export function prettyPrintJSON(json: JSONType): string {
 }
 
 export function syntaxHighlight(json: JSONType): string {
-  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
+  const jsonRE =
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
   return json
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
