@@ -1,6 +1,6 @@
 name: daily-release
 
-# Run every day at 3:00 UTC. This translates to 20:00 PT.
+# Run every Sunday at 3:00 UTC. This translates to 20:00 PT.
 # TODO(#1624): Make this daily once we have better coverage of the frontend.
 on:
   repository_dispatch:
@@ -25,14 +25,14 @@ jobs:
       - name: Check for database modifications
         run: |
           if ! git diff --quiet origin/release:frontend/database origin/main:frontend/database; then
-            echo '::warning::Skipping release since there are database modifications'
+            echo '::notice::Skipping release since there are database modifications'
             exit 1
           fi
 
       - name: Check for presence of .pause-release
         run: |
           if git cat-file -e origin/main:.pause-release 2>/dev/null; then
-            echo '::warning::Skipping release since there is a `.pause-release` file.'
+            echo '::notice::Skipping release since there is a `.pause-release` file.'
             exit 1
           fi
 
