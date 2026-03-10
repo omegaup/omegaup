@@ -83,7 +83,7 @@ class ZipFileProcessor{
     ): void {
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filePath = $zip->getNameIndex($i);
-            if (substr($filePath, -1) === '/') {
+            if (str_ends_with($filePath, '/')) {
                 continue;
             }
             $callback($filePath);

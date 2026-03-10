@@ -12,6 +12,7 @@
     :hide-input-on-limit="true"
     :only-existing-tags="onlyExistingTags"
     :typeahead-hide-discard="typeaheadHideDiscard"
+    :class="{ 'is-invalid': isInvalid }"
     @change="updateExistingOptions"
     @tag-added="onTagAdded"
     @tag-removed="onTagRemoved"
@@ -42,6 +43,7 @@ export default class Typeahead extends Vue {
   @Prop({ default: true }) typeaheadHideDiscard!: boolean;
   @Prop({ default: T.typeaheadSearchPlaceholder }) placeholder!: string;
   @Prop({ default: 300 }) debounceDelay!: number;
+  @Prop({ default: false }) isInvalid!: boolean;
 
   T = T;
   selectedOptions = this.options;
@@ -108,5 +110,9 @@ export default class Typeahead extends Vue {
 .tags-input.disabled {
   background-color: var(--typeahead-disabled);
   opacity: 1;
+}
+
+.tags-input.is-invalid .tags-input-wrapper-default {
+  border-color: var(--form-input-error-color);
 }
 </style>
