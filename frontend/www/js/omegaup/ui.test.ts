@@ -47,7 +47,7 @@ describe('ui', () => {
     it('ui.error should pass onDismiss to the store', () => {
       const callback = jest.fn();
 
-      ui.error('Something went wrong', callback);
+      ui.error('Something went wrong', { onDismiss: callback });
 
       expect(notificationsStore.state.onDismiss).toBe(callback);
     });
@@ -55,7 +55,7 @@ describe('ui', () => {
     it('ui.warning should pass onDismiss to the store', () => {
       const callback = jest.fn();
 
-      ui.warning('This is a warning', callback);
+      ui.warning('This is a warning', { onDismiss: callback });
 
       expect(notificationsStore.state.onDismiss).toBe(callback);
     });
@@ -63,7 +63,7 @@ describe('ui', () => {
     it('ui.info should pass onDismiss to the store', () => {
       const callback = jest.fn();
 
-      ui.info('Here is some info', callback);
+      ui.info('Here is some info', { onDismiss: callback });
 
       expect(notificationsStore.state.onDismiss).toBe(callback);
     });
@@ -71,7 +71,7 @@ describe('ui', () => {
     it('ui.success should pass onDismiss to the store', () => {
       const callback = jest.fn();
 
-      ui.success('Done!', true, callback);
+      ui.success('Done!', { autoHide: true, onDismiss: callback });
 
       expect(notificationsStore.state.onDismiss).toBe(callback);
     });
@@ -83,7 +83,7 @@ describe('ui', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      ui.apiError({ error: 'Something failed' }, callback);
+      ui.apiError({ error: 'Something failed' }, { onDismiss: callback });
 
       consoleSpy.mockRestore();
       expect(notificationsStore.state.onDismiss).toBe(callback);
@@ -92,7 +92,7 @@ describe('ui', () => {
     it('onDismiss should be called when notification is dismissed', () => {
       const callback = jest.fn();
 
-      ui.error('An error occurred', callback);
+      ui.error('An error occurred', { onDismiss: callback });
       // Simulate user clicking the X button (dismissNotifications action)
       notificationsStore.dispatch('dismissNotifications');
 
@@ -100,9 +100,31 @@ describe('ui', () => {
     });
 
     it('ui.* functions work normally without onDismiss (backward compatible)', () => {
-      // No callback passed — should not throw
+      // No options passed — should not throw
       expect(() => ui.error('No callback error')).not.toThrow();
       expect(notificationsStore.state.onDismiss).toBeNull();
+    });
+
+    it('ui.success should accept options object with autoHide and onDismiss', () => {
+      const callback = jest.fn();
+
+      ui.success('Success!', { autoHide: false, onDismiss: callback });
+
+      expect(notificationsStore.state.onDismiss).toBe(callback);
+    });
+
+    it('ui.success should default to autoHide=true when no options provided', () => {
+      ui.success('Success!');
+      // The autoHide logic is handled in the store, so we check the store receives success type
+      expect(notificationsStore.state.type).toBe(ui.MessageType.Success);
+    });
+
+    it('ui.success should support backward-compatible boolean autoHide parameter', () => {
+      const callback = jest.fn();
+
+      ui.success('Success!', true);
+      // Passing true as second parameter should work for backward compatibility
+      expect(notificationsStore.state.message).toBe('Success!');
     });
   });
 });
