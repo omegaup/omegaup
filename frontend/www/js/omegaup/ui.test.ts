@@ -119,12 +119,10 @@ describe('ui', () => {
       expect(notificationsStore.state.type).toBe(ui.MessageType.Success);
     });
 
-    it('ui.success should support backward-compatible boolean autoHide parameter', () => {
-      const callback = jest.fn();
-
-      ui.success('Success!', true);
-      // Passing true as second parameter should work for backward compatibility
+    it('ui.success uses autoHide: false to keep notification visible', () => {
+      ui.success('Success!', { autoHide: false });
       expect(notificationsStore.state.message).toBe('Success!');
+      expect(notificationsStore.state.type).toBe(ui.MessageType.Success);
     });
   });
 });

@@ -567,7 +567,7 @@ OmegaUp.on('ready', () => {
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
                   }),
-                  /*autoHide=*/ false,
+                  { autoHide: false },
                 );
               })
               .catch(ui.apiError);
