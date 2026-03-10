@@ -20,6 +20,7 @@ services:
       - mysql
       - gitserver
       - grader
+      - redis
     ports:
       - target: 8001
         published: 8001
@@ -32,6 +33,8 @@ services:
       DEEPSEEK_API_KEY: ""
       AI_WORKER_ENABLED: "true"
       REDIS_PASSWORD: "redis"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
 
   gitserver:
     image: omegaup/gitserver:v1.9.13
@@ -79,8 +82,8 @@ services:
 
   grader:
     image: omegaup/backend:v1.9.35
-    entrypoint: ["wait-for-it", "mysql:13306", "--", "/usr/bin/omegaup-grader"]
-    user: "${UID_GID}"
+    user: root
+    entrypoint: ["sh", "-c", "mkdir -p /var/lib/omegaup/ephemeral && chown -R ${UID_GID} /var/lib/omegaup && exec setpriv --reuid=$(echo ${UID_GID} | cut -d: -f1) --regid=$(echo ${UID_GID} | cut -d: -f2) --clear-groups wait-for-it mysql:13306 -- /usr/bin/omegaup-grader"]
     restart: always
     depends_on:
       - mysql
