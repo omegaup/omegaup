@@ -296,7 +296,6 @@
                         v-model="isPublic"
                         data-problem-access-radio-yes
                         type="radio"
-                        name="visibility"
                         class="form-check-input"
                         :disabled="!isEditable"
                         :value="true"
@@ -307,7 +306,6 @@
                       <input
                         v-model="isPublic"
                         type="radio"
-                        name="visibility"
                         class="form-check-input"
                         :disabled="!isEditable"
                         :value="false"

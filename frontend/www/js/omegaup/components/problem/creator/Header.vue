@@ -198,10 +198,50 @@ export default class Header extends Vue {
     zip.file('cdp.data', JSON.stringify(this.$store.state));
   }
 
+  getSettings(zip: JSZip) {
+    const cases: {
+      Name: string;
+      Cases: { Name: string; Weight: number }[];
+    }[] = [];
+
+    this.groups.forEach((_group) => {
+      const groupCases: { Name: string; Weight: number }[] = [];
+      _group.cases.forEach((_case) => {
+        groupCases.push({
+          Name: _group.ungroupedCase
+            ? _case.name
+            : _group.name + '.' + _case.name,
+          Weight: _case.points,
+        });
+      });
+      cases.push({
+        Name: _group.ungroupedCase ? _group.cases[0]?.name ?? '' : _group.name,
+        Cases: groupCases,
+      });
+    });
+
+    const settings = {
+      Cases: cases,
+      Limits: {
+        TimeLimit: '1s',
+        MemoryLimit: '64MiB',
+        OutputLimit: '10240KiB',
+        OverallWallTimeLimit: '30s',
+        ExtraWallTime: '0s',
+      },
+      Validator: {
+        Name: 'token-caseless',
+      },
+    };
+
+    zip.file('settings.json', JSON.stringify(settings, null, 2));
+  }
+
   generateProblem() {
     this.getStatement(this.zip);
     this.getSolution(this.zip);
     this.getCasesAndTestPlan(this.zip);
+    this.getSettings(this.zip);
 
     const problemName: string = this.$store.state.problemName;
     this.$emit('download-zip-file', {
