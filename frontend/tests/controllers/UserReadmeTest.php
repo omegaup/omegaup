@@ -1,17 +1,17 @@
 <?php
 /**
- * Tests para el README del perfil de usuario.
+ * Tests for user profile README.
  */
 class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Prueba crear un README nuevo para un usuario.
+     * Tests creating a new README for a user.
      */
     public function testCreateReadme() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $content = '# Hola\n\nSoy un usuario de omegaUp.';
-        $response = \OmegaUp\Controllers\User::apiUpdateReadme(
+        $content = '# Hello\n\nI am an omegaUp user.';
+        $response = \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'readme' => $content,
@@ -31,22 +31,22 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba actualizar un README existente.
+     * Tests updating an existing README.
      */
     public function testUpdateExistingReadme() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'readme' => 'Contenido inicial',
+                'readme' => 'Initial content',
             ])
         );
 
-        $updatedContent = '# Contenido actualizado\n\nNueva información.';
-        $response = \OmegaUp\Controllers\User::apiUpdateReadme(
+        $updatedContent = '# Updated content\n\nNew information.';
+        $response = \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'readme' => $updatedContent,
@@ -63,15 +63,15 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que el perfil incluye el README cuando está visible y habilitado.
+     * Tests that the profile includes the README when it is visible and enabled.
      */
     public function testProfileIncludesReadme() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $viewer] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $content = '## Mi perfil\n\nMe gusta la programación competitiva.';
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        $content = '## My profile\n\nI enjoy competitive programming.';
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'readme' => $content,
@@ -91,17 +91,17 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que el perfil retorna null en readme cuando está deshabilitado.
+     * Tests that the profile returns null for readme when it is disabled.
      */
     public function testProfileReadmeNullWhenDisabled() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $viewer] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'readme' => 'Contenido que será deshabilitado',
+                'readme' => 'Content that will be disabled',
             ])
         );
 
@@ -111,7 +111,7 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($readme);
         \OmegaUp\DAO\UserReadmes::setDisabled(
             intval($readme->readme_id),
-            true
+            isDisabled: true
         );
 
         $viewerLogin = self::login($viewer);
@@ -127,7 +127,7 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que el perfil retorna null en readme cuando no existe.
+     * Tests that the profile returns null for readme when it does not exist.
      */
     public function testProfileReadmeNullWhenNotExists() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -146,37 +146,37 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que apiUpdateReadme falla si el contenido excede 10,000 caracteres.
+     * Tests that apiSaveReadme fails if the content exceeds 10,000 characters.
      */
     public function testUpdateReadmeTooLong() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
-            \OmegaUp\Controllers\User::apiUpdateReadme(
+            \OmegaUp\Controllers\User::apiSaveReadme(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'readme' => str_repeat('a', 10001),
                 ])
             );
-            $this->fail('Debió lanzar InvalidParameterException');
+            $this->fail('Should have thrown InvalidParameterException');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertSame('parameterStringTooLong', $e->getMessage());
         }
     }
 
     /**
-     * Prueba reportar un README y verificar la actualización del contador.
+     * Tests reporting a README and verifying the report counter is updated.
      */
     public function testReportReadme() {
         ['user' => $targetUser, 'identity' => $targetIdentity] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $reporter] = \OmegaUp\Test\Factories\User::createUser();
 
         $ownerLogin = self::login($targetIdentity);
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $ownerLogin->auth_token,
-                'readme' => 'Contenido inapropiado',
+                'readme' => 'Inappropriate content',
             ])
         );
 
@@ -199,16 +199,16 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que el auto-deshabilitar ocurre al alcanzar el umbral de reportes.
+     * Tests that auto-disabling occurs when the report threshold is reached.
      */
     public function testAutoDisableAtReportThreshold() {
         ['user' => $targetUser, 'identity' => $targetIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $ownerLogin = self::login($targetIdentity);
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $ownerLogin->auth_token,
-                'readme' => 'Contenido que recibirá muchos reportes',
+                'readme' => 'Content that will receive many reports',
             ])
         );
 
@@ -233,17 +233,17 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Prueba que un usuario no puede reportar el mismo README dos veces.
+     * Tests that a user cannot report the same README twice.
      */
     public function testDuplicateReportPrevented() {
         ['identity' => $targetIdentity] = \OmegaUp\Test\Factories\User::createUser();
         ['identity' => $reporter] = \OmegaUp\Test\Factories\User::createUser();
 
         $ownerLogin = self::login($targetIdentity);
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $ownerLogin->auth_token,
-                'readme' => 'README a reportar',
+                'readme' => 'README to report',
             ])
         );
 
@@ -262,23 +262,23 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
                     'username' => $targetIdentity->username,
                 ])
             );
-            $this->fail('Debió lanzar DuplicatedEntryInDatabaseException');
+            $this->fail('Should have thrown DuplicatedEntryInDatabaseException');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertSame('readmeAlreadyReported', $e->getMessage());
         }
     }
 
     /**
-     * Prueba que editar un README deshabilitado lo vuelve a habilitar.
+     * Tests that editing a disabled README re-enables it.
      */
     public function testUpdateReadmeRestoresAfterDisable() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'readme' => 'Contenido original',
+                'readme' => 'Original content',
             ])
         );
 
@@ -288,13 +288,13 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($readme);
         \OmegaUp\DAO\UserReadmes::setDisabled(
             intval($readme->readme_id),
-            true
+            isDisabled: true
         );
 
-        \OmegaUp\Controllers\User::apiUpdateReadme(
+        \OmegaUp\Controllers\User::apiSaveReadme(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'readme' => 'Contenido actualizado después de deshabilitar',
+                'readme' => 'Updated content after disable',
             ])
         );
 
@@ -304,13 +304,13 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($updatedReadme);
         $this->assertFalse($updatedReadme->is_disabled);
         $this->assertSame(
-            'Contenido actualizado después de deshabilitar',
+            'Updated content after disable',
             $updatedReadme->content
         );
     }
 
     /**
-     * Prueba que reportar un README inexistente lanza NotFoundException.
+     * Tests that reporting a non-existent README throws NotFoundException.
      */
     public function testReportNonExistentReadme() {
         ['identity' => $targetIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -324,7 +324,7 @@ class UserReadmeTest extends \OmegaUp\Test\ControllerTestCase {
                     'username' => $targetIdentity->username,
                 ])
             );
-            $this->fail('Debió lanzar NotFoundException');
+            $this->fail('Should have thrown NotFoundException');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertSame('resourceNotFound', $e->getMessage());
         }

@@ -130,5 +130,8 @@ cypress/downloads/*
 stuff/inefficient_queries.csv
 
 
-# ignore files que log extension in root 
+# ignore files que log extension in root
 *.log
+
+# Ignore Claude Code instructions
+CLAUDE.md

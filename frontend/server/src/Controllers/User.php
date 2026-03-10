@@ -5337,25 +5337,30 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Actualiza el README del perfil del usuario autenticado.
+     * Saves (creates or updates) the README for the authenticated user's profile.
      *
-     * @throws \OmegaUp\Exceptions\UnauthorizedException si el usuario no está autenticado
-     * @throws \OmegaUp\Exceptions\InvalidParameterException si el contenido es vacío o excede el límite
+     * @throws \OmegaUp\Exceptions\UnauthorizedException if the user is not authenticated
+     * @throws \OmegaUp\Exceptions\InvalidParameterException if the content is empty or exceeds the limit
      *
      * @return array{status: string}
      *
      * @omegaup-request-param null|string $readme
      */
-    public static function apiUpdateReadme(\OmegaUp\Request $r): array {
+    public static function apiSaveReadme(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['readme'],
+        $content = $r->ensureOptionalString(
             'readme',
-            1,
-            10000
+            required: false,
+            validator: fn (string $content) =>
+                \OmegaUp\Validators::stringOfLengthInRange($content, 1, 10000)
         );
-        $content = strval($r['readme']);
+        if (is_null($content)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'readme'
+            );
+        }
 
         $readme = \OmegaUp\DAO\UserReadmes::getByUserId(
             intval($r->user->user_id)
@@ -5380,12 +5385,12 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Reporta el README del perfil de un usuario.
+     * Reports the README of a user's profile.
      *
-     * @throws \OmegaUp\Exceptions\UnauthorizedException si el usuario no está autenticado
-     * @throws \OmegaUp\Exceptions\InvalidParameterException si el parámetro username es inválido
-     * @throws \OmegaUp\Exceptions\NotFoundException si el usuario o README no existe o ya está deshabilitado
-     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException si el usuario ya reportó este README
+     * @throws \OmegaUp\Exceptions\UnauthorizedException if the user is not authenticated
+     * @throws \OmegaUp\Exceptions\InvalidParameterException if the username parameter is invalid
+     * @throws \OmegaUp\Exceptions\NotFoundException if the user or README does not exist or is already disabled
+     * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException if the user has already reported this README
      *
      * @return array{status: string}
      *
@@ -5394,8 +5399,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiReportReadme(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
-        $targetUser = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail($username)
+        );
+        $targetUser = \OmegaUp\DAO\Users::FindByUsername($username);
         if (is_null($targetUser) || is_null($targetUser->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -5408,7 +5416,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            \OmegaUp\DAO\UserReadmeReportLog::hasAlreadyReported(
+            \OmegaUp\DAO\UserReadmeReportLog::existsByPK(
                 intval($readme->readme_id),
                 intval($r->user->user_id)
             )
@@ -5418,28 +5426,37 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\DAO\UserReadmeReportLog::create(
-            new \OmegaUp\DAO\VO\UserReadmeReportLog([
-                'readme_id' => $readme->readme_id,
-                'reporter_user_id' => $r->user->user_id,
-            ])
-        );
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
 
-        \OmegaUp\DAO\UserReadmes::incrementReportCount(
-            intval($readme->readme_id)
-        );
-
-        $updatedReadme = \OmegaUp\DAO\UserReadmes::getByUserId(
-            $targetUser->user_id
-        );
-        if (
-            !is_null($updatedReadme) &&
-            $updatedReadme->report_count >= self::README_REPORT_THRESHOLD
-        ) {
-            \OmegaUp\DAO\UserReadmes::setDisabled(
-                intval($updatedReadme->readme_id),
-                true
+            \OmegaUp\DAO\UserReadmeReportLog::create(
+                new \OmegaUp\DAO\VO\UserReadmeReportLog([
+                    'readme_id' => $readme->readme_id,
+                    'reporter_user_id' => $r->user->user_id,
+                ])
             );
+
+            \OmegaUp\DAO\UserReadmes::incrementReportCount(
+                intval($readme->readme_id)
+            );
+
+            $updatedReadme = \OmegaUp\DAO\UserReadmes::getByUserId(
+                $targetUser->user_id
+            );
+            if (
+                !is_null($updatedReadme) &&
+                $updatedReadme->report_count >= self::README_REPORT_THRESHOLD
+            ) {
+                \OmegaUp\DAO\UserReadmes::setDisabled(
+                    intval($updatedReadme->readme_id),
+                    isDisabled: true
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return ['status' => 'ok'];
