@@ -126,6 +126,7 @@ describe('Header.vue', () => {
       'cases/New Group.New Case.out',
       'testplan',
       'cdp.data',
+      'settings.json',
     ];
 
     store.commit('casesStore/resetStore');

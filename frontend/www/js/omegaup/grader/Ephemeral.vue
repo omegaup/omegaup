@@ -327,7 +327,7 @@ export default class Ephemeral extends Vue {
   }
   @Watch('theme')
   onThemeChange() {
-    this.downloadThemeStylesheet(this.theme);
+    this.downloadThemeStylesheet();
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -762,19 +762,14 @@ export default class Ephemeral extends Vue {
     }
     this.goldenLayout?.updateSize();
   }
-  downloadThemeStylesheet(theme: string) {
-    // Light theme CSS is statically imported. Only dynamically load the
-    // dark theme when the user switches to it.
-    if (theme === Util.MonacoThemes.VSDark) {
-      import(
-        /* webpackChunkName: "goldenlayout-dark-theme" */
-        'golden-layout/src/css/goldenlayout-dark-theme.css'
-      );
-    }
+  downloadThemeStylesheet() {
+    // All golden-layout theme CSS is statically imported via the
+    // unscoped <style> block at the bottom of this file.
+    // Theme switching is handled by GoldenLayout's own class toggling.
   }
   beforeMount() {
     this.initProblem();
-    this.downloadThemeStylesheet(this.theme);
+    this.downloadThemeStylesheet();
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(
@@ -833,8 +828,8 @@ a:hover {
 }
 </style>
 
-<!-- Unscoped golden-layout CSS so selectors are not mangled by Vue scoping -->
 <style>
-@import 'golden-layout/src/css/goldenlayout-base.css';
-@import 'golden-layout/src/css/goldenlayout-light-theme.css';
+@import '~golden-layout/src/css/goldenlayout-base.css';
+@import '~golden-layout/src/css/goldenlayout-light-theme.css';
+@import '~golden-layout/src/css/goldenlayout-dark-theme.css';
 </style>

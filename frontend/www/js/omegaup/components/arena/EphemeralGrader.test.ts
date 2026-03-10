@@ -8,9 +8,23 @@ describe('EphemeralGrader.vue', () => {
     const div = document.createElement('div');
     div.id = 'root';
     document.body.appendChild(div);
+    // JSDOM reports clientWidth as 0, which causes GoldenLayout
+    // init to be deferred. Mock it so the layout initializes.
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        return 800;
+      },
+    });
   });
 
   afterEach(() => {
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        return 0;
+      },
+    });
     const rootDiv = document.getElementById('root');
     if (rootDiv) {
       document.removeChild(rootDiv);
