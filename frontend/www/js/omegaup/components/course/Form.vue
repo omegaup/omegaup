@@ -240,7 +240,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group container-fluid col-md-6">
+          <div class="form-group col-lg-6">
             <label class="font-weight-bold w-100 introjs-objective"
               >{{ T.courseNewFormObjective }}
               <font-awesome-icon
@@ -250,7 +250,7 @@
               <textarea
                 v-model="objectiveStatement.markdown"
                 data-course-objective
-                style="opacity: 0; position: absolute"
+                class="hidden-markdown-input"
               ></textarea>
               <omegaup-problem-statementedit
                 :statement="objectiveStatement"
@@ -267,7 +267,7 @@
               }}</small
             >
           </div>
-          <div class="form-group container-fluid col-md-6">
+          <div class="form-group col-lg-6">
             <label class="font-weight-bold w-100 introjs-description">
               <span
                 class="field-required"
@@ -277,7 +277,7 @@
               <textarea
                 v-model="descriptionStatement.markdown"
                 data-course-new-description
-                style="opacity: 0; position: absolute"
+                class="hidden-markdown-input"
               ></textarea>
               <omegaup-problem-statementedit
                 :statement="descriptionStatement"
@@ -398,7 +398,7 @@ export default class CourseDetails extends Vue {
     language: string;
     images: Record<string, unknown>;
   } = {
-    markdown: this.description ?? '',
+    markdown: this.description,
     language: 'en',
     images: {},
   };
@@ -407,7 +407,7 @@ export default class CourseDetails extends Vue {
     language: string;
     images: Record<string, unknown>;
   } = {
-    markdown: this.objective ?? '',
+    markdown: this.objective,
     language: 'en',
     images: {},
   };
@@ -644,35 +644,41 @@ export default class CourseDetails extends Vue {
   margin-top: 0.25rem;
 }
 /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.omegaup-course-details ::v-deep .wmd-button-bar {
-  margin-bottom: 6px;
+.omegaup-course-details ::v-deep {
+  .wmd-button-bar {
+    margin-bottom: 6px;
+  }
+
+  .wmd-input {
+    width: 100% !important;
+    min-height: 200px;
+    box-sizing: border-box;
+  }
+
+  [data-statement-edit-markdown] {
+    width: 100% !important;
+    min-height: 200px;
+    padding: 10px;
+    overflow-y: auto;
+    word-break: break-word;
+    white-space: normal;
+    background: var(--course-editor-background-color);
+    border: 1px solid var(--course-editor-border-color);
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: hidden;
+  }
+
+  code {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 }
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.omegaup-course-details ::v-deep .wmd-input {
-  width: 100% !important;
-  min-height: 160px;
-  box-sizing: border-box;
-}
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.omegaup-course-details ::v-deep [data-statement-edit-markdown] {
-  width: 100% !important;
-  min-height: 160px;
-  padding: 10px;
-  overflow-y: auto;
-  word-break: break-word;
-  white-space: normal;
-  background: #fafafa;
-  border: 1px solid #ddd;
-}
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.omegaup-course-details ::v-deep pre {
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-x: hidden;
-}
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.omegaup-course-details ::v-deep code {
-  white-space: pre-wrap;
-  word-break: break-word;
+.hidden-markdown-input {
+  opacity: 0;
+  position: absolute;
 }
 </style>

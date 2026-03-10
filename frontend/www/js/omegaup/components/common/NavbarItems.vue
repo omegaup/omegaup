@@ -46,7 +46,6 @@
           T.wordsContests
         }}</a>
       </li>
-
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-courses nav-item-align"
@@ -87,7 +86,6 @@
       >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
-
       <li
         class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
@@ -123,41 +121,36 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
-
             <template v-if="!isLoggedIn">
               <a class="dropdown-item" href="/problem/creator/">{{
                 T.createZipFileForProblem
               }}</a>
             </template>
-
             <template v-else>
-              <div class="collapse-submenu">
+              <form class="collapse-submenu">
                 <button
                   type="button"
                   class="dropdown-item dropdown-toggle"
+                  data-toggle="collapse"
+                  data-target=".collapse-links"
                   data-nav-problems-create-options
-                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
-                  @click.stop.prevent="onCreateProblemClick"
+                  aria-expanded="false"
+                  aria-controls="collapse-links"
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
-
-                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
-                  <a
-                    class="dropdown-item"
-                    href="/problem/creator/"
-                    @click.stop
-                    >{{ T.myproblemsListCreateZipFileProblem }}</a
-                  >
+                <div class="collapse collapse-links pl-3">
+                  <a class="dropdown-item" href="/problem/creator/">{{
+                    T.myproblemsListCreateZipFileProblem
+                  }}</a>
                   <a
                     class="dropdown-item"
                     href="/problem/new/"
                     data-nav-problems-create
-                    @click.stop
                     >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                   >
                 </div>
-              </div>
+              </form>
             </template>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
@@ -165,7 +158,6 @@
           </slot>
         </div>
       </li>
-
       <li
         class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
@@ -202,7 +194,6 @@
           }}</a>
         </div>
       </li>
-
       <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
@@ -217,36 +208,31 @@
         <div class="dropdown-menu fullwidth-mobile-fit-lg help-dropdown">
           <a
             class="dropdown-item"
-            :href="YouTubeTutorialsURL"
+            href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
             target="_blank"
             >{{ T.navTutorials }}</a
           >
-          <a class="dropdown-item" :href="DiscordInviteURL" target="_blank">{{
-            T.navDiscord
-          }}</a>
-          <a class="dropdown-item" :href="OmegaUpBlogURL" target="_blank">{{
-            T.navBlog
-          }}</a>
-          <hr />
-          <a class="dropdown-item" href="/problem/statement/">
-            Problem Statement Editor
-          </a>
-
-          <a class="dropdown-item" href="/grader/ephemeral/">
-            Ephemeral Grader
-          </a>
-
-          <a class="dropdown-item" href="/karel.js/"> Karel.js </a>
-          <hr />
+          <a
+            class="dropdown-item"
+            href="https://discord.com/invite/K3JFd9d3wk"
+            target="_blank"
+            >{{ T.navDiscord }}</a
+          >
+          <a
+            class="dropdown-item"
+            href="http://blog.omegaup.com/"
+            target="_blank"
+            >{{ T.navBlog }}</a
+          >
           <a
             class="dropdown-item text-wrap"
-            :href="AlgorithmsBookURL"
+            href="https://drive.google.com/file/d/1PLOO3wLCnOVC_cODwiofahsRGeyoJeCU/view"
             target="_blank"
             >{{ T.navAlgorithmsBook }}</a
           >
           <a
             class="dropdown-item text-wrap"
-            :href="CompetitiveProgrammingBookURL"
+            href="https://hdl.handle.net/11059/16567"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -262,7 +248,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { getExternalUrl } from '../../urlHelper';
 
 @Component
 export default class NavbarItems extends Vue {
@@ -276,33 +261,6 @@ export default class NavbarItems extends Vue {
   @Prop() isUnder13User!: boolean;
 
   T = T;
-
-  // Used by Cypress selector + click toggle
-  isCreateProblemSubmenuOpen = false;
-
-  get OmegaUpBlogURL(): string {
-    return getExternalUrl('OmegaUpBlogURL');
-  }
-
-  get YouTubeTutorialsURL(): string {
-    return getExternalUrl('YouTubeTutorialsURL');
-  }
-
-  get DiscordInviteURL(): string {
-    return getExternalUrl('DiscordInviteURL');
-  }
-
-  get AlgorithmsBookURL(): string {
-    return getExternalUrl('AlgorithmsBookURL');
-  }
-
-  get CompetitiveProgrammingBookURL(): string {
-    return getExternalUrl('CompetitiveProgrammingBookURL');
-  }
-
-  onCreateProblemClick(): void {
-    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
-  }
 }
 </script>
 
