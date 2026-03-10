@@ -5401,7 +5401,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $username = $r->ensureString(
             'username',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail($username)
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
         );
         $targetUser = \OmegaUp\DAO\Users::FindByUsername($username);
         if (is_null($targetUser) || is_null($targetUser->user_id)) {
