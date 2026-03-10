@@ -999,6 +999,7 @@ const translations: { [key: string]: string; } = {
   navDependents: "(My d3p3nd3n75)",
   navDiscord: "(Di5c0rd S3rv3r)",
   navHelp: "(H31p)",
+  navKarel: "(Kar31.j5)",
   navMyContent: "(My c0n73n7)",
   navMyContests: "(My c0n73575)",
   navMyCourses: "(My c0ur535)",
@@ -1006,6 +1007,8 @@ const translations: { [key: string]: string; } = {
   navMyProblems: "(My pr0b13m5)",
   navMyQualityNomination: "(My pr0b13m r3p0r75)",
   navMyTeamsGroups: "(My 73am5 gr0up5)",
+  navOmegaUpIDE: "(0m3gaUp IDE)",
+  navProblemStatementEditor: "(Pr0b13m S7a73m3n7 Edi70r)",
   navProblems: "(Pr0b13m5)",
   navProfileProblems: "(S01v3d and un501v3d pr0b13m5)",
   navQualityNominationQueue: "(R3p0r75)",
@@ -2311,7 +2314,6 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "(Wa11-7im3 (S3c))",
   wordsWarningProblem: "(K33p wi7h a warning)",
   wordsYes: "(Y35)",
-  zipPrepare: "(Pr3par3 zip fi13)",
 };
 
 export {translations as default};

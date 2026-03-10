@@ -999,6 +999,7 @@ const translations: { [key: string]: string; } = {
   navDependents: "Mis dependientes",
   navDiscord: "Servidor de Discord",
   navHelp: "Ayuda",
+  navKarel: "Karel.js",
   navMyContent: "Mi contenido",
   navMyContests: "Mis concursos",
   navMyCourses: "Mis cursos",
@@ -1006,6 +1007,8 @@ const translations: { [key: string]: string; } = {
   navMyProblems: "Mis problemas",
   navMyQualityNomination: "Mis reportes de problemas",
   navMyTeamsGroups: "Mis grupos de equipos",
+  navOmegaUpIDE: "omegaUp IDE",
+  navProblemStatementEditor: "Editor de Redacciones de Problema",
   navProblems: "Problemas",
   navProfileProblems: "Problemas resueltos e intentados",
   navQualityNominationQueue: "Reportes",
@@ -2311,7 +2314,6 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tiempo-real (Seg)",
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
-  zipPrepare: "Preparar archivo zip",
 };
 
 export {translations as default};

@@ -998,6 +998,7 @@
 	"navDependents": "Mis dependientes",
 	"navDiscord": "Servidor de Discord",
 	"navHelp": "Ayuda",
+	"navKarel": "Karel.js",
 	"navMyContent": "Mi contenido",
 	"navMyContests": "Mis concursos",
 	"navMyCourses": "Mis cursos",
@@ -1005,6 +1006,8 @@
 	"navMyProblems": "Mis problemas",
 	"navMyQualityNomination": "Mis reportes de problemas",
 	"navMyTeamsGroups": "Mis grupos de equipos",
+	"navOmegaUpIDE": "omegaUp IDE",
+	"navProblemStatementEditor": "Editor de Redacciones de Problema",
 	"navProblems": "Problemas",
 	"navProfileProblems": "Problemas resueltos e intentados",
 	"navQualityNominationQueue": "Reportes",
@@ -2309,6 +2312,5 @@
 	"wordsViewAll": "Ver todos",
 	"wordsWallTimeInSeconds": "Tiempo-real (Seg)",
 	"wordsWarningProblem": "Conservar con una advertencia",
-	"wordsYes": "S\u00ed",
-	"zipPrepare": "Preparar archivo zip"
+	"wordsYes": "S\u00ed"
 }
