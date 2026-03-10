@@ -50,6 +50,8 @@
       :sort-order="sortOrder"
       :column-name="columnName"
       :path="'/problem/'"
+      :solved-problem-aliases="solvedProblemAliases"
+      :attempted-problem-aliases="attemptedProblemAliases"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
@@ -92,6 +94,8 @@ export default class List extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   omegaup = omegaup;
