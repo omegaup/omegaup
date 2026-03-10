@@ -102,7 +102,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($token)) {
             return null;
         }
-        if (strpos($token, ',') === false) {
+        if (!str_contains($token, ',')) {
             return [
                 'token' => $token,
                 'username' => null,
