@@ -19,22 +19,28 @@
       </h4>
     </div>
     <div class="card">
-      <div v-if="includeUser" class="card-body d-flex align-items-center">
-        <omegaup-common-typeahead
-          :existing-options="searchResultUsers"
-          :value.sync="searchedUsername"
-          :max-results="10"
-          class="mr-2"
-          @update-existing-options="
-            (query) => $emit('update-search-result-users', query)
-          "
-        />
+      <div v-if="includeUser" class="card-body">
+        <div class="row align-items-md-center">
+          <div class="col-12 col-md">
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers"
+              :value.sync="searchedUsername"
+              :max-results="10"
+              class="w-100"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            />
+          </div>
 
-        <a :href="hrefSearchUser">
-          <button class="btn btn-primary" type="button">
-            {{ T.searchUser }}
-          </button>
-        </a>
+          <div class="col-12 col-md-auto mt-3 mt-md-0">
+            <a :href="hrefSearchUser">
+              <button class="btn btn-primary w-100 w-md-auto" type="button">
+                {{ T.searchUser }}
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="table mb-0 submissions-table">
