@@ -1,4 +1,5 @@
 services:
+
   frontend:
     build:
       dockerfile: ./Dockerfile.dev-php
@@ -33,7 +34,7 @@ services:
       AI_WORKER_ENABLED: "true"
       REDIS_PASSWORD: "redis"
       REDIS_HOST: "redis"
-      REDIS_PORT: 6379
+      REDIS_PORT: "6379"
 
   init-omegaupdata:
     image: alpine:3.20
@@ -128,7 +129,7 @@ services:
 
   runner:
     image: omegaup/runner:v1.9.35
-    entrypoint: ["wait-for-it","grader:11302","--","/usr/bin/omegaup-runner","-noop-sandbox"]
+    entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]
     user: "${UID_GID}"
     restart: always
     depends_on:
