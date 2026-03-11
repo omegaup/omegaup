@@ -31,8 +31,6 @@ AuthorRankRow = Tuple[
     Optional[str],
     Optional[str],
     Optional[int],
-    int,
-    float,
 ]
 
 import mysql.connector
@@ -330,8 +328,8 @@ def update_author_rank(
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON DUPLICATE KEY
                         UPDATE
-                            author_ranking = %s,
-                            author_score = %s;'''
+                            author_ranking = VALUES(author_ranking),
+                            author_score = VALUES(author_score);'''
     batch: List[AuthorRankRow] = []
     for index, row in enumerate(rows):
         if row['author_score'] != prev_score:
@@ -346,8 +344,6 @@ def update_author_rank(
             row['country_id'],
             row['state_id'],
             row['school_id'],
-            rank,
-            row['author_score'],
         ))
     chunk_size = 1000
     for index in range(0, len(batch), chunk_size):
