@@ -1,13 +1,39 @@
 #!/usr/bin/env python3
 '''Updates the user ranking.'''
 
+# pylint: disable=too-many-lines
+
 import argparse
 import datetime
 import json
 import logging
 import os
 import sys
-from typing import List, NamedTuple, Sequence, Dict, Set
+from typing import List, NamedTuple, Sequence, Dict, Set, Optional, Tuple
+
+UserRankRow = Tuple[
+    int,
+    int,
+    int,
+    float,
+    str,
+    str,
+    Optional[str],
+    Optional[str],
+    Optional[int],
+]
+AuthorRankRow = Tuple[
+    int,
+    str,
+    float,
+    int,
+    str,
+    Optional[str],
+    Optional[str],
+    Optional[int],
+    int,
+    float,
+]
 
 import mysql.connector
 import mysql.connector.cursor
@@ -205,29 +231,44 @@ def update_user_rank(
         ORDER BY
             `score` DESC;
     ''')
+    rows = cur_readonly.fetchall()
     prev_score = None
     rank = 0
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
     cur.execute('DELETE FROM `User_Rank`;')
-    for index, row in enumerate(cur_readonly.fetchall()):
-        if row['score'] != prev_score:
-            rank = index + 1
-        score = row.get('score', 0)
-        scores.append(score)
-        prev_score = score
-        cur.execute(
-            '''
+    insert_user_rank_sql = '''
                     INSERT INTO
                         `User_Rank` (`user_id`, `ranking`,
                                      `problems_solved_count`, `score`,
                                      `username`, `name`, `country_id`,
                                      `state_id`, `school_id`)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);''',
-            (row['user_id'], rank, row['problems_solved_count'], score,
-             row['username'], row['name'], row['country_id'], row['state_id'],
-             row['school_id']))
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+    batch: List[UserRankRow] = []
+    for index, row in enumerate(rows):
+        if row['score'] != prev_score:
+            rank = index + 1
+        score = row.get('score', 0)
+        scores.append(score)
+        prev_score = score
+        batch.append((
+            row['user_id'],
+            rank,
+            row['problems_solved_count'],
+            score,
+            row['username'],
+            row['name'],
+            row['country_id'],
+            row['state_id'],
+            row['school_id'],
+        ))
+    chunk_size = 1000
+    for index in range(0, len(batch), chunk_size):
+        cur.executemany(
+            insert_user_rank_sql,
+            batch[index:index + chunk_size],
+        )
     return scores
 
 
@@ -278,14 +319,10 @@ def update_author_rank(
             `author_score` DESC
     ''')
 
+    rows = cur_readonly.fetchall()
     prev_score = None
     rank = 0
-    for index, row in enumerate(cur_readonly.fetchall()):
-        if row['author_score'] != prev_score:
-            rank = index + 1
-        prev_score = row['author_score']
-        cur.execute(
-            '''
+    insert_author_rank_sql = '''
                     INSERT INTO
                         `User_Rank` (`user_id`, `username`, `author_score`,
                                      `author_ranking`, `name`, `country_id`,
@@ -294,10 +331,30 @@ def update_author_rank(
                     ON DUPLICATE KEY
                         UPDATE
                             author_ranking = %s,
-                            author_score = %s;''',
-            (row['user_id'], row['username'], row['author_score'], rank,
-             row['name'], row['country_id'], row['state_id'], row['school_id'],
-             rank, row['author_score']))
+                            author_score = %s;'''
+    batch: List[AuthorRankRow] = []
+    for index, row in enumerate(rows):
+        if row['author_score'] != prev_score:
+            rank = index + 1
+        prev_score = row['author_score']
+        batch.append((
+            row['user_id'],
+            row['username'],
+            row['author_score'],
+            rank,
+            row['name'],
+            row['country_id'],
+            row['state_id'],
+            row['school_id'],
+            rank,
+            row['author_score'],
+        ))
+    chunk_size = 1000
+    for index in range(0, len(batch), chunk_size):
+        cur.executemany(
+            insert_author_rank_sql,
+            batch[index:index + chunk_size],
+        )
 
 
 def update_user_rank_cutoffs(cur: mysql.connector.cursor.MySQLCursorDict,
