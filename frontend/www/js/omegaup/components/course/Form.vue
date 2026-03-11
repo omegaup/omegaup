@@ -678,7 +678,9 @@ export default class CourseDetails extends Vue {
   }
 }
 .hidden-markdown-input {
-  opacity: 0;
   position: absolute;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
 }
 </style>
