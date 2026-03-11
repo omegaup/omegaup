@@ -37,35 +37,37 @@
             @update:value="(value) => (showProblemTags = value)"
           ></omegaup-toggle-switch>
         </div>
-        <omegaup-problem-filter-difficulty
-          :selected-difficulty="difficulty"
-          @change-difficulty="
-            (difficulty) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedTags,
-              )
-          "
-        ></omegaup-problem-filter-difficulty>
+        <div class="filter-cards">
+          <omegaup-problem-filter-difficulty
+            :selected-difficulty="difficulty"
+            @change-difficulty="
+              (difficulty) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedTags,
+                )
+            "
+          ></omegaup-problem-filter-difficulty>
 
-        <omegaup-problem-filter-quality
-          :quality="quality"
-          @change-quality="
-            (quality) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                quality,
-                selectedTags,
-              )
-          "
-        ></omegaup-problem-filter-quality>
+          <omegaup-problem-filter-quality
+            :quality="quality"
+            @change-quality="
+              (quality) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  quality,
+                  selectedTags,
+                )
+            "
+          ></omegaup-problem-filter-quality>
+        </div>
       </div>
 
       <button
@@ -264,5 +266,11 @@ export default class CollectionList extends Vue {
 .main-content-wrapper {
   min-width: 0;
   flex: 1;
+}
+
+@media (max-width: 400px) {
+  .filter-cards {
+    display: none;
+  }
 }
 </style>
