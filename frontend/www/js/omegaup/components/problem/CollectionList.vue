@@ -1,14 +1,10 @@
 <template>
   <div class="container-fluid p-5 max-width mx-auto">
-    <div class="row">
-      <div class="col col-md-3 d-flex align-items-center">
-        <a href="/problem/collection/" data-nav-problems-collection>{{
-          T.problemCollectionBackCollections
-        }}</a>
-      </div>
-      <div class="col mb-4">
-        <h1 class="title-font p-0">{{ title }}</h1>
-      </div>
+    <h1 class="title-font p-0 mb-2">{{ title }}</h1>
+    <div class="mb-4">
+      <a href="/problem/collection/" data-nav-problems-collection>{{
+        T.problemCollectionBackCollections
+      }}</a>
     </div>
     <div class="d-flex flex-row">
       <div
