@@ -120,83 +120,98 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Returns the SELECT column expressions for the run extra fields.
-     * These reference the `rg_agg` alias produced by getRunExtraFieldsJoin().
-     *
      * @return string
      */
     final public static function getRunExtraFields() {
         /** @var string */
         return '
-            COALESCE(rg_agg.output, "OUTPUT_INTERRUPTED") AS output,
-            COALESCE(rg_agg.execution, "EXECUTION_COMPILATION_ERROR") AS execution,
-            COALESCE(rg_agg.status_runtime, "RUNTIME_NOT_AVAILABLE") AS status_runtime,
-            COALESCE(rg_agg.status_memory, "MEMORY_NOT_AVAILABLE") AS status_memory';
-    }
-
-    /**
-     * Returns a LEFT JOIN clause with a derived subquery that aggregates
-     * all 4 run-extra-status fields from Runs_Groups in a single pass
-     * per run_id, replacing the previous 4 correlated subqueries.
-     *
-     * @return string
-     */
-    final public static function getRunExtraFieldsJoin() {
-        /** @var string */
-        return '
-        LEFT JOIN (
-            SELECT
-                run_id,
-                ELT(
-                    MIN(FIELD(
-                        IF(verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
-                        IF(verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
-                        IF(verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED",
-                        "OUTPUT_CORRECT"))),
-                        "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
-                    )),
-                    "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
-                ) AS output,
-                ELT(
-                    MIN(FIELD(
-                        IF(verdict = "JE", "EXECUTION_JUDGE_ERROR",
-                        IF(verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
-                        IF(verdict = "CE", "EXECUTION_COMPILATION_ERROR",
-                        IF(verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                        IF(verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
-                        IF(verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED",
-                        "EXECUTION_FINISHED")))))),
-                        "EXECUTION_JUDGE_ERROR", "EXECUTION_VALIDATOR_ERROR",
-                        "EXECUTION_COMPILATION_ERROR", "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                        "EXECUTION_RUNTIME_ERROR", "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED"
-                    )),
-                    "EXECUTION_JUDGE_ERROR", "EXECUTION_VALIDATOR_ERROR",
-                    "EXECUTION_COMPILATION_ERROR", "EXECUTION_RUNTIME_FUNCTION_ERROR",
-                    "EXECUTION_RUNTIME_ERROR", "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED"
-                ) AS execution,
-                ELT(
-                    MIN(FIELD(
-                        IF(verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
-                        IF(verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED",
-                        "RUNTIME_AVAILABLE")),
-                        "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
-                    )),
-                    "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
-                ) AS status_runtime,
-                ELT(
-                    MIN(FIELD(
-                        IF(verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
-                        IF(verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED",
-                        "MEMORY_AVAILABLE")),
-                        "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
-                    )),
-                    "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
-                ) AS status_memory
-            FROM
-                Runs_Groups
-            GROUP BY
-                run_id
-        ) AS rg_agg ON rg_agg.run_id = r.run_id';
+        COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("OLE", "OL"), "OUTPUT_EXCEEDED",
+            IF(
+                verdict IN ("WA", "PA"), "OUTPUT_INCORRECT",
+            IF(
+                verdict IN ("JE", "VE", "CE", "FO", "RFE", "RE", "RTE", "MLE", "TLE"), "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT"
+            )))
+        AS output
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        GROUP BY
+            output
+        ORDER BY
+            field(output, "OUTPUT_EXCEEDED", "OUTPUT_INCORRECT", "OUTPUT_INTERRUPTED", "OUTPUT_CORRECT")
+        LIMIT 1
+            ), "OUTPUT_INTERRUPTED") AS output,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict = "JE", "EXECUTION_JUDGE_ERROR",
+            IF(
+                verdict = "VE", "EXECUTION_VALIDATOR_ERROR",
+            IF(
+                verdict = "CE", "EXECUTION_COMPILATION_ERROR",
+            IF(
+                verdict IN ("OF", "RFE"), "EXECUTION_RUNTIME_FUNCTION_ERROR",
+            IF(
+                verdict IN ("RE", "RTE"), "EXECUTION_RUNTIME_ERROR",
+            IF(
+                verdict IN ("ML", "MLE", "TLE", "OLE", "TO", "OL"), "EXECUTION_INTERRUPTED", "EXECUTION_FINISHED")
+            )))))
+            AS execution
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        GROUP BY
+            execution
+        ORDER BY
+            field(
+                execution,
+                "EXECUTION_JUDGE_ERROR",
+                "EXECUTION_VALIDATOR_ERROR",
+                "EXECUTION_COMPILATION_ERROR",
+                "EXECUTION_RUNTIME_FUNCTION_ERROR",
+                "EXECUTION_RUNTIME_ERROR",
+                "EXECUTION_INTERRUPTED",
+                "EXECUTION_FINISHED"
+            )
+        LIMIT 1
+            ), "EXECUTION_COMPILATION_ERROR")AS execution,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("JE", "CE"), "RUNTIME_NOT_AVAILABLE",
+            IF(
+                verdict IN ("TLE", "TO"), "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE"
+            ))
+            AS status_runtime
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        ORDER BY
+            field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
+                LIMIT 1
+            ), "RUNTIME_NOT_AVAILABLE" )AS status_runtime,
+            COALESCE(
+        ( SELECT
+            IF(
+                verdict IN ("JE", "CE"), "MEMORY_NOT_AVAILABLE",
+            IF(
+                verdict IN ("ML", "MLE"), "MEMORY_EXCEEDED", "MEMORY_AVAILABLE"
+            ))
+        AS status_memory
+        FROM
+            Runs_Groups
+        WHERE
+            run_id = r.run_id
+        ORDER BY
+            field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
+        LIMIT 1
+            ), "MEMORY_NOT_AVAILABLE" )AS status_memory';
     }
 
     /**
@@ -296,7 +311,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         }
 
         $extraFields = self::getRunExtraFields();
-        $extraFieldsJoin = self::getRunExtraFieldsJoin();
 
         $sql = "{$cteSubmissionsFeedback}
             SELECT
@@ -341,7 +355,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 User_Rank ur ON ur.user_id = i.user_id
             LEFT JOIN
                 Contests c ON c.problemset_id = s.problemset_id
-            {$extraFieldsJoin}
         ";
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where);
@@ -922,7 +935,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function getByGUID(string $guid) {
         $extraFields = self::getRunExtraFields();
-        $extraFieldsJoin = self::getRunExtraFieldsJoin();
 
         $sql = '
             SELECT
@@ -937,7 +949,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             `Submissions` `s`
         ON
             `r`.`submission_id` = `s`.`submission_id`
-        ' . $extraFieldsJoin . '
         WHERE
             `s`.`guid` = ?
         LIMIT
@@ -994,7 +1005,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $identityId
     ) {
         $extraFields = self::getRunExtraFields();
-        $extraFieldsJoin = self::getRunExtraFieldsJoin();
         $cteSubmissionsFeedback = '';
         $suggestionsCountField = '0 AS suggestions';
         $suggestionsJoin = '';
@@ -1049,7 +1059,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             {$suggestionsJoin}
             LEFT JOIN
                 Runs_Groups rg ON r.run_id = rg.run_id
-            {$extraFieldsJoin}
             INNER JOIN
                 Identities i
             ON

@@ -21,15 +21,20 @@
             <th scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsTitle }}</span>
               <span
+                v-if="showProblemTags"
                 class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
                 >{{ T.tagSourceLevel }}</span
               >
-              <span class="badge custom-badge custom-badge-owner mr-1 p-2">{{
-                T.tagSourceOwner
-              }}</span>
-              <span class="badge custom-badge custom-badge-voted p-2">{{
-                T.tagSourceVoted
-              }}</span>
+              <span
+                v-if="showProblemTags"
+                class="badge custom-badge custom-badge-owner mr-1 p-2"
+                >{{ T.tagSourceOwner }}</span
+              >
+              <span
+                v-if="showProblemTags"
+                class="badge custom-badge custom-badge-voted p-2"
+                >{{ T.tagSourceVoted }}</span
+              >
               <omegaup-common-sort-controls
                 column="title"
                 :column-type="omegaup.ColumnType.String"
@@ -205,7 +210,12 @@
               }}/{{ problem.submissions }})
             </td>
             <td v-if="loggedIn" class="text-right align-middle">
-              {{ problem.score.toFixed(2) }}
+              <span
+                :title="getProblemStatusTitle(problem)"
+                :class="['badge', getProblemStatusClass(problem)]"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
             </td>
             <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
@@ -273,11 +283,43 @@ export default class BaseList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() path!: string;
+  @Prop({ default: true }) showProblemTags!: boolean;
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
+
+  get solvedProblemAliasesSet(): Set<string> {
+    return new Set(this.solvedProblemAliases);
+  }
+
+  get attemptedProblemAliasesSet(): Set<string> {
+    return new Set(this.attemptedProblemAliases);
+  }
+
+  getProblemStatusTitle(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusSolved;
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusAttempted;
+    }
+    return T.problemStatusUnattempted;
+  }
+
+  getProblemStatusClass(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-success';
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-warning';
+    }
+    return 'badge-secondary';
+  }
+
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
