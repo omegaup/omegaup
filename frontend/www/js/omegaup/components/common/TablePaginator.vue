@@ -22,18 +22,18 @@
         </label>
       </div>
     </div>
-    <table
-      v-if="items.length > 0"
-      class="table table-striped mb-0 table-responsive col-12 table-typo p-0"
-    >
-      <thead class="d-table col-12">
+        <div v-if="items.length > 0" class="table-responsive">
+      <table
+        class="table table-striped mb-0 table-typo"
+      >
+      <thead>
         <tr>
-          <template v-for="column in columnNames"
-            ><th :class="column.style">{{ column.name }}</th></template
-          >
+          <template v-for="column in columnNames">
+            <th :key="column.name" :class="column.style">{{ column.name }}</th>
+          </template>
         </tr>
       </thead>
-      <tbody class="d-table col-12">
+      <tbody>
         <tr v-for="(group, index) in paginatedItems" :key="index">
           <th v-if="showPageOffset" scope="row" class="text-left align-middle">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
@@ -64,6 +64,7 @@
         </tr>
       </tbody>
     </table>
+  </div>
     <div v-if="items.length > 0" class="card-footer text-center">
       <div class="btn-group" role="group">
         <button
@@ -157,14 +158,7 @@ export default class TablePaginator extends Vue {
 </script>
 
 <style>
-@media (max-width: 550px) {
-  .table-typo td,
-  .table-typo th {
-    display: block;
-    background-color: var(--table-paginator-background-color);
-    border: 1px solid var(--table-paginator-border-color);
-  }
-}
+
 
 [data-table-paginator] .table td {
   padding: 0.75rem 1.25rem;
