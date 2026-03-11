@@ -1,6 +1,6 @@
 <template>
   <transition name="modal">
-    <div class="note-modal-mask" @click.self="$emit('close')">
+    <div class="note-modal-mask" @click.self="$emit('close')" @keydown.esc="$emit('close')">
       <div class="note-modal-container">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="mb-0">{{ T.problemNoteTitle }}</h5>
@@ -18,7 +18,6 @@
             <span
               class="tab-btn"
               :class="{ active: activeTab === 'write' }"
-              :style="tabStyle(activeTab === 'write')"
               @click="activeTab = 'write'"
             >
               {{ T.wordsEdit }}
@@ -26,7 +25,6 @@
             <span
               class="tab-btn"
               :class="{ active: activeTab === 'preview' }"
-              :style="tabStyle(activeTab === 'preview')"
               @click="activeTab = 'preview'"
             >
               {{ T.wordsPreview }}
@@ -114,7 +112,7 @@
               v-model="currentNoteText"
               class="note-textarea"
               rows="10"
-              maxlength="2000"
+              :maxlength="MAX_NOTE_LENGTH"
               :placeholder="T.problemNotePlaceholder"
             ></textarea>
           </div>
@@ -132,7 +130,7 @@
             </p>
           </div>
           <small class="form-text text-muted text-right d-block">
-            {{ currentNoteText.length }} / 2000 &mdash;
+            {{ currentNoteText.length }} / {{ MAX_NOTE_LENGTH }} &mdash;
             {{ T.problemNoteCharLimit }}
           </small>
         </div>
@@ -167,7 +165,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -202,10 +200,14 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class NoteModal extends Vue {
+  private static readonly MAX_NOTE_LENGTH = 2000;
+
   @Prop({ default: '' }) initialNoteText!: string;
   @Prop({ required: true }) problemAlias!: string;
+  @Prop({ default: 0 }) operationFailed!: number;
 
   T = T;
+  MAX_NOTE_LENGTH = NoteModal.MAX_NOTE_LENGTH;
   currentNoteText = '';
   isSaving = false;
   activeTab: 'write' | 'preview' = 'write';
@@ -216,19 +218,14 @@ export default class NoteModal extends Vue {
 
   mounted(): void {
     this.currentNoteText = this.initialNoteText;
-    // If there's existing text, show preview first
     if (this.initialNoteText.length > 0) {
       this.activeTab = 'preview';
     }
   }
 
-  tabStyle(isActive: boolean): Record<string, string> {
-    return {
-      color: isActive ? '#495057' : '#6c757d',
-      background: isActive ? '#fff' : 'transparent',
-      fontWeight: isActive ? '600' : '400',
-      borderColor: isActive ? '#dee2e6 #dee2e6 #fff' : 'transparent',
-    };
+  @Watch('operationFailed')
+  onOperationFailed(): void {
+    this.isSaving = false;
   }
 
   get hasExistingNote(): boolean {
@@ -358,7 +355,7 @@ export default class NoteModal extends Vue {
 
 .tab-bar {
   display: flex;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--finder-wizard-modal-container-border-color, #dee2e6);
   margin-bottom: 0;
 }
 
@@ -369,19 +366,19 @@ export default class NoteModal extends Vue {
   border-radius: 0.25rem 0.25rem 0 0;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  color: #6c757d !important;
+  color: var(--note-modal-text-muted, #6c757d) !important;
   font-size: 0.9rem;
   margin-bottom: -1px;
 
   &:hover {
-    color: #495057 !important;
-    border-color: #e9ecef #e9ecef #dee2e6;
+    color: var(--note-modal-text-color, #495057) !important;
+    border-color: var(--note-modal-hover-border, #e9ecef) var(--note-modal-hover-border, #e9ecef) var(--finder-wizard-modal-container-border-color, #dee2e6);
   }
 
   &.active {
-    color: #495057 !important;
-    background: #fff !important;
-    border-color: #dee2e6 #dee2e6 #fff;
+    color: var(--note-modal-text-color, #495057) !important;
+    background: var(--finder-wizard-modal-container-background-color, #fff) !important;
+    border-color: var(--finder-wizard-modal-container-border-color, #dee2e6) var(--finder-wizard-modal-container-border-color, #dee2e6) var(--finder-wizard-modal-container-background-color, #fff);
     font-weight: 600;
   }
 }
@@ -389,8 +386,8 @@ export default class NoteModal extends Vue {
 .toolbar {
   display: flex;
   align-items: center;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background: var(--note-modal-toolbar-bg, #f8f9fa);
+  border: 1px solid var(--finder-wizard-modal-container-border-color, #dee2e6);
   border-bottom: none;
   border-top: none;
   padding: 0.25rem 0.5rem;
@@ -403,17 +400,17 @@ export default class NoteModal extends Vue {
   border-radius: 0.2rem;
   padding: 0.3rem 0.5rem;
   cursor: pointer;
-  color: #495057;
+  color: var(--note-modal-text-color, #495057);
   font-size: 0.9rem;
   line-height: 1;
 
   &:hover {
-    background: #e9ecef;
-    border-color: #dee2e6;
+    background: var(--note-modal-hover-border, #e9ecef);
+    border-color: var(--finder-wizard-modal-container-border-color, #dee2e6);
   }
 
   &:active {
-    background: #dee2e6;
+    background: var(--finder-wizard-modal-container-border-color, #dee2e6);
   }
 }
 
@@ -426,7 +423,7 @@ export default class NoteModal extends Vue {
 .toolbar-divider {
   width: 1px;
   height: 1.2rem;
-  background: #dee2e6;
+  background: var(--finder-wizard-modal-container-border-color, #dee2e6);
   margin: 0 0.3rem;
 }
 
@@ -438,24 +435,24 @@ export default class NoteModal extends Vue {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
+  color: var(--note-modal-text-color, #495057);
+  background-color: var(--finder-wizard-modal-container-background-color, #fff);
   background-clip: padding-box;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--note-modal-input-border, #ced4da);
   border-radius: 0 0 0.25rem 0.25rem;
   resize: vertical;
   font-family: inherit;
 }
 
 .preview-pane {
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--finder-wizard-modal-container-border-color, #dee2e6);
   border-top: none;
   border-radius: 0 0 0.25rem 0.25rem;
   padding: 1rem;
   min-height: 200px;
   max-height: 400px;
   overflow-y: auto;
-  background: #fff;
+  background: var(--finder-wizard-modal-container-background-color, #fff);
 }
 
 .modal-enter-active,

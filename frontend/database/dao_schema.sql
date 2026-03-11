@@ -651,7 +651,7 @@ CREATE TABLE `Problem_Bookmarks` (
 CREATE TABLE `Problem_Notes` (
   `identity_id` int NOT NULL,
   `problem_id` int NOT NULL,
-  `note_text` text NOT NULL,
+  `note_text` varchar(2000) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`identity_id`,`problem_id`),

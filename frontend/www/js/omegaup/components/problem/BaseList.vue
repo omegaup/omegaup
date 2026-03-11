@@ -102,7 +102,7 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th v-if="loggedIn" scope="col" class="align-middle text-nowrap">
+            <th v-if="loggedIn && showNotes" scope="col" class="align-middle text-nowrap">
               <span>{{ T.wordsNotes }}</span>
             </th>
             <th scope="col" class="align-middle text-nowrap">
@@ -215,7 +215,7 @@
             <td v-if="loggedIn" class="text-right align-middle">
               {{ problem.score.toFixed(2) }}
             </td>
-            <td v-if="loggedIn" class="text-center align-middle">
+            <td v-if="loggedIn && showNotes" class="text-center align-middle">
               <button
                 class="btn btn-link p-0"
                 :title="
@@ -248,9 +248,10 @@
       ></omegaup-common-paginator>
     </div>
     <omegaup-problem-note-modal
-      v-if="showNoteModal"
+      v-if="showNotes && showNoteModal"
       :initial-note-text="noteModalText"
       :problem-alias="noteModalAlias"
+      :operation-failed="noteOperationFailed"
       @save-note="onSaveNote"
       @delete-note="onDeleteNote"
       @close="showNoteModal = false"
@@ -259,7 +260,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -313,7 +314,9 @@ export default class BaseList extends Vue {
   @Prop() columnName!: string;
   @Prop() path!: string;
   @Prop({ default: true }) showProblemTags!: boolean;
+  @Prop({ default: false }) showNotes!: boolean;
   @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
+  @Prop({ default: 0 }) noteOperationFailed!: number;
 
   T = T;
   ui = ui;
@@ -345,6 +348,13 @@ export default class BaseList extends Vue {
     return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
   }
 
+  @Watch('notes', { deep: true })
+  onNotesChanged(): void {
+    if (this.showNoteModal) {
+      this.showNoteModal = false;
+    }
+  }
+
   openNoteModal(problemAlias: string, problemId: number): void {
     this.noteModalAlias = problemAlias;
     this.noteModalText = this.notes[problemId] || '';
@@ -352,12 +362,10 @@ export default class BaseList extends Vue {
   }
 
   onSaveNote(alias: string, text: string): void {
-    this.showNoteModal = false;
     this.$emit('save-note', alias, text);
   }
 
   onDeleteNote(alias: string): void {
-    this.showNoteModal = false;
     this.$emit('delete-note', alias);
   }
 
@@ -393,11 +401,11 @@ thead tr th {
 }
 
 .note-active {
-  color: #678dd7;
+  color: var(--note-icon-active-color, #678dd7);
 }
 
 .note-inactive {
-  color: #ccc;
+  color: var(--note-icon-inactive-color, #ccc);
   opacity: 0.5;
 }
 </style>

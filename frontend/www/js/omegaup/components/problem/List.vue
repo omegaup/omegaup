@@ -50,7 +50,9 @@
       :sort-order="sortOrder"
       :column-name="columnName"
       :path="'/problem/'"
+      :show-notes="true"
       :notes="notes"
+      :note-operation-failed="noteOperationFailed"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
@@ -100,6 +102,7 @@ export default class List extends Vue {
   @Prop() columnName!: string;
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
+  @Prop({ default: 0 }) noteOperationFailed!: number;
 
   T = T;
   omegaup = omegaup;

@@ -12,6 +12,54 @@ namespace OmegaUp\DAO;
  */
 class ProblemNotes extends \OmegaUp\DAO\Base\ProblemNotes {
     /**
+     * Create or update a note, preserving created_at on update.
+     *
+     * Uses INSERT ... AS new ON DUPLICATE KEY UPDATE (MySQL 8.0.19+)
+     * instead of REPLACE INTO, which would reset created_at.
+     */
+    public static function upsert(
+        \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes
+    ): int {
+        if (
+            empty($Problem_Notes->identity_id) ||
+            empty($Problem_Notes->problem_id)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+        $sql = '
+            INSERT INTO
+                Problem_Notes (
+                    `identity_id`,
+                    `problem_id`,
+                    `note_text`,
+                    `created_at`,
+                    `updated_at`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                ) AS `new`
+            ON DUPLICATE KEY UPDATE
+                `note_text` = `new`.`note_text`,
+                `updated_at` = `new`.`updated_at`;';
+        $params = [
+            $Problem_Notes->identity_id,
+            $Problem_Notes->problem_id,
+            $Problem_Notes->note_text,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->created_at
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->updated_at
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
      * Get all notes for a specific identity
      *
      * @return list<ProblemNoteItem>
@@ -19,10 +67,10 @@ class ProblemNotes extends \OmegaUp\DAO\Base\ProblemNotes {
     public static function getAllNotesForIdentity(int $identityId): array {
         $query = '
             SELECT
-                ' . \OmegaUp\DAO\DAO::getFields(
-            \OmegaUp\DAO\VO\Problems::FIELD_NAMES,
-            'Problems'
-        ) . ',
+                Problems.problem_id,
+                Problems.alias,
+                Problems.title,
+                Problems.visibility,
                 pn.note_text
             FROM
                 Problems
@@ -35,7 +83,7 @@ class ProblemNotes extends \OmegaUp\DAO\Base\ProblemNotes {
             ORDER BY
                 pn.updated_at DESC;';
         $queryParams = [$identityId];
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, note_text: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
+        /** @var list<array{alias: string, note_text: string, problem_id: int, title: string, visibility: int}> */
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $query,
             $queryParams
@@ -43,15 +91,19 @@ class ProblemNotes extends \OmegaUp\DAO\Base\ProblemNotes {
 
         $notedProblems = [];
         foreach ($resultRows as $rowData) {
-            $problem = new \OmegaUp\DAO\VO\Problems($rowData);
-            if (\OmegaUp\DAO\Problems::isVisible($problem)) {
-                $notedProblems[] = [
-                    'alias' => $rowData['alias'],
-                    'title' => $rowData['title'],
-                    'note_text' => $rowData['note_text'],
-                    'problem_id' => $rowData['problem_id'],
-                ];
+            $visibility = intval($rowData['visibility']);
+            if (
+                $visibility < \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING
+                && $visibility !== \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
+            ) {
+                continue;
             }
+            $notedProblems[] = [
+                'alias' => $rowData['alias'],
+                'title' => $rowData['title'],
+                'note_text' => $rowData['note_text'],
+                'problem_id' => $rowData['problem_id'],
+            ];
         }
         return $notedProblems;
     }

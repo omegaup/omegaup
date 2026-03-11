@@ -299,4 +299,51 @@ class ProblemNoteTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertSame('recordNotFound', $e->getMessage());
         }
     }
+
+    /**
+     * Tests that notes on private/hidden problems are excluded from apiList
+     */
+    public function testListNotesFiltersInvisibleProblems() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a public problem and a private problem
+        $publicProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $privateProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $identity,
+            ])
+        );
+
+        $login = self::login($identity);
+
+        // Save notes on both problems
+        \OmegaUp\Controllers\ProblemNote::apiSave(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $publicProblem['problem']->alias,
+                'note_text' => 'Note on public problem',
+            ])
+        );
+        \OmegaUp\Controllers\ProblemNote::apiSave(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $privateProblem['problem']->alias,
+                'note_text' => 'Note on private problem',
+            ])
+        );
+
+        // List notes — only the public problem note should appear
+        $response = \OmegaUp\Controllers\ProblemNote::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertSame(1, $response['total']);
+        $this->assertSame(
+            $publicProblem['problem']->alias,
+            $response['notes'][0]['alias']
+        );
+    }
 }

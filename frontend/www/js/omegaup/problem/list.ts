@@ -62,7 +62,10 @@ OmegaUp.on('ready', () => {
       searchResultProblems.push({ key: query, value: query });
     }
   }
-  const notes: { [key: number]: string } = payload.notes ?? {};
+  const aliasToProblemId: { [alias: string]: number } = {};
+  for (const problem of payload.problems) {
+    aliasToProblemId[problem.alias] = problem.problem_id;
+  }
   new Vue({
     el: '#main-container',
     components: {
@@ -70,7 +73,8 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       searchResultProblems: searchResultProblems,
-      notes: notes,
+      notes: Object.assign({}, payload.notes ?? {}),
+      noteOperationFailed: 0,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
@@ -89,6 +93,7 @@ OmegaUp.on('ready', () => {
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
           notes: this.notes,
+          noteOperationFailed: this.noteOperationFailed,
         },
         on: {
           'wizard-search': (queryParameters: {
@@ -130,15 +135,15 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemNoteSaved);
-                // Update the local notes map
-                const problem = payload.problems.find(
-                  (p) => p.alias === problemAlias,
-                );
-                if (problem) {
-                  Vue.set(this.notes, problem.problem_id, noteText);
+                const problemId = aliasToProblemId[problemAlias];
+                if (problemId !== undefined) {
+                  Vue.set(this.notes, problemId, noteText);
                 }
               })
-              .catch(ui.apiError);
+              .catch((error) => {
+                ui.apiError(error);
+                this.noteOperationFailed++;
+              });
           },
           'delete-note': (problemAlias: string) => {
             api.ProblemNote.delete({
@@ -146,15 +151,15 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemNoteDeleted);
-                // Remove from local notes map
-                const problem = payload.problems.find(
-                  (p) => p.alias === problemAlias,
-                );
-                if (problem) {
-                  Vue.delete(this.notes, problem.problem_id);
+                const problemId = aliasToProblemId[problemAlias];
+                if (problemId !== undefined) {
+                  Vue.delete(this.notes, problemId);
                 }
               })
-              .catch(ui.apiError);
+              .catch((error) => {
+                ui.apiError(error);
+                this.noteOperationFailed++;
+              });
           },
         },
       });

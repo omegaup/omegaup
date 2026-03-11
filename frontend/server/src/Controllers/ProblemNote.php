@@ -38,9 +38,9 @@ class ProblemNote extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $currentIdentityId = $r->identity->identity_id;
+        $currentIdentityId = intval($r->identity->identity_id);
 
-        \OmegaUp\DAO\ProblemNotes::replace(
+        \OmegaUp\DAO\ProblemNotes::upsert(
             new \OmegaUp\DAO\VO\ProblemNotes([
                 'identity_id' => $currentIdentityId,
                 'problem_id' => $targetProblem->problem_id,
@@ -70,7 +70,7 @@ class ProblemNote extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $currentIdentityId = $r->identity->identity_id;
+        $currentIdentityId = intval($r->identity->identity_id);
         $existingNote = \OmegaUp\DAO\ProblemNotes::getByPK(
             $currentIdentityId,
             $targetProblem->problem_id
@@ -105,7 +105,7 @@ class ProblemNote extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $currentIdentityId = $r->identity->identity_id;
+        $currentIdentityId = intval($r->identity->identity_id);
         $existingNote = \OmegaUp\DAO\ProblemNotes::getByPK(
             $currentIdentityId,
             $targetProblem->problem_id
@@ -126,7 +126,7 @@ class ProblemNote extends \OmegaUp\Controllers\Controller {
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $currentIdentityId = $r->identity->identity_id;
+        $currentIdentityId = intval($r->identity->identity_id);
         $notes = \OmegaUp\DAO\ProblemNotes::getAllNotesForIdentity(
             $currentIdentityId
         );

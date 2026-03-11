@@ -1,7 +1,7 @@
 CREATE TABLE `Problem_Notes` (
   `identity_id` int NOT NULL,
   `problem_id` int NOT NULL,
-  `note_text` TEXT NOT NULL,
+  `note_text` VARCHAR(2000) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`identity_id`, `problem_id`),
