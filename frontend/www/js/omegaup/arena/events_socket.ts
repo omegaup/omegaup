@@ -246,6 +246,14 @@ export class EventsSocket {
       clearInterval(this.socketKeepalive);
       this.socketKeepalive = null;
     }
+    if (this.clarificationInterval) {
+      clearInterval(this.clarificationInterval);
+      this.clarificationInterval = null;
+    }
+    if (this.rankingInterval) {
+      clearInterval(this.rankingInterval);
+      this.rankingInterval = null;
+    }
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
       this.socketStatus = SocketStatus.Waiting;

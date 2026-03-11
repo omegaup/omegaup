@@ -154,6 +154,69 @@ describe('EventsSocket', () => {
     expect(client.socketStatus).toEqual(SocketStatus.Failed);
   });
 
+  it('should clear intervals when the connection is closed', async () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+    client.connect();
+
+    jest.runOnlyPendingTimers();
+    await server?.connected;
+
+    (client as any).clarificationInterval = setInterval(() => {}, 1000);
+    (client as any).rankingInterval = setInterval(() => {}, 1000);
+
+    expect((client as any).clarificationInterval).not.toBeNull();
+    expect((client as any).rankingInterval).not.toBeNull();
+
+    client.shouldRetry = false;
+
+    (client as any).onclose();
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+  });
+
+  it('should not leak polling intervals during reconnect cycles with setupPolls', async () => {
+    const client = new EventsSocket({ ...options, disableSockets: false });
+    
+    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    // Simulate connection failure / fallback where setupPolls is triggered
+    (client as any).socket = null;
+    (client as any).setupPolls();
+    
+    const clarificationInterval1 = (client as any).clarificationInterval;
+    const rankingInterval1 = (client as any).rankingInterval;
+    
+    expect(clarificationInterval1).not.toBeNull();
+    expect(rankingInterval1).not.toBeNull();
+    
+    // Simulate close
+    client.shouldRetry = false;
+    (client as any).onclose();
+    
+    // Verify they are explicitly cleared
+    expect((client as any).clarificationInterval).toBeNull();
+    expect((client as any).rankingInterval).toBeNull();
+    expect(clearIntervalSpy).toHaveBeenCalledWith(clarificationInterval1);
+    expect(clearIntervalSpy).toHaveBeenCalledWith(rankingInterval1);
+    
+    // Simulate next cycle fallback creating new intervals
+    (client as any).setupPolls();
+    
+    const clarificationInterval2 = (client as any).clarificationInterval;
+    const rankingInterval2 = (client as any).rankingInterval;
+    
+    expect(clarificationInterval2).not.toBeNull();
+    expect(rankingInterval2).not.toBeNull();
+    expect(clarificationInterval1).not.toEqual(clarificationInterval2);
+    
+    // Cleanup
+    (client as any).onclose();
+
+    setIntervalSpy.mockRestore();
+    clearIntervalSpy.mockRestore();
+  });
+
   it('should handle a socket when server sends /run/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
