@@ -37,14 +37,25 @@
               @read="readNotifications"
             ></omegaup-notification-list>
           </div>
-          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex">
-            <li class="nav-item">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right d-lg-flex mr-2">
+            <li class="nav-item d-flex align-items-center">
               <a
-                class="nav-link nav-login-text"
+                class="nav-link nav-login-text pr-0"
                 :href="formattedLoginURL"
                 data-login-button
-                >{{ T.navLogIn }}</a
+                @click.prevent="emitActiveTab(AvailableTabs.Login)"
               >
+                {{ T.navbarLogin }}
+              </a>
+              <span class="nav-link nav-login-text px-1">/</span>
+              <a
+                class="nav-link nav-login-text pl-0"
+                :href="formattedSignupURL"
+                data-signup-button
+                @click.prevent="emitActiveTab(AvailableTabs.Signup)"
+              >
+                {{ T.navbarRegister }}
+              </a>
             </li>
           </ul>
           <button
@@ -106,6 +117,7 @@
                     :src="gravatarURL51"
                     height="45"
                     class="pr-1 pt-1"
+                    :alt="T.navUserAvatarAlt"
                   /><span class="username mr-2" :title="currentUsername">{{
                     currentUsername
                   }}</span>
@@ -127,6 +139,7 @@
                         height="70"
                         class="rounded-circle mb-1"
                         :title="currentUsername"
+                        :alt="T.navUserAvatarAlt"
                       />
                       <h5 v-if="currentName !== ''" class="mx-2">
                         {{ currentName }}
@@ -174,6 +187,7 @@
                             height="45"
                             class="rounded-circle mr-3"
                             :title="identity.username"
+                            :alt="identity.username"
                           />{{ identity.username }}
                         </button>
                       </div>
@@ -293,12 +307,12 @@
         <!-- Logout button for desktop - navbar -->
         <a
           v-if="isLoggedIn"
-          class="navbar justify-content-end d-none d-lg-block order-1"
+          class="navbar justify-content-end d-none d-lg-block order-1 align-items-center"
           href="#"
+          :title="T.omegaupTitleLogout"
           @click.prevent="logoutModalVisible = true"
         >
           <font-awesome-icon :icon="['fas', 'power-off']" />
-          {{ T.omegaupTitleLogout }}
         </a>
       </div>
     </nav>
@@ -325,7 +339,7 @@
       ></omegaup-user-next-registered-contest>
       <div
         v-if="mentorCanChooseCoder"
-        class="alert alert-info alert-dismissible fade show"
+        class="alert alert-info alert-dismissible fade show mentor-can-choose-coder"
         role="alert"
       >
         <button type="button" class="close" data-dismiss="alert">
@@ -354,12 +368,15 @@ import common_GraderBadge from '../common/GraderBadge.vue';
 import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 import user_next_registered_contest from '../user/NextRegisteredContest.vue';
 import navbar_items from './NavbarItems.vue';
+import { AvailableTabs } from '../login/Signin.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import LogoutConfirmation from './LogoutConfirmation.vue';
 library.add(faSignOutAlt, faUser);
+
+export const EventBus = new Vue();
 
 @Component({
   components: {
@@ -405,6 +422,7 @@ export default class Navbar extends Vue {
 
   T = T;
   ui = ui;
+  AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
@@ -412,7 +430,19 @@ export default class Navbar extends Vue {
   );
 
   get formattedLoginURL(): string {
-    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+    let path = window.location.pathname;
+    if (path === '/login' || path === '/login/') {
+      path = '/';
+    }
+    return `/login/?redirect=${encodeURIComponent(path)}#login`;
+  }
+
+  get formattedSignupURL(): string {
+    let path = window.location.pathname;
+    if (path === '/login' || path === '/login/') {
+      path = '/';
+    }
+    return `/login/?redirect=${encodeURIComponent(path)}#signup`;
   }
 
   get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
@@ -445,13 +475,28 @@ export default class Navbar extends Vue {
     }
     return 'bg-warning';
   }
+
+  emitActiveTab(tab: AvailableTabs): void {
+    EventBus.$emit('update:activeTab', tab);
+    if (
+      window.location.pathname === '/login' ||
+      window.location.pathname === '/login/'
+    ) {
+      window.location.hash = `#${tab}`;
+    } else {
+      window.location.href =
+        tab === AvailableTabs.Login
+          ? this.formattedLoginURL
+          : this.formattedSignupURL;
+    }
+  }
 }
 </script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.alert-info {
+.mentor-can-choose-coder {
   margin: 1rem;
 }
 
@@ -513,7 +558,8 @@ nav.navbar {
     color: var(--header-navbar-dropdown-item-font-color);
   }
 
-  a {
+  a,
+  span.nav-link {
     color: var(--header-navbar-primary-link-color);
   }
 
@@ -576,6 +622,22 @@ nav.navbar {
     .dropdown:not(.show):hover
     > .dropdown-menu {
     display: none !important;
+  }
+
+  .nav-problems .collapse-links {
+    display: none;
+  }
+
+  .nav-problems .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
+  }
+
+  .nav-user .collapse-links {
+    display: none;
+  }
+
+  .nav-user .collapse-submenu:is(:hover, :focus-within) .collapse-links {
+    display: block;
   }
 }
 

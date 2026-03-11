@@ -15,10 +15,16 @@
             :linkify="true"
           ></omegaup-username>
         </p>
-        <p>
-          <span class="font-weight-bold">{{ T.wordsDescription }}: </span>
-          <omegaup-markdown :markdown="course.description"></omegaup-markdown>
-        </p>
+        <div class="d-flex align-items-baseline">
+          <span class="font-weight-bold mr-2 text-nowrap">
+            {{ T.wordsDescription }}:
+          </span>
+          <omegaup-markdown
+            :full-width="true"
+            :markdown="course.description"
+            class="flex-grow-1 description-content"
+          ></omegaup-markdown>
+        </div>
         <li
           v-for="assignment of course.assignments"
           :key="assignment.problemset_id"
@@ -81,3 +87,22 @@ export default class CourseCloneWithToken extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+/* Allow flex item to shrink below content size for proper text wrapping */
+.description-content {
+  min-width: 0;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep [data-markdown-statement] {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+::v-deep [data-markdown-statement] p {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+</style>
