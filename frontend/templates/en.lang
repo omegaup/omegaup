@@ -2309,3 +2309,6 @@ wordsWallTimeInSeconds = "Wall-time (Sec)"
 wordsWarningProblem = "Keep with a warning"
 wordsYes = "Yes"
 zipPrepare = "Prepare zip file"
+noStudentsEnrolled=No students enrolled yet
+addStudentsToTrackProgress=Add students to this course to start tracking their progress.
+addStudents=Add students

@@ -18,24 +18,18 @@
           </div>
           <div v-if="sortedStudents.length === 0" class="text-center p-5">
 
-              <img
-               src="/media/empty-state.svg"
-               alt="No students"
-               width="80"
-               class="mb-3"
-            />
+              <i class="fa fa-users fa-3x mb-3 text-muted"></i>
 
-            <h3>No students enrolled yet</h3>
+            <h3>{{ T.noStudentsEnrolled }}</h3>
 
            <p class="text-muted">
-             Add students to this course to start tracking their progress.
-           </p>
-
+              {{ T.addStudentsToTrackProgress }}
+            </p>
           <a
            :href="`/course/${course.alias}/edit/`"
             class="btn btn-primary mt-3"
            >
-           Add students
+           {{ T.addStudents }}
           </a>
 
         </div>

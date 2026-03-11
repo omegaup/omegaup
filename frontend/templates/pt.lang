@@ -2309,3 +2309,6 @@ wordsWallTimeInSeconds = "Tempo-real (Seg)"
 wordsWarningProblem = "Mantener com um aviso"
 wordsYes = "Sim"
 zipPrepare = "Preparar arquivo zip"
+noStudentsEnrolled=Sem alunos inscritos
+addStudentsToTrackProgress=Adicione alunos a este curso para começar a acompanhar o progresso.
+addStudents=Adicionar alunos
