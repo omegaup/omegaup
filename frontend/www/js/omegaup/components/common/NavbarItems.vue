@@ -46,6 +46,7 @@
           T.wordsContests
         }}</a>
       </li>
+
       <li
         v-if="isLoggedIn"
         class="nav-item dropdown nav-courses nav-item-align"
@@ -86,6 +87,7 @@
       >
         <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
       </li>
+
       <li
         class="nav-item dropdown nav-problems nav-item-align"
         :class="{ active: navbarSection === 'problems' }"
@@ -121,36 +123,41 @@
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
             }}</a>
+
             <template v-if="!isLoggedIn">
               <a class="dropdown-item" href="/problem/creator/">{{
                 T.createZipFileForProblem
               }}</a>
             </template>
+
             <template v-else>
-              <form class="collapse-submenu">
+              <div class="collapse-submenu">
                 <button
                   type="button"
                   class="dropdown-item dropdown-toggle"
-                  data-toggle="collapse"
-                  data-target=".collapse-links"
                   data-nav-problems-create-options
-                  aria-expanded="false"
-                  aria-controls="collapse-links"
+                  :aria-expanded="isCreateProblemSubmenuOpen ? 'true' : 'false'"
+                  @click.stop.prevent="onCreateProblemClick"
                 >
                   {{ T.myproblemsListCreateProblem }}
                 </button>
-                <div class="collapse collapse-links pl-3">
-                  <a class="dropdown-item" href="/problem/creator/">{{
-                    T.myproblemsListCreateZipFileProblem
-                  }}</a>
+
+                <div v-show="isCreateProblemSubmenuOpen" class="pl-3">
+                  <a
+                    class="dropdown-item"
+                    href="/problem/creator/"
+                    @click.stop
+                    >{{ T.myproblemsListCreateZipFileProblem }}</a
+                  >
                   <a
                     class="dropdown-item"
                     href="/problem/new/"
                     data-nav-problems-create
+                    @click.stop
                     >{{ T.myproblemsListCreateProblemWithExistingZipFile }}</a
                   >
                 </div>
-              </form>
+              </div>
             </template>
             <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
               T.navQualityNominationQueue
@@ -158,6 +165,7 @@
           </slot>
         </div>
       </li>
+
       <li
         class="nav-item dropdown nav-rank nav-item-align"
         :class="{ active: navbarSection === 'rank' }"
@@ -194,6 +202,7 @@
           }}</a>
         </div>
       </li>
+
       <li class="nav-item dropdown nav-item-align">
         <a
           class="nav-link px-2 dropdown-toggle"
@@ -257,6 +266,9 @@ export default class NavbarItems extends Vue {
 
   T = T;
 
+  // Used by Cypress selector + click toggle
+  isCreateProblemSubmenuOpen = false;
+
   get OmegaUpBlogURL(): string {
     return getExternalUrl('OmegaUpBlogURL');
   }
@@ -275,6 +287,10 @@ export default class NavbarItems extends Vue {
 
   get CompetitiveProgrammingBookURL(): string {
     return getExternalUrl('CompetitiveProgrammingBookURL');
+  }
+
+  onCreateProblemClick(): void {
+    this.isCreateProblemSubmenuOpen = !this.isCreateProblemSubmenuOpen;
   }
 }
 </script>
