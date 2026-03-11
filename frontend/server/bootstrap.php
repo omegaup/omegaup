@@ -80,7 +80,7 @@ $contentSecurityPolicy = [
         'https://www.google-analytics.com',
         'https://connect.facebook.net',
         'https://platform.twitter.com',
-        'https://www.clarity.ms',
+        'https://*.clarity.ms',
     ],
     'frame-src' => [
         '\'self\'',
