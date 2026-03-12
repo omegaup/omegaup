@@ -1,5 +1,5 @@
 <template>
-  <div class="card ranking-width">
+  <div class="card w-100">
     <ul class="nav nav-tabs justify-content-arround" role="tablist">
       <li v-for="tab in availableTabs" :key="tab.id" class="nav-item">
         <a
@@ -162,8 +162,8 @@ export default class CoderOfTheMonthList extends Vue {
   white-space: nowrap;
 }
 
-.ranking-width {
+/*.ranking-width {
   max-width: 55rem;
   margin: 0 auto;
-}
+}*/
 </style>
