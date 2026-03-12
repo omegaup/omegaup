@@ -930,7 +930,6 @@ const translations: { [key: string]: string; } = {
   navAllProblems: "All problems",
   navAuthorRanking: "Contributors ranking",
   navBlog: "Blog",
-  navCarouselManagement: "Carousel Management",
   navCoderOfTheMonth: "Coder of the month overall",
   navCoderOfTheMonthFemale: "Coder of the month for her",
   navContests: "Contests",
