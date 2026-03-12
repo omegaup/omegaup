@@ -1269,12 +1269,19 @@ export default class Form extends Vue {
     if (imageButton) {
       imageButton.remove();
     }
-    this.descriptionInput.addEventListener('keydown', (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'g') {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    }, true);
+    this.descriptionInput.addEventListener(
+      'keydown',
+      (event: KeyboardEvent) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === 'g'
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
   }
 
   @Watch('invalidParameterName')
@@ -1589,7 +1596,6 @@ export default class Form extends Vue {
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
 }
-
 
 .wmd-input {
   min-height: 120px;
