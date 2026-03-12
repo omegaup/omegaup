@@ -5444,10 +5444,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit,
             $lang
         );
-        $cdp = \OmegaUp\Controllers\Problem::getProblemCDP(
-            $problem,
-            strval($problem->commit)
-        );
+        $cdp = null;
+        try {
+            $cdp = \OmegaUp\Controllers\Problem::getProblemCDP(
+                $problem,
+                strval($problem->commit)
+            );
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to load CDP data for {$problem->alias}",
+                ['exception' => $e],
+            );
+            // CDP data is optional for the edit page to function
+        }
         $publishedRevision = null;
         foreach ($versions['log'] as $revision) {
             if ($versions['published'] === $revision['commit']) {
