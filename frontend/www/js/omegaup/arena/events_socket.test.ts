@@ -176,40 +176,40 @@ describe('EventsSocket', () => {
 
   it('should not leak polling intervals during reconnect cycles with setupPolls', async () => {
     const client = new EventsSocket({ ...options, disableSockets: false });
-    
+
     const setIntervalSpy = jest.spyOn(global, 'setInterval');
     const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
 
     // Simulate connection failure / fallback where setupPolls is triggered
     (client as any).socket = null;
     (client as any).setupPolls();
-    
+
     const clarificationInterval1 = (client as any).clarificationInterval;
     const rankingInterval1 = (client as any).rankingInterval;
-    
+
     expect(clarificationInterval1).not.toBeNull();
     expect(rankingInterval1).not.toBeNull();
-    
+
     // Simulate close
     client.shouldRetry = false;
     (client as any).onclose();
-    
+
     // Verify they are explicitly cleared
     expect((client as any).clarificationInterval).toBeNull();
     expect((client as any).rankingInterval).toBeNull();
     expect(clearIntervalSpy).toHaveBeenCalledWith(clarificationInterval1);
     expect(clearIntervalSpy).toHaveBeenCalledWith(rankingInterval1);
-    
+
     // Simulate next cycle fallback creating new intervals
     (client as any).setupPolls();
-    
+
     const clarificationInterval2 = (client as any).clarificationInterval;
     const rankingInterval2 = (client as any).rankingInterval;
-    
+
     expect(clarificationInterval2).not.toBeNull();
     expect(rankingInterval2).not.toBeNull();
     expect(clarificationInterval1).not.toEqual(clarificationInterval2);
-    
+
     // Cleanup
     (client as any).onclose();
 
