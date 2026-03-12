@@ -776,7 +776,7 @@ export default class Ephemeral extends Vue {
   }
   beforeMount() {
     this.initProblem();
-    this.downloadThemeStylesheet();
+    this.downloadThemeStylesheet(this.theme);
   }
   mounted() {
     this.goldenLayout = new GoldenLayout(
