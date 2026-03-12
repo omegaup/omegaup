@@ -1181,6 +1181,7 @@ export default class Form extends Vue {
       },
     );
     this.markdownEditor.run();
+    this.removeImageButton();
 
     const title = T.createContestInteractiveGuideTitle;
     if (!this.hasVisitedSection) {
@@ -1256,8 +1257,24 @@ export default class Form extends Vue {
           },
         );
         this.markdownEditor.run();
+        this.removeImageButton();
       });
     }
+  }
+
+  removeImageButton(): void {
+    const imageButton = this.descriptionButtonBar.querySelector(
+      '[id^="wmd-image-button"]',
+    );
+    if (imageButton) {
+      imageButton.remove();
+    }
+    this.descriptionInput.addEventListener('keydown', (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'g') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
   }
 
   @Watch('invalidParameterName')
@@ -1572,6 +1589,7 @@ export default class Form extends Vue {
 .wmd-button-bar {
   background-color: var(--wmd-button-bar-background-color);
 }
+
 
 .wmd-input {
   min-height: 120px;
