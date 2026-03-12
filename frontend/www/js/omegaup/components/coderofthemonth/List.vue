@@ -151,11 +151,19 @@ export default class CoderOfTheMonthList extends Vue {
   border-bottom: 0rem;
 }
 
+.nav-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .nav-link {
   font-weight: medium;
   letter-spacing: 0.022rem;
   padding: 0.65rem 1rem;
+  white-space: nowrap;
 }
+
 .ranking-width {
   max-width: 55rem;
   margin: 0 auto;
