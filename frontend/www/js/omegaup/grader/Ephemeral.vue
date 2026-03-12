@@ -211,11 +211,11 @@ export default class Ephemeral extends Vue {
 
   @Ref('layout-root') readonly layoutRoot!: HTMLElement;
 
-  // Theme CSS is now imported statically below; keep the mapping for
-  // backward-compatible runtime identification only.
   readonly themeToRef: { [key: string]: string } = {
-    [Util.MonacoThemes.VSLight]: 'goldenlayout-light-theme',
-    [Util.MonacoThemes.VSDark]: 'goldenlayout-dark-theme',
+    [Util.MonacoThemes
+      .VSLight]: `https://golden-layout.com/assets/css/goldenlayout-light-theme.css`,
+    [Util.MonacoThemes
+      .VSDark]: `https://golden-layout.com/assets/css/goldenlayout-dark-theme.css`,
   };
   goldenLayout: GoldenLayout | null = null;
   componentMapping: { [key: string]: GraderComponent } = {};
@@ -327,7 +327,13 @@ export default class Ephemeral extends Vue {
   }
   @Watch('theme')
   onThemeChange() {
-    this.downloadThemeStylesheet();
+    // remove old theme
+    for (const theme in this.themeToRef) {
+      if (theme === this.theme) continue;
+      const link = document.getElementById(this.themeToRef[theme]);
+      if (link) link.remove();
+    }
+    this.downloadThemeStylesheet(this.theme);
   }
 
   onDetailsJsonReady(results: GraderResults) {
@@ -762,10 +768,11 @@ export default class Ephemeral extends Vue {
     }
     this.goldenLayout?.updateSize();
   }
-  downloadThemeStylesheet() {
-    // All golden-layout theme CSS is statically imported via the
-    // unscoped <style> block at the bottom of this file.
-    // Theme switching is handled by GoldenLayout's own class toggling.
+  downloadThemeStylesheet(theme: string) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = this.themeToRef[theme];
+    document.head.appendChild(link);
   }
   beforeMount() {
     this.initProblem();
@@ -784,12 +791,7 @@ export default class Ephemeral extends Vue {
     this.RegisterVueComponent(TEXT_EDITOR_COMPONENT_NAME, TextEditor);
     this.RegisterVueComponent(ZIP_VIEWER_COMPONENT_NAME, ZipViewer);
 
-    // Defer init if the container is not yet visible (e.g., inside a
-    // Bootstrap fade tab-pane). onResized will call init once the
-    // container gains a non-zero width.
-    if (this.layoutRoot.clientWidth) {
-      this.goldenLayout.init();
-    }
+    this.goldenLayout.init();
 
     if (window.ResizeObserver) {
       new ResizeObserver(this.onResized).observe(this.layoutRoot);
@@ -826,10 +828,5 @@ div {
 a:hover {
   color: var(--zip-button-color--hover);
 }
-</style>
-
-<style>
-@import '~golden-layout/src/css/goldenlayout-base.css';
-@import '~golden-layout/src/css/goldenlayout-light-theme.css';
-@import '~golden-layout/src/css/goldenlayout-dark-theme.css';
+@import url('https://golden-layout.com/assets/css/goldenlayout-base.css');
 </style>
