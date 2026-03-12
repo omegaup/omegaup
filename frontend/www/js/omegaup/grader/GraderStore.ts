@@ -407,7 +407,7 @@ const storeOptions: StoreOptions<GraderStore> = {
       state.request.source =
         initialSource ||
         state.sessionStorageSources.sources[
-        languageExtensionMapping[state.request.language]
+          languageExtensionMapping[state.request.language]
         ];
     },
     showSubmitButton(state: GraderStore, value: boolean) {
@@ -608,13 +608,13 @@ const storeOptions: StoreOptions<GraderStore> = {
       // update interactive problem data
       const {
         idl = state.request.input.interactive?.idl ||
-        defaultInteractiveIdlSource,
+          defaultInteractiveIdlSource,
         module_name = state.request.input.interactive?.module_name || 'sumas',
         language = state.request.input.interactive?.language || 'cpp17-gcc',
         main_source = state.request.input.interactive?.main_source ||
-        defaultInteractiveMainSource,
+          defaultInteractiveMainSource,
         templates = state.request.input.interactive?.templates ||
-        originalInteractiveTemplates,
+          originalInteractiveTemplates,
       } = value;
 
       store.commit('request.input.interactive.idl', idl);
