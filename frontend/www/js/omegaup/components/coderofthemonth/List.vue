@@ -147,12 +147,10 @@ export default class CoderOfTheMonthList extends Vue {
   border-top-left-radius: 0rem;
   border-top-right-radius: 0rem;
 }
-.nav .nav-tabs {
-  border-bottom: 0rem;
-}
 
 .nav-tabs {
-  flex-wrap: nowrap;
+  border-bottom: 0rem;
+  flex-wrap: nowrap !important;
   overflow-x: auto;
   overflow-y: hidden;
 }
