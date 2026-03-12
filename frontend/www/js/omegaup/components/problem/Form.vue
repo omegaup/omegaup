@@ -307,8 +307,8 @@
                       <input
                         v-model="isPublic"
                         type="radio"
-                        class="form-check-input"
                         name="visibility"
+                        class="form-check-input"
                         :disabled="!isEditable"
                         :value="false"
                       />
