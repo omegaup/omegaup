@@ -21,8 +21,8 @@
           class="form-control d-inline-block"
           style="width: auto"
         >
-          <option value="active">{{ T.wordsActive }}</option>
-          <option value="archived">{{ T.wordsArchive }}</option>
+          <option value="active">{{ T.carouselActive }}</option>
+          <option value="archived">{{ T.carouselArchive }}</option>
           <option value="all">{{ T.wordsAll }}</option>
         </select>
         <button
@@ -44,7 +44,7 @@
             <th>{{ T.carouselExpirationDate }}</th>
             <th>{{ T.wordsStatus }}</th>
             <th>{{ T.wordsEdit }}</th>
-            <th>{{ T.wordsArchive }}</th>
+            <th>{{ T.carouselArchive }}</th>
           </tr>
         </thead>
         <tbody>
@@ -233,7 +233,7 @@
                       class="form-check-input"
                     />
                     <label class="form-check-label">
-                      {{ T.wordsActive }}
+                      {{ T.carouselActive }}
                     </label>
                   </div>
                 </div>
@@ -253,7 +253,7 @@
               class="btn btn-primary"
               @click.prevent="saveItem"
             >
-              {{ showEditModal ? T.wordsUpdate : T.wordsCreate }}
+              {{ showEditModal ? T.carouselUpdate : T.carouselCreate }}
             </button>
           </div>
         </div>
@@ -300,7 +300,7 @@
               class="btn btn-danger"
               @click.prevent="deleteItem"
             >
-              {{ T.wordsArchive }}
+              {{ T.carouselArchive }}
             </button>
           </div>
         </div>
@@ -543,18 +543,18 @@ export default class Carousel extends Vue {
 
   getStatusText(item: types.CarouselItem): string {
     if (!item.status) {
-      return T.wordsInactive;
+      return T.carouselInactive;
     }
 
     if (item.expiration_date) {
       const expirationDate = new Date(item.expiration_date);
       const now = new Date();
       if (expirationDate < now) {
-        return T.wordsExpire;
+        return T.carouselExpire;
       }
     }
 
-    return T.wordsActive;
+    return T.carouselActive;
   }
 
   getStatusBadgeClass(item: types.CarouselItem): Record<string, boolean> {
