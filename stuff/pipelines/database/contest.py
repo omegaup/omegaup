@@ -136,17 +136,18 @@ def get_users_ids(
     '''Returns a list of ids of the contestants.'''
     if not usernames:
         return []
-    cur.execute('''
+    placeholders = ', '.join(['%s'] * len(usernames))
+    cur.execute(f'''
         SELECT
             username,
             user_id
         FROM
             Identities
         WHERE
-            username IN %s''', (tuple(usernames),))
+            username IN ({placeholders})''', tuple(usernames))
     results = cur.fetchall()
     user_id_map = {row['username']: row['user_id'] for row in results}
-    return [user_id_map[username] for username in usernames if username in user_id_map]
+    return [user_id_map[username] for username in usernames]
 
 
 def get_contest_title(
