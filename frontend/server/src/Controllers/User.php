@@ -2093,7 +2093,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return list<Problem>
      */
-    private static function getSolvedProblems(int $identityId): array {
+    public static function getSolvedProblems(int $identityId): array {
         $problems = \OmegaUp\DAO\Problems::getProblemsSolved($identityId);
 
         /** @var list<Problem> */
@@ -2132,7 +2132,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return list<Problem>
      */
-    private static function getUnsolvedProblems(int $identityId): array {
+    public static function getUnsolvedProblems(int $identityId): array {
         $problems = \OmegaUp\DAO\Problems::getProblemsUnsolvedByIdentity(
             $identityId
         );
@@ -4855,7 +4855,7 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        return strpos($identity->username, ':') !== false;
+        return str_contains($identity->username, ':');
     }
 
     /**

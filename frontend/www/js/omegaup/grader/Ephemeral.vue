@@ -5,6 +5,7 @@
         omegaUp ephemeral grader
         <sup>&alpha;</sup>
       </span>
+
       <form class="form-inline my-2 my-lg-0 ephemeral-form">
         <template v-if="!isEmbedded">
           <label>
@@ -48,6 +49,20 @@
                 :icon="isDark ? ['fas', 'sun'] : ['fas', 'moon']"
                 aria-hidden="true"
               />
+            </button>
+            <button
+              v-clipboard="getCopySource"
+              v-clipboard:success="handleCopyFeedback"
+              v-clipboard:error="handleCopyError"
+              type="button"
+              class="btn btn-sm mr-2 my-sm-0"
+              :class="isCopySuccess ? 'btn-success' : 'btn-secondary'"
+              data-copy-button
+              :title="T.wordsCopyToClipboard"
+              :aria-label="T.wordsCopyToClipboard"
+              copy-to-clipboard
+            >
+              <font-awesome-icon :icon="['fas', 'copy']" aria-hidden="true" />
             </button>
           </label>
         </template>
@@ -125,6 +140,7 @@ import * as monaco from 'monaco-editor';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../omegaup';
 import Vue, { CreateElement } from 'vue';
+import Clipboard from 'v-clipboard';
 import omegaup_Countdown from '../components/Countdown.vue';
 import type { Component as VueComponent } from 'vue'; // this is the component type for Vue components
 import GoldenLayout from 'golden-layout';
@@ -137,6 +153,7 @@ import DiffEditor from './DiffEditor.vue';
 import IDESettings from './IDESettings.vue';
 import MonacoEditor from './MonacoEditor.vue';
 import TextEditor from './TextEditor.vue';
+
 import ZipViewer from './ZipViewer.vue';
 import store, { GraderResults } from './GraderStore';
 import * as Util from './util';
@@ -158,9 +175,10 @@ import {
   faDownload,
   faSun,
   faMoon,
+  faCopy,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faUpload, faFileArchive, faDownload, faSun, faMoon);
-
+library.add(faUpload, faFileArchive, faDownload, faSun, faMoon, faCopy);
+Vue.use(Clipboard);
 import T from '../lang';
 
 interface GraderComponent extends Vue {
@@ -208,6 +226,8 @@ export default class Ephemeral extends Vue {
   zipHref: string | null = null;
   zipDownload: string | null = null;
   now: number = Date.now();
+  isCopySuccess = false;
+  copySuccessTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isSubmitButton() {
     return store.getters['showSubmitButton'];
@@ -468,6 +488,25 @@ export default class Ephemeral extends Vue {
         this.isRunLoading = false;
       });
   }
+  handleCopyFeedback() {
+    this.isCopySuccess = true;
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.copySuccessTimer = setTimeout(() => {
+      this.isCopySuccess = false;
+    }, 2000);
+  }
+  getCopySource(): string {
+    return store.getters['request.source'] || '';
+  }
+  handleCopyError() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+    this.isCopySuccess = false;
+  }
+
+  beforeDestroy() {
+    if (this.copySuccessTimer) clearTimeout(this.copySuccessTimer);
+  }
+
   handleDownload(e: Event) {
     // the state is dirty when we need to re-configure zip file
     // if not, download the url (continue default behavior)
