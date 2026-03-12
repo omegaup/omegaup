@@ -2146,6 +2146,7 @@ const translations: { [key: string]: string; } = {
   wordsDownloadDetails: "Download .zip with outputs",
   wordsDownloadOutput: "Download output",
   wordsDueDate: "Due date",
+  wordsOverdue: "Overdue",
   wordsDuration: "Length",
   wordsEdit: "Edit",
   wordsEditCourse: "Edit course",

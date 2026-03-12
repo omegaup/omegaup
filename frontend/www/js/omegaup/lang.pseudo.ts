@@ -2146,6 +2146,7 @@ const translations: { [key: string]: string; } = {
   wordsDownloadDetails: "(D0wn10ad .zip wi7h 0u7pu75)",
   wordsDownloadOutput: "(D0wn10ad 0u7pu7)",
   wordsDueDate: "(Du3 da73)",
+  wordsOverdue: "(0v3rdu3)",
   wordsDuration: "(L3ng7h)",
   wordsEdit: "(Edi7)",
   wordsEditCourse: "(Edi7 c0ur53)",

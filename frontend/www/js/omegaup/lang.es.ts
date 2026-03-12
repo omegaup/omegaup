@@ -2146,6 +2146,7 @@ const translations: { [key: string]: string; } = {
   wordsDownloadDetails: "Descargar .zip con salidas",
   wordsDownloadOutput: "Descargar salida",
   wordsDueDate: "Fecha de entrega",
+  wordsOverdue: "Vencido",
   wordsDuration: "Duraci\u00f3n",
   wordsEdit: "Editar",
   wordsEditCourse: "Editar curso",
