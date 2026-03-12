@@ -5418,7 +5418,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         if (
-            \OmegaUp\DAO\UserReadmeReportLog::existsByPK(
+            \OmegaUp\DAO\Base\UserReadmeReportLog::existsByPK(
                 intval($readme->readme_id),
                 intval($r->user->user_id)
             )
@@ -5431,7 +5431,7 @@ class User extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            \OmegaUp\DAO\UserReadmeReportLog::create(
+            \OmegaUp\DAO\Base\UserReadmeReportLog::create(
                 new \OmegaUp\DAO\VO\UserReadmeReportLog([
                     'readme_id' => $readme->readme_id,
                     'reporter_user_id' => $r->user->user_id,
