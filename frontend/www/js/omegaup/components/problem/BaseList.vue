@@ -123,6 +123,13 @@
                 ></omegaup-common-sort-controls>
               </span>
             </th>
+            <th
+              v-if="hasAddTargets"
+              scope="col"
+              class="align-middle text-nowrap"
+            >
+              {{ T.wordsActions }}
+            </th>
           </tr>
         </thead>
         <tbody data-problems>
@@ -220,10 +227,34 @@
             <td class="text-right align-middle">
               {{ problem.points.toFixed(2) }}
             </td>
+            <td v-if="hasAddTargets" class="text-center align-middle">
+              <button
+                class="btn btn-link"
+                :title="T.problemAddToContestOrCourse"
+                @click.prevent="openAddToTargets(problem.alias)"
+              >
+                <font-awesome-icon :icon="['fas', 'cogs']" />
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <omegaup-overlay
+      v-if="showAddToPopup"
+      :show-overlay="showAddToPopup"
+      @hide-overlay="closeAddToTargets"
+    >
+      <template #popup>
+        <omegaup-problem-add-to-contest-or-course
+          :admin-courses="adminCourses"
+          :admin-contests="adminContests"
+          @close="closeAddToTargets"
+          @add-to-course="onAddToCourse"
+          @add-to-contest="onAddToContest"
+        ></omegaup-problem-add-to-contest-or-course>
+      </template>
+    </omegaup-overlay>
     <div class="card-footer">
       <omegaup-common-paginator
         :pager-items="pagerItems"
@@ -241,6 +272,8 @@ import * as ui from '../../ui';
 
 import common_Paginator from '../common/Paginator.vue';
 import common_SortControls from '../common/SortControls.vue';
+import omegaup_Overlay from '../Overlay.vue';
+import problem_AddToContestOrCourse from './AddToContestOrCourse.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
@@ -249,18 +282,21 @@ import { getBlogUrl } from '../../urlHelper';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
+  faCogs,
   faEyeSlash,
   faMedal,
   faExclamationTriangle,
   faBan,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
+library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan, faCogs);
 
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-sort-controls': common_SortControls,
+    'omegaup-overlay': omegaup_Overlay,
+    'omegaup-problem-add-to-contest-or-course': problem_AddToContestOrCourse,
   },
   directives: {
     tooltip: VTooltip,
@@ -269,6 +305,15 @@ library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
 export default class BaseList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
+  @Prop({ default: () => [] }) adminCourses!: {
+    alias: string;
+    name: string;
+    assignments: { alias: string; name: string; assignment_type: string }[];
+  }[];
+  @Prop({ default: () => [] }) adminContests!: {
+    alias: string;
+    title: string;
+  }[];
   @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
@@ -320,6 +365,8 @@ export default class BaseList extends Vue {
     return 'badge-secondary';
   }
 
+  showAddToPopup = false;
+  selectedProblemAliasForAdd: string | null = null;
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
     T.qualityFormQualityBad,
@@ -334,6 +381,49 @@ export default class BaseList extends Vue {
     T.qualityFormDifficultyHard,
     T.qualityFormDifficultyVeryHard,
   ];
+
+  get hasAddTargets(): boolean {
+    return this.adminCourses.length > 0 || this.adminContests.length > 0;
+  }
+
+  openAddToTargets(problemAlias: string): void {
+    this.selectedProblemAliasForAdd = problemAlias;
+    this.showAddToPopup = true;
+  }
+
+  closeAddToTargets(): void {
+    this.showAddToPopup = false;
+    this.selectedProblemAliasForAdd = null;
+  }
+
+  onAddToCourse({
+    courseAlias,
+    assignmentAlias,
+  }: {
+    courseAlias: string;
+    assignmentAlias: string;
+  }): void {
+    if (!this.selectedProblemAliasForAdd) {
+      return;
+    }
+    this.$emit('add-to-course', {
+      problemAlias: this.selectedProblemAliasForAdd,
+      courseAlias,
+      assignmentAlias,
+    });
+    this.closeAddToTargets();
+  }
+
+  onAddToContest({ contestAlias }: { contestAlias: string }): void {
+    if (!this.selectedProblemAliasForAdd) {
+      return;
+    }
+    this.$emit('add-to-contest', {
+      problemAlias: this.selectedProblemAliasForAdd,
+      contestAlias,
+    });
+    this.closeAddToTargets();
+  }
 
   hrefForProblemTag(selectedTags: string[], problemTag: string): string {
     if (!selectedTags) return `${this.path}?tag[]=${problemTag}`;

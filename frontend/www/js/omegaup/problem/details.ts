@@ -129,6 +129,8 @@ OmegaUp.on('ready', async () => {
           problemAlias: payload.problem.alias,
           totalRuns: runsStore.state.totalRuns,
           bookmarkedStatus: this.isBookmarked,
+          adminCourses: payload.adminCourses ?? [],
+          adminContests: payload.adminContests ?? [],
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -459,6 +461,44 @@ OmegaUp.on('ready', async () => {
               .finally(() => {
                 this.isLoadingBookmark = false;
               });
+          },
+          'add-to-course': ({
+            courseAlias,
+            assignmentAlias,
+          }: {
+            courseAlias: string;
+            assignmentAlias: string;
+          }) => {
+            api.Course.addProblem({
+              course_alias: courseAlias,
+              problem_alias: payload.problem.alias,
+              assignment_alias: assignmentAlias,
+            })
+              .then((data) => {
+                this.popupDisplayed = PopupDisplayed.None;
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemAddedToCourseSuccess);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
+              })
+              .catch(ui.apiError);
+          },
+          'add-to-contest': ({ contestAlias }: { contestAlias: string }) => {
+            api.Contest.addProblem({
+              contest_alias: contestAlias,
+              problem_alias: payload.problem.alias,
+              points: 100,
+            })
+              .then((data) => {
+                this.popupDisplayed = PopupDisplayed.None;
+                if (data.solutionStatus === 'not_found') {
+                  ui.success(T.problemAddedToContestSuccess);
+                } else {
+                  ui.warning(T.warningPublicSolution);
+                }
+              })
+              .catch(ui.apiError);
           },
         },
       });
