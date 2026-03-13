@@ -25,7 +25,6 @@ For more information about the API controllers, please refer to the [Controllers
   - [`/api/carouselItems/create/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicarouselitemscreate)
   - [`/api/carouselItems/delete/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicarouselitemsdelete)
   - [`/api/carouselItems/list/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicarouselitemslist)
-  - [`/api/carouselItems/listActive/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicarouselitemslistactive)
   - [`/api/carouselItems/update/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicarouselitemsupdate)
 - [Certificate](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#certificate)
   - [`/api/certificate/generateContestCertificates/`](https://github.com/omegaup/omegaup/blob/main/frontend/server/src/Controllers/README.md#apicertificategeneratecontestcertificates)

@@ -167,7 +167,9 @@ export default class Carousel extends Vue {
   }
 
   loadCarouselItems(): void {
-    api.CarouselItems.listActive({})
+    api.CarouselItems.list({
+      active_only: true,
+    })
       .then((response) => {
         const transformedSlides = response.carouselItems
           .map((item) => this.transformCarouselItem(item))

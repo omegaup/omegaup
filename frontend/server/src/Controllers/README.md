@@ -19,7 +19,6 @@
   - [`/api/carouselItems/create/`](#apicarouselitemscreate)
   - [`/api/carouselItems/delete/`](#apicarouselitemsdelete)
   - [`/api/carouselItems/list/`](#apicarouselitemslist)
-  - [`/api/carouselItems/listActive/`](#apicarouselitemslistactive)
   - [`/api/carouselItems/update/`](#apicarouselitemsupdate)
 - [Certificate](#certificate)
   - [`/api/certificate/generateContestCertificates/`](#apicertificategeneratecontestcertificates)
@@ -564,19 +563,13 @@ _Nothing_
 
 ### Description
 
-List all Carousel Items (admin only)
+List Carousel Items (admin only)
 
-### Returns
+### Parameters
 
-```typescript
-types.CarouselItemListPayload;
-```
-
-## `/api/carouselItems/listActive/`
-
-### Description
-
-List all active Carousel Items (homepage)
+| Name          | Type   | Description |
+| ------------- | ------ | ----------- |
+| `active_only` | `bool` |             |
 
 ### Returns
 

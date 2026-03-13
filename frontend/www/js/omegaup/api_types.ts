@@ -5268,9 +5268,6 @@ export namespace messages {
   export type CarouselItemsListRequest = { [key: string]: any };
   export type _CarouselItemsListServerResponse = any;
   export type CarouselItemsListResponse = types.CarouselItemListPayload;
-  export type CarouselItemsListActiveRequest = { [key: string]: any };
-  export type _CarouselItemsListActiveServerResponse = any;
-  export type CarouselItemsListActiveResponse = types.CarouselItemListPayload;
   export type CarouselItemsUpdateRequest = { [key: string]: any };
   export type CarouselItemsUpdateResponse = {};
 
@@ -6261,9 +6258,6 @@ export namespace controllers {
     list: (
       params?: messages.CarouselItemsListRequest,
     ) => Promise<messages.CarouselItemsListResponse>;
-    listActive: (
-      params?: messages.CarouselItemsListActiveRequest,
-    ) => Promise<messages.CarouselItemsListActiveResponse>;
     update: (
       params?: messages.CarouselItemsUpdateRequest,
     ) => Promise<messages.CarouselItemsUpdateResponse>;
