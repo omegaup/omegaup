@@ -60,16 +60,7 @@ export interface GraderStore {
   showRunButton: boolean;
   theme: Util.MonacoThemes;
 }
-export interface SettingsCase {
-  Name: string;
-  Weight: number;
-}
-// this type does not exist in types
-export interface SettingsCasesGroup {
-  Name: string;
-  Cases: SettingsCase[];
-  Weight: number;
-}
+
 // TODO: combine case selector group and settings cases group
 export interface CaseSelectorGroup {
   explicit: boolean;
@@ -203,10 +194,9 @@ const storeOptions: StoreOptions<GraderStore> = {
       const filename: CaseKey = `${state.currentCase}.err`;
       return state.outputs[filename] || '';
     },
-    settingsCases(state: GraderStore): SettingsCasesGroup[] {
-      // resultMap type is not present in types
+    settingsCases(state: GraderStore): types.SettingsCaseGroup[] {
       const resultMap: {
-        [key: string]: SettingsCasesGroup;
+        [key: string]: types.SettingsCaseGroup;
       } = {};
       for (const caseName in state.request.input.cases) {
         if (
@@ -221,21 +211,19 @@ const storeOptions: StoreOptions<GraderStore> = {
           resultMap[tokens[0]] = {
             Name: tokens[0],
             Cases: [],
-            Weight: 0,
           };
         }
         resultMap[tokens[0]].Cases.push({
           Name: caseName,
           Weight: state.request.input.cases[caseName].weight || 0,
         });
-        resultMap[tokens[0]].Weight +=
-          state.request.input.cases[caseName].weight || 0;
+
       }
-      const result: SettingsCasesGroup[] = [];
+      const result: types.SettingsCaseGroup[] = [];
       for (const groupName in resultMap) {
         if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
           continue;
-        resultMap[groupName].Cases.sort((a: SettingsCase, b: SettingsCase) => {
+        resultMap[groupName].Cases.sort((a: types.SettingsCase, b: types.SettingsCase) => {
           if (a.Name < b.Name) return -1;
           if (a.Name > b.Name) return 1;
           return 0;
