@@ -10,7 +10,7 @@
           class="btn btn-secondary"
           data-contest-omi
           type="button"
-          @click="confirmPresetChange(PresetType.OMI)"
+          @click="showConfirmPresetModal(PresetType.OMI)"
         >
           {{ T.contestNewFormOmiStyle }}
         </button>
@@ -18,7 +18,7 @@
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
-          @click="confirmPresetChange(PresetType.PreIOI)"
+          @click="showConfirmPresetModal(PresetType.PreIOI)"
         >
           {{ T.contestNewForm }}
         </button>
@@ -26,7 +26,7 @@
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
-          @click="confirmPresetChange(PresetType.Conacup)"
+          @click="showConfirmPresetModal(PresetType.Conacup)"
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
@@ -34,7 +34,7 @@
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
-          @click="confirmPresetChange(PresetType.ICPC)"
+          @click="showConfirmPresetModal(PresetType.ICPC)"
         >
           {{ T.contestNewFormICPCStyle }}
         </button>
@@ -857,6 +857,16 @@
         </div>
       </form>
     </div>
+    <b-modal
+      v-model="showModal"
+      ok-variant="danger"
+      cancel-variant="success"
+      :title="T.contestNewFormPresetOverwriteWarningModalTitle"
+      :ok-title="T.wordsConfirm"
+      @ok="confirmPresetChange(changePresetTo)"
+    >
+      {{ T.contestNewFormPresetOverwriteWarning }}
+    </b-modal>
   </div>
 </template>
 
@@ -1117,6 +1127,8 @@ export default class Form extends Vue {
   isSubmitting = false;
   localErrors: LocalErrors = {};
   hasFormChanged = false;
+  showModal: boolean = false;
+  changePresetTo: PresetType | null = null;
 
   mounted() {
     const title = T.createContestInteractiveGuideTitle;
@@ -1305,13 +1317,14 @@ export default class Form extends Vue {
     return Object.keys(this.localErrors).length === 0;
   }
 
-  confirmPresetChange(presetType: PresetType): void {
+  showConfirmPresetModal(presetType: PresetType): void {
     if (this.hasFormChanged && !this.update) {
-      if (!confirm(T.contestNewFormPresetOverwriteWarning)) {
-        return;
-      }
+      this.changePresetTo = presetType;
+      this.showModal = true;
     }
+  }
 
+  confirmPresetChange(presetType: PresetType): void {
     this.applyPreset(presetType);
     this.hasFormChanged = true;
   }
