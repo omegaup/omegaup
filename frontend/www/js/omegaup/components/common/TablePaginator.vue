@@ -23,7 +23,7 @@
       </div>
     </div>
     <div v-if="items.length > 0" class="table-responsive">
-      <table class="table table-striped mb-0 table-typo">
+      <table class="table table-striped mb-0 ">
         <thead>
           <tr>
             <template v-for="column in columnNames">
@@ -161,7 +161,7 @@ export default class TablePaginator extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 [data-table-paginator] .table td {
   padding: 0.75rem 1.25rem;
 }
