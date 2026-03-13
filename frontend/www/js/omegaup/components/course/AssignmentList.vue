@@ -7,6 +7,7 @@
           {{ T.courseContentEmpty }}
         </div>
       </div>
+
       <table v-else class="table table-striped">
         <thead>
           <tr>
@@ -16,33 +17,38 @@
             <th class="text-center">{{ T.wordsActions }}</th>
           </tr>
         </thead>
+
         <tbody v-sortable="{ onUpdate: sortContent }">
           <tr v-for="assignment in content" :key="assignment.alias">
             <td>
-              <button
-                v-tooltip="T.courseAssignmentReorder"
-                class="btn btn-link"
-              >
+              <button v-tooltip="T.courseAssignmentReorder" class="btn btn-link">
                 <font-awesome-icon icon="arrows-alt" />
               </button>
             </td>
+
             <td class="align-middle">
               <template v-if="assignment.assignment_type === 'homework'">
                 <font-awesome-icon icon="file-alt" />
                 <span class="ml-2">{{ T.wordsHomework }}</span>
               </template>
+
               <template v-else-if="assignment.assignment_type === 'lesson'">
                 <font-awesome-icon icon="chalkboard-teacher" />
                 <span class="ml-2">{{ T.wordsLesson }}</span>
               </template>
+
               <template v-else>
                 <font-awesome-icon icon="list-alt" />
                 <span class="ml-2">{{ T.wordsExam }}</span>
               </template>
             </td>
+
             <td class="align-middle">
-              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+              <a :href="assignmentUrl(assignment)">
+                {{ assignment.name }}
+              </a>
             </td>
+
             <td class="text-center">
               <button
                 v-tooltip="T.courseAssignmentEdit"
@@ -52,6 +58,7 @@
               >
                 <font-awesome-icon icon="edit" />
               </button>
+
               <button
                 v-tooltip="T.courseAddProblemsAdd"
                 class="btn btn-link"
@@ -59,15 +66,15 @@
               >
                 <font-awesome-icon icon="list-alt" />
               </button>
+
               <button
                 v-if="assignment.has_runs"
                 v-tooltip="T.assignmentRemoveAlreadyHasRuns"
                 class="btn btn-link"
-                data-toggle="tooltip"
-                data-placement="bottom"
               >
                 <font-awesome-icon icon="trash" class="disabled" />
               </button>
+
               <button
                 v-else
                 v-tooltip="T.courseAssignmentDelete"
@@ -80,6 +87,7 @@
           </tr>
         </tbody>
       </table>
+
       <div>
         <button
           v-if="content.length > 1"
@@ -92,6 +100,7 @@
         </button>
       </div>
     </div>
+
     <div
       v-show="assignmentFormMode === AssignmentFormMode.Default"
       class="card-footer"
@@ -104,7 +113,7 @@
                 data-course-add-new-content
                 class="btn btn-primary"
                 type="submit"
-                @click.prevent="$emit('emit-new')"
+                @click.prevent="handleAddContent"
               >
                 {{ T.courseAddContent }}
               </button>
@@ -129,8 +138,10 @@ import {
   FontAwesomeLayers,
   FontAwesomeLayersText,
 } from '@fortawesome/vue-fontawesome';
+
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+
 library.add(fas);
 
 @Component({
@@ -149,9 +160,26 @@ export default class CourseAssignmentList extends Vue {
   @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
 
   contentOrderChanged = false;
+  hasUnsavedChanges = false;
+
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
   currentContent: types.CourseAssignment[] = this.content;
+
+  mounted(): void {
+    window.addEventListener('beforeunload', this.warnBeforeLeaving);
+  }
+
+  beforeUnmount(): void {
+    window.removeEventListener('beforeunload', this.warnBeforeLeaving);
+  }
+
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    if (this.contentOrderChanged || this.hasUnsavedChanges) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
 
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
@@ -163,11 +191,14 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.currentContent.splice(event.oldIndex, 1)[0],
     );
+
     this.contentOrderChanged = true;
   }
 
   saveNewOrder(): void {
     this.contentOrderChanged = false;
+    this.hasUnsavedChanges = false;
+
     this.$emit(
       'emit-sort-content',
       this.courseAlias,
@@ -177,9 +208,15 @@ export default class CourseAssignmentList extends Vue {
     );
   }
 
+  handleAddContent(): void {
+    this.hasUnsavedChanges = true;
+    this.$emit('emit-new');
+  }
+
   @Watch('content')
   onContentChanged(newValue: types.CourseAssignment[]): void {
     this.currentContent = newValue;
+    this.hasUnsavedChanges = false;
   }
 }
 </script>
