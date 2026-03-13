@@ -5558,14 +5558,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
-            $statementLanguage = $r->ensureOptionalString('language') ?? '';
-            if ($statementLanguage !== '') {
-                \OmegaUp\Validators::validateInEnum(
-                    $statementLanguage,
-                    'lang',
-                    \OmegaUp\Controllers\Problem::ISO639_1
-                );
-            }
+            $statementLanguage = $r->ensureOptionalString('language');
+            \OmegaUp\Validators::validateOptionalInEnum(
+                $statementLanguage,
+                'lang',
+                \OmegaUp\Controllers\Problem::ISO639_1
+            );
+            $statementLanguage = $statementLanguage ?? '';
 
             $contents = $r->ensureString('contents');
 
