@@ -7,6 +7,7 @@
           v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge.png"
           :title="T.wordsHighQualityProblem"
+          :alt="T.wordsHighQualityProblem"
           class="mr-2"
         />
         <font-awesome-icon
@@ -34,7 +35,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
       <button
-        v-if="userLoggedIn"
+        v-if="userLoggedIn && !inContestOrCourse && problem.accepts_submissions"
         data-bookmark-button
         class="btn btn-link p-0 ml-2"
         :title="isBookmarked ? T.problemBookmarkRemove : T.problemBookmarkAdd"
@@ -50,6 +51,24 @@
         />
       </button>
     </h3>
+
+    <!-- Warning/Ban Reasons Banner -->
+    <div
+      v-if="showWarningReasons && warningReasons.length"
+      class="alert mx-auto w-75 mb-3"
+      :class="isBanned ? 'alert-danger' : 'alert-warning'"
+      role="alert"
+    >
+      <strong>{{
+        isBanned ? T.problemBannedBecause : T.problemWarningBecause
+      }}</strong>
+      <ul class="warning-reasons-list mb-0 mt-2">
+        <li v-for="(reason, index) in warningReasons" :key="index">
+          {{ reason }}
+        </li>
+      </ul>
+    </div>
+
     <table
       v-if="problem.accepts_submissions"
       class="table table-bordered mx-auto w-75 mb-0"
@@ -83,21 +102,21 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import T from '../../lang';
 import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
+  faBan,
+  faBookmark,
   faEdit,
   faExclamationTriangle,
-  faEyeSlash,
-  faBan,
   faExternalLinkAlt,
-  faBookmark,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -119,6 +138,7 @@ export default class ProblemSettingsSummary extends Vue {
   @Prop({ default: false }) showEditLink!: boolean;
   @Prop({ default: false }) userLoggedIn!: boolean;
   @Prop({ default: false }) isBookmarked!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
 
   T = T;
 
@@ -183,6 +203,21 @@ export default class ProblemSettingsSummary extends Vue {
     }
     return `${this.problem.input_limit / 1024} KiB`;
   }
+
+  get warningReasons(): string[] {
+    return this.problem.warningReasons ?? [];
+  }
+
+  get showWarningReasons(): boolean {
+    // Only show warning reasons when visibility indicators are active
+    // (which means the user is viewing their own problem details)
+    return this.showVisibilityIndicators;
+  }
+
+  get isBanned(): boolean {
+    // visibility <= -2 indicates banned status
+    return this.problem.visibility <= -2;
+  }
 }
 </script>
 
@@ -204,5 +239,11 @@ table td {
 .bookmark-inactive {
   color: $omegaup-grey--lighter;
   opacity: 0.5;
+}
+
+.warning-reasons-list {
+  max-height: 100px;
+  overflow-y: auto;
+  padding-left: 1.5rem;
 }
 </style>

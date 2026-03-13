@@ -98,10 +98,18 @@ export const ACL = {
 };
 
 export const Admin = {
+  getMaintenanceMode: apiCall<
+    messages.AdminGetMaintenanceModeRequest,
+    messages.AdminGetMaintenanceModeResponse
+  >('/api/admin/getMaintenanceMode/'),
   platformReportStats: apiCall<
     messages.AdminPlatformReportStatsRequest,
     messages.AdminPlatformReportStatsResponse
   >('/api/admin/platformReportStats/'),
+  setMaintenanceMode: apiCall<
+    messages.AdminSetMaintenanceModeRequest,
+    messages.AdminSetMaintenanceModeResponse
+  >('/api/admin/setMaintenanceMode/'),
 };
 
 export const AiEditorial = {
@@ -2057,6 +2065,45 @@ export const User = {
     messages.UserCoderOfTheMonthListRequest,
     messages.UserCoderOfTheMonthListResponse
   >('/api/user/coderOfTheMonthList/'),
+  compare: apiCall<
+    messages.UserCompareRequest,
+    messages._UserCompareServerResponse,
+    messages.UserCompareResponse
+  >('/api/user/compare/', (x) => {
+    if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+      x.user1 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user1);
+    if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+      x.user2 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user2);
+    return x;
+  }),
   contestStats: apiCall<
     messages.UserContestStatsRequest,
     messages._UserContestStatsServerResponse,

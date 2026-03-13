@@ -10,9 +10,9 @@ In this table you will find the main topics about our project so you can start c
 | Topic                                                  | Description                                                  |
 | -----------------------------------------------------  | ------------------------------------------------------------ |
 | [First steps](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Development-Environment-Setup-Process.md) | VM installation, general technical information  |
-| [VM set-up](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request-(English).md) | Git configuration, how to send a PR                    |
-| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture-(English).md)  | omegaUp' software architecture                      |
-| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment-(English).md)  | When and how is the deployment                               |
+| [VM set-up](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Make-a-Pull-Request.md) | Git configuration, how to send a PR                    |
+| [Architecture](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Architecture.md)  | omegaUp' software architecture                      |
+| [Release and Deployment](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Release-&-deployment.md)  | When and how is the deployment                               |
 
 [Index for developers](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-links.md)
 

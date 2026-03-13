@@ -277,18 +277,18 @@ def replace_voted_tags(dbconn: lib.db.Connection,
             try:
                 dbconn.conn.get_warnings = True
                 cur.execute(
-                    """INSERT IGNORE INTO
+                    f"""INSERT IGNORE INTO
                            `Problems_Tags`(`problem_id`, `tag_id`,
                                            `source`)
                        SELECT
-                           %%s AS `problem_id`,
+                           %s AS `problem_id`,
                            `t`.`tag_id` AS `tag_id`,
                            'voted' AS `source`
                        FROM
                            `Tags` AS `t`
                        WHERE
-                           `t`.`name` IN (%s);""" %
-                    ', '.join('%s' for _ in problem_tags),
+                           `t`.`name` IN (
+                               {', '.join('%s' for _ in problem_tags)});""",
                     (problem_id, ) + tuple(problem_tags))
                 for level, code, message in (cur.fetchwarnings() or []):
                     if code == errorcode.ER_DUP_ENTRY:
@@ -381,16 +381,42 @@ def aggregate_feedback(dbconn: lib.db.Connection) -> None:
      global_difficulty_average) = get_global_quality_and_difficulty_average(
          dbconn, rank_cutoffs)
 
+    attempted_problems = 0
+    successful_problems = 0
+    failed_problems = 0
+
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`
                        FROM `QualityNominations` as qn
                        WHERE qn.`nomination` = 'suggestion'
                          AND qn.`qualitynomination_id` > %s;""",
                     (QUALITYNOMINATION_QUESTION_CHANGE_ID,))
-        for row in cur.fetchall():
-            aggregate_problem_feedback(dbconn, row[0], rank_cutoffs,
-                                       global_quality_average,
-                                       global_difficulty_average)
+        for (problem_id,) in cur.fetchall():
+            attempted_problems += 1
+            try:
+                aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
+                                           global_quality_average,
+                                           global_difficulty_average)
+                successful_problems += 1
+            except Exception:  # pylint: disable=broad-except
+                failed_problems += 1
+                logging.exception(
+                    'Failed to aggregate feedback for problem %d. '
+                    'Continuing with remaining problems.',
+                    problem_id)
+                try:
+                    dbconn.conn.rollback()
+                except Exception:  # pylint: disable=broad-except
+                    logging.exception(
+                        'Failed to rollback transaction for problem %d',
+                        problem_id)
+
+    logging.info(
+        'Finished aggregating feedback: '
+        'attempted=%d successful=%d failed=%d',
+        attempted_problems,
+        successful_problems,
+        failed_problems)
 
 
 def aggregate_reviewers_feedback_for_problem(

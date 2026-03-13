@@ -12,7 +12,8 @@ module.exports = {
 
   entry: {
     omegaup: [
-      '@babel/polyfill',
+      'core-js/stable',
+      'regenerator-runtime/runtime',
       'unfetch/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup-legacy.js',
@@ -119,6 +120,7 @@ module.exports = {
     user_verification_parental_token:
       './frontend/www/js/omegaup/user/verification_parental_token.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
+    user_compare: './frontend/www/js/omegaup/user/compare.ts',
   },
 
   output: {

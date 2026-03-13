@@ -7,7 +7,7 @@ class ApiUtils {
      * Gets a random string
      */
     public static function getRandomString(): string {
-        return md5(uniqid(strval(rand()), true));
+        return bin2hex(random_bytes(32));
     }
 
     public static function getStringTime(?int $time = null): string {

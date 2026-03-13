@@ -42,6 +42,9 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'parent_email_verification_initial' => true,
         'parent_email_verification_deadline' => true,
         'parent_email_id' => true,
+        'x_url' => true,
+        'linkedin_url' => true,
+        'github_url' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -211,6 +214,21 @@ class Users extends \OmegaUp\DAO\VO\VO {
             $this->parent_email_id = intval(
                 $data['parent_email_id']
             );
+        }
+        if (isset($data['x_url'])) {
+            $this->x_url = is_scalar(
+                $data['x_url']
+            ) ? strval($data['x_url']) : '';
+        }
+        if (isset($data['linkedin_url'])) {
+            $this->linkedin_url = is_scalar(
+                $data['linkedin_url']
+            ) ? strval($data['linkedin_url']) : '';
+        }
+        if (isset($data['github_url'])) {
+            $this->github_url = is_scalar(
+                $data['github_url']
+            ) ? strval($data['github_url']) : '';
         }
     }
 
@@ -397,4 +415,25 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $parent_email_id = null;
+
+    /**
+     * URL del perfil en X (antes Twitter)
+     *
+     * @var string|null
+     */
+    public $x_url = null;
+
+    /**
+     * URL de perfil en LinkedIn
+     *
+     * @var string|null
+     */
+    public $linkedin_url = null;
+
+    /**
+     * URL de perfil en GitHub
+     *
+     * @var string|null
+     */
+    public $github_url = null;
 }

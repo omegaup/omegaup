@@ -24,7 +24,7 @@
       </li>
     </ul>
     <div class="tab-content">
-      <div class="row m-0 mt-4">
+      <div class="row m-0 mt-4 course-filters">
         <div class="col-md-4 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
@@ -279,8 +279,8 @@ export default class CourseTabs extends Vue {
 
 .card > .row.no-gutters {
   background-color: $omegaup-white;
-  height: 12.5rem;
-  overflow-y: auto;
+  min-height: 13.5rem;
+  overflow-y: visible;
 
   .course-data p {
     font-size: 0.9rem;
@@ -356,6 +356,18 @@ export default class CourseTabs extends Vue {
     width: calc(50% - 25px);
     flex: 0 0 calc(50% - 25px);
     max-width: calc(50% - 25px);
+  }
+
+  .row.m-0.mt-4.course-filters {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
+  }
+
+  .row.m-0.mt-4.course-filters > div {
+    max-width: 100%;
+    flex: 0 0 100%;
+    margin-left: 0 !important;
   }
 }
 

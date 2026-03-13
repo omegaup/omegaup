@@ -4,8 +4,6 @@
 
 - [Useful commands for development](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/Useful-Commands-for-Development.md)
 
-- [How to update and configure your local omegaup copy before making changes](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Update-Your-Local-Copy-of-omegaup-Before-Making-Changes.md)  
-
 - [Migration from Smarty to TS-Vue-BS4](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/[Guidelines-to-Follow]-Migrating-from-Smarty-.tpl-to-Typescript,-Vue-and-Bootstrap-4.md)
 
 - [How to get help](https://github.com/omegaup/omegaup/blob/main/frontend/www/docs/How-to-Get-Help.md)  

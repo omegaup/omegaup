@@ -79,6 +79,7 @@ export namespace dao {
     deletion_token?: string;
     facebook_user_id?: string;
     git_token?: string;
+    github_url?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
     has_scholar_objective?: boolean;
@@ -86,6 +87,7 @@ export namespace dao {
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
+    linkedin_url?: string;
     main_email_id?: number;
     main_identity_id?: number;
     parent_email_id?: number;
@@ -100,6 +102,7 @@ export namespace dao {
     user_id?: number;
     verification_id?: string;
     verified?: boolean;
+    x_url?: string;
   }
 }
 
@@ -2367,6 +2370,54 @@ export namespace types {
       );
     }
 
+    export function UserComparePayload(
+      elementId: string = 'payload',
+    ): types.UserComparePayload {
+      return ((x) => {
+        if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+          x.user1 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user1);
+        if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+          x.user2 = ((x) => {
+            x.profile = ((x) => {
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
+              return x;
+            })(x.profile);
+            return x;
+          })(x.user2);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserDependentsPayload(
       elementId: string = 'payload',
     ): types.UserDependentsPayload {
@@ -2726,6 +2777,7 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ArenaProblemset {
@@ -3058,10 +3110,12 @@ export namespace types {
     isReviewer: boolean;
     isUnder13User: boolean;
     lockDownImage: string;
+    maintenanceMessage?: types.MaintenanceMessage;
     mentorCanChooseCoder: boolean;
     navbarSection: string;
     nextRegisteredContestForUser?: types.ContestListItem;
     omegaUpLockDown: boolean;
+    preferredLanguage: string;
     profileProgress: number;
     userClassname: string;
     userCountry: string;
@@ -3955,10 +4009,25 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl?: string;
+    githubClientId?: string;
+    githubState?: string;
     hasVisitedSection?: boolean;
     statusError?: string;
     validateRecaptcha: boolean;
     verifyEmailSuccessfully?: string;
+  }
+
+  export interface MaintenanceMessage {
+    message: string;
+    type: string;
+  }
+
+  export interface MaintenanceModeStatus {
+    enabled: boolean;
+    message_en?: string;
+    message_es?: string;
+    message_pt?: string;
+    type: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -3967,6 +4036,12 @@ export namespace types {
     place?: number;
     total: { penalty: number; points: number };
     username: string;
+  }
+
+  export interface MessageLanguages {
+    en: string;
+    es: string;
+    pt: string;
   }
 
   export interface NavbarProblemsetProblem {
@@ -4053,6 +4128,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PredefinedTemplate {
+    id: string;
+    message: types.MessageLanguages;
+    title: types.MessageLanguages;
+    type: string;
   }
 
   export interface PrivacyPolicyDetailsPayload {
@@ -4247,6 +4329,7 @@ export namespace types {
     statement: types.ProblemStatement;
     title: string;
     visibility: number;
+    warningReasons?: string[];
   }
 
   export interface ProblemListCollectionPayload {
@@ -4275,6 +4358,7 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
+    attemptedProblemAliases: string[];
     column: string;
     columns: string[];
     keyword: string;
@@ -4286,6 +4370,7 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
+    solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -4920,6 +5005,8 @@ export namespace types {
   }
 
   export interface SupportDetailsPayload {
+    maintenanceMode: types.MaintenanceModeStatus;
+    maintenancePredefinedTemplates: types.PredefinedTemplate[];
     roleNamesWithDescription: types.UserRole[];
   }
 
@@ -4979,6 +5066,19 @@ export namespace types {
     country?: string;
     school?: number;
     state?: string;
+  }
+
+  export interface UserCompareData {
+    contestsCount?: number;
+    profile: types.UserProfileInfo;
+    solvedProblemsCount?: number;
+  }
+
+  export interface UserComparePayload {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+    username1?: string;
+    username2?: string;
   }
 
   export interface UserDependent {
@@ -5179,6 +5279,8 @@ export namespace messages {
   };
 
   // Admin
+  export type AdminGetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminGetMaintenanceModeResponse = types.MaintenanceModeStatus;
   export type AdminPlatformReportStatsRequest = { [key: string]: any };
   export type AdminPlatformReportStatsResponse = {
     report: {
@@ -5193,6 +5295,8 @@ export namespace messages {
       };
     };
   };
+  export type AdminSetMaintenanceModeRequest = { [key: string]: any };
+  export type AdminSetMaintenanceModeResponse = {};
 
   // AiEditorial
   export type AiEditorialGenerateRequest = { [key: string]: any };
@@ -6064,6 +6168,12 @@ export namespace messages {
   export type UserCoderOfTheMonthListResponse = {
     coders: types.CoderOfTheMonthList;
   };
+  export type UserCompareRequest = { [key: string]: any };
+  export type _UserCompareServerResponse = any;
+  export type UserCompareResponse = {
+    user1?: types.UserCompareData;
+    user2?: types.UserCompareData;
+  };
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
@@ -6177,9 +6287,15 @@ export namespace controllers {
   }
 
   export interface Admin {
+    getMaintenanceMode: (
+      params?: messages.AdminGetMaintenanceModeRequest,
+    ) => Promise<messages.AdminGetMaintenanceModeResponse>;
     platformReportStats: (
       params?: messages.AdminPlatformReportStatsRequest,
     ) => Promise<messages.AdminPlatformReportStatsResponse>;
+    setMaintenanceMode: (
+      params?: messages.AdminSetMaintenanceModeRequest,
+    ) => Promise<messages.AdminSetMaintenanceModeResponse>;
   }
 
   export interface AiEditorial {
@@ -6939,6 +7055,9 @@ export namespace controllers {
     coderOfTheMonthList: (
       params?: messages.UserCoderOfTheMonthListRequest,
     ) => Promise<messages.UserCoderOfTheMonthListResponse>;
+    compare: (
+      params?: messages.UserCompareRequest,
+    ) => Promise<messages.UserCompareResponse>;
     contestStats: (
       params?: messages.UserContestStatsRequest,
     ) => Promise<messages.UserContestStatsResponse>;

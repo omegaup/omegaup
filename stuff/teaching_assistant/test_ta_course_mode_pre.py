@@ -81,7 +81,14 @@ def create_test_course() -> None:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -114,7 +121,14 @@ def create_test_assignment() -> None:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -212,7 +226,14 @@ def get_assignment_details() -> Any:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -241,7 +262,14 @@ def create_test_problem() -> None:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -309,7 +337,14 @@ def add_problem_to_course() -> None:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -334,7 +369,14 @@ def add_student_to_course() -> None:
     login_endpoint = get_login_endpoint(TEACHER_USERNAME, TEACHER_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": TEACHER_USERNAME,
+            "password": TEACHER_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
@@ -361,7 +403,14 @@ def create_test_run(
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": STUDENT_USERNAME,
+            "password": STUDENT_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     student_cookies = response.cookies
 
@@ -398,7 +447,14 @@ def request_feedback(
     login_endpoint = get_login_endpoint(STUDENT_USERNAME, STUDENT_PASSWORD)
     login_url = f"{BASE_URL}/{login_endpoint}"
 
-    response = requests.get(login_url, timeout=30)
+    response = requests.post(
+        login_url,
+        data={
+            "usernameOrEmail": STUDENT_USERNAME,
+            "password": STUDENT_PASSWORD,
+        },
+        timeout=30,
+    )
     response.raise_for_status()
     COOKIES = response.cookies
 
