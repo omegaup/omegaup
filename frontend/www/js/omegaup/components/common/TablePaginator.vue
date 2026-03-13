@@ -23,7 +23,7 @@
       </div>
     </div>
     <div v-if="items.length > 0" class="table-responsive">
-      <table class="table table-striped mb-0 ">
+      <table class="table table-striped mb-0">
         <thead>
           <tr>
             <template v-for="column in columnNames">
