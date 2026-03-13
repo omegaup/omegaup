@@ -320,7 +320,12 @@ export default class ProblemEdit extends Vue {
   currentStatement: types.ProblemStatement = this.statement;
   currentSolution: types.ProblemStatement =
     this.solution ||
-    ({ markdown: '', language: 'es', images: {}, sources: {} } as types.ProblemStatement);
+    ({
+      markdown: '',
+      language: 'es',
+      images: {},
+      sources: {},
+    } as types.ProblemStatement);
   showConfirmationModal = false;
 
   get activeTab(): string {
@@ -359,7 +364,12 @@ export default class ProblemEdit extends Vue {
   onSolutionChange(newSolution: types.ProblemStatement | null): void {
     this.currentSolution =
       newSolution ||
-      ({ markdown: '', language: 'es', images: {}, sources: {} } as types.ProblemStatement);
+      ({
+        markdown: '',
+        language: 'es',
+        images: {},
+        sources: {},
+      } as types.ProblemStatement);
   }
 
   onGotoPrintableVersion(): void {
