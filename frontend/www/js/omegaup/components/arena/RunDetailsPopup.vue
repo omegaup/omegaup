@@ -148,15 +148,17 @@
                 >{{ T.wordsDownloadCode }}</a
               >
             </li>
-            <li v-if="data.admin">
+            <li>
               <a
+                v-if="data.admin"
                 class="output"
                 :href="`/api/run/download/run_alias/${data.guid}/`"
                 >{{ T.wordsDownloadOutput }}</a
               >
             </li>
-            <li v-if="data.admin">
+            <li>
               <a
+                v-if="data.admin"
                 class="details"
                 :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
                 >{{ T.wordsDownloadDetails }}</a
