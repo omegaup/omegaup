@@ -235,7 +235,6 @@ def update_user_rank(
         ORDER BY
             `score` DESC;
     ''')
-    rows = cur_readonly.fetchall()
     prev_score = None
     rank = 0
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
@@ -251,7 +250,7 @@ def update_user_rank(
                     VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
     user_rank_rows: List[UserRankRow] = []
     batch_size = 1000
-    for index, row in enumerate(rows):
+    for index, row in enumerate(cur_readonly):
         if row['score'] != prev_score:
             rank = index + 1
         score = row.get('score', 0)
@@ -324,7 +323,6 @@ def update_author_rank(
             `author_score` DESC
     ''')
 
-    rows = cur_readonly.fetchall()
     prev_score = None
     rank = 0
     insert_author_rank_sql = '''
@@ -339,7 +337,7 @@ def update_author_rank(
                             author_score = VALUES(author_score);'''
     author_rank_rows: List[AuthorRankRow] = []
     batch_size = 1000
-    for index, row in enumerate(rows):
+    for index, row in enumerate(cur_readonly):
         if row['author_score'] != prev_score:
             rank = index + 1
         prev_score = row['author_score']
