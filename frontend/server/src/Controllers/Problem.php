@@ -5391,6 +5391,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $extra_wall_time
      * @omegaup-request-param int|null $input_limit
      * @omegaup-request-param null|string $lang
+     * @omegaup-request-param null|string $language
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $memory_limit
      * @omegaup-request-param string $message
@@ -5557,8 +5558,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
-            $statementLanguage = $r->ensureOptionalString('language');
-            if (!is_null($statementLanguage)) {
+            $statementLanguage = $r->ensureOptionalString('language') ?? '';
+            if ($statementLanguage !== '') {
                 \OmegaUp\Validators::validateInEnum(
                     $statementLanguage,
                     'lang',
@@ -5594,13 +5595,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $details = self::getProblemEditDetails(
                 $problem,
                 $r->identity,
-                $statementLanguage ?? ''
+                $statementLanguage
             );
             if ($directory === 'solutions') {
                 $extraInfo['solution'] = \OmegaUp\Controllers\Problem::getProblemSolution(
                     $problem,
                     $problem->commit,
-                    $statementLanguage ?? $lang
+                    $statementLanguage !== '' ? $statementLanguage : $lang
                 );
             }
             $result['templateProperties']['payload'] = array_merge(
