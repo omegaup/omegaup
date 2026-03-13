@@ -5558,7 +5558,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ['statements', 'solutions']
             );
             $statementLanguage = $r->ensureOptionalString('language');
-            if (!is_null($statementLanguage) && $statementLanguage !== '') {
+            if (!is_null($statementLanguage)) {
                 \OmegaUp\Validators::validateInEnum(
                     $statementLanguage,
                     'lang',
