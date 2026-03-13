@@ -33,12 +33,23 @@ describe('Test IDE', () => {
     cy.login(loginOptions[0]);
     cy.visit('/grader/ephemeral/');
 
-    cy.get('[data-zip-download]').should('be.visible').click();
-    cy.wait(1000); // wait a little bit to make sure the file is ready
-    cy.get('[data-zip-download]').should('be.visible').click(); // cypress/downloads
-
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
     const filePath = `cypress/downloads/${fileName}`;
+
+    cy.get('[data-zip-download]').should('be.visible').click();
+    cy.get('[data-zip-download]')
+      .invoke('prop', 'href')
+      .then((zipHref) => {
+        expect(zipHref).to.match(/^blob:/);
+
+        return cy
+          .window()
+          .then((win) => win.fetch(zipHref).then((response) => response.arrayBuffer()))
+          .then((arrayBuffer) => {
+            cy.writeFile(filePath, Cypress.Buffer.from(arrayBuffer), 'binary');
+          });
+      });
+
     cy.get('[data-zip-upload]').should('be.visible');
     cy.get('input[type="file"]').selectFile(filePath, {
       force: true,
