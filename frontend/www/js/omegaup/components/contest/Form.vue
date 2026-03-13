@@ -863,6 +863,7 @@
       cancel-variant="success"
       :title="T.contestNewFormPresetOverwriteWarningModalTitle"
       :ok-title="T.wordsConfirm"
+      :cancel-title="T.wordsCancel"
       @ok="
         applyPreset(changePresetTo);
         hasFormChanged = true;
