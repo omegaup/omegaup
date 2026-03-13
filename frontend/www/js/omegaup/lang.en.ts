@@ -1024,6 +1024,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "My profile",
   navbarLogin: "Log in",
   navbarRegister: "Sign up",
+  navbarScrollToTop: "Scroll to top",
   newPublicTagsNotAllowed: "It is not allowed to add new public tags",
   noChangesDetected: "No changes were detected",
   noCoders: "No coders.",

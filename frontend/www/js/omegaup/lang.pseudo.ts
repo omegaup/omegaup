@@ -1024,6 +1024,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "(My pr0fi13)",
   navbarLogin: "(L0g in)",
   navbarRegister: "(Sign up)",
+  navbarScrollToTop: "(Scr011 70 70p)",
   newPublicTagsNotAllowed: "(I7 i5 n07 a110w3d 70 add n3w pub1ic 7ag5)",
   noChangesDetected: "(N0 chang35 w3r3 d373c73d)",
   noCoders: "(N0 c0d3r5.)",

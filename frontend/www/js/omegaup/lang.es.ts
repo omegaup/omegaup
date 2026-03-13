@@ -1024,6 +1024,7 @@ const translations: { [key: string]: string; } = {
   navViewProfile: "Mi perfil",
   navbarLogin: "Inicia sesi\u00f3n",
   navbarRegister: "Registrarse",
+  navbarScrollToTop: "Ir arriba",
   newPublicTagsNotAllowed: "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
   noChangesDetected: "No se detectaron cambios",
   noCoders: "No hay coders",

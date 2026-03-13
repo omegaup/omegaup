@@ -8,7 +8,7 @@
         <a
           class="navbar-brand p-3 mr-0 mr-sm-3"
           href="/"
-          title="Scroll to top"
+          :title="T.navbarScrollToTop"
           @click="handleLogoClick"
         >
           <img
@@ -497,11 +497,9 @@ export default class Navbar extends Vue {
   }
 
   handleLogoClick(event: MouseEvent): void {
-    if (window.location.pathname === '/') {
-      if (window.scrollY > 0) {
-        event.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+    if (window.scrollY > 0) {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 }
