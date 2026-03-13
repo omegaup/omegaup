@@ -144,6 +144,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @return array{count: int, problems: list<array{accepted: int, alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, submissions: int, tags: list<array{name: string, source: string}>, title: string, visibility: int}>}
      */
     final public static function byIdentityType(
+        
         string $identityType,
         ?string $language,
         string $orderBy,
