@@ -4371,9 +4371,9 @@ export namespace types {
   }
 
   export interface ProblemListPayload {
-    attemptedProblemAliases: string[];
     adminContests: types.AdminContestForProblem[];
     adminCourses: types.AdminCourseForProblem[];
+    attemptedProblemAliases: string[];
     column: string;
     columns: string[];
     keyword: string;
