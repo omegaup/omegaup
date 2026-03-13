@@ -88,10 +88,6 @@ class Utils {
         \OmegaUp\DAO\Submissions::update($submission);
         \OmegaUp\DAO\Runs::update($run);
 
-        // Simulate the grader callback: invalidate rank/scoreboard
-        // caches now that the verdict is known.
-        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
-
         if ($problemsetScoreMode === 'max_per_group') {
             foreach ($runScoreByGroups as $scoreByGroup) {
                 \OmegaUp\DAO\RunsGroups::create(
