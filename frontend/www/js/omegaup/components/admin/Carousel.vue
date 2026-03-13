@@ -8,12 +8,11 @@
         <label class="mr-2">{{ T.wordsLanguage }}:</label>
         <select
           v-model="currentLanguage"
-          class="form-control d-inline-block"
-          style="width: auto"
+          class="form-control d-inline-block w-auto"
         >
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="pt">Português</option>
+          <option value="en">{{ T.wordsEnglish }}</option>
+          <option value="es">{{ T.wordsSpanish }}</option>
+          <option value="pt">{{ T.wordsPortuguese }}</option>
         </select>
         <label class="mr-2 ml-3">{{ T.wordsStatus }}:</label>
         <select
@@ -81,7 +80,7 @@
             <td>
               {{
                 item.expiration_date
-                  ? formatDate(item.expiration_date)
+                  ? time.formatDateTime(item.expiration_date)
                   : T.carouselNoExpiration
               }}
             </td>
@@ -314,6 +313,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as time from '../../time';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -334,6 +334,7 @@ export default class Carousel extends Vue {
   @Prop() carouselItems!: types.CarouselItem[];
 
   T = T;
+  time = time;
   showCreateModal = false;
   showEditModal = false;
   showDeleteModal = false;
@@ -344,9 +345,9 @@ export default class Carousel extends Vue {
   editingLanguage = 'en';
   currentStatusFilter = 'active';
   languages = [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'pt', name: 'Português' },
+    { code: 'en', name: T.wordsEnglish },
+    { code: 'es', name: T.wordsSpanish },
+    { code: 'pt', name: T.wordsPortuguese },
   ];
   multilingualData: MultilingualData = {
     title: { en: '', es: '', pt: '' },
@@ -372,7 +373,7 @@ export default class Carousel extends Vue {
   onShowEditModalChanged(newVal: boolean): void {
     if (newVal && this.currentItem.expiration_date) {
       const date = new Date(this.currentItem.expiration_date);
-      this.expirationDateInput = this.formatDateForInput(date);
+      this.expirationDateInput = time.formatDateTimeLocal(date);
     } else {
       this.expirationDateInput = '';
     }
@@ -460,7 +461,7 @@ export default class Carousel extends Vue {
     };
     if (item.expiration_date) {
       const date = new Date(item.expiration_date);
-      this.expirationDateInput = this.formatDateForInput(date);
+      this.expirationDateInput = time.formatDateTimeLocal(date);
     } else {
       this.expirationDateInput = '';
     }
@@ -525,20 +526,6 @@ export default class Carousel extends Vue {
       return text || '';
     }
     return text.substring(0, maxLength) + '...';
-  }
-
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleString();
-  }
-
-  formatDateForInput(date: Date): string {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   getStatusText(item: types.CarouselItem): string {
