@@ -161,9 +161,4 @@ export default class CoderOfTheMonthList extends Vue {
   padding: 0.65rem 1rem;
   white-space: nowrap;
 }
-
-/*.ranking-width {
-  max-width: 55rem;
-  margin: 0 auto;
-}*/
 </style>
