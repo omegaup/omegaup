@@ -18,18 +18,15 @@
           </div>
           <div v-if="sortedStudents.length === 0" class="text-center p-5">
 
-              <i class="fa fa-users fa-3x mb-3 text-muted"></i>
+            <font-awesome-icon icon="users" class="mb-3 text-muted" />
 
-            <h3>{{ T.noStudentsEnrolled }}</h3>
+             <h3>{{ T.studentProgressNoStudentsEnrolled }}</h3>
 
-           <p class="text-muted">
-              {{ T.addStudentsToTrackProgress }}
+            <p class="text-muted">
+             {{ T.studentProgressAddStudentsToTrackProgress }}
             </p>
-          <a
-           :href="`/course/${course.alias}/edit/`"
-            class="btn btn-primary mt-3"
-           >
-           {{ T.addStudents }}
+
+             {{ T.studentProgressAddStudents }}
           </a>
 
         </div>
@@ -181,7 +178,11 @@ import common_SortControls from '../common/SortControls.vue';
 import course_StudentProgress from './StudentProgress.vue';
 import common_Paginator from '../common/Paginator.vue';
 import { toCsv, TableCell, Percentage } from '../../csv';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
 
+library.add(fas);
 Vue.use(AsyncComputedPlugin);
 
 export function escapeXml(cell: TableCell): string {
@@ -227,6 +228,7 @@ export function toOds(courseName: string, table: TableCell[][] | null): string {
     'omegaup-common-sort-controls': common_SortControls,
     'omegaup-course-student-progress': course_StudentProgress,
     'omegaup-common-paginator': common_Paginator,
+    FontAwesomeIcon,
   },
 })
 export default class CourseViewProgress extends Vue {
