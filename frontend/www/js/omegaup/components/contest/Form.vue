@@ -10,7 +10,7 @@
           class="btn btn-secondary"
           data-contest-omi
           type="button"
-          @click="showConfirmPresetModal(PresetType.OMI)"
+          @click="confirmPresetChange(PresetType.OMI)"
         >
           {{ T.contestNewFormOmiStyle }}
         </button>
@@ -18,7 +18,7 @@
           class="btn btn-secondary"
           data-contest-preioi
           type="button"
-          @click="showConfirmPresetModal(PresetType.PreIOI)"
+          @click="confirmPresetChange(PresetType.PreIOI)"
         >
           {{ T.contestNewForm }}
         </button>
@@ -26,7 +26,7 @@
           class="btn btn-secondary"
           data-contest-conacup
           type="button"
-          @click="showConfirmPresetModal(PresetType.Conacup)"
+          @click="confirmPresetChange(PresetType.Conacup)"
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
@@ -34,7 +34,7 @@
           class="btn btn-secondary"
           data-contest-icpc
           type="button"
-          @click="showConfirmPresetModal(PresetType.ICPC)"
+          @click="confirmPresetChange(PresetType.ICPC)"
         >
           {{ T.contestNewFormICPCStyle }}
         </button>
@@ -863,7 +863,10 @@
       cancel-variant="success"
       :title="T.contestNewFormPresetOverwriteWarningModalTitle"
       :ok-title="T.wordsConfirm"
-      @ok="confirmPresetChange(changePresetTo)"
+      @ok="
+        applyPreset(changePresetTo);
+        hasFormChanged = true;
+      "
     >
       {{ T.contestNewFormPresetOverwriteWarning }}
     </b-modal>
@@ -1317,16 +1320,14 @@ export default class Form extends Vue {
     return Object.keys(this.localErrors).length === 0;
   }
 
-  showConfirmPresetModal(presetType: PresetType): void {
+  confirmPresetChange(presetType: PresetType): void {
     if (this.hasFormChanged && !this.update) {
       this.changePresetTo = presetType;
       this.showModal = true;
+    } else {
+      this.applyPreset(presetType);
+      this.hasFormChanged = true;
     }
-  }
-
-  confirmPresetChange(presetType: PresetType): void {
-    this.applyPreset(presetType);
-    this.hasFormChanged = true;
   }
 
   applyPreset(presetType: PresetType): void {
