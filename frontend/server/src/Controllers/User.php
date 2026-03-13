@@ -2999,10 +2999,13 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Expires the known ranks
+     * Expires the known ranks and scoreboards.
      *
-     * @TODO: This should be called only in the grader->frontend callback and only IFF
-     * verdict = AC (and not test run)
+     * Callers must guard invocations so this only runs when standings
+     * actually change: verdict was AC and the submission type is
+     * 'normal' (not a test run). The call was removed from
+     * Run::apiCreate() (verdict unknown at submission time) and is
+     * now conditional in apiRejudge/apiDisqualify/apiRequalify.
      *
      * @return void
      */

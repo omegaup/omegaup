@@ -643,9 +643,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        // Expire rank cache
-        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
-
         if (!is_null($problemsetId)) {
             $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
                 $problemsetId
@@ -849,6 +846,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         self::$log->info("Run {$run->run_id} being rejudged");
 
+        $previousVerdict = $run->verdict;
+
         // Reset fields.
         $run->status = 'new';
         try {
@@ -874,8 +873,12 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         self::invalidateCacheOnRejudge($run);
 
-        // Expire ranks
-        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        if (
+            $previousVerdict === 'AC'
+            && $submission->type === 'normal'
+        ) {
+            \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        }
 
         return ['status' => 'ok'];
     }
@@ -932,6 +935,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             )
         );
         $runs = [];
+        $hadACVerdict = false;
         if (!is_null($runAlias)) {
             [
                 'submission' => $submission,
@@ -952,6 +956,9 @@ class Run extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'runCannotBeDisqualified'
                 );
+            }
+            if ($submission->verdict === 'AC') {
+                $hadACVerdict = true;
             }
             \OmegaUp\DAO\Submissions::disqualify($submission);
             $runs[] = ['guid' => $runAlias, 'username' => $username];
@@ -978,13 +985,17 @@ class Run extends \OmegaUp\Controllers\Controller {
                         'userNotAllowed'
                     );
                 }
+                if ($submission->verdict === 'AC') {
+                    $hadACVerdict = true;
+                }
                 \OmegaUp\DAO\Submissions::disqualify($submission);
                 $runs[] = ['guid' => $submission->guid, 'username' => $username];
             }
         }
 
-        // Expire ranks
-        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        if ($hadACVerdict) {
+            \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        }
         return [
             'status' => 'ok',
             'runs' => $runs,
@@ -1031,8 +1042,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Submissions::requalify($submission);
 
-        // Expire ranks
-        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        if ($submission->verdict === 'AC') {
+            \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
+        }
         return [
             'status' => 'ok'
         ];
