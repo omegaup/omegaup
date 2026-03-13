@@ -5557,6 +5557,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
+            $statementLanguage = $r->ensureOptionalString('language');
+            if (!is_null($statementLanguage) && $statementLanguage !== '') {
+                \OmegaUp\Validators::validateInEnum(
+                    $statementLanguage,
+                    'lang',
+                    \OmegaUp\Controllers\Problem::ISO639_1
+                );
+            }
 
             $contents = $r->ensureString('contents');
 
@@ -5583,7 +5591,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemParams->updatePublished
                 );
             }
-            $details = self::getProblemEditDetails($problem, $r->identity);
+            $details = self::getProblemEditDetails(
+                $problem,
+                $r->identity,
+                $statementLanguage ?? ''
+            );
+            if ($directory === 'solutions') {
+                $extraInfo['solution'] = \OmegaUp\Controllers\Problem::getProblemSolution(
+                    $problem,
+                    $problem->commit,
+                    $statementLanguage ?? $lang
+                );
+            }
+            $result['templateProperties']['payload'] = array_merge(
+                $details,
+                self::getCommonPayloadForTypeScript($r->identity)
+            );
+            $result['templateProperties']['payload'] = array_merge(
+                $extraInfo,
+                $result['templateProperties']['payload']
+            );
         } elseif ($request === 'cases') {
             $contents = $r->ensureString('contents');
             $data = json_decode($contents, true);
@@ -5672,13 +5699,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $statementLanguage = ''
     ) {
         $details = self::getProblemDetails(
             $identity,
             $problem,
             problemset: null,
-            statementLanguage: '',
+            statementLanguage: $statementLanguage,
             showSolvers: false,
             preventProblemsetOpen: false,
         );
