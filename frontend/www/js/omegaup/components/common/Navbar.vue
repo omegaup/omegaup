@@ -509,7 +509,7 @@ export default class Navbar extends Vue {
       // Find the open navbar and close it
       const navbarCollapse = this.$el.querySelector('.navbar-collapse.show');
       if (navbarCollapse) {
-        $(navbarCollapse).collapse('hide');
+        ($(navbarCollapse) as any).collapse('hide');
       }
 
       // Close any open dropdowns
