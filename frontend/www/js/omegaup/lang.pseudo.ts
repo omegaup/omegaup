@@ -105,6 +105,7 @@ const translations: { [key: string]: string; } = {
   arrayModalSize: "(Siz3)",
   assignmentCardLessons: "(%(lessonCount) 13550n5)",
   assignmentCardProblems: "(%(problemCount) pr0b13m5)",
+  assignmentCardDueDate: "(Du3 da73: %(time))",
   assignmentCardStart: "(S7ar7)",
   assignmentNotFound: "(C0n73n7 n07 f0und)",
   assignmentNotStarted: "(Th3 a55ignm3n7 ha5 n07 57ar73d y37)",
