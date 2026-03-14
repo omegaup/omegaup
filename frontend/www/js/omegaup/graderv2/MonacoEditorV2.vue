@@ -9,7 +9,7 @@
       { 'monaco-root--fullscreen': isFullscreen },
     ]"
     role="region"
-    :aria-label="`Code editor for ${filename}`"
+    :aria-label="ui.formatString(T.monacoEditorRegionLabel, { filename })"
   >
     <div
       class="editor-toolbar"
@@ -30,20 +30,22 @@
           @change="onFontSizeChange"
         >
           <option v-for="size in fontSizes" :key="size" :value="size">
-            {{ T.monacoEditorFontSizeOption.replace('{size}', String(size)) }}
+            {{ ui.formatString(T.monacoEditorFontSizeOption, { size }) }}
           </option>
         </select>
 
         <button
           v-if="contents"
+          v-clipboard="() => contents"
+          v-clipboard:success="handleCopyFeedback"
+          v-clipboard:error="handleCopyError"
           class="toolbar-btn toolbar-btn--copy"
           :class="{ 'toolbar-btn--copied': copied }"
           :title="copyButtonText"
           :aria-label="copyButtonText"
-          @click="copyCode"
         >
-          <i v-if="!copied" class="far fa-copy" aria-hidden="true"></i>
-          <i v-else class="fas fa-check" aria-hidden="true"></i>
+          <font-awesome-icon v-if="!copied" icon="clipboard" />
+          <font-awesome-icon v-else icon="check" />
           <span class="sr-only">{{ copyButtonText }}</span>
         </button>
 
@@ -115,6 +117,12 @@ import * as Util from '../grader/util';
 import * as monaco from 'monaco-editor';
 import T from '../lang';
 import * as ui from '../ui';
+import Clipboard from 'v-clipboard';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faClipboard, faCheck } from '@fortawesome/free-solid-svg-icons';
+library.add(faClipboard, faCheck);
+Vue.use(Clipboard);
 
 // ─── Sourced from constants.ts ────────────────────────────────────────────────
 import { EDITOR, TIMING } from '../grader/constants';
@@ -144,12 +152,16 @@ const FULLSCREEN_LAYOUT_DELAY_MS = 100;
 const FALLBACKS = {
   THEME: Util.MonacoThemes.VSLight, // 'vs'
   LANGUAGE: 'javascript',
-  MODULE: 'untitled',
+  MODULE: T.monacoEditorUntitled,
   EXTENSION: 'js',
   MODEL_MAPPING: 'javascript',
 } as const;
 
-@Component
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+})
 export default class MonacoEditor extends Vue {
   @Prop({ required: true }) storeMapping!: { [key: string]: string };
   @Prop({ default: false }) readOnly!: boolean;
@@ -174,6 +186,7 @@ export default class MonacoEditor extends Vue {
   private debounceTimer: number | null = null;
 
   T = T;
+  ui = ui;
 
   // ── Computed ──────────────────────────────────────────────────────────────
   get theme(): string {
@@ -321,20 +334,20 @@ export default class MonacoEditor extends Vue {
   }
 
   // ── Methods ───────────────────────────────────────────────────────────────
-  async copyCode(): Promise<void> {
-    if (!this.contents) return;
-    try {
-      await navigator.clipboard.writeText(this.contents);
-      this.copied = true;
-      if (this.copyTimeout) clearTimeout(this.copyTimeout);
-      // Duration sourced from TIMING.COPY_FEEDBACK_DURATION_MS in constants.ts
-      this.copyTimeout = window.setTimeout(
-        () => (this.copied = false),
-        TIMING.COPY_FEEDBACK_DURATION_MS,
-      );
-    } catch (err) {
-      ui.error(T.monacoEditorClipboardError);
-    }
+  handleCopyFeedback(): void {
+    this.copied = true;
+    if (this.copyTimeout) clearTimeout(this.copyTimeout);
+    // Duration sourced from TIMING.COPY_FEEDBACK_DURATION_MS in constants.ts
+    this.copyTimeout = window.setTimeout(
+      () => (this.copied = false),
+      TIMING.COPY_FEEDBACK_DURATION_MS,
+    );
+  }
+
+  handleCopyError(): void {
+    if (this.copyTimeout) clearTimeout(this.copyTimeout);
+    this.copied = false;
+    ui.error(T.monacoEditorClipboardError);
   }
 
   confirmReset(): void {
