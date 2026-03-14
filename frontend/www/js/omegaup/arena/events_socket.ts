@@ -246,20 +246,12 @@ export class EventsSocket {
       clearInterval(this.socketKeepalive);
       this.socketKeepalive = null;
     }
-    if (this.clarificationInterval) {
-      clearInterval(this.clarificationInterval);
-      this.clarificationInterval = null;
-    }
-    if (this.rankingInterval) {
-      clearInterval(this.rankingInterval);
-      this.rankingInterval = null;
-    }
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
       this.socketStatus = SocketStatus.Waiting;
       socketStore.commit('updateSocketStatus', this.socketStatus);
       setTimeout(
-        () => this.connectSocket(),
+        () => this.connectSocket().catch(ui.ignoreError),
         Math.random() * (this.intervalInMilliseconds / 2),
       );
       return;
@@ -279,6 +271,15 @@ export class EventsSocket {
           this.shouldRetry = true;
           this.socketStatus = SocketStatus.Connected;
           socketStore.commit('updateSocketStatus', this.socketStatus);
+          // Clear fallback polling intervals now that the socket has reconnected
+          if (this.clarificationInterval) {
+            clearInterval(this.clarificationInterval);
+            this.clarificationInterval = null;
+          }
+          if (this.rankingInterval) {
+            clearInterval(this.rankingInterval);
+            this.rankingInterval = null;
+          }
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             this.intervalInMilliseconds,
