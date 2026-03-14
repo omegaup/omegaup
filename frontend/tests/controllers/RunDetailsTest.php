@@ -244,14 +244,14 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->contestData
         );
 
-        $login = self::login($this->identity);
-
         $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemDataWithDiff,
             $this->contestData,
             $this->identity
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 60);
+
+        $login = self::login($this->identity);
 
     // During the active contest, download should be blocked
         try {
@@ -267,6 +267,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $finishTime = $this->contestData['request']['finish_time'];
         \OmegaUp\Time::setTimeForTesting($finishTime + 1);
+         $login = self::login($this->identity);
 
         ob_start();
         try {
