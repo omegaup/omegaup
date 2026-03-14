@@ -642,6 +642,8 @@ const translations: { [key: string]: string; } = {
   courseListAdminCourses: "Cursos que administro",
   courseListArchivedCourses: "Cursos archivados",
   courseListCurrentCourses: "Cursos actuales",
+  courseListEmptyDescription: "Crea tu primer curso para comenzar a organizar lecciones y estudiantes.",
+  courseListEmptyTitle: "A\u00fan no tienes cursos",
   courseListPastCourses: "Cursos pasados",
   courseListSubmissionsByGroup: "Env\u00edos realizados por estudiantes de este curso",
   courseListTeachingAssistantCourses: "Cursos a los que ayudo",
