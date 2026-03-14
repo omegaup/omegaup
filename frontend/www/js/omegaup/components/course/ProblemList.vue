@@ -7,9 +7,21 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
-      </div>
+      <div v-if="problems.length === 0" class="empty-state text-center p-5">
+  <h5>{{ emptyTableLabel }}</h5>
+
+  <p>
+    Add your first problem to start building this assignment.
+  </p>
+
+  <button
+    data-add-problem
+    class="btn btn-primary mt-3"
+    @click="$el.querySelector('[data-add-problem]')?.scrollIntoView()"
+  >
+    {{ addProblemButtonLabel }}
+  </button>
+</div>
       <div v-else>
         <table class="table table-striped">
           <thead>
@@ -447,3 +459,12 @@ export default class CourseProblemList extends Vue {
   }
 }
 </script>
+<style scoped>
+.empty-state {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+</style>
