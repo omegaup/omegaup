@@ -815,6 +815,7 @@ div > section {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::v-deep .lm_item_container .vs-dark {
   background-color: var(--vs-dark-background-color);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
