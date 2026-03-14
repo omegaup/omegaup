@@ -501,24 +501,14 @@ export default class Navbar extends Vue {
 
   private handleDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    const isClickInside = this.$el.contains(target);
-    const isNavLink =
-      target.closest('.nav-link') || target.closest('.dropdown-item');
+    const navbar = this.$el as HTMLElement;
 
-    if (!isClickInside || isNavLink) {
-      // Find the open navbar and close it
-      const navbarCollapse = this.$el.querySelector('.navbar-collapse.show');
-      if (navbarCollapse) {
-        ($(navbarCollapse) as any).collapse('hide');
-      }
+    if (!navbar.contains(target)) {
+      const navbarCollapse = navbar.querySelector('.navbar-collapse.show');
 
-      // Close any open dropdowns
-      const openDropdowns = this.$el.querySelectorAll(
-        '.dropdown.show, .dropdown-menu.show',
-      );
-      openDropdowns.forEach((dropdown) => {
-        $(dropdown).removeClass('show');
-      });
+      if (!navbarCollapse) return;
+
+      ($(navbarCollapse) as any).collapse('hide');
     }
   }
 }
