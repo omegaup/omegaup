@@ -471,6 +471,5 @@ export default class CourseEdit extends Vue {
     }
     this.showTab = newValue;
   }
-
 }
 </script>

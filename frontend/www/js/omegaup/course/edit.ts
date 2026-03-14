@@ -645,7 +645,7 @@ OmegaUp.on('ready', () => {
         ref: 'component',
       });
     },
-});
+  });
   const component = courseEdit.$refs.component as course_Edit;
 
   // Handle browser back/forward navigation for hash-based tabs
