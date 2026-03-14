@@ -774,7 +774,7 @@ class Scoreboard
                     if ($pointsA != $pointsB) {
                         return $pointsA < $pointsB ? 1 : -1;
                     }
-                    return $a['username'] <=> $b['username'];
+                    return strcmp($a['username'], $b['username']);
                 }
             );
         } else {
@@ -978,8 +978,8 @@ class Scoreboard
         if (!is_array($scoreByGroupArray)) {
             throw new \RuntimeException(
                 'json_decode failed with: ' .
-                json_last_error() .
-                "for : {$scoreByGroup}"
+                    json_last_error() .
+                    "for : {$scoreByGroup}"
             );
         }
 

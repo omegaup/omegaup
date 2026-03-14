@@ -754,52 +754,52 @@ class Runs extends \OmegaUp\DAO\Base\Runs
 
         if ($onlyBest) {
             $sql = "
-            SELECT
-                rs.score, rs.penalty, rs.contest_score, rs.problem_id,
-                rs.identity_id, rs.type, rs.time, rs.submit_delay, rs.guid,
-                rs.total_submissions,
-                (
-                    SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
-                    FROM Runs_Groups rg
-                    WHERE rg.run_id = rs.current_run_id
-                ) AS score_by_group
-            FROM (
+                SELECT
+                    rs.score, rs.penalty, rs.contest_score, rs.problem_id,
+                    rs.identity_id, rs.type, rs.time, rs.submit_delay, rs.guid,
+                    rs.total_submissions,
+                    (
+                        SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
+                        FROM Runs_Groups rg
+                        WHERE rg.run_id = rs.current_run_id
+                    ) AS score_by_group
+                FROM (
+                    SELECT
+                        r.score, r.penalty, r.contest_score, s.problem_id, s.identity_id,
+                        IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay,
+                        s.guid, s.current_run_id,
+                        COUNT(*) OVER (
+                            PARTITION BY s.identity_id, s.problem_id
+                        ) AS total_submissions,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY s.identity_id, s.problem_id
+                            ORDER BY r.score DESC, r.penalty ASC, s.submission_id ASC
+                        ) as run_rank
+                    FROM Submissions s
+                    INNER JOIN Runs r ON s.current_run_id = r.run_id
+                    WHERE s.problemset_id = ?
+                      AND s.status = 'ready'
+                      AND s.type = 'normal'
+                      AND $verdictCondition
+                ) AS rs
+                WHERE rs.run_rank = 1;
+            ";
+        } else {
+            $sql = "
                 SELECT
                     r.score, r.penalty, r.contest_score, s.problem_id, s.identity_id,
-                    IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay,
-                    s.guid, s.current_run_id,
-                    COUNT(*) OVER (
-                        PARTITION BY s.identity_id, s.problem_id
-                    ) AS total_submissions,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY s.identity_id, s.problem_id
-                        ORDER BY r.score DESC, r.penalty ASC, s.submission_id ASC
-                    ) as run_rank
+                    IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay, s.guid,
+                    (
+                        SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
+                        FROM Runs_Groups rg
+                        WHERE rg.run_id = r.run_id
+                    ) AS score_by_group
                 FROM Submissions s
                 INNER JOIN Runs r ON s.current_run_id = r.run_id
                 WHERE s.problemset_id = ?
                   AND s.status = 'ready'
                   AND s.type = 'normal'
-                  AND $verdictCondition
-            ) AS rs
-            WHERE rs.run_rank = 1;
-            ";
-        } else {
-            $sql = "
-            SELECT
-                r.score, r.penalty, r.contest_score, s.problem_id, s.identity_id,
-                IFNULL(s.type, 'normal') AS type, s.time, s.submit_delay, s.guid,
-                (
-                    SELECT JSON_OBJECTAGG(IFNULL(rg.group_name, ''), rg.score)
-                    FROM Runs_Groups rg
-                    WHERE rg.run_id = r.run_id
-                ) AS score_by_group
-            FROM Submissions s
-            INNER JOIN Runs r ON s.current_run_id = r.run_id
-            WHERE s.problemset_id = ?
-              AND s.status = 'ready'
-              AND s.type = 'normal'
-              AND $verdictCondition;
+                  AND $verdictCondition;
             ";
         }
 

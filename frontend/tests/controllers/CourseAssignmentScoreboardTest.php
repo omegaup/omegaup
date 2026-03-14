@@ -45,11 +45,13 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = \OmegaUp\Controllers\Course::apiAssignmentScoreboard(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course' => $courseData['course_alias'],
-            'assignment' => $courseData['assignment_alias']
-        ]));
+        $response = \OmegaUp\Controllers\Course::apiAssignmentScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course' => $courseData['course_alias'],
+                'assignment' => $courseData['assignment_alias'],
+            ])
+        );
 
         $userScore = [];
         foreach ($expectedScores as $index => $score) {
