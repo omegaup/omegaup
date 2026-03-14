@@ -45,35 +45,39 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = \OmegaUp\Controllers\Course::apiAssignmentScoreboard(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course' => $courseData['course_alias'],
-                'assignment' => $courseData['assignment_alias'],
-            ])
-        );
+        $response = \OmegaUp\Controllers\Course::apiAssignmentScoreboard(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course' => $courseData['course_alias'],
+            'assignment' => $courseData['assignment_alias']
+        ]));
 
-        $userScore = [];
-        foreach ($expectedScores as $index => $score) {
-            $key = array_keys($score);
-            $userScore[$index] = $score[$key[0]];
+        // Validation. Build a score map from the API response itself, then sort
+        // $expectedScores to match the API ranking order (score desc, username asc).
+        $apiScores = [];
+        foreach ($response['ranking'] as $entry) {
+            $apiScores[$entry['username']] = round(
+                floatval($entry['total']['points']),
+                2
+            );
         }
 
-        // Validation. Now, courses should be sorted by ranking.
-        array_multisort(
-            array_values($userScore),
-            SORT_DESC,
-            array_keys($expectedScores),
-            SORT_ASC,
-            $expectedScores
-        );
+        uksort($expectedScores, function ($usernameA, $usernameB) use ($apiScores) {
+            $scoreA = (float)($apiScores[$usernameA] ?? 0.0);
+            $scoreB = (float)($apiScores[$usernameB] ?? 0.0);
+            if (abs($scoreA - $scoreB) > 1e-5) {
+                return $scoreA < $scoreB ? 1 : -1;
+            }
+            return strcmp($usernameA, $usernameB);
+        });
+
         $expectedPlace = 0;
-        $lastScore = 0;
+        $lastScore = -1.0;
         $i = 0;
         foreach ($expectedScores as $username => $score) {
-            if ($lastScore !== $score) {
+            $totalScore = $apiScores[$username] ?? 0.0;
+            if ($lastScore !== $totalScore) {
                 $expectedPlace = $i + 1;
-                $lastScore = $score;
+                $lastScore = $totalScore;
             }
 
             $this->assertSame(
@@ -99,13 +103,32 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase
             ])
         )['templateProperties']['payload']['scoreboard'];
 
+        // Build score map from the TypeScript scoreboard response
+        $tsApiScores = [];
+        foreach ($scoreboard['ranking'] as $entry) {
+            $tsApiScores[$entry['username']] = round(
+                floatval($entry['total']['points']),
+                2
+            );
+        }
+
+        uksort($expectedScores, function ($usernameA, $usernameB) use ($tsApiScores) {
+            $scoreA = (float)($tsApiScores[$usernameA] ?? 0.0);
+            $scoreB = (float)($tsApiScores[$usernameB] ?? 0.0);
+            if (abs($scoreA - $scoreB) > 1e-5) {
+                return $scoreA < $scoreB ? 1 : -1;
+            }
+            return strcmp($usernameA, $usernameB);
+        });
+
         $expectedPlace = 0;
-        $lastScore = 0;
+        $lastScore = -1.0;
         $i = 0;
         foreach ($expectedScores as $username => $score) {
-            if ($lastScore !== $score) {
+            $totalScore = $tsApiScores[$username] ?? 0.0;
+            if ($lastScore !== $totalScore) {
                 $expectedPlace = $i + 1;
-                $lastScore = $score;
+                $lastScore = $totalScore;
             }
 
             $this->assertSame(

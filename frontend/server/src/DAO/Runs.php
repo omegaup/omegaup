@@ -177,7 +177,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs
                 "EXECUTION_FINISHED"
             )
         LIMIT 1
-            ), "EXECUTION_COMPILATION_ERROR")AS execution,
+            ), "EXECUTION_COMPILATION_ERROR") AS execution,
             COALESCE(
         ( SELECT
             IF(
@@ -193,7 +193,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs
         ORDER BY
             field(status_runtime, "RUNTIME_NOT_AVAILABLE", "RUNTIME_EXCEEDED", "RUNTIME_AVAILABLE")
                 LIMIT 1
-            ), "RUNTIME_NOT_AVAILABLE" )AS status_runtime,
+            ), "RUNTIME_NOT_AVAILABLE") AS status_runtime,
             COALESCE(
         ( SELECT
             IF(
@@ -209,7 +209,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs
         ORDER BY
             field(status_memory, "MEMORY_NOT_AVAILABLE", "MEMORY_EXCEEDED", "MEMORY_AVAILABLE")
         LIMIT 1
-            ), "MEMORY_NOT_AVAILABLE" )AS status_memory';
+            ), "MEMORY_NOT_AVAILABLE") AS status_memory';
     }
 
     /**
@@ -799,8 +799,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs
                 WHERE s.problemset_id = ?
                   AND s.status = 'ready'
                   AND s.type = 'normal'
-                  AND $verdictCondition;
-            ";
+                  AND $verdictCondition
+                ";
         }
 
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [

@@ -763,14 +763,8 @@ class Scoreboard
                  * @param ScoreboardRankingEntry $b
                  */
                 function (array $a, array $b): int {
-                    $pointsA = round(
-                        floatval($a[self::TOTAL_COLUMN]['points']),
-                        2
-                    );
-                    $pointsB = round(
-                        floatval($b[self::TOTAL_COLUMN]['points']),
-                        2
-                    );
+                    $pointsA = round(floatval($a[self::TOTAL_COLUMN]['points']), 2);
+                    $pointsB = round(floatval($b[self::TOTAL_COLUMN]['points']), 2);
                     if ($pointsA != $pointsB) {
                         return $pointsA < $pointsB ? 1 : -1;
                     }
@@ -794,17 +788,18 @@ class Scoreboard
 
         // Append the place for each user
         $currentPoints = -1;
-        $place = 1;
+        $place = 0;
         $draws = 1;
         foreach ($scoreboard as &$userData) {
             $points = round(floatval($userData['total']['points']), 2);
             if ($currentPoints === -1) {
                 $currentPoints = $points;
+                $place = 1;
             } elseif ($points < $currentPoints) {
-                $currentPoints = $points;
                 $place += $draws;
                 $draws = 1;
-            } else {
+                $currentPoints = $points;
+            } elseif ($points == $currentPoints) {
                 $draws++;
             }
             if (!$sortByName) {
@@ -978,8 +973,8 @@ class Scoreboard
         if (!is_array($scoreByGroupArray)) {
             throw new \RuntimeException(
                 'json_decode failed with: ' .
-                    json_last_error() .
-                    "for : {$scoreByGroup}"
+                json_last_error() .
+                "for : {$scoreByGroup}"
             );
         }
 
