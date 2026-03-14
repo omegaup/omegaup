@@ -1,30 +1,27 @@
 <template>
   <div class="w-100 mt-2">
+    <!-- Previous Assignment -->
     <button
-      class="btn btn-primary col-md-12 col-sm-12 col-xs-12 mb-2"
-      :disabled="previousAssignment === null"
-      :title="previousAssignment !== null ? previousAssignment.name : ''"
+      v-if="previousAssignment"
+      class="btn btn-primary w-100 mb-2"
+      :title="previousAssignment.name"
       role="button"
       @click="$emit('navigate-to-assignment', previousAssignment.alias)"
     >
-      <font-awesome-icon
-        v-if="previousAssignment !== null"
-        :icon="['fas', 'chevron-circle-left']"
-      />
-      {{ previousAssignment !== null ? previousAssignment.name : '-' }}
+      <font-awesome-icon :icon="['fas', 'chevron-circle-left']" />
+      {{ previousAssignment.name }}
     </button>
+
+    <!-- Next Assignment -->
     <button
-      class="btn btn-primary col-md-12 col-sm-12 col-xs-12"
-      :disabled="nextAssignment === null"
-      :title="nextAssignment !== null ? nextAssignment.name : ''"
+      v-if="nextAssignment"
+      class="btn btn-primary w-100"
+      :title="nextAssignment.name"
       role="button"
       @click="$emit('navigate-to-assignment', nextAssignment.alias)"
     >
-      {{ nextAssignment !== null ? nextAssignment.name : '-' }}
-      <font-awesome-icon
-        v-if="nextAssignment !== null"
-        :icon="['fas', 'chevron-circle-right']"
-      />
+      {{ nextAssignment.name }}
+      <font-awesome-icon :icon="['fas', 'chevron-circle-right']" />
     </button>
   </div>
 </template>
@@ -40,6 +37,7 @@ import {
   faChevronCircleLeft,
   faChevronCircleRight,
 } from '@fortawesome/free-solid-svg-icons';
+
 library.add(faChevronCircleLeft);
 library.add(faChevronCircleRight);
 
@@ -69,7 +67,6 @@ export default class ArenaNavbarAssignments extends Vue {
   }
 
   private get currentAssignmentIndex(): number {
-    // Getting index of current assignment
     return this.assignments.findIndex(
       (assignment) => assignment.alias === this.currentAssignment.alias,
     );
