@@ -88,13 +88,6 @@ class Utils {
         \OmegaUp\DAO\Submissions::update($submission);
         \OmegaUp\DAO\Runs::update($run);
 
-        \OmegaUp\Cache::invalidateAllKeys(
-            \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX
-        );
-        \OmegaUp\Cache::invalidateAllKeys(
-            \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX
-        );
-
         if ($problemsetScoreMode === 'max_per_group') {
             foreach ($runScoreByGroups as $scoreByGroup) {
                 \OmegaUp\DAO\RunsGroups::create(
