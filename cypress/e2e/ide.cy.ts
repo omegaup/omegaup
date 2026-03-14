@@ -34,11 +34,15 @@ describe('Test IDE', () => {
     cy.visit('/grader/ephemeral/');
 
     cy.get('[data-zip-download]').should('be.visible').click();
-    cy.wait(1000); // wait a little bit to make sure the file is ready
-    cy.get('[data-zip-download]').should('be.visible').click(); // cypress/downloads
 
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
     const filePath = `cypress/downloads/${fileName}`;
+
+    // Wait for the file to actually be written to disk before selecting it.
+    // cy.readFile retries automatically until the file exists or the timeout
+    // is reached, which is more reliable than a fixed cy.wait() on slow CI runners.
+    cy.readFile(filePath, null, { timeout: 15000 });
+
     cy.get('[data-zip-upload]').should('be.visible');
     cy.get('input[type="file"]').selectFile(filePath, {
       force: true,
