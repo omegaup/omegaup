@@ -1512,13 +1512,45 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
             }
             if (
-                $problem->show_diff
-                === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
+                  $problem->show_diff
+                  === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
             ) {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                     'userNotAllowed'
                 );
             }
+
+            // Block download during an active contest, unless the user is a contest admin.
+            if (!is_null($submission->problemset_id)) {
+                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    $submission->problemset_id
+                );
+                if (
+                    !is_null(
+                        $problemset
+                    ) && !is_null(
+                        $problemset->contest_id
+                    )
+                ) {
+                    $activeContest = \OmegaUp\DAO\Contests::getByPK(
+                        $problemset->contest_id
+                    );
+                    if (
+                        !is_null($activeContest) &&
+                        !is_null($activeContest->finish_time) &&
+                        $activeContest->finish_time->time > \OmegaUp\Time::get() &&
+                        !\OmegaUp\Authorization::isContestAdmin(
+                            $r->identity,
+                            $activeContest
+                        )
+                    ) {
+                        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                            'userNotAllowed'
+                        );
+                    }
+                }
+            }
+
             $skipAuthorization = true;
         }
 

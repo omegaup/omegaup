@@ -229,6 +229,66 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testDownloadBlockedDuringActiveContest() {
+        $adminLogin = self::login($this->admin);
+
+        $problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+            'show_diff' => 'all',
+            ]),
+            $adminLogin,
+        );
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemDataWithDiff,
+            $this->contestData
+        );
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $this->contestData,
+            $this->identity
+        );
+        $login = self::login($this->identity);
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+        'auth_token' => $login->auth_token,
+        'contest_alias' => $this->contestData['request']['alias'],
+        ]));
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemDataWithDiff,
+            $this->contestData,
+            $this->identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 60);
+
+    // During the active contest, download should be blocked
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+            'run_alias' => $runData['response']['guid'],
+            'auth_token' => $login->auth_token,
+            'show_diff' => true,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertSame('userNotAllowed', $e->getMessage());
+        }
+
+        $finishTime = $this->contestData['request']['finish_time'];
+        \OmegaUp\Time::setTimeForTesting($finishTime + 1);
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+            'run_alias' => $runData['response']['guid'],
+            'auth_token' => $login->auth_token,
+            'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // Expected — apiDownload always exits this way on success.
+        }
+        ob_end_clean();
+    }
+
     /**
      * User only can see run details for submissions when gets the verdict AC
      */
