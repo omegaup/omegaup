@@ -10,6 +10,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     protected $admin;
     protected $problemData;
     protected $identity;
+    protected $problemDataWithDiff;
 
     public function setUp(): void {
         parent::setUp();
@@ -25,6 +26,14 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             login: $adminLogin,
         );
 
+        // Get a problem with show_diff='all'
+        $this->problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => 'all',
+            ]),
+            $adminLogin,
+        );
+
         // Add the problem to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $this->problemData,
@@ -35,6 +44,16 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'identity' => $this->identity
         ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $this->contestData,
+            $this->identity
+        );
+
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $this->contestData['contest'],
+            $this->identity
+        );
     }
 
     private function assertCanSeeRunDetails(
@@ -134,20 +153,14 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Download run details and assert the content of the output files is correct
+     */
     public function testDownload() {
-        $adminLogin = self::login($this->admin);
-
-        $problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-                'show_diff' => 'all',
-            ]),
-            $adminLogin,
-        );
-
         $login = self::login($this->identity);
 
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-            $problemDataWithDiff,
+            $this->problemDataWithDiff,
             $this->identity,
             $login
         );
@@ -206,6 +219,9 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * Download should be blocked when the problem has show_diff='none'
+     */
     public function testDownloadBlockedWhenShowDiffNone() {
         $login = self::login($this->identity);
 
@@ -229,23 +245,17 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    /**
+     * During an active contest, download should be blocked even if the problem has show_diff='all'
+     */
     public function testDownloadBlockedDuringActiveContest() {
-        $adminLogin = self::login($this->admin);
-
-        $problemDataWithDiff = \OmegaUp\Test\Factories\Problem::createProblem(
-            new \OmegaUp\Test\Factories\ProblemParams([
-            'show_diff' => 'all',
-            ]),
-            $adminLogin,
-        );
-
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problemDataWithDiff,
+            $this->problemDataWithDiff,
             $this->contestData
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createRun(
-            $problemDataWithDiff,
+            $this->problemDataWithDiff,
             $this->contestData,
             $this->identity
         );
@@ -253,7 +263,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($this->identity);
 
-    // During the active contest, download should be blocked
+        // During the active contest, download should be blocked
         try {
             \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
             'run_alias' => $runData['response']['guid'],
@@ -279,7 +289,8 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // Expected — apiDownload always exits this way on success.
         }
-        ob_end_clean();
+        $zipContents = ob_end_clean();
+        $this->assertNotEmpty($zipContents);
     }
 
     /**
