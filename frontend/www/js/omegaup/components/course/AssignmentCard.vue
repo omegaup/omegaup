@@ -24,10 +24,10 @@
         <p v-if="assignment.finish_time" class="mb-0 mt-1 due-date">
           <font-awesome-icon :icon="['fas', 'clock']" />
           <span class="ml-1">{{
-              ui.formatString(T.assignmentCardDueDate, {
-                time: getFormattedTime(assignment.finish_time),
-              })
-            }}</span>
+            ui.formatString(T.assignmentCardDueDate, {
+              time: getFormattedTime(assignment.finish_time),
+            })
+          }}</span>
           <span v-if="isOverdue" class="badge badge-danger ml-2">{{
             T.wordsOverdue
           }}</span>
