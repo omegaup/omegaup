@@ -1537,7 +1537,6 @@ class Run extends \OmegaUp\Controllers\Controller {
                     );
                     if (
                         !is_null($activeContest) &&
-                        !is_null($activeContest->finish_time) &&
                         $activeContest->finish_time->time > \OmegaUp\Time::get() &&
                         !\OmegaUp\Authorization::isContestAdmin(
                             $r->identity,
