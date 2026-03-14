@@ -244,15 +244,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->contestData
         );
 
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $this->contestData,
-            $this->identity
-        );
         $login = self::login($this->identity);
-        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
-        'auth_token' => $login->auth_token,
-        'contest_alias' => $this->contestData['request']['alias'],
-        ]));
 
         $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemDataWithDiff,
