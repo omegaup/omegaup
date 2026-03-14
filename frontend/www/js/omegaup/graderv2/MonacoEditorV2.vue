@@ -462,7 +462,7 @@ export default class MonacoEditor extends Vue {
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 5px;
 }
 
 .toolbar-label {
