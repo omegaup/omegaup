@@ -809,7 +809,7 @@ div > section {
   min-height: 60em;
 }
 
-/* Fix GoldenLayout maximize panel visibility */
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
 ::v-deep .lm_item_container {
   background-color: var(--vs-background-color);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
