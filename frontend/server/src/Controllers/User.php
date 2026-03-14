@@ -2999,13 +2999,15 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Expires the known ranks and scoreboards.
+     * Expires rank caches and scoreboard caches.
      *
-     * Callers must guard invocations so this only runs when standings
-     * actually change: verdict was AC and the submission type is
-     * 'normal' (not a test run). The call was removed from
-     * Run::apiCreate() (verdict unknown at submission time) and is
-     * now conditional in apiRejudge/apiDisqualify/apiRequalify.
+     * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
+     * change when a submission receives an AC verdict, so callers
+     * must guard invocations accordingly.  Scoreboard caches are
+     * invalidated separately in Run::apiCreate() on every new
+     * submission (verdict is unknown at that point).  This function
+     * is now called conditionally in apiRejudge, apiDisqualify and
+     * apiRequalify (AC verdict + normal submission type).
      *
      * @return void
      */
