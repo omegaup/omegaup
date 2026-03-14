@@ -369,9 +369,7 @@ export default class Edit extends Vue {
 
   @Watch('initialTab')
   onInitialTabChanged(newValue: string) {
-    if (newValue !== '') {
-      this.showTab = newValue;
-    }
+    this.showTab = newValue !== '' ? newValue : this.selectedTab();
   }
   alreadyArchived = this.details.archived;
 

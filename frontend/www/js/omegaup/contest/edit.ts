@@ -36,6 +36,8 @@ OmegaUp.on('ready', () => {
     const hash = window.location.hash.substring(1).split('#')[0];
     if (validTabs.includes(hash)) {
       contestEdit.initialTab = hash;
+    } else if (hash === '') {
+      contestEdit.initialTab = '';
     }
   };
 
