@@ -23,12 +23,15 @@
              <h3>{{ T.studentProgressNoStudentsEnrolled }}</h3>
 
             <p class="text-muted">
-             {{ T.studentProgressAddStudentsToTrackProgress }}
+              {{ T.studentProgressAddStudentsToTrackProgress }}
             </p>
 
-             {{ T.studentProgressAddStudents }}
-          </a>
-
+            <a
+                :href="`/course/${course.alias}/edit/`"
+                class="btn btn-primary mt-3"
+            >
+              {{ T.studentProgressAddStudents }}
+            </a>
         </div>
        <div v-else class="table-responsive">
             <table class="table table-striped table-fixed mb-0 d-block">
