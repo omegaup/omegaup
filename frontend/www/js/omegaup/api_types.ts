@@ -4367,6 +4367,7 @@ export namespace types {
     loggedIn: boolean;
     mode: string;
     modes: string[];
+    notes: { [key: number]: string };
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
