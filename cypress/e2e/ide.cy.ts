@@ -44,7 +44,9 @@ describe('Test IDE', () => {
 
         return cy
           .window()
-          .then((win) => win.fetch(zipHref).then((response) => response.arrayBuffer()))
+          .then((win) =>
+            win.fetch(zipHref).then((response) => response.arrayBuffer()),
+          )
           .then((arrayBuffer) => {
             cy.writeFile(filePath, Cypress.Buffer.from(arrayBuffer), 'binary');
           });
