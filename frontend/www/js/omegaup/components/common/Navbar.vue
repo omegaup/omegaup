@@ -5,7 +5,11 @@
       data-enable-hover-dropdown
     >
       <div class="container-xl pl-0 pl-xl-3">
-        <a class="navbar-brand p-3 mr-0 mr-sm-3" href="/">
+        <a
+          class="navbar-brand p-3 mr-0 mr-sm-3"
+          href="/"
+          @click="handleLogoClick"
+        >
           <img
             alt="omegaUp"
             src="/media/omegaup_curves.png"
@@ -21,6 +25,15 @@
             height="20"
           />
         </a>
+
+        <div v-if="deferredPrompt" class="d-none d-lg-flex order-lg-1 mr-2">
+          <button
+            class="btn btn-primary btn-sm align-self-center"
+            @click="promptInstall"
+          >
+            {{ T.omegaupTitleInstallApp || 'Install omegaUp' }}
+          </button>
+        </div>
 
         <div class="d-inline-flex d-flex-row order-lg-1">
           <div
@@ -424,6 +437,7 @@ export default class Navbar extends Vue {
   ui = ui;
   AvailableTabs = AvailableTabs;
   logoutModalVisible = false;
+  deferredPrompt: any = null;
   teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
@@ -488,6 +502,41 @@ export default class Navbar extends Vue {
         tab === AvailableTabs.Login
           ? this.formattedLoginURL
           : this.formattedSignupURL;
+    }
+  }
+
+  handleLogoClick(event: MouseEvent): void {
+    if (window.location.pathname === '/') {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  mounted() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.deferredPrompt = e;
+    });
+
+    window.addEventListener('appinstalled', () => {
+      this.deferredPrompt = null;
+      console.log('PWA was installed');
+    });
+  }
+
+  promptInstall() {
+    if (this.deferredPrompt) {
+      this.deferredPrompt.prompt();
+      this.deferredPrompt.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        this.deferredPrompt = null;
+      });
     }
   }
 }
@@ -574,7 +623,9 @@ nav.navbar {
   }
 
   a[data-logout-button] {
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
     border-radius: 4px;
   }
 
