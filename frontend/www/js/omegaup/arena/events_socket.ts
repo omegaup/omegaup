@@ -307,7 +307,7 @@ export class EventsSocket {
       })
       .catch((e) => {
         ui.reportEvent('events-socket', 'fallback');
-        console.log(e);
+        console.error(e);
         setTimeout(() => {
           this.setupPolls();
         }, Math.random() * (this.intervalInMilliseconds / 2));
