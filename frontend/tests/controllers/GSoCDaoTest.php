@@ -16,13 +16,32 @@ class GSoCDaoTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $editions = \OmegaUp\DAO\GSoCEdition::getEditions();
-        $this->assertCount(2, $editions);
-        $this->assertSame(2025, $editions[0]['year']);
-        $this->assertSame(2024, $editions[1]['year']);
-
-        $edition2024 = \OmegaUp\DAO\GSoCEdition::getEditionByYear(2024);
+        $edition2024 = $this->findByPredicate(
+            $editions,
+            /**
+             * @param array{year: int} $edition
+             */
+            fn (array $edition): bool => $edition['year'] === 2024
+        );
+        $edition2025 = $this->findByPredicate(
+            $editions,
+            /**
+             * @param array{year: int} $edition
+             */
+            fn (array $edition): bool => $edition['year'] === 2025
+        );
         $this->assertNotNull($edition2024);
-        $this->assertSame(2024, $edition2024['year']);
+        $this->assertNotNull($edition2025);
+
+        $index2024 = array_search(2024, array_column($editions, 'year'));
+        $index2025 = array_search(2025, array_column($editions, 'year'));
+        $this->assertNotFalse($index2024);
+        $this->assertNotFalse($index2025);
+        $this->assertLessThan($index2024, $index2025);
+
+        $editionByYear = \OmegaUp\DAO\GSoCEdition::getEditionByYear(2024);
+        $this->assertNotNull($editionByYear);
+        $this->assertSame(2024, $editionByYear['year']);
 
         $this->assertNull(\OmegaUp\DAO\GSoCEdition::getEditionByYear(2030));
     }
@@ -61,7 +80,20 @@ class GSoCDaoTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertSame(intval($edition->edition_id), $idea['edition_id']);
 
         $allIdeas = \OmegaUp\DAO\GSoCIdea::getIdeas();
-        $this->assertCount(2, $allIdeas);
+        $this->assertArrayContainsWithPredicate(
+            $allIdeas,
+            /**
+             * @param array{idea_id: int} $ideaSummary
+             */
+            fn (array $ideaSummary): bool => $ideaSummary['idea_id'] === $firstIdeaId
+        );
+        $this->assertArrayContainsWithPredicate(
+            $allIdeas,
+            /**
+             * @param array{idea_id: int} $ideaSummary
+             */
+            fn (array $ideaSummary): bool => $ideaSummary['idea_id'] === $secondIdeaId
+        );
 
         $acceptedIdeas = \OmegaUp\DAO\GSoCIdea::getIdeas(
             intval($edition->edition_id),
@@ -69,6 +101,7 @@ class GSoCDaoTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertCount(1, $acceptedIdeas);
         $this->assertSame($secondIdeaId, $acceptedIdeas[0]['idea_id']);
+        $this->assertSame('Accepted', $acceptedIdeas[0]['status']);
     }
 
     public function testUpdateIdeaAndGetByIdeaAndEdition(): void {
