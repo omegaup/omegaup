@@ -972,6 +972,23 @@ export namespace types {
   export interface ProblemNoteItem { alias: string; note_text: string; problem_id: number; title: string; };
 
   export interface ProblemPrintDetailsPayload { details: types.ProblemDetails; };
+  export interface ProblemListPayload {
+    attemptedProblemAliases: string[];
+    column: string;
+    columns: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    selectedTags: string[];
+    solvedProblemAliases: string[];
+    tagData: { name?: string }[];
+    tags: string[];
+  }
 
   export interface ProblemQualityPayload { canNominateProblem: boolean; dismissed: boolean; dismissedBeforeAc: boolean; language?: string; nominated: boolean; nominatedBeforeAc: boolean; problemAlias: string; solved: boolean; tried: boolean; };
 
@@ -1120,6 +1137,41 @@ export namespace types {
   export interface UserProfileInfo { birth_date?: Date; classname: string; country?: string; country_id?: string; email?: string; gender?: string; graduation_date?: Date; gravatar_92?: string; has_competitive_objective?: boolean; has_learning_objective?: boolean; has_scholar_objective?: boolean; has_teaching_objective?: boolean; hide_problem_tags: boolean; is_own_profile: boolean; is_private: boolean; locale?: string; name?: string; preferred_language?: string; programming_languages: { [key: string]: string; }; rankinfo: { author_ranking?: number; name?: string; problems_solved?: number; rank?: number; }; scholar_degree?: string; school?: string; school_id?: number; state?: string; state_id?: string; username?: string; verified?: boolean; };
 
   export interface UserProfileStats { date?: string; runs: number; verdict: string; };
+  export interface UserProfileInfo {
+    birth_date?: Date;
+    classname: string;
+    country?: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: Date;
+    gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
+    hide_problem_tags: boolean;
+    is_own_profile: boolean;
+    is_private: boolean;
+    locale?: string;
+    name?: string;
+    preferred_language?: string;
+    programming_languages: { [key: string]: string };
+    rankinfo: {
+      author_ranking?: number;
+      name?: string;
+      problems_solved?: number;
+      rank?: number;
+    };
+    readme?: string;
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified?: boolean;
+  }
 
   export interface UserRank { rank: { classname: string; country_id?: string; name?: string; problems_solved: number; ranking?: number; score: number; timestamp?: Date; user_id: number; username: string; }[]; total: number; };
 
@@ -1771,33 +1823,58 @@ export namespace messages {
   export type UserProfileRequest = { [key: string]: any;};
   export type _UserProfileServerResponse = any
   export type UserProfileResponse = types.UserProfileInfo;
-  export type UserProfileStatisticsRequest = { [key: string]: any;};
-  export type UserProfileStatisticsResponse = { attempting: number; difficulty: { easy: number; hard: number; medium: number; unlabelled: number; }; solved: number; tags: { count: number; name: string; }[]; };
-  export type UserRemoveExperimentRequest = { [key: string]: any;};
-  export type UserRemoveExperimentResponse = {  };
-  export type UserRemoveGroupRequest = { [key: string]: any;};
-  export type UserRemoveGroupResponse = {  };
-  export type UserRemoveRoleRequest = { [key: string]: any;};
-  export type UserRemoveRoleResponse = {  };
-  export type UserRevokeAPITokenRequest = { [key: string]: any;};
-  export type UserRevokeAPITokenResponse = {  };
-  export type UserSelectCoderOfTheMonthRequest = { [key: string]: any;};
-  export type UserSelectCoderOfTheMonthResponse = {  };
-  export type UserStatsRequest = { [key: string]: any;};
-  export type UserStatsResponse = { heatmap: { count: number; date: string; }[]; runs: { date?: string; runs: number; verdict: string; }[]; };
-  export type UserStatusVerifiedRequest = { [key: string]: any;};
-  export type UserStatusVerifiedResponse = { username: string; verified: boolean; };
-  export type UserUpdateRequest = { [key: string]: any;};
-  export type UserUpdateResponse = {  };
-  export type UserUpdateBasicInfoRequest = { [key: string]: any;};
-  export type UserUpdateBasicInfoResponse = {  };
-  export type UserUpdateMainEmailRequest = { [key: string]: any;};
-  export type UserUpdateMainEmailResponse = {  };
-  export type UserValidateFilterRequest = { [key: string]: any;};
-  export type UserValidateFilterResponse = { admin: boolean; contest_admin: string[]; problem_admin: string[]; problemset_admin: number[]; user?: string; };
-  export type UserVerifyEmailRequest = { [key: string]: any;};
-  export type UserVerifyEmailResponse = {  };
-
+  export type UserProfileStatisticsRequest = { [key: string]: any };
+  export type UserProfileStatisticsResponse = {
+    attempting: number;
+    difficulty: {
+      easy: number;
+      hard: number;
+      medium: number;
+      unlabelled: number;
+    };
+    solved: number;
+    tags: { count: number; name: string }[];
+  };
+  export type UserRemoveExperimentRequest = { [key: string]: any };
+  export type UserRemoveExperimentResponse = {};
+  export type UserRemoveGroupRequest = { [key: string]: any };
+  export type UserRemoveGroupResponse = {};
+  export type UserRemoveRoleRequest = { [key: string]: any };
+  export type UserRemoveRoleResponse = {};
+  export type UserReportReadmeRequest = { [key: string]: any };
+  export type UserReportReadmeResponse = {};
+  export type UserRevokeAPITokenRequest = { [key: string]: any };
+  export type UserRevokeAPITokenResponse = {};
+  export type UserSaveReadmeRequest = { [key: string]: any };
+  export type UserSaveReadmeResponse = {};
+  export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
+  export type UserSelectCoderOfTheMonthResponse = {};
+  export type UserStatsRequest = { [key: string]: any };
+  export type UserStatsResponse = {
+    heatmap: { count: number; date: string }[];
+    runs: { date?: string; runs: number; verdict: string }[];
+  };
+  export type UserStatusVerifiedRequest = { [key: string]: any };
+  export type UserStatusVerifiedResponse = {
+    username: string;
+    verified: boolean;
+  };
+  export type UserUpdateRequest = { [key: string]: any };
+  export type UserUpdateResponse = {};
+  export type UserUpdateBasicInfoRequest = { [key: string]: any };
+  export type UserUpdateBasicInfoResponse = {};
+  export type UserUpdateMainEmailRequest = { [key: string]: any };
+  export type UserUpdateMainEmailResponse = {};
+  export type UserValidateFilterRequest = { [key: string]: any };
+  export type UserValidateFilterResponse = {
+    admin: boolean;
+    contest_admin: string[];
+    problem_admin: string[];
+    problemset_admin: number[];
+    user?: string;
+  };
+  export type UserVerifyEmailRequest = { [key: string]: any };
+  export type UserVerifyEmailResponse = {};
 }
 
 // Controller interfaces
@@ -2661,9 +2738,15 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest
     ) => Promise<messages.UserRemoveRoleResponse>;
+    reportReadme: (
+      params?: messages.UserReportReadmeRequest,
+    ) => Promise<messages.UserReportReadmeResponse>;
     revokeAPIToken: (
       params?: messages.UserRevokeAPITokenRequest
     ) => Promise<messages.UserRevokeAPITokenResponse>;
+    saveReadme: (
+      params?: messages.UserSaveReadmeRequest,
+    ) => Promise<messages.UserSaveReadmeResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;

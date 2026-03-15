@@ -518,7 +518,7 @@ OmegaUp.on('ready', () => {
                   ui.formatString(T.apiTokenSuccessfullyCreated, {
                     token: token,
                   }),
-                  false,
+                  { autoHide: false },
                 );
               })
               .catch(ui.apiError);
