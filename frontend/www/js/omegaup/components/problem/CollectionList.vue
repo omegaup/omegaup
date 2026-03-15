@@ -188,10 +188,14 @@ export default class CollectionList extends Vue {
   ToggleSwitchSize = ToggleSwitchSize;
   level = this.data.level;
   filtersVisible =
-    typeof window === 'undefined' ? true : window.innerWidth >= MOBILE_BREAKPOINT;
+    typeof window === 'undefined'
+      ? true
+      : window.innerWidth >= MOBILE_BREAKPOINT;
   showProblemTags = true;
   isMobileViewport =
-    typeof window === 'undefined' ? false : window.innerWidth < MOBILE_BREAKPOINT;
+    typeof window === 'undefined'
+      ? false
+      : window.innerWidth < MOBILE_BREAKPOINT;
 
   mounted(): void {
     this.updateViewportMode();
