@@ -38,7 +38,10 @@ describe('Test IDE', () => {
     cy.get('[data-zip-download]').should('be.visible').click(); // cypress/downloads
 
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
-    const filePath = `cypress/downloads/testproblem.zip`;
+    const filePath = `cypress/downloads/${fileName}`;
+
+    cy.readFile(filePath, { timeout: 15000 });
+
     cy.get('[data-zip-upload]').should('be.visible');
     cy.get('input[type="file"]').selectFile(filePath, {
       force: true,
