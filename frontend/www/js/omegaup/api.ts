@@ -1203,177 +1203,277 @@ export const Time = {
 };
 
 export const User = {
-    acceptPrivacyPolicy: apiCall<
-      messages.UserAcceptPrivacyPolicyRequest,
-      messages.UserAcceptPrivacyPolicyResponse
-    >('/api/user/acceptPrivacyPolicy/'),
-    addExperiment: apiCall<
-      messages.UserAddExperimentRequest,
-      messages.UserAddExperimentResponse
-    >('/api/user/addExperiment/'),
-    addGroup: apiCall<
-      messages.UserAddGroupRequest,
-      messages.UserAddGroupResponse
-    >('/api/user/addGroup/'),
-    addRole: apiCall<
-      messages.UserAddRoleRequest,
-      messages.UserAddRoleResponse
-    >('/api/user/addRole/'),
-    associateIdentity: apiCall<
-      messages.UserAssociateIdentityRequest,
-      messages.UserAssociateIdentityResponse
-    >('/api/user/associateIdentity/'),
-    changePassword: apiCall<
-      messages.UserChangePasswordRequest,
-      messages.UserChangePasswordResponse
-    >('/api/user/changePassword/'),
-    coderOfTheMonth: apiCall<
-      messages.UserCoderOfTheMonthRequest,
-      messages._UserCoderOfTheMonthServerResponse,
-      messages.UserCoderOfTheMonthResponse
-    >('/api/user/coderOfTheMonth/',
-      (x) => { if (typeof x.coderinfo !== 'undefined' &&  x.coderinfo !== null) x.coderinfo = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.coderinfo); return x; }),
-    coderOfTheMonthList: apiCall<
-      messages.UserCoderOfTheMonthListRequest,
-      messages.UserCoderOfTheMonthListResponse
-    >('/api/user/coderOfTheMonthList/'),
-    compare: apiCall<
-      messages.UserCompareRequest,
-      messages._UserCompareServerResponse,
-      messages.UserCompareResponse
-    >('/api/user/compare/',
-      (x) => { if (typeof x.user1 !== 'undefined' &&  x.user1 !== null) x.user1 = ((x) => { x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(x.user1); if (typeof x.user2 !== 'undefined' &&  x.user2 !== null) x.user2 = ((x) => { x.profile = ((x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; })(x.profile); return x; })(x.user2); return x; }),
-    contestStats: apiCall<
-      messages.UserContestStatsRequest,
-      messages._UserContestStatsServerResponse,
-      messages.UserContestStatsResponse
-    >('/api/user/contestStats/',
-      (x) => { x.contests = ((x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ((x) => { x.data = ((x) => { x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time); x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated); x.start_time = ((x: number) => new Date(x * 1000))(x.start_time); return x; })(x.data); return x; })(x[y])); } return x; })(x.contests); return x; }),
-    create: apiCall<
-      messages.UserCreateRequest,
-      messages.UserCreateResponse
-    >('/api/user/create/'),
-    createAPIToken: apiCall<
-      messages.UserCreateAPITokenRequest,
-      messages.UserCreateAPITokenResponse
-    >('/api/user/createAPIToken/'),
-    deleteConfirm: apiCall<
-      messages.UserDeleteConfirmRequest,
-      messages.UserDeleteConfirmResponse
-    >('/api/user/deleteConfirm/'),
-    deleteRequest: apiCall<
-      messages.UserDeleteRequestRequest,
-      messages.UserDeleteRequestResponse
-    >('/api/user/deleteRequest/'),
-    extraInformation: apiCall<
-      messages.UserExtraInformationRequest,
-      messages._UserExtraInformationServerResponse,
-      messages.UserExtraInformationResponse
-    >('/api/user/extraInformation/',
-      (x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.last_login !== 'undefined' &&  x.last_login !== null) x.last_login = ((x: number) => new Date(x * 1000))(x.last_login); return x; }),
-    generateGitToken: apiCall<
-      messages.UserGenerateGitTokenRequest,
-      messages.UserGenerateGitTokenResponse
-    >('/api/user/generateGitToken/'),
-    generateOmiUsers: apiCall<
-      messages.UserGenerateOmiUsersRequest,
-      messages.UserGenerateOmiUsersResponse
-    >('/api/user/generateOmiUsers/'),
-    lastPrivacyPolicyAccepted: apiCall<
-      messages.UserLastPrivacyPolicyAcceptedRequest,
-      messages.UserLastPrivacyPolicyAcceptedResponse
-    >('/api/user/lastPrivacyPolicyAccepted/'),
-    list: apiCall<
-      messages.UserListRequest,
-      messages.UserListResponse
-    >('/api/user/list/'),
-    listAPITokens: apiCall<
-      messages.UserListAPITokensRequest,
-      messages._UserListAPITokensServerResponse,
-      messages.UserListAPITokensResponse
-    >('/api/user/listAPITokens/',
-      (x) => { x.tokens = ((x) => { if (!Array.isArray(x)) { return x; } return x.map((x) => { x.last_used = ((x: number) => new Date(x * 1000))(x.last_used); x.rate_limit = ((x) => { x.reset = ((x: number) => new Date(x * 1000))(x.reset); return x; })(x.rate_limit); x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp); return x; }); })(x.tokens); return x; }),
-    listAssociatedIdentities: apiCall<
-      messages.UserListAssociatedIdentitiesRequest,
-      messages.UserListAssociatedIdentitiesResponse
-    >('/api/user/listAssociatedIdentities/'),
-    listUnsolvedProblems: apiCall<
-      messages.UserListUnsolvedProblemsRequest,
-      messages.UserListUnsolvedProblemsResponse
-    >('/api/user/listUnsolvedProblems/'),
-    login: apiCall<
-      messages.UserLoginRequest,
-      messages.UserLoginResponse
-    >('/api/user/login/'),
-    mailingListBackfill: apiCall<
-      messages.UserMailingListBackfillRequest,
-      messages.UserMailingListBackfillResponse
-    >('/api/user/mailingListBackfill/'),
-    problemsCreated: apiCall<
-      messages.UserProblemsCreatedRequest,
-      messages.UserProblemsCreatedResponse
-    >('/api/user/problemsCreated/'),
-    problemsSolved: apiCall<
-      messages.UserProblemsSolvedRequest,
-      messages.UserProblemsSolvedResponse
-    >('/api/user/problemsSolved/'),
-    profile: apiCall<
-      messages.UserProfileRequest,
-      messages._UserProfileServerResponse,
-      messages.UserProfileResponse
-    >('/api/user/profile/',
-      (x) => { if (typeof x.birth_date !== 'undefined' &&  x.birth_date !== null) x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date); if (typeof x.graduation_date !== 'undefined' &&  x.graduation_date !== null) x.graduation_date = ((x: number) => new Date(x * 1000))(x.graduation_date); return x; }),
-    profileStatistics: apiCall<
-      messages.UserProfileStatisticsRequest,
-      messages.UserProfileStatisticsResponse
-    >('/api/user/profileStatistics/'),
-    removeExperiment: apiCall<
-      messages.UserRemoveExperimentRequest,
-      messages.UserRemoveExperimentResponse
-    >('/api/user/removeExperiment/'),
-    removeGroup: apiCall<
-      messages.UserRemoveGroupRequest,
-      messages.UserRemoveGroupResponse
-    >('/api/user/removeGroup/'),
-    removeRole: apiCall<
-      messages.UserRemoveRoleRequest,
-      messages.UserRemoveRoleResponse
-    >('/api/user/removeRole/'),
-    revokeAPIToken: apiCall<
-      messages.UserRevokeAPITokenRequest,
-      messages.UserRevokeAPITokenResponse
-    >('/api/user/revokeAPIToken/'),
-    selectCoderOfTheMonth: apiCall<
-      messages.UserSelectCoderOfTheMonthRequest,
-      messages.UserSelectCoderOfTheMonthResponse
-    >('/api/user/selectCoderOfTheMonth/'),
-    stats: apiCall<
-      messages.UserStatsRequest,
-      messages.UserStatsResponse
-    >('/api/user/stats/'),
-    statusVerified: apiCall<
-      messages.UserStatusVerifiedRequest,
-      messages.UserStatusVerifiedResponse
-    >('/api/user/statusVerified/'),
-    update: apiCall<
-      messages.UserUpdateRequest,
-      messages.UserUpdateResponse
-    >('/api/user/update/'),
-    updateBasicInfo: apiCall<
-      messages.UserUpdateBasicInfoRequest,
-      messages.UserUpdateBasicInfoResponse
-    >('/api/user/updateBasicInfo/'),
-    updateMainEmail: apiCall<
-      messages.UserUpdateMainEmailRequest,
-      messages.UserUpdateMainEmailResponse
-    >('/api/user/updateMainEmail/'),
-    validateFilter: apiCall<
-      messages.UserValidateFilterRequest,
-      messages.UserValidateFilterResponse
-    >('/api/user/validateFilter/'),
-    verifyEmail: apiCall<
-      messages.UserVerifyEmailRequest,
-      messages.UserVerifyEmailResponse
-    >('/api/user/verifyEmail/'),
+  acceptPrivacyPolicy: apiCall<
+    messages.UserAcceptPrivacyPolicyRequest,
+    messages.UserAcceptPrivacyPolicyResponse
+  >('/api/user/acceptPrivacyPolicy/'),
+  addExperiment: apiCall<
+    messages.UserAddExperimentRequest,
+    messages.UserAddExperimentResponse
+  >('/api/user/addExperiment/'),
+  addGroup: apiCall<
+    messages.UserAddGroupRequest,
+    messages.UserAddGroupResponse
+  >('/api/user/addGroup/'),
+  addRole: apiCall<messages.UserAddRoleRequest, messages.UserAddRoleResponse>(
+    '/api/user/addRole/',
+  ),
+  associateIdentity: apiCall<
+    messages.UserAssociateIdentityRequest,
+    messages.UserAssociateIdentityResponse
+  >('/api/user/associateIdentity/'),
+  changePassword: apiCall<
+    messages.UserChangePasswordRequest,
+    messages.UserChangePasswordResponse
+  >('/api/user/changePassword/'),
+  coderOfTheMonth: apiCall<
+    messages.UserCoderOfTheMonthRequest,
+    messages._UserCoderOfTheMonthServerResponse,
+    messages.UserCoderOfTheMonthResponse
+  >('/api/user/coderOfTheMonth/', (x) => {
+    if (typeof x.coderinfo !== 'undefined' && x.coderinfo !== null)
+      x.coderinfo = ((x) => {
+        if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+          x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+        if (
+          typeof x.graduation_date !== 'undefined' &&
+          x.graduation_date !== null
+        )
+          x.graduation_date = ((x: number) => new Date(x * 1000))(
+            x.graduation_date,
+          );
+        return x;
+      })(x.coderinfo);
+    return x;
+  }),
+  coderOfTheMonthList: apiCall<
+    messages.UserCoderOfTheMonthListRequest,
+    messages.UserCoderOfTheMonthListResponse
+  >('/api/user/coderOfTheMonthList/'),
+  compare: apiCall<
+    messages.UserCompareRequest,
+    messages._UserCompareServerResponse,
+    messages.UserCompareResponse
+  >('/api/user/compare/', (x) => {
+    if (typeof x.user1 !== 'undefined' && x.user1 !== null)
+      x.user1 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user1);
+    if (typeof x.user2 !== 'undefined' && x.user2 !== null)
+      x.user2 = ((x) => {
+        x.profile = ((x) => {
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(x.user2);
+    return x;
+  }),
+  contestStats: apiCall<
+    messages.UserContestStatsRequest,
+    messages._UserContestStatsServerResponse,
+    messages.UserContestStatsResponse
+  >('/api/user/contestStats/', (x) => {
+    x.contests = ((x) => {
+      if (x instanceof Object) {
+        Object.keys(x).forEach(
+          (y) =>
+            (x[y] = ((x) => {
+              x.data = ((x) => {
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              })(x.data);
+              return x;
+            })(x[y])),
+        );
+      }
+      return x;
+    })(x.contests);
+    return x;
+  }),
+  create: apiCall<messages.UserCreateRequest, messages.UserCreateResponse>(
+    '/api/user/create/',
+  ),
+  createAPIToken: apiCall<
+    messages.UserCreateAPITokenRequest,
+    messages.UserCreateAPITokenResponse
+  >('/api/user/createAPIToken/'),
+  deleteConfirm: apiCall<
+    messages.UserDeleteConfirmRequest,
+    messages.UserDeleteConfirmResponse
+  >('/api/user/deleteConfirm/'),
+  deleteRequest: apiCall<
+    messages.UserDeleteRequestRequest,
+    messages.UserDeleteRequestResponse
+  >('/api/user/deleteRequest/'),
+  extraInformation: apiCall<
+    messages.UserExtraInformationRequest,
+    messages._UserExtraInformationServerResponse,
+    messages.UserExtraInformationResponse
+  >('/api/user/extraInformation/', (x) => {
+    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+    if (typeof x.last_login !== 'undefined' && x.last_login !== null)
+      x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
+    return x;
+  }),
+  generateGitToken: apiCall<
+    messages.UserGenerateGitTokenRequest,
+    messages.UserGenerateGitTokenResponse
+  >('/api/user/generateGitToken/'),
+  generateOmiUsers: apiCall<
+    messages.UserGenerateOmiUsersRequest,
+    messages.UserGenerateOmiUsersResponse
+  >('/api/user/generateOmiUsers/'),
+  lastPrivacyPolicyAccepted: apiCall<
+    messages.UserLastPrivacyPolicyAcceptedRequest,
+    messages.UserLastPrivacyPolicyAcceptedResponse
+  >('/api/user/lastPrivacyPolicyAccepted/'),
+  list: apiCall<messages.UserListRequest, messages.UserListResponse>(
+    '/api/user/list/',
+  ),
+  listAPITokens: apiCall<
+    messages.UserListAPITokensRequest,
+    messages._UserListAPITokensServerResponse,
+    messages.UserListAPITokensResponse
+  >('/api/user/listAPITokens/', (x) => {
+    x.tokens = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+        x.rate_limit = ((x) => {
+          x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+          return x;
+        })(x.rate_limit);
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.tokens);
+    return x;
+  }),
+  listAssociatedIdentities: apiCall<
+    messages.UserListAssociatedIdentitiesRequest,
+    messages.UserListAssociatedIdentitiesResponse
+  >('/api/user/listAssociatedIdentities/'),
+  listUnsolvedProblems: apiCall<
+    messages.UserListUnsolvedProblemsRequest,
+    messages.UserListUnsolvedProblemsResponse
+  >('/api/user/listUnsolvedProblems/'),
+  login: apiCall<messages.UserLoginRequest, messages.UserLoginResponse>(
+    '/api/user/login/',
+  ),
+  mailingListBackfill: apiCall<
+    messages.UserMailingListBackfillRequest,
+    messages.UserMailingListBackfillResponse
+  >('/api/user/mailingListBackfill/'),
+  problemsCreated: apiCall<
+    messages.UserProblemsCreatedRequest,
+    messages.UserProblemsCreatedResponse
+  >('/api/user/problemsCreated/'),
+  problemsSolved: apiCall<
+    messages.UserProblemsSolvedRequest,
+    messages.UserProblemsSolvedResponse
+  >('/api/user/problemsSolved/'),
+  profile: apiCall<
+    messages.UserProfileRequest,
+    messages._UserProfileServerResponse,
+    messages.UserProfileResponse
+  >('/api/user/profile/', (x) => {
+    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+    if (typeof x.graduation_date !== 'undefined' && x.graduation_date !== null)
+      x.graduation_date = ((x: number) => new Date(x * 1000))(
+        x.graduation_date,
+      );
+    return x;
+  }),
+  profileStatistics: apiCall<
+    messages.UserProfileStatisticsRequest,
+    messages.UserProfileStatisticsResponse
+  >('/api/user/profileStatistics/'),
+  removeExperiment: apiCall<
+    messages.UserRemoveExperimentRequest,
+    messages.UserRemoveExperimentResponse
+  >('/api/user/removeExperiment/'),
+  removeGroup: apiCall<
+    messages.UserRemoveGroupRequest,
+    messages.UserRemoveGroupResponse
+  >('/api/user/removeGroup/'),
+  removeRole: apiCall<
+    messages.UserRemoveRoleRequest,
+    messages.UserRemoveRoleResponse
+  >('/api/user/removeRole/'),
+  reportReadme: apiCall<
+    messages.UserReportReadmeRequest,
+    messages.UserReportReadmeResponse
+  >('/api/user/reportReadme/'),
+  revokeAPIToken: apiCall<
+    messages.UserRevokeAPITokenRequest,
+    messages.UserRevokeAPITokenResponse
+  >('/api/user/revokeAPIToken/'),
+  saveReadme: apiCall<
+    messages.UserSaveReadmeRequest,
+    messages.UserSaveReadmeResponse
+  >('/api/user/saveReadme/'),
+  selectCoderOfTheMonth: apiCall<
+    messages.UserSelectCoderOfTheMonthRequest,
+    messages.UserSelectCoderOfTheMonthResponse
+  >('/api/user/selectCoderOfTheMonth/'),
+  stats: apiCall<messages.UserStatsRequest, messages.UserStatsResponse>(
+    '/api/user/stats/',
+  ),
+  statusVerified: apiCall<
+    messages.UserStatusVerifiedRequest,
+    messages.UserStatusVerifiedResponse
+  >('/api/user/statusVerified/'),
+  update: apiCall<messages.UserUpdateRequest, messages.UserUpdateResponse>(
+    '/api/user/update/',
+  ),
+  updateBasicInfo: apiCall<
+    messages.UserUpdateBasicInfoRequest,
+    messages.UserUpdateBasicInfoResponse
+  >('/api/user/updateBasicInfo/'),
+  updateMainEmail: apiCall<
+    messages.UserUpdateMainEmailRequest,
+    messages.UserUpdateMainEmailResponse
+  >('/api/user/updateMainEmail/'),
+  validateFilter: apiCall<
+    messages.UserValidateFilterRequest,
+    messages.UserValidateFilterResponse
+  >('/api/user/validateFilter/'),
+  verifyEmail: apiCall<
+    messages.UserVerifyEmailRequest,
+    messages.UserVerifyEmailResponse
+  >('/api/user/verifyEmail/'),
 };
 

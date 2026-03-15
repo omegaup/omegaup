@@ -53,6 +53,8 @@
       :show-notes="true"
       :notes="notes"
       :note-operation-failed="noteOperationFailed"
+      :solved-problem-aliases="solvedProblemAliases"
+      :attempted-problem-aliases="attemptedProblemAliases"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
@@ -103,6 +105,8 @@ export default class List extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
   @Prop({ default: 0 }) noteOperationFailed!: number;
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   omegaup = omegaup;

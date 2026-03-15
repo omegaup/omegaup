@@ -213,7 +213,12 @@
               }}/{{ problem.submissions }})
             </td>
             <td v-if="loggedIn" class="text-right align-middle">
-              {{ problem.score.toFixed(2) }}
+              <span
+                :title="getProblemStatusTitle(problem)"
+                :class="['badge', getProblemStatusClass(problem)]"
+              >
+                {{ problem.score.toFixed(2) }}
+              </span>
             </td>
             <td v-if="loggedIn && showNotes" class="text-center align-middle">
               <button
@@ -317,6 +322,8 @@ export default class BaseList extends Vue {
   @Prop({ default: false }) showNotes!: boolean;
   @Prop({ default: () => ({}) }) notes!: { [key: number]: string };
   @Prop({ default: 0 }) noteOperationFailed!: number;
+  @Prop({ default: () => [] }) solvedProblemAliases!: string[];
+  @Prop({ default: () => [] }) attemptedProblemAliases!: string[];
 
   T = T;
   ui = ui;
@@ -325,6 +332,34 @@ export default class BaseList extends Vue {
   showNoteModal = false;
   noteModalAlias = '';
   noteModalText = '';
+
+  get solvedProblemAliasesSet(): Set<string> {
+    return new Set(this.solvedProblemAliases);
+  }
+
+  get attemptedProblemAliasesSet(): Set<string> {
+    return new Set(this.attemptedProblemAliases);
+  }
+
+  getProblemStatusTitle(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusSolved;
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return T.problemStatusAttempted;
+    }
+    return T.problemStatusUnattempted;
+  }
+
+  getProblemStatusClass(problem: omegaup.Problem): string {
+    if (this.solvedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-success';
+    }
+    if (this.attemptedProblemAliasesSet.has(problem.alias)) {
+      return 'badge-warning';
+    }
+    return 'badge-secondary';
+  }
 
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,

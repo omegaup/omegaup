@@ -49,7 +49,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, hasVisitedSection?: bool, allRuns?: list<Run>, totalRuns?: int, clarifications?: list<Clarification>, histogram: Histogram, isBookmarked?: bool, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, reviewedProblemLevel?: null|string, reviewedPublicTags?: list<string>, reviewedQualitySeal?: bool, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus: string, solvers: list<BestSolvers>, user: UserInfoForProblem, allowedSolutionsToSee: int}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, hasVisitedSection?: bool, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, query: string|null}
- * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, notes: array<int, string>}
+ * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, solvedProblemAliases: list<string>, attemptedProblemAliases: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
@@ -5234,6 +5234,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $notes = \OmegaUp\DAO\ProblemNotes::getNotesByIdentityAndProblemIds(
                 intval($r->identity->identity_id),
                 $problemIds
+        $solvedProblemAliases = [];
+        $attemptedProblemAliases = [];
+        if (!is_null($r->identity) && !is_null($r->identity->identity_id)) {
+            $solvedProblems = \OmegaUp\Controllers\User::getSolvedProblems(
+                $r->identity->identity_id
+            );
+            $solvedProblemAliases = array_map(
+                fn($problem) => $problem['alias'],
+                $solvedProblems
+            );
+            $unsolvedProblems = \OmegaUp\Controllers\User::getUnsolvedProblems(
+                $r->identity->identity_id
+            );
+            $attemptedProblemAliases = array_map(
+                fn($problem) => $problem['alias'],
+                $unsolvedProblems
             );
         }
 
@@ -5254,6 +5270,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
                     'notes' => $notes,
+                    'solvedProblemAliases' => $solvedProblemAliases,
+                    'attemptedProblemAliases' => $attemptedProblemAliases,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'
@@ -5437,10 +5455,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit,
             $lang
         );
-        $cdp = \OmegaUp\Controllers\Problem::getProblemCDP(
-            $problem,
-            strval($problem->commit)
-        );
+        $cdp = null;
+        try {
+            $cdp = \OmegaUp\Controllers\Problem::getProblemCDP(
+                $problem,
+                strval($problem->commit)
+            );
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to load CDP data for {$problem->alias}",
+                ['exception' => $e],
+            );
+            // CDP data is optional for the edit page to function
+        }
         $publishedRevision = null;
         foreach ($versions['log'] as $revision) {
             if ($versions['published'] === $revision['commit']) {
