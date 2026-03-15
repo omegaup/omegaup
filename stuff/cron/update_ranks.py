@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 '''Updates the user ranking.'''
 
-# pylint: disable=too-many-lines
-
 import argparse
 import datetime
 import json
@@ -49,6 +47,11 @@ from database.coder_of_the_month import get_last_12_coders_of_the_month
 from database.coder_of_the_month import get_user_problems
 from database.coder_of_the_month import remove_coder_of_the_month_candidates
 from database.coder_of_the_month import insert_coder_of_the_month_candidates
+from database.user_author_rank import (clear_user_rank,
+                                       fetch_author_rank_rows,
+                                       fetch_user_rank_rows,
+                                       insert_user_rank_rows,
+                                       upsert_author_rank_rows)
 from database.school_of_the_month import (
     check_existing_school_of_the_next_month,
     remove_school_of_the_month_candidates,
@@ -157,100 +160,15 @@ def update_user_rank(
     '''Updates the user ranking.'''
 
     logging.info('Updating user rank...')
-    cur_readonly.execute('''
-        SELECT
-            `i`.`username`,
-            `i`.`name`,
-            `i`.`country_id`,
-            `i`.`state_id`,
-            `full_isc`.`school_id`,
-            `i`.`identity_id`,
-            `i`.`user_id`,
-            COUNT(`p`.`problem_id`) AS `problems_solved_count`,
-            SUM(ROUND(100 / LOG(2, `p`.`accepted` + 1) , 0)) AS `score`
-        FROM
-        (
-            SELECT
-                `iu`.`user_id`,
-                `s`.`problem_id`
-            FROM
-                `Submissions` AS `s`
-            INNER JOIN
-                `Identities` AS `iu`
-            ON
-                `iu`.identity_id = `s`.identity_id
-            WHERE
-                `s`.verdict = 'AC' AND
-                `s`.type = 'normal' AND
-                `iu`.user_id IS NOT NULL
-            GROUP BY
-                `iu`.user_id, `s`.`problem_id`
-        ) AS up
-        INNER JOIN
-            `Users` AS `full_u` ON `full_u`.`user_id` = `up`.`user_id`
-        INNER JOIN
-            `Problems` AS `p`
-        ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
-        INNER JOIN
-            `Identities` AS `i`
-                ON `i`.`identity_id` = `full_u`.`main_identity_id`
-        LEFT JOIN
-            `Identities_Schools` AS `full_isc`
-        ON
-            `full_isc`.`identity_school_id` = `i`.`current_identity_school_id`
-        WHERE
-            `full_u`.`is_private` = 0
-            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
-            -- role_id = 1 is ADMIN_ROLE)
-            -- TODO: Replace magic numbers with constants
-            AND `full_u`.`user_id` NOT IN (
-                SELECT
-                    `ur`.`user_id`
-                FROM
-                    `User_Roles` AS `ur`
-                WHERE
-                    `ur`.`acl_id` = 1 AND
-                    `ur`.`role_id` = 1
-            )
-            AND NOT EXISTS (
-                SELECT
-                    `pf`.`problem_id`, `pf`.`user_id`
-                FROM
-                    `Problems_Forfeited` AS `pf`
-                WHERE
-                    `pf`.`problem_id` = `p`.`problem_id` AND
-                    `pf`.`user_id` = `full_u`.`user_id`
-            )
-            AND NOT EXISTS (
-                SELECT
-                    `a`.`acl_id`
-                FROM
-                    `ACLs` AS `a`
-                WHERE
-                    `a`.`acl_id` = `p`.`acl_id` AND
-                    `a`.`owner_id` = `full_u`.`user_id`
-            )
-        GROUP BY
-            `identity_id`
-        ORDER BY
-            `score` DESC;
-    ''')
     prev_score = None
     rank = 0
     # MySQL has no good way of obtaining percentiles, so we'll store the sorted
     # list of scores in order to calculate the cutoff scores later.
     scores: List[float] = []
-    cur.execute('DELETE FROM `User_Rank`;')
-    insert_user_rank_sql = '''
-                    INSERT INTO
-                        `User_Rank` (`user_id`, `ranking`,
-                                     `problems_solved_count`, `score`,
-                                     `username`, `name`, `country_id`,
-                                     `state_id`, `school_id`)
-                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s);'''
+    clear_user_rank(cur)
     user_rank_rows: List[UserRankRow] = []
     batch_size = 1000
-    for index, row in enumerate(cur_readonly):
+    for index, row in enumerate(fetch_user_rank_rows(cur_readonly)):
         if row['score'] != prev_score:
             rank = index + 1
         score = row.get('score', 0)
@@ -269,10 +187,10 @@ def update_user_rank(
                 school_id=row['school_id'],
             ))
         if len(user_rank_rows) >= batch_size:
-            cur.executemany(insert_user_rank_sql, user_rank_rows)
+            insert_user_rank_rows(cur, user_rank_rows)
             user_rank_rows.clear()
     if user_rank_rows:
-        cur.executemany(insert_user_rank_sql, user_rank_rows)
+        insert_user_rank_rows(cur, user_rank_rows)
     return scores
 
 
@@ -282,62 +200,11 @@ def update_author_rank(
 ) -> None:
     '''Updates the author's ranking'''
     logging.info('Updating authors ranking...')
-    cur_readonly.execute('''
-        SELECT
-            `u`.`user_id`,
-            `i`.`username`,
-            `i`.`name`,
-            `i`.`country_id`,
-            `i`.`state_id`,
-            `isc`.`school_id`,
-            SUM(`full_p`.`quality`) AS `author_score`
-        FROM
-            `Problems` AS `full_p`
-        INNER JOIN
-            `ACLs` AS `a` ON `a`.`acl_id` = `full_p`.`acl_id`
-        INNER JOIN
-            `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
-        INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = `u`.`main_identity_id`
-        LEFT JOIN
-            `Identities_Schools` AS `isc`
-        ON
-            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
-        WHERE
-            `full_p`.`quality` IS NOT NULL
-            -- Exclude site-admins (acl_id = 1 is SYSTEM_ACL,
-            -- role_id = 1 is ADMIN_ROLE)
-            -- TODO: Replace magic numbers with constants
-            AND `u`.`user_id` NOT IN (
-                SELECT
-                    `ur`.`user_id`
-                FROM
-                    `User_Roles` AS `ur`
-                WHERE
-                    `ur`.`acl_id` = 1 AND
-                    `ur`.`role_id` = 1
-            )
-        GROUP BY
-            `u`.`user_id`
-        ORDER BY
-            `author_score` DESC
-    ''')
-
     prev_score = None
     rank = 0
-    insert_author_rank_sql = '''
-                    INSERT INTO
-                        `User_Rank` (`user_id`, `username`, `author_score`,
-                                     `author_ranking`, `name`, `country_id`,
-                                     `state_id`, `school_id`)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    ON DUPLICATE KEY
-                        UPDATE
-                            author_ranking = VALUES(author_ranking),
-                            author_score = VALUES(author_score);'''
     author_rank_rows: List[AuthorRankRow] = []
     batch_size = 1000
-    for index, row in enumerate(cur_readonly):
+    for index, row in enumerate(fetch_author_rank_rows(cur_readonly)):
         if row['author_score'] != prev_score:
             rank = index + 1
         prev_score = row['author_score']
@@ -353,10 +220,10 @@ def update_author_rank(
                 school_id=row['school_id'],
             ))
         if len(author_rank_rows) >= batch_size:
-            cur.executemany(insert_author_rank_sql, author_rank_rows)
+            upsert_author_rank_rows(cur, author_rank_rows)
             author_rank_rows.clear()
     if author_rank_rows:
-        cur.executemany(insert_author_rank_sql, author_rank_rows)
+        upsert_author_rank_rows(cur, author_rank_rows)
 
 
 def update_user_rank_cutoffs(cur: mysql.connector.cursor.MySQLCursorDict,
