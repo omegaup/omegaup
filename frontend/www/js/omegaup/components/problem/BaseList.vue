@@ -102,7 +102,11 @@
                 ></omegaup-common-sort-controls
               ></span>
             </th>
-            <th v-if="loggedIn && showNotes" scope="col" class="align-middle text-nowrap">
+            <th
+              v-if="loggedIn && showNotes"
+              scope="col"
+              class="align-middle text-nowrap"
+            >
               <span>{{ T.wordsNotes }}</span>
             </th>
             <th scope="col" class="align-middle text-nowrap">

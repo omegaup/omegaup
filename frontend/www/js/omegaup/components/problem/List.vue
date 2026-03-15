@@ -58,12 +58,8 @@
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
-      @save-note="
-        (alias, text) => $emit('save-note', alias, text)
-      "
-      @delete-note="
-        (alias) => $emit('delete-note', alias)
-      "
+      @save-note="(alias, text) => $emit('save-note', alias, text)"
+      @delete-note="(alias) => $emit('delete-note', alias)"
     ></omegaup-problem-base-list>
   </div>
 </template>

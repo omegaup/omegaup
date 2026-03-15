@@ -193,6 +193,11 @@
   - [`/api/problemBookmark/toggle/`](#apiproblembookmarktoggle)
 - [ProblemForfeited](#problemforfeited)
   - [`/api/problemForfeited/getCounts/`](#apiproblemforfeitedgetcounts)
+- [ProblemNote](#problemnote)
+  - [`/api/problemNote/delete/`](#apiproblemnotedelete)
+  - [`/api/problemNote/get/`](#apiproblemnoteget)
+  - [`/api/problemNote/list/`](#apiproblemnotelist)
+  - [`/api/problemNote/save/`](#apiproblemnotesave)
 - [Problemset](#problemset)
   - [`/api/problemset/details/`](#apiproblemsetdetails)
   - [`/api/problemset/scoreboard/`](#apiproblemsetscoreboard)
@@ -3898,6 +3903,74 @@ and the number of solutions already seen
 | --------- | -------- |
 | `allowed` | `number` |
 | `seen`    | `number` |
+
+# ProblemNote
+
+ProblemNoteController
+
+## `/api/problemNote/delete/`
+
+### Description
+
+Delete a note for the current user on a problem
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
+
+## `/api/problemNote/get/`
+
+### Description
+
+Get a single note for the current user on a specific problem
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `problem_alias` | `string` |             | ✓        |
+
+### Returns
+
+| Name        | Type     |
+| ----------- | -------- |
+| `note_text` | `string` |
+
+## `/api/problemNote/list/`
+
+### Description
+
+Get all notes for the current user
+
+### Returns
+
+| Name    | Type                          |
+| ------- | ----------------------------- |
+| `notes` | `List[types.ProblemNoteItem]` |
+| `total` | `number`                      |
+
+## `/api/problemNote/save/`
+
+### Description
+
+Save (create or update) a note for the current user on a problem
+
+### Parameters
+
+| Name            | Type     | Description | Required |
+| --------------- | -------- | ----------- | -------- |
+| `note_text`     | `string` |             | ✓        |
+| `problem_alias` | `string` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 # Problemset
 

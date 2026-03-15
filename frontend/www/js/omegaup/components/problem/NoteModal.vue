@@ -1,6 +1,10 @@
 <template>
   <transition name="modal">
-    <div class="note-modal-mask" @click.self="$emit('close')" @keydown.esc="$emit('close')">
+    <div
+      class="note-modal-mask"
+      @click.self="$emit('close')"
+      @keydown.esc="$emit('close')"
+    >
       <div class="note-modal-container">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="mb-0">{{ T.problemNoteTitle }}</h5>
@@ -116,10 +120,7 @@
               :placeholder="T.problemNotePlaceholder"
             ></textarea>
           </div>
-          <div
-            v-show="activeTab === 'preview'"
-            class="preview-pane"
-          >
+          <div v-show="activeTab === 'preview'" class="preview-pane">
             <omegaup-markdown
               v-if="currentNoteText.length > 0"
               :markdown="currentNoteText"
@@ -153,9 +154,7 @@
               :disabled="isSaving || currentNoteText.length === 0"
               @click="onSave"
             >
-              {{
-                hasExistingNote ? T.problemNoteEdit : T.problemNoteAdd
-              }}
+              {{ hasExistingNote ? T.problemNoteEdit : T.problemNoteAdd }}
             </button>
           </div>
         </div>
@@ -337,17 +336,11 @@ export default class NoteModal extends Vue {
 }
 
 .note-modal-container {
-  background: var(
-    --finder-wizard-modal-container-background-color,
-    #fff
-  );
+  background: var(--finder-wizard-modal-container-background-color, #fff);
   min-width: 340px;
   max-width: 800px;
   width: 95%;
-  border: 1px solid var(
-    --finder-wizard-modal-container-border-color,
-    #dee2e6
-  );
+  border: 1px solid var(--finder-wizard-modal-container-border-color, #dee2e6);
   border-radius: 0.3rem;
   padding: 1.5em;
   position: relative;
@@ -355,7 +348,8 @@ export default class NoteModal extends Vue {
 
 .tab-bar {
   display: flex;
-  border-bottom: 1px solid var(--finder-wizard-modal-container-border-color, #dee2e6);
+  border-bottom: 1px solid
+    var(--finder-wizard-modal-container-border-color, #dee2e6);
   margin-bottom: 0;
 }
 
@@ -372,13 +366,20 @@ export default class NoteModal extends Vue {
 
   &:hover {
     color: var(--note-modal-text-color, #495057) !important;
-    border-color: var(--note-modal-hover-border, #e9ecef) var(--note-modal-hover-border, #e9ecef) var(--finder-wizard-modal-container-border-color, #dee2e6);
+    border-color: var(--note-modal-hover-border, #e9ecef)
+      var(--note-modal-hover-border, #e9ecef)
+      var(--finder-wizard-modal-container-border-color, #dee2e6);
   }
 
   &.active {
     color: var(--note-modal-text-color, #495057) !important;
-    background: var(--finder-wizard-modal-container-background-color, #fff) !important;
-    border-color: var(--finder-wizard-modal-container-border-color, #dee2e6) var(--finder-wizard-modal-container-border-color, #dee2e6) var(--finder-wizard-modal-container-background-color, #fff);
+    background: var(
+      --finder-wizard-modal-container-background-color,
+      #fff
+    ) !important;
+    border-color: var(--finder-wizard-modal-container-border-color, #dee2e6)
+      var(--finder-wizard-modal-container-border-color, #dee2e6)
+      var(--finder-wizard-modal-container-background-color, #fff);
     font-weight: 600;
   }
 }
