@@ -5234,6 +5234,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $notes = \OmegaUp\DAO\ProblemNotes::getNotesByIdentityAndProblemIds(
                 intval($r->identity->identity_id),
                 $problemIds
+            );
+        }
+
         $solvedProblemAliases = [];
         $attemptedProblemAliases = [];
         if (!is_null($r->identity) && !is_null($r->identity->identity_id)) {
