@@ -24,7 +24,7 @@
       </li>
     </ul>
     <div class="tab-content">
-      <div class="row m-0 mt-4">
+      <div class="row m-0 mt-4 course-filters">
         <div class="col-md-4 col-lg-3 p-0 ml-4">
           <input
             v-model="searchText"
@@ -137,7 +137,7 @@ import latinize from 'latinize';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -356,6 +356,18 @@ export default class CourseTabs extends Vue {
     width: calc(50% - 25px);
     flex: 0 0 calc(50% - 25px);
     max-width: calc(50% - 25px);
+  }
+
+  .row.m-0.mt-4.course-filters {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
+  }
+
+  .row.m-0.mt-4.course-filters > div {
+    max-width: 100%;
+    flex: 0 0 100%;
+    margin-left: 0 !important;
   }
 }
 
