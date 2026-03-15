@@ -1586,6 +1586,7 @@ const translations: { [key: string]: string; } = {
   problemTagTwoPointersTechnique: "Two pointers technique",
   problemTagUnformattedInputAndOutput: "Unformatted input and output",
   problemTagWaveletTrees: "Wavelet trees",
+  problemTagsLockedByPreferences: "To show problem tags, please update your preferences in your profile.",
   problemTitleExists: "Problem title already exists. Please try a different one.",
   problemVersionCurrentVersion: "Current version",
   problemVersionDate: "Commit date",

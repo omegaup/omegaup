@@ -32,14 +32,23 @@
           "
         ></omegaup-problem-filter-tags>
 
-        <div class="mb-3">
+        <div
+          class="problem-tags-toggle-row mb-3"
+          :title="isProblemTagsLocked ? T.problemTagsLockedByPreferences : ''"
+        >
           <omegaup-toggle-switch
             data-problem-tags-toggle
-            :checked-value="showProblemTags"
+            :checked-value="effectiveShowProblemTags"
             :text-description="T.userEditShowProblemTags"
             :size="ToggleSwitchSize.Small"
-            @update:value="(value) => (showProblemTags = value)"
+            :disabled="isProblemTagsLocked"
+            @update:value="
+              (value) => {
+                if (!isProblemTagsLocked) showProblemTags = value;
+              }
+            "
           ></omegaup-toggle-switch>
+          <span v-if="isProblemTagsLocked" class="problem-tags-lock"> 🔒 </span>
         </div>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
@@ -112,7 +121,7 @@
           :sort-order="sortOrder"
           :column-name="columnName"
           :path="`/problem/collection/${level}/`"
-          :show-problem-tags="showProblemTags"
+          :show-problem-tags="effectiveShowProblemTags"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit(
@@ -178,6 +187,7 @@ export default class CollectionList extends Vue {
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
   @Prop() quality!: string;
+  @Prop({ default: false }) hideProblemTagsPreference!: boolean;
 
   T = T;
   ToggleSwitchSize = ToggleSwitchSize;
@@ -186,12 +196,21 @@ export default class CollectionList extends Vue {
   showProblemTags = true;
 
   get problemsToShow(): omegaup.Problem[] {
-    if (this.showProblemTags) return this.problems;
+    if (this.effectiveShowProblemTags) return this.problems;
     // Keep filtering logic intact but hide rendered tags by stripping them.
     return this.problems.map((problem) => ({
       ...problem,
       tags: [],
     }));
+  }
+
+  get isProblemTagsLocked(): boolean {
+    return this.hideProblemTagsPreference;
+  }
+
+  get effectiveShowProblemTags(): boolean {
+    if (this.isProblemTagsLocked) return false;
+    return this.showProblemTags;
   }
 
   get publicQualityTags(): types.TagWithProblemCount[] {
@@ -240,6 +259,17 @@ export default class CollectionList extends Vue {
 
 .max-width {
   max-width: 75rem;
+}
+
+.problem-tags-toggle-row {
+  display: flex;
+  align-items: center;
+}
+
+.problem-tags-lock {
+  font-size: 0.9rem;
+  margin-left: 2px;
+  cursor: help;
 }
 
 .filters-sidebar {
