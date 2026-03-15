@@ -34,7 +34,11 @@ class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
             'expected_results' => $row['expected_results'],
             'preferred_skills' => $row['preferred_skills'],
             'possible_mentors' => $row['possible_mentors'],
-            'estimated_hours' => is_null($row['estimated_hours']) ? null : intval($row['estimated_hours']),
+            'estimated_hours' => is_null(
+                $row['estimated_hours']
+            ) ? null : intval(
+                $row['estimated_hours']
+            ),
             'skill_level' => $row['skill_level'],
             'status' => is_null($row['status']) ? 'Proposed' : $row['status'],
             'blog_link' => $row['blog_link'],
@@ -226,7 +230,11 @@ class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
             $targetEditionId = $editionId;
             if (is_null($targetEditionId)) {
                 $existingIdea = self::getIdeaById($ideaId);
-                $targetEditionId = is_null($existingIdea) ? null : intval($existingIdea['edition_id']);
+                $targetEditionId = is_null(
+                    $existingIdea
+                ) ? null : intval(
+                    $existingIdea['edition_id']
+                );
             }
             if (!is_null($targetEditionId) && $targetEditionId > 0) {
                 $ideaEdition = \OmegaUp\DAO\GSoCIdeaEdition::getByIdeaAndEdition(
@@ -239,10 +247,14 @@ class GSoCIdea extends \OmegaUp\DAO\Base\GSoCIdea {
                         'edition_id' => $targetEditionId,
                         'status' => is_null($status) ? 'Proposed' : $status,
                     ]);
-                    $affectedRows += \OmegaUp\DAO\GSoCIdeaEdition::create($ideaEdition);
+                    $affectedRows += \OmegaUp\DAO\GSoCIdeaEdition::create(
+                        $ideaEdition
+                    );
                 } elseif (!is_null($status)) {
                     $ideaEdition->status = $status;
-                    $affectedRows += \OmegaUp\DAO\GSoCIdeaEdition::update($ideaEdition);
+                    $affectedRows += \OmegaUp\DAO\GSoCIdeaEdition::update(
+                        $ideaEdition
+                    );
                 }
             }
         }

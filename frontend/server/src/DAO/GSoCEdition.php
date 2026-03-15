@@ -18,9 +18,15 @@ class GSoCEdition extends \OmegaUp\DAO\Base\GSoCEdition {
             'is_active' => boolval($edition->is_active),
             'application_deadline' => is_null($edition->application_deadline)
                 ? null
-                : \OmegaUp\DAO\DAO::toMySQLTimestamp($edition->application_deadline),
-            'created_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp($edition->created_at),
-            'updated_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp($edition->updated_at),
+                : \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                    $edition->application_deadline
+                ),
+            'created_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $edition->created_at
+            ),
+            'updated_at' => \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $edition->updated_at
+            ),
         ];
     }
 
