@@ -2,7 +2,7 @@
 
 """MySQL helpers for user and author ranking queries."""
 
-from typing import Any, Dict, Iterable, Iterator, Sequence, cast
+from typing import Any, Dict, Iterator, Sequence, cast
 
 import mysql.connector
 import mysql.connector.cursor
@@ -170,7 +170,7 @@ def clear_user_rank(
 
 def insert_user_rank_rows(
     cur: mysql.connector.cursor.MySQLCursorDict,
-    rows: Iterable[Sequence[object]],
+    rows: Sequence[Sequence[Any]],
 ) -> None:
     '''Insert user rank rows into User_Rank.'''
 
@@ -189,7 +189,7 @@ def fetch_author_rank_rows(
 
 def upsert_author_rank_rows(
     cur: mysql.connector.cursor.MySQLCursorDict,
-    rows: Iterable[Sequence[object]],
+    rows: Sequence[Sequence[Any]],
 ) -> None:
     '''Upsert author rank rows into User_Rank.'''
 
