@@ -48,7 +48,9 @@
               }
             "
           ></omegaup-toggle-switch>
-          <span v-if="isProblemTagsLocked" class="problem-tags-lock"> 🔒 </span>
+          <span v-if="isProblemTagsLocked" class="problem-tags-lock">
+            <font-awesome-icon icon="lock" />
+          </span>
         </div>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
