@@ -1566,6 +1566,24 @@ export const ProblemForfeited = {
   >('/api/problemForfeited/getCounts/'),
 };
 
+export const ProblemNote = {
+  delete: apiCall<
+    messages.ProblemNoteDeleteRequest,
+    messages.ProblemNoteDeleteResponse
+  >('/api/problemNote/delete/'),
+  get: apiCall<messages.ProblemNoteGetRequest, messages.ProblemNoteGetResponse>(
+    '/api/problemNote/get/',
+  ),
+  list: apiCall<
+    messages.ProblemNoteListRequest,
+    messages.ProblemNoteListResponse
+  >('/api/problemNote/list/'),
+  save: apiCall<
+    messages.ProblemNoteSaveRequest,
+    messages.ProblemNoteSaveResponse
+  >('/api/problemNote/save/'),
+};
+
 export const Problemset = {
   details: apiCall<
     messages.ProblemsetDetailsRequest,

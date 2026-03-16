@@ -1,0 +1,376 @@
+<?php
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
+
+namespace OmegaUp\DAO\Base;
+
+/** ProblemNotes Data Access Object (DAO) Base.
+ *
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\ProblemNotes}.
+ * @access public
+ * @abstract
+ */
+abstract class ProblemNotes {
+    /**
+     * Guardar registros.
+     *
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\ProblemNotes}
+     * pasado en la base de datos. La llave primaria indicará qué instancia va
+     * a ser actualizada en base de datos. Si la llave primara o combinación de
+     * llaves primarias que describen una fila que no se encuentra en la base de
+     * datos, entonces replace() creará una nueva fila.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
+     *
+     * @param \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemNotes}.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
+     */
+    final public static function replace(
+        \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes
+    ): int {
+        if (
+            empty($Problem_Notes->identity_id) ||
+            empty($Problem_Notes->problem_id)
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+        $sql = '
+            REPLACE INTO
+                Problem_Notes (
+                    `identity_id`,
+                    `problem_id`,
+                    `note_text`,
+                    `created_at`,
+                    `updated_at`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
+        $params = [
+            $Problem_Notes->identity_id,
+            $Problem_Notes->problem_id,
+            $Problem_Notes->note_text,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->created_at
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->updated_at
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Actualizar registros.
+     *
+     * @param \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes El objeto de tipo ProblemNotes a actualizar.
+     *
+     * @return int Número de filas afectadas
+     */
+    final public static function update(
+        \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes
+    ): int {
+        $sql = '
+            UPDATE
+                `Problem_Notes`
+            SET
+                `note_text` = ?,
+                `created_at` = ?,
+                `updated_at` = ?
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [
+            $Problem_Notes->note_text,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->created_at
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->updated_at
+            ),
+            (
+                is_null($Problem_Notes->identity_id) ?
+                null :
+                intval($Problem_Notes->identity_id)
+            ),
+            (
+                is_null($Problem_Notes->problem_id) ?
+                null :
+                intval($Problem_Notes->problem_id)
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    /**
+     * Obtener {@link \OmegaUp\DAO\VO\ProblemNotes} por llave primaria.
+     *
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\ProblemNotes}
+     * de la base de datos usando sus llaves primarias.
+     *
+     * @return ?\OmegaUp\DAO\VO\ProblemNotes Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemNotes} o NULL si no hay tal
+     * registro.
+     */
+    final public static function getByPK(
+        ?int $identity_id,
+        ?int $problem_id
+    ): ?\OmegaUp\DAO\VO\ProblemNotes {
+        $sql = '
+            SELECT
+                `Problem_Notes`.`identity_id`,
+                `Problem_Notes`.`problem_id`,
+                `Problem_Notes`.`note_text`,
+                `Problem_Notes`.`created_at`,
+                `Problem_Notes`.`updated_at`
+            FROM
+                `Problem_Notes`
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `problem_id` = ?
+                )
+            LIMIT 1;';
+        $params = [$identity_id, $problem_id];
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (empty($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\ProblemNotes($row);
+    }
+
+    /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\ProblemNotes} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\ProblemNotes}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?int $identity_id,
+        ?int $problem_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Problem_Notes`
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [$identity_id, $problem_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
+     * Contar todos los registros en `Problem_Notes`.
+     *
+     * Este método obtiene el número total de filas de la tabla **sin cargar campos**,
+     * útil para pruebas donde sólo se valida el conteo.
+     *
+     * @return int Número total de registros.
+     */
+    final public static function countAll(): int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Problem_Notes`;';
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, []);
+        return intval($count);
+    }
+
+    /**
+     * Eliminar registros.
+     *
+     * Este metodo eliminará el registro identificado por la llave primaria en
+     * el objeto {@link \OmegaUp\DAO\VO\ProblemNotes} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
+     *
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
+     *
+     * @param \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes El
+     * objeto de tipo \OmegaUp\DAO\VO\ProblemNotes a eliminar
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
+     */
+    final public static function delete(
+        \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes
+    ): void {
+        $sql = '
+            DELETE FROM
+                `Problem_Notes`
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `problem_id` = ?
+                );';
+        $params = [
+            $Problem_Notes->identity_id,
+            $Problem_Notes->problem_id
+        ];
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+    }
+
+    /**
+     * Obtener todas las filas.
+     *
+     * Esta funcion leerá todos los contenidos de la tabla en la base de datos
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\ProblemNotes}.
+     * Este método consume una cantidad de memoria proporcional al número de
+     * registros regresados, así que sólo debe usarse cuando la tabla en
+     * cuestión es pequeña o se proporcionan parámetros para obtener un menor
+     * número de filas.
+     *
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return list<\OmegaUp\DAO\VO\ProblemNotes> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\ProblemNotes}.
+     */
+    final public static function getAll(
+        ?int $pagina = null,
+        int $filasPorPagina = 100,
+        string $orden = 'identity_id',
+        string $tipoDeOrden = 'ASC'
+    ): array {
+        $sanitizedOrder = \OmegaUp\MySQLConnection::getInstance()->escape(
+            $orden
+        );
+        \OmegaUp\Validators::validateInEnum(
+            $tipoDeOrden,
+            'order_type',
+            [
+                'ASC',
+                'DESC',
+            ]
+        );
+        $sql = "
+            SELECT
+                `Problem_Notes`.`identity_id`,
+                `Problem_Notes`.`problem_id`,
+                `Problem_Notes`.`note_text`,
+                `Problem_Notes`.`created_at`,
+                `Problem_Notes`.`updated_at`
+            FROM
+                `Problem_Notes`
+            ORDER BY
+                `{$sanitizedOrder}` {$tipoDeOrden}
+        ";
+        if (!is_null($pagina)) {
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
+        }
+        $allData = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\ProblemNotes(
+                $row
+            );
+        }
+        return $allData;
+    }
+
+    /**
+     * Crear registros.
+     *
+     * Este metodo creará una nueva fila en la base de datos de acuerdo con los
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\ProblemNotes}
+     * suministrado.
+     *
+     * @param \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\ProblemNotes}
+     * a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
+     */
+    final public static function create(
+        \OmegaUp\DAO\VO\ProblemNotes $Problem_Notes
+    ): int {
+        $sql = '
+            INSERT INTO
+                `Problem_Notes` (
+                    `identity_id`,
+                    `problem_id`,
+                    `note_text`,
+                    `created_at`,
+                    `updated_at`
+                ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                );';
+        $params = [
+            (
+                is_null($Problem_Notes->identity_id) ?
+                null :
+                intval($Problem_Notes->identity_id)
+            ),
+            (
+                is_null($Problem_Notes->problem_id) ?
+                null :
+                intval($Problem_Notes->problem_id)
+            ),
+            $Problem_Notes->note_text,
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->created_at
+            ),
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                $Problem_Notes->updated_at
+            ),
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+        if ($affectedRows == 0) {
+            return 0;
+        }
+
+        return $affectedRows;
+    }
+}

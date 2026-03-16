@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
+import T from '../lang';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -61,6 +62,10 @@ OmegaUp.on('ready', () => {
       searchResultProblems.push({ key: query, value: query });
     }
   }
+  const aliasToProblemId: { [alias: string]: number } = {};
+  for (const problem of payload.problems) {
+    aliasToProblemId[problem.alias] = problem.problem_id;
+  }
   new Vue({
     el: '#main-container',
     components: {
@@ -68,6 +73,8 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       searchResultProblems: searchResultProblems,
+      notes: Object.assign({}, payload.notes ?? {}),
+      noteOperationFailed: 0,
       solvedProblemAliases: payload.solvedProblemAliases ?? [],
       attemptedProblemAliases: payload.attemptedProblemAliases ?? [],
     }),
@@ -87,6 +94,8 @@ OmegaUp.on('ready', () => {
           sortOrder: sortOrder,
           columnName: columnName,
           searchResultProblems: this.searchResultProblems,
+          notes: this.notes,
+          noteOperationFailed: this.noteOperationFailed,
           solvedProblemAliases: this.solvedProblemAliases,
           attemptedProblemAliases: this.attemptedProblemAliases,
         },
@@ -122,6 +131,39 @@ OmegaUp.on('ready', () => {
                 this.searchResultProblems = data.results;
               })
               .catch(ui.apiError);
+          },
+          'save-note': (problemAlias: string, noteText: string) => {
+            api.ProblemNote.save({
+              problem_alias: problemAlias,
+              note_text: noteText,
+            })
+              .then(() => {
+                ui.success(T.problemNoteSaved);
+                const problemId = aliasToProblemId[problemAlias];
+                if (problemId !== undefined) {
+                  Vue.set(this.notes, problemId, noteText);
+                }
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                this.noteOperationFailed++;
+              });
+          },
+          'delete-note': (problemAlias: string) => {
+            api.ProblemNote.delete({
+              problem_alias: problemAlias,
+            })
+              .then(() => {
+                ui.success(T.problemNoteDeleted);
+                const problemId = aliasToProblemId[problemAlias];
+                if (problemId !== undefined) {
+                  Vue.delete(this.notes, problemId);
+                }
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                this.noteOperationFailed++;
+              });
           },
         },
       });

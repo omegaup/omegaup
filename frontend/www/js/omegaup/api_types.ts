@@ -4367,12 +4367,20 @@ export namespace types {
     loggedIn: boolean;
     mode: string;
     modes: string[];
+    notes: { [key: number]: string };
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     selectedTags: string[];
     solvedProblemAliases: string[];
     tagData: { name?: string }[];
     tags: string[];
+  }
+
+  export interface ProblemNoteItem {
+    alias: string;
+    note_text: string;
+    problem_id: number;
+    title: string;
   }
 
   export interface ProblemPrintDetailsPayload {
@@ -5912,6 +5920,19 @@ export namespace messages {
     seen: number;
   };
 
+  // ProblemNote
+  export type ProblemNoteDeleteRequest = { [key: string]: any };
+  export type ProblemNoteDeleteResponse = {};
+  export type ProblemNoteGetRequest = { [key: string]: any };
+  export type ProblemNoteGetResponse = { note_text?: string };
+  export type ProblemNoteListRequest = { [key: string]: any };
+  export type ProblemNoteListResponse = {
+    notes: types.ProblemNoteItem[];
+    total: number;
+  };
+  export type ProblemNoteSaveRequest = { [key: string]: any };
+  export type ProblemNoteSaveResponse = {};
+
   // Problemset
   export type ProblemsetDetailsRequest = { [key: string]: any };
   export type _ProblemsetDetailsServerResponse = any;
@@ -6868,6 +6889,21 @@ export namespace controllers {
     getCounts: (
       params?: messages.ProblemForfeitedGetCountsRequest,
     ) => Promise<messages.ProblemForfeitedGetCountsResponse>;
+  }
+
+  export interface ProblemNote {
+    delete: (
+      params?: messages.ProblemNoteDeleteRequest,
+    ) => Promise<messages.ProblemNoteDeleteResponse>;
+    get: (
+      params?: messages.ProblemNoteGetRequest,
+    ) => Promise<messages.ProblemNoteGetResponse>;
+    list: (
+      params?: messages.ProblemNoteListRequest,
+    ) => Promise<messages.ProblemNoteListResponse>;
+    save: (
+      params?: messages.ProblemNoteSaveRequest,
+    ) => Promise<messages.ProblemNoteSaveResponse>;
   }
 
   export interface Problemset {
