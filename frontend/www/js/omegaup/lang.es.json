@@ -2234,7 +2234,7 @@
 	"wordsPointsDistributionInIntervals": "Distribuci\u00f3n de puntos en intervalos de 100",
 	"wordsPointsDistributionProblem": "Distribuci\u00f3n de puntajes del problema: %(alias)",
 	"wordsPointsForRank": "Puntos para ranking",
-	"wordsPointsForRankTooltip": "Estos puntos representan el valor real de este problema. Resolverlo disminuirá el valor del mismo para todos.",
+	"wordsPointsForRankTooltip": "Estos puntos representan el valor real de este problema. Resolverlo disminuir\u00e1 el valor del mismo para todos.",
 	"wordsPortuguese": "Portugu\u00e9s",
 	"wordsPractice": "Pr\u00e1ctica",
 	"wordsPrevPage": "P\u00e1gina anterior",
