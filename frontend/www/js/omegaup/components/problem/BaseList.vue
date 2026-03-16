@@ -106,7 +106,7 @@
               <span>
                 {{ T.wordsPointsForRank }}
                 <a
-                  v-tooltip="T.wordsPointsForRankTooltipDescription"
+                  v-tooltip="T.wordsPointsForRankTooltip"
                   ><img src="/media/question.png" :alt="T.wordsPointsForRank"
                 /></a>
                 <omegaup-common-sort-controls
