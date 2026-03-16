@@ -408,7 +408,6 @@ export default class CourseViewProgress extends Vue {
 }
 
 .table-fixed {
-  max-height: 80vh;
   overflow: auto;
 
   thead {
