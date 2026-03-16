@@ -622,6 +622,7 @@ const translations: { [key: string]: string; } = {
   courseExtraPointsProblem: "V\u00e1lido para pontos extras",
   courseExtraPointsProblemDesc: "Os pontos deste problema s\u00f3 se contam no caso n\u00e3o seja atingida a pontua\u00e7\u00e3o final do curso.",
   courseExtraPointsProblemLabel: "Problema para pontos extra",
+  courseGetStarted: "Comece o seu curso adicionando algum conte\u00fado!",
   courseGroupNotFound: "Grupo do curso n\u00e3o encontrado",
   courseHomepageStudentsSectionAlt: "Se\u00e7\u00e3o de alunos",
   courseHomepageStudentsSectionContent: "**Alunos**\n\n- Recebem feedback autom\u00e1tico sobre suas solu\u00e7\u00f5es.\n- Aprendem habilidades que ir\u00e3o servi\\-los na sua vida profissional.\n- Accesam cursos online 24/7.\n",

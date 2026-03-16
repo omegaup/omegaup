@@ -5,6 +5,8 @@
       <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
           {{ T.courseContentEmpty }}
+          <br />
+          {{ T.courseGetStarted }}
         </div>
       </div>
       <table v-else class="table table-striped">
@@ -99,7 +101,7 @@
       <form class="new">
         <div class="row">
           <div class="form-group col-md-12 mb-0">
-            <div class="text-right">
+            <div class="text-center">
               <button
                 data-course-add-new-content
                 class="btn btn-primary"
