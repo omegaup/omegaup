@@ -47,8 +47,7 @@ describe('Test IDE', () => {
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
     const filePath = `cypress/downloads/${fileName}`;
 
-    // Wait for the file to actually be written to disk before selecting it.
-    cy.readFile(filePath, null, { timeout: 15000 });
+    cy.readFile(filePath, { timeout: 15000 });
 
     cy.get('[data-zip-upload]').should('be.visible');
     cy.get('input[type="file"]').selectFile(filePath, {
