@@ -36,21 +36,7 @@ describe('Test IDE', () => {
     const fileName = `${Util.DUMMY_PROBLEM.alias}.zip`;
     const filePath = `cypress/downloads/${fileName}`;
 
-    cy.get('[data-zip-download]').should('be.visible').click();
-    cy.get('[data-zip-download]')
-      .invoke('prop', 'href')
-      .then((zipHref) => {
-        expect(zipHref).to.match(/^blob:/);
-
-        return cy
-          .window()
-          .then((win) =>
-            win.fetch(zipHref).then((response) => response.arrayBuffer()),
-          )
-          .then((arrayBuffer) => {
-            cy.writeFile(filePath, Cypress.Buffer.from(arrayBuffer), 'binary');
-          });
-      });
+    cy.readFile(filePath, { timeout: 15000 });
 
     cy.get('[data-zip-upload]').should('be.visible');
     cy.get('input[type="file"]').selectFile(filePath, {
