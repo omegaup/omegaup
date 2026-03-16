@@ -105,8 +105,7 @@
             <th scope="col" class="align-middle text-nowrap">
               <span>
                 {{ T.wordsPointsForRank }}
-                <a
-                  v-tooltip="T.wordsPointsForRankTooltip"
+                <a v-tooltip="T.wordsPointsForRankTooltip"
                   ><img src="/media/question.png" :alt="T.wordsPointsForRank"
                 /></a>
                 <omegaup-common-sort-controls
