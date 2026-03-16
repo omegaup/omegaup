@@ -5561,13 +5561,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $statementLanguage = $r->ensureOptionalString(
                 'language',
                 required: false,
-                validator: fn (string $lang): bool => (
+                validator: function (string $lang): bool {
                     \OmegaUp\Validators::validateInEnum(
                         $lang,
                         'lang',
                         self::VALID_LANGUAGES
-                    ) ?? true
-                )
+                    );
+                    return true;
+                }
             ) ?? '';
 
             $contents = $r->ensureString('contents');
