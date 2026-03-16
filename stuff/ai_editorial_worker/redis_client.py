@@ -29,12 +29,13 @@ class RedisJobClient:
             )
 
             # Test connection - mypy fix: assert client is not None
-            if self.client is not None:
-                self.client.ping()
-                logging.info(
-                    'Connected to Redis at %s:%s',
-                    self.config['host'], self.config['port']
-                )
+            assert self.client is not None
+            self.client.ping()
+            logging.info(
+                'Connected to Redis at %s:%s',
+                self.config['host'], 
+                self.config['port'],
+            )
 
         except redis.RedisError as e:
             logging.error('Redis connection error: %s', e)
