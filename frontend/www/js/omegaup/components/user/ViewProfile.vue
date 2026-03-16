@@ -1,5 +1,76 @@
 <template>
   <div class="container-fluid p-0 mt-0">
+    <div
+      v-if="currentReadme !== null || profile.is_own_profile"
+      class="row mb-3"
+    >
+      <div class="col-md-12">
+        <div class="card">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <span>{{ T.profileReadme }}</span>
+            <div>
+              <button
+                v-if="profile.is_own_profile && !isEditingReadme"
+                class="btn btn-sm btn-outline-secondary"
+                @click="startEditReadme"
+              >
+                {{ T.wordsEdit }}
+              </button>
+              <button
+                v-if="
+                  !profile.is_own_profile &&
+                  currentReadme !== null &&
+                  !readmeReportSubmitted
+                "
+                class="btn btn-sm btn-outline-warning"
+                @click="reportReadme"
+              >
+                {{ T.profileReadmeReport }}
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <template v-if="!isEditingReadme">
+              <omegaup-markdown
+                v-if="currentReadme"
+                :markdown="currentReadme"
+                :full-width="true"
+              ></omegaup-markdown>
+              <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
+                {{ T.profileReadmeAddPrompt }}
+              </p>
+              <div
+                v-if="readmeReportSubmitted"
+                class="alert alert-success mt-2 mb-0"
+              >
+                {{ T.profileReadmeReportSuccess }}
+              </div>
+            </template>
+            <template v-else>
+              <textarea
+                v-model="readmeEditContent"
+                class="form-control mb-2"
+                rows="10"
+              ></textarea>
+              <button
+                class="btn btn-primary btn-sm mr-2"
+                @click="saveReadme"
+              >
+                {{ T.wordsSaveChanges }}
+              </button>
+              <button
+                class="btn btn-secondary btn-sm"
+                @click="cancelEditReadme"
+              >
+                {{ T.wordsCancel }}
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -248,6 +319,7 @@
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import * as api from '../../api';
 import { types } from '../../api_types';
 import T from '../../lang';
 import {
@@ -261,6 +333,7 @@ import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import common_TablePaginator from '../common/TablePaginator.vue';
 import country_Flag from '../CountryFlag.vue';
+import common_Markdown from '../Markdown.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Charts from './Chartsv2.vue';
 import user_MainInfo from './MainInfo.vue';
@@ -290,6 +363,7 @@ function getInitialSelectedTab(
 
 @Component({
   components: {
+    'omegaup-markdown': common_Markdown,
     'omegaup-user-basicinfo': user_BasicInfo,
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
@@ -339,6 +413,10 @@ export default class ViewProfile extends Vue {
   columns = 3;
   currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+  currentReadme: string | null = this.profile.readme ?? null;
+  isEditingReadme = false;
+  readmeEditContent = '';
+  readmeReportSubmitted = false;
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
@@ -399,6 +477,33 @@ export default class ViewProfile extends Vue {
       default:
         return T.profileRankUnrated;
     }
+  }
+
+  startEditReadme(): void {
+    this.readmeEditContent = this.currentReadme ?? '';
+    this.isEditingReadme = true;
+  }
+
+  cancelEditReadme(): void {
+    this.isEditingReadme = false;
+    this.readmeEditContent = '';
+  }
+
+  saveReadme(): void {
+    api.User.saveReadme({ readme: this.readmeEditContent })
+      .then(() => {
+        this.currentReadme = this.readmeEditContent;
+        this.isEditingReadme = false;
+      })
+      .catch(ui.apiError);
+  }
+
+  reportReadme(): void {
+    api.User.reportReadme({ username: this.profile.username ?? '' })
+      .then(() => {
+        this.readmeReportSubmitted = true;
+      })
+      .catch(ui.apiError);
   }
 
   @Watch('selectedTab')
