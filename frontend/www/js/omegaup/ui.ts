@@ -10,6 +10,12 @@ import notificationsStore, {
 // Re-export MessageType and NotificationPosition for backward compatibility and convenience
 export { MessageType, NotificationPosition };
 
+export interface NotificationOptions {
+  onDismiss?: () => void;
+  autoHide?: boolean;
+  position?: NotificationPosition;
+}
+
 export function navigateTo(href: string): void {
   const [pathname, hash] = href.split('#');
   if (pathname === window.location.pathname && hash != null) {
@@ -93,11 +99,13 @@ export function displayStatus({
   type,
   autoHide,
   position,
+  onDismiss,
 }: {
   message: string;
   type: MessageType;
   autoHide?: boolean;
   position?: NotificationPosition;
+  onDismiss?: () => void;
 }): void {
   // Dispatch to Vuex store - the store action handles all visibility logic
   notificationsStore.dispatch('displayStatus', {
@@ -105,31 +113,43 @@ export function displayStatus({
     type,
     autoHide,
     position,
+    onDismiss,
   });
 }
 
-export function error(message: string): void {
-  displayStatus({ message, type: MessageType.Danger });
+export function error(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Danger, ...options });
 }
 
-export function info(message: string): void {
-  displayStatus({ message, type: MessageType.Info });
+export function info(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Info, ...options });
 }
 
-export function success(message: string, autoHide: boolean = true): void {
-  displayStatus({ message, type: MessageType.Success, autoHide });
+export function success(message: string, options?: NotificationOptions): void {
+  // Default autoHide to true for success messages unless explicitly set to false
+  displayStatus({
+    message,
+    type: MessageType.Success,
+    autoHide: options?.autoHide !== false,
+    position: options?.position,
+    onDismiss: options?.onDismiss,
+  });
 }
 
-export function warning(message: string): void {
-  displayStatus({ message, type: MessageType.Warning });
+export function warning(message: string, options?: NotificationOptions): void {
+  displayStatus({ message, type: MessageType.Warning, ...options });
 }
 
-export function apiError(response: { error?: string; payload?: any }): void {
+export function apiError(
+  response: { error?: string; payload?: any },
+  options?: NotificationOptions,
+): void {
   console.error(response);
   error(
     response.error && response.payload
       ? formatString(response.error, response.payload)
       : (response.error || 'error').toString(),
+    options,
   );
 }
 
