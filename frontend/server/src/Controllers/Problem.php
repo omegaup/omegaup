@@ -5558,13 +5558,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
-            $statementLanguage = $r->ensureOptionalString('language');
-            \OmegaUp\Validators::validateOptionalInEnum(
-                $statementLanguage,
-                'lang',
-                \OmegaUp\Controllers\Problem::ISO639_1
-            );
-            $statementLanguage = $statementLanguage ?? '';
+            $statementLanguage = $r->ensureOptionalString(
+                'language',
+                required: false,
+                validator: fn (string $lang): bool => (
+                    \OmegaUp\Validators::validateInEnum(
+                        $lang,
+                        'lang',
+                        self::VALID_LANGUAGES
+                    ) ?? true
+                )
+            ) ?? '';
 
             $contents = $r->ensureString('contents');
 
@@ -5578,7 +5582,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Validators::validateInEnum(
                     $language,
                     'lang',
-                    \OmegaUp\Controllers\Problem::ISO639_1
+                    self::VALID_LANGUAGES
                 );
                 self::updateStatement(
                     $r->identity,
