@@ -38,7 +38,7 @@ import VueCookies from 'vue-cookies';
 import T from '../../../../lang';
 import { TabIndex } from '../Tabs.vue';
 
-Vue.use(VueCookies, { expire: -1 });
+Vue.use(VueCookies, { expires: -1 });
 
 @Component({
   components: {
