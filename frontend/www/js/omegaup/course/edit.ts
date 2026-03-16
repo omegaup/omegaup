@@ -329,7 +329,6 @@ OmegaUp.on('ready', () => {
                 if (assignment.assignment_type == 'lesson') {
                   ui.success(T.courseAssignmentLectureAdded);
                 } else {
-                  console.log(data.solutionStatus);
                   if (data.solutionStatus === 'not_found') {
                     ui.success(T.courseAssignmentProblemAdded);
                   } else {
@@ -567,7 +566,7 @@ OmegaUp.on('ready', () => {
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
                   }),
-                  /*autoHide=*/ false,
+                  { autoHide: false },
                 );
               })
               .catch(ui.apiError);
