@@ -165,6 +165,11 @@ export default class Profile extends Vue {
   currentSelectedTab = this.selectedTab;
   currentViewProfileSelectedTab = this.viewProfileSelectedTab;
 
+  @Watch('viewProfileSelectedTab')
+  onViewProfileSelectedTabChanged(newValue: string | null) {
+    this.currentViewProfileSelectedTab = newValue;
+  }
+
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {
       return T.omegaupTitleProfile;
