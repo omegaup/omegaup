@@ -4776,22 +4776,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        [
-            'adminCourses' => $adminCourses,
-            'adminContests' => $adminContests,
-        ] = self::getAdminCoursesAndContestsForProblem($r->identity);
+        /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>} */
+        $adminContainers = self::getAdminCoursesAndContestsForProblem(
+            $r->identity
+        );
+        $adminCourses = $adminContainers['adminCourses'];
+        $adminContests = $adminContainers['adminContests'];
         $response['templateProperties']['payload']['adminCourses'] = $adminCourses;
         $response['templateProperties']['payload']['adminContests'] = $adminContests;
 
         return $response;
     }
 
-    /**
-     * Returns the list of courses (with pending assignments) and contests
-     * (still ongoing) that the current user administers, for the quick-add feature.
-     *
-     * @return array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}
-     */
     public static function invalidateAdminCoursesAndContestsForProblemCache(): void {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::PROBLEM_ADMIN_CONTAINERS
@@ -4815,6 +4811,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    /**
+     * Returns the list of courses (with pending assignments) and contests
+     * (still ongoing) that the current user administers, for the quick-add feature.
+     *
+     * @return array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}
+     */
     private static function getAdminCoursesAndContestsForProblem(
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
@@ -5368,10 +5370,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         /** @var list<AdminContestForProblem> */
         $adminContests = [];
         if (!is_null($r->identity)) {
-            [
-                'adminCourses' => $adminCourses,
-                'adminContests' => $adminContests,
-            ] = self::getAdminCoursesAndContestsForProblem($r->identity);
+            /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>} */
+            $adminContainers = self::getAdminCoursesAndContestsForProblem(
+                $r->identity
+            );
+            $adminCourses = $adminContainers['adminCourses'];
+            $adminContests = $adminContainers['adminContests'];
         }
 
         return [
