@@ -490,6 +490,27 @@ export default class Navbar extends Vue {
           : this.formattedSignupURL;
     }
   }
+
+  mounted() {
+    document.addEventListener('click', this.handleDocumentClick);
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleDocumentClick);
+  }
+
+  private handleDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const navbar = this.$el as HTMLElement;
+
+    if (!navbar.contains(target)) {
+      const navbarCollapse = navbar.querySelector('.navbar-collapse.show');
+
+      if (!navbarCollapse) return;
+
+      ($(navbarCollapse) as any).collapse('hide');
+    }
+  }
 }
 </script>
 
