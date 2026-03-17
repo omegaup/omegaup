@@ -319,8 +319,9 @@ export default class CollectionList extends Vue {
     height: 100%;
     padding-right: 0.5rem;
     padding-left: 0.5rem;
-    background: var(--header-color, #fff);
-    border-right: 1px solid var(--border-color, #ddd);
+    background: var(--problem-collection-list-mobile-sidebar-background-color);
+    border-right: 1px solid
+      var(--problem-collection-list-mobile-sidebar-border-color);
     box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, opacity 0.2s ease;
   }
