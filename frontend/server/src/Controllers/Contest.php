@@ -2643,6 +2643,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         self::$log->info("New Contest Created: {$contest->alias}");
     }
@@ -5137,6 +5138,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         self::$log->info("Contest updated (alias): {$contestAlias}");
 
@@ -6137,6 +6139,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Cache::invalidateAllKeys(
             \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
         );
+        \OmegaUp\Controllers\Problem::invalidateAdminCoursesAndContestsForProblemCache();
 
         return [
             'status' => 'ok',
