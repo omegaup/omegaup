@@ -177,7 +177,7 @@
           :active="currentTab === ContestTab.Current"
           @click="currentTab = ContestTab.Current"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="loading && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`current-${index}`"
@@ -186,33 +186,46 @@
               <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
+          <div
+            v-else-if="contestListEmpty && !refreshing"
+            class="empty-category"
+          >
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
-                    {{ currentContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <div class="contest-list-refresh-container">
+              <div v-if="refreshing" class="refreshing-overlay">
+                <div
+                  class="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                ></div>
+              </div>
+              <div :class="{ 'refreshing-content': refreshing }">
+                <omegaup-contest-card
+                  v-for="contestItem in contestList"
+                  :key="contestItem.contest_id"
+                  :contest="contestItem"
+                >
+                  <template #contest-button-scoreboard>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="contestItem.finish_time.toLocaleString()"
+                      >
+                        {{ currentContestDate(contestItem) }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-dropdown>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </div>
+            </div>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Current">
             <div
@@ -250,7 +263,7 @@
           :active="currentTab === ContestTab.Future"
           @click="currentTab = ContestTab.Future"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="loading && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`future-${index}`"
@@ -259,36 +272,49 @@
               <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
+          <div
+            v-else-if="contestListEmpty && !refreshing"
+            class="empty-category"
+          >
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-button-scoreboard>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.start_time)"
-                    :title="contestItem.start_time.toLocaleString()"
-                  >
-                    {{ futureContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-dropdown>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <div class="contest-list-refresh-container">
+              <div v-if="refreshing" class="refreshing-overlay">
+                <div
+                  class="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                ></div>
+              </div>
+              <div :class="{ 'refreshing-content': refreshing }">
+                <omegaup-contest-card
+                  v-for="contestItem in contestList"
+                  :key="contestItem.contest_id"
+                  :contest="contestItem"
+                >
+                  <template #contest-button-scoreboard>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a
+                        :href="getTimeLink(contestItem.start_time)"
+                        :title="contestItem.start_time.toLocaleString()"
+                      >
+                        {{ futureContestDate(contestItem) }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-button-enter>
+                    <div></div>
+                  </template>
+                  <template #contest-dropdown>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </div>
+            </div>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Future">
             <div
@@ -326,7 +352,7 @@
           :active="currentTab === ContestTab.Past"
           @click="currentTab = ContestTab.Past"
         >
-          <template v-if="loading || refreshing">
+          <template v-if="loading && contestListEmpty">
             <div
               v-for="index in 3"
               :key="`past-${index}`"
@@ -335,36 +361,49 @@
               <omegaup-contest-skeleton></omegaup-contest-skeleton>
             </div>
           </template>
-          <div v-else-if="contestListEmpty" class="empty-category">
+          <div
+            v-else-if="contestListEmpty && !refreshing"
+            class="empty-category"
+          >
             {{ T.contestListEmpty }}
           </div>
           <template v-else>
-            <omegaup-contest-card
-              v-for="contestItem in contestList"
-              :key="contestItem.contest_id"
-              :contest="contestItem"
-            >
-              <template #contest-enroll-status>
-                <div></div>
-              </template>
-              <template #text-contest-date>
-                <b-card-text>
-                  <font-awesome-icon icon="calendar-alt" />
-                  <a
-                    :href="getTimeLink(contestItem.finish_time)"
-                    :title="contestItem.finish_time.toLocaleString()"
-                  >
-                    {{ pastContestDate(contestItem) }}
-                  </a>
-                </b-card-text>
-              </template>
-              <template #contest-button-enter>
-                <div></div>
-              </template>
-              <template #contest-button-see-details>
-                <div></div>
-              </template>
-            </omegaup-contest-card>
+            <div class="contest-list-refresh-container">
+              <div v-if="refreshing" class="refreshing-overlay">
+                <div
+                  class="spinner-border spinner-border-sm text-primary"
+                  role="status"
+                ></div>
+              </div>
+              <div :class="{ 'refreshing-content': refreshing }">
+                <omegaup-contest-card
+                  v-for="contestItem in contestList"
+                  :key="contestItem.contest_id"
+                  :contest="contestItem"
+                >
+                  <template #contest-enroll-status>
+                    <div></div>
+                  </template>
+                  <template #text-contest-date>
+                    <b-card-text>
+                      <font-awesome-icon icon="calendar-alt" />
+                      <a
+                        :href="getTimeLink(contestItem.finish_time)"
+                        :title="contestItem.finish_time.toLocaleString()"
+                      >
+                        {{ pastContestDate(contestItem) }}
+                      </a>
+                    </b-card-text>
+                  </template>
+                  <template #contest-button-enter>
+                    <div></div>
+                  </template>
+                  <template #contest-button-see-details>
+                    <div></div>
+                  </template>
+                </omegaup-contest-card>
+              </div>
+            </div>
           </template>
           <template v-if="isScrollLoading && currentTab === ContestTab.Past">
             <div
@@ -527,7 +566,7 @@ class ArenaContestList extends Vue {
     this.currentQuery = '';
     this.onSearchQuery();
   }
-  fetchInitialContests() {
+  fetchInitialContests(preserveList: boolean = false) {
     const urlObj = new URL(window.location.href);
     const params: UrlParams = {
       page: 1,
@@ -537,8 +576,13 @@ class ArenaContestList extends Vue {
       filter: this.currentFilter,
       replaceState: this.isFromBrowserNavigation || this.isInitialLoad,
     };
-    // Reset the contest list for this tab to avoid stale data
-    Vue.set(this.contests, this.currentTab, []);
+    if (preserveList) {
+      // For sort/filter changes: keep the old list visible, show refreshing indicator
+      this.refreshing = true;
+    } else {
+      // For initial load and tab changes: clear the list and show skeletons
+      Vue.set(this.contests, this.currentTab, []);
+    }
     this.currentPage = 1;
     this.hasMore = true;
     // Reset the navigation and initial load flags after using them
@@ -587,10 +631,6 @@ class ArenaContestList extends Vue {
 
   fetchPage(params: UrlParams, urlObj: URL) {
     this.$emit('fetch-page', { params, urlObj });
-    // Turn off refreshing after a short delay to allow parent component to respond
-    setTimeout(() => {
-      this.refreshing = false;
-    }, 1000);
   }
 
   currentContestDate(contest: types.ContestListItem): string {
@@ -709,7 +749,7 @@ class ArenaContestList extends Vue {
     oldValue: undefined | ContestOrder,
   ) {
     if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
+    this.fetchInitialContests(true);
   }
 
   @Watch('currentFilter', { immediate: true, deep: true })
@@ -718,7 +758,23 @@ class ArenaContestList extends Vue {
     oldValue: undefined | ContestFilter,
   ) {
     if (typeof oldValue === 'undefined') return;
-    this.fetchInitialContests();
+    this.fetchInitialContests(true);
+  }
+
+  // Clear refreshing flag when new data arrives (works for both cached and API responses)
+  @Watch('contestList')
+  onContestListDataChanged() {
+    if (this.refreshing) {
+      this.refreshing = false;
+    }
+  }
+
+  // Also clear refreshing when loading transitions from true to false (safety net)
+  @Watch('loading')
+  onLoadingChanged(newValue: boolean, oldValue: boolean) {
+    if (!newValue && oldValue && this.refreshing) {
+      this.refreshing = false;
+    }
   }
 }
 
@@ -814,6 +870,25 @@ export default ArenaContestList;
   font-size: 200%;
   margin: 1em;
   color: var(--arena-contest-list-empty-category-font-color);
+}
+
+.refreshing-content {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.contest-list-refresh-container {
+  position: relative;
+}
+
+.refreshing-overlay {
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .btns-group {

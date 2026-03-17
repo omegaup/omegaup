@@ -23,6 +23,7 @@ interface NamedContestListResponse {
   name: string;
   cacheKey: string;
   response: messages.ContestListResponse;
+  replace?: boolean;
 }
 
 export const contestStoreConfig = {
@@ -48,21 +49,26 @@ export const contestStoreConfig = {
     },
     updateList(
       state: ContestState,
-      { name, cacheKey, response }: NamedContestListResponse,
+      { name, cacheKey, response, replace }: NamedContestListResponse,
     ) {
-      // Get the existing contests for this tab (or initialize as empty array)
-      const existingContests = state.contests[name] || [];
+      if (replace) {
+        // Replace the entire list atomically (for sort/filter changes)
+        Vue.set(state.contests, name, [...response.results]);
+      } else {
+        // Get the existing contests for this tab (or initialize as empty array)
+        const existingContests = state.contests[name] || [];
 
-      // Filter out duplicates by contest_id
-      const newContests = response.results.filter(
-        (newContest) =>
-          !existingContests.some(
-            (existing) => existing.contest_id === newContest.contest_id,
-          ),
-      );
+        // Filter out duplicates by contest_id
+        const newContests = response.results.filter(
+          (newContest) =>
+            !existingContests.some(
+              (existing) => existing.contest_id === newContest.contest_id,
+            ),
+        );
 
-      // Append new contests to the existing list
-      Vue.set(state.contests, name, [...existingContests, ...newContests]);
+        // Append new contests to the existing list
+        Vue.set(state.contests, name, [...existingContests, ...newContests]);
+      }
       Vue.set(state.countContests, name, response.number_of_results);
 
       // Update cache with the full response
@@ -78,11 +84,13 @@ export const contestStoreConfig = {
       payload: NamedContestListRequest,
     ) {
       const cacheKey = generateCacheKey(payload.requestParams);
+      const isReplace = payload.requestParams.page === 1;
       if (state.cache[cacheKey]) {
         commit('updateList', {
           name: payload.name,
           cacheKey,
           response: state.cache[cacheKey],
+          replace: isReplace,
         });
         return;
       }
@@ -93,6 +101,7 @@ export const contestStoreConfig = {
             name: payload.name,
             cacheKey,
             response,
+            replace: isReplace,
           });
         })
         .finally(() => {
