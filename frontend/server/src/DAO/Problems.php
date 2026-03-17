@@ -289,10 +289,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
+        $searchClauseIndex = null;
         if (!is_null($query)) {
             $curatedQuery = trim(strval(preg_replace('/\W+/', ' ', $query)));
             if ($curatedQuery !== '') {
                 if (is_numeric($query)) {
+                    // Numeric: FULLTEXT UNION exact ID — no LIKE fallback needed
+                    // since the exact ID match always guarantees a result.
                     $clauses[] = [
                         'p.problem_id IN (
                             SELECT
@@ -304,7 +307,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                                     FROM
                                         Problems p2
                                     WHERE
-                                        MATCH(p2.title, p2.alias)
+                                        MATCH(p2.alias, p2.title)
                                         AGAINST (? IN BOOLEAN MODE)
                                     UNION
                                     SELECT
@@ -318,8 +321,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         [$curatedQuery, intval($query)],
                     ];
                 } else {
+                    // Non-numeric: try FULLTEXT first.
+                    // Track its index so we can swap in a LIKE fallback if needed.
+                    $searchClauseIndex = count($clauses);
                     $clauses[] = [
-                        'MATCH(p.title, p.alias) AGAINST (? IN BOOLEAN MODE)',
+                        'MATCH(p.alias, p.title) AGAINST (? IN BOOLEAN MODE)',
                         [$curatedQuery],
                     ];
                 }
@@ -485,6 +491,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
+        // Save snapshots before WHERE assembly so we can rebuild if fallback needed.
+        $baseSql = $sql;
+        $baseArgs = $args;
+
         // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
         if (!empty($clauses)) {
             $sql .= "\nWHERE\n" . implode(
@@ -506,6 +516,34 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             "SELECT COUNT(*) $sql",
             $args
         );
+
+        // If FULLTEXT returned no results, fall back to LIKE-based search.
+        if ($count === 0 && !is_null($searchClauseIndex)) {
+            $clauses[$searchClauseIndex] = [
+                '(p.title LIKE CONCAT(\'%\', ?, \'%\') OR p.alias LIKE CONCAT(\'%\', ?, \'%\'))',
+                [$query, $query],
+            ];
+            $sql = $baseSql;
+            $args = $baseArgs;
+            if (!empty($clauses)) {
+                $sql .= "\nWHERE\n" . implode(
+                    ' AND ',
+                    array_map(
+                        /** @param array{0: string, 1: list<string>} $clause */
+                        fn (array $clause) => $clause[0],
+                        $clauses
+                    )
+                );
+                foreach ($clauses as $clause) {
+                    $args = array_merge($args, $clause[1]);
+                }
+            }
+            /** @var int */
+            $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                "SELECT COUNT(*) $sql",
+                $args
+            );
+        }
 
         // Reset the offset to 0 if out of bounds.
         if ($offset < 0 || $offset > $count) {
