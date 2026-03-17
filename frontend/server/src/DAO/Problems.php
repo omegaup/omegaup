@@ -525,18 +525,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
             $sql = $baseSql;
             $args = $baseArgs;
-            if (!empty($clauses)) {
-                $sql .= "\nWHERE\n" . implode(
-                    ' AND ',
-                    array_map(
-                        /** @param array{0: string, 1: list<string>} $clause */
-                        fn (array $clause) => $clause[0],
-                        $clauses
-                    )
-                );
-                foreach ($clauses as $clause) {
-                    $args = array_merge($args, $clause[1]);
-                }
+            $sql .= "\nWHERE\n" . implode(
+                ' AND ',
+                array_map(
+                    /** @param array{0: string, 1: list<string>} $clause */
+                    fn (array $clause) => $clause[0],
+                    $clauses
+                )
+            );
+            foreach ($clauses as $clause) {
+                $args = array_merge($args, $clause[1]);
             }
             /** @var int */
             $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
