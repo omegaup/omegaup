@@ -213,7 +213,7 @@
           </div>
         </div>
         <div
-          class="w-50 mx-auto d-flex justify-content-between text-center progress-text"
+          class="w-50 mx-auto d-flex justify-content-between text-center progress-text mb-4"
         >
           <p class="my-0 text-uppercase">
             {{ T.courseDetailsProgress }}
