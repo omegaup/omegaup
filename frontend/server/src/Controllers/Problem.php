@@ -125,6 +125,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
 
+    const ADMIN_CONTAINERS_CACHE_TTL = 3600;
+
     // quality values
     const QUALITY_VALUES = ['onlyQualityProblems', 'all'];
 
@@ -4790,6 +4792,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}
      */
+    public static function invalidateAdminCoursesAndContestsForProblemCache(): void {
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::PROBLEM_ADMIN_CONTAINERS
+        );
+    }
+
+    private static function getAdminCoursesAndContestsForProblemCacheTimeout(
+        ?int $nextChangeAt,
+        int $now
+    ): int {
+        if (is_null($nextChangeAt)) {
+            return self::ADMIN_CONTAINERS_CACHE_TTL;
+        }
+
+        return max(
+            1,
+            min(
+                self::ADMIN_CONTAINERS_CACHE_TTL,
+                $nextChangeAt - $now + 1
+            )
+        );
+    }
+
     private static function getAdminCoursesAndContestsForProblem(
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
@@ -4798,65 +4823,76 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $now = \OmegaUp\Time::get();
-
-        // Courses administered by the user with at least one pending assignment
-        $adminCourseData = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-            $identity->identity_id
-        );
-        $allAdminCourses = array_merge(
-            $adminCourseData['admin'],
-            $adminCourseData['teachingAssistant']
+        $cache = new \OmegaUp\Cache(
+            \OmegaUp\Cache::PROBLEM_ADMIN_CONTAINERS,
+            strval($identity->identity_id)
         );
 
-        /** @var list<AdminCourseForProblem> */
-        $adminCourses = [];
-        foreach ($allAdminCourses as $course) {
-            $assignments = \OmegaUp\DAO\Courses::getAllAssignments(
-                $course['alias'],
-                isAdmin: true
-            );
-            /** @var list<array{alias: string, name: string, assignment_type: string}> */
-            $pendingAssignments = [];
-            foreach ($assignments as $assignment) {
-                if (
-                    is_null($assignment['finish_time']) ||
-                    $assignment['finish_time']->time > $now
-                ) {
-                    $pendingAssignments[] = [
-                        'alias' => $assignment['alias'],
-                        'name' => $assignment['name'],
-                        'assignment_type' => $assignment['assignment_type'],
-                    ];
-                }
-            }
-            if (!empty($pendingAssignments)) {
-                $adminCourses[] = [
-                    'alias' => $course['alias'],
-                    'name' => $course['name'],
-                    'assignments' => $pendingAssignments,
-                ];
-            }
+        /** @var array{adminCourses: list<AdminCourseForProblem>, adminContests: list<AdminContestForProblem>}|null */
+        $cachedPayload = $cache->get();
+        if (is_array($cachedPayload)) {
+            return $cachedPayload;
         }
 
-        // Contests administered by the user that are still ongoing
-        $adminContestRows = \OmegaUp\DAO\Contests::getAllContestsAdminedByIdentity(
-            $identity->identity_id
+        $rows = \OmegaUp\DAO\Problemsets::getAdminContainersForProblemQuickAdd(
+            $identity->identity_id,
+            $now
         );
+
+        /** @var array<string, AdminCourseForProblem> */
+        $adminCoursesByAlias = [];
         /** @var list<AdminContestForProblem> */
         $adminContests = [];
-        foreach ($adminContestRows as $contest) {
-            if ($contest['finish_time']->time > $now) {
-                $adminContests[] = [
-                    'alias' => $contest['alias'],
-                    'title' => $contest['title'],
-                ];
+        $nextChangeAt = null;
+
+        foreach ($rows as $row) {
+            if (
+                !is_null($row['finish_time']) && (
+                    is_null($nextChangeAt) ||
+                    $row['finish_time']->time < $nextChangeAt
+                )
+            ) {
+                $nextChangeAt = $row['finish_time']->time;
             }
+
+            if ($row['entity_type'] === 'assignment') {
+                if (!isset($adminCoursesByAlias[$row['container_alias']])) {
+                    $adminCoursesByAlias[$row['container_alias']] = [
+                        'alias' => $row['container_alias'],
+                        'name' => $row['container_name'],
+                        'assignments' => [],
+                    ];
+                }
+                $adminCoursesByAlias[$row['container_alias']]['assignments'][] = [
+                    'alias' => $row['item_alias'],
+                    'name' => $row['item_name'],
+                    'assignment_type' => strval($row['assignment_type']),
+                ];
+                continue;
+            }
+
+            $adminContests[] = [
+                'alias' => $row['item_alias'],
+                'title' => $row['item_name'],
+            ];
         }
 
-        return [
+        /** @var list<AdminCourseForProblem> */
+        $adminCourses = array_values($adminCoursesByAlias);
+        $result = [
             'adminCourses' => $adminCourses,
             'adminContests' => $adminContests,
         ];
+
+        $cache->set(
+            $result,
+            self::getAdminCoursesAndContestsForProblemCacheTimeout(
+                $nextChangeAt,
+                $now
+            )
+        );
+
+        return $result;
     }
 
     /**
