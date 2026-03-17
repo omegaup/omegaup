@@ -65,7 +65,7 @@
     {% jsInclude 'common_scroll_to_top' omitRuntime %}
       <div id="scroll-to-top"></div>
     {% jsInclude 'common_footer' omitRuntime %}
-    {% if not headerPayload.inContest and not hideFooterAndHeader %}
+    {% if not headerPayload.inContest and not hideFooterAndHeader and not arenaMode %}
       <div id="common-footer"></div>
     {% endif %}
 
