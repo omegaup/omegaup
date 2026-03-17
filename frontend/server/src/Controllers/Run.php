@@ -643,12 +643,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
 
-        \OmegaUp\Cache::invalidateAllKeys(
-            \OmegaUp\Cache::CONTESTANT_SCOREBOARD_PREFIX
-        );
-        \OmegaUp\Cache::invalidateAllKeys(
-            \OmegaUp\Cache::ADMIN_SCOREBOARD_PREFIX
-        );
+        // Expire rank cache
+        \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
         if (!is_null($problemsetId)) {
             $assignment = \OmegaUp\DAO\Assignments::getAssignmentForProblemset(
