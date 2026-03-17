@@ -66,17 +66,25 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertCount(1, $response['adminCourses']);
+        $this->assertTrue($response['user']['loggedIn']);
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
         $this->assertSame(
             $activeCourseData['course_alias'],
-            $response['adminCourses'][0]['alias']
+            $adminCourses[0]['alias']
         );
-        $this->assertCount(1, $response['adminCourses'][0]['assignments']);
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(1, $adminCourses[0]['assignments']);
 
-        $this->assertCount(1, $response['adminContests']);
+        $this->assertCount(1, $adminContests);
         $this->assertSame(
             $activeContestData['request']['alias'],
-            $response['adminContests'][0]['alias']
+            $adminContests[0]['alias']
         );
     }
 
@@ -107,9 +115,17 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertCount(1, $response['adminCourses']);
-        $this->assertCount(1, $response['adminCourses'][0]['assignments']);
-        $this->assertSame([], $response['adminContests']);
+        $this->assertTrue($response['user']['loggedIn']);
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(1, $adminCourses[0]['assignments']);
+        $this->assertSame([], $adminContests);
 
         \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -136,17 +152,25 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertCount(1, $response['adminCourses']);
-        $this->assertCount(2, $response['adminCourses'][0]['assignments']);
+        $this->assertTrue($response['user']['loggedIn']);
+        $adminCourses = $response['adminCourses'] ?? [];
+        $adminContests = $response['adminContests'] ?? [];
+        $this->assertIsArray($adminCourses);
+        $this->assertIsArray($adminContests);
+
+        $this->assertCount(1, $adminCourses);
+        $this->assertArrayHasKey('assignments', $adminCourses[0]);
+        $this->assertIsArray($adminCourses[0]['assignments']);
+        $this->assertCount(2, $adminCourses[0]['assignments']);
         $this->assertSame(
             'homework',
-            $response['adminCourses'][0]['assignments'][0]['assignment_type']
+            $adminCourses[0]['assignments'][0]['assignment_type']
         );
         $this->assertSame(
             'lesson',
-            $response['adminCourses'][0]['assignments'][1]['assignment_type']
+            $adminCourses[0]['assignments'][1]['assignment_type']
         );
-        $this->assertCount(1, $response['adminContests']);
+        $this->assertCount(1, $adminContests);
     }
 
     public function testViewProblemInAContestDetailsValid() {

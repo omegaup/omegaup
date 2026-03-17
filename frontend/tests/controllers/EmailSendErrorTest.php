@@ -49,6 +49,8 @@ class EmailSendErrorTest extends \OmegaUp\Test\ControllerTestCase {
             'Test Subject',
             'Test Body'
         );
+
+        $this->assertTrue(true);
     }
 
     /**
