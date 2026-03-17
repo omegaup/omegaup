@@ -31,7 +31,9 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             assignmentDuration: 1800,
         );
         if (is_null($expiredCourseData['assignment'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException('assignmentNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
         }
         $expiredCourseData['assignment']->finish_time = new \OmegaUp\Timestamp(
             \OmegaUp\Time::get() - 10
@@ -48,8 +50,12 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $adminIdentity,
                 'contestDirectorUser' => $adminUser,
-                'startTime' => new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 7200),
-                'finishTime' => new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 3600),
+                'startTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 7200
+                ),
+                'finishTime' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() - 3600
+                ),
             ])
         );
 
