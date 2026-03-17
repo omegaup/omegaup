@@ -159,7 +159,9 @@ const storeOptions: StoreOptions<GraderStore> = {
     languages(state: GraderStore): string[] {
       return state.languages;
     },
-    sessionStorageSources(state: GraderStore): GraderSessionStorageSources | null {
+    sessionStorageSources(
+      state: GraderStore,
+    ): GraderSessionStorageSources | null {
       return state.sessionStorageSources;
     },
     moduleName(state: GraderStore): string {
@@ -217,17 +219,18 @@ const storeOptions: StoreOptions<GraderStore> = {
           Name: caseName,
           Weight: state.request.input.cases[caseName].weight || 0,
         });
-
       }
       const result: types.SettingsCaseGroup[] = [];
       for (const groupName in resultMap) {
         if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
           continue;
-        resultMap[groupName].Cases.sort((a: types.SettingsCase, b: types.SettingsCase) => {
-          if (a.Name < b.Name) return -1;
-          if (a.Name > b.Name) return 1;
-          return 0;
-        });
+        resultMap[groupName].Cases.sort(
+          (a: types.SettingsCase, b: types.SettingsCase) => {
+            if (a.Name < b.Name) return -1;
+            if (a.Name > b.Name) return 1;
+            return 0;
+          },
+        );
         result.push(resultMap[groupName]);
       }
       result.sort((a, b) => {
@@ -243,10 +246,14 @@ const storeOptions: StoreOptions<GraderStore> = {
     'request.language'(state: GraderStore): string {
       return state.request.language;
     },
-    'request.input.validator.custom_validator.language'(state: GraderStore): string {
+    'request.input.validator.custom_validator.language'(
+      state: GraderStore,
+    ): string {
       return state.request.input.validator.custom_validator?.language || '';
     },
-    'request.input.validator.custom_validator.source'(state: GraderStore): string {
+    'request.input.validator.custom_validator.source'(
+      state: GraderStore,
+    ): string {
       return state.request.input.validator.custom_validator?.source || '';
     },
     'request.input.interactive.idl'(state: GraderStore): string {
@@ -340,13 +347,21 @@ const storeOptions: StoreOptions<GraderStore> = {
     request(state: GraderStore): GraderRequest {
       return state.request;
     },
-    customValidator(state: GraderStore): { language: string; limits?: types.LimitsSettings; source: string; } | undefined {
+    customValidator(
+      state: GraderStore,
+    ):
+      | { language: string; limits?: types.LimitsSettings; source: string }
+      | undefined {
       return state.request.input.validator.custom_validator;
     },
-    inputCases(state: GraderStore): { [key: string]: { in: string; out: string; weight?: number; } } {
+    inputCases(state: GraderStore): {
+      [key: string]: { in: string; out: string; weight?: number };
+    } {
       return state.request.input.cases;
     },
-    Interactive(state: GraderStore): types.InteractiveSettingsDistrib | undefined {
+    Interactive(
+      state: GraderStore,
+    ): types.InteractiveSettingsDistrib | undefined {
       return state.request.input.interactive;
     },
     limits(state: GraderStore): types.LimitsSettings {
