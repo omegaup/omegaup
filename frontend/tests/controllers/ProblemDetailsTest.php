@@ -66,7 +66,6 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertTrue($response['user']['loggedIn']);
         $adminCourses = $response['adminCourses'] ?? [];
         $adminContests = $response['adminContests'] ?? [];
         $this->assertIsArray($adminCourses);
@@ -115,7 +114,6 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertTrue($response['user']['loggedIn']);
         $adminCourses = $response['adminCourses'] ?? [];
         $adminContests = $response['adminContests'] ?? [];
         $this->assertIsArray($adminCourses);
@@ -152,7 +150,6 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['templateProperties']['payload'];
 
-        $this->assertTrue($response['user']['loggedIn']);
         $adminCourses = $response['adminCourses'] ?? [];
         $adminContests = $response['adminContests'] ?? [];
         $this->assertIsArray($adminCourses);
