@@ -6909,6 +6909,76 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemPrintDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $lang
+     */
+    public static function getProblemPresentationDetailsForTypeScript(\OmegaUp\Request $r) {
+        // Get user
+        $r->ensureIdentity();
+
+        // Validate request
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $r->identity,
+            $r
+        );
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
+            $r->identity,
+            contestAlias: null,
+            problemAlias: $problemAlias,
+            statementType: 'markdown',
+            problemsetId: null
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $details = self::getProblemDetails(
+            $r->identity,
+            $problem,
+            $problemset,
+            $lang,
+            showSolvers: true,
+            preventProblemsetOpen: false,
+        );
+
+        if (is_null($details)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        return [
+            'templateProperties' => [
+                'payload' => [
+                    'details' => $details,
+                ],
+                'hideFooterAndHeader' => true,
+                'fullWidth' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemPrint',
+                    [
+                        'problemTitle' => $details['title'],
+                    ]
+                ),
+            ],
+            'entrypoint' => 'problem_presentation',
+        ];
+    }
+
+    /**
      * Returns the CDP structure for the given problem
      *
      * @param \OmegaUp\DAO\VO\Problems $problem

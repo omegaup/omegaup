@@ -34,6 +34,15 @@
       <a v-if="showEditLink" :href="`/problem/${problem.alias}/edit/`">
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
+      <a
+        v-if="showClassroomViewLink"
+        :href="`/arena/problem/${problem.alias}/presentation/`"
+        target="_blank"
+        class="ml-2"
+        :title="T.problemClassroomView"
+      >
+        <font-awesome-icon :icon="['fas', 'chalkboard-teacher']" />
+      </a>
       <button
         v-if="userLoggedIn && !inContestOrCourse && problem.accepts_submissions"
         data-bookmark-button
@@ -111,6 +120,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBan,
   faBookmark,
+  faChalkboardTeacher,
   faEdit,
   faExclamationTriangle,
   faExternalLinkAlt,
@@ -124,6 +134,7 @@ library.add(
   faBan,
   faExternalLinkAlt,
   faBookmark,
+  faChalkboardTeacher,
 );
 
 @Component({
@@ -139,6 +150,7 @@ export default class ProblemSettingsSummary extends Vue {
   @Prop({ default: false }) userLoggedIn!: boolean;
   @Prop({ default: false }) isBookmarked!: boolean;
   @Prop({ default: false }) inContestOrCourse!: boolean;
+  @Prop({ default: true }) showClassroomViewLink!: boolean;
 
   T = T;
 
