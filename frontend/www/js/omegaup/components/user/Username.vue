@@ -1,5 +1,5 @@
 <template>
-  <span :class="['username', classname]" :title="username">
+  <span :class="classname" :title="username">
     <omegaup-countryflag
       v-if="country != null"
       :country="country"
