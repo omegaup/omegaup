@@ -67,7 +67,7 @@ span {
   word-break: break-word;
 }
 
-span.username a {
+span a {
   display: inline-block;
   max-width: 100%;
   white-space: normal;
