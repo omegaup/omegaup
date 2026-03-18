@@ -4031,6 +4031,7 @@ export namespace types {
   }
 
   export interface MergedScoreboardEntry {
+    classname: string;
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
     place?: number;
