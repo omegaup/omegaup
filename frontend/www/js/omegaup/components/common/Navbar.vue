@@ -9,7 +9,7 @@
           class="navbar-brand p-3 mr-0 mr-sm-3"
           href="/"
           :title="T.navbarScrollToTop"
-          @click="handleLogoClick"
+          @click.prevent="handleLogoClick"
         >
           <img
             alt="omegaUp"
@@ -364,7 +364,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import $ from 'jquery';  
+import $ from 'jquery';
 import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
@@ -497,13 +497,14 @@ export default class Navbar extends Vue {
     }
   }
 
-  handleLogoClick(event: MouseEvent): void {
+  handleLogoClick(): void {
     if (window.scrollY > 0) {
-      event.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (window.location.pathname !== '/') {
+      window.location.href = '/';
     }
   }
-  
+
   mounted() {
     document.addEventListener('click', this.handleDocumentClick);
   }
