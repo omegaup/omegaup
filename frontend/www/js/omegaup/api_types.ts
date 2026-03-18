@@ -4034,6 +4034,7 @@ export namespace types {
   export interface MergedScoreboardEntry {
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
+    classname: string;
     place?: number;
     total: { penalty: number; points: number };
     username: string;

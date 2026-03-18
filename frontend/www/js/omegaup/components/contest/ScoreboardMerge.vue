@@ -45,7 +45,7 @@
             <tr
               v-for="rank in scoreboard"
               :key="rank.username"
-              :class="rank.username"
+              :class="rank.classname"
             >
               <th>{{ rank.place }}</th>
               <th>
