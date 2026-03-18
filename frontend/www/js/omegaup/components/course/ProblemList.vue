@@ -7,9 +7,20 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
-      </div>
+     <div v-if="problems.length === 0" class="text-center p-5">
+  <h4>No problems added yet</h4>
+
+  <p class="text-muted">
+    Start building this course content by adding the first problem.
+  </p>
+
+  <button
+  class="btn btn-primary"
+  @click="$el.querySelector('[data-add-problem]').scrollIntoView({ behavior: 'smooth' })"
+>
+  Add problem
+</button>
+</div>
       <div v-else>
         <table class="table table-striped">
           <thead>

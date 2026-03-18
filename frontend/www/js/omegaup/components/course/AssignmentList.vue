@@ -2,12 +2,8 @@
   <div class="omegaup-course-assignmentlist card">
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
-      <div v-if="content.length === 0" class="card-body">
-        <div class="empty-table-message">
-          {{ T.courseContentEmpty }}
-        </div>
-      </div>
-      <table v-else class="table table-striped">
+      
+      <table class="table table-striped">
         <thead>
           <tr>
             <td></td>
@@ -187,9 +183,5 @@ export default class CourseAssignmentList extends Vue {
 <style lang="scss" scoped>
 .disabled {
   color: lightgrey;
-}
-
-.table td {
-  vertical-align: middle;
 }
 </style>

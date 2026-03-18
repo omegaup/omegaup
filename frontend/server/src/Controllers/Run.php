@@ -1099,13 +1099,13 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
     }
 
-    /**
-     * Gets the details of a run. Includes admin details if admin.
-     *
-     * @return RunDetails
-     *
-     * @omegaup-request-param string $run_alias
-     */
+   /**
+ * Gets the details of a run. Includes additional information if the user is an admin.
+ *
+ * @return RunDetails
+ *
+ * @omegaup-request-param string $run_alias Unique identifier of the run whose details are requested.
+ */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
@@ -1350,14 +1350,12 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Given the run alias, returns the source code and any compile errors if any
-     * Used in the arena, any contestant can view its own codes and compile errors
-     *
+     * Returns the source code and compile errors of a submission.
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
      *
-     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param string $run_alias Unique identifier of the run whose source code will be retrieved.
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -1464,10 +1462,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Given the run alias, returns a .zip file with all the .out files generated for a run.
-     *
-     * @omegaup-request-param string $run_alias
-     * @omegaup-request-param bool $show_diff
+     * Downloads a ZIP file containing the output files generated for a run.
+     * @omegaup-request-param string $run_alias Unique identifier of the run to download.
+     * @omegaup-request-param bool $show_diff Indicates whether output differences should be included.
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
@@ -1904,18 +1901,18 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets a list of latest runs overall
-     *
-     * @return array{runs: list<Run>, totalRuns: int}
-     *
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language
-     * @omegaup-request-param int $offset
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int $rowcount
-     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
-     * @omegaup-request-param string $username
-     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
-     */
+ * Gets a list of recent runs.
+ *
+ * @return array{runs: list<Run>, totalRuns: int}
+ *
+ * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cpp20-clang'|'cpp20-gcc'|'cs'|'go'|'hs'|'java'|'js'|'kj'|'kp'|'kt'|'lua'|'pas'|'py2'|'py3'|'rb'|'rs'|null $language Programming language filter.
+ * @omegaup-request-param int $offset Number of runs to skip.
+ * @omegaup-request-param string $problem_alias Alias of the problem to filter runs.
+ * @omegaup-request-param int $rowcount Number of runs to return.
+ * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status Filter runs by status.
+ * @omegaup-request-param string $username Username whose runs will be retrieved.
+ * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict Filter runs by verdict.
+ */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
         $r->ensureIdentity();
