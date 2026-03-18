@@ -3076,6 +3076,7 @@ export namespace types {
     columns: string[];
     difficulty: string;
     frequentTags: types.TagWithProblemCount[];
+    hideProblemTagsPreference: boolean;
     keyword: string;
     language: string;
     languages: string[];
@@ -4400,7 +4401,7 @@ export namespace types {
   }
 
   export interface ProblemSettings {
-    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Cases: types.SettingsCaseGroup[];
     Interactive?: {
       Interfaces: {
         [key: string]: { [key: string]: types.InteractiveInterface };
@@ -4886,6 +4887,16 @@ export namespace types {
     memory_limit: string;
     overall_wall_time_limit: string;
     time_limit: string;
+  }
+
+  export interface SettingsCase {
+    Name: string;
+    Weight: number;
+  }
+
+  export interface SettingsCaseGroup {
+    Cases: types.SettingsCase[];
+    Name: string;
   }
 
   export interface Signature {
