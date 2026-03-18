@@ -364,6 +364,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import $ from 'jquery';  
 import * as ui from '../../ui';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import notifications_List from '../notification/List.vue';
@@ -500,6 +501,27 @@ export default class Navbar extends Vue {
     if (window.scrollY > 0) {
       event.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  
+  mounted() {
+    document.addEventListener('click', this.handleDocumentClick);
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('click', this.handleDocumentClick);
+  }
+
+  private handleDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const navbar = this.$el as HTMLElement;
+
+    if (!navbar.contains(target)) {
+      const navbarCollapse = navbar.querySelector('.navbar-collapse.show');
+
+      if (!navbarCollapse) return;
+
+      ($(navbarCollapse) as any).collapse('hide');
     }
   }
 }
