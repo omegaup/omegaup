@@ -7,7 +7,7 @@
       method="GET"
       class="form-inline d-flex justify-content-center align-items-center flex-wrap form-mobile"
     >
-      <div v-if="tags.length !== 0" class="form-group mr-2">
+      <div v-if="tags.length !== 0" class="form-group mr-2 d-flex flex-wrap align-items-center">
         <div v-for="tag in tags" :key="tag" class="mr-1">
           <input type="hidden" name="tag[]" :value="tag" />
           <span class="badge badge-secondary m-1 p-2">{{
