@@ -1,0 +1,9 @@
+# Ignore all private key files
+*.pem
+*.key
+
+# Ignore environment variables
+.env
+
+# Ignore node modules or other heavy folders
+node_modules/
