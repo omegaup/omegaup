@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  * @psalm-type CollectionDetailsByAuthorPayload=array{authorsRanking: AuthorsRank, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, authors: list<string>}
- * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
+ * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string, hideProblemTagsPreference: bool}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
@@ -5391,6 +5391,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $extra_wall_time
      * @omegaup-request-param int|null $input_limit
      * @omegaup-request-param null|string $lang
+     * @omegaup-request-param null|string $language
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param int|null $memory_limit
      * @omegaup-request-param string $message
@@ -5557,6 +5558,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'directory',
                 ['statements', 'solutions']
             );
+            $statementLanguage = $r->ensureOptionalString(
+                'language',
+                required: false,
+                validator: function (string $lang): bool {
+                    \OmegaUp\Validators::validateInEnum(
+                        $lang,
+                        'lang',
+                        self::VALID_LANGUAGES
+                    );
+                    return true;
+                }
+            ) ?? '';
 
             $contents = $r->ensureString('contents');
 
@@ -5570,7 +5583,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Validators::validateInEnum(
                     $language,
                     'lang',
-                    \OmegaUp\Controllers\Problem::ISO639_1
+                    self::VALID_LANGUAGES
                 );
                 self::updateStatement(
                     $r->identity,
@@ -5583,7 +5596,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemParams->updatePublished
                 );
             }
-            $details = self::getProblemEditDetails($problem, $r->identity);
+            $details = self::getProblemEditDetails(
+                $problem,
+                $r->identity,
+                $statementLanguage
+            );
+            if ($directory === 'solutions') {
+                $extraInfo['solution'] = \OmegaUp\Controllers\Problem::getProblemSolution(
+                    $problem,
+                    $problem->commit,
+                    $statementLanguage !== '' ? $statementLanguage : $lang
+                );
+            }
+            $result['templateProperties']['payload'] = array_merge(
+                $details,
+                self::getCommonPayloadForTypeScript($r->identity)
+            );
+            $result['templateProperties']['payload'] = array_merge(
+                $extraInfo,
+                $result['templateProperties']['payload']
+            );
         } elseif ($request === 'cases') {
             $contents = $r->ensureString('contents');
             $data = json_decode($contents, true);
@@ -5672,13 +5704,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $statementLanguage = ''
     ) {
         $details = self::getProblemDetails(
             $identity,
             $problem,
             problemset: null,
-            statementLanguage: '',
+            statementLanguage: $statementLanguage,
             showSolvers: false,
             preventProblemsetOpen: false,
         );
@@ -6593,6 +6626,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tagsList' => $result['tags'],
                     'tagData' => $result['tagData'],
                     'difficulty' => $result['difficulty'],
+                    'hideProblemTagsPreference' => $r->user?->hide_problem_tags ?? false,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByLevel'
