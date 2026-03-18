@@ -351,6 +351,7 @@ const availableTabs = [
   'students',
   'admins',
   'clone',
+  'archive',
 ];
 const emptyAssignment: types.CourseAssignment = {
   problemset_id: 0,

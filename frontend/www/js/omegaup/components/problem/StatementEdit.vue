@@ -240,6 +240,7 @@ export default class ProblemStatementEdit extends Vue {
     border: 1px solid var(--markdown-preview-border-color);
     padding: 10px;
     margin-bottom: 10px;
+    width: 100%;
   }
 
   hr,
