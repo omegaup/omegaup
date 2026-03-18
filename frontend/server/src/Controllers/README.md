@@ -277,6 +277,7 @@
   - [`/api/user/problemsSolved/`](#apiuserproblemssolved)
   - [`/api/user/profile/`](#apiuserprofile)
   - [`/api/user/profileStatistics/`](#apiuserprofilestatistics)
+  - [`/api/user/recordCookieConsent/`](#apiuserrecordcookieconsent)
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
@@ -5488,6 +5489,22 @@ Get profile statistics including solved problems by difficulty and tags distribu
 | `difficulty` | `{ easy: number; hard: number; medium: number; unlabelled: number; }` |
 | `solved`     | `number`                                                              |
 | `tags`       | `List[{ count: number; name: string; }]`                              |
+
+## `/api/user/recordCookieConsent/`
+
+### Description
+
+API endpoint to record user's cookie consent decision
+
+### Parameters
+
+| Name       | Type   | Description | Required |
+| ---------- | ------ | ----------- | -------- |
+| `accepted` | `bool` |             | ✓        |
+
+### Returns
+
+_Nothing_
 
 ## `/api/user/removeExperiment/`
 

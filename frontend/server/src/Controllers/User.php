@@ -5316,6 +5316,31 @@ class User extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'user_compare',
         ];
     }
+
+    /**
+     * API endpoint to record user's cookie consent decision
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param bool $accepted
+     */
+    public static function apiRecordCookieConsent(\OmegaUp\Request $r): array {
+        // Validate and retrieve the accepted parameter
+        $accepted = $r->ensureBool('accepted');
+
+        // Log the cookie consent decision
+        self::$log->info('Cookie consent recorded', [
+            'accepted' => $accepted,
+        ]);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();

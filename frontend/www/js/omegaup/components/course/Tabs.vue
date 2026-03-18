@@ -137,7 +137,7 @@ import latinize from 'latinize';
 import 'intro.js/introjs.css';
 import introJs from 'intro.js';
 import VueCookies from 'vue-cookies';
-Vue.use(VueCookies, { expires: -1 });
+Vue.use(VueCookies, { expire: -1 });
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
