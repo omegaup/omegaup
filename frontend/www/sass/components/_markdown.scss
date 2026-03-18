@@ -93,4 +93,9 @@
   img {
     max-width: 100%;
   }
+
+  a {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
 }
