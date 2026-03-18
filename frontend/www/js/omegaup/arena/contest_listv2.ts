@@ -73,7 +73,7 @@ function parseUrlState(): {
     if (urlParams.get('page')) {
       const pageParam = urlParams.get('page');
       if (pageParam) {
-        page = parseInt(pageParam);
+        page = parseInt(pageParam, 10);
       }
     }
     if (urlParams.get('filter')) {
