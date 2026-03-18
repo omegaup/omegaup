@@ -2256,7 +2256,7 @@ const translations: { [key: string]: string; } = {
   wordsPointsDistributionInIntervals: "(P0in75 di57ribu7i0n in in73rva15 0f 100)",
   wordsPointsDistributionProblem: "(P0in75 di57ribu7i0n f0r pr0b13m: %(alias))",
   wordsPointsForRank: "(P0in75 f0r ranking)",
-  wordsPointsForRankTooltip: "(Th353 p0in75 r35pr353n7 7h3 ac7ua1 va1u3 0f 7hi5 pr0b13m. S01ving i7 wi11 d3cr3a53 i75 va1u3. F0r d37ai15 f0110w 7hi5 1ink.)",
+  wordsPointsForRankTooltip: "(Th353 p0in75 r3pr353n7 7h3 ac7ua1 va1u3 0f 7hi5 pr0b13m. S01ving i7 wi11 d3cr3a53 i75 va1u3 f0r 3v3ry0n3.)",
   wordsPortuguese: "(P0r7ugu353)",
   wordsPractice: "(Prac7ic3)",
   wordsPrevPage: "(Pr3vi0u5 pag3)",
