@@ -3018,8 +3018,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @TODO: This should be called only in the grader->frontend callback and only IFF
      * Expires rank caches and scoreboard caches.
-     *
+     * 
      * Rank caches (PROBLEMS_SOLVED_RANK, USER_COMPARE_DATA) only
      * change when a submission receives an AC verdict, so callers
      * must guard invocations accordingly.  Scoreboard caches are
