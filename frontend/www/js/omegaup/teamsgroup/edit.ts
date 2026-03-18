@@ -385,4 +385,20 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+
+    if (!Object.values(AvailableTabs).includes(hash as AvailableTabs)) {
+      teamsGroupEdit.tab = AvailableTabs.Teams;
+      return;
+    }
+
+    teamsGroupEdit.tab = hash as AvailableTabs;
+    console.log('hashchange detected:', hash);
+  };
+
+  // set initial tab from hash
+  onHashChange();
+  // listen for future navigation
+  window.addEventListener('hashchange', onHashChange);
 });

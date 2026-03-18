@@ -162,11 +162,15 @@ export default class TeamsGroupEdit extends Vue {
 
   @Watch('tab')
   onTabChanged(newValue: AvailableTabs): void {
-    if (!Object.values(AvailableTabs).includes(this.tab)) {
+    if (!Object.values(AvailableTabs).includes(newValue)) {
       this.selectedTab = AvailableTabs.Teams;
       return;
     }
     this.selectedTab = newValue;
+  }
+  
+  mounted(): void {
+    this.onTabChanged(this.tab);
   }
 
   @Watch('teamsIdentities')
