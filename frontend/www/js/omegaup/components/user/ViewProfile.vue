@@ -41,12 +41,6 @@
               <p v-else-if="profile.is_own_profile" class="text-muted mb-0">
                 {{ T.profileReadmeAddPrompt }}
               </p>
-              <div
-                v-if="readmeReportSubmitted"
-                class="alert alert-success mt-2 mb-0"
-              >
-                {{ T.profileReadmeReportSuccess }}
-              </div>
             </template>
             <template v-else>
               <textarea
@@ -411,7 +405,7 @@ export default class ViewProfile extends Vue {
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
   currentReadme: string | null = this.profile.readme ?? null;
   isEditingReadme = false;
-  readmeEditContent = '';
+  readmeEditContent: string | null = null;
   readmeReportSubmitted = false;
 
   get createdContests(): Contest[] {
@@ -476,20 +470,21 @@ export default class ViewProfile extends Vue {
   }
 
   startEditReadme(): void {
-    this.readmeEditContent = this.currentReadme ?? '';
+    this.readmeEditContent = this.currentReadme;
     this.isEditingReadme = true;
   }
 
   cancelEditReadme(): void {
     this.isEditingReadme = false;
-    this.readmeEditContent = '';
+    this.readmeEditContent = null;
   }
 
   saveReadme(): void {
+    const content = this.readmeEditContent ?? '';
     this.$emit('save-readme', {
-      readme: this.readmeEditContent,
+      readme: content,
       onSuccess: () => {
-        this.currentReadme = this.readmeEditContent;
+        this.currentReadme = content;
         this.isEditingReadme = false;
       },
     });
@@ -500,6 +495,7 @@ export default class ViewProfile extends Vue {
       username: this.profile.username ?? '',
       onSuccess: () => {
         this.readmeReportSubmitted = true;
+        ui.success(T.profileReadmeReportSuccess);
       },
     });
   }
