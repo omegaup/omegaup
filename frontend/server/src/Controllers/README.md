@@ -4269,13 +4269,13 @@ Create a new run
 
 ### Description
 
-Gets the details of a run. Includes admin details if admin.
+Gets the details of a run. Includes additional information if the user is an admin.
 
 ### Parameters
 
-| Name        | Type     | Description | Required |
-| ----------- | -------- | ----------- | -------- |
-| `run_alias` | `string` |             | ✓        |
+| Name        | Type     | Description                                               | Required |
+| ----------- | -------- | --------------------------------------------------------- | -------- |
+| `run_alias` | `string` | Unique identifier of the run whose details are requested. | ✓        |
 
 ### Returns
 
@@ -4365,19 +4365,19 @@ types.SubmissionFeedback[]
 
 ### Description
 
-Gets a list of latest runs overall
+Gets a list of recent runs.
 
 ### Parameters
 
-| Name            | Type                                                                                                                                                                                                                | Description | Required |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- |
-| `offset`        | `int`                                                                                                                                                                                                               |             | ✓        |
-| `problem_alias` | `string`                                                                                                                                                                                                            |             | ✓        |
-| `rowcount`      | `int`                                                                                                                                                                                                               |             | ✓        |
-| `username`      | `string`                                                                                                                                                                                                            |             | ✓        |
-| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` |             |          |
-| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           |             |          |
-| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              |             |          |
+| Name            | Type                                                                                                                                                                                                                | Description                            | Required |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | -------- |
+| `offset`        | `int`                                                                                                                                                                                                               | Number of runs to skip.                | ✓        |
+| `problem_alias` | `string`                                                                                                                                                                                                            | Alias of the problem to filter runs.   | ✓        |
+| `rowcount`      | `int`                                                                                                                                                                                                               | Number of runs to return.              | ✓        |
+| `username`      | `string`                                                                                                                                                                                                            | Username whose runs will be retrieved. | ✓        |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cpp20-clang'\|'cpp20-gcc'\|'cs'\|'go'\|'hs'\|'java'\|'js'\|'kj'\|'kp'\|'kt'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|'rs'\|null` | Programming language filter.           |          |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                                                                           | Filter runs by status.                 |          |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                                                                              | Filter runs by verdict.                |          |
 
 ### Returns
 
@@ -4423,14 +4423,13 @@ _Nothing_
 
 ### Description
 
-Given the run alias, returns the source code and any compile errors if any
-Used in the arena, any contestant can view its own codes and compile errors
+Returns the source code and compile errors of a submission.
 
 ### Parameters
 
-| Name        | Type     | Description | Required |
-| ----------- | -------- | ----------- | -------- |
-| `run_alias` | `string` |             | ✓        |
+| Name        | Type     | Description                                                       | Required |
+| ----------- | -------- | ----------------------------------------------------------------- | -------- |
+| `run_alias` | `string` | Unique identifier of the run whose source code will be retrieved. | ✓        |
 
 ### Returns
 

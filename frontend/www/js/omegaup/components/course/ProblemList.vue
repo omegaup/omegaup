@@ -7,20 +7,24 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-     <div v-if="problems.length === 0" class="text-center p-5">
-  <h4>No problems added yet</h4>
+      <div
+        v-if="!problems || problems.length === 0"
+        class="empty-state text-center p-5 w-100"
+      >
+        <h5>{{ emptyTableLabel }}</h5>
 
-  <p class="text-muted">
-    Start building this course content by adding the first problem.
-  </p>
+        <button
+          class="btn btn-primary mt-3"
+          @click="
+            $el
+              .querySelector('.card-footer')
+              ?.scrollIntoView({ behavior: 'smooth' })
+          "
+        >
+          {{ addProblemButtonLabel }}
+        </button>
+      </div>
 
-  <button
-  class="btn btn-primary"
-  @click="$el.querySelector('[data-add-problem]').scrollIntoView({ behavior: 'smooth' })"
->
-  Add problem
-</button>
-</div>
       <div v-else>
         <table class="table table-striped">
           <thead>
@@ -29,13 +33,12 @@
               <th class="text-center">{{ problemTableHeaderLabel }}</th>
               <th class="text-center">{{ pointsTableHeaderLabel }}</th>
               <th class="text-center">{{ T.courseExtraPointsProblem }}</th>
-              <th class="text-center">
-                {{ T.wordsActions }}
-              </th>
+              <th class="text-center">{{ T.wordsActions }}</th>
             </tr>
           </thead>
+
           <tbody v-sortable="{ onUpdate: sort }">
-            <tr v-for="problem in problems" :key="problem.letter">
+            <tr v-for="problem in problems" :key="problem.alias">
               <td class="text-center">
                 <button
                   class="btn btn-link"
@@ -45,15 +48,19 @@
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
               </td>
+
               <td class="align-middle text-center">
-                <a :href="`/arena/problem/${problem.alias}/`">{{
-                  problem.alias
-                }}</a>
+                <a :href="`/arena/problem/${problem.alias}/`">
+                  {{ problem.alias }}
+                </a>
               </td>
+
               <td class="align-middle">{{ problem.points }}</td>
+
               <td class="align-middle text-center">
                 {{ problem.is_extra_problem ? T.wordsYes : T.wordsNo }}
               </td>
+
               <td class="button-column text-center">
                 <button
                   class="btn btn-link"
@@ -63,6 +70,7 @@
                 >
                   <font-awesome-icon icon="edit" />
                 </button>
+
                 <button
                   class="btn btn-link"
                   :title="removeButtonLabel"
@@ -74,6 +82,7 @@
             </tr>
           </tbody>
         </table>
+
         <div>
           <button
             class="btn btn-primary"
@@ -185,7 +194,7 @@
                   onSaveProblem(assignment, {
                     alias: problemAlias.key,
                     points: points,
-                    commit: selectedRevision.commit,
+                    commit: selectedRevision?.commit,
                     is_extra_problem: isExtraProblem,
                   })
                 "

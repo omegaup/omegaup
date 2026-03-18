@@ -2,7 +2,6 @@
   <div class="omegaup-course-assignmentlist card">
     <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
-      
       <table class="table table-striped">
         <thead>
           <tr>

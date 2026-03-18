@@ -7,8 +7,15 @@
       <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
-      <div v-if="problems.length == 0" class="empty-table-message">
-        {{ emptyTableLabel }}
+      <div
+        v-if="problems.length === 0"
+        class="empty-state text-center p-5 w-100"
+      >
+        <h5>{{ emptyTableLabel }}</h5>
+
+        <button class="btn btn-primary mt-3" @click="showForm = true">
+          {{ addButtonLabel }}
+        </button>
       </div>
       <div v-else>
         <table class="table table-striped">
@@ -41,7 +48,11 @@
         </table>
       </div>
     </div>
-    <div class="card-footer" data-course-add-problem>
+    <div
+      v-if="showForm || problems.length > 0"
+      class="card-footer"
+      data-course-add-problem
+    >
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -130,6 +141,7 @@ export default class CourseScheduledProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
 
+  showForm = false;
   get addCardHeaderTitleLabel(): string {
     return this.assignment.assignment_type === 'lesson'
       ? T.courseAddLecturesAdd
