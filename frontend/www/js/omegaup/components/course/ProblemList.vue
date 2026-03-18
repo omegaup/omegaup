@@ -13,15 +13,8 @@
       >
         <h5>{{ emptyTableLabel }}</h5>
 
-        <button
-          class="btn btn-primary mt-3"
-          @click="
-            $el
-              .querySelector('.card-footer')
-              ?.scrollIntoView({ behavior: 'smooth' })
-          "
-        >
-          {{ addProblemButtonLabel }}
+        <button class="btn btn-primary mt-3" @click="showForm = true">
+          Add problem
         </button>
       </div>
 
@@ -261,6 +254,7 @@ export default class CourseProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
+  showForm = false; 
   useLatestVersion = true;
   isExtraProblem = false;
   versionLog: types.ProblemVersion[] = [];
