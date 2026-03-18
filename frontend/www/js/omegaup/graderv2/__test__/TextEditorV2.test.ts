@@ -41,12 +41,11 @@ describe('TextEditorV2.vue', () => {
   };
 
   beforeEach(() => {
-    // We no longer need fake timers because lodash is mocked!
-    store.getters = {
-      theme: 'vs-dark',
-      testContents: 'Initial store content\nLine 2',
-      testModule: 'my_program',
-    };
+    Object.assign(store.getters, {
+      'theme': 'vs-dark',
+      'testContents': 'Initial store content\nLine 2',
+      'testModule': 'my_program',
+    });
     (store.dispatch as jest.Mock).mockClear();
   });
 
