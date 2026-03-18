@@ -17,8 +17,19 @@ import {
   identityRequiredFields,
 } from '../groups';
 
+const validTabs = Object.values(AvailableTabs) as string[];
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
+
+  const onHashChange = () => {
+    const hash = window.location.hash.substring(1).split('#')[0];
+    if (validTabs.includes(hash)) {
+      groupEdit.tab = hash;
+    } else if (hash === '') {
+      groupEdit.tab = AvailableTabs.Members;
+    }
+  };
   const searchResultSchools: types.SchoolListItem[] = [];
   const groupEdit = new Vue({
     el: '#main-container',
@@ -325,4 +336,6 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  window.addEventListener('hashchange', onHashChange);
 });
