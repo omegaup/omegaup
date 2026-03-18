@@ -111,12 +111,11 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sqlLimit = 'LIMIT ?, ?';
         $params[] = max(0, $page - 1) * $pageSize;
         $params[] = $pageSize;
-  
+
         $query = $sqlSelect . $sqlFrom . $sqlOrderBy . $sqlLimit;
 
-
         $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $query, 
+            $query,
             $params
         );
 
